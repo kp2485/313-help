@@ -1,0 +1,90 @@
+import type { Alert, Badge, BundleRow, OpenResult } from './types.js';
+import { badge } from './freshness.js';
+import { nextOccurrences, openNow } from './schedule.js';
+import { nowWallMinutes } from './time.js';
+
+// One ranking rule (DECISIONS 10-B2):
+//   eligibility -> distance band -> reported-closed last -> open-now / next-open -> freshness -> distance -> id
+// Distance comes before everything except eligibility because many users have no car.
+
+export interface Query {
+  /** Category slug or prefix: "food" matches "food.pantry". */
+  category?: string;
+  /** Every flag listed must be on the row. */
+  flags?: string[];
+  /** Device location; held in memory only, never written or sent. */
+  near?: { lat: number; lon: number };
+  /** "now": who is open right now. "week": who has a time in the next 7 days. */
+  mode?: 'now' | 'week';
+}
+
+export interface Ranked {
+  row: BundleRow;
+  open: OpenResult;
+  badge: Badge;
+  miles: number | null;
+  band: 0 | 1 | 2;
+}
+
+const EARTH_MILES = 3958.8;
+
+export function miles(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_MILES * Math.asin(Math.sqrt(h));
+}
+
+function bandOf(mi: number | null): 0 | 1 | 2 {
+  if (mi === null) return 0; // no location known, or a phone-only service: reachable from anywhere
+  return mi <= 1 ? 0 : mi <= 3 ? 1 : 2;
+}
+
+function openKeyNow(o: OpenResult, today: string): number {
+  switch (o.state) {
+    case 'open': return 0;
+    case 'closes_soon': return 1;
+    case 'closed': return o.next?.date === today ? 2 : o.next ? 4 : 5;
+    case 'call_first': return 3;
+    default: return 6; // unknown sorts last: never implied open
+  }
+}
+
+function openKeyWeek(row: BundleRow, o: OpenResult, now: Date, alerts: Alert[]): number {
+  if (o.state === 'open' || o.state === 'closes_soon') return 0;
+  if (o.state === 'call_first') return 1;
+  if (o.state === 'unknown') return 3;
+  const next = nextOccurrences(row, now, 1, alerts)[0];
+  return next && next.start - nowWallMinutes(now) <= 7 * 1440 ? 0 : 2;
+}
+
+export function rank(rows: BundleRow[], q: Query, now: Date, alerts: Alert[] = []): Ranked[] {
+  const mode = q.mode ?? 'now';
+  const today = new Date(nowWallMinutes(now) * 60000).toISOString().slice(0, 10);
+
+  const out = rows
+    .filter((r) => r.status === 'active')
+    .filter((r) => !q.category || r.category === q.category || r.category.startsWith(q.category + '.'))
+    .filter((r) => (q.flags ?? []).every((f) => r.flags.includes(f)))
+    .map((row) => {
+      // DV rows never carry coordinates, so they never get a distance (docs/08).
+      const mi = q.near && row.lat !== undefined && row.lon !== undefined
+        ? miles(q.near, { lat: row.lat, lon: row.lon }) : null;
+      const open = openNow(row, now, alerts);
+      const key = mode === 'week' ? openKeyWeek(row, open, now, alerts) : openKeyNow(open, today);
+      return { row, open, badge: badge(row, now), miles: mi, band: bandOf(mi), key };
+    });
+
+  // Rows with 2+ standing closed reports stay visible but go last in their band (docs/04).
+  const reported = (r: { badge: Badge }) => (r.badge.level === 'reported_closed' ? 1 : 0);
+
+  out.sort((a, b) =>
+    a.band - b.band
+    || reported(a) - reported(b)
+    || a.key - b.key
+    || a.badge.tier - b.badge.tier
+    || (a.miles ?? 0) - (b.miles ?? 0)
+    || a.row.id.localeCompare(b.row.id));
+
+  return out.map(({ key: _key, ...r }) => r);
+}

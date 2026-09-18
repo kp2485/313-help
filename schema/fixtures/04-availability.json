@@ -1,0 +1,116 @@
+{
+  "description": "Unknown is never rendered as open. 24/7 lines are open. Non-active rows are not listed.",
+  "rows": [
+    {
+      "id": "sal_247",
+      "category": "health.mental",
+      "availability": "always"
+    },
+    {
+      "id": "sal_call",
+      "availability": "call_first"
+    },
+    {
+      "id": "sal_unknown",
+      "availability": "unknown"
+    },
+    {
+      "id": "sal_sched_empty",
+      "availability": "scheduled",
+      "schedules": []
+    },
+    {
+      "id": "sal_suspended",
+      "status": "suspended",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ]
+    },
+    {
+      "id": "sal_archived",
+      "status": "archived",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "archived": {
+        "at": "2026-08-30",
+        "reason": "closed_permanently"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "24/7 line",
+      "fn": "openNow",
+      "row": "sal_247",
+      "now": "2026-09-18T07:00:00Z",
+      "expect": {
+        "state": "open"
+      }
+    },
+    {
+      "name": "call first",
+      "fn": "openNow",
+      "row": "sal_call",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": {
+        "state": "call_first"
+      }
+    },
+    {
+      "name": "unknown hours",
+      "fn": "openNow",
+      "row": "sal_unknown",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": {
+        "state": "unknown"
+      }
+    },
+    {
+      "name": "scheduled with no schedule rows is unknown, not open",
+      "fn": "openNow",
+      "row": "sal_sched_empty",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": {
+        "state": "unknown"
+      }
+    },
+    {
+      "name": "suspended row is not listed even inside its window",
+      "fn": "openNow",
+      "row": "sal_suspended",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": {
+        "state": "not_listed"
+      }
+    },
+    {
+      "name": "archived row is not listed",
+      "fn": "openNow",
+      "row": "sal_archived",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": {
+        "state": "not_listed"
+      }
+    },
+    {
+      "name": "archived row has no upcoming times",
+      "fn": "nextOccurrences",
+      "row": "sal_archived",
+      "now": "2026-09-18T12:00:00Z",
+      "expect": []
+    }
+  ]
+}

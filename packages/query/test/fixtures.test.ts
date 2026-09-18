@@ -1,0 +1,60 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { badge, bundleAge, effectiveNow, nextOccurrences, openNow, rank } from '../src/index.js';
+import type { Alert, BundleRow } from '../src/index.js';
+
+// Fixtures are plain JSON so the iOS implementation can run the same cases.
+const dir = join(__dirname, '../../../schema/fixtures');
+
+interface Case {
+  name: string;
+  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'bundleAge' | 'effectiveNow';
+  now: string;
+  row?: string;
+  n?: number;
+  query?: Record<string, unknown>;
+  index?: { generated_at: string; heartbeat: string };
+  expect: unknown;
+}
+type FixtureRow = Partial<BundleRow> & { id: string };
+interface Fixture { description: string; rows?: FixtureRow[]; alerts?: Alert[]; cases: Case[] }
+
+const DEFAULTS = {
+  org: 'Test Org', category: 'food.pantry', what: 'Free groceries', phones: [], flags: [],
+  availability: 'scheduled', schedules: [], status: 'active',
+  facts: { cadence_days: 45, reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' } },
+};
+
+for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
+  const fx = JSON.parse(readFileSync(join(dir, file), 'utf8')) as Fixture;
+  const rows = (fx.rows ?? []).map((r) => ({ ...DEFAULTS, ...r, name: r.name ?? r.id, facts: { ...DEFAULTS.facts, ...(r.facts ?? {}) } })) as BundleRow[];
+  const alerts = fx.alerts ?? [];
+  const find = (id?: string) => {
+    const r = rows.find((x) => x.id === id);
+    if (!r) throw new Error(`${file}: no row ${id}`);
+    return r;
+  };
+
+  describe(`${file} — ${fx.description}`, () => {
+    for (const c of fx.cases) {
+      it(c.name, () => {
+        const now = new Date(c.now);
+        switch (c.fn) {
+          case 'openNow':
+            expect(openNow(find(c.row), now, alerts)).toMatchObject(c.expect as object); break;
+          case 'nextOccurrences':
+            expect(nextOccurrences(find(c.row), now, c.n ?? 3, alerts).map((o) => `${o.date} ${o.opens_at}-${o.closes_at}`)).toEqual(c.expect); break;
+          case 'badge':
+            expect(badge(find(c.row), now)).toMatchObject(c.expect as object); break;
+          case 'rank':
+            expect(rank(rows, c.query ?? {}, now, alerts).map((r) => r.row.id)).toEqual(c.expect); break;
+          case 'bundleAge':
+            expect(bundleAge(c.index!, now)).toBe(c.expect); break;
+          case 'effectiveNow':
+            expect(effectiveNow(now, c.index!.generated_at).toISOString()).toBe(c.expect); break;
+        }
+      });
+    }
+  });
+}

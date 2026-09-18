@@ -1,0 +1,104 @@
+{
+  "description": "Windows that run past midnight (closes_at <= opens_at), including the fall-back night when 1:30am happens twice.",
+  "rows": [
+    {
+      "id": "sal_respite",
+      "category": "shelter.warming",
+      "schedules": [
+        {
+          "freq": "DAILY",
+          "dtstart": "2026-10-25",
+          "opens_at": "20:00",
+          "closes_at": "09:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_fri_night",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "20:00",
+          "closes_at": "09:00"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "first 1:30am on fall-back night (EDT)",
+      "fn": "openNow",
+      "row": "sal_respite",
+      "now": "2026-11-01T05:30:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "09:00"
+      }
+    },
+    {
+      "name": "second 1:30am on fall-back night (EST)",
+      "fn": "openNow",
+      "row": "sal_respite",
+      "now": "2026-11-01T06:30:00Z",
+      "expect": {
+        "state": "open"
+      }
+    },
+    {
+      "name": "8:45am closes soon",
+      "fn": "openNow",
+      "row": "sal_respite",
+      "now": "2026-11-01T13:45:00Z",
+      "expect": {
+        "state": "closes_soon",
+        "minutes_left": 15
+      }
+    },
+    {
+      "name": "9:00am closed; reopens tonight",
+      "fn": "openNow",
+      "row": "sal_respite",
+      "now": "2026-11-01T14:00:00Z",
+      "expect": {
+        "state": "closed",
+        "next": {
+          "date": "2026-11-01",
+          "opens_at": "20:00"
+        }
+      }
+    },
+    {
+      "name": "3:30am on spring-forward night",
+      "fn": "openNow",
+      "row": "sal_respite",
+      "now": "2027-03-14T07:30:00Z",
+      "expect": {
+        "state": "open"
+      }
+    },
+    {
+      "name": "Saturday 8am is still Friday night's window",
+      "fn": "openNow",
+      "row": "sal_fri_night",
+      "now": "2026-09-19T12:00:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "09:00"
+      }
+    },
+    {
+      "name": "Saturday 9pm is closed; a Friday-only window does not open Saturday",
+      "fn": "openNow",
+      "row": "sal_fri_night",
+      "now": "2026-09-20T01:00:00Z",
+      "expect": {
+        "state": "closed",
+        "next": {
+          "date": "2026-09-25"
+        }
+      }
+    }
+  ]
+}

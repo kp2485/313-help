@@ -1,0 +1,75 @@
+{
+  "description": "Bundle-age banner and dead-man switch (docs/12), plus the broken-clock guard.",
+  "cases": [
+    {
+      "name": "one day old",
+      "fn": "bundleAge",
+      "now": "2026-09-19T08:00:00Z",
+      "index": {
+        "generated_at": "2026-09-18T08:00:00Z",
+        "heartbeat": "2026-09-18"
+      },
+      "expect": "fresh"
+    },
+    {
+      "name": "four days old",
+      "fn": "bundleAge",
+      "now": "2026-09-22T09:00:00Z",
+      "index": {
+        "generated_at": "2026-09-18T08:00:00Z",
+        "heartbeat": "2026-09-18"
+      },
+      "expect": "aging"
+    },
+    {
+      "name": "31 days old",
+      "fn": "bundleAge",
+      "now": "2026-10-19T09:00:00Z",
+      "index": {
+        "generated_at": "2026-09-18T08:00:00Z",
+        "heartbeat": "2026-09-18"
+      },
+      "expect": "old"
+    },
+    {
+      "name": "121 days old",
+      "fn": "bundleAge",
+      "now": "2027-01-17T09:00:00Z",
+      "index": {
+        "generated_at": "2026-09-18T08:00:00Z",
+        "heartbeat": "2026-09-18"
+      },
+      "expect": "sunset"
+    },
+    {
+      "name": "fresh bundle but no human heartbeat for 137 days: a cron job cannot keep a dead project alive",
+      "fn": "bundleAge",
+      "now": "2027-02-02T09:00:00Z",
+      "index": {
+        "generated_at": "2027-02-01T08:00:00Z",
+        "heartbeat": "2026-09-18"
+      },
+      "expect": "sunset"
+    },
+    {
+      "name": "device clock reset to 2010: use the bundle's build time",
+      "fn": "effectiveNow",
+      "now": "2010-01-01T00:00:00Z",
+      "index": {
+        "generated_at": "2026-09-18T08:00:00Z",
+        "heartbeat": "2026-09-18"
+      },
+      "expect": "2026-09-18T08:00:00.000Z"
+    },
+    {
+      "name": "sane device clock is kept",
+      "fn": "effectiveNow",
+      "now": "2026-09-20T00:00:00Z",
+      "index": {
+        "generated_at": "2026-09-18T08:00:00Z",
+        "heartbeat": "2026-09-18"
+      },
+      "expect": "2026-09-20T00:00:00.000Z"
+    }
+  ]
+}

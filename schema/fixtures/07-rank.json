@@ -1,0 +1,310 @@
+{
+  "description": "Friday 2026-09-18 1:45pm. One rule: eligibility -> distance band (0-1, 1-3, 3+ mi) -> reported-closed last in band -> open-now/next-open -> freshness -> distance -> id. Near point is 42.3700,-83.0800.",
+  "rows": [
+    {
+      "id": "a_near_closed",
+      "lat": 42.3772,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "MO",
+          "dtstart": "2026-09-07",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ],
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "b_near_open",
+      "lat": 42.38,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "flags": [
+        "no_id_required"
+      ],
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "c_mid_open_confirmed",
+      "lat": 42.399,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-09-15",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "d_far_open_confirmed",
+      "lat": 42.45,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-09-15",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "e_near_reported",
+      "lat": 42.3743,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 2,
+          "closed_last_at": "2026-09-17",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "f_near_unknown",
+      "lat": 42.3729,
+      "lon": -83.08,
+      "availability": "unknown",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "g_hotline_nocoords",
+      "availability": "always",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "h_clinic",
+      "category": "health.clinic",
+      "lat": 42.371,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-09-15",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "i_archived",
+      "status": "archived",
+      "lat": 42.3701,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "with location: a nearby row beats a better-confirmed far one; reported-closed is last in its band; unknown is never ahead of known",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": {
+        "category": "food",
+        "near": {
+          "lat": 42.37,
+          "lon": -83.08
+        }
+      },
+      "expect": [
+        "g_hotline_nocoords",
+        "b_near_open",
+        "a_near_closed",
+        "f_near_unknown",
+        "e_near_reported",
+        "c_mid_open_confirmed",
+        "d_far_open_confirmed"
+      ]
+    },
+    {
+      "name": "no location: one band, open first, then freshness",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": {
+        "category": "food"
+      },
+      "expect": [
+        "c_mid_open_confirmed",
+        "d_far_open_confirmed",
+        "b_near_open",
+        "g_hotline_nocoords",
+        "a_near_closed",
+        "f_near_unknown",
+        "e_near_reported"
+      ]
+    },
+    {
+      "name": "week mode: anything with a time in the next 7 days ties; nearest wins",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": {
+        "category": "food",
+        "near": {
+          "lat": 42.37,
+          "lon": -83.08
+        },
+        "mode": "week"
+      },
+      "expect": [
+        "g_hotline_nocoords",
+        "a_near_closed",
+        "b_near_open",
+        "f_near_unknown",
+        "e_near_reported",
+        "c_mid_open_confirmed",
+        "d_far_open_confirmed"
+      ]
+    },
+    {
+      "name": "flag filter",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": {
+        "category": "food",
+        "flags": [
+          "no_id_required"
+        ]
+      },
+      "expect": [
+        "b_near_open"
+      ]
+    },
+    {
+      "name": "exact category",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": {
+        "category": "health.clinic"
+      },
+      "expect": [
+        "h_clinic"
+      ]
+    }
+  ]
+}

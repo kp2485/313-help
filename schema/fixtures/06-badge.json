@@ -1,0 +1,265 @@
+{
+  "description": "Badges are computed on the device from dated facts and today's date. They state what is known; source presence is never verification.",
+  "rows": [
+    {
+      "id": "sal_confirmed",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-18",
+        "entry_method": "web",
+        "last_confirmed_at": "2026-10-16T14:05-04:00",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "sal_entry",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-18",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "sal_never",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "open_data",
+          "name": "City of Detroit Recreation Centers layer",
+          "last_edited": "2016-11-16"
+        }
+      }
+    },
+    {
+      "id": "sal_reported_once",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 1,
+          "closed_last_at": "2026-10-18",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-10",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "sal_reported_twice",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 2,
+          "closed_last_at": "2026-10-19",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-18",
+        "entry_method": "phone"
+      }
+    },
+    {
+      "id": "sal_confirm_after_report",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 1,
+          "closed_last_at": "2026-10-10",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-15",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "sal_same_day",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 1,
+          "closed_last_at": "2026-10-15",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-15",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "sal_community_phone",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "community",
+          "name": "Added by a community member"
+        },
+        "last_confirmed_at": "2026-10-19",
+        "last_confirm_method": "phone"
+      }
+    },
+    {
+      "id": "sal_archived",
+      "status": "archived",
+      "archived": {
+        "at": "2026-08-30",
+        "reason": "closed_permanently"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "visitor confirmed 4 days ago",
+      "fn": "badge",
+      "row": "sal_confirmed",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "confirmed",
+        "key": "badge.confirmed.community_confirm",
+        "params": {
+          "days": 4
+        },
+        "tier": 0
+      }
+    },
+    {
+      "name": "checked at entry, inside window",
+      "fn": "badge",
+      "row": "sal_entry",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "entry_checked",
+        "key": "badge.entry_checked.web",
+        "params": {
+          "date": "2026-09-18"
+        }
+      }
+    },
+    {
+      "name": "same row, clock forward past the window: badge flips with no new bundle",
+      "fn": "badge",
+      "row": "sal_entry",
+      "now": "2026-11-15T16:00:00Z",
+      "expect": {
+        "level": "unconfirmed",
+        "params": {
+          "date": "2026-09-18"
+        }
+      }
+    },
+    {
+      "name": "listed in a 2016 data layer and never checked by a person",
+      "fn": "badge",
+      "row": "sal_never",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "never_checked",
+        "params": {
+          "source_date": "2016-11-16"
+        }
+      }
+    },
+    {
+      "name": "one closed report newer than the last confirm",
+      "fn": "badge",
+      "row": "sal_reported_once",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_once",
+        "params": {
+          "date": "2026-10-18"
+        }
+      }
+    },
+    {
+      "name": "two closed reports",
+      "fn": "badge",
+      "row": "sal_reported_twice",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_closed",
+        "params": {
+          "count": 2
+        },
+        "tier": 5
+      }
+    },
+    {
+      "name": "a confirm after the report clears the warning",
+      "fn": "badge",
+      "row": "sal_confirm_after_report",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "confirmed"
+      }
+    },
+    {
+      "name": "same-day confirm does not outweigh a closed report",
+      "fn": "badge",
+      "row": "sal_same_day",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_once"
+      }
+    },
+    {
+      "name": "community-added row checked by phone earns the good badge",
+      "fn": "badge",
+      "row": "sal_community_phone",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "confirmed",
+        "key": "badge.confirmed.phone",
+        "tier": 0
+      }
+    },
+    {
+      "name": "archived",
+      "fn": "badge",
+      "row": "sal_archived",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "archived",
+        "params": {
+          "date": "2026-08-30"
+        }
+      }
+    }
+  ]
+}

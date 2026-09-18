@@ -1,0 +1,186 @@
+{
+  "description": "Monthly nth-weekday, day-of-month, every-other-week, one-off, ended, and seasonal (valid_from/valid_to) schedules.",
+  "rows": [
+    {
+      "id": "sal_2tu",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "2TU",
+          "dtstart": "2026-01-13",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_monthdays",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "bymonthday": "1,15",
+          "dtstart": "2026-01-01",
+          "opens_at": "09:00",
+          "closes_at": "11:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_biweekly",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "interval": 2,
+          "byday": "SA",
+          "dtstart": "2026-09-05",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_oneoff",
+      "schedules": [
+        {
+          "dtstart": "2026-09-26",
+          "until": "2026-09-26",
+          "opens_at": "10:00",
+          "closes_at": "13:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_ended",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "MO",
+          "dtstart": "2026-01-05",
+          "until": "2026-08-31",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_summer",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "WE",
+          "dtstart": "2026-01-07",
+          "valid_from": "2026-06-01",
+          "valid_to": "2026-08-31",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_two_windows",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "MO,WE",
+          "dtstart": "2026-01-05",
+          "opens_at": "09:00",
+          "closes_at": "12:00"
+        },
+        {
+          "freq": "WEEKLY",
+          "byday": "WE",
+          "dtstart": "2026-01-07",
+          "opens_at": "17:00",
+          "closes_at": "19:00"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "second Tuesday of the month",
+      "fn": "nextOccurrences",
+      "row": "sal_2tu",
+      "now": "2026-10-01T12:00:00Z",
+      "n": 2,
+      "expect": [
+        "2026-10-13 10:00-12:00",
+        "2026-11-10 10:00-12:00"
+      ]
+    },
+    {
+      "name": "1st and 15th",
+      "fn": "nextOccurrences",
+      "row": "sal_monthdays",
+      "now": "2026-09-18T12:00:00Z",
+      "n": 2,
+      "expect": [
+        "2026-10-01 09:00-11:00",
+        "2026-10-15 09:00-11:00"
+      ]
+    },
+    {
+      "name": "every other Saturday counts from dtstart",
+      "fn": "nextOccurrences",
+      "row": "sal_biweekly",
+      "now": "2026-09-18T12:00:00Z",
+      "n": 2,
+      "expect": [
+        "2026-09-19 10:00-12:00",
+        "2026-10-03 10:00-12:00"
+      ]
+    },
+    {
+      "name": "one-off event is upcoming",
+      "fn": "openNow",
+      "row": "sal_oneoff",
+      "now": "2026-09-18T17:00:00Z",
+      "expect": {
+        "state": "closed",
+        "next": {
+          "date": "2026-09-26"
+        }
+      }
+    },
+    {
+      "name": "one-off event is over: closed with no next, never open",
+      "fn": "openNow",
+      "row": "sal_oneoff",
+      "now": "2026-09-27T17:00:00Z",
+      "expect": {
+        "state": "closed",
+        "next": null
+      }
+    },
+    {
+      "name": "schedule whose until has passed has no next",
+      "fn": "openNow",
+      "row": "sal_ended",
+      "now": "2026-09-21T14:30:00Z",
+      "expect": {
+        "state": "closed",
+        "next": null
+      }
+    },
+    {
+      "name": "seasonal schedule outside valid_to has no next",
+      "fn": "nextOccurrences",
+      "row": "sal_summer",
+      "now": "2026-09-18T12:00:00Z",
+      "n": 3,
+      "expect": []
+    },
+    {
+      "name": "two schedules merge in time order",
+      "fn": "nextOccurrences",
+      "row": "sal_two_windows",
+      "now": "2026-09-22T12:00:00Z",
+      "n": 3,
+      "expect": [
+        "2026-09-23 09:00-12:00",
+        "2026-09-23 17:00-19:00",
+        "2026-09-28 09:00-12:00"
+      ]
+    }
+  ]
+}

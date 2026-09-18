@@ -1,0 +1,15 @@
+{
+  "name": "detroithelp",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "build:bundle": "pnpm --filter @detroithelp/pipeline build:bundle",
+    "build:bundle:release": "pnpm --filter @detroithelp/pipeline build:bundle -- --release",
+    "ingest:opendata": "pnpm --filter @detroithelp/pipeline ingest:opendata",
+    "geocode": "pnpm --filter @detroithelp/pipeline geocode",
+    "keys:generate": "pnpm --filter @detroithelp/pipeline keys:generate"
+  }
+}

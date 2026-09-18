@@ -15,3 +15,8 @@ Thumbs.db
 # iOS
 apps/ios/**/xcuserdata/
 apps/ios/**/DerivedData/
+
+# local caches and dev keys
+.cache/
+.keys/
+coverage/

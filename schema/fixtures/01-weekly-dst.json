@@ -1,0 +1,116 @@
+{
+  "description": "Weekly Friday pantry 1:30-2:30pm. Wall-clock times must hold across both DST changes (EDT=UTC-4 until 2026-11-01, EST=UTC-5, EDT again 2027-03-14).",
+  "rows": [
+    {
+      "id": "sal_fri_pantry",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "open at 1:45pm EDT",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "14:30",
+        "minutes_left": 45
+      }
+    },
+    {
+      "name": "closes soon at 2:10pm",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2026-09-18T18:10:00Z",
+      "expect": {
+        "state": "closes_soon",
+        "minutes_left": 20
+      }
+    },
+    {
+      "name": "closed exactly at closing time; next is the following Friday",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2026-09-18T18:30:00Z",
+      "expect": {
+        "state": "closed",
+        "next": {
+          "date": "2026-09-25",
+          "opens_at": "13:30"
+        }
+      }
+    },
+    {
+      "name": "open at 1:45pm EST though dtstart was in EDT",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2026-12-04T18:45:00Z",
+      "expect": {
+        "state": "open"
+      }
+    },
+    {
+      "name": "12:45pm EST is closed (a fixed-UTC-offset implementation says open)",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2026-12-04T17:45:00Z",
+      "expect": {
+        "state": "closed",
+        "next": {
+          "date": "2026-12-04"
+        }
+      }
+    },
+    {
+      "name": "next three across the fall-back weekend keep their wall times",
+      "fn": "nextOccurrences",
+      "row": "sal_fri_pantry",
+      "now": "2026-10-28T12:00:00Z",
+      "n": 3,
+      "expect": [
+        "2026-10-30 13:30-14:30",
+        "2026-11-06 13:30-14:30",
+        "2026-11-13 13:30-14:30"
+      ]
+    },
+    {
+      "name": "open the Friday before spring-forward (EST)",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2027-03-12T18:45:00Z",
+      "expect": {
+        "state": "open"
+      }
+    },
+    {
+      "name": "open the Friday after spring-forward (EDT)",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2027-03-19T17:45:00Z",
+      "expect": {
+        "state": "open"
+      }
+    },
+    {
+      "name": "Thursday is closed; next is tomorrow",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2026-09-17T17:45:00Z",
+      "expect": {
+        "state": "closed",
+        "next": {
+          "date": "2026-09-18"
+        }
+      }
+    }
+  ]
+}

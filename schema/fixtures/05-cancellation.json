@@ -1,0 +1,90 @@
+{
+  "description": "HSDS schedules have no exception dates. A published cancellation alert suppresses the occurrences that open inside its window. Drafts and retracted alerts do nothing.",
+  "rows": [
+    {
+      "id": "sal_fri_pantry",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ]
+    },
+    {
+      "id": "sal_other",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ]
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alert_2026-11-27_pantry_closed",
+      "kind": "cancellation",
+      "category": "food",
+      "title": "No pantry the day after Thanksgiving",
+      "starts_at": "2026-11-27T00:00:00-05:00",
+      "ends_at": "2026-11-28T00:00:00-05:00",
+      "targets": [
+        "sal_fri_pantry"
+      ],
+      "status": "published"
+    },
+    {
+      "id": "alert_draft",
+      "kind": "cancellation",
+      "category": "food",
+      "title": "draft",
+      "starts_at": "2026-11-27T00:00:00-05:00",
+      "ends_at": "2026-11-28T00:00:00-05:00",
+      "targets": [
+        "sal_other"
+      ],
+      "status": "draft"
+    }
+  ],
+  "cases": [
+    {
+      "name": "cancelled window is closed, flagged as cancelled, next is a week later",
+      "fn": "openNow",
+      "row": "sal_fri_pantry",
+      "now": "2026-11-27T18:45:00Z",
+      "expect": {
+        "state": "closed",
+        "cancelled_now": true,
+        "next": {
+          "date": "2026-12-04"
+        }
+      }
+    },
+    {
+      "name": "upcoming list skips the cancelled date",
+      "fn": "nextOccurrences",
+      "row": "sal_fri_pantry",
+      "now": "2026-11-20T20:00:00Z",
+      "n": 2,
+      "expect": [
+        "2026-12-04 13:30-14:30",
+        "2026-12-11 13:30-14:30"
+      ]
+    },
+    {
+      "name": "a draft alert cancels nothing",
+      "fn": "openNow",
+      "row": "sal_other",
+      "now": "2026-11-27T18:45:00Z",
+      "expect": {
+        "state": "open"
+      }
+    }
+  ]
+}
