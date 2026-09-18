@@ -19,11 +19,14 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 07 | [Gap analysis](07-gap-analysis.md) | What D Compassion had, what it lacked, what we add |
 | 08 | [Privacy & safety](08-privacy-safety.md) | No-PII design, anonymous reporting, youth, harm-reduction content, App Store review |
 | 09 | [Roadmap & open questions](09-roadmap.md) | Hackathon scope, v1, v2, decisions Kyle needs to make |
+| 10 | [Adversarial audit](10-adversarial-audit.md) | Where docs 01–09 break their own rules, ranked, with fixes and a web fact-check. **Read before building.** |
+| 11 | [Healthy places](11-greenway-public-places.md) | Proposal: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
+| — | [DECISIONS.md](DECISIONS.md) | Decisions the docs don't cover; audit fixes awaiting approval |
 | — | [CLAUDE.md](../CLAUDE.md) | Handoff instructions for Claude Code |
 
 ## Status
 
-- 2026-09-18: Drafted for review. Nothing built yet.
+- 2026-09-18: Drafted for review. Nothing built yet. Audited the same day (doc 10); fixes are listed as *Proposed* in DECISIONS.md and are not yet applied to docs 01–09.
 - DHD program staff are aware of this project and informally supportive of reusing the public information from the D Compassion build. A written authorization letter is pending — see 08 and 09.
 
 ## The three ideas that make this app different
