@@ -79,6 +79,7 @@ export interface MapSpec {
   dots?: MapDot[]; me?: { lat: number; lon: number } | null;
   fit: { lat: number; lon: number }[];          // show at least these points at the start
   minMeters?: number;                           // never start closer than this many meters across
+  quiet?: boolean;                              // a map about help, not parks: no dots for small parks, so the listing dots stand out
   cover?: boolean;                              // fill the box with the fit area (the wide city on a tall phone) instead of showing all of it
   strings: { zoomIn: string; zoomOut: string; reset: string; bigger: string; smaller: string; details: string; park: string; noStreets: string; source: (date: string) => string; phase: Record<string, string> };
   segGo?: (id: string) => string;               // data-go value for a greenway segment
@@ -217,7 +218,7 @@ export class MapView {
       c.fillStyle = col.park; c.beginPath(); for (const a of this.map.parks) if (touches(a.box, view)) { this.trace(a.pts); c.closePath(); } c.fill();
       // Zoomed out, a pocket park is smaller than a pixel: mark it with a small dot so it can still be found.
       c.fillStyle = col.parkInk; c.beginPath();
-      for (const a of this.map.parks) if (touches(a.box, view) && (a.box[2] - a.box[0]) * this.s < 7) { const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2); c.moveTo(x + 2, y); c.arc(x, y, 2, 0, 6.2832); }
+      if (!this.spec.quiet) for (const a of this.map.parks) if (touches(a.box, view) && (a.box[2] - a.box[0]) * this.s < 7) { const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2); c.moveTo(x + 2, y); c.arc(x, y, 2, 0, 6.2832); }
       c.globalAlpha = 0.75; c.fill(); c.globalAlpha = 1;
       // Small streets appear as you zoom in; main roads are always there to get your bearings.
       const showCls = mpp < 9 ? 4 : mpp < 16 ? 3 : 2;

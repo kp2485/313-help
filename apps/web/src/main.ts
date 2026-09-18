@@ -22,6 +22,7 @@ let loadError = false;
 let here: { lat: number; lon: number } | null = null;   // device location, or a ZIP's center: this variable only, never stored
 let hereZip = '';                                        // the ZIP a person typed, when `here` came from one
 let locDenied = false, zipOpen = false, zipUnknown = false;
+let listMap = false;                                      // "Show these on a map" is open on the current list
 let searchText = '';                                     // memory only: never stored, sent, or put in the URL
 const reported = new Map<string, 'sent' | 'queued'>();   // this visit only, so the thank-you stays put
 const stack: View[] = [{ v: 'tab', tab: 'home' }];
@@ -121,7 +122,13 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
   const ranked = rank(bundle!.rows, { ...query, ...(here && !opts.noDistance ? { near: here } : {}) }, now(), bundle!.alerts);
   if (!ranked.length) return `<p class="empty">${T(opts.emptyKey ?? 'results.none')} <a href="tel:211">211</a></p>`;
   const shown = opts.limit ? ranked.slice(0, opts.limit) : ranked;
-  return `${opts.noDistance ? '' : locChip()}<ul class="cards">${shown.map((r) => card(r, !opts.noDistance)).join('')}</ul>
+  // The map is closed until asked for, so the first Call button stays near the top. Never on the "not safe at home"
+  // screen, and never a dot for a sensitive listing (those carry no coordinates in the first place).
+  const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && r.row.category !== 'shelter.dv' && r.row.category !== 'health.mental');
+  const map = !pins.length ? '' : listMap
+    ? `${mapBox({ key: 'list:' + JSON.stringify(query), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, go: JSON.stringify({ v: 'detail', id: r.row.id }) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
+    : `<button class="chip" data-listmap>${icon('pin', 'sm')}${T('map.show', { count: pins.length })}</button>`;
+  return `${opts.noDistance ? '' : locChip()}${map}<ul class="cards">${shown.map((r) => card(r, !opts.noDistance)).join('')}</ul>
     ${opts.seeAll && ranked.length > shown.length ? `<button class="btn ghost" ${go(opts.seeAll)}>${T('results.see_all', { count: ranked.length })}</button>` : ''}`;
 }
 // One tap to confirm, one tap to correct (docs/04). Places get the things-not-people list (docs/11).
@@ -249,7 +256,7 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
     <h2>${T('detail.what')}</h2><p>${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${esc(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: r.hours_text })}</p>` : ''}
     ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${esc(clock(n.opens_at))} – ${esc(clock(n.closes_at))}</span></li>`).join('')}</ul>` : ''}
-    ${r.address ? `<h2>${T('detail.where')}</h2><address>${esc(r.address.line1)}<br>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</address>${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
+    ${r.address ? `<h2>${T('detail.where')}</h2><address>${esc(r.address.line1)}<br>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</address>${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, quiet: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
     ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
     ${r.website ? `<p>${ext(r.website, t('detail.website'), 'link')}</p>` : ''}
     <h2>${T('detail.source')}</h2><p>${esc(r.facts.source.name)}</p>${reportBox(r.id, false, r.category)}</main>` };
@@ -259,11 +266,11 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean }): string {
+function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean }): string {
   const segments = bundle?.greenway?.segments ?? [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
@@ -354,6 +361,7 @@ function render(focus = true): void {
 }
 function navigate(view: View): void {
   if (view.v === 'tab') { stack.length = 0; searchText = ''; }   // a tab is a fresh start, not one more screen to back out of
+  if (view.v !== 'detail') listMap = false;   // coming back from a place, the map is still open
   stack.push(view);
   history.pushState({ n: stack.length }, '', hashFor(view) ?? location.pathname + location.search);
   render();
@@ -361,9 +369,10 @@ function navigate(view: View): void {
 window.addEventListener('popstate', () => { if (stack.length > 1) stack.pop(); else stack[0] = fromHash(location.hash); render(); });
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report],[data-listmap]');
   if (!el) return;
   if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
+  else if ('listmap' in el.dataset) { listMap = !listMap; render(false); }
   else if (el.dataset.report) {
     const box = el.closest<HTMLElement>('.report')!, target = box.dataset.target!;
     reported.set(target, await submit(await buildReport(target, el.dataset.report, box.querySelector('textarea')?.value ?? '')));

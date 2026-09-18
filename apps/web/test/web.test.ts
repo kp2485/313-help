@@ -111,6 +111,10 @@ describe('map', () => {
     expect(main).toContain('me: here && !hereZip ? here : null');
     expect(main).toContain('!sensitive && r.lat !== undefined ? mapBox');
   });
+  it('the list map is closed until asked for, and is never offered on the "not safe at home" screen', () => {
+    expect(main).toContain('let listMap = false;');
+    expect(main).toContain("const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && r.row.category !== 'shelter.dv' && r.row.category !== 'health.mental');");
+  });
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
 });
 
