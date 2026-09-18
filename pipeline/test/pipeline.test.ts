@@ -11,6 +11,8 @@ import { validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { parseCalendar, toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
+import { buildIndicators, milesToArea } from '../src/indicators.js';
+import { nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
 import { crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
@@ -217,6 +219,54 @@ describe('street map from City open data', () => {
   });
 });
 
+describe('neighborhood indicators (docs/13)', () => {
+  const square = (x: number, y: number, d = 0.01) => ({ type: 'Polygon', coordinates: [[[x, y], [x + d, y], [x + d, y + d], [x, y + d], [x, y]]] });
+  const hoods = toNeighborhoods([
+    { properties: { nhood_name: ' Bagley ', council_district: 2 }, geometry: square(-83.16, 42.41) },
+    { properties: { nhood_name: 'Far Side', council_district: 9 }, geometry: square(-83.0, 42.3) },
+    { properties: { nhood_name: '', council_district: 1 }, geometry: square(-83.1, 42.3) },
+  ], [[[-83.165, 42.405], [-83.155, 42.405], [-83.155, 42.415], [-83.165, 42.415], [-83.165, 42.405]]]);
+  it('reads the City layer: stable nbh_ ids, district, and the greenway lens by overlap with the study areas', () => {
+    expect(hoods.map((n) => n.id)).toEqual(['nbh_bagley', 'nbh_far_side']);
+    expect(hoods[0]).toMatchObject({ name: 'Bagley', district: 2, jlg_study_area: true });
+    expect(hoods[1]!.district).toBeNull(); expect(hoods[1]!.jlg_study_area).toBeUndefined();
+    expect(nameKey('Mc Dougall-Hunt')).toBe(nameKey('McDougall Hunt'));
+  });
+  it('small numbers are hidden before anything is stored', () => {
+    expect(suppress(4, 90000, 1000)).toEqual({ count: 'lt5' });
+    expect(suppress(9, 90000)).toEqual({ count: 9 });
+    expect(suppress(10, 90000.4)).toEqual({ count: 10, median: 90000 });
+  });
+  it('counts help inside or within half a mile, says what our list is missing, and never ranks', () => {
+    expect(milesToArea({ lat: 42.415, lon: -83.155 }, hoods[0]!.rings)).toBe(0);
+    expect(milesToArea({ lat: 42.415, lon: -83.14 }, hoods[0]!.rings)).toBeGreaterThan(0.4);
+    const out = buildIndicators({
+      hoods, parks: [{ lat: 42.412, lon: -83.158 }], stats: { neighborhoods: { nbh_bagley: { 2025: { sales: 183, median_price: 190000 } } } },
+      segments: [{ id: 'seg_a', name: 'A', phase: 'open', lines: [[[-83.159, 42.412], [-83.158, 42.413]]] }],
+      rows: [row({ id: 'sal_in', category: 'harm.narcan', lat: 42.415, lon: -83.155 }), row({ id: 'sal_near', category: 'food.pantry', lat: 42.4225, lon: -83.155 }),
+        row({ id: 'sal_far', category: 'food.pantry', lat: 42.30, lon: -83.2 }), row({ id: 'sal_dv', category: 'shelter.dv' })],
+    });
+    const b = out.neighborhoods[0]!;
+    expect(b.help).toMatchObject({ total: 2, none_listed_yet: ['health'], coverage_checked: false });
+    expect(b.help.by).toMatchObject({ food: 1, harm: 1 });
+    expect(b.places).toEqual({ parks: 1, rec_centers: 0, greenway_open: 1 });
+    expect(b.years['2025']).toEqual({ sales: 183, median_price: 190000 });
+    expect(out.segments).toEqual({ seg_a: ['nbh_bagley'] });
+    expect(JSON.stringify(out)).not.toMatch(/rank|score|worst|best/i);
+  });
+  it('the committed City numbers cover all 205 neighborhoods, hold no count under 5, and no names of buyers or sellers', () => {
+    const h = JSON.parse(readFileSync(p('data/ingested/neighborhoods.json'), 'utf8')), st = readFileSync(p('data/ingested/city_stats.json'), 'utf8');
+    expect(h.neighborhoods).toHaveLength(205);
+    expect(h.neighborhoods.filter((n: any) => n.jlg_study_area).length).toBeGreaterThan(20);
+    for (const years of Object.values<any>(JSON.parse(st).neighborhoods)) for (const y of Object.values<any>(years)) {
+      for (const k of ['sales', 'permits']) if (y[k] !== undefined && y[k] !== 'lt5') expect(y[k]).toBeGreaterThanOrEqual(5);
+      if (y.median_price !== undefined) expect(y.sales).toBeGreaterThanOrEqual(10);
+    }
+    expect(st).not.toMatch(/grantor|grantee|parcel_id|"address"/);
+    expect(readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8')).not.toMatch(/outFields: '[^']*(grantor|grantee|address)/);
+  });
+});
+
 describe('the real bundle', () => {
   let out: string, index: any, rows: BundleRow[];
   beforeAll(async () => {
@@ -229,6 +279,11 @@ describe('the real bundle', () => {
     expect(Object.keys(index.files)).toEqual(expect.arrayContaining(['map/base.json', 'map/streets.json']));
     const g = JSON.parse(readFileSync(join(out, 'places/greenway.json'), 'utf8'));
     expect(g.segments.find((x: any) => x.id === 'seg_dequindre_cut_detroit_riverwalk').cross_streets).toContain('Gratiot Ave');
+  });
+  it('carries the neighborhood numbers under the same signature', () => {
+    expect(Object.keys(index.files)).toContain('indicators/neighborhoods.json');
+    const d = JSON.parse(readFileSync(join(out, 'indicators/neighborhoods.json'), 'utf8'));
+    expect(d.neighborhoods).toHaveLength(205); expect(d.near_miles).toBe(0.5); expect(d.origin).toHaveLength(2);
   });
   it('is signed, and the signature covers every file through its checksum', () => {
     const bytes = readFileSync(join(out, 'index.json'));

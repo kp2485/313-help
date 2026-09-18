@@ -58,8 +58,8 @@ A static, public page per neighborhood ("How is Bagley doing?") plus a citywide 
 ## Order of work
 
 1. **Done:** greenway access shed (`data/indicators/greenway_access.json`).
-2. Neighborhood polygons ingested; help-access panel for all 205 neighborhoods (pure query over our bundle — cheap, unique, demoable).
-3. Property Sales + Building Permits panels (the staying-power / investment pair).
+2. **Done 2026-09-18:** neighborhood polygons ingested (`pnpm ingest:neighborhoods`); help-access panel for all 205 neighborhoods, built into the signed bundle as `indicators/neighborhoods.json` and shown in the app at `#/n` and `#/n/nbh_…` (from About and from each greenway segment).
+3. **Done 2026-09-18:** Property Sales + Building Permits, 2019 to now, in one panel. Counts and medians are added up by the City's server per neighborhood, so no sale record (and no buyer or seller name) is ever downloaded. Sales are residential, arm's-length, over $1,000. The greenway lens is the 52 neighborhoods that overlap the City's eight study-area polygons (that layer holds study sub-areas, not neighborhood names).
 4. Blight, demolitions, Improve Detroit days-to-close.
 5. Crashes; PLACES tract map.
 6. Foreclosure and eviction sources, once found.

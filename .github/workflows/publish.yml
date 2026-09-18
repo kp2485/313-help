@@ -79,7 +79,7 @@ jobs:
           pnpm --filter @detroithelp/pipeline ingest:greenway
           pnpm --filter @detroithelp/pipeline ingest:city parks
           pnpm --filter @detroithelp/pipeline ingest:city zips
-          if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; fi
+          if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; fi
       - name: Open a pull request if a source changed
         env:
           GH_TOKEN: ${{ github.token }}

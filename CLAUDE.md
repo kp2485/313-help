@@ -24,7 +24,7 @@ You are building **Detroit Compass** (named by Kyle 2026-09-18; internal package
 ## Conventions
 
 - TypeScript strict for pipeline/api/web; SwiftUI (iOS 17+) for iOS. Node 22. pnpm workspaces.
-- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal). Never reuse.
+- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal, `nbh_` neighborhood). Never reuse.
 - Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements against the same fixtures.
 - Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline, used in floating wall-clock mode only — see DECISIONS.md; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
 - Detroit time zone `America/Detroit` everywhere. Bbox sanity: lat 42.25–42.46, lon −83.29 to −82.91.

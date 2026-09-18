@@ -74,8 +74,9 @@ export async function refresh(current?: Bundle): Promise<Bundle | null> {
   if (current && index.generated_at < current.index.generated_at) throw new Error('bundle is older than the one we have');
 
   const files: Record<string, unknown> = {};
-  // map/ files are big and only needed when a person opens a map: map.ts fetches and checks them then.
-  await Promise.all(Object.entries(index.files).filter(([name]) => !name.startsWith('map/')).map(async ([name, meta]) => {
+  // map/ and indicators/ files are big and only needed when a person opens a map or a neighborhood page:
+  // they are fetched and checked then (fetchVerified).
+  await Promise.all(Object.entries(index.files).filter(([name]) => !name.startsWith('map/') && !name.startsWith('indicators/')).map(async ([name, meta]) => {
     const b = await bytes(name);
     if ((await sha256Hex(b)) !== meta.sha256) throw new Error(`checksum mismatch: ${name}`);
     files[name] = parse(b);

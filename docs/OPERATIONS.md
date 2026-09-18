@@ -34,6 +34,7 @@ In production the pipeline syncs every id at each publish.
 | When | What | How long |
 |---|---|---|
 | About weekly | Work the exceptions queue: new proposals (one entry check each), listings with 2+ "closed" reports, machine-raised tasks | under an hour |
+| Every month | `pnpm ingest:neighborhoods` and `pnpm ingest:basemap` refresh the neighborhood numbers and the street map from City open data (the nightly job does this on the 1st and opens a pull request). Read the diff, merge it | 5 minutes |
 | Every 30 days | `pnpm check:emergency` — confirms each emergency number still matches its owner's page. If it fails, a published number changed: read the page, edit `data/seed/emergency.csv` by hand | 5 minutes |
 | When adding listings | Put one pipe-delimited line per listing in `data/seed/incoming/*.txt` (format at the top of `pipeline/src/import-lines.ts`), then `pnpm import:lines` → `pnpm check:sources` → `pnpm geocode` → `pnpm build:bundle`. Imported rows are `proposed` and invisible until their own source page matches. Hours become a schedule only if every part parses; otherwise they're shown as written with "call first." Rows whose site blocks scripts: read the page in a browser, then set `status=active`, `entry_method=web` | — |
 | Monthly or so | `pnpm ingest:opendata`, then read the git diff of `data/ingested/`. A changed phone number or address is approved by committing it | 10 minutes |

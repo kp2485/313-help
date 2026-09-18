@@ -4,6 +4,7 @@ import {
 } from '@detroithelp/query';
 import strings from '../../../strings/en.json';
 import { cached, refresh, type Bundle } from './data.js';
+import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
 import { MapView, type MapDot, type MapSpec } from './map.js';
 import { CATEGORIES, HARDCODED, NEEDS, TABS, type Need, type TabId } from './needs.js';
@@ -16,7 +17,7 @@ import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
 type View =
-  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'greenway' } | { v: 'parks' }
+  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens?: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
   | { v: 'need'; id: string; refine?: string; all?: boolean }
   | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
 
@@ -27,6 +28,7 @@ let hereZip = '';                                        // the ZIP a person typ
 let locDenied = false, zipOpen = false, zipUnknown = false;
 let savedIds: string[] = [];                             // listing ids saved on this phone (saved.ts); never sent
 let proposed: { state: 'sent' | 'queued'; ref?: string } | null = null, proposeError = false;
+let indicators: Indicators | null | undefined;           // neighborhood numbers (docs/13): fetched the first time a neighborhood screen opens
 let listMap = false;                                      // "Show these on a map" is open on the current list
 let searchText = '';                                     // memory only: never stored, sent, or put in the URL
 const reported = new Map<string, 'sent' | 'queued'>();   // this visit only, so the thank-you stays put
@@ -276,11 +278,11 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean }): string {
+function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][] }): string {
   const segments = bundle?.greenway?.segments ?? [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
@@ -305,7 +307,8 @@ function segment(s: Segment): string {
     ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
     ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${esc(s.cross_streets.join(' · '))}</p>` : ''}
     <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
-    ${s.phase === 'open' ? reportBox(s.id, true) : ''}</main>`;
+    ${s.phase === 'open' ? reportBox(s.id, true) : ''}
+    ${bundle!.index.files['indicators/neighborhoods.json'] ? `<h2>${T('hood.about_area')}</h2><ul class="rows">${indicators ? (indicators.segments[s.id] ?? []).map((id) => indicators!.neighborhoods.find((n) => n.id === id)).filter((n): n is Hood => !!n).map((n) => rowLink({ v: 'hood', id: n.id }, 'info', n.name)).join('') : ''}${rowLink({ v: 'hoods', lens: 'jlg' }, 'path', t('hood.lens_jlg'))}</ul>` : ''}</main>`;
 }
 // Search: the text lives in one variable. It is never stored, sent, or put in the URL (docs/05).
 function searchResults(): string {
@@ -343,10 +346,23 @@ function addScreen(): string {
       ${radios('how_known', HOW_KNOWN, (id) => t('add.how.' + id))}${field('notes', 280, { area: true, hint: 'add.h.notes' })}
       <button class="btn" type="submit">${T('add.send')}</button><p class="foot">${T('add.privacy')}</p></form></main>`;
 }
+// Neighborhood pages (docs/13, hoods.ts). Not in the crisis path; the numbers load only when one of these screens opens.
+function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string; html: string } {
+  if (indicators === undefined) { void loadIndicators(bundle!.index).then((d) => { indicators = d; render(false); }); }
+  if (!indicators) return { title: t('hood.title'), html: `<main><p class="empty">${T(indicators === null ? 'hood.unavailable' : 'home.loading')}</p></main>` };
+  const d = indicators, ui = {
+    t, esc, date: prettyDate, link: (url: string, label: string) => ext(url, label, 'link'), go: (view: object) => go(view as View),
+    map: (h: Hood) => mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), quiet: false, outline: outline(h, d.origin), fit: outline(h, d.origin).flat(), minMeters: 900 }),
+  };
+  if (v.v === 'hoods') return { title: t(v.lens === 'jlg' ? 'hood.lens_jlg' : 'hood.title'), html: hoodList(d, ui, v.lens) };
+  const h = d.neighborhoods.find((x) => x.id === v.id);
+  return h ? { title: h.name, html: hoodPage(h, d, ui) } : { title: t('hood.title'), html: hoodList(d, ui) };
+}
 function about(): string {
   const i = bundle?.index;
   return `<main>${[1, 2, 3, 4].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
-    ${i ? `<p class="foot">${T('about.data', { version: i.version, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p></main>`;
+    ${i ? `<p class="foot">${T('about.data', { version: i.version, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
+    <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul></main>`;
 }
 
 // ---- router: in-memory stack. Need screens and sensitive listings never touch the URL (audit A8). ----
@@ -359,18 +375,21 @@ function hashFor(v: View): string | null {
   if (v.v === 'parks') return '#/parks';
   if (v.v === 'about') return '#/about';
   if (v.v === 'add') return '#/add';
+  if (v.v === 'hoods') return v.lens ? `#/n/lens-${v.lens}` : '#/n';
+  if (v.v === 'hood') return `#/n/${v.id}`;
   return null; // the urgent sheet, search, saved places, and every "need" screen: no trace
 }
 function fromHash(h: string): View {
-  const m = /^#\/(r|c|greenway|about|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
+  const m = /^#\/(r|c|n|greenway|about|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
   if (!m) return { v: 'tab', tab: 'home' };
   if (m[1] === 'r' && m[2]) return { v: 'detail', id: m[2] };
   if (m[1] === 'c' && m[2]) return { v: 'list', cat: m[2] };
+  if (m[1] === 'n') return !m[2] ? { v: 'hoods' } : m[2].startsWith('lens-') ? { v: 'hoods', lens: m[2].slice(5) } : { v: 'hood', id: m[2] };
   if (m[1] === 'greenway') return m[2] ? { v: 'segment', id: m[2] } : { v: 'greenway' };
   if (m[1] === 'about' || m[1] === 'parks' || m[1] === 'add') return { v: m[1] };
   return { v: 'tab', tab: m[1] as TabId };
 }
-const TAB_OF: Partial<Record<View['v'], TabId>> = { search: 'help', saved: 'help', add: 'help', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
+const TAB_OF: Partial<Record<View['v'], TabId>> = { search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
 function render(focus = true): void {
   const v = stack[stack.length - 1]!;
   for (const m of mapViews) m.destroy();
@@ -382,6 +401,7 @@ function render(focus = true): void {
   else if (v.v === 'search') { title = t('search.title'); body = searchScreen(); }
   else if (v.v === 'saved') { title = t('saved.title'); body = savedScreen(); }
   else if (v.v === 'add') { title = t('add.title'); body = addScreen(); }
+  else if (v.v === 'hoods' || v.v === 'hood') { const hs = hoodScreen(v); title = hs.title; body = hs.html; }
   else if (v.v === 'need') { const n = NEEDS.find((x) => x.id === v.id)!; title = t(n.stepsOnly ? 'od.title' : 'need.' + n.id); exit = !!n.quickExit; body = need(v); }
   else if (v.v === 'list') { title = t('cat.' + v.cat); body = `<main>${results(CATEGORIES.find((c) => c.id === v.cat)?.query ?? {}, {})}</main>`; }
   else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; body = d.html; }
@@ -460,7 +480,8 @@ let lastCheck = 0;
 async function checkForUpdate(): Promise<void> {
   if (Date.now() - lastCheck < 15 * 60000) return;
   lastCheck = Date.now();
-  try { const next = await refresh(bundle); if (next) { bundle = next; render(false); } }
+  // A new list brings new neighborhood numbers: forget the old ones, and load again when a neighborhood screen asks.
+  try { const next = await refresh(bundle); if (next) { bundle = next; indicators = undefined; render(false); } }
   catch (e) { console.warn('bundle refresh failed; keeping what we have', e); if (!bundle) { loadError = true; render(false); } }
 }
 async function start(): Promise<void> {

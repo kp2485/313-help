@@ -8,6 +8,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import type { Alert, BundleRow } from '@detroithelp/query';
 import { p, readCsv, sha256, today, writeJson, type CsvRow } from './util.js';
 import { loadSources } from './ingest-arcgis.js';
+import { buildIndicators, NEAR_MILES } from './indicators.js';
+import { GRID } from './ingest-basemap.js';
 import { fromIngested, fromSeed, toHsds, type Normalized } from './normalize.js';
 import { hsdsSchema, validateAlerts, validateEmergency, validateHsds, validateRows } from './validate.js';
 import { loadSigningKey, publicKeyB64, signBytes } from './sign.js';
@@ -93,8 +95,8 @@ export async function build(opts: BuildOptions = {}) {
     for (const s of g.segments as { id: string; cross_streets?: string[] }[]) if (crossings[s.id]?.length) s.cross_streets = crossings[s.id];
     counts.greenway_segments = g.segments.length; put('places/greenway.json', g);
   }
+  const putCompact = (name: string, data: unknown) => { const buf = Buffer.from(JSON.stringify(data)); mkdirSync(`${out}/${name.slice(0, name.lastIndexOf('/'))}`, { recursive: true }); writeFileSync(`${out}/${name}`, buf); files[name] = { sha256: sha256(buf), bytes: buf.length }; };
   if (hasMap) {
-    const putCompact = (name: string, data: unknown) => { const buf = Buffer.from(JSON.stringify(data)); mkdirSync(`${out}/map`, { recursive: true }); writeFileSync(`${out}/${name}`, buf); files[name] = { sha256: sha256(buf), bytes: buf.length }; };
     const cells: Record<string, unknown> = {};
     for (const f of readdirSync(`${mapDir}/cells`).sort()) cells[f.replace('.json', '')] = JSON.parse(readFileSync(`${mapDir}/cells/${f}`, 'utf8'));
     const source = JSON.parse(readFileSync(`${mapDir}/source.json`, 'utf8'));
@@ -106,6 +108,22 @@ export async function build(opts: BuildOptions = {}) {
   const parksFile = p('data/ingested/city_parks.json'), eventsFile = p('data/ingested/city_events.json');
   if (existsSync(parksFile)) { const d = JSON.parse(readFileSync(parksFile, 'utf8')); counts.parks = d.parks.length; put('places/parks.json', d); }
   // ZIP center points for "Type a ZIP" (docs/05): about 1 KB, and the typed ZIP never leaves the phone.
+  // Neighborhood indicators (docs/13): public City data joined with our own listings. Like the map, the file is
+  // under the signature but only downloaded when someone opens a neighborhood page. It is not in the crisis path.
+  const hoodsFile = p('data/ingested/neighborhoods.json'), statsFile = p('data/ingested/city_stats.json');
+  if (existsSync(hoodsFile) && existsSync(statsFile)) {
+    const h = JSON.parse(readFileSync(hoodsFile, 'utf8')), st = JSON.parse(readFileSync(statsFile, 'utf8'));
+    const ind = buildIndicators({
+      hoods: h.neighborhoods, rows: live, stats: st,
+      parks: existsSync(parksFile) ? JSON.parse(readFileSync(parksFile, 'utf8')).parks : [],
+      segments: existsSync(jlg) ? JSON.parse(readFileSync(jlg, 'utf8')).segments : [],
+    });
+    const doc = { sources: { neighborhoods: h.source, ...st.sources }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, ...ind };
+    putCompact('indicators/neighborhoods.json', doc);
+    counts.neighborhoods = ind.neighborhoods.length;
+    // Committed on publish, without the outlines, so the history of every number is in git (docs/13).
+    if (opts.hsdsDir !== null) writeJson(p('data/indicators/neighborhoods.json'), { ...doc, neighborhoods: ind.neighborhoods.map(({ rings: _rings, ...n }) => n) });
+  }
   const zipsFile = p('data/ingested/city_zips.json');
   if (existsSync(zipsFile)) put('places/zips.json', JSON.parse(readFileSync(zipsFile, 'utf8')));
   if (existsSync(eventsFile)) { const d = JSON.parse(readFileSync(eventsFile, 'utf8')); d.events = d.events.filter((e: { starts_at: string }) => e.starts_at.slice(0, 10) >= todayStr); counts.events = d.events.length; put('events.json', d); }

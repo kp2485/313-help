@@ -1,0 +1,9187 @@
+{
+ "sources": {
+  "sales": {
+   "name": "City of Detroit Assessor: property sales",
+   "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/assessor_property_sales_view/FeatureServer/0",
+   "last_edited": "2026-09-17"
+  },
+  "permits": {
+   "name": "City of Detroit BSEED: building permits",
+   "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/bseed_building_permits/FeatureServer/0",
+   "last_edited": "2026-09-18"
+  }
+ },
+ "fetched_at": "2026-09-18",
+ "first_year": 2019,
+ "partial_year": 2026,
+ "city": {
+  "2019": {
+   "sales": 6202,
+   "median_price": 38000,
+   "permits": 5864,
+   "permit_cost": 1731091985
+  },
+  "2020": {
+   "sales": 5366,
+   "median_price": 44000,
+   "permits": 4432,
+   "permit_cost": 1946188972
+  },
+  "2021": {
+   "sales": 6559,
+   "median_price": 55000,
+   "permits": 6710,
+   "permit_cost": 1906824112
+  },
+  "2022": {
+   "sales": 8072,
+   "median_price": 65000,
+   "permits": 6526,
+   "permit_cost": 2415181574
+  },
+  "2023": {
+   "sales": 7215,
+   "median_price": 68000,
+   "permits": 6147,
+   "permit_cost": 1834505915
+  },
+  "2024": {
+   "sales": 8775,
+   "median_price": 79000,
+   "permits": 6938,
+   "permit_cost": 2339179890
+  },
+  "2025": {
+   "sales": 7541,
+   "median_price": 85000,
+   "permits": 6283,
+   "permit_cost": 2889499358
+  },
+  "2026": {
+   "sales": 3803,
+   "median_price": 86500,
+   "permits": 4254,
+   "permit_cost": 2102224712
+  }
+ },
+ "neighborhoods": {
+  "nbh_airport_sub": {
+   "2019": {
+    "sales": 15,
+    "median_price": 20000,
+    "permits": 46,
+    "permit_cost": 107838606
+   },
+   "2020": {
+    "sales": 12,
+    "median_price": 28000,
+    "permits": 39,
+    "permit_cost": 20486576
+   },
+   "2021": {
+    "sales": 17,
+    "median_price": 20000,
+    "permits": 79,
+    "permit_cost": 95989218
+   },
+   "2022": {
+    "sales": 22,
+    "median_price": 31000,
+    "permits": 80,
+    "permit_cost": 37391231
+   },
+   "2023": {
+    "sales": 21,
+    "median_price": 30000,
+    "permits": 62,
+    "permit_cost": 49251173
+   },
+   "2024": {
+    "sales": 34,
+    "median_price": 41250,
+    "permits": 80,
+    "permit_cost": 5799519
+   },
+   "2025": {
+    "sales": 55,
+    "median_price": 30000,
+    "permits": 95,
+    "permit_cost": 52956936
+   },
+   "2026": {
+    "sales": 22,
+    "median_price": 30000,
+    "permits": 57,
+    "permit_cost": 13451242
+   }
+  },
+  "nbh_arden_park": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 101152
+   },
+   "2022": {
+    "sales": 8,
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5"
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_aviation_sub": {
+   "2019": {
+    "sales": 47,
+    "median_price": 53000,
+    "permits": 29,
+    "permit_cost": 230958
+   },
+   "2020": {
+    "sales": 26,
+    "median_price": 57500,
+    "permits": 15,
+    "permit_cost": 184118
+   },
+   "2021": {
+    "sales": 24,
+    "median_price": 70702,
+    "permits": 42,
+    "permit_cost": 403982
+   },
+   "2022": {
+    "sales": 43,
+    "median_price": 117000,
+    "permits": 45,
+    "permit_cost": 652945
+   },
+   "2023": {
+    "sales": 42,
+    "median_price": 109000,
+    "permits": 39,
+    "permit_cost": 589194
+   },
+   "2024": {
+    "sales": 43,
+    "median_price": 125000,
+    "permits": 45,
+    "permit_cost": 660409
+   },
+   "2025": {
+    "sales": 38,
+    "median_price": 104000,
+    "permits": 31,
+    "permit_cost": 621884
+   },
+   "2026": {
+    "sales": 27,
+    "median_price": 120000,
+    "permits": 29,
+    "permit_cost": 632191
+   }
+  },
+  "nbh_bagley": {
+   "2019": {
+    "sales": 205,
+    "median_price": 70000,
+    "permits": 164,
+    "permit_cost": 2218933
+   },
+   "2020": {
+    "sales": 179,
+    "median_price": 105000,
+    "permits": 121,
+    "permit_cost": 2555276
+   },
+   "2021": {
+    "sales": 169,
+    "median_price": 127000,
+    "permits": 159,
+    "permit_cost": 10956063
+   },
+   "2022": {
+    "sales": 216,
+    "median_price": 147750,
+    "permits": 160,
+    "permit_cost": 3174520
+   },
+   "2023": {
+    "sales": 207,
+    "median_price": 165000,
+    "permits": 143,
+    "permit_cost": 2035589
+   },
+   "2024": {
+    "sales": 261,
+    "median_price": 175000,
+    "permits": 161,
+    "permit_cost": 2725155
+   },
+   "2025": {
+    "sales": 183,
+    "median_price": 190000,
+    "permits": 109,
+    "permit_cost": 2734982
+   },
+   "2026": {
+    "sales": 84,
+    "median_price": 201500,
+    "permits": 106,
+    "permit_cost": 7206559
+   }
+  },
+  "nbh_barton_mcfarland": {
+   "2019": {
+    "sales": 87,
+    "median_price": 31500,
+    "permits": 62,
+    "permit_cost": 678324
+   },
+   "2020": {
+    "sales": 83,
+    "median_price": 37000,
+    "permits": 47,
+    "permit_cost": 3868237
+   },
+   "2021": {
+    "sales": 118,
+    "median_price": 47250,
+    "permits": 96,
+    "permit_cost": 3399302
+   },
+   "2022": {
+    "sales": 153,
+    "median_price": 52000,
+    "permits": 65,
+    "permit_cost": 1068519
+   },
+   "2023": {
+    "sales": 140,
+    "median_price": 54600,
+    "permits": 51,
+    "permit_cost": 1293097
+   },
+   "2024": {
+    "sales": 172,
+    "median_price": 72750,
+    "permits": 77,
+    "permit_cost": 3887865
+   },
+   "2025": {
+    "sales": 113,
+    "median_price": 65000,
+    "permits": 94,
+    "permit_cost": 3361674
+   },
+   "2026": {
+    "sales": 53,
+    "median_price": 63000,
+    "permits": 51,
+    "permit_cost": 1089791
+   }
+  },
+  "nbh_belmont": {
+   "2019": {
+    "sales": 37,
+    "median_price": 30000,
+    "permits": 8,
+    "permit_cost": 88136
+   },
+   "2020": {
+    "sales": 25,
+    "median_price": 50000,
+    "permits": 14,
+    "permit_cost": 225474
+   },
+   "2021": {
+    "sales": 40,
+    "median_price": 61000,
+    "permits": 21,
+    "permit_cost": 134040
+   },
+   "2022": {
+    "sales": 35,
+    "median_price": 66900,
+    "permits": 15,
+    "permit_cost": 169034
+   },
+   "2023": {
+    "sales": 44,
+    "median_price": 64000,
+    "permits": 12,
+    "permit_cost": 99229
+   },
+   "2024": {
+    "sales": 58,
+    "median_price": 79500,
+    "permits": 17,
+    "permit_cost": 214998
+   },
+   "2025": {
+    "sales": 49,
+    "median_price": 70000,
+    "permits": 13,
+    "permit_cost": 117750
+   },
+   "2026": {
+    "sales": 28,
+    "median_price": 74500,
+    "permits": 8,
+    "permit_cost": 83286
+   }
+  },
+  "nbh_berg_lahser": {
+   "2019": {
+    "sales": 24,
+    "median_price": 57500,
+    "permits": 28,
+    "permit_cost": 390619
+   },
+   "2020": {
+    "sales": 23,
+    "median_price": 59150,
+    "permits": 19,
+    "permit_cost": 750554
+   },
+   "2021": {
+    "sales": 30,
+    "median_price": 74500,
+    "permits": 37,
+    "permit_cost": 1165778
+   },
+   "2022": {
+    "sales": 43,
+    "median_price": 96000,
+    "permits": 40,
+    "permit_cost": 584829
+   },
+   "2023": {
+    "sales": 39,
+    "median_price": 110000,
+    "permits": 31,
+    "permit_cost": 580326
+   },
+   "2024": {
+    "sales": 38,
+    "median_price": 127000,
+    "permits": 52,
+    "permit_cost": 1387929
+   },
+   "2025": {
+    "sales": 37,
+    "median_price": 144200,
+    "permits": 33,
+    "permit_cost": 1114082
+   },
+   "2026": {
+    "sales": 23,
+    "median_price": 130000,
+    "permits": 28,
+    "permit_cost": 693692
+   }
+  },
+  "nbh_bethune_community": {
+   "2019": {
+    "sales": 139,
+    "median_price": 30500,
+    "permits": 49,
+    "permit_cost": 483186
+   },
+   "2020": {
+    "sales": 136,
+    "median_price": 40500,
+    "permits": 44,
+    "permit_cost": 497952
+   },
+   "2021": {
+    "sales": 146,
+    "median_price": 47100,
+    "permits": 73,
+    "permit_cost": 1144433
+   },
+   "2022": {
+    "sales": 170,
+    "median_price": 60000,
+    "permits": 65,
+    "permit_cost": 962667
+   },
+   "2023": {
+    "sales": 198,
+    "median_price": 56250,
+    "permits": 74,
+    "permit_cost": 19641399
+   },
+   "2024": {
+    "sales": 188,
+    "median_price": 67500,
+    "permits": 64,
+    "permit_cost": 7716611
+   },
+   "2025": {
+    "sales": 171,
+    "median_price": 65000,
+    "permits": 70,
+    "permit_cost": 2787556
+   },
+   "2026": {
+    "sales": 86,
+    "median_price": 67500,
+    "permits": 42,
+    "permit_cost": 2263684
+   }
+  },
+  "nbh_blackstone_park": {
+   "2019": {
+    "sales": 19,
+    "median_price": 41000,
+    "permits": 5,
+    "permit_cost": 25170
+   },
+   "2020": {
+    "sales": 22,
+    "median_price": 57000,
+    "permits": 7,
+    "permit_cost": 38855
+   },
+   "2021": {
+    "sales": 25,
+    "median_price": 69000,
+    "permits": 14,
+    "permit_cost": 159411
+   },
+   "2022": {
+    "sales": 26,
+    "median_price": 87500,
+    "permits": 17,
+    "permit_cost": 415724
+   },
+   "2023": {
+    "sales": 17,
+    "median_price": 72000,
+    "permits": 19,
+    "permit_cost": 219160
+   },
+   "2024": {
+    "sales": 20,
+    "median_price": 97750,
+    "permits": 23,
+    "permit_cost": 302856
+   },
+   "2025": {
+    "sales": 33,
+    "median_price": 79200,
+    "permits": 18,
+    "permit_cost": 342044
+   },
+   "2026": {
+    "sales": 16,
+    "median_price": 122500,
+    "permits": 15,
+    "permit_cost": 231100
+   }
+  },
+  "nbh_boston_edison": {
+   "2019": {
+    "sales": 30,
+    "median_price": 185585,
+    "permits": 62,
+    "permit_cost": 1067781
+   },
+   "2020": {
+    "sales": 30,
+    "median_price": 253500,
+    "permits": 45,
+    "permit_cost": 595220
+   },
+   "2021": {
+    "sales": 36,
+    "median_price": 293000,
+    "permits": 49,
+    "permit_cost": 1414049
+   },
+   "2022": {
+    "sales": 46,
+    "median_price": 327000,
+    "permits": 40,
+    "permit_cost": 1138420
+   },
+   "2023": {
+    "sales": 28,
+    "median_price": 407500,
+    "permits": 37,
+    "permit_cost": 1975414
+   },
+   "2024": {
+    "sales": 30,
+    "median_price": 346000,
+    "permits": 53,
+    "permit_cost": 1801686
+   },
+   "2025": {
+    "sales": 37,
+    "median_price": 342295,
+    "permits": 30,
+    "permit_cost": 1012992
+   },
+   "2026": {
+    "sales": 16,
+    "median_price": 336000,
+    "permits": 18,
+    "permit_cost": 684895
+   }
+  },
+  "nbh_boynton": {
+   "2019": {
+    "sales": 42,
+    "median_price": 22500,
+    "permits": 53,
+    "permit_cost": 516974
+   },
+   "2020": {
+    "sales": 27,
+    "median_price": 30000,
+    "permits": 39,
+    "permit_cost": 582312
+   },
+   "2021": {
+    "sales": 44,
+    "median_price": 26250,
+    "permits": 66,
+    "permit_cost": 833205
+   },
+   "2022": {
+    "sales": 79,
+    "median_price": 35000,
+    "permits": 62,
+    "permit_cost": 1112789
+   },
+   "2023": {
+    "sales": 74,
+    "median_price": 43000,
+    "permits": 59,
+    "permit_cost": 874065
+   },
+   "2024": {
+    "sales": 83,
+    "median_price": 64000,
+    "permits": 68,
+    "permit_cost": 802776
+   },
+   "2025": {
+    "sales": 54,
+    "median_price": 67350,
+    "permits": 55,
+    "permit_cost": 2954977
+   },
+   "2026": {
+    "sales": 38,
+    "median_price": 56750,
+    "permits": 50,
+    "permit_cost": 3212607
+   }
+  },
+  "nbh_brightmoor": {
+   "2019": {
+    "sales": 73,
+    "median_price": 39000,
+    "permits": 61,
+    "permit_cost": 890716
+   },
+   "2020": {
+    "sales": 67,
+    "median_price": 40500,
+    "permits": 51,
+    "permit_cost": 893092
+   },
+   "2021": {
+    "sales": 84,
+    "median_price": 42800,
+    "permits": 69,
+    "permit_cost": 1384988
+   },
+   "2022": {
+    "sales": 106,
+    "median_price": 57100,
+    "permits": 64,
+    "permit_cost": 999963
+   },
+   "2023": {
+    "sales": 72,
+    "median_price": 54000,
+    "permits": 66,
+    "permit_cost": 868789
+   },
+   "2024": {
+    "sales": 102,
+    "median_price": 55500,
+    "permits": 119,
+    "permit_cost": 1002561
+   },
+   "2025": {
+    "sales": 122,
+    "median_price": 64500,
+    "permits": 62,
+    "permit_cost": 2212797
+   },
+   "2026": {
+    "sales": 47,
+    "median_price": 60000,
+    "permits": 46,
+    "permit_cost": 589842
+   }
+  },
+  "nbh_buffalo_charles": {
+   "2019": {
+    "sales": 27,
+    "median_price": 38000,
+    "permits": 31,
+    "permit_cost": 383686
+   },
+   "2020": {
+    "sales": 19,
+    "median_price": 45000,
+    "permits": 25,
+    "permit_cost": 4046232
+   },
+   "2021": {
+    "sales": 34,
+    "median_price": 50000,
+    "permits": 42,
+    "permit_cost": 486264
+   },
+   "2022": {
+    "sales": 65,
+    "median_price": 100000,
+    "permits": 40,
+    "permit_cost": 413144
+   },
+   "2023": {
+    "sales": 52,
+    "median_price": 120000,
+    "permits": 35,
+    "permit_cost": 565775
+   },
+   "2024": {
+    "sales": 39,
+    "median_price": 140000,
+    "permits": 35,
+    "permit_cost": 1246144
+   },
+   "2025": {
+    "sales": 58,
+    "median_price": 145500,
+    "permits": 31,
+    "permit_cost": 1799759
+   },
+   "2026": {
+    "sales": 25,
+    "median_price": 100000,
+    "permits": 19,
+    "permit_cost": 305584
+   }
+  },
+  "nbh_butler": {
+   "2019": {
+    "sales": 19,
+    "median_price": 22000,
+    "permits": 15,
+    "permit_cost": 208177
+   },
+   "2020": {
+    "sales": 17,
+    "median_price": 40000,
+    "permits": 11,
+    "permit_cost": 85447
+   },
+   "2021": {
+    "sales": 24,
+    "median_price": 52167,
+    "permits": 13,
+    "permit_cost": 303692
+   },
+   "2022": {
+    "sales": 28,
+    "median_price": 58250,
+    "permits": 20,
+    "permit_cost": 10147517
+   },
+   "2023": {
+    "sales": 22,
+    "median_price": 67500,
+    "permits": 13,
+    "permit_cost": 2474726
+   },
+   "2024": {
+    "sales": 27,
+    "median_price": 74000,
+    "permits": 28,
+    "permit_cost": 2289948
+   },
+   "2025": {
+    "sales": 30,
+    "median_price": 75050,
+    "permits": 15,
+    "permit_cost": 121117
+   },
+   "2026": {
+    "sales": 12,
+    "median_price": 62500,
+    "permits": 12,
+    "permit_cost": 213526
+   }
+  },
+  "nbh_cadillac_community": {
+   "2019": {
+    "sales": 6,
+    "permits": 6,
+    "permit_cost": 48013
+   },
+   "2020": {
+    "sales": 7,
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 8,
+    "permit_cost": 109065
+   },
+   "2022": {
+    "sales": 11,
+    "median_price": 40000,
+    "permits": 5,
+    "permit_cost": 81430
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 10,
+    "permit_cost": 347695
+   },
+   "2024": {
+    "sales": 9,
+    "permits": 8,
+    "permit_cost": 103971
+   },
+   "2025": {
+    "sales": 10,
+    "median_price": 89950,
+    "permits": 5,
+    "permit_cost": 1819015
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_cadillac_heights": {
+   "2019": {
+    "sales": 9,
+    "permits": 16,
+    "permit_cost": 142649
+   },
+   "2020": {
+    "sales": 6,
+    "permits": 13,
+    "permit_cost": 47405
+   },
+   "2021": {
+    "sales": 18,
+    "median_price": 19000,
+    "permits": 20,
+    "permit_cost": 252013
+   },
+   "2022": {
+    "sales": 15,
+    "median_price": 30000,
+    "permits": 18,
+    "permit_cost": 335171
+   },
+   "2023": {
+    "sales": 26,
+    "median_price": 30000,
+    "permits": 14,
+    "permit_cost": 304716
+   },
+   "2024": {
+    "sales": 30,
+    "median_price": 32500,
+    "permits": 27,
+    "permit_cost": 519363
+   },
+   "2025": {
+    "sales": 36,
+    "median_price": 28500,
+    "permits": 24,
+    "permit_cost": 357504
+   },
+   "2026": {
+    "sales": 21,
+    "median_price": 34000,
+    "permits": 20,
+    "permit_cost": 216019
+   }
+  },
+  "nbh_campau_banglatown": {
+   "2019": {
+    "sales": 18,
+    "median_price": 20000,
+    "permits": 18,
+    "permit_cost": 177868
+   },
+   "2020": {
+    "sales": 12,
+    "median_price": 20000,
+    "permits": 29,
+    "permit_cost": 525079
+   },
+   "2021": {
+    "sales": 20,
+    "median_price": 19673,
+    "permits": 24,
+    "permit_cost": 267845
+   },
+   "2022": {
+    "sales": 35,
+    "median_price": 70000,
+    "permits": 23,
+    "permit_cost": 342059
+   },
+   "2023": {
+    "sales": 18,
+    "median_price": 135000,
+    "permits": 27,
+    "permit_cost": 360150
+   },
+   "2024": {
+    "sales": 40,
+    "median_price": 90000,
+    "permits": 50,
+    "permit_cost": 833008
+   },
+   "2025": {
+    "sales": 26,
+    "median_price": 124000,
+    "permits": 32,
+    "permit_cost": 2293113
+   },
+   "2026": {
+    "sales": 9,
+    "permits": 22,
+    "permit_cost": 913636
+   }
+  },
+  "nbh_carbon_works": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 1289894
+   },
+   "2021": {
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 19,
+    "permit_cost": 12787348
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 13809000
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 107331002
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 63752505
+   }
+  },
+  "nbh_castle_rouge": {
+   "2019": {
+    "sales": 26,
+    "median_price": 38000,
+    "permits": 20,
+    "permit_cost": 179052
+   },
+   "2020": {
+    "sales": 16,
+    "median_price": 46500,
+    "permits": 13,
+    "permit_cost": 74794
+   },
+   "2021": {
+    "sales": 36,
+    "median_price": 65000,
+    "permits": 25,
+    "permit_cost": 188067
+   },
+   "2022": {
+    "sales": 25,
+    "median_price": 73000,
+    "permits": 20,
+    "permit_cost": 279747
+   },
+   "2023": {
+    "sales": 36,
+    "median_price": 68250,
+    "permits": 10,
+    "permit_cost": 147969
+   },
+   "2024": {
+    "sales": 28,
+    "median_price": 70500,
+    "permits": 13,
+    "permit_cost": 297457
+   },
+   "2025": {
+    "sales": 19,
+    "median_price": 130000,
+    "permits": 11,
+    "permit_cost": 106031
+   },
+   "2026": {
+    "sales": 13,
+    "median_price": 95000,
+    "permits": 8,
+    "permit_cost": 108010
+   }
+  },
+  "nbh_central_southwest": {
+   "2019": {
+    "sales": 52,
+    "median_price": 40000,
+    "permits": 139,
+    "permit_cost": 3437660
+   },
+   "2020": {
+    "sales": 46,
+    "median_price": 39500,
+    "permits": 116,
+    "permit_cost": 3623587
+   },
+   "2021": {
+    "sales": 54,
+    "median_price": 50000,
+    "permits": 124,
+    "permit_cost": 3281739
+   },
+   "2022": {
+    "sales": 72,
+    "median_price": 80250,
+    "permits": 107,
+    "permit_cost": 15159586
+   },
+   "2023": {
+    "sales": 60,
+    "median_price": 95000,
+    "permits": 95,
+    "permit_cost": 18449640
+   },
+   "2024": {
+    "sales": 52,
+    "median_price": 82000,
+    "permits": 109,
+    "permit_cost": 4204716
+   },
+   "2025": {
+    "sales": 35,
+    "median_price": 115000,
+    "permits": 74,
+    "permit_cost": 15329228
+   },
+   "2026": {
+    "sales": 37,
+    "median_price": 110000,
+    "permits": 45,
+    "permit_cost": 7372508
+   }
+  },
+  "nbh_chadsey_condon": {
+   "2019": {
+    "sales": 15,
+    "median_price": 27500,
+    "permits": 37,
+    "permit_cost": 966173
+   },
+   "2020": {
+    "sales": 5,
+    "permits": 32,
+    "permit_cost": 2671450
+   },
+   "2021": {
+    "sales": 18,
+    "median_price": 13750,
+    "permits": 45,
+    "permit_cost": 743616
+   },
+   "2022": {
+    "sales": 15,
+    "median_price": 53000,
+    "permits": 44,
+    "permit_cost": 3011938
+   },
+   "2023": {
+    "sales": 15,
+    "median_price": 72000,
+    "permits": 33,
+    "permit_cost": 7101458
+   },
+   "2024": {
+    "sales": 21,
+    "median_price": 83000,
+    "permits": 57,
+    "permit_cost": 1836473
+   },
+   "2025": {
+    "sales": 17,
+    "median_price": 115000,
+    "permits": 46,
+    "permit_cost": 20616084
+   },
+   "2026": {
+    "sales": 8,
+    "permits": 36,
+    "permit_cost": 9253868
+   }
+  },
+  "nbh_chalfonte": {
+   "2019": {
+    "sales": 11,
+    "median_price": 19900,
+    "permits": 21,
+    "permit_cost": 179904
+   },
+   "2020": {
+    "sales": 17,
+    "median_price": 25000,
+    "permits": 9,
+    "permit_cost": 66515
+   },
+   "2021": {
+    "sales": 21,
+    "median_price": 30000,
+    "permits": 19,
+    "permit_cost": 251691
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 34950,
+    "permits": 22,
+    "permit_cost": 495904
+   },
+   "2023": {
+    "sales": 9,
+    "permits": 22,
+    "permit_cost": 419482
+   },
+   "2024": {
+    "sales": 15,
+    "median_price": 43000,
+    "permits": 25,
+    "permit_cost": 566928
+   },
+   "2025": {
+    "sales": 27,
+    "median_price": 36000,
+    "permits": 22,
+    "permit_cost": 223486
+   },
+   "2026": {
+    "sales": 7,
+    "permits": 12,
+    "permit_cost": 143108
+   }
+  },
+  "nbh_chandler_park": {
+   "2019": {
+    "sales": 18,
+    "median_price": 29100,
+    "permits": 24,
+    "permit_cost": 546408
+   },
+   "2020": {
+    "sales": 14,
+    "median_price": 24000,
+    "permits": 12,
+    "permit_cost": 280593
+   },
+   "2021": {
+    "sales": 12,
+    "median_price": 29000,
+    "permits": 20,
+    "permit_cost": 477264
+   },
+   "2022": {
+    "sales": 21,
+    "median_price": 55000,
+    "permits": 20,
+    "permit_cost": 306124
+   },
+   "2023": {
+    "sales": 18,
+    "median_price": 44950,
+    "permits": 28,
+    "permit_cost": 469624
+   },
+   "2024": {
+    "sales": 26,
+    "median_price": 48000,
+    "permits": 22,
+    "permit_cost": 13726350
+   },
+   "2025": {
+    "sales": 15,
+    "median_price": 72000,
+    "permits": 36,
+    "permit_cost": 1145672
+   },
+   "2026": {
+    "sales": 9,
+    "permits": 26,
+    "permit_cost": 3431729
+   }
+  },
+  "nbh_chandler_park_chalmers": {
+   "2019": {
+    "sales": 7,
+    "permits": 9,
+    "permit_cost": 119295
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 9,
+    "permit_cost": 80511
+   },
+   "2021": {
+    "sales": 5,
+    "permits": 9,
+    "permit_cost": 49355
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 26000,
+    "permits": 11,
+    "permit_cost": 65674
+   },
+   "2023": {
+    "sales": 12,
+    "median_price": 63000,
+    "permits": 6,
+    "permit_cost": 86949
+   },
+   "2024": {
+    "sales": 10,
+    "median_price": 63500,
+    "permits": 12,
+    "permit_cost": 124652
+   },
+   "2025": {
+    "sales": 11,
+    "median_price": 129000,
+    "permits": 6,
+    "permit_cost": 64858
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_claytown": {
+   "2019": {
+    "sales": 104,
+    "median_price": 30000,
+    "permits": 84,
+    "permit_cost": 1378492
+   },
+   "2020": {
+    "sales": 74,
+    "median_price": 35000,
+    "permits": 49,
+    "permit_cost": 566688
+   },
+   "2021": {
+    "sales": 97,
+    "median_price": 40000,
+    "permits": 90,
+    "permit_cost": 1921581
+   },
+   "2022": {
+    "sales": 106,
+    "median_price": 55000,
+    "permits": 95,
+    "permit_cost": 14377685
+   },
+   "2023": {
+    "sales": 77,
+    "median_price": 55000,
+    "permits": 93,
+    "permit_cost": 2173925
+   },
+   "2024": {
+    "sales": 72,
+    "median_price": 70000,
+    "permits": 118,
+    "permit_cost": 3271362
+   },
+   "2025": {
+    "sales": 77,
+    "median_price": 80000,
+    "permits": 85,
+    "permit_cost": 2619027
+   },
+   "2026": {
+    "sales": 42,
+    "median_price": 92500,
+    "permits": 37,
+    "permit_cost": 1020227
+   }
+  },
+  "nbh_college_park": {
+   "2019": {
+    "sales": 108,
+    "median_price": 45000,
+    "permits": 45,
+    "permit_cost": 995057
+   },
+   "2020": {
+    "sales": 70,
+    "median_price": 50000,
+    "permits": 35,
+    "permit_cost": 476440
+   },
+   "2021": {
+    "sales": 85,
+    "median_price": 64500,
+    "permits": 85,
+    "permit_cost": 1271379
+   },
+   "2022": {
+    "sales": 103,
+    "median_price": 67000,
+    "permits": 70,
+    "permit_cost": 993503
+   },
+   "2023": {
+    "sales": 110,
+    "median_price": 67750,
+    "permits": 54,
+    "permit_cost": 5016744
+   },
+   "2024": {
+    "sales": 121,
+    "median_price": 80000,
+    "permits": 57,
+    "permit_cost": 916455
+   },
+   "2025": {
+    "sales": 129,
+    "median_price": 90000,
+    "permits": 55,
+    "permit_cost": 915815
+   },
+   "2026": {
+    "sales": 33,
+    "median_price": 82000,
+    "permits": 48,
+    "permit_cost": 887487
+   }
+  },
+  "nbh_conant_gardens": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 9,
+    "permit_cost": 154819
+   },
+   "2020": {
+    "sales": 9,
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 7,
+    "permits": 12,
+    "permit_cost": 117046
+   },
+   "2022": {
+    "sales": 10,
+    "median_price": 56500,
+    "permits": 8,
+    "permit_cost": 55914
+   },
+   "2023": {
+    "sales": 19,
+    "median_price": 40000,
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": 16,
+    "median_price": 45000,
+    "permits": "lt5"
+   },
+   "2025": {
+    "sales": 12,
+    "median_price": 69500,
+    "permits": 8,
+    "permit_cost": 5003511
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 45813741
+   }
+  },
+  "nbh_conner_creek": {
+   "2019": {
+    "sales": 51,
+    "median_price": 26000,
+    "permits": 26,
+    "permit_cost": 3587366
+   },
+   "2020": {
+    "sales": 45,
+    "median_price": 35500,
+    "permits": 27,
+    "permit_cost": 12716363
+   },
+   "2021": {
+    "sales": 63,
+    "median_price": 38750,
+    "permits": 35,
+    "permit_cost": 8546497
+   },
+   "2022": {
+    "sales": 64,
+    "median_price": 42500,
+    "permits": 23,
+    "permit_cost": 857794
+   },
+   "2023": {
+    "sales": 37,
+    "median_price": 47500,
+    "permits": 24,
+    "permit_cost": 5068962
+   },
+   "2024": {
+    "sales": 66,
+    "median_price": 57500,
+    "permits": 31,
+    "permit_cost": 4550222
+   },
+   "2025": {
+    "sales": 63,
+    "median_price": 48500,
+    "permits": 23,
+    "permit_cost": 4914385
+   },
+   "2026": {
+    "sales": 36,
+    "median_price": 55050,
+    "permits": 17,
+    "permit_cost": 12728956
+   }
+  },
+  "nbh_core_city": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 3873338
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 23,
+    "permit_cost": 6338033
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 5447236
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 28,
+    "permit_cost": 21968013
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 1901950
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 16,
+    "permit_cost": 1016580
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 19,
+    "permit_cost": 4665867
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 8,
+    "permit_cost": 624276
+   }
+  },
+  "nbh_corktown": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 101,
+    "permit_cost": 53929817
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 42,
+    "permit_cost": 47949099
+   },
+   "2021": {
+    "permits": 89,
+    "permit_cost": 232904227
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 76,
+    "permit_cost": 494917502
+   },
+   "2023": {
+    "sales": 7,
+    "permits": 93,
+    "permit_cost": 135999561
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 42,
+    "permit_cost": 30720895
+   },
+   "2025": {
+    "sales": 7,
+    "permits": 50,
+    "permit_cost": 44423740
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 19,
+    "permit_cost": 58255364
+   }
+  },
+  "nbh_cornerstone_village": {
+   "2019": {
+    "sales": 157,
+    "median_price": 40000,
+    "permits": 66,
+    "permit_cost": 22210881
+   },
+   "2020": {
+    "sales": 110,
+    "median_price": 41500,
+    "permits": 53,
+    "permit_cost": 3838532
+   },
+   "2021": {
+    "sales": 147,
+    "median_price": 55500,
+    "permits": 86,
+    "permit_cost": 2523242
+   },
+   "2022": {
+    "sales": 188,
+    "median_price": 65000,
+    "permits": 71,
+    "permit_cost": 4030084
+   },
+   "2023": {
+    "sales": 151,
+    "median_price": 82000,
+    "permits": 61,
+    "permit_cost": 7180829
+   },
+   "2024": {
+    "sales": 148,
+    "median_price": 84000,
+    "permits": 74,
+    "permit_cost": 2876167
+   },
+   "2025": {
+    "sales": 107,
+    "median_price": 89900,
+    "permits": 77,
+    "permit_cost": 10079755
+   },
+   "2026": {
+    "sales": 65,
+    "median_price": 95000,
+    "permits": 50,
+    "permit_cost": 1267128
+   }
+  },
+  "nbh_crary_st_marys": {
+   "2019": {
+    "sales": 169,
+    "median_price": 45000,
+    "permits": 61,
+    "permit_cost": 501803
+   },
+   "2020": {
+    "sales": 95,
+    "median_price": 56000,
+    "permits": 44,
+    "permit_cost": 766371
+   },
+   "2021": {
+    "sales": 107,
+    "median_price": 70000,
+    "permits": 67,
+    "permit_cost": 971212
+   },
+   "2022": {
+    "sales": 146,
+    "median_price": 86500,
+    "permits": 73,
+    "permit_cost": 1256742
+   },
+   "2023": {
+    "sales": 128,
+    "median_price": 75750,
+    "permits": 74,
+    "permit_cost": 1565277
+   },
+   "2024": {
+    "sales": 168,
+    "median_price": 95750,
+    "permits": 80,
+    "permit_cost": 1056738
+   },
+   "2025": {
+    "sales": 147,
+    "median_price": 95000,
+    "permits": 53,
+    "permit_cost": 776365
+   },
+   "2026": {
+    "sales": 70,
+    "median_price": 89500,
+    "permits": 46,
+    "permit_cost": 554791
+   }
+  },
+  "nbh_davison": {
+   "2019": {
+    "sales": 16,
+    "median_price": 15600,
+    "permits": 20,
+    "permit_cost": 619174
+   },
+   "2020": {
+    "sales": 10,
+    "median_price": 23750,
+    "permits": 13,
+    "permit_cost": 77288
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 35000,
+    "permits": 20,
+    "permit_cost": 324606
+   },
+   "2022": {
+    "sales": 19,
+    "median_price": 26000,
+    "permits": 30,
+    "permit_cost": 543593
+   },
+   "2023": {
+    "sales": 18,
+    "median_price": 20000,
+    "permits": 27,
+    "permit_cost": 3548626
+   },
+   "2024": {
+    "sales": 22,
+    "median_price": 39500,
+    "permits": 29,
+    "permit_cost": 3611042
+   },
+   "2025": {
+    "sales": 21,
+    "median_price": 65000,
+    "permits": 29,
+    "permit_cost": 673181
+   },
+   "2026": {
+    "sales": 16,
+    "median_price": 45500,
+    "permits": 14,
+    "permit_cost": 221020
+   }
+  },
+  "nbh_davison_schoolcraft": {
+   "2019": {
+    "sales": 11,
+    "median_price": 15000,
+    "permits": 10,
+    "permit_cost": 147443
+   },
+   "2020": {
+    "sales": 10,
+    "median_price": 17750,
+    "permits": 9,
+    "permit_cost": 697477
+   },
+   "2021": {
+    "sales": 14,
+    "median_price": 27000,
+    "permits": 23,
+    "permit_cost": 518133
+   },
+   "2022": {
+    "sales": 18,
+    "median_price": 33500,
+    "permits": 19,
+    "permit_cost": 568667
+   },
+   "2023": {
+    "sales": 23,
+    "median_price": 40000,
+    "permits": 18,
+    "permit_cost": 630232
+   },
+   "2024": {
+    "sales": 30,
+    "median_price": 52500,
+    "permits": 22,
+    "permit_cost": 634741
+   },
+   "2025": {
+    "sales": 36,
+    "median_price": 42500,
+    "permits": 10,
+    "permit_cost": 316121
+   },
+   "2026": {
+    "sales": 22,
+    "median_price": 67500,
+    "permits": 12,
+    "permit_cost": 134533
+   }
+  },
+  "nbh_delray": {
+   "2019": {
+    "sales": 7,
+    "permits": 9,
+    "permit_cost": 947557
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 1197959
+   },
+   "2021": {
+    "sales": 6,
+    "permits": 21,
+    "permit_cost": 1614412
+   },
+   "2022": {
+    "sales": 6,
+    "permits": 55,
+    "permit_cost": 5835160
+   },
+   "2023": {
+    "sales": 8,
+    "permits": 36,
+    "permit_cost": 1176350
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 16,
+    "permit_cost": 1541356
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 22,
+    "permit_cost": 35730545
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_denby": {
+   "2019": {
+    "sales": 60,
+    "median_price": 40000,
+    "permits": 17,
+    "permit_cost": 137528
+   },
+   "2020": {
+    "sales": 45,
+    "median_price": 54500,
+    "permits": 10,
+    "permit_cost": 149898
+   },
+   "2021": {
+    "sales": 60,
+    "median_price": 55000,
+    "permits": 17,
+    "permit_cost": 257987
+   },
+   "2022": {
+    "sales": 77,
+    "median_price": 65000,
+    "permits": 28,
+    "permit_cost": 382328
+   },
+   "2023": {
+    "sales": 48,
+    "median_price": 65000,
+    "permits": 19,
+    "permit_cost": 238744
+   },
+   "2024": {
+    "sales": 77,
+    "median_price": 68000,
+    "permits": 27,
+    "permit_cost": 296796
+   },
+   "2025": {
+    "sales": 54,
+    "median_price": 70000,
+    "permits": 26,
+    "permit_cost": 372955
+   },
+   "2026": {
+    "sales": 28,
+    "median_price": 83500,
+    "permits": 19,
+    "permit_cost": 1863613
+   }
+  },
+  "nbh_detroit_golf": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 2380911
+   },
+   "2020": {
+    "sales": 5,
+    "permits": 7,
+    "permit_cost": 183698
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 362492
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 1530991
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 1374319
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 15,
+    "permit_cost": 1977946
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 303849
+   },
+   "2026": {
+    "permits": 15,
+    "permit_cost": 312637
+   }
+  },
+  "nbh_dexter_fenkell": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 8,
+    "permits": 5,
+    "permit_cost": 51095
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 8,
+    "permit_cost": 152139
+   },
+   "2023": {
+    "sales": 5,
+    "permits": 9,
+    "permit_cost": 141739
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 10,
+    "permit_cost": 76837
+   },
+   "2025": {
+    "sales": 7,
+    "permits": 13,
+    "permit_cost": 7125727
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 335911
+   }
+  },
+  "nbh_dexter_linwood": {
+   "2019": {
+    "sales": 48,
+    "median_price": 30000,
+    "permits": 80,
+    "permit_cost": 2140521
+   },
+   "2020": {
+    "sales": 67,
+    "median_price": 30000,
+    "permits": 54,
+    "permit_cost": 661216
+   },
+   "2021": {
+    "sales": 69,
+    "median_price": 49900,
+    "permits": 82,
+    "permit_cost": 2089111
+   },
+   "2022": {
+    "sales": 88,
+    "median_price": 55000,
+    "permits": 96,
+    "permit_cost": 3749875
+   },
+   "2023": {
+    "sales": 95,
+    "median_price": 59900,
+    "permits": 87,
+    "permit_cost": 2068879
+   },
+   "2024": {
+    "sales": 126,
+    "median_price": 80000,
+    "permits": 100,
+    "permit_cost": 5076656
+   },
+   "2025": {
+    "sales": 126,
+    "median_price": 85500,
+    "permits": 98,
+    "permit_cost": 4886340
+   },
+   "2026": {
+    "sales": 70,
+    "median_price": 77500,
+    "permits": 90,
+    "permit_cost": 5927678
+   }
+  },
+  "nbh_east_canfield": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 56244
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 103535
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 12,
+    "permit_cost": 111799
+   },
+   "2023": {
+    "sales": 19,
+    "median_price": 54000,
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": 6,
+    "permits": 5,
+    "permit_cost": 76696
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 142169
+   },
+   "2026": {
+    "sales": 6,
+    "permits": "lt5"
+   }
+  },
+  "nbh_east_english_village": {
+   "2019": {
+    "sales": 83,
+    "median_price": 70000,
+    "permits": 59,
+    "permit_cost": 677779
+   },
+   "2020": {
+    "sales": 76,
+    "median_price": 103750,
+    "permits": 45,
+    "permit_cost": 754527
+   },
+   "2021": {
+    "sales": 61,
+    "median_price": 135000,
+    "permits": 89,
+    "permit_cost": 1094250
+   },
+   "2022": {
+    "sales": 77,
+    "median_price": 160000,
+    "permits": 78,
+    "permit_cost": 1286839
+   },
+   "2023": {
+    "sales": 64,
+    "median_price": 168750,
+    "permits": 68,
+    "permit_cost": 4680479
+   },
+   "2024": {
+    "sales": 108,
+    "median_price": 160000,
+    "permits": 68,
+    "permit_cost": 7664682
+   },
+   "2025": {
+    "sales": 70,
+    "median_price": 171000,
+    "permits": 74,
+    "permit_cost": 10992161
+   },
+   "2026": {
+    "sales": 42,
+    "median_price": 192500,
+    "permits": 51,
+    "permit_cost": 4039736
+   }
+  },
+  "nbh_east_village": {
+   "2019": {
+    "sales": 18,
+    "median_price": 36450,
+    "permits": 63,
+    "permit_cost": 1941998
+   },
+   "2020": {
+    "sales": 11,
+    "median_price": 24000,
+    "permits": 55,
+    "permit_cost": 2686857
+   },
+   "2021": {
+    "sales": 20,
+    "median_price": 37279,
+    "permits": 86,
+    "permit_cost": 2968959
+   },
+   "2022": {
+    "sales": 24,
+    "median_price": 55000,
+    "permits": 82,
+    "permit_cost": 5065680
+   },
+   "2023": {
+    "sales": 19,
+    "median_price": 54500,
+    "permits": 84,
+    "permit_cost": 5704515
+   },
+   "2024": {
+    "sales": 56,
+    "median_price": 66500,
+    "permits": 91,
+    "permit_cost": 11488819
+   },
+   "2025": {
+    "sales": 44,
+    "median_price": 92500,
+    "permits": 93,
+    "permit_cost": 9972571
+   },
+   "2026": {
+    "sales": 22,
+    "median_price": 111000,
+    "permits": 76,
+    "permit_cost": 6873054
+   }
+  },
+  "nbh_eden_gardens": {
+   "2019": {
+    "sales": 18,
+    "median_price": 35752,
+    "permits": 25,
+    "permit_cost": 746640
+   },
+   "2020": {
+    "sales": 31,
+    "median_price": 36000,
+    "permits": 11,
+    "permit_cost": 570103
+   },
+   "2021": {
+    "sales": 21,
+    "median_price": 25000,
+    "permits": 20,
+    "permit_cost": 225367
+   },
+   "2022": {
+    "sales": 36,
+    "median_price": 58250,
+    "permits": 24,
+    "permit_cost": 353806
+   },
+   "2023": {
+    "sales": 26,
+    "median_price": 48750,
+    "permits": 23,
+    "permit_cost": 273596
+   },
+   "2024": {
+    "sales": 41,
+    "median_price": 68000,
+    "permits": 32,
+    "permit_cost": 463512
+   },
+   "2025": {
+    "sales": 31,
+    "median_price": 84000,
+    "permits": 29,
+    "permit_cost": 632438
+   },
+   "2026": {
+    "sales": 18,
+    "median_price": 60000,
+    "permits": 27,
+    "permit_cost": 551908
+   }
+  },
+  "nbh_elijah_mccoy": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 24459073
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 14,
+    "permit_cost": 19236203
+   },
+   "2021": {
+    "sales": 5,
+    "permits": 14,
+    "permit_cost": 12687419
+   },
+   "2022": {
+    "sales": 10,
+    "median_price": 41500,
+    "permits": 10,
+    "permit_cost": 31036985
+   },
+   "2023": {
+    "sales": 5,
+    "permits": 27,
+    "permit_cost": 58199857
+   },
+   "2024": {
+    "sales": 6,
+    "permits": 36,
+    "permit_cost": 972481243
+   },
+   "2025": {
+    "sales": 7,
+    "permits": 26,
+    "permit_cost": 1075540891
+   },
+   "2026": {
+    "sales": 7,
+    "permits": 8,
+    "permit_cost": 875227980
+   }
+  },
+  "nbh_eliza_howell": {
+   "2019": {
+    "sales": 10,
+    "median_price": 37025,
+    "permits": 10,
+    "permit_cost": 94742
+   },
+   "2020": {
+    "sales": 5,
+    "permits": 6,
+    "permit_cost": 35394
+   },
+   "2021": {
+    "sales": 14,
+    "median_price": 40000,
+    "permits": 6,
+    "permit_cost": 64271
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 64900,
+    "permits": 9,
+    "permit_cost": 424060
+   },
+   "2023": {
+    "sales": 16,
+    "median_price": 82000,
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": 15,
+    "median_price": 72000,
+    "permits": 13,
+    "permit_cost": 148766
+   },
+   "2025": {
+    "sales": 10,
+    "median_price": 105000,
+    "permits": 7,
+    "permit_cost": 88864
+   },
+   "2026": {
+    "sales": 5,
+    "permits": "lt5"
+   }
+  },
+  "nbh_evergreen_lahser_7_8": {
+   "2019": {
+    "sales": 97,
+    "median_price": 48000,
+    "permits": 48,
+    "permit_cost": 415126
+   },
+   "2020": {
+    "sales": 63,
+    "median_price": 54000,
+    "permits": 43,
+    "permit_cost": 333120
+   },
+   "2021": {
+    "sales": 79,
+    "median_price": 62000,
+    "permits": 68,
+    "permit_cost": 1199499
+   },
+   "2022": {
+    "sales": 100,
+    "median_price": 72500,
+    "permits": 61,
+    "permit_cost": 1370593
+   },
+   "2023": {
+    "sales": 102,
+    "median_price": 78500,
+    "permits": 62,
+    "permit_cost": 827657
+   },
+   "2024": {
+    "sales": 116,
+    "median_price": 84500,
+    "permits": 62,
+    "permit_cost": 11260211
+   },
+   "2025": {
+    "sales": 99,
+    "median_price": 105000,
+    "permits": 52,
+    "permit_cost": 1217356
+   },
+   "2026": {
+    "sales": 57,
+    "median_price": 110000,
+    "permits": 33,
+    "permit_cost": 5204671
+   }
+  },
+  "nbh_evergreen_outer_drive": {
+   "2019": {
+    "sales": 110,
+    "median_price": 43650,
+    "permits": 52,
+    "permit_cost": 401557
+   },
+   "2020": {
+    "sales": 83,
+    "median_price": 51500,
+    "permits": 32,
+    "permit_cost": 3046047
+   },
+   "2021": {
+    "sales": 104,
+    "median_price": 64500,
+    "permits": 59,
+    "permit_cost": 588912
+   },
+   "2022": {
+    "sales": 116,
+    "median_price": 71500,
+    "permits": 72,
+    "permit_cost": 830965
+   },
+   "2023": {
+    "sales": 116,
+    "median_price": 96500,
+    "permits": 50,
+    "permit_cost": 1038877
+   },
+   "2024": {
+    "sales": 133,
+    "median_price": 80000,
+    "permits": 67,
+    "permit_cost": 904544
+   },
+   "2025": {
+    "sales": 108,
+    "median_price": 95750,
+    "permits": 60,
+    "permit_cost": 829186
+   },
+   "2026": {
+    "sales": 52,
+    "median_price": 101000,
+    "permits": 28,
+    "permit_cost": 405105
+   }
+  },
+  "nbh_far_west_detroit": {
+   "2019": {
+    "sales": 61,
+    "median_price": 42000,
+    "permits": 14,
+    "permit_cost": 133898
+   },
+   "2020": {
+    "sales": 48,
+    "median_price": 51000,
+    "permits": 17,
+    "permit_cost": 313430
+   },
+   "2021": {
+    "sales": 56,
+    "median_price": 62500,
+    "permits": 27,
+    "permit_cost": 255168
+   },
+   "2022": {
+    "sales": 66,
+    "median_price": 89950,
+    "permits": 22,
+    "permit_cost": 185040
+   },
+   "2023": {
+    "sales": 60,
+    "median_price": 90000,
+    "permits": 20,
+    "permit_cost": 303170
+   },
+   "2024": {
+    "sales": 68,
+    "median_price": 113550,
+    "permits": 27,
+    "permit_cost": 363800
+   },
+   "2025": {
+    "sales": 43,
+    "median_price": 102000,
+    "permits": 24,
+    "permit_cost": 228516
+   },
+   "2026": {
+    "sales": 29,
+    "median_price": 110500,
+    "permits": 16,
+    "permit_cost": 192690
+   }
+  },
+  "nbh_farwell": {
+   "2019": {
+    "sales": 52,
+    "median_price": 24000,
+    "permits": 51,
+    "permit_cost": 404475
+   },
+   "2020": {
+    "sales": 68,
+    "median_price": 30000,
+    "permits": 55,
+    "permit_cost": 1253302
+   },
+   "2021": {
+    "sales": 75,
+    "median_price": 38000,
+    "permits": 63,
+    "permit_cost": 982239
+   },
+   "2022": {
+    "sales": 115,
+    "median_price": 45000,
+    "permits": 69,
+    "permit_cost": 671069
+   },
+   "2023": {
+    "sales": 88,
+    "median_price": 45000,
+    "permits": 57,
+    "permit_cost": 4826033
+   },
+   "2024": {
+    "sales": 91,
+    "median_price": 52500,
+    "permits": 65,
+    "permit_cost": 1083895
+   },
+   "2025": {
+    "sales": 89,
+    "median_price": 62000,
+    "permits": 47,
+    "permit_cost": 1562779
+   },
+   "2026": {
+    "sales": 51,
+    "median_price": 70000,
+    "permits": 48,
+    "permit_cost": 639979
+   }
+  },
+  "nbh_fiskhorn": {
+   "2019": {
+    "sales": 24,
+    "median_price": 35500,
+    "permits": 12,
+    "permit_cost": 114756
+   },
+   "2020": {
+    "sales": 28,
+    "median_price": 33500,
+    "permits": 8,
+    "permit_cost": 57522
+   },
+   "2021": {
+    "sales": 31,
+    "median_price": 52500,
+    "permits": 14,
+    "permit_cost": 135074
+   },
+   "2022": {
+    "sales": 38,
+    "median_price": 55000,
+    "permits": 9,
+    "permit_cost": 107810
+   },
+   "2023": {
+    "sales": 23,
+    "median_price": 52500,
+    "permits": 12,
+    "permit_cost": 482222
+   },
+   "2024": {
+    "sales": 44,
+    "median_price": 55500,
+    "permits": 6,
+    "permit_cost": 50391
+   },
+   "2025": {
+    "sales": 45,
+    "median_price": 73000,
+    "permits": 9,
+    "permit_cost": 240144
+   },
+   "2026": {
+    "sales": 28,
+    "median_price": 66000,
+    "permits": "lt5"
+   }
+  },
+  "nbh_fitzgerald_marygrove": {
+   "2019": {
+    "sales": 128,
+    "median_price": 38500,
+    "permits": 91,
+    "permit_cost": 4326378
+   },
+   "2020": {
+    "sales": 104,
+    "median_price": 46750,
+    "permits": 47,
+    "permit_cost": 7978326
+   },
+   "2021": {
+    "sales": 115,
+    "median_price": 68000,
+    "permits": 68,
+    "permit_cost": 6182789
+   },
+   "2022": {
+    "sales": 150,
+    "median_price": 76250,
+    "permits": 78,
+    "permit_cost": 1499639
+   },
+   "2023": {
+    "sales": 136,
+    "median_price": 80000,
+    "permits": 95,
+    "permit_cost": 10672471
+   },
+   "2024": {
+    "sales": 172,
+    "median_price": 93500,
+    "permits": 116,
+    "permit_cost": 52101739
+   },
+   "2025": {
+    "sales": 156,
+    "median_price": 92000,
+    "permits": 75,
+    "permit_cost": 9208216
+   },
+   "2026": {
+    "sales": 59,
+    "median_price": 101000,
+    "permits": 49,
+    "permit_cost": 878650
+   }
+  },
+  "nbh_five_points": {
+   "2019": {
+    "sales": 21,
+    "median_price": 33000,
+    "permits": 13,
+    "permit_cost": 327074
+   },
+   "2020": {
+    "sales": 14,
+    "median_price": 36500,
+    "permits": 6,
+    "permit_cost": 213151
+   },
+   "2021": {
+    "sales": 27,
+    "median_price": 45000,
+    "permits": 13,
+    "permit_cost": 531157
+   },
+   "2022": {
+    "sales": 28,
+    "median_price": 65000,
+    "permits": 14,
+    "permit_cost": 211717
+   },
+   "2023": {
+    "sales": 38,
+    "median_price": 70500,
+    "permits": 22,
+    "permit_cost": 401091
+   },
+   "2024": {
+    "sales": 40,
+    "median_price": 88000,
+    "permits": 23,
+    "permit_cost": 407801
+   },
+   "2025": {
+    "sales": 37,
+    "median_price": 83000,
+    "permits": 20,
+    "permit_cost": 244665
+   },
+   "2026": {
+    "sales": 12,
+    "median_price": 60900,
+    "permits": 12,
+    "permit_cost": 186190
+   }
+  },
+  "nbh_fox_creek": {
+   "2019": {
+    "sales": 11,
+    "median_price": 28000,
+    "permits": 14,
+    "permit_cost": 294024
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 12,
+    "permit_cost": 418210
+   },
+   "2021": {
+    "sales": 9,
+    "permits": 23,
+    "permit_cost": 593970
+   },
+   "2022": {
+    "sales": 9,
+    "permits": 25,
+    "permit_cost": 864776
+   },
+   "2023": {
+    "sales": 7,
+    "permits": 15,
+    "permit_cost": 253095
+   },
+   "2024": {
+    "sales": 20,
+    "median_price": 49750,
+    "permits": 27,
+    "permit_cost": 308671
+   },
+   "2025": {
+    "sales": 21,
+    "median_price": 54000,
+    "permits": 32,
+    "permit_cost": 544511
+   },
+   "2026": {
+    "sales": 17,
+    "median_price": 26500,
+    "permits": 11,
+    "permit_cost": 137495
+   }
+  },
+  "nbh_franklin": {
+   "2019": {
+    "sales": 11,
+    "median_price": 26600,
+    "permits": 13,
+    "permit_cost": 207749
+   },
+   "2020": {
+    "sales": 13,
+    "median_price": 29469,
+    "permits": 18,
+    "permit_cost": 268070
+   },
+   "2021": {
+    "sales": 23,
+    "median_price": 42000,
+    "permits": 8,
+    "permit_cost": 69741
+   },
+   "2022": {
+    "sales": 25,
+    "median_price": 38000,
+    "permits": 19,
+    "permit_cost": 365277
+   },
+   "2023": {
+    "sales": 16,
+    "median_price": 44000,
+    "permits": 31,
+    "permit_cost": 1631910
+   },
+   "2024": {
+    "sales": 35,
+    "median_price": 50000,
+    "permits": 18,
+    "permit_cost": 344634
+   },
+   "2025": {
+    "sales": 29,
+    "median_price": 82000,
+    "permits": 32,
+    "permit_cost": 545603
+   },
+   "2026": {
+    "sales": 11,
+    "median_price": 60000,
+    "permits": 21,
+    "permit_cost": 283468
+   }
+  },
+  "nbh_franklin_park": {
+   "2019": {
+    "sales": 113,
+    "median_price": 35000,
+    "permits": 58,
+    "permit_cost": 667977
+   },
+   "2020": {
+    "sales": 104,
+    "median_price": 35500,
+    "permits": 54,
+    "permit_cost": 727673
+   },
+   "2021": {
+    "sales": 111,
+    "median_price": 58000,
+    "permits": 102,
+    "permit_cost": 1145658
+   },
+   "2022": {
+    "sales": 143,
+    "median_price": 50000,
+    "permits": 102,
+    "permit_cost": 1329990
+   },
+   "2023": {
+    "sales": 147,
+    "median_price": 55000,
+    "permits": 51,
+    "permit_cost": 14651241
+   },
+   "2024": {
+    "sales": 148,
+    "median_price": 73000,
+    "permits": 81,
+    "permit_cost": 1229011
+   },
+   "2025": {
+    "sales": 135,
+    "median_price": 74900,
+    "permits": 79,
+    "permit_cost": 97890119
+   },
+   "2026": {
+    "sales": 69,
+    "median_price": 60000,
+    "permits": 42,
+    "permit_cost": 671734
+   }
+  },
+  "nbh_garden_homes": {
+   "2019": {
+    "sales": 45,
+    "median_price": 32000,
+    "permits": 29,
+    "permit_cost": 349444
+   },
+   "2020": {
+    "sales": 42,
+    "median_price": 32500,
+    "permits": 20,
+    "permit_cost": 1705028
+   },
+   "2021": {
+    "sales": 31,
+    "median_price": 63000,
+    "permits": 17,
+    "permit_cost": 4809154
+   },
+   "2022": {
+    "sales": 55,
+    "median_price": 60000,
+    "permits": 16,
+    "permit_cost": 141610
+   },
+   "2023": {
+    "sales": 63,
+    "median_price": 75000,
+    "permits": 21,
+    "permit_cost": 517102
+   },
+   "2024": {
+    "sales": 66,
+    "median_price": 74500,
+    "permits": 31,
+    "permit_cost": 21878074
+   },
+   "2025": {
+    "sales": 45,
+    "median_price": 85000,
+    "permits": 41,
+    "permit_cost": 504152
+   },
+   "2026": {
+    "sales": 23,
+    "median_price": 97000,
+    "permits": 28,
+    "permit_cost": 10564580
+   }
+  },
+  "nbh_gateway_community": {
+   "2019": {
+    "sales": 14,
+    "median_price": 28000,
+    "permits": 33,
+    "permit_cost": 612960
+   },
+   "2020": {
+    "sales": 18,
+    "median_price": 43900,
+    "permits": 22,
+    "permit_cost": 956642
+   },
+   "2021": {
+    "sales": 15,
+    "median_price": 50000,
+    "permits": 42,
+    "permit_cost": 1308791
+   },
+   "2022": {
+    "sales": 14,
+    "median_price": 87700,
+    "permits": 30,
+    "permit_cost": 1422918
+   },
+   "2023": {
+    "sales": 17,
+    "median_price": 75000,
+    "permits": 34,
+    "permit_cost": 12965654
+   },
+   "2024": {
+    "sales": 29,
+    "median_price": 99000,
+    "permits": 44,
+    "permit_cost": 13120458
+   },
+   "2025": {
+    "sales": 15,
+    "median_price": 125000,
+    "permits": 26,
+    "permit_cost": 2710214
+   },
+   "2026": {
+    "sales": 10,
+    "median_price": 129000,
+    "permits": 21,
+    "permit_cost": 1141006
+   }
+  },
+  "nbh_grand_river_i96": {
+   "2019": {
+    "sales": 19,
+    "median_price": 19500,
+    "permits": 35,
+    "permit_cost": 452080
+   },
+   "2020": {
+    "sales": 29,
+    "median_price": 21500,
+    "permits": 21,
+    "permit_cost": 365371
+   },
+   "2021": {
+    "sales": 25,
+    "median_price": 30000,
+    "permits": 41,
+    "permit_cost": 936859
+   },
+   "2022": {
+    "sales": 29,
+    "median_price": 38000,
+    "permits": 42,
+    "permit_cost": 509675
+   },
+   "2023": {
+    "sales": 28,
+    "median_price": 35000,
+    "permits": 31,
+    "permit_cost": 1015592
+   },
+   "2024": {
+    "sales": 35,
+    "median_price": 55000,
+    "permits": 28,
+    "permit_cost": 507494
+   },
+   "2025": {
+    "sales": 49,
+    "median_price": 38000,
+    "permits": 40,
+    "permit_cost": 2087430
+   },
+   "2026": {
+    "sales": 16,
+    "median_price": 57250,
+    "permits": 21,
+    "permit_cost": 306768
+   }
+  },
+  "nbh_grand_river_st_marys": {
+   "2019": {
+    "sales": 28,
+    "median_price": 47500,
+    "permits": 18,
+    "permit_cost": 120509
+   },
+   "2020": {
+    "sales": 22,
+    "median_price": 72075,
+    "permits": 14,
+    "permit_cost": 230602
+   },
+   "2021": {
+    "sales": 28,
+    "median_price": 74000,
+    "permits": 19,
+    "permit_cost": 954110
+   },
+   "2022": {
+    "sales": 28,
+    "median_price": 97000,
+    "permits": 14,
+    "permit_cost": 398794
+   },
+   "2023": {
+    "sales": 16,
+    "median_price": 105750,
+    "permits": 11,
+    "permit_cost": 286898
+   },
+   "2024": {
+    "sales": 35,
+    "median_price": 80000,
+    "permits": 15,
+    "permit_cost": 922146
+   },
+   "2025": {
+    "sales": 39,
+    "median_price": 80000,
+    "permits": 14,
+    "permit_cost": 18896731
+   },
+   "2026": {
+    "sales": 18,
+    "median_price": 70000,
+    "permits": 13,
+    "permit_cost": 223722
+   }
+  },
+  "nbh_grandmont": {
+   "2019": {
+    "sales": 21,
+    "median_price": 100000,
+    "permits": 29,
+    "permit_cost": 438325
+   },
+   "2020": {
+    "sales": 22,
+    "median_price": 98500,
+    "permits": 30,
+    "permit_cost": 359004
+   },
+   "2021": {
+    "sales": 26,
+    "median_price": 139500,
+    "permits": 37,
+    "permit_cost": 387976
+   },
+   "2022": {
+    "sales": 40,
+    "median_price": 187000,
+    "permits": 27,
+    "permit_cost": 331199
+   },
+   "2023": {
+    "sales": 25,
+    "median_price": 130000,
+    "permits": 42,
+    "permit_cost": 561825
+   },
+   "2024": {
+    "sales": 21,
+    "median_price": 150000,
+    "permits": 31,
+    "permit_cost": 454469
+   },
+   "2025": {
+    "sales": 28,
+    "median_price": 179500,
+    "permits": 29,
+    "permit_cost": 619597
+   },
+   "2026": {
+    "sales": 13,
+    "median_price": 150000,
+    "permits": 18,
+    "permit_cost": 414904
+   }
+  },
+  "nbh_grandmont_1": {
+   "2019": {
+    "sales": 30,
+    "median_price": 81500,
+    "permits": 19,
+    "permit_cost": 210534
+   },
+   "2020": {
+    "sales": 27,
+    "median_price": 120000,
+    "permits": 19,
+    "permit_cost": 212316
+   },
+   "2021": {
+    "sales": 21,
+    "median_price": 130000,
+    "permits": 29,
+    "permit_cost": 479037
+   },
+   "2022": {
+    "sales": 34,
+    "median_price": 157495,
+    "permits": 32,
+    "permit_cost": 324331
+   },
+   "2023": {
+    "sales": 17,
+    "median_price": 130000,
+    "permits": 34,
+    "permit_cost": 467140
+   },
+   "2024": {
+    "sales": 34,
+    "median_price": 129000,
+    "permits": 32,
+    "permit_cost": 449279
+   },
+   "2025": {
+    "sales": 24,
+    "median_price": 158000,
+    "permits": 26,
+    "permit_cost": 437230
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 21,
+    "permit_cost": 210132
+   }
+  },
+  "nbh_grant": {
+   "2019": {
+    "sales": 17,
+    "median_price": 20000,
+    "permits": 17,
+    "permit_cost": 267372
+   },
+   "2020": {
+    "sales": 7,
+    "permits": 27,
+    "permit_cost": 512477
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 18000,
+    "permits": 38,
+    "permit_cost": 1189696
+   },
+   "2022": {
+    "sales": 24,
+    "median_price": 42500,
+    "permits": 25,
+    "permit_cost": 866366
+   },
+   "2023": {
+    "sales": 19,
+    "median_price": 50000,
+    "permits": 26,
+    "permit_cost": 2041302
+   },
+   "2024": {
+    "sales": 32,
+    "median_price": 48450,
+    "permits": 38,
+    "permit_cost": 2083036
+   },
+   "2025": {
+    "sales": 21,
+    "median_price": 73000,
+    "permits": 31,
+    "permit_cost": 761708
+   },
+   "2026": {
+    "sales": 12,
+    "median_price": 80000,
+    "permits": 16,
+    "permit_cost": 377015
+   }
+  },
+  "nbh_gratiot_town_kettering": {
+   "2019": {
+    "sales": 5,
+    "permits": 15,
+    "permit_cost": 1059705
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 26,
+    "permit_cost": 13888282
+   },
+   "2021": {
+    "sales": 8,
+    "permits": 21,
+    "permit_cost": 1061096
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 664565
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 16,
+    "permit_cost": 921419
+   },
+   "2024": {
+    "sales": 9,
+    "permits": 34,
+    "permit_cost": 56582044
+   },
+   "2025": {
+    "sales": 10,
+    "median_price": 40000,
+    "permits": 18,
+    "permit_cost": 628706
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 26,
+    "permit_cost": 838711
+   }
+  },
+  "nbh_gratiot_woods": {
+   "2019": {
+    "sales": 9,
+    "permits": 19,
+    "permit_cost": 284523
+   },
+   "2020": {
+    "sales": 5,
+    "permits": 10,
+    "permit_cost": 291640
+   },
+   "2021": {
+    "sales": 10,
+    "median_price": 33500,
+    "permits": 20,
+    "permit_cost": 253796
+   },
+   "2022": {
+    "sales": 9,
+    "permits": 29,
+    "permit_cost": 443097
+   },
+   "2023": {
+    "sales": 17,
+    "median_price": 55000,
+    "permits": 23,
+    "permit_cost": 4358683
+   },
+   "2024": {
+    "sales": 22,
+    "median_price": 43750,
+    "permits": 30,
+    "permit_cost": 1354573
+   },
+   "2025": {
+    "sales": 15,
+    "median_price": 31000,
+    "permits": 22,
+    "permit_cost": 270711
+   },
+   "2026": {
+    "sales": 10,
+    "median_price": 41000,
+    "permits": 17,
+    "permit_cost": 151071
+   }
+  },
+  "nbh_gratiot_findlay": {
+   "2019": {
+    "sales": 15,
+    "median_price": 23000,
+    "permits": 21,
+    "permit_cost": 246944
+   },
+   "2020": {
+    "sales": 12,
+    "median_price": 46500,
+    "permits": 13,
+    "permit_cost": 322326
+   },
+   "2021": {
+    "sales": 12,
+    "median_price": 44000,
+    "permits": 20,
+    "permit_cost": 716988
+   },
+   "2022": {
+    "sales": 22,
+    "median_price": 42000,
+    "permits": 24,
+    "permit_cost": 3546694
+   },
+   "2023": {
+    "sales": 19,
+    "median_price": 44000,
+    "permits": 14,
+    "permit_cost": 435542
+   },
+   "2024": {
+    "sales": 28,
+    "median_price": 47750,
+    "permits": 29,
+    "permit_cost": 5403395
+   },
+   "2025": {
+    "sales": 16,
+    "median_price": 48625,
+    "permits": 35,
+    "permit_cost": 452166
+   },
+   "2026": {
+    "sales": 8,
+    "permits": 27,
+    "permit_cost": 277803
+   }
+  },
+  "nbh_gratiot_grand": {
+   "2019": {
+    "sales": 14,
+    "median_price": 28750,
+    "permits": 25,
+    "permit_cost": 407040
+   },
+   "2020": {
+    "sales": 7,
+    "permits": 27,
+    "permit_cost": 358931
+   },
+   "2021": {
+    "sales": 10,
+    "median_price": 50000,
+    "permits": 37,
+    "permit_cost": 904021
+   },
+   "2022": {
+    "sales": 19,
+    "median_price": 46000,
+    "permits": 38,
+    "permit_cost": 1754753
+   },
+   "2023": {
+    "sales": 25,
+    "median_price": 64000,
+    "permits": 46,
+    "permit_cost": 10561331
+   },
+   "2024": {
+    "sales": 19,
+    "median_price": 70000,
+    "permits": 43,
+    "permit_cost": 771982
+   },
+   "2025": {
+    "sales": 20,
+    "median_price": 65000,
+    "permits": 19,
+    "permit_cost": 217564
+   },
+   "2026": {
+    "sales": 14,
+    "median_price": 68500,
+    "permits": 25,
+    "permit_cost": 369532
+   }
+  },
+  "nbh_green_acres": {
+   "2019": {
+    "sales": 30,
+    "median_price": 178750,
+    "permits": 36,
+    "permit_cost": 462357
+   },
+   "2020": {
+    "sales": 24,
+    "median_price": 207500,
+    "permits": 44,
+    "permit_cost": 630337
+   },
+   "2021": {
+    "sales": 29,
+    "median_price": 210000,
+    "permits": 36,
+    "permit_cost": 1027792
+   },
+   "2022": {
+    "sales": 25,
+    "median_price": 182580,
+    "permits": 38,
+    "permit_cost": 1206126
+   },
+   "2023": {
+    "sales": 17,
+    "median_price": 220000,
+    "permits": 31,
+    "permit_cost": 1209588
+   },
+   "2024": {
+    "sales": 23,
+    "median_price": 255000,
+    "permits": 36,
+    "permit_cost": 961040
+   },
+   "2025": {
+    "sales": 27,
+    "median_price": 250000,
+    "permits": 28,
+    "permit_cost": 406062
+   },
+   "2026": {
+    "sales": 13,
+    "median_price": 242000,
+    "permits": 31,
+    "permit_cost": 1216536
+   }
+  },
+  "nbh_greenfield": {
+   "2019": {
+    "sales": 88,
+    "median_price": 35342,
+    "permits": 43,
+    "permit_cost": 699759
+   },
+   "2020": {
+    "sales": 81,
+    "median_price": 40000,
+    "permits": 24,
+    "permit_cost": 414821
+   },
+   "2021": {
+    "sales": 95,
+    "median_price": 60000,
+    "permits": 39,
+    "permit_cost": 471419
+   },
+   "2022": {
+    "sales": 123,
+    "median_price": 55000,
+    "permits": 33,
+    "permit_cost": 385755
+   },
+   "2023": {
+    "sales": 127,
+    "median_price": 58000,
+    "permits": 45,
+    "permit_cost": 3218383
+   },
+   "2024": {
+    "sales": 130,
+    "median_price": 62250,
+    "permits": 47,
+    "permit_cost": 570683
+   },
+   "2025": {
+    "sales": 130,
+    "median_price": 73700,
+    "permits": 55,
+    "permit_cost": 1250069
+   },
+   "2026": {
+    "sales": 59,
+    "median_price": 95000,
+    "permits": 32,
+    "permit_cost": 471797
+   }
+  },
+  "nbh_greenfield_park": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 78827
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5"
+   },
+   "2024": {
+    "sales": 6,
+    "permits": 12,
+    "permit_cost": 188275
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 47095
+   },
+   "2026": {
+    "permits": 10,
+    "permit_cost": 50600
+   }
+  },
+  "nbh_greenfield_grand_river": {
+   "2019": {
+    "sales": 46,
+    "median_price": 49800,
+    "permits": 27,
+    "permit_cost": 249537
+   },
+   "2020": {
+    "sales": 51,
+    "median_price": 60000,
+    "permits": 15,
+    "permit_cost": 146161
+   },
+   "2021": {
+    "sales": 37,
+    "median_price": 70000,
+    "permits": 20,
+    "permit_cost": 365779
+   },
+   "2022": {
+    "sales": 49,
+    "median_price": 73000,
+    "permits": 19,
+    "permit_cost": 386640
+   },
+   "2023": {
+    "sales": 50,
+    "median_price": 99500,
+    "permits": 24,
+    "permit_cost": 338269
+   },
+   "2024": {
+    "sales": 62,
+    "median_price": 111250,
+    "permits": 27,
+    "permit_cost": 428072
+   },
+   "2025": {
+    "sales": 37,
+    "median_price": 95000,
+    "permits": 25,
+    "permit_cost": 373592
+   },
+   "2026": {
+    "sales": 25,
+    "median_price": 120000,
+    "permits": 10,
+    "permit_cost": 236573
+   }
+  },
+  "nbh_greenwich": {
+   "2019": {
+    "sales": 29,
+    "median_price": 65500,
+    "permits": 18,
+    "permit_cost": 119394
+   },
+   "2020": {
+    "sales": 20,
+    "median_price": 97000,
+    "permits": 15,
+    "permit_cost": 126846
+   },
+   "2021": {
+    "sales": 22,
+    "median_price": 122750,
+    "permits": 23,
+    "permit_cost": 620022
+   },
+   "2022": {
+    "sales": 28,
+    "median_price": 137450,
+    "permits": 28,
+    "permit_cost": 322116
+   },
+   "2023": {
+    "sales": 28,
+    "median_price": 110000,
+    "permits": 21,
+    "permit_cost": 1378031
+   },
+   "2024": {
+    "sales": 21,
+    "median_price": 175000,
+    "permits": 18,
+    "permit_cost": 186960
+   },
+   "2025": {
+    "sales": 18,
+    "median_price": 181500,
+    "permits": 21,
+    "permit_cost": 284083
+   },
+   "2026": {
+    "sales": 14,
+    "median_price": 165700,
+    "permits": 13,
+    "permit_cost": 196974
+   }
+  },
+  "nbh_grixdale_farms": {
+   "2019": {
+    "sales": 14,
+    "median_price": 26000,
+    "permits": 16,
+    "permit_cost": 207143
+   },
+   "2020": {
+    "sales": 13,
+    "median_price": 27000,
+    "permits": 15,
+    "permit_cost": 402016
+   },
+   "2021": {
+    "sales": 15,
+    "median_price": 51400,
+    "permits": 19,
+    "permit_cost": 209143
+   },
+   "2022": {
+    "sales": 17,
+    "median_price": 62500,
+    "permits": 22,
+    "permit_cost": 662614
+   },
+   "2023": {
+    "sales": 18,
+    "median_price": 61500,
+    "permits": 26,
+    "permit_cost": 510504
+   },
+   "2024": {
+    "sales": 19,
+    "median_price": 91000,
+    "permits": 20,
+    "permit_cost": 432808
+   },
+   "2025": {
+    "sales": 16,
+    "median_price": 133250,
+    "permits": 20,
+    "permit_cost": 1199796
+   },
+   "2026": {
+    "sales": 10,
+    "median_price": 117500,
+    "permits": 14,
+    "permit_cost": 303405
+   }
+  },
+  "nbh_harmony_village": {
+   "2019": {
+    "sales": 56,
+    "median_price": 45750,
+    "permits": 21,
+    "permit_cost": 369224
+   },
+   "2020": {
+    "sales": 57,
+    "median_price": 49500,
+    "permits": 12,
+    "permit_cost": 183219
+   },
+   "2021": {
+    "sales": 42,
+    "median_price": 59500,
+    "permits": 27,
+    "permit_cost": 588991
+   },
+   "2022": {
+    "sales": 64,
+    "median_price": 70000,
+    "permits": 20,
+    "permit_cost": 422108
+   },
+   "2023": {
+    "sales": 57,
+    "median_price": 63000,
+    "permits": 23,
+    "permit_cost": 306542
+   },
+   "2024": {
+    "sales": 83,
+    "median_price": 98000,
+    "permits": 26,
+    "permit_cost": 487338
+   },
+   "2025": {
+    "sales": 61,
+    "median_price": 80000,
+    "permits": 23,
+    "permit_cost": 308218
+   },
+   "2026": {
+    "sales": 46,
+    "median_price": 75000,
+    "permits": 19,
+    "permit_cost": 292766
+   }
+  },
+  "nbh_hawthorne_park": {
+   "2019": {
+    "sales": 11,
+    "median_price": 17250,
+    "permits": 9,
+    "permit_cost": 120895
+   },
+   "2020": {
+    "sales": 17,
+    "median_price": 21000,
+    "permits": 12,
+    "permit_cost": 121979
+   },
+   "2021": {
+    "sales": 13,
+    "median_price": 17000,
+    "permits": 14,
+    "permit_cost": 201302
+   },
+   "2022": {
+    "sales": 13,
+    "median_price": 42000,
+    "permits": 17,
+    "permit_cost": 140542
+   },
+   "2023": {
+    "sales": 21,
+    "median_price": 42000,
+    "permits": 12,
+    "permit_cost": 95551
+   },
+   "2024": {
+    "sales": 17,
+    "median_price": 35000,
+    "permits": 13,
+    "permit_cost": 174384
+   },
+   "2025": {
+    "sales": 13,
+    "median_price": 40000,
+    "permits": 16,
+    "permit_cost": 174849
+   },
+   "2026": {
+    "sales": 6,
+    "permits": 7,
+    "permit_cost": 156611
+   }
+  },
+  "nbh_historic_atkinson": {
+   "2019": {
+    "sales": 6,
+    "permits": 21,
+    "permit_cost": 639088
+   },
+   "2020": {
+    "sales": 6,
+    "permits": 10,
+    "permit_cost": 265400
+   },
+   "2021": {
+    "sales": 9,
+    "permits": 6,
+    "permit_cost": 52704
+   },
+   "2022": {
+    "sales": 7,
+    "permits": 7,
+    "permit_cost": 252823
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": 10,
+    "median_price": 250000,
+    "permits": 6,
+    "permit_cost": 88012
+   },
+   "2025": {
+    "sales": 19,
+    "median_price": 239000,
+    "permits": 5,
+    "permit_cost": 41082
+   },
+   "2026": {
+    "sales": 13,
+    "median_price": 269000,
+    "permits": "lt5"
+   }
+  },
+  "nbh_holcomb_community": {
+   "2019": {
+    "sales": 65,
+    "median_price": 23030,
+    "permits": 25,
+    "permit_cost": 499815
+   },
+   "2020": {
+    "sales": 51,
+    "median_price": 35000,
+    "permits": 19,
+    "permit_cost": 212644
+   },
+   "2021": {
+    "sales": 67,
+    "median_price": 43000,
+    "permits": 37,
+    "permit_cost": 1413969
+   },
+   "2022": {
+    "sales": 67,
+    "median_price": 51000,
+    "permits": 29,
+    "permit_cost": 1106336
+   },
+   "2023": {
+    "sales": 66,
+    "median_price": 48000,
+    "permits": 35,
+    "permit_cost": 3438886
+   },
+   "2024": {
+    "sales": 85,
+    "median_price": 70000,
+    "permits": 64,
+    "permit_cost": 1296178
+   },
+   "2025": {
+    "sales": 68,
+    "median_price": 75000,
+    "permits": 35,
+    "permit_cost": 424890
+   },
+   "2026": {
+    "sales": 24,
+    "median_price": 60500,
+    "permits": 18,
+    "permit_cost": 175722
+   }
+  },
+  "nbh_hubbard_farms": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 10,
+    "permit_cost": 168558
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 14,
+    "permit_cost": 5291971
+   },
+   "2021": {
+    "sales": 6,
+    "permits": 16,
+    "permit_cost": 251346
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 12,
+    "permit_cost": 192351
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 10,
+    "permit_cost": 1847184
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 301763
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 9,
+    "permit_cost": 240421
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 5683049
+   }
+  },
+  "nbh_hubbard_richard": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 1566000
+   },
+   "2020": {
+    "permits": 5,
+    "permit_cost": 191279
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 53324442
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 8,
+    "permit_cost": 974655
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 9,
+    "permit_cost": 55938413
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 3752462
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 3693840
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 1991807
+   }
+  },
+  "nbh_hubbell_lyndon": {
+   "2019": {
+    "sales": 29,
+    "median_price": 25000,
+    "permits": 19,
+    "permit_cost": 320906
+   },
+   "2020": {
+    "sales": 37,
+    "median_price": 40000,
+    "permits": 19,
+    "permit_cost": 224972
+   },
+   "2021": {
+    "sales": 38,
+    "median_price": 50000,
+    "permits": 18,
+    "permit_cost": 204117
+   },
+   "2022": {
+    "sales": 45,
+    "median_price": 65000,
+    "permits": 27,
+    "permit_cost": 392192
+   },
+   "2023": {
+    "sales": 42,
+    "median_price": 57500,
+    "permits": 29,
+    "permit_cost": 417160
+   },
+   "2024": {
+    "sales": 60,
+    "median_price": 58500,
+    "permits": 28,
+    "permit_cost": 279181
+   },
+   "2025": {
+    "sales": 43,
+    "median_price": 58500,
+    "permits": 24,
+    "permit_cost": 411699
+   },
+   "2026": {
+    "sales": 17,
+    "median_price": 84000,
+    "permits": 21,
+    "permit_cost": 320449
+   }
+  },
+  "nbh_hubbell_puritan": {
+   "2019": {
+    "sales": 45,
+    "median_price": 54000,
+    "permits": 15,
+    "permit_cost": 146647
+   },
+   "2020": {
+    "sales": 30,
+    "median_price": 55000,
+    "permits": 13,
+    "permit_cost": 205559
+   },
+   "2021": {
+    "sales": 47,
+    "median_price": 60000,
+    "permits": 36,
+    "permit_cost": 320157
+   },
+   "2022": {
+    "sales": 56,
+    "median_price": 79450,
+    "permits": 24,
+    "permit_cost": 430805
+   },
+   "2023": {
+    "sales": 64,
+    "median_price": 76500,
+    "permits": 24,
+    "permit_cost": 352541
+   },
+   "2024": {
+    "sales": 53,
+    "median_price": 101000,
+    "permits": 29,
+    "permit_cost": 752178
+   },
+   "2025": {
+    "sales": 70,
+    "median_price": 90000,
+    "permits": 18,
+    "permit_cost": 213240
+   },
+   "2026": {
+    "sales": 21,
+    "median_price": 95000,
+    "permits": 12,
+    "permit_cost": 162524
+   }
+  },
+  "nbh_indian_village": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 31,
+    "permit_cost": 913655
+   },
+   "2020": {
+    "sales": 7,
+    "permits": 20,
+    "permit_cost": 992614
+   },
+   "2021": {
+    "sales": 9,
+    "permits": 20,
+    "permit_cost": 872983
+   },
+   "2022": {
+    "sales": 8,
+    "permits": 17,
+    "permit_cost": 739295
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 25,
+    "permit_cost": 1395493
+   },
+   "2024": {
+    "sales": 6,
+    "permits": 13,
+    "permit_cost": 1034323
+   },
+   "2025": {
+    "sales": 6,
+    "permits": 17,
+    "permit_cost": 725964
+   },
+   "2026": {
+    "sales": 5,
+    "permits": 11,
+    "permit_cost": 950289
+   }
+  },
+  "nbh_islandview": {
+   "2019": {
+    "sales": 17,
+    "median_price": 50500,
+    "permits": 102,
+    "permit_cost": 18647639
+   },
+   "2020": {
+    "sales": 14,
+    "median_price": 58250,
+    "permits": 46,
+    "permit_cost": 12154614
+   },
+   "2021": {
+    "sales": 20,
+    "median_price": 70000,
+    "permits": 91,
+    "permit_cost": 25774607
+   },
+   "2022": {
+    "sales": 30,
+    "median_price": 81000,
+    "permits": 100,
+    "permit_cost": 16186092
+   },
+   "2023": {
+    "sales": 33,
+    "median_price": 77500,
+    "permits": 95,
+    "permit_cost": 13036416
+   },
+   "2024": {
+    "sales": 44,
+    "median_price": 162500,
+    "permits": 98,
+    "permit_cost": 8950605
+   },
+   "2025": {
+    "sales": 43,
+    "median_price": 170000,
+    "permits": 100,
+    "permit_cost": 18969115
+   },
+   "2026": {
+    "sales": 19,
+    "median_price": 217500,
+    "permits": 55,
+    "permit_cost": 10189858
+   }
+  },
+  "nbh_jamison": {
+   "2019": {
+    "sales": 8,
+    "permits": 6,
+    "permit_cost": 51822
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 10,
+    "permit_cost": 197066
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 43306,
+    "permits": 12,
+    "permit_cost": 410582
+   },
+   "2022": {
+    "sales": 10,
+    "median_price": 52500,
+    "permits": 17,
+    "permit_cost": 354990
+   },
+   "2023": {
+    "sales": 17,
+    "median_price": 42500,
+    "permits": 12,
+    "permit_cost": 193467
+   },
+   "2024": {
+    "sales": 31,
+    "median_price": 65000,
+    "permits": 24,
+    "permit_cost": 535827
+   },
+   "2025": {
+    "sales": 15,
+    "median_price": 65000,
+    "permits": 15,
+    "permit_cost": 283378
+   },
+   "2026": {
+    "sales": 11,
+    "median_price": 52000,
+    "permits": 15,
+    "permit_cost": 1086359
+   }
+  },
+  "nbh_jefferson_chalmers": {
+   "2019": {
+    "sales": 53,
+    "median_price": 43000,
+    "permits": 105,
+    "permit_cost": 3168851
+   },
+   "2020": {
+    "sales": 31,
+    "median_price": 47500,
+    "permits": 65,
+    "permit_cost": 5767476
+   },
+   "2021": {
+    "sales": 41,
+    "median_price": 75000,
+    "permits": 111,
+    "permit_cost": 7161527
+   },
+   "2022": {
+    "sales": 51,
+    "median_price": 121000,
+    "permits": 91,
+    "permit_cost": 14615954
+   },
+   "2023": {
+    "sales": 82,
+    "median_price": 84000,
+    "permits": 83,
+    "permit_cost": 4522483
+   },
+   "2024": {
+    "sales": 73,
+    "median_price": 135000,
+    "permits": 79,
+    "permit_cost": 1980602
+   },
+   "2025": {
+    "sales": 66,
+    "median_price": 172500,
+    "permits": 84,
+    "permit_cost": 7411208
+   },
+   "2026": {
+    "sales": 25,
+    "median_price": 180250,
+    "permits": 52,
+    "permit_cost": 30176764
+   }
+  },
+  "nbh_joseph_berry_sub": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 10875138
+   },
+   "2020": {
+    "permits": 7,
+    "permit_cost": 177597
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 229180
+   },
+   "2022": {
+    "sales": 6,
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 139167
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 408595
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2026": {
+    "permits": 5,
+    "permit_cost": 65222
+   }
+  },
+  "nbh_joy_community": {
+   "2019": {
+    "sales": 45,
+    "median_price": 25000,
+    "permits": 27,
+    "permit_cost": 451727
+   },
+   "2020": {
+    "sales": 32,
+    "median_price": 32500,
+    "permits": 19,
+    "permit_cost": 92603
+   },
+   "2021": {
+    "sales": 54,
+    "median_price": 46084,
+    "permits": 51,
+    "permit_cost": 855030
+   },
+   "2022": {
+    "sales": 73,
+    "median_price": 42000,
+    "permits": 41,
+    "permit_cost": 820863
+   },
+   "2023": {
+    "sales": 72,
+    "median_price": 50750,
+    "permits": 35,
+    "permit_cost": 27040704
+   },
+   "2024": {
+    "sales": 81,
+    "median_price": 49500,
+    "permits": 40,
+    "permit_cost": 9115361
+   },
+   "2025": {
+    "sales": 48,
+    "median_price": 72500,
+    "permits": 28,
+    "permit_cost": 415756
+   },
+   "2026": {
+    "sales": 28,
+    "median_price": 60000,
+    "permits": 20,
+    "permit_cost": 192019
+   }
+  },
+  "nbh_joy_schaefer": {
+   "2019": {
+    "sales": 10,
+    "median_price": 31500,
+    "permits": 5,
+    "permit_cost": 18150
+   },
+   "2020": {
+    "sales": 9,
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 14,
+    "median_price": 60500,
+    "permits": 5,
+    "permit_cost": 60373
+   },
+   "2022": {
+    "sales": 13,
+    "median_price": 37935,
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": 10,
+    "median_price": 50000,
+    "permits": 7,
+    "permit_cost": 849349
+   },
+   "2024": {
+    "sales": 18,
+    "median_price": 81000,
+    "permits": 9,
+    "permit_cost": 91734
+   },
+   "2025": {
+    "sales": 9,
+    "permits": "lt5"
+   },
+   "2026": {
+    "sales": 6,
+    "permits": 6,
+    "permit_cost": 54535
+   }
+  },
+  "nbh_krainz_woods": {
+   "2019": {
+    "sales": 26,
+    "median_price": 23750,
+    "permits": 17,
+    "permit_cost": 183107
+   },
+   "2020": {
+    "sales": 15,
+    "median_price": 21000,
+    "permits": 17,
+    "permit_cost": 117456
+   },
+   "2021": {
+    "sales": 34,
+    "median_price": 26750,
+    "permits": 20,
+    "permit_cost": 220638
+   },
+   "2022": {
+    "sales": 37,
+    "median_price": 32000,
+    "permits": 28,
+    "permit_cost": 358106
+   },
+   "2023": {
+    "sales": 35,
+    "median_price": 35000,
+    "permits": 20,
+    "permit_cost": 430510
+   },
+   "2024": {
+    "sales": 45,
+    "median_price": 48000,
+    "permits": 23,
+    "permit_cost": 215030
+   },
+   "2025": {
+    "sales": 30,
+    "median_price": 69000,
+    "permits": 42,
+    "permit_cost": 464680
+   },
+   "2026": {
+    "sales": 15,
+    "median_price": 35000,
+    "permits": 16,
+    "permit_cost": 259124
+   }
+  },
+  "nbh_lafayette_park": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 14,
+    "permit_cost": 1709648
+   },
+   "2020": {
+    "permits": 13,
+    "permit_cost": 11568246
+   },
+   "2021": {
+    "permits": 27,
+    "permit_cost": 18755886
+   },
+   "2022": {
+    "permits": 22,
+    "permit_cost": 8000354
+   },
+   "2023": {
+    "permits": 18,
+    "permit_cost": 21963269
+   },
+   "2024": {
+    "permits": 17,
+    "permit_cost": 22463457
+   },
+   "2025": {
+    "permits": 13,
+    "permit_cost": 552592
+   },
+   "2026": {
+    "permits": 13,
+    "permit_cost": 338951
+   }
+  },
+  "nbh_lasalle_college_park": {
+   "2019": {
+    "sales": 37,
+    "median_price": 34000,
+    "permits": 22,
+    "permit_cost": 171732
+   },
+   "2020": {
+    "sales": 36,
+    "median_price": 42000,
+    "permits": 20,
+    "permit_cost": 133894
+   },
+   "2021": {
+    "sales": 33,
+    "median_price": 49900,
+    "permits": 29,
+    "permit_cost": 1286219
+   },
+   "2022": {
+    "sales": 47,
+    "median_price": 50000,
+    "permits": 25,
+    "permit_cost": 231365
+   },
+   "2023": {
+    "sales": 33,
+    "median_price": 50000,
+    "permits": 21,
+    "permit_cost": 281326
+   },
+   "2024": {
+    "sales": 56,
+    "median_price": 53750,
+    "permits": 35,
+    "permit_cost": 517166
+   },
+   "2025": {
+    "sales": 39,
+    "median_price": 65000,
+    "permits": 14,
+    "permit_cost": 172109
+   },
+   "2026": {
+    "sales": 15,
+    "median_price": 70000,
+    "permits": 13,
+    "permit_cost": 163249
+   }
+  },
+  "nbh_lasalle_gardens": {
+   "2019": {
+    "sales": 13,
+    "median_price": 45000,
+    "permits": 34,
+    "permit_cost": 759680
+   },
+   "2020": {
+    "sales": 8,
+    "permits": 16,
+    "permit_cost": 355379
+   },
+   "2021": {
+    "sales": 14,
+    "median_price": 43750,
+    "permits": 22,
+    "permit_cost": 1338402
+   },
+   "2022": {
+    "sales": 20,
+    "median_price": 146000,
+    "permits": 30,
+    "permit_cost": 461720
+   },
+   "2023": {
+    "sales": 18,
+    "median_price": 154500,
+    "permits": 23,
+    "permit_cost": 2709867
+   },
+   "2024": {
+    "sales": 29,
+    "median_price": 183000,
+    "permits": 22,
+    "permit_cost": 574275
+   },
+   "2025": {
+    "sales": 27,
+    "median_price": 265000,
+    "permits": 21,
+    "permit_cost": 374698
+   },
+   "2026": {
+    "sales": 13,
+    "median_price": 240000,
+    "permits": 12,
+    "permit_cost": 145319
+   }
+  },
+  "nbh_littlefield_community": {
+   "2019": {
+    "sales": 7,
+    "permits": 11,
+    "permit_cost": 111597
+   },
+   "2020": {
+    "sales": 13,
+    "median_price": 24500,
+    "permits": 7,
+    "permit_cost": 75609
+   },
+   "2021": {
+    "sales": 10,
+    "median_price": 25200,
+    "permits": 28,
+    "permit_cost": 2541118
+   },
+   "2022": {
+    "sales": 23,
+    "median_price": 25000,
+    "permits": 16,
+    "permit_cost": 224005
+   },
+   "2023": {
+    "sales": 18,
+    "median_price": 34500,
+    "permits": 15,
+    "permit_cost": 194070
+   },
+   "2024": {
+    "sales": 29,
+    "median_price": 40000,
+    "permits": 28,
+    "permit_cost": 339594
+   },
+   "2025": {
+    "sales": 18,
+    "median_price": 51500,
+    "permits": 15,
+    "permit_cost": 477472
+   },
+   "2026": {
+    "sales": 9,
+    "permits": 15,
+    "permit_cost": 501040
+   }
+  },
+  "nbh_mapleridge": {
+   "2019": {
+    "sales": 43,
+    "median_price": 35000,
+    "permits": 42,
+    "permit_cost": 930396
+   },
+   "2020": {
+    "sales": 40,
+    "median_price": 28625,
+    "permits": 25,
+    "permit_cost": 295842
+   },
+   "2021": {
+    "sales": 61,
+    "median_price": 40000,
+    "permits": 35,
+    "permit_cost": 325267
+   },
+   "2022": {
+    "sales": 90,
+    "median_price": 42000,
+    "permits": 48,
+    "permit_cost": 1219014
+   },
+   "2023": {
+    "sales": 68,
+    "median_price": 50500,
+    "permits": 50,
+    "permit_cost": 1135373
+   },
+   "2024": {
+    "sales": 78,
+    "median_price": 45000,
+    "permits": 63,
+    "permit_cost": 1198297
+   },
+   "2025": {
+    "sales": 70,
+    "median_price": 55000,
+    "permits": 44,
+    "permit_cost": 824601
+   },
+   "2026": {
+    "sales": 32,
+    "median_price": 57000,
+    "permits": 30,
+    "permit_cost": 403627
+   }
+  },
+  "nbh_martin_park": {
+   "2019": {
+    "sales": 59,
+    "median_price": 55000,
+    "permits": 33,
+    "permit_cost": 876819
+   },
+   "2020": {
+    "sales": 26,
+    "median_price": 71250,
+    "permits": 18,
+    "permit_cost": 488169
+   },
+   "2021": {
+    "sales": 44,
+    "median_price": 83500,
+    "permits": 41,
+    "permit_cost": 14650850
+   },
+   "2022": {
+    "sales": 50,
+    "median_price": 141500,
+    "permits": 30,
+    "permit_cost": 3495409
+   },
+   "2023": {
+    "sales": 41,
+    "median_price": 98500,
+    "permits": 37,
+    "permit_cost": 3803617
+   },
+   "2024": {
+    "sales": 65,
+    "median_price": 140000,
+    "permits": 34,
+    "permit_cost": 2464482
+   },
+   "2025": {
+    "sales": 46,
+    "median_price": 129000,
+    "permits": 52,
+    "permit_cost": 41759856
+   },
+   "2026": {
+    "sales": 29,
+    "median_price": 150000,
+    "permits": 30,
+    "permit_cost": 13402037
+   }
+  },
+  "nbh_mcdougall_hunt": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 29,
+    "permit_cost": 7719009
+   },
+   "2020": {
+    "sales": 6,
+    "permits": 15,
+    "permit_cost": 19904263
+   },
+   "2021": {
+    "sales": 10,
+    "median_price": 39000,
+    "permits": 24,
+    "permit_cost": 5232372
+   },
+   "2022": {
+    "sales": 7,
+    "permits": 32,
+    "permit_cost": 1682377
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 39,
+    "permit_cost": 1029324
+   },
+   "2024": {
+    "sales": 9,
+    "permits": 36,
+    "permit_cost": 5769518
+   },
+   "2025": {
+    "sales": 8,
+    "permits": 41,
+    "permit_cost": 1159838
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 23,
+    "permit_cost": 790277
+   }
+  },
+  "nbh_mcdowell": {
+   "2019": {
+    "sales": 33,
+    "median_price": 63000,
+    "permits": 18,
+    "permit_cost": 282408
+   },
+   "2020": {
+    "sales": 18,
+    "median_price": 57500,
+    "permits": 16,
+    "permit_cost": 227755
+   },
+   "2021": {
+    "sales": 30,
+    "median_price": 99500,
+    "permits": 24,
+    "permit_cost": 254134
+   },
+   "2022": {
+    "sales": 28,
+    "median_price": 115000,
+    "permits": 18,
+    "permit_cost": 352589
+   },
+   "2023": {
+    "sales": 35,
+    "median_price": 95000,
+    "permits": 23,
+    "permit_cost": 14015492
+   },
+   "2024": {
+    "sales": 27,
+    "median_price": 110000,
+    "permits": 16,
+    "permit_cost": 1871873
+   },
+   "2025": {
+    "sales": 27,
+    "median_price": 120000,
+    "permits": 24,
+    "permit_cost": 339855
+   },
+   "2026": {
+    "sales": 18,
+    "median_price": 143000,
+    "permits": 14,
+    "permit_cost": 122963
+   }
+  },
+  "nbh_mcnichols_evergreen": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 96264
+   },
+   "2020": {
+    "sales": 5,
+    "permits": 8,
+    "permit_cost": 39063
+   },
+   "2021": {
+    "sales": 13,
+    "median_price": 70000,
+    "permits": 24,
+    "permit_cost": 262414
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 127500,
+    "permits": 24,
+    "permit_cost": 342385
+   },
+   "2023": {
+    "sales": 13,
+    "median_price": 135000,
+    "permits": 12,
+    "permit_cost": 170086
+   },
+   "2024": {
+    "sales": 22,
+    "median_price": 178500,
+    "permits": 12,
+    "permit_cost": 174803
+   },
+   "2025": {
+    "sales": 15,
+    "median_price": 115000,
+    "permits": 11,
+    "permit_cost": 248097
+   },
+   "2026": {
+    "sales": 5,
+    "permits": 9,
+    "permit_cost": 162263
+   }
+  },
+  "nbh_melvern_hill": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 131361
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 58690
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_michigan_martin": {
+   "2019": {
+    "sales": 11,
+    "median_price": 40000,
+    "permits": 8,
+    "permit_cost": 574500
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 24201
+   },
+   "2021": {
+    "sales": 8,
+    "permits": 6,
+    "permit_cost": 330749
+   },
+   "2022": {
+    "sales": 11,
+    "median_price": 58000,
+    "permits": 9,
+    "permit_cost": 1729420
+   },
+   "2023": {
+    "sales": 11,
+    "median_price": 65000,
+    "permits": 9,
+    "permit_cost": 2225025
+   },
+   "2024": {
+    "sales": 8,
+    "permits": 12,
+    "permit_cost": 300873
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 93850
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 9,
+    "permit_cost": 205074
+   }
+  },
+  "nbh_midtown": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 86,
+    "permit_cost": 178941265
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 78,
+    "permit_cost": 397371279
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 62,
+    "permit_cost": 37445989
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 54,
+    "permit_cost": 32682860
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 72,
+    "permit_cost": 30461042
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 64,
+    "permit_cost": 65331374
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 115,
+    "permit_cost": 38641228
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 54,
+    "permit_cost": 31837331
+   }
+  },
+  "nbh_midwest": {
+   "2019": {
+    "sales": 64,
+    "median_price": 16750,
+    "permits": 69,
+    "permit_cost": 6618898
+   },
+   "2020": {
+    "sales": 61,
+    "median_price": 20000,
+    "permits": 42,
+    "permit_cost": 826467
+   },
+   "2021": {
+    "sales": 73,
+    "median_price": 20000,
+    "permits": 96,
+    "permit_cost": 2255039
+   },
+   "2022": {
+    "sales": 117,
+    "median_price": 25000,
+    "permits": 107,
+    "permit_cost": 6582477
+   },
+   "2023": {
+    "sales": 103,
+    "median_price": 32000,
+    "permits": 112,
+    "permit_cost": 6214524
+   },
+   "2024": {
+    "sales": 113,
+    "median_price": 42000,
+    "permits": 151,
+    "permit_cost": 13116275
+   },
+   "2025": {
+    "sales": 101,
+    "median_price": 55000,
+    "permits": 134,
+    "permit_cost": 5174254
+   },
+   "2026": {
+    "sales": 70,
+    "median_price": 57500,
+    "permits": 88,
+    "permit_cost": 4650819
+   }
+  },
+  "nbh_miller_grove": {
+   "2019": {
+    "sales": 27,
+    "median_price": 36000,
+    "permits": 20,
+    "permit_cost": 203734
+   },
+   "2020": {
+    "sales": 20,
+    "median_price": 48000,
+    "permits": 15,
+    "permit_cost": 347780
+   },
+   "2021": {
+    "sales": 24,
+    "median_price": 50000,
+    "permits": 27,
+    "permit_cost": 580841
+   },
+   "2022": {
+    "sales": 23,
+    "median_price": 66000,
+    "permits": 22,
+    "permit_cost": 11746934
+   },
+   "2023": {
+    "sales": 21,
+    "median_price": 63000,
+    "permits": 16,
+    "permit_cost": 10581564
+   },
+   "2024": {
+    "sales": 26,
+    "median_price": 87500,
+    "permits": 15,
+    "permit_cost": 390863
+   },
+   "2025": {
+    "sales": 29,
+    "median_price": 93000,
+    "permits": 26,
+    "permit_cost": 7073829
+   },
+   "2026": {
+    "sales": 9,
+    "permits": 14,
+    "permit_cost": 148027
+   }
+  },
+  "nbh_minock_park": {
+   "2019": {
+    "sales": 11,
+    "median_price": 43000,
+    "permits": 8,
+    "permit_cost": 50762
+   },
+   "2020": {
+    "sales": 5,
+    "permits": 5,
+    "permit_cost": 38646
+   },
+   "2021": {
+    "sales": 13,
+    "median_price": 80000,
+    "permits": 15,
+    "permit_cost": 170379
+   },
+   "2022": {
+    "sales": 14,
+    "median_price": 56500,
+    "permits": 5,
+    "permit_cost": 39955
+   },
+   "2023": {
+    "sales": 13,
+    "median_price": 89000,
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": 23,
+    "median_price": 80000,
+    "permits": 9,
+    "permit_cost": 11409036
+   },
+   "2025": {
+    "sales": 10,
+    "median_price": 83400,
+    "permits": 5,
+    "permit_cost": 130285
+   },
+   "2026": {
+    "sales": 5,
+    "permits": 8,
+    "permit_cost": 246546
+   }
+  },
+  "nbh_mohican_regent": {
+   "2019": {
+    "sales": 50,
+    "median_price": 44500,
+    "permits": 13,
+    "permit_cost": 296589
+   },
+   "2020": {
+    "sales": 43,
+    "median_price": 53000,
+    "permits": 14,
+    "permit_cost": 98044
+   },
+   "2021": {
+    "sales": 55,
+    "median_price": 60000,
+    "permits": 26,
+    "permit_cost": 235474
+   },
+   "2022": {
+    "sales": 46,
+    "median_price": 60000,
+    "permits": 23,
+    "permit_cost": 1107898
+   },
+   "2023": {
+    "sales": 35,
+    "median_price": 78000,
+    "permits": 21,
+    "permit_cost": 591303
+   },
+   "2024": {
+    "sales": 52,
+    "median_price": 85000,
+    "permits": 22,
+    "permit_cost": 328816
+   },
+   "2025": {
+    "sales": 42,
+    "median_price": 91000,
+    "permits": 28,
+    "permit_cost": 1080031
+   },
+   "2026": {
+    "sales": 22,
+    "median_price": 64750,
+    "permits": 21,
+    "permit_cost": 301149
+   }
+  },
+  "nbh_morningside": {
+   "2019": {
+    "sales": 164,
+    "median_price": 41850,
+    "permits": 103,
+    "permit_cost": 1299375
+   },
+   "2020": {
+    "sales": 128,
+    "median_price": 50000,
+    "permits": 76,
+    "permit_cost": 1545539
+   },
+   "2021": {
+    "sales": 186,
+    "median_price": 65000,
+    "permits": 160,
+    "permit_cost": 2428666
+   },
+   "2022": {
+    "sales": 223,
+    "median_price": 75000,
+    "permits": 162,
+    "permit_cost": 4388824
+   },
+   "2023": {
+    "sales": 156,
+    "median_price": 99000,
+    "permits": 104,
+    "permit_cost": 12821964
+   },
+   "2024": {
+    "sales": 245,
+    "median_price": 98000,
+    "permits": 139,
+    "permit_cost": 5198061
+   },
+   "2025": {
+    "sales": 203,
+    "median_price": 110000,
+    "permits": 124,
+    "permit_cost": 3202347
+   },
+   "2026": {
+    "sales": 93,
+    "median_price": 125900,
+    "permits": 82,
+    "permit_cost": 3050394
+   }
+  },
+  "nbh_moross_morang": {
+   "2019": {
+    "sales": 147,
+    "median_price": 35000,
+    "permits": 41,
+    "permit_cost": 322686
+   },
+   "2020": {
+    "sales": 119,
+    "median_price": 40000,
+    "permits": 23,
+    "permit_cost": 224941
+   },
+   "2021": {
+    "sales": 134,
+    "median_price": 48800,
+    "permits": 51,
+    "permit_cost": 466312
+   },
+   "2022": {
+    "sales": 169,
+    "median_price": 49900,
+    "permits": 48,
+    "permit_cost": 803699
+   },
+   "2023": {
+    "sales": 136,
+    "median_price": 56500,
+    "permits": 37,
+    "permit_cost": 651687
+   },
+   "2024": {
+    "sales": 176,
+    "median_price": 65650,
+    "permits": 59,
+    "permit_cost": 1033182
+   },
+   "2025": {
+    "sales": 126,
+    "median_price": 67500,
+    "permits": 34,
+    "permit_cost": 544856
+   },
+   "2026": {
+    "sales": 76,
+    "median_price": 70000,
+    "permits": 30,
+    "permit_cost": 592972
+   }
+  },
+  "nbh_mount_olivet": {
+   "2019": {
+    "sales": 27,
+    "median_price": 33615,
+    "permits": 5,
+    "permit_cost": 109919
+   },
+   "2020": {
+    "sales": 18,
+    "median_price": 37000,
+    "permits": 11,
+    "permit_cost": 99835
+   },
+   "2021": {
+    "sales": 26,
+    "median_price": 51000,
+    "permits": 10,
+    "permit_cost": 160663
+   },
+   "2022": {
+    "sales": 38,
+    "median_price": 53250,
+    "permits": 19,
+    "permit_cost": 329371
+   },
+   "2023": {
+    "sales": 20,
+    "median_price": 57000,
+    "permits": 21,
+    "permit_cost": 296160
+   },
+   "2024": {
+    "sales": 27,
+    "median_price": 70000,
+    "permits": 20,
+    "permit_cost": 614471
+   },
+   "2025": {
+    "sales": 34,
+    "median_price": 65000,
+    "permits": 16,
+    "permit_cost": 220594
+   },
+   "2026": {
+    "sales": 8,
+    "permits": 6,
+    "permit_cost": 84386
+   }
+  },
+  "nbh_nardin_park": {
+   "2019": {
+    "sales": 10,
+    "median_price": 17500,
+    "permits": 22,
+    "permit_cost": 305140
+   },
+   "2020": {
+    "sales": 15,
+    "median_price": 29000,
+    "permits": 12,
+    "permit_cost": 235036
+   },
+   "2021": {
+    "sales": 12,
+    "median_price": 25084,
+    "permits": 30,
+    "permit_cost": 600778
+   },
+   "2022": {
+    "sales": 34,
+    "median_price": 40000,
+    "permits": 27,
+    "permit_cost": 654853
+   },
+   "2023": {
+    "sales": 10,
+    "median_price": 28250,
+    "permits": 26,
+    "permit_cost": 416974
+   },
+   "2024": {
+    "sales": 30,
+    "median_price": 39000,
+    "permits": 38,
+    "permit_cost": 26523499
+   },
+   "2025": {
+    "sales": 42,
+    "median_price": 58500,
+    "permits": 31,
+    "permit_cost": 15877513
+   },
+   "2026": {
+    "sales": 25,
+    "median_price": 62000,
+    "permits": 19,
+    "permit_cost": 582991
+   }
+  },
+  "nbh_new_center_commons": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 33615798
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 37898618
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 20,
+    "permit_cost": 115631770
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 31952744
+   },
+   "2023": {
+    "permits": 20,
+    "permit_cost": 2157266
+   },
+   "2024": {
+    "permits": 17,
+    "permit_cost": 17384742
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 22,
+    "permit_cost": 4823960
+   },
+   "2026": {
+    "permits": 13,
+    "permit_cost": 3580909
+   }
+  },
+  "nbh_nolan": {
+   "2019": {
+    "sales": 43,
+    "median_price": 21500,
+    "permits": 36,
+    "permit_cost": 872899
+   },
+   "2020": {
+    "sales": 40,
+    "median_price": 24500,
+    "permits": 25,
+    "permit_cost": 250755
+   },
+   "2021": {
+    "sales": 42,
+    "median_price": 31000,
+    "permits": 45,
+    "permit_cost": 8436428
+   },
+   "2022": {
+    "sales": 67,
+    "median_price": 41500,
+    "permits": 48,
+    "permit_cost": 782779
+   },
+   "2023": {
+    "sales": 62,
+    "median_price": 45100,
+    "permits": 61,
+    "permit_cost": 1287512
+   },
+   "2024": {
+    "sales": 76,
+    "median_price": 58750,
+    "permits": 60,
+    "permit_cost": 3398168
+   },
+   "2025": {
+    "sales": 48,
+    "median_price": 55000,
+    "permits": 51,
+    "permit_cost": 789473
+   },
+   "2026": {
+    "sales": 27,
+    "median_price": 55000,
+    "permits": 60,
+    "permit_cost": 710798
+   }
+  },
+  "nbh_north_campau": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 69930
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 5,
+    "permits": "lt5"
+   },
+   "2022": {
+    "sales": 6,
+    "permits": 11,
+    "permit_cost": 91000
+   },
+   "2023": {
+    "sales": 5,
+    "permits": 15,
+    "permit_cost": 173669
+   },
+   "2024": {
+    "sales": 9,
+    "permits": 9,
+    "permit_cost": 120463
+   },
+   "2025": {
+    "sales": 11,
+    "median_price": 35000,
+    "permits": 11,
+    "permit_cost": 420876
+   },
+   "2026": {
+    "sales": 10,
+    "median_price": 26000,
+    "permits": "lt5"
+   }
+  },
+  "nbh_north_corktown": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 28,
+    "permit_cost": 9354467
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 23,
+    "permit_cost": 14639120
+   },
+   "2021": {
+    "permits": 26,
+    "permit_cost": 14351525
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 39,
+    "permit_cost": 17218497
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 43,
+    "permit_cost": 5121681
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 41,
+    "permit_cost": 37434581
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 36,
+    "permit_cost": 40416999
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 33,
+    "permit_cost": 6669976
+   }
+  },
+  "nbh_north_end": {
+   "2019": {
+    "sales": 24,
+    "median_price": 35500,
+    "permits": 118,
+    "permit_cost": 14111796
+   },
+   "2020": {
+    "sales": 28,
+    "median_price": 50113,
+    "permits": 59,
+    "permit_cost": 2918831
+   },
+   "2021": {
+    "sales": 21,
+    "median_price": 50000,
+    "permits": 85,
+    "permit_cost": 16678540
+   },
+   "2022": {
+    "sales": 35,
+    "median_price": 140000,
+    "permits": 86,
+    "permit_cost": 23439944
+   },
+   "2023": {
+    "sales": 35,
+    "median_price": 199900,
+    "permits": 63,
+    "permit_cost": 20430642
+   },
+   "2024": {
+    "sales": 43,
+    "median_price": 190000,
+    "permits": 78,
+    "permit_cost": 8788374
+   },
+   "2025": {
+    "sales": 40,
+    "median_price": 245000,
+    "permits": 60,
+    "permit_cost": 4528967
+   },
+   "2026": {
+    "sales": 14,
+    "median_price": 164500,
+    "permits": 41,
+    "permit_cost": 3969827
+   }
+  },
+  "nbh_north_rosedale_park": {
+   "2019": {
+    "sales": 50,
+    "median_price": 118500,
+    "permits": 56,
+    "permit_cost": 802977
+   },
+   "2020": {
+    "sales": 49,
+    "median_price": 149900,
+    "permits": 51,
+    "permit_cost": 527781
+   },
+   "2021": {
+    "sales": 47,
+    "median_price": 170000,
+    "permits": 68,
+    "permit_cost": 1381409
+   },
+   "2022": {
+    "sales": 60,
+    "median_price": 178450,
+    "permits": 82,
+    "permit_cost": 1929084
+   },
+   "2023": {
+    "sales": 44,
+    "median_price": 176750,
+    "permits": 58,
+    "permit_cost": 925010
+   },
+   "2024": {
+    "sales": 53,
+    "median_price": 194000,
+    "permits": 83,
+    "permit_cost": 1568052
+   },
+   "2025": {
+    "sales": 49,
+    "median_price": 220000,
+    "permits": 67,
+    "permit_cost": 1965109
+   },
+   "2026": {
+    "sales": 22,
+    "median_price": 227500,
+    "permits": 51,
+    "permit_cost": 1090842
+   }
+  },
+  "nbh_northeast_central_district": {
+   "2019": {
+    "sales": 14,
+    "median_price": 19000,
+    "permits": 19,
+    "permit_cost": 217592
+   },
+   "2020": {
+    "sales": 19,
+    "median_price": 18000,
+    "permits": 7,
+    "permit_cost": 49897
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 41250,
+    "permits": 21,
+    "permit_cost": 221341
+   },
+   "2022": {
+    "sales": 27,
+    "median_price": 45000,
+    "permits": 14,
+    "permit_cost": 125492
+   },
+   "2023": {
+    "sales": 20,
+    "median_price": 41500,
+    "permits": 12,
+    "permit_cost": 134117
+   },
+   "2024": {
+    "sales": 31,
+    "median_price": 44800,
+    "permits": 15,
+    "permit_cost": 217687
+   },
+   "2025": {
+    "sales": 21,
+    "median_price": 44000,
+    "permits": 16,
+    "permit_cost": 258891
+   },
+   "2026": {
+    "sales": 10,
+    "median_price": 62500,
+    "permits": 18,
+    "permit_cost": 269589
+   }
+  },
+  "nbh_northwest_community": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 144411
+   },
+   "2021": {
+    "sales": 8,
+    "permits": 11,
+    "permit_cost": 109495
+   },
+   "2022": {
+    "sales": 9,
+    "permits": 10,
+    "permit_cost": 157036
+   },
+   "2023": {
+    "sales": 7,
+    "permits": 11,
+    "permit_cost": 85364
+   },
+   "2024": {
+    "sales": 18,
+    "median_price": 33000,
+    "permits": 12,
+    "permit_cost": 174819
+   },
+   "2025": {
+    "sales": 14,
+    "median_price": 37000,
+    "permits": 8,
+    "permit_cost": 266759
+   },
+   "2026": {
+    "sales": 8,
+    "permits": 7,
+    "permit_cost": 147492
+   }
+  },
+  "nbh_nortown": {
+   "2019": {
+    "sales": 34,
+    "median_price": 23500,
+    "permits": 24,
+    "permit_cost": 216135
+   },
+   "2020": {
+    "sales": 31,
+    "median_price": 35000,
+    "permits": 20,
+    "permit_cost": 185114
+   },
+   "2021": {
+    "sales": 33,
+    "median_price": 57900,
+    "permits": 32,
+    "permit_cost": 377221
+   },
+   "2022": {
+    "sales": 34,
+    "median_price": 54250,
+    "permits": 35,
+    "permit_cost": 4710910
+   },
+   "2023": {
+    "sales": 51,
+    "median_price": 60000,
+    "permits": 33,
+    "permit_cost": 1069604
+   },
+   "2024": {
+    "sales": 45,
+    "median_price": 80000,
+    "permits": 31,
+    "permit_cost": 448850
+   },
+   "2025": {
+    "sales": 41,
+    "median_price": 70000,
+    "permits": 31,
+    "permit_cost": 644994
+   },
+   "2026": {
+    "sales": 17,
+    "median_price": 85000,
+    "permits": 28,
+    "permit_cost": 412381
+   }
+  },
+  "nbh_nw_goldberg": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 8,
+    "permit_cost": 81697
+   },
+   "2020": {
+    "sales": 6,
+    "permits": 7,
+    "permit_cost": 69012
+   },
+   "2021": {
+    "sales": 9,
+    "permits": 10,
+    "permit_cost": 165534
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 732178
+   },
+   "2023": {
+    "sales": 7,
+    "permits": 16,
+    "permit_cost": 2590458
+   },
+   "2024": {
+    "sales": 9,
+    "permits": 17,
+    "permit_cost": 6850704
+   },
+   "2025": {
+    "sales": 6,
+    "permits": 17,
+    "permit_cost": 28807077
+   },
+   "2026": {
+    "sales": 5,
+    "permits": 8,
+    "permit_cost": 54875039
+   }
+  },
+  "nbh_oak_grove_district_1": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 631017
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 7,
+    "permits": 6,
+    "permit_cost": 65661
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 1175749
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 348805
+   },
+   "2024": {
+    "sales": 10,
+    "median_price": 76950,
+    "permits": 7,
+    "permit_cost": 3677541
+   },
+   "2025": {
+    "sales": 5,
+    "permits": 7,
+    "permit_cost": 293185
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 153110
+   }
+  },
+  "nbh_oak_grove_district_2": {
+   "2019": {
+    "sales": 20,
+    "median_price": 42000,
+    "permits": 15,
+    "permit_cost": 100755
+   },
+   "2020": {
+    "sales": 17,
+    "median_price": 74000,
+    "permits": 10,
+    "permit_cost": 217483
+   },
+   "2021": {
+    "sales": 17,
+    "median_price": 71000,
+    "permits": 12,
+    "permit_cost": 199356
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 95500,
+    "permits": 15,
+    "permit_cost": 499993
+   },
+   "2023": {
+    "sales": 13,
+    "median_price": 97000,
+    "permits": 15,
+    "permit_cost": 352282
+   },
+   "2024": {
+    "sales": 22,
+    "median_price": 96500,
+    "permits": 11,
+    "permit_cost": 125244
+   },
+   "2025": {
+    "sales": 36,
+    "median_price": 91500,
+    "permits": 14,
+    "permit_cost": 807162
+   },
+   "2026": {
+    "sales": 6,
+    "permits": 15,
+    "permit_cost": 216853
+   }
+  },
+  "nbh_oakman_blvd_community": {
+   "2019": {
+    "sales": 47,
+    "median_price": 33000,
+    "permits": 65,
+    "permit_cost": 2469485
+   },
+   "2020": {
+    "sales": 64,
+    "median_price": 38950,
+    "permits": 40,
+    "permit_cost": 31681197
+   },
+   "2021": {
+    "sales": 61,
+    "median_price": 45000,
+    "permits": 55,
+    "permit_cost": 1026552
+   },
+   "2022": {
+    "sales": 121,
+    "median_price": 55000,
+    "permits": 79,
+    "permit_cost": 3621264
+   },
+   "2023": {
+    "sales": 92,
+    "median_price": 58000,
+    "permits": 53,
+    "permit_cost": 731858
+   },
+   "2024": {
+    "sales": 104,
+    "median_price": 77700,
+    "permits": 97,
+    "permit_cost": 16403843
+   },
+   "2025": {
+    "sales": 102,
+    "median_price": 103250,
+    "permits": 88,
+    "permit_cost": 5933926
+   },
+   "2026": {
+    "sales": 50,
+    "median_price": 113800,
+    "permits": 50,
+    "permit_cost": 1683594
+   }
+  },
+  "nbh_o_hair_park": {
+   "2019": {
+    "sales": 74,
+    "median_price": 37500,
+    "permits": 33,
+    "permit_cost": 643969
+   },
+   "2020": {
+    "sales": 59,
+    "median_price": 43000,
+    "permits": 28,
+    "permit_cost": 438143
+   },
+   "2021": {
+    "sales": 58,
+    "median_price": 60000,
+    "permits": 42,
+    "permit_cost": 5527092
+   },
+   "2022": {
+    "sales": 72,
+    "median_price": 56250,
+    "permits": 44,
+    "permit_cost": 4443894
+   },
+   "2023": {
+    "sales": 81,
+    "median_price": 58000,
+    "permits": 46,
+    "permit_cost": 854916
+   },
+   "2024": {
+    "sales": 90,
+    "median_price": 67000,
+    "permits": 56,
+    "permit_cost": 2721347
+   },
+   "2025": {
+    "sales": 78,
+    "median_price": 77500,
+    "permits": 41,
+    "permit_cost": 12913347
+   },
+   "2026": {
+    "sales": 47,
+    "median_price": 100000,
+    "permits": 20,
+    "permit_cost": 5961960
+   }
+  },
+  "nbh_old_redford": {
+   "2019": {
+    "sales": 6,
+    "permits": 10,
+    "permit_cost": 1613052
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 74345
+   },
+   "2021": {
+    "sales": 9,
+    "permits": 8,
+    "permit_cost": 113313
+   },
+   "2022": {
+    "sales": 8,
+    "permits": 14,
+    "permit_cost": 663467
+   },
+   "2023": {
+    "sales": 7,
+    "permits": 6,
+    "permit_cost": 382035
+   },
+   "2024": {
+    "sales": 6,
+    "permits": 9,
+    "permit_cost": 602119
+   },
+   "2025": {
+    "sales": 10,
+    "median_price": 93500,
+    "permits": 15,
+    "permit_cost": 436332
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 101722
+   }
+  },
+  "nbh_outer_drive_hayes": {
+   "2019": {
+    "sales": 98,
+    "median_price": 27250,
+    "permits": 32,
+    "permit_cost": 2143831
+   },
+   "2020": {
+    "sales": 123,
+    "median_price": 40000,
+    "permits": 38,
+    "permit_cost": 1193690
+   },
+   "2021": {
+    "sales": 135,
+    "median_price": 51000,
+    "permits": 79,
+    "permit_cost": 598780
+   },
+   "2022": {
+    "sales": 141,
+    "median_price": 49900,
+    "permits": 62,
+    "permit_cost": 1004406
+   },
+   "2023": {
+    "sales": 102,
+    "median_price": 58250,
+    "permits": 78,
+    "permit_cost": 6694082
+   },
+   "2024": {
+    "sales": 164,
+    "median_price": 62000,
+    "permits": 75,
+    "permit_cost": 2268144
+   },
+   "2025": {
+    "sales": 145,
+    "median_price": 58000,
+    "permits": 82,
+    "permit_cost": 9964238
+   },
+   "2026": {
+    "sales": 94,
+    "median_price": 79950,
+    "permits": 48,
+    "permit_cost": 8697256
+   }
+  },
+  "nbh_palmer_woods": {
+   "2019": {
+    "sales": 5,
+    "permits": 19,
+    "permit_cost": 514233
+   },
+   "2020": {
+    "sales": 6,
+    "permits": 14,
+    "permit_cost": 737464
+   },
+   "2021": {
+    "sales": 9,
+    "permits": 23,
+    "permit_cost": 1509374
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 14,
+    "permit_cost": 626124
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 20,
+    "permit_cost": 1123174
+   },
+   "2024": {
+    "sales": 5,
+    "permits": 17,
+    "permit_cost": 712916
+   },
+   "2025": {
+    "sales": 6,
+    "permits": 16,
+    "permit_cost": 883826
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 12,
+    "permit_cost": 512164
+   }
+  },
+  "nbh_paveway": {
+   "2019": {
+    "sales": 7,
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": 7,
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 7,
+    "permits": 7,
+    "permit_cost": 44889
+   },
+   "2022": {
+    "sales": 8,
+    "permits": 7,
+    "permit_cost": 113288
+   },
+   "2023": {
+    "sales": 9,
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": 12,
+    "median_price": 56000,
+    "permits": 6,
+    "permit_cost": 32990
+   },
+   "2025": {
+    "sales": 14,
+    "median_price": 51000,
+    "permits": 11,
+    "permit_cost": 79418
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_pembroke": {
+   "2019": {
+    "sales": 17,
+    "median_price": 30000,
+    "permits": 15,
+    "permit_cost": 99790
+   },
+   "2020": {
+    "sales": 9,
+    "permits": 8,
+    "permit_cost": 57679
+   },
+   "2021": {
+    "sales": 21,
+    "median_price": 41000,
+    "permits": 7,
+    "permit_cost": 46449
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 53500,
+    "permits": 7,
+    "permit_cost": 88208
+   },
+   "2023": {
+    "sales": 23,
+    "median_price": 45000,
+    "permits": 10,
+    "permit_cost": 108786
+   },
+   "2024": {
+    "sales": 18,
+    "median_price": 72700,
+    "permits": 10,
+    "permit_cost": 90491
+   },
+   "2025": {
+    "sales": 20,
+    "median_price": 69500,
+    "permits": 9,
+    "permit_cost": 116338
+   },
+   "2026": {
+    "sales": 8,
+    "permits": 10,
+    "permit_cost": 106490
+   }
+  },
+  "nbh_penrose": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "permits": 6,
+    "permit_cost": 487706
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5"
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 79659
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 12,
+    "permit_cost": 21354747
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 4591000
+   }
+  },
+  "nbh_pershing": {
+   "2019": {
+    "sales": 28,
+    "median_price": 24000,
+    "permits": 10,
+    "permit_cost": 84057
+   },
+   "2020": {
+    "sales": 16,
+    "median_price": 29500,
+    "permits": 14,
+    "permit_cost": 204374
+   },
+   "2021": {
+    "sales": 34,
+    "median_price": 44000,
+    "permits": 16,
+    "permit_cost": 122028
+   },
+   "2022": {
+    "sales": 44,
+    "median_price": 44750,
+    "permits": 10,
+    "permit_cost": 77587
+   },
+   "2023": {
+    "sales": 38,
+    "median_price": 57450,
+    "permits": 20,
+    "permit_cost": 326537
+   },
+   "2024": {
+    "sales": 31,
+    "median_price": 58500,
+    "permits": 26,
+    "permit_cost": 456594
+   },
+   "2025": {
+    "sales": 34,
+    "median_price": 45000,
+    "permits": 10,
+    "permit_cost": 144511
+   },
+   "2026": {
+    "sales": 21,
+    "median_price": 52000,
+    "permits": 19,
+    "permit_cost": 181137
+   }
+  },
+  "nbh_petoskey_otsego": {
+   "2019": {
+    "sales": 13,
+    "median_price": 20000,
+    "permits": 16,
+    "permit_cost": 175364
+   },
+   "2020": {
+    "sales": 16,
+    "median_price": 23875,
+    "permits": 12,
+    "permit_cost": 184369
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 48000,
+    "permits": 26,
+    "permit_cost": 482110
+   },
+   "2022": {
+    "sales": 41,
+    "median_price": 53000,
+    "permits": 31,
+    "permit_cost": 2685179
+   },
+   "2023": {
+    "sales": 19,
+    "median_price": 57500,
+    "permits": 28,
+    "permit_cost": 4122199
+   },
+   "2024": {
+    "sales": 27,
+    "median_price": 80000,
+    "permits": 27,
+    "permit_cost": 455187
+   },
+   "2025": {
+    "sales": 42,
+    "median_price": 62250,
+    "permits": 19,
+    "permit_cost": 335017
+   },
+   "2026": {
+    "sales": 15,
+    "median_price": 124000,
+    "permits": 20,
+    "permit_cost": 444542
+   }
+  },
+  "nbh_piety_hill": {
+   "2019": {
+    "sales": 8,
+    "permits": 42,
+    "permit_cost": 7188064
+   },
+   "2020": {
+    "sales": 13,
+    "median_price": 79000,
+    "permits": 18,
+    "permit_cost": 18370277
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 115000,
+    "permits": 25,
+    "permit_cost": 18138226
+   },
+   "2022": {
+    "sales": 20,
+    "median_price": 171450,
+    "permits": 36,
+    "permit_cost": 5391631
+   },
+   "2023": {
+    "sales": 9,
+    "permits": 46,
+    "permit_cost": 24149044
+   },
+   "2024": {
+    "sales": 13,
+    "median_price": 194000,
+    "permits": 24,
+    "permit_cost": 1672528
+   },
+   "2025": {
+    "sales": 16,
+    "median_price": 170000,
+    "permits": 29,
+    "permit_cost": 3163860
+   },
+   "2026": {
+    "sales": 14,
+    "median_price": 260000,
+    "permits": 38,
+    "permit_cost": 3821713
+   }
+  },
+  "nbh_pilgrim_village": {
+   "2019": {
+    "sales": 12,
+    "median_price": 14500,
+    "permits": 21,
+    "permit_cost": 200128
+   },
+   "2020": {
+    "sales": 11,
+    "median_price": 25000,
+    "permits": 11,
+    "permit_cost": 105624
+   },
+   "2021": {
+    "sales": 33,
+    "median_price": 30000,
+    "permits": 16,
+    "permit_cost": 280447
+   },
+   "2022": {
+    "sales": 22,
+    "median_price": 31000,
+    "permits": 29,
+    "permit_cost": 830660
+   },
+   "2023": {
+    "sales": 22,
+    "median_price": 44000,
+    "permits": 28,
+    "permit_cost": 1281197
+   },
+   "2024": {
+    "sales": 36,
+    "median_price": 46250,
+    "permits": 30,
+    "permit_cost": 360432
+   },
+   "2025": {
+    "sales": 30,
+    "median_price": 48750,
+    "permits": 28,
+    "permit_cost": 273267
+   },
+   "2026": {
+    "sales": 16,
+    "median_price": 45000,
+    "permits": 9,
+    "permit_cost": 318258
+   }
+  },
+  "nbh_pingree_park": {
+   "2019": {
+    "sales": 14,
+    "median_price": 31250,
+    "permits": 22,
+    "permit_cost": 427317
+   },
+   "2020": {
+    "sales": 7,
+    "permits": 14,
+    "permit_cost": 136343
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 79500,
+    "permits": 37,
+    "permit_cost": 608010
+   },
+   "2022": {
+    "sales": 15,
+    "median_price": 135000,
+    "permits": 33,
+    "permit_cost": 482343
+   },
+   "2023": {
+    "sales": 13,
+    "median_price": 129000,
+    "permits": 21,
+    "permit_cost": 340254
+   },
+   "2024": {
+    "sales": 20,
+    "median_price": 75500,
+    "permits": 35,
+    "permit_cost": 497762
+   },
+   "2025": {
+    "sales": 8,
+    "permits": 13,
+    "permit_cost": 174400
+   },
+   "2026": {
+    "sales": 10,
+    "median_price": 214950,
+    "permits": 18,
+    "permit_cost": 266632
+   }
+  },
+  "nbh_plymouth_hubbell": {
+   "2019": {
+    "sales": 47,
+    "median_price": 30000,
+    "permits": 39,
+    "permit_cost": 337164
+   },
+   "2020": {
+    "sales": 54,
+    "median_price": 38500,
+    "permits": 22,
+    "permit_cost": 337996
+   },
+   "2021": {
+    "sales": 61,
+    "median_price": 45000,
+    "permits": 41,
+    "permit_cost": 514288
+   },
+   "2022": {
+    "sales": 86,
+    "median_price": 49500,
+    "permits": 35,
+    "permit_cost": 427188
+   },
+   "2023": {
+    "sales": 75,
+    "median_price": 50000,
+    "permits": 38,
+    "permit_cost": 138674846
+   },
+   "2024": {
+    "sales": 98,
+    "median_price": 60000,
+    "permits": 49,
+    "permit_cost": 2105030
+   },
+   "2025": {
+    "sales": 73,
+    "median_price": 61000,
+    "permits": 33,
+    "permit_cost": 689487
+   },
+   "2026": {
+    "sales": 25,
+    "median_price": 64000,
+    "permits": 14,
+    "permit_cost": 144835
+   }
+  },
+  "nbh_plymouth_i96": {
+   "2019": {
+    "sales": 6,
+    "permits": 9,
+    "permit_cost": 102938
+   },
+   "2020": {
+    "sales": 6,
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 34900,
+    "permits": 9,
+    "permit_cost": 160848
+   },
+   "2022": {
+    "sales": 19,
+    "median_price": 49300,
+    "permits": 10,
+    "permit_cost": 92120
+   },
+   "2023": {
+    "sales": 12,
+    "median_price": 35500,
+    "permits": 9,
+    "permit_cost": 117640
+   },
+   "2024": {
+    "sales": 17,
+    "median_price": 68000,
+    "permits": 8,
+    "permit_cost": 170979
+   },
+   "2025": {
+    "sales": 14,
+    "median_price": 54000,
+    "permits": 7,
+    "permit_cost": 241939
+   },
+   "2026": {
+    "sales": 11,
+    "median_price": 46000,
+    "permits": 7,
+    "permit_cost": 67115
+   }
+  },
+  "nbh_poletown_east": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 19,
+    "permit_cost": 354613379
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 23,
+    "permit_cost": 52672596
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 34,
+    "permit_cost": 48568401
+   },
+   "2022": {
+    "sales": 7,
+    "permits": 42,
+    "permit_cost": 261087298
+   },
+   "2023": {
+    "sales": 5,
+    "permits": 34,
+    "permit_cost": 63787450
+   },
+   "2024": {
+    "sales": 6,
+    "permits": 41,
+    "permit_cost": 11506530
+   },
+   "2025": {
+    "sales": 12,
+    "median_price": 30000,
+    "permits": 37,
+    "permit_cost": 35419398
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 14,
+    "permit_cost": 5544773
+   }
+  },
+  "nbh_pride_area_community": {
+   "2019": {
+    "sales": 10,
+    "median_price": 23750,
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": 6,
+    "permits": 8,
+    "permit_cost": 516925
+   },
+   "2021": {
+    "sales": 5,
+    "permits": 20,
+    "permit_cost": 177294
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 12,
+    "permit_cost": 197724
+   },
+   "2023": {
+    "sales": 11,
+    "median_price": 35000,
+    "permits": 7,
+    "permit_cost": 247950
+   },
+   "2024": {
+    "sales": 17,
+    "median_price": 55000,
+    "permits": 9,
+    "permit_cost": 192165
+   },
+   "2025": {
+    "sales": 9,
+    "permits": 9,
+    "permit_cost": 255568
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 10,
+    "permit_cost": 140690
+   }
+  },
+  "nbh_pulaski": {
+   "2019": {
+    "sales": 74,
+    "median_price": 28750,
+    "permits": 7,
+    "permit_cost": 112648
+   },
+   "2020": {
+    "sales": 49,
+    "median_price": 30000,
+    "permits": 20,
+    "permit_cost": 209995
+   },
+   "2021": {
+    "sales": 64,
+    "median_price": 41500,
+    "permits": 26,
+    "permit_cost": 369957
+   },
+   "2022": {
+    "sales": 82,
+    "median_price": 50000,
+    "permits": 20,
+    "permit_cost": 471305
+   },
+   "2023": {
+    "sales": 60,
+    "median_price": 45000,
+    "permits": 33,
+    "permit_cost": 480237
+   },
+   "2024": {
+    "sales": 81,
+    "median_price": 51000,
+    "permits": 27,
+    "permit_cost": 301181
+   },
+   "2025": {
+    "sales": 67,
+    "median_price": 57500,
+    "permits": 37,
+    "permit_cost": 1054041
+   },
+   "2026": {
+    "sales": 34,
+    "median_price": 59000,
+    "permits": 13,
+    "permit_cost": 113822
+   }
+  },
+  "nbh_regent_park": {
+   "2019": {
+    "sales": 119,
+    "median_price": 37500,
+    "permits": 65,
+    "permit_cost": 12044509
+   },
+   "2020": {
+    "sales": 127,
+    "median_price": 38151,
+    "permits": 42,
+    "permit_cost": 805530
+   },
+   "2021": {
+    "sales": 143,
+    "median_price": 45000,
+    "permits": 57,
+    "permit_cost": 523308
+   },
+   "2022": {
+    "sales": 160,
+    "median_price": 50000,
+    "permits": 73,
+    "permit_cost": 1548807
+   },
+   "2023": {
+    "sales": 136,
+    "median_price": 54500,
+    "permits": 59,
+    "permit_cost": 1067061
+   },
+   "2024": {
+    "sales": 146,
+    "median_price": 61450,
+    "permits": 63,
+    "permit_cost": 1041167
+   },
+   "2025": {
+    "sales": 148,
+    "median_price": 65000,
+    "permits": 67,
+    "permit_cost": 1056779
+   },
+   "2026": {
+    "sales": 70,
+    "median_price": 61500,
+    "permits": 42,
+    "permit_cost": 535648
+   }
+  },
+  "nbh_riverbend": {
+   "2019": {
+    "sales": 11,
+    "median_price": 30000,
+    "permits": 16,
+    "permit_cost": 1229572
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 10,
+    "permit_cost": 2646562
+   },
+   "2021": {
+    "sales": 11,
+    "median_price": 52000,
+    "permits": 21,
+    "permit_cost": 1198537
+   },
+   "2022": {
+    "sales": 18,
+    "median_price": 41500,
+    "permits": 38,
+    "permit_cost": 1092554
+   },
+   "2023": {
+    "sales": 11,
+    "median_price": 40000,
+    "permits": 35,
+    "permit_cost": 9033575
+   },
+   "2024": {
+    "sales": 11,
+    "median_price": 86500,
+    "permits": 40,
+    "permit_cost": 4043705
+   },
+   "2025": {
+    "sales": 21,
+    "median_price": 37500,
+    "permits": 44,
+    "permit_cost": 10977139
+   },
+   "2026": {
+    "sales": 8,
+    "permits": 40,
+    "permit_cost": 10224327
+   }
+  },
+  "nbh_riverdale": {
+   "2019": {
+    "sales": 15,
+    "median_price": 25000,
+    "permits": 10,
+    "permit_cost": 769949
+   },
+   "2020": {
+    "sales": 12,
+    "median_price": 27625,
+    "permits": 22,
+    "permit_cost": 229202
+   },
+   "2021": {
+    "sales": 17,
+    "median_price": 39700,
+    "permits": 11,
+    "permit_cost": 129099
+   },
+   "2022": {
+    "sales": 25,
+    "median_price": 59800,
+    "permits": 17,
+    "permit_cost": 153099
+   },
+   "2023": {
+    "sales": 20,
+    "median_price": 54950,
+    "permits": 10,
+    "permit_cost": 90903
+   },
+   "2024": {
+    "sales": 34,
+    "median_price": 52500,
+    "permits": 13,
+    "permit_cost": 136139
+   },
+   "2025": {
+    "sales": 18,
+    "median_price": 79200,
+    "permits": 7,
+    "permit_cost": 100160
+   },
+   "2026": {
+    "sales": 11,
+    "median_price": 50000,
+    "permits": "lt5"
+   }
+  },
+  "nbh_rosedale_park": {
+   "2019": {
+    "sales": 53,
+    "median_price": 110000,
+    "permits": 51,
+    "permit_cost": 577814
+   },
+   "2020": {
+    "sales": 41,
+    "median_price": 127900,
+    "permits": 45,
+    "permit_cost": 653022
+   },
+   "2021": {
+    "sales": 63,
+    "median_price": 152000,
+    "permits": 36,
+    "permit_cost": 544676
+   },
+   "2022": {
+    "sales": 58,
+    "median_price": 185000,
+    "permits": 40,
+    "permit_cost": 555326
+   },
+   "2023": {
+    "sales": 45,
+    "median_price": 170000,
+    "permits": 47,
+    "permit_cost": 1093452
+   },
+   "2024": {
+    "sales": 50,
+    "median_price": 197250,
+    "permits": 41,
+    "permit_cost": 678844
+   },
+   "2025": {
+    "sales": 40,
+    "median_price": 176000,
+    "permits": 31,
+    "permit_cost": 834829
+   },
+   "2026": {
+    "sales": 20,
+    "median_price": 180450,
+    "permits": 28,
+    "permit_cost": 668826
+   }
+  },
+  "nbh_rouge_park": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": "lt5"
+   },
+   "2025": {
+    "permits": "lt5"
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_russell_woods": {
+   "2019": {
+    "sales": 26,
+    "median_price": 55500,
+    "permits": 18,
+    "permit_cost": 346845
+   },
+   "2020": {
+    "sales": 19,
+    "median_price": 80000,
+    "permits": 13,
+    "permit_cost": 236460
+   },
+   "2021": {
+    "sales": 23,
+    "median_price": 70000,
+    "permits": 20,
+    "permit_cost": 355692
+   },
+   "2022": {
+    "sales": 47,
+    "median_price": 100000,
+    "permits": 13,
+    "permit_cost": 282361
+   },
+   "2023": {
+    "sales": 40,
+    "median_price": 95000,
+    "permits": 25,
+    "permit_cost": 478334
+   },
+   "2024": {
+    "sales": 47,
+    "median_price": 133000,
+    "permits": 42,
+    "permit_cost": 1543972
+   },
+   "2025": {
+    "sales": 45,
+    "median_price": 130000,
+    "permits": 35,
+    "permit_cost": 1591258
+   },
+   "2026": {
+    "sales": 25,
+    "median_price": 148000,
+    "permits": 18,
+    "permit_cost": 178211
+   }
+  },
+  "nbh_san_bernardo": {
+   "2019": {
+    "sales": 17,
+    "median_price": 43500,
+    "permits": 5,
+    "permit_cost": 151259
+   },
+   "2020": {
+    "sales": 20,
+    "median_price": 57750,
+    "permits": 12,
+    "permit_cost": 115873
+   },
+   "2021": {
+    "sales": 20,
+    "median_price": 65755,
+    "permits": 14,
+    "permit_cost": 6263384
+   },
+   "2022": {
+    "sales": 18,
+    "median_price": 80000,
+    "permits": 13,
+    "permit_cost": 121592
+   },
+   "2023": {
+    "sales": 14,
+    "median_price": 95000,
+    "permits": 10,
+    "permit_cost": 13202359
+   },
+   "2024": {
+    "sales": 25,
+    "median_price": 97000,
+    "permits": 13,
+    "permit_cost": 282835
+   },
+   "2025": {
+    "sales": 25,
+    "median_price": 95000,
+    "permits": 10,
+    "permit_cost": 147014
+   },
+   "2026": {
+    "sales": 8,
+    "permits": "lt5"
+   }
+  },
+  "nbh_schaefer_7_8_lodge": {
+   "2019": {
+    "sales": 61,
+    "median_price": 48750,
+    "permits": 37,
+    "permit_cost": 579835
+   },
+   "2020": {
+    "sales": 60,
+    "median_price": 56000,
+    "permits": 28,
+    "permit_cost": 268899
+   },
+   "2021": {
+    "sales": 53,
+    "median_price": 85000,
+    "permits": 49,
+    "permit_cost": 1044109
+   },
+   "2022": {
+    "sales": 59,
+    "median_price": 127000,
+    "permits": 54,
+    "permit_cost": 1185057
+   },
+   "2023": {
+    "sales": 46,
+    "median_price": 111100,
+    "permits": 39,
+    "permit_cost": 502811
+   },
+   "2024": {
+    "sales": 67,
+    "median_price": 110000,
+    "permits": 41,
+    "permit_cost": 515680
+   },
+   "2025": {
+    "sales": 52,
+    "median_price": 132750,
+    "permits": 44,
+    "permit_cost": 549502
+   },
+   "2026": {
+    "sales": 35,
+    "median_price": 123000,
+    "permits": 30,
+    "permit_cost": 456603
+   }
+  },
+  "nbh_schoolcraft_southfield": {
+   "2019": {
+    "sales": 62,
+    "median_price": 36000,
+    "permits": 47,
+    "permit_cost": 1567216
+   },
+   "2020": {
+    "sales": 60,
+    "median_price": 43450,
+    "permits": 54,
+    "permit_cost": 3759846
+   },
+   "2021": {
+    "sales": 61,
+    "median_price": 45500,
+    "permits": 72,
+    "permit_cost": 30218665
+   },
+   "2022": {
+    "sales": 86,
+    "median_price": 57500,
+    "permits": 58,
+    "permit_cost": 51129100
+   },
+   "2023": {
+    "sales": 68,
+    "median_price": 73750,
+    "permits": 56,
+    "permit_cost": 1513060
+   },
+   "2024": {
+    "sales": 112,
+    "median_price": 65000,
+    "permits": 71,
+    "permit_cost": 3596870
+   },
+   "2025": {
+    "sales": 83,
+    "median_price": 60000,
+    "permits": 61,
+    "permit_cost": 14079664
+   },
+   "2026": {
+    "sales": 41,
+    "median_price": 80000,
+    "permits": 36,
+    "permit_cost": 1312491
+   }
+  },
+  "nbh_schulze": {
+   "2019": {
+    "sales": 117,
+    "median_price": 59000,
+    "permits": 92,
+    "permit_cost": 3378416
+   },
+   "2020": {
+    "sales": 88,
+    "median_price": 80000,
+    "permits": 45,
+    "permit_cost": 423903
+   },
+   "2021": {
+    "sales": 117,
+    "median_price": 95000,
+    "permits": 88,
+    "permit_cost": 1578768
+   },
+   "2022": {
+    "sales": 130,
+    "median_price": 112500,
+    "permits": 63,
+    "permit_cost": 1618725
+   },
+   "2023": {
+    "sales": 111,
+    "median_price": 110000,
+    "permits": 72,
+    "permit_cost": 5307956
+   },
+   "2024": {
+    "sales": 174,
+    "median_price": 129950,
+    "permits": 89,
+    "permit_cost": 2128705
+   },
+   "2025": {
+    "sales": 105,
+    "median_price": 145000,
+    "permits": 68,
+    "permit_cost": 4059771
+   },
+   "2026": {
+    "sales": 61,
+    "median_price": 159900,
+    "permits": 44,
+    "permit_cost": 104553879
+   }
+  },
+  "nbh_seven_mile_lodge": {
+   "2019": {
+    "sales": 14,
+    "median_price": 77700,
+    "permits": 5,
+    "permit_cost": 82143
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 133113
+   },
+   "2021": {
+    "sales": 9,
+    "permits": 9,
+    "permit_cost": 32596
+   },
+   "2022": {
+    "sales": 10,
+    "median_price": 92500,
+    "permits": 7,
+    "permit_cost": 106849
+   },
+   "2023": {
+    "sales": 11,
+    "median_price": 128000,
+    "permits": 11,
+    "permit_cost": 131924
+   },
+   "2024": {
+    "sales": 8,
+    "permits": 9,
+    "permit_cost": 61532
+   },
+   "2025": {
+    "sales": 6,
+    "permits": 7,
+    "permit_cost": 151504
+   },
+   "2026": {
+    "sales": 6,
+    "permits": 7,
+    "permit_cost": 237523
+   }
+  },
+  "nbh_seven_mile_rouge": {
+   "2019": {
+    "sales": 22,
+    "median_price": 40300,
+    "permits": 8,
+    "permit_cost": 171076
+   },
+   "2020": {
+    "sales": 17,
+    "median_price": 35000,
+    "permits": 8,
+    "permit_cost": 185962
+   },
+   "2021": {
+    "sales": 26,
+    "median_price": 60000,
+    "permits": 19,
+    "permit_cost": 216787
+   },
+   "2022": {
+    "sales": 26,
+    "median_price": 65500,
+    "permits": 15,
+    "permit_cost": 404235
+   },
+   "2023": {
+    "sales": 31,
+    "median_price": 77000,
+    "permits": 10,
+    "permit_cost": 4088153
+   },
+   "2024": {
+    "sales": 29,
+    "median_price": 72900,
+    "permits": 15,
+    "permit_cost": 129195
+   },
+   "2025": {
+    "sales": 24,
+    "median_price": 106000,
+    "permits": 15,
+    "permit_cost": 6457490
+   },
+   "2026": {
+    "sales": 12,
+    "median_price": 73000,
+    "permits": 12,
+    "permit_cost": 18964263
+   }
+  },
+  "nbh_sherwood": {
+   "2019": {
+    "sales": 14,
+    "median_price": 33500,
+    "permits": 20,
+    "permit_cost": 2577744
+   },
+   "2020": {
+    "sales": 11,
+    "median_price": 45500,
+    "permits": 17,
+    "permit_cost": 167611
+   },
+   "2021": {
+    "sales": 25,
+    "median_price": 60000,
+    "permits": 17,
+    "permit_cost": 171529
+   },
+   "2022": {
+    "sales": 25,
+    "median_price": 55000,
+    "permits": 12,
+    "permit_cost": 514775
+   },
+   "2023": {
+    "sales": 21,
+    "median_price": 66000,
+    "permits": 18,
+    "permit_cost": 267763
+   },
+   "2024": {
+    "sales": 30,
+    "median_price": 71000,
+    "permits": 16,
+    "permit_cost": 669545
+   },
+   "2025": {
+    "sales": 35,
+    "median_price": 80000,
+    "permits": 17,
+    "permit_cost": 5730430
+   },
+   "2026": {
+    "sales": 8,
+    "permits": 10,
+    "permit_cost": 5627881
+   }
+  },
+  "nbh_sherwood_forest": {
+   "2019": {
+    "sales": 16,
+    "median_price": 285500,
+    "permits": 22,
+    "permit_cost": 1060552
+   },
+   "2020": {
+    "sales": 7,
+    "permits": 14,
+    "permit_cost": 210960
+   },
+   "2021": {
+    "sales": 8,
+    "permits": 34,
+    "permit_cost": 687620
+   },
+   "2022": {
+    "sales": 13,
+    "median_price": 406000,
+    "permits": 21,
+    "permit_cost": 633938
+   },
+   "2023": {
+    "sales": 10,
+    "median_price": 394500,
+    "permits": 20,
+    "permit_cost": 578355
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 19,
+    "permit_cost": 541776
+   },
+   "2025": {
+    "sales": 12,
+    "median_price": 477500,
+    "permits": 17,
+    "permit_cost": 456996
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 612244
+   }
+  },
+  "nbh_south_of_six": {
+   "2019": {
+    "sales": 19,
+    "median_price": 28000,
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": 14,
+    "median_price": 38500,
+    "permits": 5,
+    "permit_cost": 44700
+   },
+   "2021": {
+    "sales": 20,
+    "median_price": 51500,
+    "permits": 10,
+    "permit_cost": 141557
+   },
+   "2022": {
+    "sales": 22,
+    "median_price": 62500,
+    "permits": 9,
+    "permit_cost": 162873
+   },
+   "2023": {
+    "sales": 32,
+    "median_price": 88000,
+    "permits": 9,
+    "permit_cost": 140522
+   },
+   "2024": {
+    "sales": 22,
+    "median_price": 71000,
+    "permits": 11,
+    "permit_cost": 91455
+   },
+   "2025": {
+    "sales": 22,
+    "median_price": 83500,
+    "permits": 8,
+    "permit_cost": 68677
+   },
+   "2026": {
+    "sales": 12,
+    "median_price": 76500,
+    "permits": 11,
+    "permit_cost": 81465
+   }
+  },
+  "nbh_southfield_plymouth": {
+   "2019": {
+    "sales": 12,
+    "median_price": 48500,
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": 10,
+    "median_price": 41250,
+    "permits": 5,
+    "permit_cost": 46745
+   },
+   "2021": {
+    "sales": 15,
+    "median_price": 45000,
+    "permits": 7,
+    "permit_cost": 44368
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 37000,
+    "permits": 9,
+    "permit_cost": 281804
+   },
+   "2023": {
+    "sales": 21,
+    "median_price": 83000,
+    "permits": 8,
+    "permit_cost": 145530
+   },
+   "2024": {
+    "sales": 20,
+    "median_price": 60000,
+    "permits": 10,
+    "permit_cost": 114227
+   },
+   "2025": {
+    "sales": 8,
+    "permits": 5,
+    "permit_cost": 643811
+   },
+   "2026": {
+    "sales": 7,
+    "permits": 5,
+    "permit_cost": 58989
+   }
+  },
+  "nbh_springwells": {
+   "2019": {
+    "sales": 67,
+    "median_price": 38000,
+    "permits": 78,
+    "permit_cost": 4389646
+   },
+   "2020": {
+    "sales": 40,
+    "median_price": 33500,
+    "permits": 36,
+    "permit_cost": 1117341
+   },
+   "2021": {
+    "sales": 78,
+    "median_price": 50000,
+    "permits": 84,
+    "permit_cost": 1476330
+   },
+   "2022": {
+    "sales": 82,
+    "median_price": 64250,
+    "permits": 101,
+    "permit_cost": 5302680
+   },
+   "2023": {
+    "sales": 62,
+    "median_price": 80000,
+    "permits": 66,
+    "permit_cost": 1803824
+   },
+   "2024": {
+    "sales": 61,
+    "median_price": 80000,
+    "permits": 64,
+    "permit_cost": 5627778
+   },
+   "2025": {
+    "sales": 54,
+    "median_price": 97500,
+    "permits": 55,
+    "permit_cost": 40154922
+   },
+   "2026": {
+    "sales": 30,
+    "median_price": 116750,
+    "permits": 29,
+    "permit_cost": 1278973
+   }
+  },
+  "nbh_the_eye": {
+   "2019": {
+    "sales": 33,
+    "median_price": 39666,
+    "permits": 11,
+    "permit_cost": 1088681
+   },
+   "2020": {
+    "sales": 31,
+    "median_price": 57000,
+    "permits": 18,
+    "permit_cost": 143479
+   },
+   "2021": {
+    "sales": 43,
+    "median_price": 72500,
+    "permits": 17,
+    "permit_cost": 944271
+   },
+   "2022": {
+    "sales": 34,
+    "median_price": 72500,
+    "permits": 19,
+    "permit_cost": 503776
+   },
+   "2023": {
+    "sales": 39,
+    "median_price": 92000,
+    "permits": 20,
+    "permit_cost": 175089
+   },
+   "2024": {
+    "sales": 39,
+    "median_price": 91000,
+    "permits": 24,
+    "permit_cost": 8246611
+   },
+   "2025": {
+    "sales": 42,
+    "median_price": 89500,
+    "permits": 15,
+    "permit_cost": 4271212
+   },
+   "2026": {
+    "sales": 20,
+    "median_price": 87500,
+    "permits": 10,
+    "permit_cost": 331614
+   }
+  },
+  "nbh_tri_point": {
+   "2019": {
+    "sales": 5,
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 73535
+   },
+   "2022": {
+    "sales": 7,
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": 7,
+    "permits": 5,
+    "permit_cost": 57590
+   },
+   "2025": {
+    "permits": "lt5"
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_university_district": {
+   "2019": {
+    "sales": 54,
+    "median_price": 242500,
+    "permits": 61,
+    "permit_cost": 1358445
+   },
+   "2020": {
+    "sales": 48,
+    "median_price": 277500,
+    "permits": 46,
+    "permit_cost": 1217959
+   },
+   "2021": {
+    "sales": 47,
+    "median_price": 280000,
+    "permits": 81,
+    "permit_cost": 1740217
+   },
+   "2022": {
+    "sales": 36,
+    "median_price": 285000,
+    "permits": 66,
+    "permit_cost": 1737230
+   },
+   "2023": {
+    "sales": 32,
+    "median_price": 306250,
+    "permits": 56,
+    "permit_cost": 1260681
+   },
+   "2024": {
+    "sales": 39,
+    "median_price": 295000,
+    "permits": 74,
+    "permit_cost": 2220194
+   },
+   "2025": {
+    "sales": 31,
+    "median_price": 400000,
+    "permits": 54,
+    "permit_cost": 919298
+   },
+   "2026": {
+    "sales": 28,
+    "median_price": 297500,
+    "permits": 47,
+    "permit_cost": 9942972
+   }
+  },
+  "nbh_virginia_park": {
+   "2019": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2020": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": 5
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_virginia_park_community": {
+   "2019": {
+    "sales": 33,
+    "median_price": 50000,
+    "permits": 69,
+    "permit_cost": 6555352
+   },
+   "2020": {
+    "sales": 30,
+    "median_price": 42000,
+    "permits": 52,
+    "permit_cost": 3528512
+   },
+   "2021": {
+    "sales": 36,
+    "median_price": 60000,
+    "permits": 111,
+    "permit_cost": 37915371
+   },
+   "2022": {
+    "sales": 57,
+    "median_price": 100000,
+    "permits": 81,
+    "permit_cost": 2936600
+   },
+   "2023": {
+    "sales": 27,
+    "median_price": 130000,
+    "permits": 92,
+    "permit_cost": 27364651
+   },
+   "2024": {
+    "sales": 83,
+    "median_price": 140000,
+    "permits": 68,
+    "permit_cost": 29261198
+   },
+   "2025": {
+    "sales": 60,
+    "median_price": 159000,
+    "permits": 77,
+    "permit_cost": 26128875
+   },
+   "2026": {
+    "sales": 27,
+    "median_price": 130000,
+    "permits": 34,
+    "permit_cost": 5211049
+   }
+  },
+  "nbh_von_steuben": {
+   "2019": {
+    "sales": 40,
+    "median_price": 35000,
+    "permits": 28,
+    "permit_cost": 192447
+   },
+   "2020": {
+    "sales": 49,
+    "median_price": 25000,
+    "permits": 22,
+    "permit_cost": 206967
+   },
+   "2021": {
+    "sales": 72,
+    "median_price": 40000,
+    "permits": 39,
+    "permit_cost": 418925
+   },
+   "2022": {
+    "sales": 66,
+    "median_price": 51000,
+    "permits": 33,
+    "permit_cost": 277920
+   },
+   "2023": {
+    "sales": 49,
+    "median_price": 49000,
+    "permits": 24,
+    "permit_cost": 283755
+   },
+   "2024": {
+    "sales": 77,
+    "median_price": 58000,
+    "permits": 42,
+    "permit_cost": 670761
+   },
+   "2025": {
+    "sales": 66,
+    "median_price": 57500,
+    "permits": 38,
+    "permit_cost": 560744
+   },
+   "2026": {
+    "sales": 20,
+    "median_price": 65000,
+    "permits": 22,
+    "permit_cost": 272643
+   }
+  },
+  "nbh_wade": {
+   "2019": {
+    "sales": 17,
+    "median_price": 26650,
+    "permits": 17,
+    "permit_cost": 198196
+   },
+   "2020": {
+    "sales": 18,
+    "median_price": 29125,
+    "permits": 19,
+    "permit_cost": 363528
+   },
+   "2021": {
+    "sales": 29,
+    "median_price": 44500,
+    "permits": 20,
+    "permit_cost": 232113
+   },
+   "2022": {
+    "sales": 33,
+    "median_price": 43000,
+    "permits": 27,
+    "permit_cost": 4749430
+   },
+   "2023": {
+    "sales": 19,
+    "median_price": 52000,
+    "permits": 22,
+    "permit_cost": 4745754
+   },
+   "2024": {
+    "sales": 37,
+    "median_price": 52000,
+    "permits": 29,
+    "permit_cost": 595641
+   },
+   "2025": {
+    "sales": 31,
+    "median_price": 70000,
+    "permits": 33,
+    "permit_cost": 431232
+   },
+   "2026": {
+    "sales": 17,
+    "median_price": 85000,
+    "permits": 23,
+    "permit_cost": 344839
+   }
+  },
+  "nbh_warren_ave_community": {
+   "2019": {
+    "sales": 118,
+    "median_price": 32000,
+    "permits": 50,
+    "permit_cost": 478420
+   },
+   "2020": {
+    "sales": 110,
+    "median_price": 33750,
+    "permits": 33,
+    "permit_cost": 392264
+   },
+   "2021": {
+    "sales": 141,
+    "median_price": 46000,
+    "permits": 61,
+    "permit_cost": 674298
+   },
+   "2022": {
+    "sales": 142,
+    "median_price": 50000,
+    "permits": 49,
+    "permit_cost": 647717
+   },
+   "2023": {
+    "sales": 149,
+    "median_price": 60000,
+    "permits": 52,
+    "permit_cost": 3375298
+   },
+   "2024": {
+    "sales": 110,
+    "median_price": 70750,
+    "permits": 52,
+    "permit_cost": 6685560
+   },
+   "2025": {
+    "sales": 121,
+    "median_price": 70000,
+    "permits": 48,
+    "permit_cost": 681346
+   },
+   "2026": {
+    "sales": 56,
+    "median_price": 75000,
+    "permits": 42,
+    "permit_cost": 1554062
+   }
+  },
+  "nbh_warrendale": {
+   "2019": {
+    "sales": 305,
+    "median_price": 28503,
+    "permits": 102,
+    "permit_cost": 1162516
+   },
+   "2020": {
+    "sales": 293,
+    "median_price": 35000,
+    "permits": 82,
+    "permit_cost": 1220836
+   },
+   "2021": {
+    "sales": 312,
+    "median_price": 47150,
+    "permits": 160,
+    "permit_cost": 2748238
+   },
+   "2022": {
+    "sales": 366,
+    "median_price": 47750,
+    "permits": 129,
+    "permit_cost": 1839872
+   },
+   "2023": {
+    "sales": 341,
+    "median_price": 52500,
+    "permits": 152,
+    "permit_cost": 2723624
+   },
+   "2024": {
+    "sales": 408,
+    "median_price": 64950,
+    "permits": 112,
+    "permit_cost": 2315238
+   },
+   "2025": {
+    "sales": 322,
+    "median_price": 70000,
+    "permits": 95,
+    "permit_cost": 1362928
+   },
+   "2026": {
+    "sales": 225,
+    "median_price": 78000,
+    "permits": 64,
+    "permit_cost": 1680574
+   }
+  },
+  "nbh_we_care_community": {
+   "2019": {
+    "sales": 15,
+    "median_price": 25000,
+    "permits": 15,
+    "permit_cost": 212530
+   },
+   "2020": {
+    "sales": 15,
+    "median_price": 36250,
+    "permits": 11,
+    "permit_cost": 168830
+   },
+   "2021": {
+    "sales": 29,
+    "median_price": 51900,
+    "permits": 19,
+    "permit_cost": 231865
+   },
+   "2022": {
+    "sales": 29,
+    "median_price": 45000,
+    "permits": 17,
+    "permit_cost": 478111
+   },
+   "2023": {
+    "sales": 27,
+    "median_price": 54000,
+    "permits": 16,
+    "permit_cost": 601583
+   },
+   "2024": {
+    "sales": 42,
+    "median_price": 67250,
+    "permits": 19,
+    "permit_cost": 464977
+   },
+   "2025": {
+    "sales": 32,
+    "median_price": 68000,
+    "permits": 22,
+    "permit_cost": 269485
+   },
+   "2026": {
+    "sales": 9,
+    "permits": 20,
+    "permit_cost": 199806
+   }
+  },
+  "nbh_weatherby": {
+   "2019": {
+    "sales": 24,
+    "median_price": 28500,
+    "permits": 15,
+    "permit_cost": 500427
+   },
+   "2020": {
+    "sales": 23,
+    "median_price": 39500,
+    "permits": 11,
+    "permit_cost": 439518
+   },
+   "2021": {
+    "sales": 17,
+    "median_price": 49000,
+    "permits": 20,
+    "permit_cost": 587241
+   },
+   "2022": {
+    "sales": 20,
+    "median_price": 39500,
+    "permits": 15,
+    "permit_cost": 290458
+   },
+   "2023": {
+    "sales": 26,
+    "median_price": 38250,
+    "permits": 14,
+    "permit_cost": 1185055
+   },
+   "2024": {
+    "sales": 18,
+    "median_price": 65000,
+    "permits": 13,
+    "permit_cost": 299761
+   },
+   "2025": {
+    "sales": 24,
+    "median_price": 72500,
+    "permits": 16,
+    "permit_cost": 271864
+   },
+   "2026": {
+    "sales": 15,
+    "median_price": 80000,
+    "permits": 9,
+    "permit_cost": 93017
+   }
+  },
+  "nbh_west_end": {
+   "2019": {
+    "sales": 10,
+    "median_price": 18500,
+    "permits": 28,
+    "permit_cost": 297276
+   },
+   "2020": {
+    "sales": 9,
+    "permits": 36,
+    "permit_cost": 559187
+   },
+   "2021": {
+    "sales": 19,
+    "median_price": 30000,
+    "permits": 55,
+    "permit_cost": 772171
+   },
+   "2022": {
+    "sales": 16,
+    "median_price": 46500,
+    "permits": 55,
+    "permit_cost": 1058843
+   },
+   "2023": {
+    "sales": 16,
+    "median_price": 32200,
+    "permits": 47,
+    "permit_cost": 561488
+   },
+   "2024": {
+    "sales": 23,
+    "median_price": 48000,
+    "permits": 44,
+    "permit_cost": 926736
+   },
+   "2025": {
+    "sales": 23,
+    "median_price": 64500,
+    "permits": 54,
+    "permit_cost": 1021536
+   },
+   "2026": {
+    "sales": 22,
+    "median_price": 42500,
+    "permits": 44,
+    "permit_cost": 771683
+   }
+  },
+  "nbh_west_outer_drive": {
+   "2019": {
+    "sales": 27,
+    "median_price": 45900,
+    "permits": 11,
+    "permit_cost": 89885
+   },
+   "2020": {
+    "sales": 15,
+    "median_price": 55000,
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 32,
+    "median_price": 76000,
+    "permits": 15,
+    "permit_cost": 113411
+   },
+   "2022": {
+    "sales": 27,
+    "median_price": 96000,
+    "permits": 15,
+    "permit_cost": 120812
+   },
+   "2023": {
+    "sales": 37,
+    "median_price": 115000,
+    "permits": 13,
+    "permit_cost": 130134
+   },
+   "2024": {
+    "sales": 50,
+    "median_price": 115100,
+    "permits": 21,
+    "permit_cost": 117922
+   },
+   "2025": {
+    "sales": 16,
+    "median_price": 150400,
+    "permits": 11,
+    "permit_cost": 296192
+   },
+   "2026": {
+    "sales": 13,
+    "median_price": 105000,
+    "permits": 12,
+    "permit_cost": 141539
+   }
+  },
+  "nbh_west_village": {
+   "2019": {
+    "sales": 13,
+    "median_price": 254000,
+    "permits": 25,
+    "permit_cost": 1443177
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 19,
+    "permit_cost": 1176343
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 18,
+    "permit_cost": 1018850
+   },
+   "2022": {
+    "sales": 5,
+    "permits": 15,
+    "permit_cost": 560142
+   },
+   "2023": {
+    "sales": 8,
+    "permits": 18,
+    "permit_cost": 1626146
+   },
+   "2024": {
+    "sales": 7,
+    "permits": 11,
+    "permit_cost": 428514
+   },
+   "2025": {
+    "sales": 7,
+    "permits": 9,
+    "permit_cost": 316072
+   },
+   "2026": {
+    "sales": 5,
+    "permits": 21,
+    "permit_cost": 513892
+   }
+  },
+  "nbh_westwood_park": {
+   "2019": {
+    "sales": 6,
+    "permits": 6,
+    "permit_cost": 62870
+   },
+   "2020": {
+    "sales": 10,
+    "median_price": 46000,
+    "permits": 6,
+    "permit_cost": 119308
+   },
+   "2021": {
+    "sales": 15,
+    "median_price": 40000,
+    "permits": 7,
+    "permit_cost": 37799
+   },
+   "2022": {
+    "sales": 18,
+    "median_price": 70000,
+    "permits": 16,
+    "permit_cost": 119941
+   },
+   "2023": {
+    "sales": 10,
+    "median_price": 60000,
+    "permits": 8,
+    "permit_cost": 156212
+   },
+   "2024": {
+    "sales": 16,
+    "median_price": 71500,
+    "permits": 10,
+    "permit_cost": 150375
+   },
+   "2025": {
+    "sales": 10,
+    "median_price": 82500,
+    "permits": 10,
+    "permit_cost": 112405
+   },
+   "2026": {
+    "sales": 5,
+    "permits": 7,
+    "permit_cost": 66685
+   }
+  },
+  "nbh_wildemere_park": {
+   "2019": {
+    "sales": 8,
+    "permits": 12,
+    "permit_cost": 230893
+   },
+   "2020": {
+    "sales": 12,
+    "median_price": 26000,
+    "permits": 9,
+    "permit_cost": 143554
+   },
+   "2021": {
+    "sales": 17,
+    "median_price": 40000,
+    "permits": 21,
+    "permit_cost": 344683
+   },
+   "2022": {
+    "sales": 21,
+    "median_price": 45000,
+    "permits": 17,
+    "permit_cost": 287502
+   },
+   "2023": {
+    "sales": 21,
+    "median_price": 27000,
+    "permits": 16,
+    "permit_cost": 179988
+   },
+   "2024": {
+    "sales": 20,
+    "median_price": 52000,
+    "permits": 15,
+    "permit_cost": 205078
+   },
+   "2025": {
+    "sales": 18,
+    "median_price": 70000,
+    "permits": 21,
+    "permit_cost": 391695
+   },
+   "2026": {
+    "sales": 12,
+    "median_price": 128000,
+    "permits": 12,
+    "permit_cost": 251780
+   }
+  },
+  "nbh_winship": {
+   "2019": {
+    "sales": 72,
+    "median_price": 55475,
+    "permits": 47,
+    "permit_cost": 4196964
+   },
+   "2020": {
+    "sales": 63,
+    "median_price": 59900,
+    "permits": 43,
+    "permit_cost": 7064308
+   },
+   "2021": {
+    "sales": 48,
+    "median_price": 85000,
+    "permits": 59,
+    "permit_cost": 4612660
+   },
+   "2022": {
+    "sales": 65,
+    "median_price": 98500,
+    "permits": 66,
+    "permit_cost": 4739202
+   },
+   "2023": {
+    "sales": 83,
+    "median_price": 105000,
+    "permits": 58,
+    "permit_cost": 776432
+   },
+   "2024": {
+    "sales": 78,
+    "median_price": 107750,
+    "permits": 54,
+    "permit_cost": 869895
+   },
+   "2025": {
+    "sales": 83,
+    "median_price": 120000,
+    "permits": 48,
+    "permit_cost": 1009400
+   },
+   "2026": {
+    "sales": 27,
+    "median_price": 130000,
+    "permits": 33,
+    "permit_cost": 21002197
+   }
+  },
+  "nbh_woodbridge": {
+   "2019": {
+    "sales": "lt5",
+    "permits": 41,
+    "permit_cost": 4048402
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 36,
+    "permit_cost": 5740418
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 39,
+    "permit_cost": 2310401
+   },
+   "2022": {
+    "sales": 8,
+    "permits": 62,
+    "permit_cost": 6675823
+   },
+   "2023": {
+    "sales": 12,
+    "median_price": 277500,
+    "permits": 62,
+    "permit_cost": 7242251
+   },
+   "2024": {
+    "sales": 6,
+    "permits": 25,
+    "permit_cost": 660562
+   },
+   "2025": {
+    "sales": 14,
+    "median_price": 365000,
+    "permits": 55,
+    "permit_cost": 22293747
+   },
+   "2026": {
+    "sales": 6,
+    "permits": 34,
+    "permit_cost": 2941713
+   }
+  },
+  "nbh_yorkshire_woods": {
+   "2019": {
+    "sales": 98,
+    "median_price": 32250,
+    "permits": 19,
+    "permit_cost": 80683
+   },
+   "2020": {
+    "sales": 80,
+    "median_price": 40150,
+    "permits": 16,
+    "permit_cost": 128719
+   },
+   "2021": {
+    "sales": 79,
+    "median_price": 50000,
+    "permits": 25,
+    "permit_cost": 266355
+   },
+   "2022": {
+    "sales": 112,
+    "median_price": 56950,
+    "permits": 17,
+    "permit_cost": 324418
+   },
+   "2023": {
+    "sales": 80,
+    "median_price": 52000,
+    "permits": 22,
+    "permit_cost": 340230
+   },
+   "2024": {
+    "sales": 98,
+    "median_price": 60000,
+    "permits": 41,
+    "permit_cost": 1026984
+   },
+   "2025": {
+    "sales": 82,
+    "median_price": 75250,
+    "permits": 29,
+    "permit_cost": 227679
+   },
+   "2026": {
+    "sales": 41,
+    "median_price": 69000,
+    "permits": 23,
+    "permit_cost": 261354
+   }
+  },
+  "nbh_state_fair": {
+   "2019": {
+    "permits": "lt5"
+   },
+   "2020": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "permits": 8,
+    "permit_cost": 41740000
+   },
+   "2022": {
+    "permits": 10,
+    "permit_cost": 34292864
+   },
+   "2023": {
+    "permits": 8,
+    "permit_cost": 29252600
+   },
+   "2024": {
+    "permits": 12,
+    "permit_cost": 25998000
+   },
+   "2025": {
+    "permits": 10,
+    "permit_cost": 35989145
+   },
+   "2026": {
+    "permits": 7,
+    "permit_cost": 29150000
+   }
+  },
+  "nbh_downtown": {
+   "2019": {
+    "permits": 261,
+    "permit_cost": 299220727
+   },
+   "2020": {
+    "permits": 178,
+    "permit_cost": 579356081
+   },
+   "2021": {
+    "permits": 184,
+    "permit_cost": 734302055
+   },
+   "2022": {
+    "permits": 189,
+    "permit_cost": 959154367
+   },
+   "2023": {
+    "permits": 186,
+    "permit_cost": 577418747
+   },
+   "2024": {
+    "permits": 166,
+    "permit_cost": 376506062
+   },
+   "2025": {
+    "permits": 202,
+    "permit_cost": 487298078
+   },
+   "2026": {
+    "permits": 115,
+    "permit_cost": 362664972
+   }
+  },
+  "nbh_medbury_park": {
+   "2019": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 14,
+    "permit_cost": 9238129
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 112571487
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_milwaukee_junction": {
+   "2019": {
+    "permits": 32,
+    "permit_cost": 17516504
+   },
+   "2020": {
+    "permits": 24,
+    "permit_cost": 10876001
+   },
+   "2021": {
+    "permits": 22,
+    "permit_cost": 14105532
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 2267921
+   },
+   "2023": {
+    "permits": 25,
+    "permit_cost": 25884182
+   },
+   "2024": {
+    "permits": 11,
+    "permit_cost": 1350410
+   },
+   "2025": {
+    "permits": 20,
+    "permit_cost": 5931367
+   },
+   "2026": {
+    "permits": 8,
+    "permit_cost": 2812874
+   }
+  },
+  "nbh_mexicantown": {
+   "2019": {
+    "permits": 7,
+    "permit_cost": 107216
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": 6,
+    "permit_cost": 88094
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 1866087
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2025": {
+    "sales": 5,
+    "permits": 6,
+    "permit_cost": 1243909
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_oakwood_heights": {
+   "2019": {
+    "permits": 6,
+    "permit_cost": 506500
+   },
+   "2020": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "permits": 10,
+    "permit_cost": 1064081
+   },
+   "2022": {
+    "permits": 6,
+    "permit_cost": 881500
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": 8,
+    "permit_cost": 16006700
+   },
+   "2025": {
+    "permits": 7,
+    "permit_cost": 1437900
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_conner_creek_industrial": {
+   "2019": {
+    "permits": 38,
+    "permit_cost": 254915519
+   },
+   "2020": {
+    "permits": 28,
+    "permit_cost": 66890088
+   },
+   "2021": {
+    "permits": 20,
+    "permit_cost": 20204060
+   },
+   "2022": {
+    "permits": 10,
+    "permit_cost": 6157380
+   },
+   "2023": {
+    "permits": 6,
+    "permit_cost": 8167667
+   },
+   "2024": {
+    "permits": 7,
+    "permit_cost": 643231
+   },
+   "2025": {
+    "permits": 12,
+    "permit_cost": 2396212
+   },
+   "2026": {
+    "permits": 15,
+    "permit_cost": 3984802
+   }
+  },
+  "nbh_greektown": {
+   "2019": {
+    "permits": 12,
+    "permit_cost": 886151
+   },
+   "2020": {
+    "permits": 8,
+    "permit_cost": 2390500
+   },
+   "2021": {
+    "permits": 8,
+    "permit_cost": 16861000
+   },
+   "2022": {
+    "permits": 5,
+    "permit_cost": 948750
+   },
+   "2023": {
+    "permits": 5,
+    "permit_cost": 588548
+   },
+   "2024": {
+    "permits": "lt5"
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_tech_town": {
+   "2019": {
+    "permits": 17,
+    "permit_cost": 20009763
+   },
+   "2020": {
+    "permits": 12,
+    "permit_cost": 4878930
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 7,
+    "permit_cost": 2579766
+   },
+   "2022": {
+    "permits": 5,
+    "permit_cost": 166501
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": "lt5"
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 38457190
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_elmwood_park": {
+   "2019": {
+    "permits": 21,
+    "permit_cost": 7679304
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": 36,
+    "permit_cost": 18407544
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 54,
+    "permit_cost": 24424094
+   },
+   "2022": {
+    "permits": 41,
+    "permit_cost": 9115149
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 47,
+    "permit_cost": 8458396
+   },
+   "2024": {
+    "permits": 27,
+    "permit_cost": 7057883
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 37,
+    "permit_cost": 3305606
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 961684
+   }
+  },
+  "nbh_eastern_market": {
+   "2019": {
+    "permits": 24,
+    "permit_cost": 2953155
+   },
+   "2020": {
+    "permits": 28,
+    "permit_cost": 4144608
+   },
+   "2021": {
+    "permits": 15,
+    "permit_cost": 5045518
+   },
+   "2022": {
+    "permits": 26,
+    "permit_cost": 13274051
+   },
+   "2023": {
+    "permits": 14,
+    "permit_cost": 944971
+   },
+   "2024": {
+    "permits": 19,
+    "permit_cost": 9127492
+   },
+   "2025": {
+    "permits": 16,
+    "permit_cost": 10355086
+   },
+   "2026": {
+    "permits": 5,
+    "permit_cost": 612337
+   }
+  },
+  "nbh_jeffries": {
+   "2019": {
+    "permits": 6,
+    "permit_cost": 3372262
+   },
+   "2020": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_west_side_industrial": {
+   "2019": {
+    "permits": 12,
+    "permit_cost": 974835
+   },
+   "2020": {
+    "permits": 7,
+    "permit_cost": 361901
+   },
+   "2021": {
+    "permits": 17,
+    "permit_cost": 2787946
+   },
+   "2022": {
+    "permits": 12,
+    "permit_cost": 57486144
+   },
+   "2023": {
+    "permits": 9,
+    "permit_cost": 46496047
+   },
+   "2024": {
+    "permits": 6,
+    "permit_cost": 1125411
+   },
+   "2025": {
+    "permits": 9,
+    "permit_cost": 15623500
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_rivertown": {
+   "2019": {
+    "permits": 23,
+    "permit_cost": 2699993
+   },
+   "2020": {
+    "permits": 17,
+    "permit_cost": 2402894
+   },
+   "2021": {
+    "permits": 14,
+    "permit_cost": 1089012
+   },
+   "2022": {
+    "permits": 15,
+    "permit_cost": 5468210
+   },
+   "2023": {
+    "permits": 14,
+    "permit_cost": 1214370
+   },
+   "2024": {
+    "permits": 12,
+    "permit_cost": 1129225
+   },
+   "2025": {
+    "permits": 19,
+    "permit_cost": 3125503
+   },
+   "2026": {
+    "permits": 6,
+    "permit_cost": 332840
+   }
+  },
+  "nbh_happy_homes": {
+   "2019": {
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 190940
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 13,
+    "permit_cost": 92157210
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 6,
+    "permit_cost": 106963
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_brush_park": {
+   "2019": {
+    "permits": 45,
+    "permit_cost": 56643806
+   },
+   "2020": {
+    "permits": 43,
+    "permit_cost": 85257695
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 41,
+    "permit_cost": 25407541
+   },
+   "2022": {
+    "permits": 17,
+    "permit_cost": 26409260
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 44,
+    "permit_cost": 67244923
+   },
+   "2024": {
+    "sales": "lt5",
+    "permits": 21,
+    "permit_cost": 45133003
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 17,
+    "permit_cost": 17345908
+   },
+   "2026": {
+    "permits": 12,
+    "permit_cost": 30692196
+   }
+  },
+  "nbh_forest_park": {
+   "2019": {
+    "permits": 6,
+    "permit_cost": 5126500
+   },
+   "2020": {
+    "permits": 12,
+    "permit_cost": 8432752
+   },
+   "2021": {
+    "permits": 5,
+    "permit_cost": 2495690
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": 34,
+    "permit_cost": 1258500
+   },
+   "2025": {
+    "permits": 6,
+    "permit_cost": 395100
+   },
+   "2026": {
+    "permits": 6,
+    "permit_cost": 43115
+   }
+  },
+  "nbh_cultural_center": {
+   "2019": {
+    "permits": 22,
+    "permit_cost": 1437956
+   },
+   "2020": {
+    "permits": 10,
+    "permit_cost": 3191400
+   },
+   "2021": {
+    "permits": 11,
+    "permit_cost": 991029
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 18,
+    "permit_cost": 5031458
+   },
+   "2023": {
+    "permits": 12,
+    "permit_cost": 7447432
+   },
+   "2024": {
+    "permits": 15,
+    "permit_cost": 9905838
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 7958401
+   },
+   "2026": {
+    "permits": 8,
+    "permit_cost": 1273209
+   }
+  },
+  "nbh_ravendale": {
+   "2019": {
+    "permits": "lt5"
+   },
+   "2020": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2021": {
+    "sales": 6,
+    "permits": "lt5"
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2023": {
+    "sales": "lt5",
+    "permits": 5,
+    "permit_cost": 50460
+   },
+   "2024": {
+    "sales": 7,
+    "permits": 12,
+    "permit_cost": 180562
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": "lt5"
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_palmer_park": {
+   "2019": {
+    "permits": 8,
+    "permit_cost": 3440230
+   },
+   "2020": {
+    "permits": 5,
+    "permit_cost": 3457150
+   },
+   "2021": {
+    "permits": 7,
+    "permit_cost": 2488969
+   },
+   "2022": {
+    "sales": "lt5",
+    "permits": 11,
+    "permit_cost": 4335750
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": "lt5"
+   },
+   "2025": {
+    "sales": 5,
+    "permits": "lt5"
+   },
+   "2026": {
+    "sales": "lt5",
+    "permits": "lt5"
+   }
+  },
+  "nbh_medical_center": {
+   "2019": {
+    "permits": 15,
+    "permit_cost": 3970584
+   },
+   "2020": {
+    "permits": 5,
+    "permit_cost": 3065000
+   },
+   "2021": {
+    "permits": 10,
+    "permit_cost": 2919807
+   },
+   "2022": {
+    "permits": 14,
+    "permit_cost": 3254493
+   },
+   "2023": {
+    "permits": 14,
+    "permit_cost": 5971500
+   },
+   "2024": {
+    "permits": 17,
+    "permit_cost": 5667376
+   },
+   "2025": {
+    "permits": 30,
+    "permit_cost": 8756234
+   },
+   "2026": {
+    "permits": 10,
+    "permit_cost": 4330070
+   }
+  },
+  "nbh_russell_industrial": {
+   "2019": {
+    "permits": 22,
+    "permit_cost": 4423751
+   },
+   "2020": {
+    "permits": 10,
+    "permit_cost": 26123200
+   },
+   "2021": {
+    "permits": 5,
+    "permit_cost": 1168980
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "permits": 7,
+    "permit_cost": 5375163
+   },
+   "2024": {
+    "permits": "lt5"
+   },
+   "2025": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_wayne_state": {
+   "2019": {
+    "permits": 5,
+    "permit_cost": 2565950
+   },
+   "2020": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": "lt5"
+   },
+   "2025": {
+    "permits": 6,
+    "permit_cost": 1577000
+   }
+  },
+  "nbh_marina_district": {
+   "2019": {
+    "permits": 6,
+    "permit_cost": 43992
+   },
+   "2020": {
+    "permits": 13,
+    "permit_cost": 301804
+   },
+   "2021": {
+    "sales": "lt5",
+    "permits": 19,
+    "permit_cost": 486870
+   },
+   "2022": {
+    "sales": 6,
+    "permits": 6,
+    "permit_cost": 64824
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": 9,
+    "permit_cost": 276605
+   },
+   "2025": {
+    "sales": "lt5",
+    "permits": 20,
+    "permit_cost": 418997
+   },
+   "2026": {
+    "permits": 8,
+    "permit_cost": 186588
+   }
+  },
+  "nbh_garden_view": {
+   "2019": {
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_new_center": {
+   "2019": {
+    "permits": 53,
+    "permit_cost": 44719267
+   },
+   "2020": {
+    "permits": 22,
+    "permit_cost": 7505001
+   },
+   "2021": {
+    "permits": 12,
+    "permit_cost": 2309997
+   },
+   "2022": {
+    "permits": 8,
+    "permit_cost": 13522078
+   },
+   "2023": {
+    "permits": 8,
+    "permit_cost": 301151
+   },
+   "2024": {
+    "permits": 9,
+    "permit_cost": 8623895
+   },
+   "2025": {
+    "permits": 9,
+    "permit_cost": 711500
+   },
+   "2026": {
+    "permits": 8,
+    "permit_cost": 2287468
+   }
+  },
+  "nbh_gold_coast": {
+   "2019": {
+    "permits": 21,
+    "permit_cost": 2686964
+   },
+   "2020": {
+    "permits": 11,
+    "permit_cost": 49522539
+   },
+   "2021": {
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": 8,
+    "permit_cost": 211275
+   },
+   "2023": {
+    "permits": 7,
+    "permit_cost": 2230670
+   },
+   "2024": {
+    "permits": 19,
+    "permit_cost": 19691640
+   },
+   "2025": {
+    "permits": 14,
+    "permit_cost": 17940395
+   },
+   "2026": {
+    "permits": 9,
+    "permit_cost": 19722142
+   }
+  },
+  "nbh_belle_isle": {
+   "2020": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_waterworks_park": {
+   "2020": {
+    "permits": "lt5"
+   },
+   "2021": {
+    "permits": "lt5"
+   },
+   "2022": {
+    "permits": "lt5"
+   },
+   "2023": {
+    "permits": "lt5"
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_douglass": {
+   "2023": {
+    "permits": "lt5"
+   },
+   "2024": {
+    "permits": "lt5"
+   },
+   "2025": {
+    "permits": 6,
+    "permit_cost": 48536416
+   },
+   "2026": {
+    "permits": "lt5"
+   }
+  },
+  "nbh_brewster_homes": {
+   "2026": {
+    "permits": "lt5"
+   }
+  }
+ }
+}

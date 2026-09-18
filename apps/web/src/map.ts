@@ -76,6 +76,7 @@ export interface MapSpec {
   key: string;                                  // remembers pan and zoom while this screen is open
   label: string;                                // what a screen reader hears for the picture
   segments: Segment[]; focus?: string;          // greenway; `focus` is drawn bold
+  outline?: { lat: number; lon: number }[][];   // a neighborhood's edge
   dots?: MapDot[]; me?: { lat: number; lon: number } | null;
   fit: { lat: number; lon: number }[];          // show at least these points at the start
   minMeters?: number;                           // never start closer than this many meters across
@@ -233,6 +234,10 @@ export class MapView {
       }
       const labelCls = mpp < 4.6 ? 4 : mpp < 8 ? 3 : mpp < 14 ? 2 : mpp < 30 ? 1 : 0;
       for (const cls of [0, 1, 2, 3, 4]) if (cls <= labelCls) for (const r of visible[cls]!) if (r.name) labels.push({ name: r.name, pts: r.pts, cls });
+    }
+    if (this.spec.outline) {
+      c.beginPath(); for (const ring of this.spec.outline) { ring.forEach((q, i) => (i ? c.lineTo(this.X(wx(q.lon)), this.Y(wy(q.lat))) : c.moveTo(this.X(wx(q.lon)), this.Y(wy(q.lat))))); c.closePath(); }
+      c.globalAlpha = 0.12; c.fillStyle = col.brand; c.fill(); c.globalAlpha = 1; c.strokeStyle = col.strong; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.stroke(); c.setLineDash([]);
     }
     // Greenway: open stretches are a solid green line; the rest is dashed and says so when tapped.
     const stroke = (g: { lines: Float32Array[] }, color: string, lw: number, dash: number[]) => { c.strokeStyle = color; c.lineWidth = lw; c.setLineDash(dash); c.beginPath(); for (const l of g.lines) this.trace(l); c.stroke(); };

@@ -10,6 +10,7 @@ import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
 import { FOOD_BENEFITS } from '../src/benefits.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
+import { hoodList, hoodPage, type Hood, type Indicators } from '../src/hoods.js';
 import { build as buildReport, nonce } from '../src/report.js';
 
 const root = join(__dirname, '../../..');
@@ -127,6 +128,42 @@ describe('add a place, saved places, help paying for food', () => {
   });
 });
 
+describe('neighborhood pages (docs/13 honesty rules)', () => {
+  const ui = { t: (k: string, p: Record<string, string | number> = {}) => (strings[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '<div class="mapbox"></div>' };
+  const hood = (name: string, district: number | null, total: number): Hood => ({ id: 'nbh_' + name.toLowerCase(), name, district, center: [42.4, -83.1], rings: [], years: { 2024: { sales: 'lt5', permits: 12, permit_cost: 500000 }, 2025: { sales: 40, median_price: 90000 } },
+    help: { total, by: { food: 0, harm: total }, nearest_miles: { food: 2.3, clinic: null, narcan: 0.5, indoors: 0.8 }, none_listed_yet: ['food', 'health'], coverage_checked: false }, places: { parks: 3, rec_centers: 1, greenway_open: 0 } });
+  const src = { name: 'City data', url: 'https://example.org/x', last_edited: '2026-09-17' };
+  const d: Indicators = { sources: { neighborhoods: src, sales: src, permits: src }, stats_fetched_at: '2026-09-18', first_year: 2024, partial_year: 2026, near_miles: 0.5, origin: [-83.32, 42.22], segments: {},
+    city: { 2024: { sales: 8775, median_price: 79000 }, 2025: { sales: 7541, median_price: 85000 }, 2026: { sales: 3803, median_price: 86500 } }, neighborhoods: [hood('Zug', 1, 9), hood('Alpha', 1, 0), hood('Midway', 2, 4)] };
+  it('lists neighborhoods in ABC order inside each district: never by a number', () => {
+    const html = hoodList(d, ui);
+    expect(html.indexOf('Alpha')).toBeLessThan(html.indexOf('Zug')); expect(html.indexOf('Zug')).toBeLessThan(html.indexOf('Midway'));
+    expect(html).toContain("We don't rank neighborhoods");
+    expect(readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8')).not.toMatch(/sort[(][^)]*(total|median|sales|permits)/);
+  });
+  it('every page says the numbers describe and do not explain, and a thin list is called our gap, with a way to add a place', () => {
+    const html = hoodPage(d.neighborhoods[0]!, d, ui);
+    expect(html).toContain("They can't tell you why");
+    expect(html).toContain('It does not mean there is no help here');
+    expect(html).toContain('"v":"add"');
+    expect(html).toContain('That describes our list, not the neighborhood');
+    expect(html).not.toContain('MISSING:');
+  });
+  it('hidden counts read "fewer than 5", a missing price says why, the unfinished year says "so far", and both tables sit in one panel', () => {
+    const html = hoodPage(d.neighborhoods[0]!, d, ui);
+    expect(html).toContain('fewer than 5'); expect(html).toContain('too few sales to show a price'); expect(html).toContain('2026 so far');
+    const panel = html.slice(html.indexOf('Read these two together'));
+    expect(panel.indexOf('<table')).toBeGreaterThan(-1);
+    expect(panel.slice(0, panel.indexOf('</div>')).match(/<table/g)).toHaveLength(2);
+    expect(html).toContain('We leave out crime numbers on purpose');
+  });
+  it('neighborhood numbers are fetched only when asked for, and checked against the signed index', () => {
+    const src2 = readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8');
+    expect(src2).toContain('fetchVerified(index, FILE)'); expect(src2).not.toContain(' fetch(');
+    expect(readFileSync(join(__dirname, '../src/data.ts'), 'utf8')).toContain("!name.startsWith('indicators/')");
+  });
+});
+
 describe('map', () => {
   const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
   it('reads the pipeline line format: whole 1e-5 degrees from an origin, then steps', () => {
@@ -167,7 +204,7 @@ describe('privacy and copy rules, checked against the source', () => {
     for (const k of used) expect(strings[k], k).toBeTypeOf('string');
   });
   it('never writes to localStorage, sessionStorage, or cookies, and never sends anything', () => {
-    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts']) {
+    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts', 'hoods.ts', 'saved.ts', 'benefits.ts']) {
       const src = readFileSync(join(__dirname, '../src', f), 'utf8');
       expect(src, f).not.toMatch(/localStorage|sessionStorage|document\.cookie|sendBeacon|XMLHttpRequest/);
       expect(src.match(/method:\s*'POST'/), f).toBeNull();
