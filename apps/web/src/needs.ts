@@ -38,7 +38,8 @@ export const NEEDS: Need[] = [
   { id: 'doctor', icon: 'health', group: 'soon', query: { category: 'health.clinic' } },
   { id: 'utilities', icon: 'bolt', group: 'soon', query: { category: 'utilities' } },
   { id: 'narcan', icon: 'box', group: 'soon', query: { category: 'harm.narcan' } },
-  { id: 'hot_cold', icon: 'sun', group: 'soon', query: { category: 'shelter.cooling' }, emptyKey: 'hotcold.none' },
+  // Warming and cooling centers are announced as alerts. Day to day, libraries and recreation centers are the free indoor places.
+  { id: 'hot_cold', icon: 'sun', group: 'soon', query: { category: 'rec' }, intro: 'hotcold.intro', emptyKey: 'hotcold.none' },
 ];
 
 /** Browse-by-type chips on the Help tab. Recreation, transit and events have their own tabs. */

@@ -13,7 +13,8 @@
     "keys:generate": "tsx src/keys.ts",
     "check:emergency": "tsx src/check-emergency.ts",
     "ingest:greenway": "tsx src/ingest-greenway.ts",
-    "ingest:city": "tsx src/ingest-city.ts"
+    "ingest:city": "tsx src/ingest-city.ts",
+    "import:lines": "tsx src/import-lines.ts"
   },
   "dependencies": {
     "@detroithelp/query": "workspace:*",

@@ -182,8 +182,8 @@
   "rec.parks": "City parks",
   "rec.all_parks": "See all {count} parks",
   "rec.parks_source": "Park list from the City of Detroit, updated {date}.",
-  "rec.centers": "Recreation centers",
-  "rec.centers_none": "We're still adding recreation centers. For hours and programs, call Detroit Parks and Recreation at 313-224-1100.",
+  "rec.centers": "Recreation centers and libraries",
+  "rec.centers_none": "We're still adding recreation centers and libraries. For hours and programs, call Detroit Parks and Recreation at 313-224-1100.",
   "rec.bike": "Bikes",
   "transit.lede": "Get where you're going by bus, streetcar, or People Mover.",
   "transit.tip": "On any listing, tap “Bus directions” to plan the trip there.",
@@ -194,5 +194,6 @@
   "events.source": "Events read from the City's calendar on {date}.",
   "events.all": "See the City's full calendar",
   "detail.bus": "Bus directions",
-  "detail.where": "Where"
+  "detail.where": "Where",
+  "hotcold.intro": "Libraries and recreation centers are free and open to everyone during the day. When the City opens warming or cooling centers, they show up on the Home page."
 }

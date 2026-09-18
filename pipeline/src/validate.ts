@@ -9,7 +9,7 @@ import { inBbox, p, parsePhone, type CsvRow } from './util.js';
 export interface Issues { errors: string[]; warnings: string[] }
 
 const ID = /^sal_[a-z0-9_]+$/;
-const CATEGORY = /^(food\.(pantry|meal|mobile|benefits)|shelter\.(emergency|warming|cooling|dv)|harm\.(narcan|supplies)|health\.(clinic|mental|dhd)|utilities|housing\.rent|hygiene\.shower|transport|youth)$/;
+const CATEGORY = /^(food\.(pantry|meal|mobile|benefits)|shelter\.(emergency|warming|cooling|dv)|harm\.(narcan|supplies)|health\.(clinic|mental|dhd)|utilities|housing\.rent|hygiene\.shower|transport|youth|rec\.(center|library))$/;
 // Patterns that suggest a person's contact details leaked into public text.
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]+/;
 // Case-sensitive on purpose: the name part must be Capitalized Words, or "ask for help today" would match.

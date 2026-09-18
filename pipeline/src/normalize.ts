@@ -7,7 +7,7 @@ import type { Source } from './ingest-arcgis.js';
 // How long a confirmation stays good, by category (docs/04). Not a to-do list for anyone.
 const CADENCE: [string, number][] = [
   ['food.mobile', 14], ['food.pantry', 45], ['food.meal', 45], ['harm.', 45], ['shelter.', 60], ['youth', 60],
-  ['hygiene.', 45], ['utilities', 90], ['housing.', 90], ['health.', 180], ['food.benefits', 365],
+  ['hygiene.', 45], ['utilities', 90], ['housing.', 90], ['health.', 180], ['rec.', 180], ['food.benefits', 365],
 ];
 export const cadenceFor = (category: string) => CADENCE.find(([k]) => category.startsWith(k))?.[1] ?? 90;
 
@@ -46,6 +46,7 @@ export function fromSeed(resources: CsvRow[], schedules: CsvRow[]): Normalized {
       phones: phones(r),
       ...(r.website ? { website: r.website } : {}),
       availability: (r.availability || 'unknown') as Availability,
+      ...(r.hours_text ? { hours_text: r.hours_text } : {}),
       ...(r.notice ? { notice: r.notice } : {}),
       schedules: bySal.get(r.sal_id!) ?? [],
       flags: r.flags ? r.flags.split(',').map((f) => f.trim()).filter(Boolean) : [],

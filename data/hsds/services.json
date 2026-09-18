@@ -866,6 +866,1524 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "c74e0418-aef8-5200-a35b-e819f746e683",
+  "name": "Adams Butzel Complex",
+  "status": "active",
+  "description": "City recreation center with a pool, ice arena, gym, and weight room. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes, the gym, and the pool. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "ba51498a-0959-55cc-9190-015caf42aa65",
+    "location": {
+     "id": "2cead042-f0a0-536c-9e91-7c72a62d115f",
+     "name": "Adams Butzel Complex",
+     "location_type": "physical",
+     "latitude": 42.395199,
+     "longitude": -83.163919,
+     "addresses": [
+      {
+       "id": "a010a279-dde5-53f0-a3bf-25c285676e10",
+       "address_1": "10500 Lyndon",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_adams_butzel_complex"
+     }
+    },
+    "phones": [
+     {
+      "id": "fc1e4bcf-e6d6-5b0b-94ac-f87a6d1d66b6",
+      "number": "313-628-0990"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "27c0f02e-44eb-5879-94e4-a1edb0289f53",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "12864631-707c-5f36-a8e9-c2f4e149666a",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_adams_butzel_complex",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/adams-butzel-complex"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_adams_butzel_complex",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "e464f8ae-b44a-5f93-8016-62e45c994892",
+  "name": "Butzel Family Center",
+  "status": "active",
+  "description": "City center with senior and youth services and help agencies on site. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and programs. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cd5faf9d-1bfe-5254-9061-ba389c47e937",
+    "location": {
+     "id": "c50b0d7a-7cec-5b2b-b005-d42798ac72a3",
+     "name": "Butzel Family Center",
+     "location_type": "physical",
+     "latitude": 42.357475,
+     "longitude": -83.002487,
+     "addresses": [
+      {
+       "id": "19e9aca4-061c-593e-9c21-d6367457e814",
+       "address_1": "7737 Kercheval",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48214",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_butzel_family_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "28c17360-d0e9-5008-ad21-5d912f0c1f3a",
+      "number": "313-628-2100"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "f7d2784b-70f0-5f91-9b83-fecb802bdeed",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_butzel_family_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/butzel-family-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_butzel_family_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "ca9618c1-fb07-575d-af6d-e3d0c6e7e0e9",
+  "name": "Chandler Park Fieldhouse",
+  "status": "active",
+  "description": "City fieldhouse with a gym, indoor track, and turf field. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes, the gym, and the track. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e0e11616-14fa-5a99-a3fc-479831b4aa00",
+    "location": {
+     "id": "f35abe1b-23fd-5a22-8c9d-aa45ac411da2",
+     "name": "Chandler Park Fieldhouse",
+     "location_type": "physical",
+     "latitude": 42.394509,
+     "longitude": -82.977222,
+     "addresses": [
+      {
+       "id": "497224de-0db5-5cc9-898e-a35f8dcaa8d6",
+       "address_1": "12300 Chandler Park Drive",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48213",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_chandler_park_fieldhouse"
+     }
+    },
+    "phones": [
+     {
+      "id": "45d1d436-7094-5b27-9cc4-65be7494e1f1",
+      "number": "313-224-3663"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "c78df5d4-3ca7-56f2-932a-8ca5fc304e15",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "07:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "b7dfd7c5-79a2-55da-b1f6-6d2def510127",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_chandler_park_fieldhouse",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/chandler-park-fieldhouse"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_chandler_park_fieldhouse",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "c635d16c-9956-5d46-a6d4-8bf27068836b",
+  "name": "Clemente Recreation Center",
+  "status": "active",
+  "description": "City recreation center with a gym, weight room, computer lab, and lending library. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and the gym. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a74ea0b6-0152-566d-a05e-732dcd0aae6d",
+    "location": {
+     "id": "fa88aa09-9f2b-52e8-8238-99d727a6293e",
+     "name": "Clemente Recreation Center",
+     "location_type": "physical",
+     "latitude": 42.325239,
+     "longitude": -83.078471,
+     "addresses": [
+      {
+       "id": "343d8463-9fb6-5e41-aab1-fe450320c277",
+       "address_1": "2631 Bagley",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48216",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_clemente_recreation_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "f66d6096-f3a4-52f0-8cba-c2395a4ff10d",
+      "number": "313-224-0228"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "c48f2b65-acf8-5900-91c0-5aae63314cef",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "5fd0119d-f7b1-5e6f-9689-8f3cb79fcb94",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_clemente_recreation_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/clemente-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_clemente_recreation_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "18d0a6a7-0c33-5fad-81f8-8909b20ac0b8",
+  "name": "Coleman A. Young Community Center",
+  "status": "active",
+  "description": "City recreation center with a pool, gym, weight room, and boxing. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes, the gym, and the pool. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "1a89531c-2a01-5f16-ac34-e719adc6a58c",
+    "location": {
+     "id": "bad1e25b-dbfa-5fc8-bd06-0baadff5ed1a",
+     "name": "Coleman A. Young Community Center",
+     "location_type": "physical",
+     "latitude": 42.345385,
+     "longitude": -83.024511,
+     "addresses": [
+      {
+       "id": "8b3db408-eec2-5bdb-aaf4-5159072869d0",
+       "address_1": "2751 Robert Bradby Dr",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_coleman_a_young_community_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "7e3e0609-19af-50ba-804b-7ab6dde0bbc0",
+      "number": "313-628-0995"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "47280a54-66ba-524c-a982-95a384c1db0b",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "be0fa896-b6cf-598c-9077-0a7bf7911d21",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_coleman_a_young_community_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/coleman-young-community-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_coleman_a_young_community_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "a78029af-c134-506b-8668-44c5fcf5d5a5",
+  "name": "Community Center at AB Ford",
+  "status": "active",
+  "description": "City community center on the east riverfront. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and programs. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a789e605-51fd-5bd0-b7ca-5d54d07890f9",
+    "location": {
+     "id": "0184be97-f27e-58aa-a4e8-0a2198bd04bb",
+     "name": "Community Center at AB Ford",
+     "location_type": "physical",
+     "latitude": 42.357578,
+     "longitude": -82.942853,
+     "addresses": [
+      {
+       "id": "58b05c1a-5055-524d-a202-aefde23087e9",
+       "address_1": "100 Lenox",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48215",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_community_center_at_ab_ford"
+     }
+    },
+    "phones": [
+     {
+      "id": "7396e5ae-43cc-50e3-8be6-8a9a21991e6d",
+      "number": "313-628-1197"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "3246c44b-26f2-5208-8a69-0c276c5b9858",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "af22a9a6-8533-532a-a083-8e87cad65645",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_community_center_at_ab_ford",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/ABFord"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_community_center_at_ab_ford",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f33831ec-e1f5-54ea-9231-c31765861992",
+  "name": "Crowell Recreation Center",
+  "status": "active",
+  "description": "City recreation center with a gym, weight room, boxing, and a walking path in the park. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and the gym. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "8c1a4992-87c6-55d6-8fde-50fedd08ef4f",
+    "location": {
+     "id": "bc48384e-3946-5ac1-b8e6-48090b2cc299",
+     "name": "Crowell Recreation Center",
+     "location_type": "physical",
+     "latitude": 42.410837,
+     "longitude": -83.257204,
+     "addresses": [
+      {
+       "id": "96094764-e487-5e46-bf79-1d9db036e471",
+       "address_1": "16630 Lahser",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_crowell_recreation_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "7c3435e9-ce02-5fe7-857b-778801ed667d",
+      "number": "313-628-2047"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "68510f01-18d3-51ce-9184-395108bc84e7",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "7a9d9ec9-8ff7-588a-9c7d-215e3136d86c",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_crowell_recreation_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/crowell-community-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_crowell_recreation_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "b0a47cb6-d57f-58ba-91dd-38b7c1188ddf",
+  "name": "Farwell Recreation Center",
+  "status": "active",
+  "description": "City recreation center with a gym, weight room, arts and crafts, and dance. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and the gym. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a9a00616-bac6-52d9-87d3-9e684c48bea5",
+    "location": {
+     "id": "746916aa-e75c-5657-9fa3-2181eb85d333",
+     "name": "Farwell Recreation Center",
+     "location_type": "physical",
+     "latitude": 42.440652,
+     "longitude": -83.058027,
+     "addresses": [
+      {
+       "id": "3319fb67-8b8e-5299-9b96-5cce710b6c02",
+       "address_1": "2781 E Outer Drive",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48234",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_farwell_recreation_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "65a17e1a-d3c9-5994-a9f0-408f78bdb77f",
+      "number": "313-628-2028"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "46497ddd-aca0-5ef5-9aa4-1d776e740043",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "83e77084-4a71-5eb0-8684-cbd158d9bb21",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_farwell_recreation_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/farwell-recreation-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_farwell_recreation_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "e9e32961-532e-5a13-8cb6-1da066593b91",
+  "name": "Heilmann Recreation Center",
+  "status": "active",
+  "description": "City recreation center with a pool, gym, and weight room, plus senior and youth programs. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes, the gym, and the pool. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "1eaaa912-33f5-58c4-b895-dfe31e6d4a59",
+    "location": {
+     "id": "9865d3ae-bbff-5545-a30e-71e26f8bd1bc",
+     "name": "Heilmann Recreation Center",
+     "location_type": "physical",
+     "latitude": 42.440027,
+     "longitude": -82.963144,
+     "addresses": [
+      {
+       "id": "8e5fed51-92ab-5038-bf8d-704c5b0f0b69",
+       "address_1": "19601 Brock Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48205",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_heilmann_recreation_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "d7dc5686-29d3-5c30-92e6-52466dccaaad",
+      "number": "313-224-9334"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "a06ca7f6-1f8a-5e12-9842-cc75499b5b4f",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "cb909015-9634-5056-a48a-5de68679ef36",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_heilmann_recreation_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/heilmann-community-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_heilmann_recreation_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "61ec6638-86f2-5a2f-956b-f1d972e3bb72",
+  "name": "Helen Moore Community Center",
+  "status": "active",
+  "description": "City community center with a gym, weight room, reading room, and art room. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and the gym. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e7f229a2-99e5-5ecd-a6f3-7fcbf6acf26b",
+    "location": {
+     "id": "55d4a688-e618-5de0-a22f-7be5dd5409e7",
+     "name": "Helen Moore Community Center",
+     "location_type": "physical",
+     "latitude": 42.380429,
+     "longitude": -83.124686,
+     "addresses": [
+      {
+       "id": "275b40d7-a5ee-5dae-abae-85ee0f5a680f",
+       "address_1": "11825 Dexter Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_helen_moore_community_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "5d67a183-ca63-5cb7-b906-0bd15afda365",
+      "number": "313-224-9303"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "17635774-ff52-5ad4-b19b-4c160b735821",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "d0d53329-4bca-598f-9130-3a9c3854a453",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_helen_moore_community_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/helen-moore-community-center-ed-davis-park"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_helen_moore_community_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "3e40b37b-9cac-5915-9f9f-597435784fc5",
+  "name": "Joseph Walker Williams Center",
+  "status": "active",
+  "description": "City recreation center with swimming, dance, and boxing. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and the pool. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "ab103606-cbcb-5f77-8871-3a0a0ee40146",
+    "location": {
+     "id": "97ba9d3c-f692-5615-a4fb-23c6c9ac668b",
+     "name": "Joseph Walker Williams Center",
+     "location_type": "physical",
+     "latitude": 42.371088,
+     "longitude": -83.095885,
+     "addresses": [
+      {
+       "id": "a456125b-cdfd-541e-9ce3-227a82c30052",
+       "address_1": "8431 Rosa Parks Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_joseph_walker_williams_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "e60dc663-3049-53f7-93b6-132e7d7b3dbb",
+      "number": "313-628-2039"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "3791cca6-c967-5036-ad0d-2652eb0f3cd3",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "56216024-078f-5350-ad7d-b367b899114a",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_joseph_walker_williams_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/joseph-walker-williams-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_joseph_walker_williams_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "2e8af41f-5dba-54b3-b78f-378c8032d892",
+  "name": "Kemeny Recreation Center",
+  "status": "active",
+  "description": "City recreation center with a gym, weight room, game room, and sports fields. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and the gym. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "1e6fddd1-d91c-5741-8565-2de091dca201",
+    "location": {
+     "id": "fabdfc72-d16e-5366-8d76-1576bc905ca1",
+     "name": "Kemeny Recreation Center",
+     "location_type": "physical",
+     "latitude": 42.273491,
+     "longitude": -83.157997,
+     "addresses": [
+      {
+       "id": "b40f18e1-1360-56b7-9747-c95cf79a6e6b",
+       "address_1": "2260 S Fort St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48217",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_kemeny_recreation_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "23f7243c-735f-53fb-84a7-8e2709f94834",
+      "number": "313-628-2819"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "bdbf7a10-e1e5-5979-a6a0-18daf88f8206",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "7a933d32-07c0-5538-b8dc-299b1837d1cf",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_kemeny_recreation_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/kemeny-recreation-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_kemeny_recreation_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "ae12827f-0501-5e86-88dd-4d113303e485",
+  "name": "Lasky Recreation Center",
+  "status": "active",
+  "description": "City recreation center with a gym, weight room, boxing, and a track. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes and the gym. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "26b27115-fa32-5f38-869a-f330152bac45",
+    "location": {
+     "id": "0878878f-c549-509e-994d-7e9933c464c1",
+     "name": "Lasky Recreation Center",
+     "location_type": "physical",
+     "latitude": 42.414047,
+     "longitude": -83.052597,
+     "addresses": [
+      {
+       "id": "75e67144-b4e0-525a-b674-fcbae5c6b496",
+       "address_1": "13200 Fenelon",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_lasky_recreation_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "d017c56e-b912-5c41-a9b6-3d161e4ccf42",
+      "number": "313-628-2030"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "5f6dda33-baf9-524e-8262-b1e5ddd01e37",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "8579f03a-354d-5ebc-98f9-74c17ca13793",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_lasky_recreation_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/lasky-recreation-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_lasky_recreation_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "a61c02a5-d849-5069-87dd-4a6b1491c935",
+  "name": "Northwest Activities Center",
+  "status": "active",
+  "description": "City activities center with a pool, gym, and weight room. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes, the gym, and the pool. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "5b825915-f057-5386-947f-578344be606b",
+    "location": {
+     "id": "9c808434-1c04-5d7c-900b-194b7e725ed6",
+     "name": "Northwest Activities Center",
+     "location_type": "physical",
+     "latitude": 42.422235,
+     "longitude": -83.170288,
+     "addresses": [
+      {
+       "id": "aa184e86-2f59-5754-84e4-783eb4204271",
+       "address_1": "18100 Meyers",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48235",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_northwest_activities_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "c454f503-7309-50bb-920d-4c6718206bdb",
+      "number": "313-578-7500"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "0de67ffd-79b5-50d7-8fda-953dcf49d2a5",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "e310ec6d-4ee7-57cb-a5f4-dab4ab38a4fe",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_northwest_activities_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/northwest-activities-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_northwest_activities_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "82bfef3b-8cd1-5e00-ad58-d6595248a422",
+  "name": "Patton Community Center",
+  "status": "active",
+  "description": "City community center with a pool, gym, senior room, and computers. Anyone can come in to cool off on hot days.",
+  "eligibility_description": "You need a membership for classes, the gym, and the pool. Ask at the front desk.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "2e2c367a-00e3-5f3e-bb67-2afe35378d1e",
+   "name": "Detroit Parks and Recreation",
+   "description": "Detroit Parks and Recreation",
+   "x_detroit": {
+    "id": "org_detroit_parks_and_recreation"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "fe7e09a0-fd33-5f98-94ca-1842ba75a4fb",
+    "location": {
+     "id": "e47a3310-26bf-5d43-84db-bab986bfe146",
+     "name": "Patton Community Center",
+     "location_type": "physical",
+     "latitude": 42.308946,
+     "longitude": -83.137091,
+     "addresses": [
+      {
+       "id": "a7b76935-2183-5def-9dea-95a15d7c2e8d",
+       "address_1": "2301 Woodmere",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_parks_patton_community_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "ae190641-9cc5-5e7c-9d93-45cc83325b00",
+      "number": "313-628-2000"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "f1bb9727-1697-56e7-af48-3c109b541038",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "82077f78-7e35-5d2e-a1ee-9082e7b5ffc8",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_parks_patton_community_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Parks and Recreation website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/patton-community-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_parks_patton_community_center",
+   "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "798632f5-a3cd-5e42-8093-b41ee370b0f0",
   "name": "Free Narcan and harm reduction supplies",
   "status": "active",
@@ -5116,6 +6634,82 @@
   "x_detroit": {
    "id": "svc_focus_hope_food_for_seniors",
    "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "3994388c-07b1-59b8-88ea-4d1c986e4561",
+  "name": "Tindal Recreation Center",
+  "status": "active",
+  "description": "Recreation center run by a partner group for the City. Call for hours and programs.",
+  "url": "https://detroitmi.gov/departments/detroit-parks-recreation",
+  "organization": {
+   "id": "61992585-1de2-528b-9adb-5c3a8e37b3a1",
+   "name": "Healthy Kidz, Inc.",
+   "description": "Healthy Kidz, Inc.",
+   "x_detroit": {
+    "id": "org_healthy_kidz_inc"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "7d84fdc4-54b6-5045-8d9c-7d921cf938c9",
+    "location": {
+     "id": "f1088b1e-18ca-5b72-a8a5-eebf723f782e",
+     "name": "Tindal Recreation Center",
+     "location_type": "physical",
+     "latitude": 42.431267,
+     "longitude": -83.163674,
+     "addresses": [
+      {
+       "id": "38af2879-74f5-594a-9846-71a4f4e34d83",
+       "address_1": "10301 W Seven Mile Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48221",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_healthy_kidz_tindal_recreation_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "85570dbb-f7aa-5cea-b7cc-e79a5b1fad8c",
+      "number": "313-307-8869"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_healthy_kidz_tindal_recreation_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Healthy Kidz, Inc. website",
+      "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/tindal-recreation-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_healthy_kidz_tindal_recreation_center",
+   "category": "rec.center"
   },
   "assured_date": "2026-09-18"
  },

@@ -165,7 +165,7 @@ function recTab(): string {
   const g = bundle?.greenway, parks = bundle?.parks ?? [];
   const openCount = g?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const nearParks = here ? [...parks].map((p) => ({ p, mi: milesBetween(here!, p) })).sort((a, b) => a.mi - b.mi).slice(0, 5) : [];
-  const centers = rank(bundle?.rows ?? [], { category: 'shelter.cooling', ...(here ? { near: here } : {}) }, now());
+  const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now());
   return `<main><h1 class="page" tabindex="-1">${T('tab.rec')}</h1><p class="lede">${T('rec.lede')}</p>
     ${g ? `<button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'dim')}</button>${gwMap(g.segments)}` : ''}
     ${parks.length ? `<h2>${T('rec.parks')}</h2>${locChip()}${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => `<li><div class="row static"><span class="rowic">${icon('rec')}</span><span class="rowtx"><strong>${esc(p.name)}</strong><small>${[p.address, t('miles', { miles: mi.toFixed(1) })].filter(Boolean).map(esc).join(' · ')}</small></span></div></li>`).join('')}</ul>` : ''}

@@ -10,6 +10,7 @@ import { p, parsePhone, sha256, uuid5 } from '../src/util.js';
 import { validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { parseCalendar } from '../src/ingest-city.js';
+import { lineToRows, parseSchedule } from '../src/import-lines.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
@@ -124,6 +125,23 @@ describe('City calendar reader', () => {
     expect(ev[0]).toEqual({ id: 'evt_gourdys_pumpkin_run_2026-09-19', title: "Gourdy's Pumpkin Run", starts_at: '2026-09-19T10:00', time_text: '10:00 am - 2:00 pm', department: 'Parks & Recreation', url: 'https://detroitmi.gov/events/gourdys-pumpkin-run' });
     expect(ev[1]).toMatchObject({ starts_at: '2026-09-20', title: 'Board meeting' });
     expect(JSON.stringify(ev)).not.toContain('own description');
+  });
+});
+
+describe('hours from research text', () => {
+  it('become a schedule only when every part is understood', () => {
+    expect(parseSchedule('Mon-Fri 8am-9pm; Sat 9am-5pm')).toEqual([{ byday: 'MO,TU,WE,TH,FR', opens_at: '08:00', closes_at: '21:00' }, { byday: 'SA', opens_at: '09:00', closes_at: '17:00' }]);
+    expect(parseSchedule('Monday through Thursday: 8:30 a.m. - 12:00 p.m. & 1:00 p.m. - 5:00 p.m.')).toEqual([{ byday: 'MO,TU,WE,TH', opens_at: '08:30', closes_at: '12:00' }, { byday: 'MO,TU,WE,TH', opens_at: '13:00', closes_at: '17:00' }]);
+    expect(parseSchedule('Tuesdays and Thursdays 10 am to noon')).toEqual([{ byday: 'TU,TH', opens_at: '10:00', closes_at: '12:00' }]);
+    expect(parseSchedule('M-F 9-5pm')).toEqual([{ byday: 'MO,TU,WE,TH,FR', opens_at: '09:00', closes_at: '17:00' }]);
+  });
+  it('refuses to guess', () => {
+    for (const text of ['Second Saturday of the month 10am-noon', 'Mon-Fri 8am-9pm; weekends vary', 'By appointment', 'Wednesdays after service', 'Fri 1pm until food runs out', 'Sat 5pm-9am', 'not stated'])
+      expect(parseSchedule(text), text).toBeNull();
+  });
+  it('a line with unclear hours is imported as call-first with the hours kept as written', () => {
+    const out = lineToRows('Hope Pantry | Hope Church | food.pantry | Free groceries. | 1 Main St | Detroit | 48204 | 313-555-0100 | https://x.org | 2nd Saturday 10am-noon | | https://x.org/pantry');
+    expect(out).toMatchObject({ resource: { sal_id: 'sal_hope_church_hope_pantry', status: 'proposed', availability: 'call_first', hours_text: '2nd Saturday 10am-noon' }, schedules: [] });
   });
 });
 
