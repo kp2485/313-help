@@ -1,0 +1,33 @@
+sal_id,freq,interval,byday,bymonthday,dtstart,until,valid_from,valid_to,opens_at,closes_at,description
+sal_csk_meldrum_meals,WEEKLY,,"MO,TU,WE,TH,FR",,2026-09-14,,,,08:30,09:30,Breakfast
+sal_csk_meldrum_meals,WEEKLY,,"MO,TU,WE,TH,FR",,2026-09-14,,,,11:00,13:00,Lunch
+sal_csk_conner_meals,WEEKLY,,"MO,TU,WE,TH,FR,SA",,2026-09-14,,,,08:30,09:30,Breakfast
+sal_csk_conner_meals,WEEKLY,,"MO,TU,WE,TH,FR,SA",,2026-09-14,,,,11:00,13:00,Lunch
+sal_csk_conner_meals,WEEKLY,,"MO,TU,WE,TH,FR",,2026-09-14,,,,16:00,17:00,Dinner
+sal_pope_francis_day_center,WEEKLY,,"MO,TU,WE,TH,FR,SA",,2026-09-14,,,,07:00,11:00,
+sal_crossroads_sunday_meal,WEEKLY,,SU,,2026-09-14,,,,11:00,14:00,
+sal_focus_hope_seniors_west,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,08:00,16:00,
+sal_focus_hope_seniors_west,WEEKLY,,FR,,2026-09-14,,,,08:00,12:00,
+sal_focus_hope_seniors_east,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,08:00,16:00,
+sal_focus_hope_seniors_east,WEEKLY,,FR,,2026-09-14,,,,08:00,12:00,
+sal_csk_conner_showers,WEEKLY,,"TU,TH",,2026-09-14,,,,09:00,13:00,
+sal_thaw_utility_help,WEEKLY,,"MO,TU,WE,TH,FR",,2026-09-14,,,,08:00,16:45,Phone hours
+sal_wayne_metro_connect_center,WEEKLY,,"MO,TU,WE,TH,FR",,2026-09-14,,,,08:00,18:00,Phone hours
+sal_wayne_metro_connect_center,WEEKLY,,SA,,2026-09-14,,,,09:00,12:00,Phone hours
+sal_wayne_metro_walkin_welcome_center,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,08:30,12:00,
+sal_wayne_metro_walkin_welcome_center,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,13:00,17:00,
+sal_wayne_metro_walkin_dresner,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,08:30,12:00,
+sal_wayne_metro_walkin_dresner,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,13:00,17:00,
+sal_wayne_metro_walkin_west,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,08:30,12:00,
+sal_wayne_metro_walkin_west,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,13:00,17:00,
+sal_wayne_metro_walkin_east,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,08:30,12:00,
+sal_wayne_metro_walkin_east,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,13:00,17:00,
+sal_chass_southwest,WEEKLY,,"MO,WE,TH,FR",,2026-09-14,,,,08:00,17:00,
+sal_chass_southwest,WEEKLY,,TU,,2026-09-14,,,,08:00,20:00,
+sal_chass_southwest,WEEKLY,,SA,,2026-09-14,,,,08:00,12:00,
+sal_covenant_care_michigan_ave,WEEKLY,,"MO,TU",,2026-09-14,,,,08:00,20:00,
+sal_covenant_care_michigan_ave,WEEKLY,,"WE,TH,FR",,2026-09-14,,,,08:00,17:00,
+sal_covenant_care_joy_rd,WEEKLY,,"MO,WE,TH,FR",,2026-09-14,,,,08:00,16:30,Medical
+sal_covenant_care_joy_rd,WEEKLY,,TU,,2026-09-14,,,,08:00,18:00,Medical
+sal_ruth_ellis_drop_in,WEEKLY,,"MO,WE",,2026-09-14,,,,15:00,20:30,
+sal_ruth_ellis_drop_in,WEEKLY,,TH,,2026-09-14,,,,11:00,14:00,Resource day

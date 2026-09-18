@@ -1,0 +1,5755 @@
+[
+ {
+  "id": "da91ce6b-fc17-55b5-82e7-fa6a4664cddd",
+  "name": "Doctor visits and pharmacy",
+  "status": "active",
+  "description": "Doctor visits and a pharmacy in Southwest Detroit.",
+  "url": "https://www.chasscenter.org",
+  "organization": {
+   "id": "f463305b-5ae2-5070-afb5-7eaea1001c17",
+   "name": "CHASS Center",
+   "description": "CHASS Center",
+   "x_detroit": {
+    "id": "org_chass"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "dd1fe291-24d4-5db3-ac7f-342f0f4ed978",
+    "location": {
+     "id": "bb7ce263-d7be-5488-aa9d-885ecc3700a9",
+     "name": "CHASS Southwest Center",
+     "location_type": "physical",
+     "latitude": 42.309544,
+     "longitude": -83.096371,
+     "addresses": [
+      {
+       "id": "61f25623-cf5f-5e7e-92fd-2aa7e95793bb",
+       "address_1": "5635 W Fort St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_chass_southwest"
+     }
+    },
+    "phones": [
+     {
+      "id": "6a88ed5f-449d-5079-8dc9-378d341a289b",
+      "number": "313-849-3920"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "baee7547-fc91-5fdc-a8b9-61471b17e551",
+      "freq": "WEEKLY",
+      "byday": "MO,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "194e148e-709a-5a4d-b4a8-14777b415f38",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "70885f27-4402-574a-9450-d13730eaceea",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_chass_southwest",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "spanish"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "CHASS Center website",
+      "url": "https://www.chasscenter.org/contact"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_chass_southwest",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "5aaa79f8-2a7b-555f-acae-792b82f8dabd",
+  "name": "Medical, dental, and counseling",
+  "status": "active",
+  "description": "Medical, dental, and counseling care. You pay based on your income.",
+  "url": "https://covenantcommunitycare.org",
+  "organization": {
+   "id": "f7047c94-5f36-56f7-9543-34771bb11e49",
+   "name": "Covenant Community Care",
+   "description": "Covenant Community Care",
+   "x_detroit": {
+    "id": "org_covenant_community_care"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "aa6e50b1-176f-5b55-af17-421234a8de08",
+    "location": {
+     "id": "dff479c8-425c-54f5-9a5b-6c0fb32e7f69",
+     "name": "Covenant Community Care, Michigan Ave",
+     "location_type": "physical",
+     "latitude": 42.331214,
+     "longitude": -83.113248,
+     "addresses": [
+      {
+       "id": "58ac3e37-5281-5d32-8c43-d2306e13934d",
+       "address_1": "5716 Michigan Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_covenant_care_michigan_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "1b3b5561-a7b4-5c60-8f7a-278bd441978f",
+      "number": "313-554-1095"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "b9a122b4-7eb7-5fe1-9507-b598b77bb210",
+      "freq": "WEEKLY",
+      "byday": "MO,TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "43065fd7-41e2-5c43-82bd-541d7df3f1ce",
+      "freq": "WEEKLY",
+      "byday": "WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_covenant_care_michigan_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "sliding_fee"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Covenant Community Care website",
+      "url": "https://covenantcommunitycare.org/locations/michigan-avenue/"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "405cd896-1575-5da9-b1c2-b83571b6c080",
+    "location": {
+     "id": "02865aff-4e2c-54d5-bbc4-6b0dbc73855e",
+     "name": "Covenant Community Care, Joy Road",
+     "location_type": "physical",
+     "latitude": 42.357825,
+     "longitude": -83.214997,
+     "addresses": [
+      {
+       "id": "d2941d5e-92f0-528b-b8cf-aa241a014d1e",
+       "address_1": "17625 Joy Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_covenant_care_joy_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "c3caf628-d856-5f9d-bec4-620d52b7cb0d",
+      "number": "313-446-8800"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "9360c8b6-25a7-56fb-a356-7509e7328198",
+      "freq": "WEEKLY",
+      "byday": "MO,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "16:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Medical"
+     },
+     {
+      "id": "29d621e6-c741-5272-adfc-9cadc0d98386",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Medical"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_covenant_care_joy_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "sliding_fee"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Covenant Community Care website",
+      "url": "https://covenantcommunitycare.org/locations/joy-road/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_covenant_community_care_clinic",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f256ca1f-6e5f-5d01-bfaa-49baf5ddf010",
+  "name": "Shelter and help for young adults",
+  "status": "active",
+  "description": "Shelter and help for young people ages 18 to 24 in crisis. Open all day, every day.",
+  "eligibility_description": "Ages 18 to 24.",
+  "url": "https://covenanthousemi.org",
+  "organization": {
+   "id": "d766fd19-13e9-5f77-b63f-77626b36fbbb",
+   "name": "Covenant House Michigan",
+   "description": "Covenant House Michigan",
+   "x_detroit": {
+    "id": "org_covenant_house_mi"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cbbaa2c2-ac6f-58cc-9507-684ad1798246",
+    "location": {
+     "id": "51cd873c-0de6-5210-b2d1-3ede98e0c82d",
+     "name": "Covenant House Michigan",
+     "location_type": "physical",
+     "latitude": 42.33645,
+     "longitude": -83.089371,
+     "addresses": [
+      {
+       "id": "ff2280a3-cabe-58a8-a804-79ce39a3c4ff",
+       "address_1": "2959 Martin Luther King Jr Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48208",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_covenant_house_detroit"
+     }
+    },
+    "phones": [
+     {
+      "id": "c5af4614-eb9f-5e76-84a6-02c1edf36824",
+      "number": "313-463-2000"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_covenant_house_detroit",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "youth"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Covenant House Michigan website",
+      "url": "https://covenanthousemi.org/contact-us/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_covenant_house_detroit",
+   "category": "youth"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "7f6ceafa-af72-53af-ae4a-63fd6ef4a059",
+  "name": "Sunday hot meal",
+  "status": "active",
+  "description": "Free hot meal every Sunday.",
+  "url": "https://crossroadsofmichigan.org",
+  "organization": {
+   "id": "59a55e3c-fc60-5579-af82-ae96831c3f24",
+   "name": "Crossroads of Michigan",
+   "description": "Crossroads of Michigan",
+   "x_detroit": {
+    "id": "org_crossroads"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a1841b7c-4731-5d46-8d25-1444b9fccb63",
+    "location": {
+     "id": "38911277-d2aa-5671-85a0-a43a443fc5cd",
+     "name": "Crossroads of Michigan",
+     "location_type": "physical",
+     "latitude": 42.361538,
+     "longitude": -83.096027,
+     "addresses": [
+      {
+       "id": "b6b934aa-667f-54b9-9219-0e9838043cd4",
+       "address_1": "2424 W Grand Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48208",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_crossroads_sunday_meal"
+     }
+    },
+    "phones": [
+     {
+      "id": "296c570d-414a-5f3f-92a6-252327b450e6",
+      "number": "313-831-2787"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "167cab29-d90c-5865-b6f7-b41e1477403d",
+      "freq": "WEEKLY",
+      "byday": "SU",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_crossroads_sunday_meal",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Crossroads of Michigan website",
+      "url": "https://crossroadsofmichigan.org/clients"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_crossroads_sunday_meal",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "39cf864c-fa6c-547b-8186-4aa35caba960",
+  "name": "Free hot meals",
+  "status": "active",
+  "description": "Free hot breakfast, lunch, and dinner for anyone.",
+  "url": "https://www.cskdetroit.org",
+  "organization": {
+   "id": "2e45964b-a52f-537c-8a60-f3a81e975702",
+   "name": "Capuchin Soup Kitchen",
+   "description": "Capuchin Soup Kitchen",
+   "x_detroit": {
+    "id": "org_capuchin"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "337ef52a-eb32-5e52-8e19-ac8686fbecbc",
+    "location": {
+     "id": "2061e56e-0596-575b-9949-8928256e3fff",
+     "name": "Capuchin Soup Kitchen, Conner",
+     "location_type": "physical",
+     "latitude": 42.385993,
+     "longitude": -82.969552,
+     "addresses": [
+      {
+       "id": "371f05b8-8ca4-5d40-b981-45522f5a0e88",
+       "address_1": "4390 Conner St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48215",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_csk_conner_meals"
+     }
+    },
+    "phones": [
+     {
+      "id": "889d3158-ed15-565b-b838-f7b6e1ec2cfb",
+      "number": "313-822-8606"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "512dc682-5773-544d-abd3-897d78f5ce52",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "09:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Breakfast"
+     },
+     {
+      "id": "e2340b26-b373-5b15-8745-21e111868e16",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Lunch"
+     },
+     {
+      "id": "006d91a0-b114-58ab-96a2-f6a14d31902b",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "16:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Dinner"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_csk_conner_meals",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Capuchin Soup Kitchen website",
+      "url": "https://www.cskdetroit.org/services-offerings/meal-program/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_csk_conner_meals",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "3f12c0a6-36f5-57b6-b673-7a62cb61763b",
+  "name": "Showers and clean clothes",
+  "status": "active",
+  "description": "Free shower and clean clothes.",
+  "url": "https://www.cskdetroit.org",
+  "organization": {
+   "id": "2e45964b-a52f-537c-8a60-f3a81e975702",
+   "name": "Capuchin Soup Kitchen",
+   "description": "Capuchin Soup Kitchen",
+   "x_detroit": {
+    "id": "org_capuchin"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "73088880-8281-5cad-a7c4-0e4e8e7deb48",
+    "location": {
+     "id": "7928cac1-8609-5c74-a791-344ed44fab8e",
+     "name": "Capuchin Soup Kitchen, Conner",
+     "location_type": "physical",
+     "latitude": 42.385993,
+     "longitude": -82.969552,
+     "addresses": [
+      {
+       "id": "f2eb19a4-d16e-5dcb-b669-daf50b8aadc7",
+       "address_1": "4390 Conner St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48215",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_csk_conner_showers"
+     }
+    },
+    "phones": [
+     {
+      "id": "be5c7f39-23e2-5b5d-ac12-a9c86b0cc98a",
+      "number": "313-579-2100 ext. 4217"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "377f4ae9-83df-5971-b89d-121c03c042e2",
+      "freq": "WEEKLY",
+      "byday": "TU,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_csk_conner_showers",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Capuchin Soup Kitchen website",
+      "url": "https://www.cskdetroit.org/services-offerings/shower-program/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_csk_conner_showers",
+   "category": "hygiene.shower"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "c6b2deda-2ecc-5785-b284-8d2ee2feebec",
+  "name": "Free hot meals",
+  "status": "active",
+  "description": "Free hot breakfast and lunch for anyone. No questions asked.",
+  "url": "https://www.cskdetroit.org",
+  "organization": {
+   "id": "2e45964b-a52f-537c-8a60-f3a81e975702",
+   "name": "Capuchin Soup Kitchen",
+   "description": "Capuchin Soup Kitchen",
+   "x_detroit": {
+    "id": "org_capuchin"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "577d7e77-8f19-5e60-a7b1-05294da7a0e3",
+    "location": {
+     "id": "18cab863-0d29-5275-9fb3-7701ba1e6055",
+     "name": "Capuchin Soup Kitchen, Meldrum",
+     "location_type": "physical",
+     "latitude": 42.348829,
+     "longitude": -83.011728,
+     "addresses": [
+      {
+       "id": "c39408b3-3618-528e-8ca6-3d935832524c",
+       "address_1": "1264 Meldrum St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_csk_meldrum_meals"
+     }
+    },
+    "phones": [
+     {
+      "id": "ba54153d-fe71-5899-984c-05041e21daca",
+      "number": "313-579-2100"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "455585df-bd72-524f-9790-3b5c21621332",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "09:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Breakfast"
+     },
+     {
+      "id": "40511968-5b44-5f7c-b284-0c20400ccc77",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Lunch"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_csk_meldrum_meals",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Capuchin Soup Kitchen website",
+      "url": "https://www.cskdetroit.org/services-offerings/meal-program/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_csk_meldrum_meals",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "11c63e1c-de04-5ff3-83c6-7eedd6714ac4",
+  "name": "Shoppers' Choice food pantry",
+  "status": "active",
+  "description": "Free groceries you pick out yourself. Call first to set up your first visit.",
+  "eligibility_description": "First visit is by appointment.",
+  "url": "https://www.cskdetroit.org",
+  "organization": {
+   "id": "2e45964b-a52f-537c-8a60-f3a81e975702",
+   "name": "Capuchin Soup Kitchen",
+   "description": "Capuchin Soup Kitchen",
+   "x_detroit": {
+    "id": "org_capuchin"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "1fd1cf6d-8301-5306-9a0c-c0800b51c007",
+    "location": {
+     "id": "d7ced142-c861-5c48-989f-9775d78d0d21",
+     "name": "Capuchin Services Center",
+     "location_type": "physical",
+     "latitude": 42.37791,
+     "longitude": -83.032285,
+     "addresses": [
+      {
+       "id": "6a38a7ca-315b-5551-893b-eddabd00a505",
+       "address_1": "6333 Medbury St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48211",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_csk_shoppers_choice_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "9c988be7-29a5-576c-be71-5494e7f54b6d",
+      "number": "313-925-1370"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_csk_shoppers_choice_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [
+      "appointment_required"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Capuchin Soup Kitchen website",
+      "url": "https://www.cskdetroit.org/services-offerings/food-pantry/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_csk_shoppers_choice_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "798632f5-a3cd-5e42-8093-b41ee370b0f0",
+  "name": "Free Narcan and harm reduction supplies",
+  "status": "active",
+  "description": "Free Narcan from a newsstand box. No ID, no cost, no questions. The box is outdoors.",
+  "organization": {
+   "id": "7e7aed0f-02e0-5717-832e-1f12f6ec18c6",
+   "name": "Detroit Health Department",
+   "description": "Detroit Health Department",
+   "x_detroit": {
+    "id": "org_dhd"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cedd5862-d31d-591f-84ed-ad3f51a3809f",
+    "location": {
+     "id": "ecc86f8b-1b54-5ec1-804b-58d96ff66183",
+     "name": "6 & J Gas & More (Citgo Gas Station)",
+     "location_type": "physical",
+     "latitude": 42.418146,
+     "longitude": -83.101336,
+     "addresses": [
+      {
+       "id": "0a0db649-fdf4-5424-b76e-0ef12c8a8f5e",
+       "address_1": "1 East McNichols",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_1_east_mcnichols"
+     }
+    },
+    "phones": [
+     {
+      "id": "fdbf72d8-d933-5bda-941a-5738c0d3c6c6",
+      "number": "313-866-2562",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_1_east_mcnichols",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c6034e77-8841-53f6-b611-0f042431a62c",
+    "location": {
+     "id": "1db9b08a-10c7-5263-b81b-b8c67738b9e4",
+     "name": "1 Hart Plaza",
+     "location_type": "physical",
+     "latitude": 42.328274,
+     "longitude": -83.044329,
+     "addresses": [
+      {
+       "id": "e84fb8af-957e-5dda-b9d5-f2c6fa62a0fe",
+       "address_1": "1 Hart Plaza",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_1_hart_plaza"
+     }
+    },
+    "phones": [
+     {
+      "id": "01d4e23f-7415-5a28-8cdb-9d1dbcd4b7da",
+      "number": "313-877-8057",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_1_hart_plaza",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Hours vary by event",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "60938309-3a69-5fe8-90f2-a6cc74ddec97",
+    "location": {
+     "id": "87a9d63c-97b5-5974-8319-0a0fe4b530a8",
+     "name": "Detroit Health Department",
+     "location_type": "physical",
+     "latitude": 42.347686,
+     "longitude": -83.055939,
+     "addresses": [
+      {
+       "id": "2af47679-79b9-5f98-acdd-7f48021f75af",
+       "address_1": "100 Mack Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_100_mack_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "5d6d3f1b-e35c-55de-9581-40dcf84941a5",
+      "number": "313-876-4000",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_100_mack_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "8:30-4pm M-F",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "6ba7ad25-699a-5c2f-a4ad-c542f83d1ef4",
+    "location": {
+     "id": "78f9de14-b473-51f6-8b36-7c527edd110a",
+     "name": "Sunoco Gas Station",
+     "location_type": "physical",
+     "latitude": 42.373818,
+     "longitude": -83.159046,
+     "addresses": [
+      {
+       "id": "03d96bcf-8a44-5e64-a6de-49409ebaf916",
+       "address_1": "10000 Plymouth Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_10000_plymouth_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "fdc857cc-958c-59bc-a20e-c7d3bc8b3336",
+      "number": "800-786-6261",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_10000_plymouth_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "84037ddb-1c13-5ef8-a80f-dbee41b48688",
+    "location": {
+     "id": "5ece4331-cc51-59bd-8246-e412ff3c2236",
+     "name": "First Step Market",
+     "location_type": "physical",
+     "latitude": 42.4225,
+     "longitude": -82.940401,
+     "addresses": [
+      {
+       "id": "fb619a10-54c2-5cca-af79-d10f60171a8d",
+       "address_1": "10644 Morang",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_10644_morang"
+     }
+    },
+    "phones": [
+     {
+      "id": "399e0d1e-b7eb-5c54-b25c-a5b1637a8b78",
+      "number": "313-290-2996",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_10644_morang",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday–Thursday: 9:00 AM–10:00 PM Friday & Saturday: 9:00 AM–11:00 PM Sunday: 9:00 AM–9:00 PM",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0babdf8a-65f2-5d8d-86d3-8c52607b4b0e",
+    "location": {
+     "id": "385b1290-e751-5333-a3cd-7a7d5e78cd96",
+     "name": "Jason Hargrove Transit Center",
+     "location_type": "physical",
+     "latitude": 42.443955,
+     "longitude": -83.116778,
+     "addresses": [
+      {
+       "id": "7541d5ac-17c2-52d0-92ca-54e78c735076",
+       "address_1": "1121 W. Eight Mile Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_1121_w_eight_mile_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "9897365c-0159-5e24-a51a-7ad1dc0a1e0a",
+      "number": "313-933-1300",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_1121_w_eight_mile_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "1400a8d3-8de2-5c9b-9682-808478b9a657",
+    "location": {
+     "id": "4b2bbcf5-e45e-57db-8aec-47c514b5c66e",
+     "name": "Barrell & Bottle Party Shoppe",
+     "location_type": "physical",
+     "latitude": 42.377372,
+     "longitude": -83.122164,
+     "addresses": [
+      {
+       "id": "1db3361f-f11c-5880-920f-578867555b66",
+       "address_1": "11320 Dexter",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_11320_dexter"
+     }
+    },
+    "phones": [
+     {
+      "id": "4d5d6841-1bf6-545f-bf9b-fe3eececdd86",
+      "number": "313-869-2039",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_11320_dexter",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9-10 M-S, 10-10 Sun",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7a85b7d8-2af3-56c6-baaf-d8de99e56572",
+    "location": {
+     "id": "8e48172b-97c4-5d32-9b5a-c750c71a0454",
+     "name": "Careland Pharmacy and Medical Supply",
+     "location_type": "physical",
+     "latitude": 42.389443,
+     "longitude": -82.978285,
+     "addresses": [
+      {
+       "id": "a49d89e9-7ccf-50c5-a234-f30f9e5ea063",
+       "address_1": "11919 E. Warren Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_11919_e_warren_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "8ab9ff24-4820-5073-b317-ba5777e7139a",
+      "number": "313-499-1352",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_11919_e_warren_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday – Friday: 10 AM – 6 PM Saturday: 10 AM – 2 PM Sunday: Closed",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8c520d70-6170-5178-9707-778df538b0d9",
+    "location": {
+     "id": "804ef26b-bff3-5c94-9bce-82573e18f7f3",
+     "name": "Cabana Motel",
+     "location_type": "physical",
+     "latitude": 42.400242,
+     "longitude": -82.980627,
+     "addresses": [
+      {
+       "id": "9f50c72a-d771-574d-bd04-f99929d2a001",
+       "address_1": "12291 Harper Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_12291_harper_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "9bc8fc50-0d3e-5ff2-8781-0bc03d83e949",
+      "number": "313-371-1220",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_12291_harper_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "231dddae-78a8-50b7-9fa1-942fd57b87fa",
+    "location": {
+     "id": "a87be19a-66db-52e7-811c-1e63d008865d",
+     "name": "Mr S Party Store",
+     "location_type": "physical",
+     "latitude": 42.427874,
+     "longitude": -82.954967,
+     "addresses": [
+      {
+       "id": "56b1bcc1-ac5f-53a9-abf9-fad4664b5570",
+       "address_1": "12337 Morang Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_12337_morang_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "fc7af462-7fa4-570b-9b2e-4042e6bd666f",
+      "number": "313-839-2774",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_12337_morang_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "M-Th 9am-11pm F-Sat 9am-12am Sun 11am-10pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "70741f63-927d-5f2d-b26a-8ec1b2d55b5a",
+    "location": {
+     "id": "6babf8b8-5912-51b0-82e9-ca27a1cd9592",
+     "name": "Capuchin Soup Kitchen",
+     "location_type": "physical",
+     "latitude": 42.351071,
+     "longitude": -83.012652,
+     "addresses": [
+      {
+       "id": "2e9d887e-990e-5a32-a16d-475dff47e693",
+       "address_1": "1264 Meldrum St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_1264_meldrum_st"
+     }
+    },
+    "phones": [
+     {
+      "id": "ae4a7d08-25aa-5662-b3b6-50adc85d6392",
+      "number": "313-579-2100",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_1264_meldrum_st",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday – Friday: 8:30–9:30 AM, 11:00 AM–1:00 PM Saturday – Sunday: Closed",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f8986012-8875-544e-ba51-fadcc8b2e218",
+    "location": {
+     "id": "5f079ee5-d393-5342-9b38-177e5b69b81f",
+     "name": "Detroit Rescue Mission Ministries (Genesis House)",
+     "location_type": "physical",
+     "latitude": 42.366168,
+     "longitude": -83.170955,
+     "addresses": [
+      {
+       "id": "0d2205da-b364-5b4e-87ae-a5047e1ed4f1",
+       "address_1": "12900 W Chicago St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_12900_w_chicago_st"
+     }
+    },
+    "phones": [
+     {
+      "id": "7be62532-fddf-5efe-ac45-46cff479c665",
+      "number": "313-309-5900",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_12900_w_chicago_st",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "M-F 9-4:30PM",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "aaba9b2a-5775-5563-acbb-34c652fa895d",
+    "location": {
+     "id": "1a0da9c4-c616-5b6f-a4fd-5039fa00f173",
+     "name": "Community Health Awareness group (CHAG)",
+     "location_type": "physical",
+     "latitude": 42.325829,
+     "longitude": -83.059553,
+     "addresses": [
+      {
+       "id": "7be019c1-e96d-555f-99b7-57031c11f12d",
+       "address_1": "1300 Fort St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_1300_fort_st"
+     }
+    },
+    "phones": [
+     {
+      "id": "47691f9a-c214-58ff-bbb3-d7ca3d98689b",
+      "number": "313-963-3434",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_1300_fort_st",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9-5pm M-F",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "cc4cd654-8b54-579f-8f71-73b82d000662",
+    "location": {
+     "id": "057b735d-28f4-5274-9bc3-a06af0d3fd71",
+     "name": "Mike's Petroleum (Citgo Gas Station)",
+     "location_type": "physical",
+     "latitude": 42.435099,
+     "longitude": -82.990552,
+     "addresses": [
+      {
+       "id": "1db5ce56-3af0-55b6-9a98-1d7ab60dd6b4",
+       "address_1": "13033 E. Seven Mile Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_13033_e_seven_mile_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "64e3b3e0-f73d-521d-8cb1-35c5cdb399dd",
+      "number": "313-312-2669",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_13033_e_seven_mile_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7e25c075-4329-5045-9641-97750e0e3107",
+    "location": {
+     "id": "f74edbe4-4043-525f-91c9-3f014b3008dd",
+     "name": "Rosa Parks Transit Center",
+     "location_type": "physical",
+     "latitude": 42.332544,
+     "longitude": -83.052707,
+     "addresses": [
+      {
+       "id": "20918b5c-cda9-5700-9b88-5b58c3f9756e",
+       "address_1": "1310 Cass Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_1310_cass_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "2f246e1f-81b3-5e5f-91f7-671faf881703",
+      "number": "313-224-2160",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_1310_cass_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "aa3fce7a-33de-525b-b894-5b79b010059b",
+    "location": {
+     "id": "25d99411-d1b2-52e5-aedc-8c7a14a0eac0",
+     "name": "Matrix Human Services",
+     "location_type": "physical",
+     "latitude": 42.426531,
+     "longitude": -82.984527,
+     "addresses": [
+      {
+       "id": "7b1caa7e-ab12-5b26-98f9-a9fdb8427c69",
+       "address_1": "13560 E. McNichols",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_13560_e_mcnichols"
+     }
+    },
+    "phones": [
+     {
+      "id": "849e9217-3068-52a1-8f6d-8ca588aa5c4a",
+      "number": "313-526-4000",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_13560_e_mcnichols",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday – Friday: 7:30 AM – 8:00 PM Saturday – Sunday: 9:00 AM - 4:00 PM",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "a60f0863-ea1b-5ee2-8f31-ec6798d46b8f",
+    "location": {
+     "id": "66041e1e-6c50-511b-8911-5f87c6d747bc",
+     "name": "Citgo Gas Station",
+     "location_type": "physical",
+     "latitude": 42.416212,
+     "longitude": -83.180287,
+     "addresses": [
+      {
+       "id": "87a74bd8-4674-5d95-af4b-207607b6527e",
+       "address_1": "13601 W. McNichols",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_13601_w_mcnichols"
+     }
+    },
+    "phones": [
+     {
+      "id": "0028362d-d404-561f-944c-985d3a54ef5d",
+      "number": "313-270-5650",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_13601_w_mcnichols",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d580d1e0-7e69-5b73-a07e-e79de2149d7f",
+    "location": {
+     "id": "574a5eff-c225-5879-9f48-dfd0d7288d62",
+     "name": "Amoco Gas Station",
+     "location_type": "physical",
+     "latitude": 42.416212,
+     "longitude": -83.180287,
+     "addresses": [
+      {
+       "id": "85d0e583-6b93-566f-999b-f932210e9a96",
+       "address_1": "13601 W. McNichols",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_13601_w_mcnichols_amoco_gas_station"
+     }
+    },
+    "phones": [
+     {
+      "id": "137a3313-1388-5662-9860-e46461b76d9a",
+      "number": "313-270-5650",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_13601_w_mcnichols_amoco_gas_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "9dbd416f-3374-5701-9c4d-085666f333d2",
+    "location": {
+     "id": "7b7b9e23-9f99-55cd-9a72-7cd48ae4139e",
+     "name": "Zeke’s Liquor",
+     "location_type": "physical",
+     "latitude": 42.43076,
+     "longitude": -83.181129,
+     "addresses": [
+      {
+       "id": "a5fe8a34-57a1-5268-990b-161b044af67a",
+       "address_1": "13635 W. 7 Mile Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_13635_w_7_mile_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "83460074-5a3c-50e9-9b63-5dab1659bb93",
+      "number": "313-342-7222",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_13635_w_7_mile_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Varies by day",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "69404817-e64e-50bd-8072-13d309948016",
+    "location": {
+     "id": "46397192-5c4a-5a75-9410-b2e5cbc344e7",
+     "name": "Breaking Chains Outreach Ministries",
+     "location_type": "physical",
+     "latitude": 42.416044,
+     "longitude": -83.071231,
+     "addresses": [
+      {
+       "id": "696bcb87-2445-57d4-9580-3cb561b571af",
+       "address_1": "13881 Joseph Campau St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_13881_joseph_campau_st"
+     }
+    },
+    "phones": [
+     {
+      "id": "42c5ffe5-63e1-5288-bc07-594467fbdf3b",
+      "number": "586-563-5801",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_13881_joseph_campau_st",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "7-8:30pm Tues, 6:45-9:45pm Sat",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "da1e890e-c584-552d-a334-21ca74bbe291",
+    "location": {
+     "id": "0adec7f7-bc18-5230-8323-94320be2b362",
+     "name": "Food Giant",
+     "location_type": "physical",
+     "latitude": 42.389137,
+     "longitude": -83.197164,
+     "addresses": [
+      {
+       "id": "ea730fc9-f42b-5863-9148-e41d5ac189e6",
+       "address_1": "14040 Greenfield",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_14040_greenfield"
+     }
+    },
+    "phones": [
+     {
+      "id": "084a53ae-36d4-5f02-985c-5afd9c61d218",
+      "number": "313-270-2800",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_14040_greenfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Varies by day",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "987c41bd-c012-514b-a7ca-8faf0981b58c",
+    "location": {
+     "id": "3fe96e8f-c45e-5810-b815-517a7aaeb358",
+     "name": "Greater St. Paul",
+     "location_type": "physical",
+     "latitude": 42.447608,
+     "longitude": -82.97037,
+     "addresses": [
+      {
+       "id": "dfe98961-d523-5948-b89a-ead17788cc11",
+       "address_1": "15325 Gratiot",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_15325_gratiot"
+     }
+    },
+    "phones": [
+     {
+      "id": "537da30f-9fee-5578-8ef1-f35c6d33b54f",
+      "number": "313-839-4000",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_15325_gratiot",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "10am Sunday",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0fc08cb8-9af9-58b4-8d2c-7013727d1c82",
+    "location": {
+     "id": "e62dde3f-aef1-5bf3-b8ca-326e1aead282",
+     "name": "Greenfield Market",
+     "location_type": "physical",
+     "latitude": 42.409404,
+     "longitude": -83.199863,
+     "addresses": [
+      {
+       "id": "45ed1588-f9c6-5bdd-ae0c-256fa99fff58",
+       "address_1": "15530 Puritan Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_15530_puritan_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "5fc37bb3-b35c-535b-bec8-cf0c3ecb1126",
+      "number": "313-837-1176",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_15530_puritan_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "7am-8pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "e030cf78-9a7b-5255-89f6-dd55c4ec1c06",
+    "location": {
+     "id": "64c332b7-4935-51c1-b3de-01bdc15316b9",
+     "name": "Fenkell Liquor",
+     "location_type": "physical",
+     "latitude": 42.401132,
+     "longitude": -83.206321,
+     "addresses": [
+      {
+       "id": "992f6bab-200e-559b-b860-3a36a449752c",
+       "address_1": "16159 Fenkell",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_16159_fenkell"
+     }
+    },
+    "phones": [
+     {
+      "id": "e6e46030-8a07-5b07-860d-384ab231d5de",
+      "number": "313-273-5300",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_16159_fenkell",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Varies by day",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "9100be9a-3329-5bef-bdba-7535e5a1397e",
+    "location": {
+     "id": "3ff6c650-9852-5f24-981a-bf10184cade7",
+     "name": "Marathon Gas Station",
+     "location_type": "physical",
+     "latitude": 42.417679,
+     "longitude": -83.104792,
+     "addresses": [
+      {
+       "id": "5c6f7fa2-4cfe-5196-af58-7957ea73d70e",
+       "address_1": "16540 Woodward",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_16540_woodward"
+     }
+    },
+    "phones": [
+     {
+      "id": "20095482-c156-5e96-87b2-256f13ffef48",
+      "number": "313-310-5440",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_16540_woodward",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "ea06f2e2-ec75-5a21-a085-9bf78bde46ef",
+    "location": {
+     "id": "272a5f3f-e84c-5ae4-9dc5-a4e64754e2dc",
+     "name": "Restorations Towers Apartments",
+     "location_type": "physical",
+     "latitude": 42.410734,
+     "longitude": -83.258973,
+     "addresses": [
+      {
+       "id": "bcc6271e-355a-5987-a712-00c5d4518fca",
+       "address_1": "16651 Lasher",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_16651_lasher"
+     }
+    },
+    "phones": [
+     {
+      "id": "2def4c92-767a-5a03-91c5-94cdf64b8f04",
+      "number": "313-538-0360",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_16651_lasher",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday – Friday: 8:30 AM – 5:00 PM Saturday – Sunday: Closed",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "3d3adef2-1f44-5b8b-8e3d-2884d9f07e17",
+    "location": {
+     "id": "3d9fb234-c370-5ea5-b17f-35950fe908b4",
+     "name": "Cadieux Gas & Mart Inc.",
+     "location_type": "physical",
+     "latitude": 42.416901,
+     "longitude": -82.936397,
+     "addresses": [
+      {
+       "id": "b1a47a4c-59cc-55ca-9c71-75cb8721da7e",
+       "address_1": "17111 Harper Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_17111_harper_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "ad7d4710-4bda-50c4-8577-2e4498f9822d",
+      "number": "313-882-9900",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_17111_harper_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5956ba0b-c6a2-58df-8dba-e69b297dcc22",
+    "location": {
+     "id": "3f8c4fd5-2504-58f4-b63c-46909fd918b6",
+     "name": "Grace in Action",
+     "location_type": "physical",
+     "latitude": 42.305476,
+     "longitude": -83.130446,
+     "addresses": [
+      {
+       "id": "30dd3773-9eed-547f-818f-0b966069718d",
+       "address_1": "1725 Lawndale",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_1725_lawndale"
+     }
+    },
+    "phones": [
+     {
+      "id": "ce2981b4-3f0b-5b8d-b903-8957bcbb470e",
+      "number": "313-910-5997",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_1725_lawndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f8c0553c-ab97-58b5-8580-d1498ce280e0",
+    "location": {
+     "id": "d7a5b462-be92-5dee-971e-ad6de22238e6",
+     "name": "Detroit Detention Center",
+     "location_type": "physical",
+     "latitude": 42.424289,
+     "longitude": -83.044728,
+     "addresses": [
+      {
+       "id": "a0538c08-9c39-5661-84d6-b5951dcffa55",
+       "address_1": "17601 Mound Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_17601_mound_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "88ce5348-e0a8-5590-8a1f-0610fc0eea26",
+      "number": "313-368-8300",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_17601_mound_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7c6e4e05-8f4c-544d-b257-5cc216775837",
+    "location": {
+     "id": "2c442490-9db4-597e-ab54-48f9fc843753",
+     "name": "Amoco Gas Station",
+     "location_type": "physical",
+     "latitude": 42.400095,
+     "longitude": -83.21753,
+     "addresses": [
+      {
+       "id": "36975d94-3bbe-52fc-8ebb-540695119785",
+       "address_1": "17785 Grand River",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_17785_grand_river"
+     }
+    },
+    "phones": [
+     {
+      "id": "39017530-082e-5963-b8bd-10827e3e9ced",
+      "number": "313-835-9420",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_17785_grand_river",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c0da8e4e-5f43-563b-8990-5729f71598b4",
+    "location": {
+     "id": "8e96cb52-1d03-5f20-a141-0a60eb53c3dc",
+     "name": "Church of Jesus Christ Latter Day Saints",
+     "location_type": "physical",
+     "latitude": 42.429411,
+     "longitude": -83.112695,
+     "addresses": [
+      {
+       "id": "30763d21-751f-579f-a36a-23fd16372fe5",
+       "address_1": "18734 Woodward",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_18734_woodward"
+     }
+    },
+    "phones": [
+     {
+      "id": "ba4cd450-35cc-55a4-a2a3-b0bb33c9cf04",
+      "number": "248-433-6222",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_18734_woodward",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9-6pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d4da3eec-f50d-510e-84b0-b8c937774d39",
+    "location": {
+     "id": "8cfaae98-3a87-5935-9761-b668f768f72b",
+     "name": "La Renaissance Motel",
+     "location_type": "physical",
+     "latitude": 42.430368,
+     "longitude": -83.113444,
+     "addresses": [
+      {
+       "id": "97ea48cf-0651-5e3e-b873-eeff7b9afd3c",
+       "address_1": "18850 Woodward Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_18850_woodward_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "23584740-741b-56a3-b2dc-3c560adfbdba",
+      "number": "313-369-2811",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_18850_woodward_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8ca8c1b3-0299-568e-a262-423a904c079e",
+    "location": {
+     "id": "e1c6be40-c4c4-5dea-9ee3-9755145d7290",
+     "name": "Schoolcraft Liquor",
+     "location_type": "physical",
+     "latitude": 42.386665,
+     "longitude": -83.231055,
+     "addresses": [
+      {
+       "id": "d9bac99f-fdb5-5d86-9972-a91aed2ab99f",
+       "address_1": "19300 Schoolcraft",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_19300_schoolcraft"
+     }
+    },
+    "phones": [
+     {
+      "id": "fb062ada-37d3-5dbd-a3de-f40e1ac850e4",
+      "number": "313-838-8338",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_19300_schoolcraft",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "8am – 2am daily",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b47e511f-5407-5182-abfc-41001ebf9884",
+    "location": {
+     "id": "7407bea9-3cbb-5215-aaed-b8fd138f989a",
+     "name": "Family Dollar",
+     "location_type": "physical",
+     "latitude": 42.343527,
+     "longitude": -83.230158,
+     "addresses": [
+      {
+       "id": "e05d5c30-70d5-5b6c-8e50-bc604ac12c32",
+       "address_1": "19340 W. Warren",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_19340_w_warren"
+     }
+    },
+    "phones": [
+     {
+      "id": "376c5979-2c63-5f2a-877b-fb130f2e6968",
+      "number": "513-826-2276",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_19340_w_warren",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9-9pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "eb5cc9d7-00f2-506a-a917-413a6bc59a56",
+    "location": {
+     "id": "65379995-c81a-5db9-8ba3-8a71258ba468",
+     "name": "Coleman A. Young Municipal Center (CAYMC)",
+     "location_type": "physical",
+     "latitude": 42.329689,
+     "longitude": -83.043562,
+     "addresses": [
+      {
+       "id": "d6919b83-f100-55fe-bece-c8a1665b45f6",
+       "address_1": "2 Woodward Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_2_woodward_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "6a871928-b5b5-579c-a3a7-b99b36464def",
+      "number": "313-309-2300",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_2_woodward_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "M-F 8am-5pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7a4be025-8cbf-5261-a4d1-70d0ceee9cfa",
+    "location": {
+     "id": "465d8e42-3795-50c9-aea6-950c7f8e55f5",
+     "name": "Spirit Plaza",
+     "location_type": "physical",
+     "latitude": 42.329204,
+     "longitude": -83.044719,
+     "addresses": [
+      {
+       "id": "81342254-64d1-5bd1-abb3-c82444ebc52b",
+       "address_1": "2 Woodward Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_2_woodward_ave_spirit_plaza"
+     }
+    },
+    "phones": [
+     {
+      "id": "2ebed4cd-5527-5882-a4ca-dfd39371f4f7",
+      "number": "313-628-4203",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_2_woodward_ave_spirit_plaza",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9-4:30pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "93cce8f6-81a5-52a8-bfc4-14af8688f95c",
+    "location": {
+     "id": "b9da0130-df41-5ee2-b9d8-7edb8af2bcda",
+     "name": "BP Gas Station (Sams Petro)",
+     "location_type": "physical",
+     "latitude": 42.445396,
+     "longitude": -83.024095,
+     "addresses": [
+      {
+       "id": "bc6b338b-edd8-5a5a-adac-65835c2bffa5",
+       "address_1": "20216 Van Dyke Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_20216_van_dyke_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "1b233077-ae00-52b5-a289-7da9f02473d2",
+      "number": "313-366-1800",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_20216_van_dyke_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Varies by day",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "362e0848-cb48-587b-a5c3-02b1f770bde3",
+    "location": {
+     "id": "7791f70d-98a6-5860-8f5a-c350ff67dc85",
+     "name": "Hotel/Motel",
+     "location_type": "physical",
+     "latitude": 42.358608,
+     "longitude": -83.106013,
+     "addresses": [
+      {
+       "id": "e2b62e8e-3230-5a5c-bece-87e1e1bea0f8",
+       "address_1": "2127 W. Grand Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_2127_w_grand_blvd"
+     }
+    },
+    "phones": [
+     {
+      "id": "0459f0ff-066f-5bb5-89e1-7e34b011c8e9",
+      "number": "313-898-6353",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_2127_w_grand_blvd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "8am - 9pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "25423a5e-7f07-5f18-9437-dc9e10b275dc",
+    "location": {
+     "id": "95019926-db58-5c84-945b-dd26270c177c",
+     "name": "Motor City Liquor",
+     "location_type": "physical",
+     "latitude": 42.3524,
+     "longitude": -83.032541,
+     "addresses": [
+      {
+       "id": "ea7bfddd-b2d0-5f71-aea9-91b6b5939ec1",
+       "address_1": "2313 Gratiot Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_2313_gratiot_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "93e82746-7c7a-5d57-b2e9-ce174030fd66",
+      "number": "313-567-5909",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_2313_gratiot_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Sunday - Saturday: 8 AM - 12 AM",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "39368617-ca56-586e-af92-7c7ef5255851",
+    "location": {
+     "id": "b374efdb-388b-534f-959e-2f250a097f3a",
+     "name": "University of Detroit Mercy-Dental School",
+     "location_type": "physical",
+     "latitude": 42.337953,
+     "longitude": -83.087135,
+     "addresses": [
+      {
+       "id": "26e077d4-efa1-5263-8283-4ec725c7d8f5",
+       "address_1": "2700 Martin Luther King Jr Blvd.",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_2700_martin_luther_king_jr_blvd"
+     }
+    },
+    "phones": [
+     {
+      "id": "c766cbcf-c415-57e5-9835-2b26e68b0f56",
+      "number": "313-494-6700",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_2700_martin_luther_king_jr_blvd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9am-6pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "cb08934c-0615-55c6-8875-3027b4beead0",
+    "location": {
+     "id": "8154189d-e065-515e-946a-402f20a88de7",
+     "name": "Kevin’s All Seasons Landscaping",
+     "location_type": "physical",
+     "latitude": 42.268497,
+     "longitude": -83.161109,
+     "addresses": [
+      {
+       "id": "91b42fbb-27e5-542d-a9d2-dc1657a9309f",
+       "address_1": "2795 S. Fort St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_2795_s_fort_st"
+     }
+    },
+    "phones": [
+     {
+      "id": "fa9ab572-73d9-5815-88f0-e86047060a47",
+      "number": "313-294-4545",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_2795_s_fort_st",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "8-6pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "1f6b9187-a519-510c-ab92-fd5df568ccd3",
+    "location": {
+     "id": "3050c680-5a51-5d78-a2d2-361f1322c894",
+     "name": "Charles H Wright Museum",
+     "location_type": "physical",
+     "latitude": 42.359128,
+     "longitude": -83.060824,
+     "addresses": [
+      {
+       "id": "75bcfbf1-e3a1-521e-b57b-a621c24ed74a",
+       "address_1": "315 E Warren",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_315_e_warren"
+     }
+    },
+    "phones": [
+     {
+      "id": "9fc3e27a-1056-5a5b-81b6-1c58dbb9dc6b",
+      "number": "313-494-5800",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_315_e_warren",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9am-5pm Tues, Wed, Fri, Sat, & Sun 9am-7pm Thu",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "54efe19d-4aa4-558a-b668-77da6d8d3928",
+    "location": {
+     "id": "dd03a9a4-a04c-52d6-a555-53f339adc88c",
+     "name": "Marathon Gas Station",
+     "location_type": "physical",
+     "latitude": 42.287969,
+     "longitude": -83.165078,
+     "addresses": [
+      {
+       "id": "a7741b8b-226e-5033-b814-be502712c434",
+       "address_1": "377 Schaefer St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_377_schaefer_st"
+     }
+    },
+    "phones": [
+     {
+      "id": "c60f79bc-31c1-536f-bfdc-ae749bb0cefe",
+      "number": "313-554-1899",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_377_schaefer_st",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "4ffd7645-9982-5012-9517-13a40d3a8073",
+    "location": {
+     "id": "3778d81c-0046-50e0-9b07-e4cce567be41",
+     "name": "University of Detroit Mercy",
+     "location_type": "physical",
+     "latitude": 42.412944,
+     "longitude": -83.137079,
+     "addresses": [
+      {
+       "id": "d8ea1f8b-6405-528f-af90-e5586f8527b0",
+       "address_1": "4001 W McNichols Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_4001_w_mcnichols_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "a410fbc6-1318-5cc2-82c5-84ca12f3e530",
+      "number": "313-993-1245",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_4001_w_mcnichols_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "11-11pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "e1538d1e-96fe-580f-9395-1ee78b5bcac8",
+    "location": {
+     "id": "f5defbd9-cd55-5afe-b8d2-b2ba06dc2810",
+     "name": "University of Detroit Mercy-Wellness Cente",
+     "location_type": "physical",
+     "latitude": 42.417196,
+     "longitude": -83.135333,
+     "addresses": [
+      {
+       "id": "00c7fd94-df6c-516f-af52-5bc7df445c53",
+       "address_1": "4001 W McNichols Rd, (on corner of McNichols & Fairfeild)",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_4001_w_mcnichols_rd_on_corner_of_mcnichols_and_fairfeild"
+     }
+    },
+    "phones": [
+     {
+      "id": "d0379d3f-13d0-50b6-ba1e-ffda8eb57f3a",
+      "number": "313-993-1245",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_4001_w_mcnichols_rd_on_corner_of_mcnichols_and_fairfeild",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b9375f23-3341-50ac-a411-976a33de32e4",
+    "location": {
+     "id": "f8e78e7c-417c-56cd-a1c3-05b983e05ede",
+     "name": "BP Gas Station",
+     "location_type": "physical",
+     "latitude": 42.312786,
+     "longitude": -83.090026,
+     "addresses": [
+      {
+       "id": "d3685b9c-795c-5866-b49a-f9935ee2c8fb",
+       "address_1": "4276 W. Fort",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_4276_w_fort"
+     }
+    },
+    "phones": [
+     {
+      "id": "3384a748-9d3a-5626-84a8-b0b6fc27d3f3",
+      "number": "313-914-5749",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_4276_w_fort",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2b86fcab-b21b-554b-99e5-b11fc5f18172",
+    "location": {
+     "id": "7c46c3b9-a539-5408-ae36-51688160b300",
+     "name": "Capuchin Soup Kitchen",
+     "location_type": "physical",
+     "latitude": 42.38664,
+     "longitude": -82.969637,
+     "addresses": [
+      {
+       "id": "a083bf8b-f185-5682-8f62-b2fcde03565a",
+       "address_1": "4390 Conner",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_4390_conner"
+     }
+    },
+    "phones": [
+     {
+      "id": "9ff3b5b3-ab7c-563a-bac0-2a5bd2a38bad",
+      "number": "313-822-8606",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_4390_conner",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday–Friday 8:30–9:30 AM, 11 AM–1 PM, 4–5 PM Saturday 8:30–9:30 AM, 11 AM–1 PM Sunday Closed",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "49eb8351-78d4-5538-bb1a-309b07a93ffb",
+    "location": {
+     "id": "0804edc8-0d3f-5484-8948-cc7b5c4c5475",
+     "name": "Eastside Community Network",
+     "location_type": "physical",
+     "latitude": 42.386305,
+     "longitude": -82.970918,
+     "addresses": [
+      {
+       "id": "57d1880c-3eee-5315-9ca9-a18dea65515e",
+       "address_1": "4401 Conner",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_4401_conner"
+     }
+    },
+    "phones": [
+     {
+      "id": "52f79dfd-4fb7-5ffe-8850-6e206bdf6e15",
+      "number": "313-571-2800",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_4401_conner",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday–Friday 9 AM–8 PM Saturday 10 AM–3 PM Sunday Closed",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "ee4964c6-ed7b-5f30-8ffe-482f02fe5f18",
+    "location": {
+     "id": "759ae832-bb07-5b08-93da-4947147cdd2a",
+     "name": "Mobil Gas Station",
+     "location_type": "physical",
+     "latitude": 42.319801,
+     "longitude": -83.095916,
+     "addresses": [
+      {
+       "id": "64023c6a-0dc4-525c-bb8a-312efa2a252e",
+       "address_1": "4415 W. Vernor Hwy",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_4415_w_vernor_hwy"
+     }
+    },
+    "phones": [
+     {
+      "id": "2c2f32cb-4e57-516f-82a1-f4b513dd736d",
+      "number": "313-842-2433",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_4415_w_vernor_hwy",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8868b6ab-a886-584f-a485-8bc85e254574",
+    "location": {
+     "id": "0546408b-d116-58ff-8aa5-00770d01578d",
+     "name": "Mariners Inn",
+     "location_type": "physical",
+     "latitude": 42.339767,
+     "longitude": -83.058431,
+     "addresses": [
+      {
+       "id": "d17f8e1f-a39e-504a-b2e4-2149fb905d0e",
+       "address_1": "445 Ledyard",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_445_ledyard"
+     }
+    },
+    "phones": [
+     {
+      "id": "a82ded2b-b604-5cc8-8be7-7de8463228af",
+      "number": "313-962-9446",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_445_ledyard",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "094b33b0-87c0-55b4-94e5-7babd6700a7b",
+    "location": {
+     "id": "a52a3300-393b-577d-acf4-cb43f70a1ce7",
+     "name": "Adi Coney Island",
+     "location_type": "physical",
+     "latitude": 42.330846,
+     "longitude": -83.118416,
+     "addresses": [
+      {
+       "id": "8b369760-e8c0-59b6-92f4-6746ac091aa6",
+       "address_1": "6171 Michigan Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_6171_michigan_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "4b99d2d5-72bb-53e5-a43d-760c2afdd24f",
+      "number": "313-254-6740",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_6171_michigan_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f8a90bb5-08a2-5d49-b804-fb12be96f215",
+    "location": {
+     "id": "a7f9b58a-443a-54ec-a683-85c15ccee88f",
+     "name": "Happy's Pizza",
+     "location_type": "physical",
+     "latitude": 42.434131,
+     "longitude": -83.025068,
+     "addresses": [
+      {
+       "id": "467be3d8-5056-5185-92f7-5dcf6f1a792c",
+       "address_1": "7731 E. 7 Mile",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_7731_e_7_mile"
+     }
+    },
+    "phones": [
+     {
+      "id": "f2379d4e-39fc-50ec-8cce-2c649b8abe2b",
+      "number": "313-892-7777",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_7731_e_7_mile",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "M-Th: 11:00 AM–12:00 AM Fri-Sat: 11:00 AM–1:00 AM Sun: 11:00 AM–11:00 PM",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "482af0ce-d08f-5d32-92d8-f1165258b58d",
+    "location": {
+     "id": "bc4b46cc-f361-5fd8-b915-10e5f14d432b",
+     "name": "Family Dollar",
+     "location_type": "physical",
+     "latitude": 42.41688,
+     "longitude": -83.150423,
+     "addresses": [
+      {
+       "id": "d144ea40-d431-5ea3-b8bb-13cd9fdbc6e9",
+       "address_1": "8031 W. McNichols",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_8031_w_mcnichols"
+     }
+    },
+    "phones": [
+     {
+      "id": "b23df69f-00a2-5c17-9f6e-258dd062ef42",
+      "number": "313-816-8884",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_8031_w_mcnichols",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "8am-8pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "ea5ef088-364d-5496-aae4-92438fc68964",
+    "location": {
+     "id": "90d175f4-ee42-52f5-8845-319423494ea8",
+     "name": "Detroit Palace Liquor",
+     "location_type": "physical",
+     "latitude": 42.402324,
+     "longitude": -83.15005,
+     "addresses": [
+      {
+       "id": "098aa280-881d-5244-9cea-1b88757026de",
+       "address_1": "8105 Fenkell Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_8105_fenkell_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "25e9e5b3-eb6d-56c9-8702-f4d4bf052962",
+      "number": "313-307-8740",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_8105_fenkell_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Varies by day",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "9a3758c1-fe50-5f75-afcb-2554e28b2a74",
+    "location": {
+     "id": "c20b2b08-d51b-5cbc-ba46-fc199037ead1",
+     "name": "On the River Apartment",
+     "location_type": "physical",
+     "latitude": 42.351187,
+     "longitude": -82.990746,
+     "addresses": [
+      {
+       "id": "67a9cf59-228c-5f37-8a7f-c5b7b5598351",
+       "address_1": "8330 E Jefferson Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_8330_e_jefferson_ave"
+     }
+    },
+    "phones": [
+     {
+      "id": "73b3405f-56f3-5617-9382-29648bf51145",
+      "number": "313-331-7780",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_8330_e_jefferson_ave",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Mon, Tue, Thu, Fri: 8:30 AM – 5:00 PM Wed: 8:30 AM – 12:30 PM Sat & Sun: Closed",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "81585efd-bd4a-5506-bd6a-80eb86446335",
+    "location": {
+     "id": "a7165308-2a0d-5380-9d86-f2417775253d",
+     "name": "Breakers Covenant Church",
+     "location_type": "physical",
+     "latitude": 42.380487,
+     "longitude": -83.08083,
+     "addresses": [
+      {
+       "id": "9b2aa85f-5ff6-530f-ac04-069887b4ce8e",
+       "address_1": "8801 Woodward",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_8801_woodward"
+     }
+    },
+    "phones": [
+     {
+      "id": "dea9f026-2111-536a-9204-a8d3ce39f1b3",
+      "number": "313-468-8320",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_8801_woodward",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9-3pm, Closed Saturday",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "65c4d74e-8fdd-55d8-8e63-701596662a4b",
+    "location": {
+     "id": "0f7fb80c-1e9b-593c-8c95-cd59da760dca",
+     "name": "Neighborhood Service Organization (NSO)",
+     "location_type": "physical",
+     "latitude": 42.402924,
+     "longitude": -83.114037,
+     "addresses": [
+      {
+       "id": "af6d7a95-f591-57ca-a775-26e94f9083b5",
+       "address_1": "882 Oakman Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_882_oakman_blvd"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_882_oakman_blvd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "Monday – Friday: 8:30 AM – 5:00 PM Saturday – Sunday: Closed",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2b64b431-af64-5cf5-b520-67714075c807",
+    "location": {
+     "id": "1a94170d-8663-55d2-a33a-396a8bfe5520",
+     "name": "GSD – Rouge Service Yard",
+     "location_type": "physical",
+     "latitude": 42.359853,
+     "longitude": -83.255498,
+     "addresses": [
+      {
+       "id": "1a722e01-291d-5f33-89bc-68e2972cee6a",
+       "address_1": "9000 Lahser Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_9000_lahser_rd"
+     }
+    },
+    "phones": [
+     {
+      "id": "bc0573e6-e519-504b-ae65-249f816807a7",
+      "number": "313-628-1136",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_9000_lahser_rd",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "hours_text": "9am – 4:30pm",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "089b570a-797a-53a9-8f90-2d70618e060a",
+    "location": {
+     "id": "63143242-c398-5935-8365-a19c30e5b260",
+     "name": "Detroit QLINE",
+     "location_type": "physical",
+     "latitude": 42.336428,
+     "longitude": -83.050241,
+     "addresses": [
+      {
+       "id": "b64464cb-39de-5dd4-8d43-7bb0f30f598e",
+       "address_1": "Grand Circus Station, Northbound on Woodward",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_grand_circus_station_northbound_on_woodward"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_grand_circus_station_northbound_on_woodward",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "72d67205-efe5-52c9-a76f-3ef9ac35fbdc",
+    "location": {
+     "id": "19f75b0d-854c-5635-9662-d1b90247b81c",
+     "name": "Detroit QLINE",
+     "location_type": "physical",
+     "latitude": 42.336432,
+     "longitude": -83.05059,
+     "addresses": [
+      {
+       "id": "70f2b315-976a-5862-978f-98f93dcdea5d",
+       "address_1": "Grand Circus Station, Southbound on Woodward",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hr_grand_circus_station_southbound_on_woodward"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_hr_grand_circus_station_southbound_on_woodward",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Health Department harm reduction station list",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction",
+      "last_edited": "2026-08-26"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dhd_harm_reduction",
+   "category": "harm.narcan"
+  }
+ },
+ {
+  "id": "60db7a91-981f-5067-a085-cadd1ca98c97",
+  "name": "Genesis House II shelter",
+  "status": "active",
+  "description": "Shelter for families, single women, and parents with children. Call first.",
+  "url": "https://drmm.org",
+  "organization": {
+   "id": "8a618a8f-d24d-5496-b7bc-c9a666de3f62",
+   "name": "Detroit Rescue Mission Ministries",
+   "description": "Detroit Rescue Mission Ministries",
+   "x_detroit": {
+    "id": "org_drmm"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cfd447c1-f531-516c-af95-1a058362f5ba",
+    "location": {
+     "id": "f506d81f-4859-5c3c-8953-a7e7e30af717",
+     "name": "Genesis House II",
+     "location_type": "physical",
+     "latitude": 42.365999,
+     "longitude": -83.170466,
+     "addresses": [
+      {
+       "id": "e2e2eccc-73be-5380-9bbe-972942ce605b",
+       "address_1": "12900 W Chicago",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_drmm_genesis_house_2"
+     }
+    },
+    "phones": [
+     {
+      "id": "ffbd77eb-4c1c-5ffc-bf5e-0bf56b8d8797",
+      "number": "313-309-5900"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_drmm_genesis_house_2",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Rescue Mission Ministries website",
+      "url": "https://drmm.org/about-us/locations/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_drmm_genesis_house_2",
+   "category": "shelter.emergency"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "07696a25-3d1c-5661-858e-09e0b5faeb60",
+  "name": "Gratiot shelter",
+  "status": "active",
+  "description": "Shelter for women and children. Call first.",
+  "url": "https://drmm.org",
+  "organization": {
+   "id": "8a618a8f-d24d-5496-b7bc-c9a666de3f62",
+   "name": "Detroit Rescue Mission Ministries",
+   "description": "Detroit Rescue Mission Ministries",
+   "x_detroit": {
+    "id": "org_drmm"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "7f2f33db-7eba-5150-b115-c40668fdd8fa",
+    "location": {
+     "id": "e7b57faa-faac-5e9e-a2c8-c15e23eba1fe",
+     "name": "DRMM Gratiot Shelter",
+     "location_type": "physical",
+     "latitude": 42.444936,
+     "longitude": -82.971282,
+     "addresses": [
+      {
+       "id": "110d51e6-4fda-5596-b4cd-3a72a8f62780",
+       "address_1": "15063 Gratiot Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48205",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_drmm_gratiot_shelter"
+     }
+    },
+    "phones": [
+     {
+      "id": "460c8101-72a3-5863-99cf-6c6aeee0f98e",
+      "number": "313-499-8605"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_drmm_gratiot_shelter",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [
+      "women"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Rescue Mission Ministries website",
+      "url": "https://drmm.org/about-us/locations/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_drmm_gratiot_shelter",
+   "category": "shelter.emergency"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "3ae02919-3102-5115-9e1b-4bfe42419bb5",
+  "name": "Shutoff protection plans",
+  "status": "active",
+  "description": "Plans that can stop a shutoff for low-income households, seniors, people with medical needs, and active military.",
+  "url": "https://www.dteenergy.com",
+  "organization": {
+   "id": "03b34c5e-8b91-5c3f-9da2-7afb474f6741",
+   "name": "DTE Energy",
+   "description": "DTE Energy",
+   "x_detroit": {
+    "id": "org_dte"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "05ccfd25-1ca2-51aa-9f42-7008dcff25e7",
+    "location": {
+     "id": "66f61024-22cb-5b01-8660-0a9c675475c8",
+     "name": "Shutoff protection plans",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_dte_shutoff_protection"
+     }
+    },
+    "phones": [
+     {
+      "id": "c0d0af15-7199-57b5-b03b-881ab33823ac",
+      "number": "800-477-4747"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dte_shutoff_protection",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "DTE Energy website",
+      "url": "https://www.dteenergy.com/us/en/residential/billing-and-payments/energy-assistance/general-assistance.html"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dte_shutoff_protection",
+   "category": "utilities"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "c91a46d8-187e-5f4e-8e5d-bd2b5f064de6",
+  "name": "Crisis care center",
+  "status": "active",
+  "description": "Walk in any time for help in a mental health crisis. Adults and children. No appointment, insurance, or ID needed.",
+  "url": "https://dwihn.org",
+  "organization": {
+   "id": "7b25a876-94db-5bfe-9d40-664cc47acb46",
+   "name": "Detroit Wayne Integrated Health Network",
+   "description": "Detroit Wayne Integrated Health Network",
+   "x_detroit": {
+    "id": "org_dwihn"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "919d0fe8-8e15-5d7d-ba1c-8c5ff3910da2",
+    "location": {
+     "id": "057ab04e-63d0-5464-a83f-695f9150a2e9",
+     "name": "DWIHN Care Center",
+     "location_type": "physical",
+     "latitude": 42.367305,
+     "longitude": -83.077212,
+     "addresses": [
+      {
+       "id": "b2fd1a58-89f4-5a1b-8e9f-1687635b3357",
+       "address_1": "707 W Milwaukee Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dwihn_care_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "12a57530-8e0f-5f5f-92fc-cb1744624037",
+      "number": "313-989-9444"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dwihn_care_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Wayne Integrated Health Network website",
+      "url": "https://dwihn.org/programs-services/crisis-services"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dwihn_care_center",
+   "category": "health.mental"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "03736897-da93-5166-b952-30c5d8da3240",
+  "name": "24-hour crisis line",
+  "status": "active",
+  "description": "Call any time to talk to a real person about a mental health crisis.",
+  "url": "https://dwihn.org",
+  "organization": {
+   "id": "7b25a876-94db-5bfe-9d40-664cc47acb46",
+   "name": "Detroit Wayne Integrated Health Network",
+   "description": "Detroit Wayne Integrated Health Network",
+   "x_detroit": {
+    "id": "org_dwihn"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e6253244-53e8-57af-9cb5-5939fd443bbe",
+    "location": {
+     "id": "8c97625f-eabe-5c73-8b2f-e597b164272e",
+     "name": "24-hour crisis line",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_dwihn_crisis_line"
+     }
+    },
+    "phones": [
+     {
+      "id": "0210206c-6adb-5c1d-8266-8a0b017cc6fd",
+      "number": "800-241-4949"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dwihn_crisis_line",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Wayne Integrated Health Network website",
+      "url": "https://dwihn.org/crisis-help"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dwihn_crisis_line",
+   "category": "health.mental"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f8541670-8fb7-5dd4-becf-8ce78680c161",
+  "name": "Lifeline H2O plan",
+  "status": "active",
+  "description": "A lower water bill based on your income.",
+  "eligibility_description": "Low income households with a DWSD account.",
+  "url": "https://lifeline.detroitmi.gov",
+  "organization": {
+   "id": "c9711aaf-49a4-5a84-bb20-9e4228d8d101",
+   "name": "Detroit Water and Sewerage Department",
+   "description": "Detroit Water and Sewerage Department",
+   "x_detroit": {
+    "id": "org_dwsd"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a01b89e0-2197-5ce8-9fa1-802a494f129b",
+    "location": {
+     "id": "5e98c49f-ebbe-5fa3-843c-f94daad5e981",
+     "name": "Lifeline H2O plan",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_dwsd_lifeline"
+     }
+    },
+    "phones": [
+     {
+      "id": "9831b3c1-ad38-567e-80dd-e7c025c3bcf7",
+      "number": "313-267-8000"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dwsd_lifeline",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "notice": "Enrollment is full right now. You can join the waitlist.",
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Water and Sewerage Department website",
+      "url": "https://detroitmi.gov/departments/water-and-sewerage-department/dwsd-customer-service/dwsd-here-help-water-assistance-programs/lifeline-plan"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dwsd_lifeline",
+   "category": "utilities"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f8422b20-b69a-56c3-be9b-12e3c2adad9b",
+  "name": "24-hour helpline",
+  "status": "active",
+  "description": "Call any time for help with domestic or sexual violence.",
+  "url": "https://www.firststep-mi.org",
+  "organization": {
+   "id": "c63b3f0f-2b54-5331-bcd7-edd80adaf6db",
+   "name": "First Step",
+   "description": "First Step",
+   "x_detroit": {
+    "id": "org_first_step"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "8bde6681-b938-5992-8b3a-ee375f0d3284",
+    "location": {
+     "id": "cb274068-2e67-5d3b-8a45-178b9111c934",
+     "name": "24-hour helpline",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_first_step_helpline"
+     }
+    },
+    "phones": [
+     {
+      "id": "0813fde4-b4bb-505a-a7cc-1d6d50efb4eb",
+      "number": "734-722-6800"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_first_step_helpline",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "First Step website",
+      "url": "https://www.firststep-mi.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_first_step_helpline",
+   "category": "shelter.dv"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "5dd171f8-2a8b-5e9e-a6bd-33958074d757",
+  "name": "Food for Seniors",
+  "status": "active",
+  "description": "Free food box each month for people 60 and older with low income. No appointment needed.",
+  "eligibility_description": "Age 60 or older with low income. Bring photo ID and proof of address.",
+  "url": "https://www.focushope.edu",
+  "organization": {
+   "id": "527f89b8-8222-586e-aff1-b19486ef0420",
+   "name": "Focus: HOPE",
+   "description": "Focus: HOPE",
+   "x_detroit": {
+    "id": "org_focus_hope"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "92da4d02-55d5-5181-9eca-588d588d5a09",
+    "location": {
+     "id": "f573dd39-fc4a-5ea9-9f7a-d5405fb1f622",
+     "name": "Focus: HOPE food center, Westside",
+     "location_type": "physical",
+     "latitude": 42.39983,
+     "longitude": -83.121095,
+     "addresses": [
+      {
+       "id": "cb67b326-2eb6-518c-96f5-05dfc6423fe6",
+       "address_1": "1300 Oakman Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_focus_hope_seniors_west"
+     }
+    },
+    "phones": [
+     {
+      "id": "ad2912f6-e6f5-5cde-bf58-5a1c1942a3a1",
+      "number": "313-494-4600"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "f01a9ea8-c068-5917-a17a-5431b8120eb6",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "16:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "931924a3-3e24-5bf7-a57f-67ef93757c0e",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_focus_hope_seniors_west",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in",
+      "seniors"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Focus: HOPE website",
+      "url": "https://www.focushope.edu/programs/food-for-seniors/"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "6588a8b8-500a-5d36-bdd3-cdaa489b61af",
+    "location": {
+     "id": "3482a79d-2ba3-5a50-b97e-67d924c7f295",
+     "name": "Focus: HOPE food center, Eastside",
+     "location_type": "physical",
+     "latitude": 42.406132,
+     "longitude": -82.965481,
+     "addresses": [
+      {
+       "id": "08165d90-87fe-52c4-9c47-555cc5c2e75a",
+       "address_1": "9151 Chalmers St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48213",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_focus_hope_seniors_east"
+     }
+    },
+    "phones": [
+     {
+      "id": "ba4f2abc-f896-530d-9656-b3b4c2ac2531",
+      "number": "313-494-4600"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "e7b9b812-0e6e-5813-b248-f807481d35c8",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "16:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "c47c8af9-f58a-547c-b550-c908126addda",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_focus_hope_seniors_east",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in",
+      "seniors"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Focus: HOPE website",
+      "url": "https://www.focushope.edu/programs/food-for-seniors/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_focus_hope_food_for_seniors",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "4e476050-2bbb-5e06-9128-ec418bb08c1d",
+  "name": "Detroit Housing Resource HelpLine",
+  "status": "active",
+  "description": "Call to ask for a shelter bed or housing help. Housing staff answer Monday to Friday 8am to 6pm and Saturday 9am to noon. At other times the same number reaches street outreach.",
+  "organization": {
+   "id": "753ac9ba-f455-5b48-8059-3a0e3ad5f435",
+   "name": "City of Detroit Housing and Revitalization Department",
+   "description": "City of Detroit Housing and Revitalization Department",
+   "x_detroit": {
+    "id": "org_detroit_hrd"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "03e3ea6e-a5f2-5f4e-8a9c-bfe7509430f6",
+    "location": {
+     "id": "8a230018-f4fc-5e01-a534-2c104eace517",
+     "name": "Detroit Housing Resource HelpLine",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_housing_helpline"
+     }
+    },
+    "phones": [
+     {
+      "id": "34e59d34-9692-5867-a6f7-0392fb14cf99",
+      "number": "866-313-2520"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_housing_helpline",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "City of Detroit Housing and Revitalization Department website",
+      "url": "https://detroitmi.gov/departments/housing-and-revitalization-department/homelessness"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_housing_helpline",
+   "category": "shelter.emergency"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "91e68322-f24c-5d08-842b-abc3d86deafd",
+  "name": "24-hour hotline",
+  "status": "active",
+  "description": "Free, private help any time. Call, or text START to 88788.",
+  "url": "https://www.thehotline.org",
+  "organization": {
+   "id": "c55dacdb-b1fb-56eb-9729-bf0418e98945",
+   "name": "National Domestic Violence Hotline",
+   "description": "National Domestic Violence Hotline",
+   "x_detroit": {
+    "id": "org_ndvh"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d6562b5f-73cc-583b-a5c6-1d3241567c24",
+    "location": {
+     "id": "ada0f721-334c-5a14-bff6-7fa3fc3fde52",
+     "name": "24-hour hotline",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_national_dv_hotline"
+     }
+    },
+    "phones": [
+     {
+      "id": "29ebaafe-54ed-5a2e-a0fa-becef47c1c90",
+      "number": "800-799-7233"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_national_dv_hotline",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "National Domestic Violence Hotline website",
+      "url": "https://www.thehotline.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_national_dv_hotline",
+   "category": "shelter.dv"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f0fc4d02-e4d7-5c0d-8a6d-1a33d57c5c55",
+  "name": "24-hour safeline",
+  "status": "active",
+  "description": "Call, text, or chat any time if you ran away or are thinking about it.",
+  "url": "https://www.1800runaway.org",
+  "organization": {
+   "id": "d2cee3fa-a8b9-5ebc-862b-fa5862ad3471",
+   "name": "National Runaway Safeline",
+   "description": "National Runaway Safeline",
+   "x_detroit": {
+    "id": "org_nrs"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cd275344-91cb-563e-b82c-1ede4d905628",
+    "location": {
+     "id": "be97129a-221c-5f6d-999e-192bb034071f",
+     "name": "24-hour safeline",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_national_runaway_safeline"
+     }
+    },
+    "phones": [
+     {
+      "id": "33592aaf-bcab-50ff-b860-e823852621e5",
+      "number": "800-786-2929"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_national_runaway_safeline",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "youth"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "National Runaway Safeline website",
+      "url": "https://www.1800runaway.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_national_runaway_safeline",
+   "category": "youth"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "cc2d166d-aaba-5eb7-931b-6ab1e22d286a",
+  "name": "Bag lunch and drop-in help",
+  "status": "active",
+  "description": "Free bag lunch and drop-in help for people without housing. Monday to Thursday. Call for times.",
+  "url": "https://www.noahatcentral.org",
+  "organization": {
+   "id": "800a78dd-40b5-54d3-8e15-e5808b504d90",
+   "name": "NOAH at Central",
+   "description": "NOAH at Central",
+   "x_detroit": {
+    "id": "org_noah"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "35023e76-a55a-556c-b37b-aad0536770b1",
+    "location": {
+     "id": "d912b93c-1164-59e2-8895-02b4f43e5770",
+     "name": "NOAH at Central",
+     "location_type": "physical",
+     "latitude": 42.33718,
+     "longitude": -83.05058,
+     "addresses": [
+      {
+       "id": "2a043510-5697-5cdc-9dc8-76a3f1a1a3e4",
+       "address_1": "23 E Adams Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48226",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_noah_bag_lunch"
+     }
+    },
+    "phones": [
+     {
+      "id": "81c6b97b-03a5-5670-90c3-aedf53319c99",
+      "number": "313-965-5422"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_noah_bag_lunch",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "NOAH at Central website",
+      "url": "https://noahatcentral.org/what-we-do/bag-lunch/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_noah_bag_lunch",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "c788171e-4bf2-5637-9e0c-8633d5cd508e",
+  "name": "Morning meals, showers, and laundry",
+  "status": "active",
+  "description": "Two free meals each morning, plus showers, laundry, restrooms, and mail.",
+  "url": "https://popefranciscenter.org",
+  "organization": {
+   "id": "8d618f68-ff20-5203-b67a-cedbdd0f0760",
+   "name": "Pope Francis Center",
+   "description": "Pope Francis Center",
+   "x_detroit": {
+    "id": "org_pope_francis_center"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "b6bd66cd-ff92-53de-8dcd-27be1fc8352f",
+    "location": {
+     "id": "82b911a2-8db6-5017-8ce0-93824b8fe500",
+     "name": "Pope Francis Center",
+     "location_type": "physical",
+     "latitude": 42.331843,
+     "longitude": -83.038401,
+     "addresses": [
+      {
+       "id": "a113f449-30b8-5fb9-9275-fff36404d03e",
+       "address_1": "438 Saint Antoine St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48226",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_pope_francis_day_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "03007b76-351b-53a0-8d0c-6eac565f8556",
+      "number": "313-964-2823"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "e473a4ca-dfb8-5fbf-b8a8-96208a6078f3",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "07:00",
+      "closes_at": "11:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_pope_francis_day_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Pope Francis Center website",
+      "url": "https://popefranciscenter.org/get-help/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_pope_francis_day_center",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "af3e2189-b4b1-510c-a2ea-6efe405122f7",
+  "name": "Drop-in center",
+  "status": "active",
+  "description": "Hot food, showers, laundry, clothes, and hygiene kits for LGBTQ+ young people.",
+  "eligibility_description": "Ages 13 to 30.",
+  "url": "https://www.ruthelliscenter.org",
+  "organization": {
+   "id": "aecab26f-25b1-5aac-93d8-d80d72033122",
+   "name": "Ruth Ellis Center",
+   "description": "Ruth Ellis Center",
+   "x_detroit": {
+    "id": "org_ruth_ellis"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "8a5aa145-4ebb-5c9a-a46f-fbea104eae46",
+    "location": {
+     "id": "9b44d79e-1d8e-53b0-978e-df93dfd2beba",
+     "name": "Ruth Ellis Center",
+     "location_type": "physical",
+     "latitude": 42.407545,
+     "longitude": -83.094256,
+     "addresses": [
+      {
+       "id": "7129073a-01e2-5226-a31d-d3a6b266422e",
+       "address_1": "95 Victor St",
+       "city": "Highland Park",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ruth_ellis_drop_in"
+     }
+    },
+    "phones": [
+     {
+      "id": "b3f73e65-6ea4-5120-9150-6d1d133b7f58",
+      "number": "313-252-1950"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "9516d36c-af34-561f-b6ad-f0b741383099",
+      "freq": "WEEKLY",
+      "byday": "MO,WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "15:00",
+      "closes_at": "20:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "f3caec85-65c0-579b-9c1f-6fe02f6a5270",
+      "freq": "WEEKLY",
+      "byday": "TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Resource day"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_ruth_ellis_drop_in",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "youth",
+      "lgbtq",
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Ruth Ellis Center website",
+      "url": "https://ruthelliscenter.org/what-we-do/health-equity-outreach/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_ruth_ellis_drop_in",
+   "category": "youth"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f5813338-06a1-51f6-b841-9589cfb3af97",
+  "name": "Utility bill help",
+  "status": "active",
+  "description": "Help paying heat, electric, and water bills. Call or apply online.",
+  "eligibility_description": "Income limits vary. Have ID, Social Security numbers, and proof of income for all adults.",
+  "url": "https://thawfund.org",
+  "organization": {
+   "id": "d3684b6a-8c96-5e4c-ac8d-c2eeb9605a69",
+   "name": "The Heat and Warmth Fund (THAW)",
+   "description": "The Heat and Warmth Fund (THAW)",
+   "x_detroit": {
+    "id": "org_thaw"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "930f2713-ccb8-574a-a0ea-820b653f477a",
+    "location": {
+     "id": "1bf07b4b-326a-5eb2-8845-194168dfcaa0",
+     "name": "Utility bill help",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_thaw_utility_help"
+     }
+    },
+    "phones": [
+     {
+      "id": "be0cc146-f269-58cf-baa7-97268cbb68b9",
+      "number": "800-866-8429"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "bfc7b29b-b6df-57b5-9598-6c98d5ffde36",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "16:45",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Phone hours"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_thaw_utility_help",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "The Heat and Warmth Fund (THAW) website",
+      "url": "https://thawfund.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_thaw_utility_help",
+   "category": "utilities"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "940ce8a2-c00e-5b0b-a2c7-9f89a322246f",
+  "name": "Connect Center phone line",
+  "status": "active",
+  "description": "One phone call to find out if you can get help with water, energy, or rent.",
+  "url": "https://www.waynemetro.org",
+  "organization": {
+   "id": "0b326bf5-0d09-5719-b768-2a5164b496e9",
+   "name": "Wayne Metropolitan Community Action Agency",
+   "description": "Wayne Metropolitan Community Action Agency",
+   "x_detroit": {
+    "id": "org_wayne_metro"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "76881ee8-66e7-589e-8734-59ba9913ce64",
+    "location": {
+     "id": "f394a1b7-5918-53d9-b8a6-28281f6e92cb",
+     "name": "Connect Center phone line",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_wayne_metro_connect_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "35f0e9fa-b16c-5d47-bd2f-22711f04094c",
+      "number": "313-388-9799"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "0d55e3ae-cd2d-5fda-8a8f-bd6d3500334d",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Phone hours"
+     },
+     {
+      "id": "20c324f2-353e-542c-84ed-13a55defcb86",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Phone hours"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_wayne_metro_connect_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Wayne Metropolitan Community Action Agency website",
+      "url": "https://www.waynemetro.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_wayne_metro_connect_center",
+   "category": "utilities"
+  },
+  "assured_date": "2026-09-18"
+ }
+]

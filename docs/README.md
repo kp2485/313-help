@@ -25,8 +25,22 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | — | [DECISIONS.md](DECISIONS.md) | Decisions the docs don't cover; audit fixes awaiting approval |
 | — | [CLAUDE.md](../CLAUDE.md) | Handoff instructions for Claude Code |
 
+## Build
+
+```
+pnpm install
+pnpm test                # 58 query fixture cases + pipeline tests
+pnpm build:bundle        # data/seed + data/ingested -> data/hsds + data/bundle/v1 (signed, dev key)
+pnpm ingest:opendata     # refresh City open-data layers into data/ingested and data/staging
+pnpm --filter @detroithelp/pipeline check:sources   # promote proposed rows whose source page matches
+pnpm geocode             # fill coordinates in data/seed/resources.csv (U.S. Census geocoder)
+```
+
+`pnpm build:bundle:release` fails until every emergency number in `data/seed/emergency.csv` has a `verified_by_call_on` within 30 days and `BUNDLE_SIGNING_KEY` is set. That is on purpose.
+
 ## Status
 
+- 2026-09-18: **Build step 1 done** — seed CSVs, shared query package with fixtures, pipeline, HSDS 3.2-valid export, signed bundle (86 rows). Next: `apps/web` PWA.
 - 2026-09-18: Drafted for review. Nothing built yet. Audited the same day (doc 10); fixes are listed as *Proposed* in DECISIONS.md and are not yet applied to docs 01–09.
 - DHD program staff are aware of this project and informally supportive of reusing the public information from the D Compassion build. DHD has not offered to maintain any data or feed, and there is no written authorization; the design assumes neither (see 02 and 08).
 

@@ -141,6 +141,22 @@
         "at": "2026-08-30",
         "reason": "closed_permanently"
       }
+    },
+    {
+      "id": "sal_station",
+      "category": "harm.narcan",
+      "facts": {
+        "cadence_days": 45,
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "open_data",
+          "name": "Detroit Health Department station list",
+          "last_edited": "2026-08-26"
+        }
+      }
     }
   ],
   "cases": [
@@ -259,6 +275,29 @@
         "params": {
           "date": "2026-08-30"
         }
+      }
+    },
+    {
+      "name": "on the publisher's list, which they edited 55 days ago: say exactly that, no more",
+      "fn": "badge",
+      "row": "sal_station",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "source_listed",
+        "key": "badge.source_listed",
+        "params": {
+          "source_date": "2026-08-26"
+        },
+        "tier": 2
+      }
+    },
+    {
+      "name": "same row once the list has gone 90+ days without an edit",
+      "fn": "badge",
+      "row": "sal_station",
+      "now": "2026-12-01T16:00:00Z",
+      "expect": {
+        "level": "never_checked"
       }
     }
   ]

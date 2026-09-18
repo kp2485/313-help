@@ -41,9 +41,10 @@ Computed on the device from dated facts. First match wins:
 4. `confirmed` — `last_confirmed_at` within `cadence_days`. String key carries the method (`badge.confirmed.phone` vs `badge.confirmed.community_confirm`): a tap is not a phone call.
 5. `entry_checked` — `checked_at_entry` within `cadence_days`.
 6. `unconfirmed` — has a date, but past its window.
-7. `never_checked` — no person has ever checked it. Being present in a source is not verification.
+7. `source_listed` — never checked by us, but it is on a publisher's list that the publisher edited within 90 days. The badge names the list and its date and claims nothing else. Same sort tier as `unconfirmed`.
+8. `never_checked` — no person has ever checked it and the source is old or undated. Being present in a source is not verification.
 
-Tiers 0–6 in that freshness order (confirmed = 0) are sort keys only. No number is ever shown.
+Tiers in that freshness order (confirmed = 0) are sort keys only. No number is ever shown.
 
 ## Ranking
 

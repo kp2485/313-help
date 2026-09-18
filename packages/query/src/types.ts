@@ -56,6 +56,10 @@ export interface BundleRow {
   phones: { number: string; label?: string }[];
   website?: string;
   availability: Availability;
+  /** Hours exactly as the source states them, when we could not turn them into a schedule. Shown as-is; never used for open-now. */
+  hours_text?: string;
+  /** Short plain-language heads-up, e.g. "Enrollment is full. You can join the waitlist." */
+  notice?: string;
   schedules: Schedule[];
   flags: string[];
   languages?: string[];
@@ -105,7 +109,7 @@ export interface OpenResult {
 }
 
 export type BadgeLevel =
-  | 'confirmed' | 'entry_checked' | 'unconfirmed' | 'never_checked'
+  | 'confirmed' | 'entry_checked' | 'unconfirmed' | 'source_listed' | 'never_checked'
   | 'reported_once' | 'reported_closed' | 'archived';
 
 export interface Badge {

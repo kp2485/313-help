@@ -1,0 +1,45 @@
+# Registry of sources (docs/02). All sources are read-only; never write back.
+# mode: publish = rows enter the bundle labeled with the source and its last-edit date
+#                 (allowed only while the layer was edited within max_age_days)
+#       stage   = rows land in data/staging/ as candidates and need an entry check
+# Staff contact-name fields are never ingested. Phone/address changes show up as a
+# git diff of data/ingested/*.csv and are approved by merging that diff (10-A5).
+
+sources:
+  - id: dhd_harm_reduction
+    name: Detroit Health Department harm reduction station list
+    tier: A
+    kind: arcgis
+    url: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/DHD_Harm_Reduction_List_view/FeatureServer/0
+    page: https://detroitmi.gov/departments/detroit-health-department/programs-and-services/behavioral-health-program/harm-reduction
+    license: unstated   # City portal states no license; ask (10-B12). Facts only; attributed.
+    mode: publish
+    max_age_days: 90
+    category: harm.narcan
+    cadence_days: 45
+    org: { id: org_dhd, name: Detroit Health Department }
+    fields: { name: Location_Description, address: Address, phone: Phone_Number, website: Website, hours: Hours_of_Operations, ref: GlobalID }
+    extra: [Distribution_Device_Type, Box_Location, Type_of_Business]
+    id_prefix: hr
+
+  - id: rec_centers
+    name: City of Detroit Recreation Centers layer
+    tier: A
+    kind: arcgis
+    url: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/RecCenters/FeatureServer/0
+    license: unstated
+    mode: stage          # last edited 2016-11-16: names/addresses/coordinates only, check each at entry
+    max_age_days: 90
+    category: shelter.cooling
+    cadence_days: 180
+    org: { id: org_detroit_parks_rec, name: Detroit Parks & Recreation }
+    fields: { name: Site, address: Address, zip: Zip, phone: Phone }   # Contact (staff names) deliberately not mapped
+    id_prefix: rec
+
+  - id: jlg_route_segments
+    name: Joe Louis Greenway Route Segments
+    tier: A
+    kind: arcgis
+    url: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Joe_Louis_Greenway_Routes/FeatureServer/0
+    license: unstated
+    enabled: false       # docs/11 is still a proposal

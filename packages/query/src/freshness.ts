@@ -6,9 +6,11 @@ import { daysBetween, toWall, wallDateString } from './time.js';
 // on an offline phone for months ages here, not at build time.
 
 const TIER = {
-  confirmed: 0, entry_checked: 1, unconfirmed: 2, never_checked: 3,
+  confirmed: 0, entry_checked: 1, unconfirmed: 2, source_listed: 2, never_checked: 3,
   reported_once: 4, reported_closed: 5, archived: 6,
 } as const;
+
+const SOURCE_RECENT_DAYS = 90;
 
 function day(s: string): string { return s.slice(0, 10); }
 
@@ -46,7 +48,13 @@ export function badge(row: BundleRow, now: Date): Badge {
     return { level: 'unconfirmed', key: 'badge.unconfirmed', params: { date: lastTouch }, tier: TIER.unconfirmed };
   }
 
-  // Present in a source, never checked by a person. Source presence is not verification.
+  // Present in a source, never checked by a person. Source presence is not verification,
+  // so the badge only states the fact: whose list it is and when they last edited it.
+  // A list its publisher touched recently reads differently from one untouched since 2016.
+  const srcDate = f.source.last_edited ? day(f.source.last_edited) : null;
+  if (srcDate && daysBetween(srcDate, today) <= SOURCE_RECENT_DAYS) {
+    return { level: 'source_listed', key: 'badge.source_listed', params: { source: f.source.name, source_date: srcDate }, tier: TIER.source_listed };
+  }
   return {
     level: 'never_checked',
     key: 'badge.never_checked',

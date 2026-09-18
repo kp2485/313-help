@@ -1,0 +1,27 @@
+// Fills lat/lon (and a missing zip) in data/seed/resources.csv using the U.S. Census geocoder
+// (public, no key). Runs by hand, results are committed; the build never calls the network.
+// DV rows are skipped: they must never carry an address or coordinates.
+
+import { inBbox } from './util.js';
+import { readResources, writeResources } from './seed-io.js';
+
+async function geocode(line: string): Promise<{ lat: number; lon: number; zip?: string } | null> {
+  const url = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=${encodeURIComponent(line)}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const m = ((await res.json()) as any).result?.addressMatches?.[0];
+  return m ? { lat: m.coordinates.y, lon: m.coordinates.x, zip: m.addressComponents?.zip } : null;
+}
+
+const rows = readResources();
+for (const r of rows) {
+  if (!r.address_1 || (r.lat && r.lon) || r.category === 'shelter.dv') continue;
+  const street = r.address_1.replace(/,?\s*(suite|ste|unit|#)\s*[\w-]+$/i, '');
+  const hit = await geocode(`${street}, ${r.city || 'Detroit'}, MI ${r.zip ?? ''}`);
+  if (!hit) { console.warn(`no match: ${r.sal_id} (${r.address_1})`); continue; }
+  if (!inBbox(hit.lat, hit.lon)) { console.warn(`outside Detroit bbox, ignored: ${r.sal_id}`); continue; }
+  r.lat = hit.lat.toFixed(6); r.lon = hit.lon.toFixed(6);
+  if (!r.zip && hit.zip) r.zip = hit.zip;
+  console.log(`${r.sal_id}: ${r.lat}, ${r.lon}`);
+}
+writeResources(rows);
