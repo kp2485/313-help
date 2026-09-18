@@ -9,11 +9,14 @@ import { MapView, type MapDot, type MapSpec } from './map.js';
 import { CATEGORIES, HARDCODED, NEEDS, TABS, type Need, type TabId } from './needs.js';
 import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, submit } from './report.js';
 import { TRANSIT } from './transit.js';
+import { FOOD_BENEFITS } from './benefits.js';
+import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitProposal } from './propose.js';
+import { canSave, clearSaved, loadSaved, toggleSaved } from './saved.js';
 import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
 type View =
-  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'search' } | { v: 'greenway' } | { v: 'parks' }
+  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'greenway' } | { v: 'parks' }
   | { v: 'need'; id: string; refine?: string; all?: boolean }
   | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
 
@@ -22,6 +25,8 @@ let loadError = false;
 let here: { lat: number; lon: number } | null = null;   // device location, or a ZIP's center: this variable only, never stored
 let hereZip = '';                                        // the ZIP a person typed, when `here` came from one
 let locDenied = false, zipOpen = false, zipUnknown = false;
+let savedIds: string[] = [];                             // listing ids saved on this phone (saved.ts); never sent
+let proposed: { state: 'sent' | 'queued'; ref?: string } | null = null, proposeError = false;
 let listMap = false;                                      // "Show these on a map" is open on the current list
 let searchText = '';                                     // memory only: never stored, sent, or put in the URL
 const reported = new Map<string, 'sent' | 'queued'>();   // this visit only, so the thank-you stays put
@@ -174,7 +179,8 @@ function helpTab(): string {
   const group = (g: Need['group']) => `<ul class="rows">${NEEDS.filter((n) => n.group === g).map((n) => rowLink({ v: 'need', id: n.id }, n.icon, t('need.' + n.id))).join('')}</ul>`;
   return `<main><h1 class="page" tabindex="-1">${T('home.needs')}</h1><p class="lede">${T('help.lede')}</p>${searchBtn()}
     <h2>${T('help.now')}</h2>${group('now')}<h2>${T('help.soon')}</h2>${group('soon')}
-    <h2>${T('home.categories')}</h2><ul class="chips">${CATEGORIES.map((c) => `<li><button class="chip lg" ${go({ v: 'list', cat: c.id })}>${icon(c.icon, 'sm')}${T('cat.' + c.id)}</button></li>`).join('')}</ul></main>`;
+    <h2>${T('home.categories')}</h2><ul class="chips">${CATEGORIES.map((c) => `<li><button class="chip lg" ${go({ v: 'list', cat: c.id })}>${icon(c.icon, 'sm')}${T('cat.' + c.id)}</button></li>`).join('')}</ul>
+    <h2>${T('help.more')}</h2><ul class="rows">${rowLink({ v: 'saved' }, 'bookmark', t('saved.title'), t('saved.sub'))}${rowLink({ v: 'add' }, 'plus', t('add.title'), t('add.sub'))}</ul></main>`;
 }
 function recTab(): string {
   const g = bundle?.greenway, parks = bundle?.parks ?? [];
@@ -218,7 +224,10 @@ function need(view: Extract<View, { v: 'need' }>): string {
   const first = (n.first ?? []).map(callButton).join('');
   if (n.stepsOnly) return `<main><div class="stackbtns">${first}</div><ol class="steps">${[1, 2, 3, 4, 5, 6].map((i) => `<li>${T('od.s' + i)}</li>`).join('')}</ol><p class="foot">${T('od.review_note')}</p></main>`;
   const refine = n.refine && !view.refine ? `<ul class="rows">${n.refine.map((r) => rowLink({ v: 'need', id: n.id, refine: r.id }, n.icon, t(`refine.${n.id}.${r.id}`))).join('')}</ul>` : '';
-  const query = n.refine ? n.refine.find((r) => r.id === view.refine)?.query : n.query;
+  const chosen = n.refine?.find((r) => r.id === view.refine);
+  const query = n.refine ? chosen?.query : n.query;
+  if (chosen?.benefits) return `<main><p class="lede">${T('benefits.lede')}</p>${FOOD_BENEFITS.items.map((b) => `<h2>${esc(b.title)}</h2><div class="panel"><p>${esc(b.body)}</p><div class="stackbtns">${ext(b.url, b.label)}</div></div>`).join('')}
+    <p class="foot">${T('benefits.note')} <a href="tel:211">211</a></p><p class="foot">${T('transit.checked', { date: prettyDate(FOOD_BENEFITS.checked) })}</p></main>`;
   const dv = n.id === 'unsafe';
   return `<main>${n.intro ? `<p class="lede">${T(n.intro)}</p>` : ''}${first ? `<div class="stackbtns">${first}</div>` : ''}${dv ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
     ${refine}${query ? results(query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true }, emptyKey: n.emptyKey, noDistance: dv }) : ''}</main>`;
@@ -251,7 +260,8 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${esc(ph.label)}` : ''}</span><strong>${esc(ph.number)}</strong></a>`).join('')}
       ${r.address ? `<div class="two"><a class="btn ghost" href="${esc(directionsHref(r))}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
         <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${placeQ(r)}&travelmode=transit" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>` : ''}
-      <button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button></div>
+      <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}" aria-pressed="${savedIds.includes(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button></div>
+      ${savedIds.includes(r.id) ? `<p class="foot" role="status">${T('saved.note')}</p>` : ''}</div>
     ${r.category === 'shelter.dv' ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
     <h2>${T('detail.what')}</h2><p>${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${esc(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: r.hours_text })}</p>` : ''}
@@ -311,6 +321,28 @@ function searchScreen(): string {
   return `<main><label class="searchbox">${T('search.label')}<input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" maxlength="60" value="${esc(searchText)}"></label>
     <div id="searchout" aria-live="polite">${searchResults()}</div></main>`;
 }
+function savedScreen(): string {
+  const rows = bundle!.rows.filter((r) => savedIds.includes(r.id) && canSave(r.category));
+  const ranked = rank(rows, here ? { near: here } : {}, now(), bundle!.alerts).sort((a, b) => savedIds.indexOf(a.row.id) - savedIds.indexOf(b.row.id));
+  const closed = bundle!.archived.filter((a) => savedIds.includes(a.id));
+  if (!ranked.length && !closed.length) return `<main><p class="lede">${T('saved.note')}</p><p class="empty">${T('saved.none')}</p></main>`;
+  return `<main><p class="lede">${T('saved.note')}</p><ul class="cards">${ranked.map((r) => card(r)).join('')}</ul>
+    ${closed.length ? `<h2>${T('search.closed_head')}</h2><ul class="rows">${closed.map((a) => rowLink({ v: 'detail', id: a.id }, 'info', a.name, t('badge.archived', { date: prettyDate(a.archived.at) }))).join('')}</ul>` : ''}
+    <button class="btn ghost" data-saved-clear>${T('saved.clear')}</button></main>`;
+}
+// Add a place (docs/04): about the place, never about the person sending it. A steward checks it before it can appear.
+function addScreen(): string {
+  if (proposed) return `<main><p class="banner ok" role="status">${icon('check', 'sm')} ${T(proposed.state === 'queued' ? 'add.queued' : 'add.sent')}${proposed.ref ? ` ${T('add.ref', { ref: proposed.ref })}` : ''}</p>
+    <button class="btn ghost" data-add-again>${T('add.again')}</button></main>`;
+  const field = (name: string, max: number, o: { required?: boolean; area?: boolean; hint?: string; mode?: string } = {}) => `<label>${T('add.f.' + name)}${o.required ? '' : ` <small>${T('add.optional')}</small>`}
+    ${o.area ? `<textarea name="${name}" rows="2" maxlength="${max}" ${o.required ? 'required' : ''}></textarea>` : `<input name="${name}" maxlength="${max}" autocomplete="off" ${o.mode ? `inputmode="${o.mode}"` : ''} ${o.required ? 'required' : ''}>`}${o.hint ? `<small>${T(o.hint)}</small>` : ''}</label>`;
+  const radios = (name: string, ids: readonly string[], key: (id: string) => string) => `<fieldset><legend>${T('add.f.' + name)}</legend><div class="kinds">${ids.map((id) => `<label class="pick"><input type="radio" name="${name}" value="${id}" required><span>${esc(key(id))}</span></label>`).join('')}</div></fieldset>`;
+  return `<main><p class="lede">${T('add.lede')}</p>${proposeError ? `<p class="banner warn" role="alert">${T('add.missing')}</p>` : ''}
+    <form class="addform" data-add novalidate>${field('name', 120, { required: true })}${radios('category', PROPOSE_CATEGORIES, (id) => t('add.cat.' + id))}
+      ${field('what', 280, { required: true, area: true, hint: 'add.h.what' })}${field('address', 200, { hint: 'add.h.address' })}${field('schedule_text', 200, { hint: 'add.h.schedule' })}${field('phone', 40, { mode: 'tel', hint: 'add.h.phone' })}
+      ${radios('how_known', HOW_KNOWN, (id) => t('add.how.' + id))}${field('notes', 280, { area: true, hint: 'add.h.notes' })}
+      <button class="btn" type="submit">${T('add.send')}</button><p class="foot">${T('add.privacy')}</p></form></main>`;
+}
 function about(): string {
   const i = bundle?.index;
   return `<main>${[1, 2, 3, 4].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
@@ -326,18 +358,19 @@ function hashFor(v: View): string | null {
   if (v.v === 'segment') return `#/greenway/${v.id}`;
   if (v.v === 'parks') return '#/parks';
   if (v.v === 'about') return '#/about';
-  return null; // the urgent sheet, search, and every "need" screen: no trace
+  if (v.v === 'add') return '#/add';
+  return null; // the urgent sheet, search, saved places, and every "need" screen: no trace
 }
 function fromHash(h: string): View {
-  const m = /^#\/(r|c|greenway|about|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
+  const m = /^#\/(r|c|greenway|about|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
   if (!m) return { v: 'tab', tab: 'home' };
   if (m[1] === 'r' && m[2]) return { v: 'detail', id: m[2] };
   if (m[1] === 'c' && m[2]) return { v: 'list', cat: m[2] };
   if (m[1] === 'greenway') return m[2] ? { v: 'segment', id: m[2] } : { v: 'greenway' };
-  if (m[1] === 'about' || m[1] === 'parks') return { v: m[1] };
+  if (m[1] === 'about' || m[1] === 'parks' || m[1] === 'add') return { v: m[1] };
   return { v: 'tab', tab: m[1] as TabId };
 }
-const TAB_OF: Partial<Record<View['v'], TabId>> = { search: 'help', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
+const TAB_OF: Partial<Record<View['v'], TabId>> = { search: 'help', saved: 'help', add: 'help', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
 function render(focus = true): void {
   const v = stack[stack.length - 1]!;
   for (const m of mapViews) m.destroy();
@@ -347,6 +380,8 @@ function render(focus = true): void {
   else if (v.v === 'urgent') { title = t('strip.more'); body = urgent(); }
   else if (v.v === 'about') { title = t('about.title'); body = about(); }
   else if (v.v === 'search') { title = t('search.title'); body = searchScreen(); }
+  else if (v.v === 'saved') { title = t('saved.title'); body = savedScreen(); }
+  else if (v.v === 'add') { title = t('add.title'); body = addScreen(); }
   else if (v.v === 'need') { const n = NEEDS.find((x) => x.id === v.id)!; title = t(n.stepsOnly ? 'od.title' : 'need.' + n.id); exit = !!n.quickExit; body = need(v); }
   else if (v.v === 'list') { title = t('cat.' + v.cat); body = `<main>${results(CATEGORIES.find((c) => c.id === v.cat)?.query ?? {}, {})}</main>`; }
   else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; body = d.html; }
@@ -362,6 +397,7 @@ function render(focus = true): void {
 function navigate(view: View): void {
   if (view.v === 'tab') { stack.length = 0; searchText = ''; }   // a tab is a fresh start, not one more screen to back out of
   if (view.v !== 'detail') listMap = false;   // coming back from a place, the map is still open
+  if (view.v === 'add') { proposed = null; proposeError = false; }
   stack.push(view);
   history.pushState({ n: stack.length }, '', hashFor(view) ?? location.pathname + location.search);
   render();
@@ -369,10 +405,13 @@ function navigate(view: View): void {
 window.addEventListener('popstate', () => { if (stack.length > 1) stack.pop(); else stack[0] = fromHash(location.hash); render(); });
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report],[data-listmap]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again]');
   if (!el) return;
   if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
   else if ('listmap' in el.dataset) { listMap = !listMap; render(false); }
+  else if (el.dataset.save) { const row = bundle?.rows.find((x) => x.id === el.dataset.save); savedIds = await toggleSaved(savedIds, el.dataset.save, row?.category ?? ''); render(false); }
+  else if ('savedClear' in el.dataset) { savedIds = await clearSaved(); render(false); }
+  else if ('addAgain' in el.dataset) { proposed = null; render(); }
   else if (el.dataset.report) {
     const box = el.closest<HTMLElement>('.report')!, target = box.dataset.target!;
     reported.set(target, await submit(await buildReport(target, el.dataset.report, box.querySelector('textarea')?.value ?? '')));
@@ -403,6 +442,13 @@ app.addEventListener('input', (ev) => {
 app.addEventListener('submit', (ev) => {
   ev.preventDefault();
   const form = ev.target as HTMLFormElement;
+  if ('add' in form.dataset) {
+    const p = buildProposal(Object.fromEntries([...new FormData(form)].map(([k, v]) => [k, String(v)])));
+    if (!p) { proposeError = true; app.querySelector('.addform')?.insertAdjacentHTML('beforebegin', app.querySelector('.banner.warn') ? '' : `<p class="banner warn" role="alert">${T('add.missing')}</p>`); window.scrollTo(0, 0); return; }
+    form.querySelector<HTMLButtonElement>('button[type=submit]')!.disabled = true;
+    void submitProposal(p).then((r) => { proposed = r; proposeError = false; render(); });
+    return;
+  }
   if (!('zip' in form.dataset)) return;
   const zip = String(new FormData(form).get('zip') ?? '').trim(), c = bundle?.zips?.[zip];
   if (c) { here = { lat: c[0], lon: c[1] }; hereZip = zip; zipOpen = zipUnknown = locDenied = false; } else zipUnknown = true;
@@ -421,10 +467,11 @@ async function start(): Promise<void> {
   stack[0] = fromHash(location.hash);
   render(false);
   bundle = await cached();
+  savedIds = await loadSaved();
   if (bundle) render(false);
   await checkForUpdate();
-  void flush();
-  window.addEventListener('online', () => { void flush(); void checkForUpdate(); });
+  void flush(); void flushProposals();
+  window.addEventListener('online', () => { void flush(); void flushProposals(); void checkForUpdate(); });
   // An installed app can stay open for days. Look for a newer list whenever it comes back into view
   // (at most every 15 minutes), so nobody is reading last week's list on a phone that has signal.
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void checkForUpdate(); });

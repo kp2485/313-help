@@ -7,6 +7,9 @@ import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
 import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
+import { FOOD_BENEFITS } from '../src/benefits.js';
+import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
+import { canSave } from '../src/saved.js';
 import { build as buildReport, nonce } from '../src/report.js';
 
 const root = join(__dirname, '../../..');
@@ -89,6 +92,41 @@ describe('reports from the phone', () => {
   });
 });
 
+describe('add a place, saved places, help paying for food', () => {
+  const full = { name: '  New Hope pantry ', category: 'food', what: 'Free groceries', address: '1 Main St', phone: '313-555-0100', schedule_text: 'Tuesdays 10 to 12', how_known: 'volunteer', notes: '' };
+  it('a proposal carries exactly the fields the API accepts, and nothing about the person or the phone', () => {
+    const p = buildProposal(full)!;
+    expect(Object.keys(p).sort()).toEqual(['address', 'category', 'how_known', 'name', 'phone', 'schedule_text', 'what']);
+    expect(p.name).toBe('New Hope pantry');
+    expect(buildProposal({ ...full, extra: 'x', lat: '42.3' } as Record<string, string>)).not.toHaveProperty('lat');
+    const src = readFileSync(join(__dirname, '../src/propose.ts'), 'utf8');
+    expect(src).toContain("credentials: 'omit'");
+    expect(src).not.toMatch(/navigator|geolocation|userAgent|localStorage|document[.]cookie|installSecret/);
+  });
+  it('needs a name, what people get, a kind of help, and how the person knows', () => {
+    for (const k of ['name', 'what', 'category', 'how_known']) expect(buildProposal({ ...full, [k]: ' ' }), k).toBeNull();
+    expect(buildProposal({ ...full, category: 'shelter.dv' })).toBeNull();
+    expect(buildProposal({ ...full, name: 'x'.repeat(500) })!.name).toHaveLength(120);
+  });
+  it('offers no way to propose a domestic-violence shelter, and every choice has plain words', () => {
+    expect(PROPOSE_CATEGORIES.join(' ')).not.toMatch(/dv|mental/);
+    for (const c of PROPOSE_CATEGORIES) expect(strings['add.cat.' + c], c).toBeTypeOf('string');
+    for (const h of HOW_KNOWN) expect(strings['add.how.' + h], h).toBeTypeOf('string');
+    for (const f of ['name', 'category', 'what', 'address', 'schedule_text', 'phone', 'how_known', 'notes']) expect(strings['add.f.' + f], f).toBeTypeOf('string');
+  });
+  it('domestic-violence and mental-health listings can never be saved; the Saved screen leaves no URL', () => {
+    expect(canSave('shelter.dv')).toBe(false); expect(canSave('health.mental')).toBe(false);
+    expect(canSave('food.pantry')).toBe(true); expect(canSave('harm.narcan')).toBe(true);
+    expect(strings['saved.note']).toMatch(/this phone only/);
+    expect(main).toContain("canSave(r.category) ? `<button");
+  });
+  it('help paying for food links only to the programs\' own sites, over https', () => {
+    expect(FOOD_BENEFITS.items.map((b) => new URL(b.url).hostname).sort()).toEqual(['doubleupfoodbucks.org', 'newmibridges.michigan.gov', 'www.michigan.gov']);
+    for (const b of FOOD_BENEFITS.items) expect(b.url.startsWith('https://')).toBe(true);
+    expect(NEEDS.find((n) => n.id === 'food')!.refine!.map((r) => r.id)).toEqual(['today', 'week', 'paying']);
+  });
+});
+
 describe('map', () => {
   const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
   it('reads the pipeline line format: whole 1e-5 degrees from an origin, then steps', () => {
@@ -136,9 +174,9 @@ describe('privacy and copy rules, checked against the source', () => {
     }
   });
   it('need screens and search never put anything in the URL', () => {
-    expect(main).toMatch(/return null; \/\/ the urgent sheet, search, and every "need" screen: no trace/);
+    expect(main).toMatch(/return null; \/\/ the urgent sheet, search, saved places, and every "need" screen: no trace/);
     const hashFor = main.slice(main.indexOf('function hashFor'), main.indexOf('function fromHash'));
-    expect(hashFor).not.toMatch(/'search'|'need'|'urgent'/);
+    expect(hashFor).not.toMatch(/'search'|'need'|'urgent'|'saved'/);
   });
   it('what a person types (search text, ZIP) stays in a variable: never in storage, a request, or the URL', () => {
     // idbSet is the only way this app writes to the phone, and main.ts never calls it.

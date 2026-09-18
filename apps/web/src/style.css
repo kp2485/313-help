@@ -67,8 +67,14 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 .loc { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .625rem; margin:.75rem 0; color:var(--muted); }
 .zipform { display:inline-flex; flex-wrap:wrap; align-items:center; gap:.5rem; } .zipform label { display:inline-flex; align-items:center; gap:.5rem; font-size:.9375rem; }
 .zipform input,.searchbox input { font:inherit; color:var(--ink); padding:.5rem .875rem; border-radius:var(--r-sm); border:1.5px solid var(--line); background:var(--surface); } .zipform input { min-height:2.75rem; width:6.5rem; }
+.addform { display:grid; gap:1.125rem; margin-top:1rem; } .addform label { display:grid; gap:.375rem; font-weight:600; } .addform label small,.addform legend + small { font-weight:400; }
+.addform input:not([type=radio]),.addform textarea { width:100%; font:inherit; font-weight:400; color:var(--ink); min-height:3rem; padding:.625rem .75rem; border-radius:var(--r-sm); border:1.5px solid var(--line); background:var(--surface); }
+.addform fieldset { border:0; margin:0; padding:0; } .addform legend { font-weight:600; margin-bottom:.5rem; padding:0; }
+.pick { display:inline-flex !important; grid-template-columns:none; align-items:center; gap:.5rem; min-height:2.75rem; padding:.4rem .95rem; border-radius:99rem; background:var(--surface); border:1.5px solid var(--line); font-weight:600; cursor:pointer; } .pick:has(input:checked) { background:var(--brand-soft); color:var(--brand-soft-ink); border-color:var(--brand); } .pick input { accent-color:var(--brand); width:1.125rem; height:1.125rem; margin:0; }
+.addform .kinds { display:flex; flex-wrap:wrap; gap:.5rem; }
 .searchbtn { display:flex; align-items:center; gap:.625rem; width:100%; min-height:3rem; margin:.75rem 0; padding:.625rem 1rem; border-radius:99rem; background:var(--surface); border:1.5px solid var(--line); color:var(--muted); font-size:1rem; text-align:left; } .searchbtn:hover { border-color:var(--brand); } .searchbtn .ic { color:var(--brand); }
 .searchbox { display:grid; gap:.375rem; margin:.75rem 0; font-size:.9375rem; color:var(--muted); } .searchbox input { width:100%; min-height:3rem; font-size:1.0625rem; }
+.cards + .btn { margin-top:.75rem; }
 .cards { display:grid; gap:.75rem; margin-top:.75rem; }
 .card { display:grid; gap:.75rem; padding:1rem 1.125rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); }
 .cardlink { display:grid; gap:.375rem; color:inherit; text-decoration:none; } .what { color:var(--muted); }

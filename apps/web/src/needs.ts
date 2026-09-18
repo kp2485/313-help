@@ -11,7 +11,8 @@ export interface Need {
   group: 'now' | 'soon';
   /** Emergency numbers (by id in emergency.json) shown BEFORE any list. Principle 8: never ask what you can't act on. */
   first?: string[];
-  refine?: { id: string; query: Query }[];
+  /** A choice leads to a list (`query`) or, for programs that are not places, to link-outs (`benefits`). */
+  refine?: { id: string; query?: Query; benefits?: boolean }[];
   query?: Query;
   /** No list at all: 911 and rescue steps only. A bystander must not be sent on an errand (audit A7). */
   stepsOnly?: boolean;
@@ -34,6 +35,7 @@ export const NEEDS: Need[] = [
   { id: 'food', icon: 'food', group: 'soon', refine: [
     { id: 'today', query: { category: 'food.meal', mode: 'now' } },
     { id: 'week', query: { category: 'food', mode: 'week' } },
+    { id: 'paying', benefits: true },
   ] },
   { id: 'doctor', icon: 'health', group: 'soon', query: { category: 'health.clinic' } },
   { id: 'utilities', icon: 'bolt', group: 'soon', query: { category: 'utilities' } },
