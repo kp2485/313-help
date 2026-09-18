@@ -7,7 +7,7 @@
 A gift needs someone to receive it. So far:
 
 - DHD, the most natural recipient, has not signalled it will maintain even a list (DECISIONS.md).
-- D Compassion stalled because nobody at the city could carry it through IT review and store submission. A better app does not remove that obstacle; it only lowers it. Zero PII lowers it a lot — there is no resident data for a security review to worry about — but "who owns this, who answers when it's wrong" still needs a name.
+- D Compassion reached the app stores in 2025 only through an outside vendor, and has about ten installs (corrected 2026-09-18; see 07). The City can get an app published; what it has not shown is the capacity to keep one current.
 
 So plan for three futures, in order of likelihood, and make the app safe in all of them:
 
