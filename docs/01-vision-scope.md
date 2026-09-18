@@ -1,0 +1,54 @@
+# 01 — Vision & Scope
+
+## Problem
+
+Detroit has an enormous, fragmented safety net: city departments, DHD programs, 211, CAM, food banks, church pantries, rec centers, libraries, mutual aid. The information about it is scattered across press releases, PDFs, third-party aggregators, and word of mouth — and it goes stale fast. Mobile pantries move. Warming centers activate for four days and close. A Narcan newsstand gets relocated. Someone in crisis follows a two-year-old listing to a locked door.
+
+The Health Department tried to solve this with D Compassion (Dec 2024). It never shipped: it collected resident data (which triggered city IT/security review), hardcoded its directory (so it couldn't be kept current), and had no back end at all. See 07-gap-analysis.md.
+
+## Who it's for
+
+Primary: **any Detroit resident who needs help right now** — food this week, a bed tonight, Narcan, utility shutoff help, a cooling center, a clinic. Assume: an older or budget Android phone, prepaid data that may be off, low tolerance for forms, possibly in crisis, possibly reading at a 6th-grade level, possibly Spanish-, Arabic-, or Bengali-speaking.
+
+Secondary:
+- **Helpers** — CHWs, church volunteers, librarians, outreach workers, SisterFriends, Health Hub students — who look things up on behalf of someone else and are the most likely people to report changes.
+- **Resource providers** — a church running a Forgotten Harvest mobile pantry, a barbershop with a Narcan newsstand — who want to be listed and keep their listing right.
+- **Data owners** — DHD staff who maintain the official lists, and (eventually) 211/CIE.
+
+## What it is
+
+A **directory + triage + freshness system** for Detroit help resources:
+
+- Browse and search resources by category, map, and "open now."
+- Answer 2–4 taps ("I need food this week") and get the two or three resources that fit — computed on the device.
+- See how fresh each listing is and report when it's wrong.
+- Get time-boxed alerts (cold-weather respite activated, cooling centers open, mobile pantry today).
+- Works offline from a bundled snapshot.
+
+## What it is NOT
+
+- **Not an intake system.** It never asks who you are. "Someone will contact you" workflows belong to 211/CIE and CAM, where humans answer.
+- **Not a city app.** Shipped by Kyle Peterson / Linwood Technologies. DHD content is used with permission and attributed; the city's name is not on the store listing unless a written agreement says so.
+- **Not a case-management or bed-management tool.** Real-time shelter availability is 313SafeBeds' domain; we link to it or embed its public status when it exists.
+- **Not a general Detroit services app** (permits, taxes, trash pickup). Scope is *help for people in need*.
+- **Not a scraper that rehosts other directories.** We ingest sources we have rights to, attribute them, and add value through verification and reporting.
+
+## Design principles (test every decision against these)
+
+1. **Zero PII, by construction.** No accounts, no names, no phone numbers, no location history stored server-side. Reports are anonymous. If a feature needs PII, it's out of scope.
+2. **Never lie about freshness.** Every listing shows when it was last verified and by whom (source type). Stale listings are visibly stale. Unknown is shown as unknown, never as "open."
+3. **Three taps to a phone number.** In crisis, the path to "call this" or "go here" must be shorter than the path to anything else. Emergency contacts are always one screen away.
+4. **Works on the worst phone with no signal.** Offline-first, small bundle, no heavy map SDK required for core function, no login walls, no video.
+5. **Plain language, multiple languages.** English first, Spanish and Arabic next, Bengali after. Reading level ≤ 6th grade for all UI copy.
+6. **The data outlives the app.** Canonical data is a published, versioned, openly licensed dataset in an HSDS-shaped format. The app is one consumer of it.
+7. **Owners own their rows.** DHD maintains DHD rows; a church maintains its pantry row; the community flags, stewards confirm. The app never becomes the single point of failure for anyone's list.
+8. **Never ask what you can't act on.** If the triage asks about safety, the very next screen is a number to call. (This is why the D Compassion intake was harmful, not just useless.)
+9. **Ship small, ship real.** A directory with 60 verified resources beats one with 600 unverified ones.
+
+## Success looks like
+
+- A resident finds a real, open food distribution within 60 seconds on first launch, no account, no signal.
+- A church volunteer adds their pantry's schedule in under five minutes and gets a confirmation that it's live.
+- A closed resource is flagged by two people and disappears from default results within 24 hours, with a steward notified.
+- DHD updates the Narcan station list in a spreadsheet and the app reflects it by the next fetch — without Kyle doing anything.
+- 211/CIE can pull our dataset as HSDS and find nothing they can't parse.

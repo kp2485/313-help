@@ -1,0 +1,17 @@
+# generated — built in CI, never committed (see CLAUDE.md)
+data/bundle/
+
+node_modules/
+dist/
+.svelte-kit/
+.wrangler/
+.dev.vars
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+
+# iOS
+apps/ios/**/xcuserdata/
+apps/ios/**/DerivedData/
