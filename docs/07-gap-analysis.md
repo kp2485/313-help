@@ -1,5 +1,7 @@
 # 07 — Gap Analysis: D Compassion vs. this app
 
+> **Correction, 2026-09-18.** Earlier drafts said D Compassion never shipped and was Android-only. That is wrong. It is live as the **"Detroit Compassion App"** on Google Play (package `com.detroithealthdepartment.dcompassion`, "Initial Release," updated 2025-05-16, 10+ downloads) and the Apple App Store (id6743035244; 115 MB; iOS 15+), published by a vendor, **Command Data Solutions, Inc**, not by the City. Its store privacy labels declare name, phone number, and device ID collected and linked to identity, and personal info shared with third parties. What follows describes the December 2024 build we examined; the comparison that matters now is with the shipped app: it asks who you are, weighs 115 MB, and has about ten installs.
+
 Source: reverse-engineering of `com.detroithealthdepartment.dcompassion` v1.0 (built 2024-12-10, .NET MAUI Blazor Hybrid, Radzen UI, Android only). The directory content is public program information; DHD staff are informally supportive; no written authorization exists and none is assumed (see 08).
 
 ## What D Compassion had
@@ -28,12 +30,12 @@ Source: reverse-engineering of `com.detroithealthdepartment.dcompassion` v1.0 (b
 | No time-boxed events | Warming/cooling/respite activations couldn't be represented | Alerts entity with start/end (03) |
 | No map, no distance, no "open now" | Directory was a flat list | Map + list, RRULE-based open-now and next-occurrence (05) |
 | No offline | WebView app on a phone with no data = blank | Bundled snapshot, offline-first (05, 06) |
-| No iOS | Half the city excluded | iOS native + PWA now, Android native next |
+| iOS only via a 115 MB vendor build (2025) | Heavy download for a prepaid data plan | A ~35 KB PWA that works on any phone now; native apps later |
 | Collected PII with no protection | Blocked by city review; ethically wrong for a crisis app | Zero PII by construction (08) |
 | Hardcoded to DHD only | Couldn't grow | Multi-org: city, food banks, churches, partners |
 | English only | Excluded SW Detroit, Dearborn-adjacent, Bangladeshi communities | ES/AR/BN roadmap (05) |
 | No accessibility work | Generic WebView | Dynamic type, screen readers, contrast targets (05) |
-| App store submission never happened | Nobody at the city could complete it | Shipped independently by Linwood Technologies using public information, clearly marked as not a city app (08) |
+| Store release took a vendor and reached ~10 installs | Shipping wasn't the hard part; being worth installing was | Shipped independently by Linwood Technologies using public information, clearly marked as not a city app (08) |
 
 ## What we deliberately don't add
 

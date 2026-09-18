@@ -4,7 +4,7 @@
 
 Detroit has an enormous, fragmented safety net: city departments, DHD programs, 211, CAM, food banks, church pantries, rec centers, libraries, mutual aid. The information about it is scattered across press releases, PDFs, third-party aggregators, and word of mouth — and it goes stale fast. Mobile pantries move. Warming centers activate for four days and close. A Narcan newsstand gets relocated. Someone in crisis follows a two-year-old listing to a locked door.
 
-The Health Department tried to solve this with D Compassion (Dec 2024). It never shipped: it collected resident data (which triggered city IT/security review), hardcoded its directory (so it couldn't be kept current), and had no back end at all. See 07-gap-analysis.md.
+The Health Department tried to solve this with D Compassion (built Dec 2024; released by a vendor in 2025 as the "Detroit Compassion App," about ten installs — corrected 2026-09-18, see 07). It asks residents for their name and phone number, its directory was hardcoded in the build we examined (so it couldn't be kept current), and that build had no back end. See 07-gap-analysis.md.
 
 ## Who it's for
 

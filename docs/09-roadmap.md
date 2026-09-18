@@ -16,7 +16,7 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 
 **Cut list if behind:** map (list is fine), Saved, search, languages, notifications, provider claim flow, GTFS.
 
-**Demo script (3 min):** stalled city app → what's inside it (30 sec) → "here's the version that ships": find food this week in 3 taps offline → file a report → steward archives → app updates → "and nobody at the city had to do anything for this to stay current" (show a page-watcher task, then the greenway beat from doc 11). Close on: stores nothing, freshness is the product, data outlives the app.
+**Demo script (3 min):** the City's app, as it is in the stores today: asks your name and phone number, 115 MB, about ten installs (say only what the store listings show) → what's inside it (30 sec) → "here's the version that ships": find food this week in 3 taps offline → file a report → steward archives → app updates → "and nobody at the city had to do anything for this to stay current" (show a page-watcher task, then the greenway beat from doc 11). Close on: stores nothing, freshness is the product, data outlives the app.
 
 ## v1 (public beta, ~6–8 weeks after)
 
