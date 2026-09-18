@@ -1,11 +1,13 @@
-import rrulePkg from 'rrule';
+import * as rrulePkg from 'rrule';
 import type { Alert, BundleRow, Occurrence, OpenResult, Schedule, WallMinutes } from './types.js';
 import {
   dateToFloating, floatingToDateString, nowWallMinutes, parseTime, toWall, wallMinutes,
 } from './time.js';
 
-// rrule ships CJS; default import works under both Node ESM and bundlers.
-const { RRule } = rrulePkg as unknown as typeof import('rrule');
+// Node resolves rrule's CommonJS build (everything under `default`); bundlers resolve its ESM build
+// (named exports). Take whichever is there.
+type RRuleModule = typeof import('rrule');
+const RRule: RRuleModule['RRule'] = (rrulePkg as unknown as RRuleModule).RRule ?? (rrulePkg as unknown as { default: RRuleModule }).default.RRule;
 
 const CLOSES_SOON_MINUTES = 30;
 const LOOKAHEAD_DAYS = 120;

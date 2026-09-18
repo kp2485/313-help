@@ -18,3 +18,5 @@ jobs:
       # Dev build: proves the seed is valid, HSDS-valid, and signable. Release builds run
       # separately with BUNDLE_SIGNING_KEY and fail until emergency numbers have been phoned.
       - run: pnpm build:bundle
+      # The PWA pins the dev key the bundle step just wrote, then builds with the bundle copied in.
+      - run: pnpm --filter @detroithelp/web build
