@@ -33,7 +33,7 @@ You are building **DetroitHelp** (working name), a zero-PII resource directory a
 
 ## Data sources
 
-Registry in `data/sources.yaml` (see docs/02 for tiers and cadences). Do not scrape any Tier C/D source. Owner feeds are read-only; never write back.
+Registry in `data/sources.yaml` (see docs/02 for tiers and cadences). Do not scrape any Tier C/D source. No institution maintains a feed for us (DHD included): stewards maintain `data/seed/`, page watchers only open steward tasks, and nothing auto-publishes from a watched page. All sources are read-only; never write back.
 
 ## Things to ask Kyle before doing
 

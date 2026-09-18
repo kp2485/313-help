@@ -37,15 +37,15 @@ Organization ─┬─< Service ─────< ServiceAtLocation >────
     "status": "active",            // proposed | verified | active | stale | flagged | suspended | archived
     "confidence": 0.86,            // 0..1, computed; see 04
     "source": {
-      "type": "owner_feed",        // owner_feed | open_data | partner_feed | press_release | seed_list | community
-      "name": "DHD Wellness Stations sheet",
+      "type": "watched_page",      // watched_page | open_data | partner_feed | press_release | seed_list | community | owner_feed (opt-in; none today)
+      "name": "DHD harm reduction page (detroitmi.gov)",
       "url": "https://…",
       "fetched_at": "2026-09-18T04:00:00Z",
-      "record_ref": "row:17"
+      "record_ref": "station:17"
     },
     "verification": {
       "last_verified_at": "2026-09-14T15:22:00Z",
-      "method": "phone",           // owner_feed | phone | in_person | web | community_confirm | auto_check
+      "method": "phone",           // phone | in_person | web | community_confirm | auto_check | owner_attest (opt-in orgs only)
       "by_role": "steward",        // owner | steward | community | system
       "cadence_days": 14           // category default, overridable per row
     },
@@ -129,7 +129,7 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 ## Identity & IDs
 
 - IDs are stable slugs, never reused: `org_dhd`, `loc_newbethel_8430_linwood`, `svc_fh_mobile_pantry`, `sal_newbethel_fh_mobile_pantry`.
-- Owner feeds supply their own external IDs; we store them in `source.record_ref` and map, never overwrite ours.
+- Sources that carry their own external IDs (open data, any future partner feed) keep them: we store them in `source.record_ref` and map, never overwrite ours.
 - Archived rows keep their ID forever so old reports, alerts, and deep links resolve.
 
 ## Published dataset shape
@@ -143,4 +143,4 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 - `last_verified_at` older than `cadence_days` → `stale`.
 - Two independent `closed_permanently` reports within 30 days → `flagged` (hidden from default results, shown with warning if searched).
 - Steward accept → `archived` (kept, hidden, with reason and optional replacement).
-- Owner feed drops a row → `stale` (not archived) until a human confirms — feeds glitch.
+- A source (open-data layer, watched page) drops a row → steward task; the row stays visible as `stale` until a human confirms — sources glitch.

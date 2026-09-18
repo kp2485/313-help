@@ -50,7 +50,7 @@ This app is separate from CommunityChest specifically so youth-meetup safety que
 
 ## Authorization & branding (city relationship)
 
-- Get a one-page letter from DHD: authorizes listing DHD program and wellness-station information, names a data owner, states whether the DHD name/logo may appear in-app, and confirms the app is not an official City of Detroit product. Until it exists, attribute content as "Source: Detroit Health Department public listings" and keep the logo off.
+- **Plan of record: no letter.** The app lists only information DHD already publishes, attributed as "Source: Detroit Health Department public listings," with no DHD name in the title, no logo, and "Not an official City of Detroit app" on first launch and in About. A one-page letter (permission to use the name/logo, confirmation it's not a city product) would be welcome and is worth one ask — but DHD has not signalled it will take on any role, so nothing depends on it, and we never imply endorsement.
 - Store listing is under Kyle Peterson / Linwood Technologies. "City of Detroit" does not appear in the app name.
 - Partner data (Forgotten Harvest, Gleaners) only with written permission or a feed they hand us; otherwise link out.
 

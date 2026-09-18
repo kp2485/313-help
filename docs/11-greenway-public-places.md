@@ -109,7 +109,7 @@ Say this rule out loud to the judge. It's a feature.
 **The adversarial questions a greenway judge should ask, answered:**
 
 1. *"The city already has Improve Detroit. Why this?"* — Improve Detroit ties reports to accounts, emails, precise location, and device IDs **[checked]**, has no greenway request type **[checked]**, and is a City of Detroit tool, while a quarter of the route is in three other cities. We are the no-account, works-offline, segment-aware front end. We should **feed** it, not fight it: for Detroit segments, stewards forward via the public Open311 API (verify write access and terms) or a daily digest; for the other three cities, the digest goes to whoever the Partnership names.
-2. *"Who reads these?"* — Until a named person at GSD or the Partnership agrees to receive the digest, the button **does not ship** (Principle 8: never ask what you can't act on). The hackathon demo shows the real flow into our steward queue and the digest/export; the ask to the judge is "who should get this email?"
+2. *"Who reads these?"* — Best case, a named person at GSD or the Partnership gets a daily digest; the ask to the judge is "who should get this email?" But we don't depend on a yes (see "The DHD lesson" below): with no recipient, reports go to a public open-issues list, and the app says exactly that. What never ships is a button that implies someone official is reading when nobody is (Principle 8).
 3. *"Will you tell residents it got fixed?"* — Yes, and that's the part 311 systems skip: the segment shows "Fixed Sept 22 — thanks to a neighbor's report." No account needed because the feedback is on the place, not to the person.
 
 ### 3. Impact ("Is the greenway helping?")
@@ -134,6 +134,15 @@ A static, public dashboard page (built by the pipeline, no server) comparing the
 | Are people healthier? | CDC PLACES tract estimates (physical inactivity, obesity, mental distress) | Model-based, ~2-year lag **[checked]** — it **cannot** detect a greenway effect at tract level. Show as baseline context only, labeled as such. Do not let anyone put a PLACES delta on a slide as "impact." |
 
 Honesty rules for Layer B: the route wasn't placed at random, so before/after differences are **descriptive, not causal**; every chart carries its caveat in plain words; segments are compared to themselves over time first, to the city second. A dashboard that overclaims will be torn apart by the first planner who sees it — and the judge is one.
+
+## The DHD lesson, applied here
+
+The help directory was first designed around DHD maintaining a spreadsheet. They never signalled they would. Assume the same of GSD and the Partnership until proven otherwise:
+
+- **Places data** comes from the City's open layers plus our own hand-seeded amenities. Nothing waits on the greenway team.
+- **Condition reports** must be useful with no recipient. Fallback if nobody agrees to receive a digest: reports (structured fields only — kind, segment, date, status; never photos or free text) publish as an open dataset and a public "open issues on the greenway" page that block clubs, council staff, and reporters can read. The confirmation copy changes to match: "Thanks. This is now on the public list of greenway issues. We can't promise when it gets fixed." That is still an honest promise (Principle 8).
+- **"Fixed" status** then comes from neighbors ("Looks good today" on a segment with an open issue closes it after a steward glance), not from the agency.
+- A named recipient makes all of this better. It is an upgrade, not a dependency.
 
 ## What to ask the greenway team (one conversation)
 

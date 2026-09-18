@@ -5,7 +5,7 @@
 ```
   SOURCES                         PIPELINE (nightly + on-demand)                  PUBLISH
   ─────────                       ─────────────────────────────                  ───────
-  DHD Google Sheet  ──┐
+  Watched pages (DHD)─┐
   Open Data (ArcGIS) ─┤   ingest/*.ts  →  normalize → validate (HSDS) → diff
   Press releases ─────┼──▶            →  confidence scoring → bundle build  ──▶  Cloudflare Pages / R2
   Partner CSVs ───────┤                                                            /data/hsds/…
@@ -48,7 +48,7 @@ detroithelp/
 - Runs in GitHub Actions nightly (04:00 ET) and on manual dispatch / webhook from the admin tool.
 - Each source has a parser producing `NormalizedRecord[]`; normalize maps to HSDS entities with deterministic IDs.
 - **Validate**: HSDS JSON Schema + our extension schema + sanity (Detroit bbox, phone format, RRULE parse, no `until` in the past on active).
-- **Diff** against the last published HSDS: added / changed / dropped rows. Dropped owner-feed rows → `stale`, not archived. Diff summary posted to the admin tool and (optional) a Slack/email.
+- **Diff** against the last published HSDS: added / changed / dropped rows. Rows dropped by a source → steward task; never auto-archived. Diff summary posted to the admin tool and (optional) a Slack/email.
 - **Score** confidence (04) using D1's report/verification data pulled at build time.
 - **Bundle**: denormalize `service_at_location` + joins into per-category gzipped JSON; `alerts.json`; `archived.json` (compact); `index.json` with version = git SHA + timestamp and per-file checksums. Upload to R2 behind Cloudflare; Pages serves `/data/*` with long cache + versioned paths.
 - HSDS output committed to `data/hsds/` so every publish is a git commit — free audit trail and rollback.

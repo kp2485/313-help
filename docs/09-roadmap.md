@@ -16,14 +16,14 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 
 **Cut list if behind:** map (list is fine), Saved, search, languages, notifications, provider claim flow, GTFS.
 
-**Demo script (3 min):** stalled city app → what's inside it (30 sec) → "here's the version that ships": find food this week in 3 taps offline → file a report → steward archives → app updates → "and here's DHD's spreadsheet driving the Narcan list." Close on: stores nothing, freshness is the product, data outlives the app.
+**Demo script (3 min):** stalled city app → what's inside it (30 sec) → "here's the version that ships": find food this week in 3 taps offline → file a report → steward archives → app updates → "and nobody at the city had to do anything for this to stay current" (show a page-watcher task, then the greenway beat from doc 11). Close on: stores nothing, freshness is the product, data outlives the app.
 
 ## v1 (public beta, ~6–8 weeks after)
 
-- Authorization letter from DHD; DHD sheet live as an owner feed.
+- Page watchers live on DHD's public harm-reduction and program pages. (No DHD feed or letter is assumed.)
 - iOS on TestFlight, PWA public, Android native started.
 - 150+ verified resources; every one phoned or in-person verified within 30 days of launch.
-- Steward roster: Kyle + 1 DHD data owner + 2 community stewards (CHW, librarian, or church coordinator).
+- Steward roster: Kyle + 3 community stewards (CHW, librarian, church coordinator, or outreach worker). Row count is capped by what this roster can verify (doc 10-A6).
 - Spanish UI.
 - Privacy policy, About/data sources, open dataset published, repo public.
 - First conversation with Forgotten Harvest/Gleaners about a feed.
@@ -53,7 +53,7 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 4. **Analytics on or off at launch?** Recommendation: off for the hackathon; identifier-free aggregate counts at v1 with the About-screen disclosure.
 5. **Who are the first two community stewards?** Names, not roles.
 6. **313SafeBeds involvement:** teammate on the hackathon, or partner via link-out only?
-7. **Ask DHD the four questions in 02** before or after the hackathon? (Recommendation: send Friday; don't block on the reply.)
+7. **Ask DHD the four questions in 02** before or after the hackathon? (Recommendation: send once; assume silence.)
 8. **Map tiles on the PWA:** OSM/Leaflet (free, attribution required) vs. MapLibre + a tile provider (nicer, may cost). Recommendation: Leaflet + OSM for the hackathon.
 9. **Do we bundle the 2023 Council homelessness guide entries as `seed_list` (confidence 0.5) or only after a verification pass?** Recommendation: only entries verified this month; the rest stay in a `to-verify` CSV.
 10. **Domain:** register now (Cloudflare) so deep links in the demo are real.

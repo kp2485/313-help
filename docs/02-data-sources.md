@@ -6,7 +6,7 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 
 - **Tier A — Machine-readable, open license.** Build an automated ingester. Diff on every fetch.
 - **Tier B — Published but human-readable (web page, PDF, press release).** Semi-automated: scrape or parse, but a human confirms diffs before publish.
-- **Tier C — Owned by a partner, not open.** Manual entry or a shared spreadsheet the owner edits. Partnership or written permission required.
+- **Tier C — Owned by a partner, not open.** Manual entry by us, or (only if a partner volunteers) a feed they maintain. Partnership or written permission required. **No Tier C feed exists today; don't plan around one.**
 - **Tier D — Third-party aggregators.** Do NOT rehost. Use for gap-finding and cross-checking only; link out if useful. Respect ToS.
 
 ## Source inventory
@@ -17,8 +17,8 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 |---|---|---|---|---|---|---|
 | Detroit Open Data Portal (data.detroitmi.gov) | ArcGIS Hub; datasets have REST/GeoJSON endpoints | A | ArcGIS Hub API: each dataset exposes `/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson` (**to verify per dataset**) | Varies | Low for facilities | Council district boundaries change 2026-01-01 — don't cache district lookups long-term |
 | Recreation Centers dataset | Rec centers with addresses; these double as cooling centers | A | Open Data Portal (verified dataset exists) | Rare | Hours change seasonally | Hours are published in press releases, not necessarily in the dataset — treat hours as Tier B |
-| DHD Harm Reduction Wellness Stations | 25 stations: 2 vending (Jason Hargrove & Rosa Parks transit centers), ~15 newsstands, countertops | B (A if the map layer is public) | detroitmi.gov harm reduction page has an embedded zip-search map — almost certainly an ArcGIS feature layer (**to verify**; if public, promote to Tier A). Fallback: DHD-owned spreadsheet | DHD adds stations over time | **High** — stations move, get vandalized, run out of stock; "list will be updated as more are added" | This is DHD's row set; DHD must own it. Ask our DHD contact for the map's data owner. Verification cadence: 14 days |
-| DHD program directory | The ~18 programs hardcoded in D Compassion (WIC, Lead Safe, SisterFriends, HIV/STI, CeaseFire, immunizations, animal care, vital records, etc.) | C | Seed from the APK strings (public info), then DHD-maintained spreadsheet | Rare | Low–medium (phone numbers, hours) | Include the public-health emergency line 313-933-3437 |
+| DHD Harm Reduction Wellness Stations | 25 stations: 2 vending (Jason Hargrove & Rosa Parks transit centers), ~15 newsstands, countertops | B (A if the map layer is public) | detroitmi.gov harm reduction page has an embedded zip-search map — almost certainly an ArcGIS feature layer (**to verify**; if public, promote to Tier A). Fallback: we hand-maintain the list from the public page, with a page watcher to catch changes | DHD adds stations over time | **High** — stations move, get vandalized, run out of stock; "list will be updated as more are added" | DHD publishes this list but has not offered to maintain a feed for us — **we maintain these rows.** Most stations sit inside a host (barbershop, transit center, store) that has a phone: verify through the **host**, not DHD. Cadence: 30 days by host call + community confirms (see 04); 14 days was not honorable without an owner |
+| DHD program directory | The ~18 programs hardcoded in D Compassion (WIC, Lead Safe, SisterFriends, HIV/STI, CeaseFire, immunizations, animal care, vital records, etc.) | B | Seed from DHD's public program pages (cross-check against the APK strings; the website wins), maintained by us with a page watcher | Rare | Low–medium (phone numbers, hours) | Include the public-health emergency line 313-933-3437 |
 | Warming centers / cold-weather respite / cooling centers | Seasonal + ad-hoc activations announced by press release; respite sites e.g. DRMM 13130 Woodward, Pope Francis Center 2915 W Hancock; cooling = all rec centers + DPL branches | B | detroitmi.gov news feed (RSS **to verify**); pattern-match "warming center", "respite", "cooling center" | Event-driven, often 24–96 hour windows | **Very high** — these expire by design | Model as **Alerts/Activations** with start/end, not as permanent resources. Cold Weather Line: 866-313-2520 |
 | CAM Detroit (Coordinated Assessment Model) | Shelter access: 313-305-0311; in-person sites (Cass Community Social Services 11850 Woodrow Wilson; NOAH at Central 23 E Adams); camdetroit.org/cam-access-points | B | Static page; hours change | Occasional | Medium | Run by HRD/HAND, not DHD. This is the correct front door for "I need a bed tonight" — never route around it |
 | Council President's Homelessness Resource Guide (PDF, 2023) | Showers, shelters, warming/cooling, DV, veterans, youth/LGBTQ+ resources | B | PDF on detroitmi.gov | Stale | High — 2023 | Use as a **seed list to verify**, not as truth |
@@ -33,7 +33,7 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 | Forgotten Harvest | Mobile pantry map at forgottenharvest.org/find-food; many sites are churches (e.g. New Bethel Baptist, 8430 Linwood — a Forgotten Harvest mobile pantry) | B → C | Public map (scrape **only with permission**); better: ask FH for a data feed or a partner spreadsheet. Phone 248-967-1500 | Weekly schedules; sites open/close monthly | **High** — schedules and sites shift | Highest-value partnership after DHD. Their "find food" data already has schedules; we add on-the-ground verification |
 | Gleaners Community Food Bank | Mobile drive-up distributions (pantrynet.org/mobile-distribution-events), plus partner pantries, shelters, soup kitchens; 866-453-2637 | B → C | Public event listings; ask for feed | Weekly | High | Same approach as FH |
 | Wayne County Food Finder | engage.waynecountymi.gov/foodfinder | B | Web map (**to verify** if ArcGIS-backed) | Unknown | Medium | Cross-check source |
-| City food-access map by council district | An ArcGIS Experience (experience.arcgis.com/…/Search-by-Council-District) referenced in a 2026 pantry guide | A? | **To verify** — if this is a city feature layer of food resources it's a major Tier A source | Unknown | Unknown | Ask DHD whose map this is |
+| City food-access map by council district | An ArcGIS Experience (experience.arcgis.com/…/Search-by-Council-District) referenced in a 2026 pantry guide | A? | **To verify** — if this is a city feature layer of food resources it's a major Tier A source | Unknown | Unknown | Inspect the map's network calls to find the layer and its owner; no reply from DHD needed |
 | Church pantries (independent) | Hundreds of churches host pantries or FH/Gleaners distributions | C | **Self-registration** via the app's "add a resource" flow + steward verification | Weekly schedules | High | This is the community-contribution case the lifecycle doc is built around |
 | Capuchin Soup Kitchen, Focus: HOPE, Salvation Army Conner Creek, St. Suzanne Cody Rouge, Perry Outreach | Established food orgs | B | Their sites | Occasional | Medium | Seed list |
 | Karmanos "Summer Food Pantry Resource Guide" (PDF, dated 6/29/26) | Curated list of pantries with schedules for Detroit & SE Michigan | B | PDF | Semi-annual | Medium | Excellent seed list with dates — but a PDF is a snapshot |
@@ -68,15 +68,17 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 
 ## Ingestion strategy summary
 
-1. **DHD spreadsheet → JSON** is the first pipeline. One Google Sheet (or CSV in a repo DHD can edit via a form) with tabs for wellness stations and programs. Nightly fetch, diff, publish. This is what the authorization letter should reference.
+1. **Seed CSVs in the repo are the first pipeline** (`data/seed/*.csv`, maintained by stewards through the admin tool or a pull request). For DHD content, a **page watcher** fetches the public harm-reduction and program pages nightly, hashes the relevant section, and opens a steward task when it changes. We never auto-publish from a watched page. There is no DHD spreadsheet and none is planned; if any org later volunteers a feed, it plugs in as one more source.
 2. **Open data portal ingesters** for rec centers, libraries, precincts. Low churn, low risk, easy.
 3. **Press-release watcher** for activations (warming/cooling/respite). Parse title + body for known site names and dates; create Alerts with explicit end times; a human confirms before publish for the first season.
 4. **Food partner feeds** — start with a manually curated seed of ~40 church/FH/Gleaners sites with schedules, verified by phone. In parallel, ask FH and Gleaners for a feed.
 5. **Community add/report** — see 04.
 
-## What to ask DHD for (one email)
+## What to ask DHD for (optional — nothing blocks on a reply)
 
-- Who owns the wellness station map/list, and can they maintain it in a shared sheet?
+DHD has been informally supportive but has not signalled it will maintain anything. Send this once; build as if the answer is silence.
+
+- Is the wellness station map backed by a public layer we can read? (We are not asking them to maintain anything.)
 - Is the council-district food-access ArcGIS map a DHD product, and is its layer public?
 - The current DHD program list with a named contact per program.
 - Whether they'll introduce us to Forgotten Harvest / Gleaners data contacts.

@@ -13,7 +13,7 @@ Primary: **any Detroit resident who needs help right now** — food this week, a
 Secondary:
 - **Helpers** — CHWs, church volunteers, librarians, outreach workers, SisterFriends, Health Hub students — who look things up on behalf of someone else and are the most likely people to report changes.
 - **Resource providers** — a church running a Forgotten Harvest mobile pantry, a barbershop with a Narcan newsstand — who want to be listed and keep their listing right.
-- **Data owners** — DHD staff who maintain the official lists, and (eventually) 211/CIE.
+- **Data consumers** — 211/CIE, DHD, or anyone else who wants a clean, current dataset. *We do not assume any institution will maintain data for us.* As of 2026-09-18, DHD has not offered to maintain a list or a feed; the plan works without them.
 
 ## What it is
 
@@ -41,7 +41,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 4. **Works on the worst phone with no signal.** Offline-first, small bundle, no heavy map SDK required for core function, no login walls, no video.
 5. **Plain language, multiple languages.** English first, Spanish and Arabic next, Bengali after. Reading level ≤ 6th grade for all UI copy.
 6. **The data outlives the app.** Canonical data is a published, versioned, openly licensed dataset in an HSDS-shaped format. The app is one consumer of it.
-7. **Owners own their rows.** DHD maintains DHD rows; a church maintains its pantry row; the community flags, stewards confirm. The app never becomes the single point of failure for anyone's list.
+7. **Assume nobody maintains anything.** The directory must stay honest if no institution ever lifts a finger: we watch public sources, the community flags and confirms, stewards verify, and rows nobody has checked decay visibly. An org that *wants* to own its rows (a church, a food bank, someday DHD) can opt in — that's a bonus, never a dependency.
 8. **Never ask what you can't act on.** If the triage asks about safety, the very next screen is a number to call. (This is why the D Compassion intake was harmful, not just useless.)
 9. **Ship small, ship real.** A directory with 60 verified resources beats one with 600 unverified ones.
 
@@ -50,5 +50,5 @@ A **directory + triage + freshness system** for Detroit help resources:
 - A resident finds a real, open food distribution within 60 seconds on first launch, no account, no signal.
 - A church volunteer adds their pantry's schedule in under five minutes and gets a confirmation that it's live.
 - A closed resource is flagged by two people and disappears from default results within 24 hours, with a steward notified.
-- DHD updates the Narcan station list in a spreadsheet and the app reflects it by the next fetch — without Kyle doing anything.
+- DHD changes the Narcan station list on its public web page; our page watcher notices within a day, a steward confirms the diff, and the app reflects it — without anyone at DHD doing anything for us.
 - 211/CIE can pull our dataset as HSDS and find nothing they can't parse.

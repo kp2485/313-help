@@ -7,7 +7,7 @@ This is the part D Compassion — and most resource directories — never solved
 1. **Nothing is ever deleted.** Rows are archived with a reason and, when possible, a replacement. History is data.
 2. **Unknown is not "open."** A listing that hasn't been verified within its cadence is shown as stale, sorted down, and labeled. We never imply currency we don't have.
 3. **Two sources beat one.** A single anonymous report never takes a resource down. Two independent reports hide it from default results; a steward archives it.
-4. **Owners are the fastest path to truth.** If the row came from an owner feed (DHD's sheet), the feed's next fetch resolves most reports automatically. Community reports on owner rows are routed to the owner.
+4. **The person at the door is the fastest path to truth.** No institution maintains a feed for us (see 02), so nothing resolves a report automatically. The best evidence is someone physically there: a resident's report, a host's answer on the phone, a steward's visit. A published list never outranks the person standing at the empty box.
 5. **Make reporting cheaper than complaining.** One tap from the detail screen. No account. No form longer than a tweet.
 6. **Reward confirmation as much as correction.** "Still here, still open" reports reset the verification clock and are the cheapest verification we have.
 
@@ -17,7 +17,7 @@ This is the part D Compassion — and most resource directories — never solved
                  ┌──────────┐
   add-a-resource │ proposed │ community/owner submitted, not visible
                  └────┬─────┘
-            steward   │ accept (or owner feed row appears)
+            steward   │ accept (or open-data row appears) 
                       ▼
                  ┌──────────┐   cadence passes with     ┌──────────┐
                  │  active  │ ──no verification──────▶  │  stale   │  visible, labeled, sorted down
@@ -28,7 +28,7 @@ This is the part D Compassion — and most resource directories — never solved
                  ┌──────────┐   steward accepts          ┌──────────┐
                  │ flagged  │ ────────────────────────▶  │ archived │  hidden; reason + replacement kept
                  └────┬─────┘                            └──────────┘
-                      │ steward rejects / owner feed confirms                 ▲
+                      │ steward rejects after checking                        ▲
                       └──────────────▶ active                                │
                                                                               │
                  ┌───────────┐  owner or steward pauses (e.g. pantry on       │
@@ -44,7 +44,7 @@ This is the part D Compassion — and most resource directories — never solved
 Computed at bundle build time; drives sort order and badge. Never shown as a number to residents — shown as one of three badges: **Verified recently** / **Might be out of date** / **Reported closed**.
 
 ```
-base by source type:    owner_feed 0.9 | partner_feed 0.85 | open_data 0.8 | press_release 0.7 | seed_list 0.5 | community 0.4
+base by source type:    partner_feed 0.85 | open_data 0.8 | watched_page 0.7 | press_release 0.7 | seed_list 0.5 | community 0.4   (owner_feed 0.9 reserved for opt-in orgs; none today. Formula under review — see 10-B1)
 age decay:              × max(0.3, 1 − days_since_verified / (2 × cadence_days))
 confirm boost:          + 0.05 per community "still open" in last 30 days (cap +0.15)
 report penalty:         − 0.25 per open "closed/moved" report (independent nonces)
@@ -60,7 +60,7 @@ Badges: ≥ 0.7 Verified recently; 0.4–0.7 Might be out of date; < 0.4 or stat
 | Category | Cadence | Why |
 |---|---|---|
 | Alerts/activations | Hard end date — no cadence; expire automatically | By design |
-| Harm reduction stations | 14 days | Vandalism, relocation, stock-outs |
+| Harm reduction stations | 30 days (host phone call) + community confirms | Vandalism, relocation, stock-outs. 14 days needed an owner we don't have; stock-outs travel as same-day signals instead |
 | Mobile food distributions | 7 days (schedule) / 30 days (site) | Schedules shift weekly |
 | Church/independent pantries | 30 days | Volunteer-run; holidays and summer breaks |
 | Shelter / CAM access points | 30 days | Hours change |
@@ -72,7 +72,7 @@ Cadence is a per-row override; category value is the default.
 
 ## Verification methods (cheapest first)
 
-1. **Owner feed fetch** — the row appeared in the owner's sheet/feed on this fetch → verified (`method: owner_feed`).
+1. **Source still lists it** — the row is still present in its open-data layer or watched page. This is **not verification**; it only means the publisher hasn't removed it, and it never resets the clock. (If an org ever opts in to maintain its rows, a dated attestation from them does count — `method: owner_attest`.)
 2. **Auto-checks** (nightly, no human): phone number format + carrier validity (via a lookup API, if budget allows; otherwise format only); website HTTP status; geocode sanity (address resolves within Detroit bbox); schedule sanity (no `until` in the past on an active row).
 3. **Community confirm** — "Still open" tap from the detail screen. Resets clock only if ≥ 2 independent confirms in 30 days OR 1 confirm on a row ≤ 45 days stale.
 4. **Steward phone call** — the standard for anything community-added or flagged. Script: "Are you still running the pantry? Days/times? Any ID or residency requirement? Okay to list?" Log method, date, who (role only).
@@ -98,11 +98,11 @@ Submission:
 - Offline: queued locally, sent on next connection. Show "We'll send this when you're back online."
 - Rate limit: 20 reports/day per nonce, 3 per target per nonce. Silent drop beyond that.
 
-Abuse model: a competitor pantry or a troll mass-reporting closures. Mitigations: independent-nonce requirement (2 reports from the same nonce count once), steward review before archive, owner-feed rows auto-resolve, and reports never delete — worst case is a false "might be closed" badge for a day.
+Abuse model: a competitor pantry or a troll mass-reporting closures. Mitigations: independent-nonce requirement (2 reports from the same nonce count once), steward review before archive, and reports never delete — worst case is a false "might be closed" badge for a day.
 
 ## Steward workflow
 
-**Stewards** are trusted humans with a login to the admin tool (see 06) — Kyle, a DHD data owner, ideally a couple of CHWs/librarians/church coordinators. Stewards are the only people who can archive. Roles: `owner` (can edit own org's rows, can't archive others'), `steward` (city-wide), `admin`.
+**Stewards** are trusted humans with a login to the admin tool (see 06) — Kyle plus community stewards (CHWs, librarians, church coordinators, outreach workers). No DHD seat is assumed. Stewards are the only people who can archive. Roles: `owner` (can edit own org's rows, can't archive others'), `steward` (city-wide), `admin`.
 
 Daily queue, sorted by urgency:
 1. Flagged rows (2+ closed/moved reports) — call or check; archive or clear.

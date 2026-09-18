@@ -27,7 +27,7 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 ## Status
 
 - 2026-09-18: Drafted for review. Nothing built yet. Audited the same day (doc 10); fixes are listed as *Proposed* in DECISIONS.md and are not yet applied to docs 01–09.
-- DHD program staff are aware of this project and informally supportive of reusing the public information from the D Compassion build. A written authorization letter is pending — see 08 and 09.
+- DHD program staff are aware of this project and informally supportive of reusing the public information from the D Compassion build. DHD has not offered to maintain any data or feed, and there is no written authorization; the design assumes neither (see 02 and 08).
 
 ## The three ideas that make this app different
 

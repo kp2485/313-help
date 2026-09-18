@@ -2,6 +2,8 @@
 
 Audit date: 2026-09-18. Method: read every doc as (a) a troll with `curl`, (b) an abusive partner holding the phone, (c) a stale phone that hasn't been online in months, (d) a burned-out volunteer steward, (e) an App Store reviewer, (f) a 211 engineer importing our data, (g) a hackathon judge. Facts marked **[checked]** were verified on the web on the audit date; see "Fact-check results" at the end.
 
+> **Update, same day:** Kyle confirmed there is **no DHD spreadsheet and DHD has not signalled it will maintain anything.** Docs 01–09 were revised to drop that assumption (principle 7 is now "assume nobody maintains anything"). That retires the mechanism behind A2 and one leg of A5, and makes A6 the most important finding in this audit. Those three are annotated below.
+
 The design is strong. Zero-PII by construction, static read plane, and "freshness is the product" are the right bets. The findings below are where the docs **break their own principles**. Nothing here says "start over."
 
 Severity: **S1** = breaks a non-negotiable or can hurt someone; fix before any code. **S2** = will produce wrong behavior or an embarrassing demo; fix in the spec before the matching build step. **S3** = inconsistency or cleanup.
@@ -28,6 +30,7 @@ Fix (all compatible with zero-PII):
 6. **Presence-weighted reports (next-level, optional):** a QR sticker on the station/pantry door deep-links to the confirm screen with a per-site token. A report carrying the site token is worth more than one without. No identity involved, and it solves A6.
 
 ### A2. An owner feed that nobody touches reads as "Verified recently" forever
+**Resolved by removal (2026-09-18).** There is no owner feed. 04 now says presence in any source is *not* verification and never resets the clock. The finding stays on record because the same trap reappears with open-data layers and watched pages: "the City's layer still lists it" must never turn a badge green. Original text:
 *Docs: 04 Verification method 1, Principle 4; 03 Freshness rules; 01 Success.*
 
 "The row appeared in the owner's sheet on this fetch → verified." A Google Sheet that DHD last edited in 2026 will still be re-"verified" nightly in 2028 at base confidence 0.9. That is D Compassion's failure (hardcoded list goes stale) moved into a spreadsheet, with a green badge on top. It directly violates Principle 2.
@@ -60,7 +63,7 @@ Also: the 03 example shows `submitted_at` with seconds (`13:41:10`) while 04/08 
 ### A5. "Bundle wins" on emergency numbers + unsigned bundles + unreviewed owner feed = a phone-number hijack path
 *Docs: 05 Home, 06 Pipeline, 02 Ingestion 1.*
 
-Chain: anyone with edit rights on the DHD Google Sheet (or a phished DHD account, or a leaked GitHub Actions secret, or one steward login) → nightly pipeline → auto-publish at 0.9 confidence with no human in the loop → the bundle overrides the static emergency strip. `index.json` checksums come from the same origin as the files, so they detect corruption, not tampering. Result: a scam or harassment number on the crisis line of every phone by morning.
+*(2026-09-18: the Google Sheet leg is gone; the rest of the chain stands, and a watched page or open-data layer is the same kind of upstream we don't control.)* Chain: anyone who can alter an upstream source (originally the DHD Google Sheet; now a City page or data layer), or a leaked GitHub Actions secret, or one steward login → nightly pipeline → auto-publish at 0.9 confidence with no human in the loop → the bundle overrides the static emergency strip. `index.json` checksums come from the same origin as the files, so they detect corruption, not tampering. Result: a scam or harassment number on the crisis line of every phone by morning.
 
 Fix:
 - **911 and 988 are hardcoded and not overridable. Ever.** Other strip numbers are overridable only from the steward-reviewed emergency file, never from an ingested feed.
@@ -69,6 +72,7 @@ Fix:
 - Two-person rule (or at least a 1-hour delay + notification to all stewards) for edits to the emergency file.
 
 ### A6. The verification workload doesn't fit the steward roster, so everything will go stale
+**Now the top risk (2026-09-18).** With no DHD owner, every DHD row — 25 stations, ~18 programs — lands on the same volunteer roster. Changes made in 01–09: station cadence moved from 14 to 30 days; stations are verified by phoning the **host** (the barbershop, store, or transit center has a phone even though the newsstand doesn't); stock-outs travel as same-day signals (B4) rather than as verification; the v1 roster drops the assumed DHD seat; row count is capped by roster capacity. QR markers on DHD's stations need DHD's cooperation, so don't count on them there — ask hosts and churches individually instead.
 *Docs: 04 cadences + steward workflow, 09 v1 roster.*
 
 v1 target: 150+ resources, four stewards of whom three are volunteers, flagged SLA 24h. Count the calls: ~40 food sites on a 7-day schedule cadence ≈ 40 calls/week; ~50 pantries/shelters at 30 days ≈ 12/week; plus proposals and flags. And the 25 harm-reduction stations (14-day cadence) **have no phone** — a newsstand can't confirm it's stocked — so those are ~2 in-person visits a day.
