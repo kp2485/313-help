@@ -144,9 +144,9 @@
     -83.02288
    ],
    "help": {
-    "total": 4,
+    "total": 7,
     "by": {
-     "food": 2,
+     "food": 5,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -156,7 +156,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.3,
+     "food": 1,
      "clinic": 1.6,
      "narcan": 2.2,
      "indoors": 2
@@ -471,25 +471,24 @@
     -83.15373
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 2
     },
     "nearest_miles": {
-     "food": 2.3,
-     "clinic": 5.5,
+     "food": 0.9,
+     "clinic": 2.2,
      "narcan": 0.5,
      "indoors": 0.8
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -720,8 +719,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 4.7,
+     "food": 1.8,
+     "clinic": 1.8,
      "narcan": 1.1,
      "indoors": 1.7
     },
@@ -770,9 +769,9 @@
     -83.19295
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -782,13 +781,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.4,
-     "clinic": 3.4,
+     "food": 0.4,
+     "clinic": 0.8,
      "narcan": 0.5,
      "indoors": 1.6
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -900,8 +898,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 7.7,
-     "clinic": 6.2,
+     "food": 4.2,
+     "clinic": 3.9,
      "narcan": 1.9,
      "indoors": 2
     },
@@ -1005,9 +1003,9 @@
     -83.16983
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 3,
      "shelter": 0,
@@ -1017,13 +1015,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 2.5,
-     "clinic": 4,
+     "food": 0.9,
+     "clinic": 1.7,
      "narcan": 1,
      "indoors": 0.7
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -1138,8 +1135,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4,
-     "clinic": 6,
+     "food": 1.5,
+     "clinic": 0.8,
      "narcan": 0.7,
      "indoors": 0.9
     },
@@ -1252,7 +1249,7 @@
     },
     "nearest_miles": {
      "food": 1.6,
-     "clinic": 2,
+     "clinic": 1.2,
      "narcan": 0.7,
      "indoors": 0.9
     },
@@ -1542,7 +1539,7 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 5.8,
+     "food": 2.6,
      "clinic": 3.5,
      "narcan": 1.2,
      "indoors": 1.2
@@ -1882,8 +1879,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.4,
-     "clinic": 3.7,
+     "food": 1.3,
+     "clinic": 1.6,
      "narcan": 1.9,
      "indoors": 0.9
     },
@@ -1998,8 +1995,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.6,
-     "clinic": 2.3,
+     "food": 1.5,
+     "clinic": 1.9,
      "narcan": 0.1,
      "indoors": 1.7
     },
@@ -2094,9 +2091,9 @@
     -83.07701
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -2106,13 +2103,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.2,
-     "clinic": 2.4,
+     "food": 0.8,
+     "clinic": 1.6,
      "narcan": 0.5,
      "indoors": 1.4
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -2451,7 +2447,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 5.8,
+     "food": 2.2,
      "clinic": 3.1,
      "narcan": 1.6,
      "indoors": 2.1
@@ -2805,8 +2801,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 1.6,
-     "clinic": 3.8,
+     "food": 1.5,
+     "clinic": 1.6,
      "narcan": 0.3,
      "indoors": 0.7
     },
@@ -2912,10 +2908,10 @@
     -82.97745
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 4,
      "shelter": 0,
      "utilities": 1,
@@ -2925,13 +2921,11 @@
     },
     "nearest_miles": {
      "food": 0.8,
-     "clinic": 4,
+     "clinic": 0.3,
      "narcan": 0.4,
      "indoors": 0.1
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -3031,9 +3025,9 @@
     -82.95913
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -3044,7 +3038,7 @@
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 4.9,
+     "clinic": 1.2,
      "narcan": 1,
      "indoors": 1
     },
@@ -3262,10 +3256,10 @@
     -83.21232
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 1,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -3274,15 +3268,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.9,
-     "clinic": 4.3,
+     "food": 1.2,
+     "clinic": 0.8,
      "narcan": 1,
      "indoors": 2.1
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -3383,9 +3374,9 @@
     -83.06616
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -3395,13 +3386,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.3,
-     "clinic": 2.6,
+     "food": 0.1,
+     "clinic": 2,
      "narcan": 0.9,
      "indoors": 0.9
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -3492,26 +3482,25 @@
     -83.00892
    ],
    "help": {
-    "total": 3,
+    "total": 6,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.3,
-     "clinic": 4.2,
+     "food": 1.6,
+     "clinic": 0.5,
      "narcan": 0.8,
      "indoors": 2.3
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -3613,10 +3602,10 @@
     -82.96555
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 4,
      "shelter": 0,
      "utilities": 1,
@@ -3626,13 +3615,11 @@
     },
     "nearest_miles": {
      "food": 1.1,
-     "clinic": 4.8,
+     "clinic": 0.9,
      "narcan": 1.1,
      "indoors": 1.5
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -3914,10 +3901,10 @@
     -82.92028
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -3926,14 +3913,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.4,
-     "clinic": 7,
+     "food": 1.5,
+     "clinic": 0.8,
      "narcan": 0.9,
      "indoors": 2.9
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -4035,10 +4021,10 @@
     -83.21277
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
@@ -4047,14 +4033,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.2,
-     "clinic": 3.4,
+     "food": 1.3,
+     "clinic": 1,
      "narcan": 0.5,
      "indoors": 2.3
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -4253,9 +4238,9 @@
     -83.05039
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -4265,13 +4250,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 1.4,
+     "food": 0.9,
      "clinic": 1.9,
      "narcan": 0.5,
      "indoors": 0.3
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -4374,7 +4358,7 @@
     -83.14843
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -4382,12 +4366,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 1
     },
     "nearest_miles": {
      "food": 1.1,
-     "clinic": 3.2,
+     "clinic": 1.5,
      "narcan": 0.9,
      "indoors": 0.9
     },
@@ -4606,25 +4590,24 @@
     -82.95543
    ],
    "help": {
-    "total": 2,
+    "total": 5,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.3,
-     "clinic": 5.5,
+     "food": 0.9,
+     "clinic": 1.4,
      "narcan": 0.3,
      "indoors": 1.2
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -4725,25 +4708,24 @@
     -83.12632
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.6,
-     "clinic": 4.2,
+     "food": 0.7,
+     "clinic": 1.3,
      "narcan": 0.6,
      "indoors": 2
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -4822,10 +4804,10 @@
     -83.12912
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 1,
-     "health": 0,
+     "food": 2,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -4835,13 +4817,11 @@
     },
     "nearest_miles": {
      "food": 0.4,
-     "clinic": 3.8,
+     "clinic": 0.4,
      "narcan": 0.8,
      "indoors": 1.3
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -4931,26 +4911,24 @@
     -83.10866
    ],
    "help": {
-    "total": 4,
+    "total": 7,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 2,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 1
     },
     "nearest_miles": {
      "food": 1.2,
-     "clinic": 2.8,
+     "clinic": 0.8,
      "narcan": 0.9,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -5223,7 +5201,7 @@
     },
     "nearest_miles": {
      "food": 1,
-     "clinic": 3.6,
+     "clinic": 0.9,
      "narcan": 0.9,
      "indoors": 1.2
     },
@@ -5317,9 +5295,9 @@
     -82.93322
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -5329,13 +5307,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.7,
-     "clinic": 6.2,
+     "food": 0.7,
+     "clinic": 1.6,
      "narcan": 1.1,
      "indoors": 2.3
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -5430,10 +5407,10 @@
     -82.98566
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 1,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -5442,15 +5419,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.6,
-     "clinic": 4.1,
+     "food": 0.6,
+     "clinic": 0.9,
      "narcan": 0.8,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -5552,9 +5526,9 @@
     -83.04137
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -5640,25 +5614,24 @@
     -82.98695
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.2,
-     "clinic": 3.7,
+     "food": 1,
+     "clinic": 1.5,
      "narcan": 0.9,
      "indoors": 1.3
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -5883,7 +5856,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 5.9,
+     "food": 2.5,
      "clinic": 3.4,
      "narcan": 1.6,
      "indoors": 1.6
@@ -5979,9 +5952,9 @@
     -83.02726
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -5991,8 +5964,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 0.8,
-     "clinic": 2,
+     "food": 0.7,
+     "clinic": 1.6,
      "narcan": 0.6,
      "indoors": 0.1
     },
@@ -6080,7 +6053,7 @@
     -83.25192
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -6088,12 +6061,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 6.9,
-     "clinic": 5.6,
+     "food": 3.3,
+     "clinic": 3,
      "narcan": 1.6,
      "indoors": 1.6
     },
@@ -6201,7 +6174,7 @@
     -83.227
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -6209,12 +6182,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 5.3,
-     "clinic": 4.3,
+     "food": 1.9,
+     "clinic": 1.5,
      "narcan": 1.4,
      "indoors": 1.7
     },
@@ -6332,7 +6305,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 5.4,
+     "food": 1.6,
      "clinic": 2.5,
      "narcan": 0.9,
      "indoors": 4.4
@@ -6435,9 +6408,9 @@
     -83.05826
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -6447,13 +6420,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 2.9,
-     "clinic": 3.3,
+     "food": 0.9,
+     "clinic": 2.1,
      "narcan": 1.2,
      "indoors": 0.1
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -6569,7 +6541,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2,
+     "food": 1.8,
      "clinic": 1.2,
      "narcan": 1.4,
      "indoors": 3.3
@@ -6674,25 +6646,24 @@
     -83.15704
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 6,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 1
     },
     "nearest_miles": {
-     "food": 1.9,
-     "clinic": 4.4,
+     "food": 1.2,
+     "clinic": 1.9,
      "narcan": 0.5,
      "indoors": 0.9
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -6807,8 +6778,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 8,
-     "clinic": 6.2,
+     "food": 4.7,
+     "clinic": 4.4,
      "narcan": 1.9,
      "indoors": 2
     },
@@ -6926,7 +6897,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.4,
+     "food": 1.2,
      "clinic": 2.2,
      "narcan": 0.7,
      "indoors": 1.5
@@ -7005,10 +6976,10 @@
     -82.96086
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 1,
-     "health": 0,
+     "food": 2,
+     "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 1,
@@ -7018,13 +6989,11 @@
     },
     "nearest_miles": {
      "food": 0.5,
-     "clinic": 4.8,
+     "clinic": 1,
      "narcan": 0.5,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -7121,25 +7090,24 @@
     -82.98547
    ],
    "help": {
-    "total": 4,
+    "total": 7,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 3,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 4.5,
+     "food": 0.4,
+     "clinic": 1.8,
      "narcan": 0.3,
      "indoors": 1.2
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -7242,26 +7210,24 @@
     -83.23889
    ],
    "help": {
-    "total": 2,
+    "total": 6,
     "by": {
-     "food": 0,
+     "food": 3,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.2,
+     "food": 0.5,
      "clinic": 1.3,
      "narcan": 0.9,
      "indoors": 3.4
     },
-    "none_listed_yet": [
-     "food"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -7362,9 +7328,9 @@
     -83.14965
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -7374,13 +7340,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.2,
-     "clinic": 5.9,
+     "food": 0.4,
+     "clinic": 2.2,
      "narcan": 1.7,
      "indoors": 1
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -7494,7 +7459,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.8,
+     "food": 1.1,
      "clinic": 0.3,
      "narcan": 1.3,
      "indoors": 3.7
@@ -7569,7 +7534,7 @@
     },
     "nearest_miles": {
      "food": 1.7,
-     "clinic": 1.9,
+     "clinic": 1.1,
      "narcan": 0.8,
      "indoors": 1.2
     },
@@ -7690,8 +7655,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.2,
-     "clinic": 4,
+     "food": 0.8,
+     "clinic": 0.7,
      "narcan": 0.1,
      "indoors": 0.8
     },
@@ -7766,7 +7731,7 @@
     -83.17258
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -7774,12 +7739,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 1,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
      "food": 1.7,
-     "clinic": 2.9,
+     "clinic": 2.5,
      "narcan": 1,
      "indoors": 0.8
     },
@@ -7898,8 +7863,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.5,
-     "clinic": 2.8,
+     "food": 1.3,
+     "clinic": 1.3,
      "narcan": 0.2,
      "indoors": 2.2
     },
@@ -8016,8 +7981,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.6,
-     "clinic": 2.3,
+     "food": 1.3,
+     "clinic": 2,
      "narcan": 0.6,
      "indoors": 2.5
     },
@@ -8131,7 +8096,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.9,
+     "food": 1.2,
      "clinic": 2.2,
      "narcan": 0.4,
      "indoors": 2.2
@@ -8232,25 +8197,24 @@
     -83.03306
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 2.6,
+     "food": 0.2,
+     "clinic": 1.3,
      "narcan": 0.6,
      "indoors": 1.3
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -8351,25 +8315,24 @@
     -82.99213
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.6,
-     "clinic": 3.7,
+     "food": 0.7,
+     "clinic": 2,
      "narcan": 0.6,
      "indoors": 1.9
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -8471,9 +8434,9 @@
     -83.00956
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -8483,13 +8446,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.3,
-     "clinic": 2.8,
+     "food": 0.8,
+     "clinic": 0.9,
      "narcan": 1.3,
      "indoors": 0.9
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -8592,9 +8554,9 @@
     -83.02417
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -8706,9 +8668,9 @@
     -83.00117
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -8718,13 +8680,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.6,
-     "clinic": 2.9,
+     "food": 0.8,
+     "clinic": 1.4,
      "narcan": 1.4,
      "indoors": 1.4
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -8908,9 +8869,9 @@
     -83.12961
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -8920,13 +8881,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.8,
-     "clinic": 5.1,
+     "food": 0.6,
+     "clinic": 1.4,
      "narcan": 0.7,
      "indoors": 1.9
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -9021,10 +8981,10 @@
     -83.20892
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -9033,14 +8993,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 5.2,
-     "clinic": 5.6,
+     "food": 1.6,
+     "clinic": 0.8,
      "narcan": 1.5,
      "indoors": 2.3
     },
     "none_listed_yet": [
      "food",
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -9155,8 +9114,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.1,
-     "clinic": 2.3,
+     "food": 1.4,
+     "clinic": 1.9,
      "narcan": 0.4,
      "indoors": 2.1
     },
@@ -9263,10 +9222,10 @@
     -83.0966
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -9275,14 +9234,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 3.1,
+     "food": 1.5,
+     "clinic": 0.7,
      "narcan": 0.4,
      "indoors": 2.3
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -9380,8 +9338,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 3.6,
-     "clinic": 5.7,
+     "food": 1.2,
+     "clinic": 1,
      "narcan": 0.4,
      "indoors": 0.6
     },
@@ -9482,10 +9440,10 @@
     -83.106
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 4,
      "shelter": 0,
      "utilities": 0,
@@ -9494,14 +9452,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.7,
-     "clinic": 3.3,
+     "food": 1.2,
+     "clinic": 0.7,
      "narcan": 0.3,
      "indoors": 2.7
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -9615,8 +9572,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 3,
+     "food": 1.4,
+     "clinic": 2.1,
      "narcan": 1.1,
      "indoors": 0.6
     },
@@ -9709,9 +9666,9 @@
     -83.1736
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -9721,13 +9678,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 2.8,
-     "clinic": 4.3,
+     "food": 0.7,
+     "clinic": 1.3,
      "narcan": 0.4,
      "indoors": 0.7
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -9827,10 +9783,10 @@
     -83.09136
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -9839,14 +9795,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.4,
-     "clinic": 3.1,
+     "food": 1.4,
+     "clinic": 0.7,
      "narcan": 0.8,
      "indoors": 1.9
     },
     "none_listed_yet": [
      "food",
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -9960,7 +9915,7 @@
     },
     "nearest_miles": {
      "food": 1.2,
-     "clinic": 2.4,
+     "clinic": 1.4,
      "narcan": 0.8,
      "indoors": 0.5
     },
@@ -10053,7 +10008,7 @@
     -83.24891
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -10061,12 +10016,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 1
     },
     "nearest_miles": {
-     "food": 6.2,
-     "clinic": 4.6,
+     "food": 3,
+     "clinic": 2.6,
      "narcan": 0.8,
      "indoors": 0.8
     },
@@ -10388,8 +10343,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.8,
-     "clinic": 2.9,
+     "food": 1,
+     "clinic": 1.5,
      "narcan": 0.6,
      "indoors": 1.3
     },
@@ -10497,10 +10452,10 @@
     -83.19064
    ],
    "help": {
-    "total": 3,
+    "total": 6,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 2,
+     "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
@@ -10509,15 +10464,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.6,
-     "clinic": 3.9,
+     "food": 0.3,
+     "clinic": 0.5,
      "narcan": 0.5,
      "indoors": 1.3
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -10616,10 +10568,10 @@
     -82.99524
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 1,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -10628,15 +10580,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 1.1,
-     "clinic": 3.8,
+     "food": 0.3,
+     "clinic": 0.3,
      "narcan": 0.6,
      "indoors": 0.4
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -10722,10 +10671,10 @@
     -83.00244
    ],
    "help": {
-    "total": 4,
+    "total": 7,
     "by": {
-     "food": 1,
-     "health": 0,
+     "food": 3,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -10735,13 +10684,11 @@
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 3.4,
+     "clinic": 0.3,
      "narcan": 0.6,
      "indoors": 0.2
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -10854,7 +10801,7 @@
     },
     "nearest_miles": {
      "food": 0.9,
-     "clinic": 2.1,
+     "clinic": 1.9,
      "narcan": 0.7,
      "indoors": 0.7
     },
@@ -10961,10 +10908,10 @@
     -82.94657
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -10974,13 +10921,12 @@
     },
     "nearest_miles": {
      "food": 1.9,
-     "clinic": 5.9,
+     "clinic": 0.5,
      "narcan": 2,
      "indoors": 0.5
     },
     "none_listed_yet": [
      "food",
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -11175,8 +11121,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.5,
-     "clinic": 4.3,
+     "food": 0.9,
+     "clinic": 0.9,
      "narcan": 0.4,
      "indoors": 1
     },
@@ -11257,9 +11203,9 @@
     -83.20375
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 1,
      "harm": 0,
      "shelter": 0,
@@ -11269,13 +11215,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.4,
+     "food": 0.9,
      "clinic": 0.8,
      "narcan": 1.7,
      "indoors": 2.9
     },
     "none_listed_yet": [
-     "food",
      "harm"
     ],
     "coverage_checked": false
@@ -11490,9 +11435,9 @@
     -83.05592
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -11502,13 +11447,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 2.5,
+     "food": 0.4,
+     "clinic": 2.1,
      "narcan": 0.6,
      "indoors": 0.8
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -11721,8 +11665,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 3.2,
+     "food": 1,
+     "clinic": 1.8,
      "narcan": 1.1,
      "indoors": 2.1
     },
@@ -11843,7 +11787,7 @@
     },
     "nearest_miles": {
      "food": 0.2,
-     "clinic": 2.4,
+     "clinic": 2.3,
      "narcan": 0.7,
      "indoors": 0.4
     },
@@ -11945,7 +11889,7 @@
     -83.15179
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
@@ -11953,12 +11897,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 1,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
      "food": 0.9,
-     "clinic": 2.7,
+     "clinic": 2,
      "narcan": 0.6,
      "indoors": 1.1
     },
@@ -12063,25 +12007,24 @@
     -82.96388
    ],
    "help": {
-    "total": 3,
+    "total": 8,
     "by": {
-     "food": 0,
+     "food": 3,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 1
     },
     "nearest_miles": {
-     "food": 1.7,
-     "clinic": 5.4,
+     "food": 0.5,
+     "clinic": 1.9,
      "narcan": 0.5,
      "indoors": 0.6
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -12196,8 +12139,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.9,
-     "clinic": 4.9,
+     "food": 1.4,
+     "clinic": 1.5,
      "narcan": 1.1,
      "indoors": 1.4
     },
@@ -12279,25 +12222,24 @@
     -83.13324
    ],
    "help": {
-    "total": 3,
+    "total": 7,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.1,
-     "clinic": 4.2,
+     "food": 0.4,
+     "clinic": 1.1,
      "narcan": 0.2,
      "indoors": 2
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -12399,9 +12341,9 @@
     -83.02998
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -12411,13 +12353,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 1,
-     "clinic": 2.4,
+     "food": 0.3,
+     "clinic": 1.5,
      "narcan": 0.2,
      "indoors": 0.7
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -12525,8 +12466,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 3.4,
-     "clinic": 6,
+     "food": 1.2,
+     "clinic": 1.5,
      "narcan": 1,
      "indoors": 0.4
     },
@@ -12642,8 +12583,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 5.6,
-     "clinic": 4.1,
+     "food": 2.7,
+     "clinic": 2.2,
      "narcan": 0.9,
      "indoors": 0.8
     },
@@ -12928,8 +12869,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 6.9,
-     "clinic": 5.2,
+     "food": 3.8,
+     "clinic": 3.4,
      "narcan": 0.9,
      "indoors": 1
     },
@@ -13318,9 +13259,9 @@
     -83.1262
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 1,
      "shelter": 0,
@@ -13330,7 +13271,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.4,
+     "food": 1,
      "clinic": 0.8,
      "narcan": 1.1,
      "indoors": 1.8
@@ -13448,8 +13389,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 5.8,
-     "clinic": 4,
+     "food": 3.1,
+     "clinic": 2.7,
      "narcan": 0.5,
      "indoors": 0.4
     },
@@ -13657,8 +13598,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.9,
-     "clinic": 3.3,
+     "food": 2.3,
+     "clinic": 2,
      "narcan": 0.9,
      "indoors": 1.3
     },
@@ -13755,7 +13696,7 @@
     -82.97604
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -13763,12 +13704,12 @@
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.7,
-     "clinic": 5.4,
+     "food": 1.2,
+     "clinic": 2.2,
      "narcan": 0.3,
      "indoors": 0.7
     },
@@ -13873,9 +13814,9 @@
     -82.94469
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 1,
+     "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -13885,8 +13826,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.2,
-     "clinic": 5.6,
+     "food": 0.1,
+     "clinic": 1.9,
      "narcan": 1.3,
      "indoors": 1.7
     },
@@ -13993,27 +13934,24 @@
     -82.94105
    ],
    "help": {
-    "total": 3,
+    "total": 7,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 2,
+     "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.9,
-     "clinic": 6.3,
+     "food": 1,
+     "clinic": 0.7,
      "narcan": 0.3,
      "indoors": 1.4
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -14114,27 +14052,24 @@
     -83.01834
    ],
    "help": {
-    "total": 1,
+    "total": 4,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 1,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.4,
-     "clinic": 2.9,
+     "food": 0.6,
+     "clinic": 1.1,
      "narcan": 0.8,
      "indoors": 1.9
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -14235,19 +14170,19 @@
     -83.13072
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 1
     },
     "nearest_miles": {
-     "food": 0.6,
+     "food": 0.1,
      "clinic": 1.7,
      "narcan": 0.7,
      "indoors": 0.8
@@ -14544,10 +14479,10 @@
     -83.09326
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -14556,14 +14491,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.2,
-     "clinic": 4,
+     "food": 1.8,
+     "clinic": 0.9,
      "narcan": 1.2,
      "indoors": 1.8
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -14678,7 +14612,7 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 1.6,
+     "food": 1.1,
      "clinic": 1.8,
      "narcan": 0.3,
      "indoors": 1.1
@@ -15017,8 +14951,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.8,
-     "clinic": 3.7,
+     "food": 1.9,
+     "clinic": 1.4,
      "narcan": 0.8,
      "indoors": 1.6
     },
@@ -15120,9 +15054,9 @@
     -83.07771
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -15132,13 +15066,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.6,
-     "clinic": 2.8,
+     "food": 0.7,
+     "clinic": 1.4,
      "narcan": 1,
      "indoors": 1.3
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -15243,7 +15176,7 @@
     -83.16299
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
      "health": 0,
@@ -15251,12 +15184,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 1
     },
     "nearest_miles": {
      "food": 1.6,
-     "clinic": 3.4,
+     "clinic": 2.2,
      "narcan": 1.1,
      "indoors": 0.4
     },
@@ -15358,26 +15291,25 @@
     -83.02071
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.2,
-     "clinic": 3.7,
+     "food": 1.1,
+     "clinic": 0.2,
      "narcan": 0.4,
      "indoors": 1.9
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -15590,7 +15522,7 @@
     -83.23033
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -15598,12 +15530,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 6.1,
-     "clinic": 5.4,
+     "food": 2.3,
+     "clinic": 1.9,
      "narcan": 2.2,
      "indoors": 2.2
     },
@@ -15722,8 +15654,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 6.6,
-     "clinic": 4.8,
+     "food": 3.8,
+     "clinic": 3.4,
      "narcan": 0.5,
      "indoors": 0.5
     },
@@ -15815,9 +15747,9 @@
     -83.15338
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -15827,13 +15759,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 3.1,
-     "clinic": 5.9,
+     "food": 0.6,
+     "clinic": 2,
      "narcan": 1.4,
      "indoors": 0.7
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -15927,26 +15858,24 @@
     -83.13869
    ],
    "help": {
-    "total": 6,
+    "total": 12,
     "by": {
-     "food": 3,
-     "health": 0,
+     "food": 5,
+     "health": 2,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 1,
+     "youth": 3,
      "rec": 0
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 2.8,
+     "clinic": 1.3,
      "narcan": 1,
      "indoors": 0.8
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -16146,8 +16075,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 6.7,
-     "clinic": 5,
+     "food": 3.7,
+     "clinic": 3.2,
      "narcan": 0.8,
      "indoors": 0.8
     },
@@ -16238,9 +16167,9 @@
     -82.96213
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -16251,7 +16180,7 @@
     },
     "nearest_miles": {
      "food": 0.4,
-     "clinic": 4.9,
+     "clinic": 1.7,
      "narcan": 1.2,
      "indoors": 1.4
     },
@@ -16371,8 +16300,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.8,
-     "clinic": 4,
+     "food": 1.1,
+     "clinic": 0.8,
      "narcan": 0.4,
      "indoors": 2.4
     },
@@ -16467,8 +16396,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.4,
-     "clinic": 4.7,
+     "food": 0.9,
+     "clinic": 1.1,
      "narcan": 0.7,
      "indoors": 2
     },
@@ -16680,8 +16609,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.7,
-     "clinic": 6.4,
+     "food": 1.2,
+     "clinic": 1.5,
      "narcan": 1.2,
      "indoors": 0.8
     },
@@ -16783,10 +16712,10 @@
     -83.11328
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
@@ -16795,14 +16724,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.5,
-     "clinic": 4.2,
+     "food": 1.5,
+     "clinic": 0.5,
      "narcan": 0.3,
      "indoors": 2.6
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -16887,9 +16815,9 @@
     -83.07051
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -16899,13 +16827,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 2.8,
-     "clinic": 3.1,
+     "food": 0.7,
+     "clinic": 1.7,
      "narcan": 1.4,
      "indoors": 0.7
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -17007,9 +16934,9 @@
     -83.11696
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -17019,13 +16946,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.1,
+     "food": 0.9,
      "clinic": 1.5,
      "narcan": 0.6,
      "indoors": 1.3
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -17140,7 +17066,7 @@
     },
     "nearest_miles": {
      "food": 1.4,
-     "clinic": 1.8,
+     "clinic": 1.7,
      "narcan": 0.2,
      "indoors": 0.8
     },
@@ -17240,26 +17166,24 @@
     -83.12024
    ],
    "help": {
-    "total": 4,
+    "total": 9,
     "by": {
-     "food": 1,
-     "health": 0,
+     "food": 2,
+     "health": 2,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
      "food": 0.2,
-     "clinic": 3.4,
+     "clinic": 0.3,
      "narcan": 0.3,
      "indoors": 1.6
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -17360,9 +17284,9 @@
     -83.00622
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -17372,13 +17296,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.4,
-     "clinic": 2.8,
+     "food": 0.9,
+     "clinic": 1.1,
      "narcan": 1.5,
      "indoors": 1.1
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -17600,9 +17523,9 @@
     -83.20317
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -17612,13 +17535,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.6,
+     "food": 0.8,
      "clinic": 1.5,
      "narcan": 0.9,
      "indoors": 2.4
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -17947,26 +17869,25 @@
     -83.00023
    ],
    "help": {
-    "total": 1,
+    "total": 4,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.9,
-     "clinic": 4.3,
+     "food": 1.2,
+     "clinic": 0.9,
      "narcan": 0.6,
      "indoors": 1.9
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -18081,7 +18002,7 @@
     },
     "nearest_miles": {
      "food": 1.1,
-     "clinic": 3.6,
+     "clinic": 0.6,
      "narcan": 0.2,
      "indoors": 0.5
     },
@@ -18171,25 +18092,24 @@
     -82.95465
    ],
    "help": {
-    "total": 3,
+    "total": 7,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 1,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 1
     },
     "nearest_miles": {
-     "food": 2.6,
-     "clinic": 6.2,
+     "food": 0.6,
+     "clinic": 1.9,
      "narcan": 0.8,
      "indoors": 0.5
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -18292,10 +18212,10 @@
     -82.9498
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -18305,13 +18225,11 @@
     },
     "nearest_miles": {
      "food": 1.1,
-     "clinic": 5.4,
+     "clinic": 0.6,
      "narcan": 1.1,
      "indoors": 1.6
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -18422,8 +18340,8 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 6.6,
-     "clinic": 4.6,
+     "food": 3.7,
+     "clinic": 3.5,
      "narcan": 0.4,
      "indoors": 0.5
     },
@@ -18544,7 +18462,7 @@
     },
     "nearest_miles": {
      "food": 0.9,
-     "clinic": 2.3,
+     "clinic": 1.7,
      "narcan": 1.1,
      "indoors": 0.7
     },
@@ -18637,8 +18555,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.5,
-     "clinic": 2.9,
+     "food": 1.9,
+     "clinic": 2.1,
      "narcan": 0.7,
      "indoors": 1.6
     },
@@ -18738,7 +18656,7 @@
     -83.25478
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
      "health": 0,
@@ -18746,11 +18664,11 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 5,
+     "food": 1.3,
      "clinic": 2,
      "narcan": 0.1,
      "indoors": 3.6
@@ -18912,7 +18830,7 @@
     -83.13366
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
@@ -18920,12 +18838,12 @@
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 1
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 2.8,
+     "clinic": 1.1,
      "narcan": 0.8,
      "indoors": 0.6
     },
@@ -19029,10 +18947,10 @@
     -83.19645
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -19041,14 +18959,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.6,
-     "clinic": 5.5,
+     "food": 1.2,
+     "clinic": 0.2,
      "narcan": 0.9,
      "indoors": 1.7
     },
     "none_listed_yet": [
      "food",
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -19140,10 +19057,10 @@
     -83.18815
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -19152,14 +19069,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.4,
-     "clinic": 5.9,
+     "food": 1.4,
+     "clinic": 0.3,
      "narcan": 0.8,
      "indoors": 1.4
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -19255,9 +19171,9 @@
     -83.2082
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -19267,13 +19183,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.9,
+     "food": 0.8,
      "clinic": 1.7,
      "narcan": 0.8,
      "indoors": 2.5
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -19376,9 +19291,9 @@
     -83.17015
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 3,
      "shelter": 0,
@@ -19388,13 +19303,12 @@
      "rec": 2
     },
     "nearest_miles": {
-     "food": 3.1,
-     "clinic": 5.3,
+     "food": 1.1,
+     "clinic": 1.4,
      "narcan": 0.6,
      "indoors": 0.3
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -19492,10 +19406,10 @@
     -83.19366
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -19504,14 +19418,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.4,
-     "clinic": 5.4,
+     "food": 1,
+     "clinic": 0.2,
      "narcan": 0.7,
      "indoors": 1.5
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -19609,8 +19522,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 7.8,
-     "clinic": 6.1,
+     "food": 4.4,
+     "clinic": 4.1,
      "narcan": 1.9,
      "indoors": 1.9
     },
@@ -19716,26 +19629,25 @@
     -83.03286
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3,
-     "clinic": 3.5,
+     "food": 1.2,
+     "clinic": 0.8,
      "narcan": 0.6,
      "indoors": 1.3
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -19832,9 +19744,9 @@
     -83.13556
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -19844,13 +19756,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.6,
-     "clinic": 5.1,
+     "food": 0.4,
+     "clinic": 1.6,
      "narcan": 1.1,
      "indoors": 1.5
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -19954,8 +19865,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 7.3,
-     "clinic": 5.1,
+     "food": 4.2,
+     "clinic": 4.3,
      "narcan": 1.2,
      "indoors": 1.3
     },
@@ -20060,9 +19971,9 @@
     -83.22364
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -20072,13 +19983,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.5,
+     "food": 0.4,
      "clinic": 1.4,
      "narcan": 0.8,
      "indoors": 2.9
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -20307,8 +20217,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.9,
-     "clinic": 4.6,
+     "food": 1.4,
+     "clinic": 0.8,
      "narcan": 0.2,
      "indoors": 2.6
     },
@@ -20478,8 +20388,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 7.5,
-     "clinic": 5.4,
+     "food": 4.6,
+     "clinic": 4.2,
      "narcan": 1.3,
      "indoors": 1.4
     },
@@ -20594,8 +20504,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3.6,
-     "clinic": 5.1,
+     "food": 0.6,
+     "clinic": 0.9,
      "narcan": 0.2,
      "indoors": 0.7
     },
@@ -20672,25 +20582,24 @@
     -83.1339
    ],
    "help": {
-    "total": 3,
+    "total": 6,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.6,
-     "clinic": 4.5,
+     "food": 0.3,
+     "clinic": 1.7,
      "narcan": 0.3,
      "indoors": 1.7
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -20883,7 +20792,7 @@
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 2.4,
+     "clinic": 2,
      "narcan": 0.9,
      "indoors": 0.2
     },
@@ -20988,25 +20897,24 @@
     -82.9953
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 2.1,
-     "clinic": 3.9,
+     "food": 0.6,
+     "clinic": 1.5,
      "narcan": 0.6,
      "indoors": 1.9
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -21122,7 +21030,7 @@
     },
     "nearest_miles": {
      "food": 1.1,
-     "clinic": 3.6,
+     "clinic": 1,
      "narcan": 0.5,
      "indoors": 0.9
     },
@@ -21241,7 +21149,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 3,
+     "food": 1.2,
      "clinic": 1.1,
      "narcan": 1.1,
      "indoors": 4.3
@@ -21350,26 +21258,24 @@
     -83.23183
    ],
    "help": {
-    "total": 3,
+    "total": 8,
     "by": {
-     "food": 0,
+     "food": 3,
      "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 2,
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.1,
+     "food": 0.5,
      "clinic": 1.4,
      "narcan": 0.2,
      "indoors": 5
     },
-    "none_listed_yet": [
-     "food"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -21482,8 +21388,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.7,
-     "clinic": 4.6,
+     "food": 1,
+     "clinic": 1.1,
      "narcan": 0.7,
      "indoors": 1.2
     },
@@ -21733,9 +21639,9 @@
     -83.23488
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -21745,13 +21651,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.1,
+     "food": 0.9,
      "clinic": 1.7,
      "narcan": 0.7,
      "indoors": 2.6
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -21852,10 +21757,10 @@
     -82.99356
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 1,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
@@ -21864,15 +21769,12 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.2,
-     "clinic": 3.1,
+     "food": 0.6,
+     "clinic": 0.7,
      "narcan": 0.8,
      "indoors": 1
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -21984,7 +21886,7 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 5.4,
+     "food": 1.7,
      "clinic": 2.6,
      "narcan": 0.8,
      "indoors": 2.9
@@ -22179,10 +22081,10 @@
     -82.99777
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 1,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -22191,15 +22093,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 0.8,
-     "clinic": 3.6,
+     "food": 0.6,
+     "clinic": 0.4,
      "narcan": 0.4,
      "indoors": 0.4
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -22297,8 +22196,8 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 4.5,
-     "clinic": 2.6,
+     "food": 1.7,
+     "clinic": 2.4,
      "narcan": 0.5,
      "indoors": 1.7
     },
@@ -22519,10 +22418,10 @@
     -83.19156
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
-     "food": 0,
-     "health": 0,
+     "food": 1,
+     "health": 2,
      "harm": 4,
      "shelter": 0,
      "utilities": 1,
@@ -22531,15 +22430,12 @@
      "rec": 1
     },
     "nearest_miles": {
-     "food": 3.9,
-     "clinic": 4.5,
+     "food": 0.1,
+     "clinic": 0.5,
      "narcan": 0.7,
      "indoors": 1.1
     },
-    "none_listed_yet": [
-     "food",
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -22745,10 +22641,10 @@
     -82.94313
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
-     "health": 0,
+     "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
@@ -22757,14 +22653,13 @@
      "rec": 0
     },
     "nearest_miles": {
-     "food": 1.4,
-     "clinic": 5.9,
+     "food": 0.8,
+     "clinic": 1,
      "narcan": 0.3,
      "indoors": 1.9
     },
     "none_listed_yet": [
-     "food",
-     "health"
+     "food"
     ],
     "coverage_checked": false
    },

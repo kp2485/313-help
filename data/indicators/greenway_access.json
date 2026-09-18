@@ -49,7 +49,7 @@
   {
    "id": "seg_cherrylawn_bridge",
    "name": "Cherrylawn Bridge",
-   "total": 0,
+   "total": 1,
    "by_category": {
     "food": 0,
     "health": 0,
@@ -57,7 +57,7 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0,
+    "youth": 1,
     "rec": 0
    },
    "none_listed_yet": [
@@ -88,7 +88,7 @@
   {
    "id": "seg_conrail_davison_to_intervale",
    "name": "Conrail (Davison to Intervale)",
-   "total": 0,
+   "total": 1,
    "by_category": {
     "food": 0,
     "health": 0,
@@ -96,7 +96,7 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0,
+    "youth": 1,
     "rec": 0
    },
    "none_listed_yet": [
@@ -146,7 +146,7 @@
   {
    "id": "seg_conrail_oakman_to_buena_vista",
    "name": "Conrail (Oakman to Buena Vista)",
-   "total": 0,
+   "total": 1,
    "by_category": {
     "food": 0,
     "health": 0,
@@ -154,7 +154,7 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0,
+    "youth": 1,
     "rec": 0
    },
    "none_listed_yet": [
