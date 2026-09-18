@@ -10,7 +10,9 @@
     "ingest:opendata": "tsx src/ingest-arcgis.ts",
     "geocode": "tsx src/geocode.ts",
     "check:sources": "tsx src/check-sources.ts",
-    "keys:generate": "tsx src/keys.ts"
+    "keys:generate": "tsx src/keys.ts",
+    "check:emergency": "tsx src/check-emergency.ts",
+    "ingest:greenway": "tsx src/ingest-greenway.ts"
   },
   "dependencies": {
     "@detroithelp/query": "workspace:*",
@@ -20,5 +22,10 @@
     "csv-stringify": "^6.5.1",
     "yaml": "^2.5.1"
   },
-  "devDependencies": { "tsx": "^4.19.0", "typescript": "^5.6.0", "vitest": "^2.1.0", "@types/node": "^22.0.0" }
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.0.0"
+  }
 }

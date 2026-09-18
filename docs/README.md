@@ -20,8 +20,9 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 08 | [Privacy & safety](08-privacy-safety.md) | No-PII design, anonymous reporting, youth, harm-reduction content, App Store review |
 | 09 | [Roadmap & open questions](09-roadmap.md) | Hackathon scope, v1, v2, decisions Kyle needs to make |
 | 10 | [Adversarial audit](10-adversarial-audit.md) | Where docs 01–09 break their own rules, ranked, with fixes and a web fact-check. **Read before building.** |
-| 11 | [Healthy places](11-greenway-public-places.md) | Proposal: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
+| 11 | [Healthy places](11-greenway-public-places.md) | Approved: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
 | 12 | [Gift & handoff](12-gift-and-handoff.md) | What "open-source gift to the city" demands of the design: unattended operation, dead-man switch, transfer checklist, costs |
+| 13 | [Neighborhood indicators](13-neighborhood-indicators.md) | Citywide public-data picture for all 205 neighborhoods; honesty rules; the greenway as one lens |
 | — | [DECISIONS.md](DECISIONS.md) | Decisions the docs don't cover; audit fixes awaiting approval |
 | — | [CLAUDE.md](../CLAUDE.md) | Handoff instructions for Claude Code |
 

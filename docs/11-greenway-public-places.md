@@ -1,6 +1,6 @@
 # 11 — Healthy Places: the Joe Louis Greenway, Parks, and Rec Sites
 
-Status: **proposal**, 2026-09-18. Changes scope set in 01. Nothing here is built. Facts marked **[checked]** were verified on the web on this date.
+Status: **approved by Kyle 2026-09-18.** Changes scope set in 01. Built so far: segment ingest (52 segments, 20 open), on-device geometry (`packages/query/src/places.ts`), access-shed report. **Layer B below is superseded by [doc 13](13-neighborhood-indicators.md): the public-data indicators now cover every Detroit neighborhood, with the greenway study area as one lens.** Facts marked **[checked]** were verified on the web on this date.
 
 ## Why this belongs in a help app (and the test for what doesn't)
 
@@ -121,7 +121,7 @@ Two layers. Neither touches resident data.
 - **Access shed:** for each open segment, the count of verified help resources within a 10-minute walk, by category — and the gaps ("no free food within ½ mile of the Intervale segment"). Recomputed every build; tracked over time. This measures the greenway as a connector, which no public dataset does.
 - *Not* per-user anything. If analytics ever turn on (audit B7), place views are category-level weekly counts. We do not count "visits," and we say so: the right tool for visits is a **trail counter**, not a phone. Whether counters exist on the route is not published **[checked: could not verify]** — ask, and ingest them as an owner feed if they do.
 
-**Layer B — public data inside the City's own study area (the real impact story):**
+**Layer B — superseded: see [doc 13](13-neighborhood-indicators.md) (citywide, all 205 neighborhoods; the greenway study area is one lens). The table below is kept for the greenway-specific caveats.**
 A static, public dashboard page (built by the pipeline, no server) comparing the ½-mile planning-study area to the rest of the city and to itself over time, using open datasets **[checked, all exist on data.detroitmi.gov]**:
 
 | Question the framework plan asks | Dataset | Caveat |

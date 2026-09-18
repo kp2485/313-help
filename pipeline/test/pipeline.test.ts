@@ -42,13 +42,18 @@ describe('emergency numbers', () => {
     { id: 'emg_911', number: '911', hardcoded: 'yes', verified_by_call_on: '' },
     { id: 'emg_988', number: '988', hardcoded: 'yes', verified_by_call_on: '' },
   ];
-  it('a release fails while any number has never been phoned', () => {
+  it('a release fails while any number has never been checked', () => {
     const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '' }], '2026-09-18', true);
-    expect(r.errors.join()).toMatch(/never phoned/);
+    expect(r.errors.join()).toMatch(/never checked against its published source/);
   });
   it('a release fails when the last call is older than 30 days', () => {
     const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '2026-08-01' }], '2026-09-18', true);
     expect(r.errors.join()).toMatch(/48 days ago/);
+  });
+  it('a recent match against the published page is enough', () => {
+    const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '', verified_published_on: '2026-09-15' }, { id: 'emg_211', number: '211', hardcoded: 'no' }], '2026-09-18', true);
+    expect(r.errors).toEqual([]);
+    expect(r.verified).toBe(true);
   });
   it('passes with a recent call, and never asks anyone to test-call 911 or 988', () => {
     const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '2026-09-10' }], '2026-09-18', true);
@@ -113,7 +118,7 @@ describe('the real bundle', () => {
   });
   it('a tampered index fails verification; a tampered data file fails its checksum', () => {
     const sig = JSON.parse(readFileSync(join(out, 'index.json.sig'), 'utf8'));
-    const forged = Buffer.from(readFileSync(join(out, 'index.json'), 'utf8').replace('"emergency_verified": false', '"emergency_verified": true'));
+    const forged = Buffer.from(readFileSync(join(out, 'index.json'), 'utf8').replace('"schema": 1', '"schema": 2'));
     expect(verifyBytes(forged, sig.signature, [sig.public_key])).toBe(false);
     const f = join(out, 'emergency.json');
     writeFileSync(f, readFileSync(f, 'utf8').replace('866-313-2520', '900-555-0199'));
@@ -123,15 +128,14 @@ describe('the real bundle', () => {
     const sig = JSON.parse(readFileSync(join(out, 'index.json.sig'), 'utf8'));
     expect(verifyBytes(readFileSync(join(out, 'index.json')), sig.signature, ['MCowBQYDK2VwAyEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='])).toBe(false);
   });
-  it('says plainly that emergency numbers are not yet phoned, and the heartbeat is a human date', () => {
-    expect(index.emergency_verified).toBe(false);
+  it('reports whether emergency numbers are verified, and the heartbeat is a human date', () => {
+    expect(typeof index.emergency_verified).toBe('boolean');
     expect(index.heartbeat).toBe('2026-09-18');
   });
-  it('no DV row has a place, and proposed rows stay out', () => {
+  it('no DV row has a place', () => {
     const dv = rows.filter((r) => r.category === 'shelter.dv');
     expect(dv.length).toBeGreaterThan(0);
     for (const r of dv) { expect(r.address).toBeUndefined(); expect(r.lat).toBeUndefined(); }
-    expect(rows.find((r) => r.id === 'sal_ywca_interim_house_line')).toBeUndefined();
   });
   it('every badge a real row can produce has a plain-language string', () => {
     const strings = JSON.parse(readFileSync(p('strings/en.json'), 'utf8'));

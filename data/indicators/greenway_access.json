@@ -1,0 +1,381 @@
+{
+ "generated_from": "data/bundle/v1",
+ "walk_miles": 0.5,
+ "source": {
+  "name": "Joe Louis Greenway Route Segments",
+  "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Joe_Louis_Greenway_Routes/FeatureServer/0",
+  "last_edited": "2026-09-13",
+  "fetched_at": "2026-09-18"
+ },
+ "segments": [
+  {
+   "id": "seg_bagley_16th_to_15th",
+   "name": "Bagley (16th to 15th)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_bagley_streetscape_i_96_to_24th",
+   "name": "Bagley Streetscape (I-96 to 24th)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_cherrylawn_bridge",
+   "name": "Cherrylawn Bridge",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_chicago_connector_chicago_to_oakman",
+   "name": "Chicago Connector (Chicago to Oakman)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_conrail_davison_to_intervale",
+   "name": "Conrail (Davison to Intervale)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_conrail_grand_river_to_oakman",
+   "name": "Conrail (Grand River to Oakman)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_conrail_joy_to_chicago",
+   "name": "Conrail (Joy to Chicago)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_conrail_oakman_to_buena_vista",
+   "name": "Conrail (Oakman to Buena Vista)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_conrail_warren_to_joy",
+   "name": "Conrail (Warren to Joy)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_dequindre_cut_detroit_riverwalk",
+   "name": "Dequindre Cut/Detroit Riverwalk",
+   "total": 1,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 1,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health"
+   ]
+  },
+  {
+   "id": "seg_ghib_junction_fort_campbell_jefferson_green_open",
+   "name": "GHIB (Junction, Fort, Campbell, Jefferson, Green)",
+   "total": 2,
+   "by_category": {
+    "food": 0,
+    "health": 1,
+    "harm": 1,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food"
+   ]
+  },
+  {
+   "id": "seg_grand_river",
+   "name": "Grand River",
+   "total": 1,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 1,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health"
+   ]
+  },
+  {
+   "id": "seg_i_96_75_pedestrian_bridge",
+   "name": "I-96/75 Pedestrian Bridge",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_jos_campau_holbrook_to_hamtramck_drive",
+   "name": "Jos Campau (Holbrook to Hamtramck Drive)",
+   "total": 0,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 0,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health",
+    "harm"
+   ]
+  },
+  {
+   "id": "seg_jos_campau_mcnichols_to_carpenter",
+   "name": "Jos Campau (McNichols to Carpenter)",
+   "total": 1,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 1,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health"
+   ]
+  },
+  {
+   "id": "seg_oakman_boulevard",
+   "name": "Oakman Boulevard",
+   "total": 1,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 1,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health"
+   ]
+  },
+  {
+   "id": "seg_riverfront_dequindre_cut_to_8th",
+   "name": "Riverfront (Dequindre Cut to 8th)",
+   "total": 5,
+   "by_category": {
+    "food": 1,
+    "health": 0,
+    "harm": 4,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "health"
+   ]
+  },
+  {
+   "id": "seg_southwest_greenway",
+   "name": "Southwest Greenway",
+   "total": 1,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 1,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health"
+   ]
+  },
+  {
+   "id": "seg_west_grand_boulevard_riverfront_to_bagley",
+   "name": "West Grand Boulevard (Riverfront to Bagley)",
+   "total": 2,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 2,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health"
+   ]
+  },
+  {
+   "id": "seg_west_jefferson_8th_to_rosa_parks",
+   "name": "West Jefferson (8th to Rosa Parks)",
+   "total": 1,
+   "by_category": {
+    "food": 0,
+    "health": 0,
+    "harm": 1,
+    "shelter": 0,
+    "utilities": 0,
+    "hygiene": 0,
+    "youth": 0
+   },
+   "none_listed_yet": [
+    "food",
+    "health"
+   ]
+  }
+ ]
+}

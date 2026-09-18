@@ -4,7 +4,7 @@
 //                                and BUNDLE_SIGNING_KEY is set
 
 import { execSync } from 'node:child_process';
-import { readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import type { Alert, BundleRow } from '@detroithelp/query';
 import { p, readCsv, sha256, today, writeJson, type CsvRow } from './util.js';
 import { loadSources } from './ingest-arcgis.js';
@@ -76,12 +76,17 @@ export async function build(opts: BuildOptions = {}) {
   const cutoff = new Date(now.getTime() - 90 * 86400000).toISOString().slice(0, 10);
   put('archived.json', rows.filter((r) => r.status === 'archived' && (r.archived?.at ?? '') >= cutoff)
     .map((r) => ({ id: r.id, name: r.name, category: r.category, archived: r.archived })));
+  // Greenway segments (docs/11): fetched after the help categories, so a phone that only ever
+  // loads food never downloads a trail map.
+  const jlg = p('data/ingested/jlg_segments.json');
+  if (existsSync(jlg)) { const g = JSON.parse(readFileSync(jlg, 'utf8')); counts.greenway_segments = g.segments.length; put('places/greenway.json', g); }
   put('alerts.json', alerts.filter((a) => a.status === 'published' && Date.parse(a.ends_at) > now.getTime()));
   put('emergency.json', emergency.sort((a, b) => Number(a.sort) - Number(b.sort))
     .map((r) => ({ id: r.id, label: r.label, number: r.number, ...(r.sms ? { sms: r.sms } : {}), hardcoded: r.hardcoded === 'yes' })));
 
   // Dates a person did something: phoned an emergency number, or checked a row in. These live in
   // committed CSVs, so a nightly job that only rebuilds cannot move the heartbeat forward.
+  // verified_published_on is a machine check, so it does not count as a human date.
   const humanDates = [...emergency.map((r) => r.verified_by_call_on), ...rows.map((r) => r.facts.checked_at_entry)]
     .filter((d): d is string => !!d).map((d) => d.slice(0, 10)).sort();
   const { key, kind } = loadSigningKey(!!opts.release);
@@ -95,7 +100,7 @@ export async function build(opts: BuildOptions = {}) {
   writeJson(`${out}/index.json.sig`, { alg: 'Ed25519', signature: signBytes(indexBytes, key), public_key: publicKeyB64(key) });
 
   const total = Object.values(files).reduce((n, f) => n + f.bytes, 0) + indexBytes.length;
-  log(`bundle ${index.version}: ${live.length} rows in ${Object.keys(counts).length} categories, ${(total / 1024).toFixed(0)} KB, signed (${kind}), emergency numbers ${emg.verified ? 'verified' : 'NOT yet phoned'}`);
+  log(`bundle ${index.version}: ${live.length} rows in ${Object.keys(counts).length} categories, ${(total / 1024).toFixed(0)} KB, signed (${kind}), emergency numbers ${emg.verified ? 'match their published sources' : 'NOT yet checked'}`);
   log('  ', Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(' · '));
   return { index, out, rows, services, warnings };
 }

@@ -1,0 +1,122 @@
+{
+  "description": "Greenway geometry on the device: help within a 10-minute walk (0.5 mi) of a segment, nearest open segment to a listing, and snapping a report to a segment so raw GPS never leaves the phone. 0.01 deg of latitude is about 0.69 mi.",
+  "segments": [
+    {
+      "id": "seg_test_open",
+      "name": "Test Open",
+      "phase": "open",
+      "lines": [
+        [
+          [
+            -83.1,
+            42.37
+          ],
+          [
+            -83.06,
+            42.37
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "seg_test_planned",
+      "name": "Test Planned",
+      "phase": "planned",
+      "lines": [
+        [
+          [
+            -83.06,
+            42.37
+          ],
+          [
+            -83.06,
+            42.4
+          ]
+        ]
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "sal_on_trail",
+      "lat": 42.3705,
+      "lon": -83.08
+    },
+    {
+      "id": "sal_quarter_mile",
+      "lat": 42.3736,
+      "lon": -83.09
+    },
+    {
+      "id": "sal_past_the_end",
+      "lat": 42.37,
+      "lon": -83.05
+    },
+    {
+      "id": "sal_one_mile",
+      "lat": 42.3845,
+      "lon": -83.08
+    },
+    {
+      "id": "sal_near_planned_only",
+      "lat": 42.395,
+      "lon": -83.061
+    },
+    {
+      "id": "sal_hotline",
+      "availability": "always"
+    },
+    {
+      "id": "sal_archived_on_trail",
+      "status": "archived",
+      "lat": 42.3701,
+      "lon": -83.08
+    }
+  ],
+  "cases": [
+    {
+      "name": "rows within half a mile of the segment, nearest first; hotlines and archived rows never appear",
+      "fn": "helpAlong",
+      "segment": "seg_test_open",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": [
+        "sal_on_trail",
+        "sal_quarter_mile"
+      ]
+    },
+    {
+      "name": "distance is to the nearest point of the line, including past its end",
+      "fn": "milesToSegment",
+      "segment": "seg_test_open",
+      "row": "sal_past_the_end",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": 0.51,
+      "tolerance": 0.02
+    },
+    {
+      "name": "a listing is only ever described as near an OPEN segment",
+      "fn": "nearestSegment",
+      "row": "sal_near_planned_only",
+      "openOnly": true,
+      "maxMiles": 0.5,
+      "now": "2026-09-18T17:45:00Z",
+      "expect": null
+    },
+    {
+      "name": "a report snaps to the nearest segment of any phase",
+      "fn": "nearestSegment",
+      "row": "sal_near_planned_only",
+      "now": "2026-09-18T17:45:00Z",
+      "expect": "seg_test_planned"
+    },
+    {
+      "name": "near the open trail",
+      "fn": "nearestSegment",
+      "row": "sal_quarter_mile",
+      "openOnly": true,
+      "maxMiles": 0.5,
+      "now": "2026-09-18T17:45:00Z",
+      "expect": "seg_test_open"
+    }
+  ]
+}

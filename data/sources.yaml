@@ -39,7 +39,8 @@ sources:
   - id: jlg_route_segments
     name: Joe Louis Greenway Route Segments
     tier: A
-    kind: arcgis
+    kind: arcgis_lines   # handled by ingest-greenway.ts -> data/ingested/jlg_segments.json
     url: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Joe_Louis_Greenway_Routes/FeatureServer/0
     license: unstated
-    enabled: false       # docs/11 is still a proposal
+    # docs/11 approved 2026-09-18. PHASE_DESCRIPTION (Open / Under Construction / Funded / Unfunded)
+    # is the truth for "can I walk here today".

@@ -5751,5 +5751,414 @@
    "category": "utilities"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "b8d7941a-76db-5381-8f20-5f1fa882a701",
+  "name": "Walk-in help with applications",
+  "status": "active",
+  "description": "Walk in for help applying for water, energy, or rent help.",
+  "url": "https://www.waynemetro.org",
+  "organization": {
+   "id": "0b326bf5-0d09-5719-b768-2a5164b496e9",
+   "name": "Wayne Metropolitan Community Action Agency",
+   "description": "Wayne Metropolitan Community Action Agency",
+   "x_detroit": {
+    "id": "org_wayne_metro"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "c4c7f40e-e7bf-5344-a393-ae0b250e6681",
+    "location": {
+     "id": "ca2c2828-235b-5534-a7e2-7066ac50eb92",
+     "name": "Wayne Metro Welcome Center",
+     "location_type": "physical",
+     "latitude": 42.370491,
+     "longitude": -83.073392,
+     "addresses": [
+      {
+       "id": "4f495bfa-b6ed-5e00-adef-486219e8c257",
+       "address_1": "7310 Woodward Ave, Suite 114",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_wayne_metro_walkin_welcome_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "44957ea9-5034-5cc7-a28b-0bfdc7beeadb",
+      "number": "313-388-9799"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "31e1e8a0-1091-59c8-a3a6-b6c84bbac759",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "3e9f171e-368a-5887-bebb-00c48b4c1b1c",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_wayne_metro_walkin_welcome_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Wayne Metropolitan Community Action Agency website",
+      "url": "https://www.waynemetro.org/location-directory/"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "9bf27153-4a21-5e55-85f9-0e35a53b0238",
+    "location": {
+     "id": "3f8e469b-75ce-5eb9-8d94-ff5f95e03113",
+     "name": "Dresner Community Center",
+     "location_type": "physical",
+     "latitude": 42.327723,
+     "longitude": -83.119511,
+     "addresses": [
+      {
+       "id": "7077a686-6988-5bea-81fa-ed232484c05b",
+       "address_1": "3700 Gilbert St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_wayne_metro_walkin_dresner"
+     }
+    },
+    "phones": [
+     {
+      "id": "28b503cc-2637-50ac-8195-21f2172092d5",
+      "number": "313-388-9799"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "8a8abcc0-8b9b-5ee5-b4ba-47fb8bb95e26",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "044d8732-04d6-5f57-9d95-c6db83910537",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_wayne_metro_walkin_dresner",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Wayne Metropolitan Community Action Agency website",
+      "url": "https://www.waynemetro.org/location-directory/"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "3a00a214-fb3a-52c0-9f4f-0820cd80fdc6",
+    "location": {
+     "id": "5159c356-352a-5bf1-bb5d-f70b099e7039",
+     "name": "Wayne Metro West Client Service Center",
+     "location_type": "physical",
+     "latitude": 42.422235,
+     "longitude": -83.170288,
+     "addresses": [
+      {
+       "id": "a938c545-b825-52b9-a34c-a8eb1667e04c",
+       "address_1": "18100 Meyers Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48235",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_wayne_metro_walkin_west"
+     }
+    },
+    "phones": [
+     {
+      "id": "b5a53af5-ecfe-5d8b-b310-1e4440e434b9",
+      "number": "313-388-9799"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "e0cc282f-911c-5c37-95bd-d8bb159941de",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "1e896944-fa51-52dd-83f9-e30de4d6d769",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_wayne_metro_walkin_west",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Wayne Metropolitan Community Action Agency website",
+      "url": "https://www.waynemetro.org/location-directory/"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "9741b8eb-644f-597c-9097-f6d5aa47d5e1",
+    "location": {
+     "id": "80be3139-fa53-5cca-bbf5-8bcc024f9c0a",
+     "name": "Wayne Metro East Client Service Center",
+     "location_type": "physical",
+     "latitude": 42.391255,
+     "longitude": -82.980562,
+     "addresses": [
+      {
+       "id": "3b14c807-af86-57d9-b927-e92f595006a7",
+       "address_1": "5555 Conner St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48213",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_wayne_metro_walkin_east"
+     }
+    },
+    "phones": [
+     {
+      "id": "77af6045-7c22-5510-add6-fd3f86467867",
+      "number": "313-388-9799"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "25464351-8506-52fe-9b8c-83b735ffdd1e",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "09257f4d-7b2a-5da5-a076-cc9046bf543d",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_wayne_metro_walkin_east",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 90,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Wayne Metropolitan Community Action Agency website",
+      "url": "https://www.waynemetro.org/location-directory/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_wayne_metro_walkin",
+   "category": "utilities"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "09c31602-ca5b-5d42-adda-9f1c3bc71392",
+  "name": "Interim House crisis line",
+  "status": "active",
+  "description": "24-hour crisis line and help making a safety plan. You do not have to be in danger right now to call.",
+  "url": "https://www.ywcadetroit.org",
+  "organization": {
+   "id": "4c556bf8-f70e-52f9-917a-4ad0db74a2d6",
+   "name": "YWCA Metropolitan Detroit",
+   "description": "YWCA Metropolitan Detroit",
+   "x_detroit": {
+    "id": "org_ywca_metro_detroit"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e584eeab-a495-5670-89a6-a3be031bcd9c",
+    "location": {
+     "id": "1458cf42-67dc-5096-9670-be742e9005ca",
+     "name": "Interim House crisis line",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_ywca_interim_house_line"
+     }
+    },
+    "phones": [
+     {
+      "id": "7218342f-78a1-5c4e-8f38-7d0704e7c42c",
+      "number": "313-861-5300"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ywca_interim_house_line",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "YWCA Metropolitan Detroit website",
+      "url": "https://www.ywcadetroit.org/get-help/domestic-violence-support-safety/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_ywca_interim_house_line",
+   "category": "shelter.dv"
+  },
+  "assured_date": "2026-09-18"
  }
 ]

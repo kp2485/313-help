@@ -30,7 +30,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 - **Not an intake system.** It never asks who you are. "Someone will contact you" workflows belong to 211/CIE and CAM, where humans answer.
 - **Not a city app.** Shipped by Kyle Peterson / Linwood Technologies. DHD content is used with permission and attributed; the city's name is not on the store listing unless a written agreement says so.
 - **Not a case-management or bed-management tool.** Real-time shelter availability is 313SafeBeds' domain; we link to it or embed its public status when it exists.
-- **Not a general Detroit services app** (permits, taxes, trash pickup). Scope is *help for people in need*.
+- **Not a general Detroit services app** (permits, taxes, trash pickup). Scope is *help and healthy places*: things that are free, physical, near you, and good for you — a pantry, a clinic, a park restroom, an open stretch of the Joe Louis Greenway (doc 11, approved 2026-09-18). Crisis users pay nothing for the places features: Home order, triage, and the first bundle files are unchanged.
 - **Not a scraper that rehosts other directories.** We ingest sources we have rights to, attribute them, and add value through verification and reporting.
 
 ## Design principles (test every decision against these)

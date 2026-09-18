@@ -65,11 +65,13 @@ export function validateEmergency(rows: CsvRow[], todayStr: string, release: boo
       need.delete(r.id!);
       continue; // 911 and 988 are never test-called
     }
-    const on = r.verified_by_call_on;
+    if (parsePhone(r.number ?? '')?.number.length === 3) continue; // national three-digit codes (211)
+    // Either a logged phone call or a match against the owner's published page counts (check:emergency).
+    const on = [r.verified_by_call_on, r.verified_published_on].filter(Boolean).sort().pop();
     const age = on ? Math.round((Date.parse(todayStr) - Date.parse(on)) / 86400000) : Infinity;
     if (age > 30) {
       verified = false;
-      (release ? errors : warnings).push(`${r.id} (${r.number}): ${on ? `last phoned ${on}, ${age} days ago` : 'never phoned'}; a release needs a call within 30 days`);
+      (release ? errors : warnings).push(`${r.id} (${r.number}): ${on ? `last checked ${on}, ${age} days ago` : 'never checked against its published source'}; a release needs a check within 30 days (pnpm check:emergency)`);
     }
   }
   for (const id of need.keys()) errors.push(`${id} is missing from emergency.csv`);

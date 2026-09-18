@@ -22,7 +22,7 @@ Tab bar (max 4): **Home · Map · Search · Saved**. No profile tab — there is
 
 ## Home
 
-- **Emergency strip**: pinned, high contrast. Two fixed buttons (**911**, **Shelter**) plus "More urgent numbers," so it survives the largest text sizes on a 320dp screen. **911 and 988 are hardcoded and can never be overridden.** Other numbers come from `emergency.csv` through the signed bundle, so they can be corrected without a store release but not by a tampered feed (10-A5). Each is phoned every 30 days; the release build fails otherwise.
+- **Emergency strip**: pinned, high contrast. Two fixed buttons (**911**, **Shelter**) plus "More urgent numbers," so it survives the largest text sizes on a 320dp screen. **911 and 988 are hardcoded and can never be overridden.** Other numbers come from `emergency.csv` through the signed bundle, so they can be corrected without a store release but not by a tampered feed (10-A5). Each must match what its owner currently publishes, machine-checked every 30 days (`pnpm check:emergency`); the release build fails otherwise.
 - **Alerts**: cards with title, ends-at ("through Wed 12pm"), one action button. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
 - **"What do you need?"** is a heading, not a button: the needs are listed right on Home, one tap each (10-B13). Principle 3 path: need (1) → refinement if any (2) → **Call** (3).
 - **Category grid**: Food · Shelter tonight · Narcan · Warm/Cool · Health · Utilities · Rent help · Showers · More.

@@ -1,0 +1,1346 @@
+{
+ "source": {
+  "name": "Joe Louis Greenway Route Segments",
+  "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Joe_Louis_Greenway_Routes/FeatureServer/0",
+  "last_edited": "2026-09-13",
+  "fetched_at": "2026-09-18"
+ },
+ "segments": [
+  {
+   "id": "seg_bagley_16th_to_15th",
+   "name": "Bagley (16th to 15th)",
+   "phase": "open",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.07604,
+      42.32604
+     ],
+     [
+      -83.07414,
+      42.32662
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_bagley_21st_to_16th",
+   "name": "Bagley (21st to 16th)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.08143,
+      42.32439
+     ],
+     [
+      -83.07604,
+      42.32604
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_bagley_24th_to_w_grand",
+   "name": "Bagley (24th to W. Grand)",
+   "phase": "planned",
+   "typology": "Shared street",
+   "lines": [
+    [
+     [
+      -83.0885,
+      42.32201
+     ],
+     [
+      -83.08598,
+      42.32299
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_bagley_streetscape_i_96_to_24th",
+   "name": "Bagley Streetscape (I-96 to 24th)",
+   "phase": "open",
+   "typology": "Shared street",
+   "lines": [
+    [
+     [
+      -83.08598,
+      42.32299
+     ],
+     [
+      -83.08407,
+      42.32358
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_cherrylawn_bridge",
+   "name": "Cherrylawn Bridge",
+   "phase": "open",
+   "typology": "Bridge",
+   "lines": [
+    [
+     [
+      -83.15415,
+      42.38599
+     ],
+     [
+      -83.15474,
+      42.38591
+     ],
+     [
+      -83.15458,
+      42.3859
+     ],
+     [
+      -83.15457,
+      42.38422
+     ],
+     [
+      -83.154,
+      42.38412
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_chicago_connector_chicago_to_oakman",
+   "name": "Chicago Connector (Chicago to Oakman)",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.15126,
+      42.36837
+     ],
+     [
+      -83.14987,
+      42.36837
+     ],
+     [
+      -83.14871,
+      42.36764
+     ],
+     [
+      -83.14866,
+      42.36652
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_clark_park",
+   "name": "Clark Park",
+   "phase": "funded",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.0912,
+      42.31409
+     ],
+     [
+      -83.0896,
+      42.31478
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_davison_to_intervale",
+   "name": "Conrail (Davison to Intervale)",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.14849,
+      42.39159
+     ],
+     [
+      -83.1489,
+      42.39103
+     ],
+     [
+      -83.14925,
+      42.38981
+     ],
+     [
+      -83.1492,
+      42.38611
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_dequindre_to_mcnichols",
+   "name": "Conrail (Dequindre to McNichols)",
+   "phase": "under_construction",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.07261,
+      42.41854
+     ],
+     [
+      -83.07506,
+      42.41855
+     ],
+     [
+      -83.08186,
+      42.41605
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_grand_river_to_oakman",
+   "name": "Conrail (Grand River to Oakman)",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.14878,
+      42.37696
+     ],
+     [
+      -83.14865,
+      42.3735
+     ],
+     [
+      -83.14881,
+      42.37287
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_intervale_to_livernois",
+   "name": "Conrail (Intervale to Livernois)",
+   "phase": "under_construction",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.13967,
+      42.39464
+     ],
+     [
+      -83.14208,
+      42.39392
+     ],
+     [
+      -83.14721,
+      42.39195
+     ],
+     [
+      -83.14772,
+      42.39206
+     ],
+     [
+      -83.14849,
+      42.39159
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_joy_to_chicago",
+   "name": "Conrail (Joy to Chicago)",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.14866,
+      42.36652
+     ],
+     [
+      -83.14857,
+      42.36386
+     ],
+     [
+      -83.14778,
+      42.36328
+     ],
+     [
+      -83.14772,
+      42.36204
+     ],
+     [
+      -83.14835,
+      42.36167
+     ],
+     [
+      -83.14828,
+      42.35916
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_livernois_to_rosa_parks",
+   "name": "Conrail (Livernois to Rosa Parks)",
+   "phase": "under_construction",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.1176,
+      42.40255
+     ],
+     [
+      -83.11871,
+      42.40238
+     ],
+     [
+      -83.13692,
+      42.39579
+     ],
+     [
+      -83.13967,
+      42.39464
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_oakman_to_buena_vista",
+   "name": "Conrail (Oakman to Buena Vista)",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.14878,
+      42.37696
+     ],
+     [
+      -83.14902,
+      42.3828
+     ],
+     [
+      -83.14963,
+      42.38316
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_warren_to_joy",
+   "name": "Conrail (Warren to Joy)",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.14828,
+      42.35916
+     ],
+     [
+      -83.14765,
+      42.34901
+     ],
+     [
+      -83.14779,
+      42.34483
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_woodrow_wilson_to_woodward",
+   "name": "Conrail (Woodrow Wilson to Woodward)",
+   "phase": "under_construction",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.10104,
+      42.41142
+     ],
+     [
+      -83.10385,
+      42.41036
+     ],
+     [
+      -83.10519,
+      42.40968
+     ],
+     [
+      -83.10748,
+      42.40727
+     ],
+     [
+      -83.10862,
+      42.40646
+     ],
+     [
+      -83.11543,
+      42.40372
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_conrail_woodward_to_dequindre",
+   "name": "Conrail (Woodward to Dequindre)",
+   "phase": "funded",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.08186,
+      42.41605
+     ],
+     [
+      -83.08451,
+      42.41513
+     ],
+     [
+      -83.08594,
+      42.41489
+     ],
+     [
+      -83.08978,
+      42.4152
+     ],
+     [
+      -83.09094,
+      42.4151
+     ],
+     [
+      -83.10101,
+      42.41143
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_davison_cherrylawn_bridge_to_conrail",
+   "name": "Davison (Cherrylawn Bridge to Conrail)",
+   "phase": "funded",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.1492,
+      42.38611
+     ],
+     [
+      -83.15415,
+      42.38599
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_dequindre_cut_detroit_riverwalk",
+   "name": "Dequindre Cut/Detroit Riverwalk",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.02655,
+      42.33318
+     ],
+     [
+      -83.03455,
+      42.34547
+     ],
+     [
+      -83.03566,
+      42.34685
+     ],
+     [
+      -83.04065,
+      42.35434
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_dequindre_cut_extension_e_warren_to_mack",
+   "name": "Dequindre Cut Extension (E. Warren to Mack)",
+   "phase": "funded",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.04065,
+      42.35434
+     ],
+     [
+      -83.04673,
+      42.36354
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_dubois_greenway_st_aubin_to_forest",
+   "name": "Dubois Greenway (St. Aubin to Forest)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.04281,
+      42.36497
+     ],
+     [
+      -83.04559,
+      42.36915
+     ],
+     [
+      -83.04602,
+      42.369
+     ],
+     [
+      -83.04866,
+      42.37286
+     ],
+     [
+      -83.04968,
+      42.37252
+     ],
+     [
+      -83.05046,
+      42.37369
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_east_warren_east_forest_dubois_to_dequindre",
+   "name": "East Warren/East Forest (Dubois to Dequindre)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.04673,
+      42.36354
+     ],
+     [
+      -83.04281,
+      42.36497
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_fisher_service_drive_clark_to_junction",
+   "name": "FIsher Service Drive (Clark to Junction)",
+   "phase": "funded",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.09739,
+      42.31162
+     ],
+     [
+      -83.0912,
+      42.31409
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_ghib_junction_fort_campbell_jefferson_green_open",
+   "name": "GHIB (Junction, Fort, Campbell, Jefferson, Green)",
+   "phase": "open",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.11424,
+      42.30405
+     ],
+     [
+      -83.11091,
+      42.29945
+     ],
+     [
+      -83.11039,
+      42.29913
+     ],
+     [
+      -83.10873,
+      42.29889
+     ],
+     [
+      -83.10823,
+      42.29859
+     ],
+     [
+      -83.1073,
+      42.29729
+     ],
+     [
+      -83.10734,
+      42.29611
+     ],
+     [
+      -83.10674,
+      42.29526
+     ],
+     [
+      -83.10121,
+      42.29766
+     ],
+     [
+      -83.09791,
+      42.30118
+     ],
+     [
+      -83.09363,
+      42.30288
+     ],
+     [
+      -83.098,
+      42.30894
+     ],
+     [
+      -83.09606,
+      42.30978
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_ghib_junction_fort_campbell_jefferson_green_under_construction",
+   "name": "GHIB (Junction, Fort, Campbell, Jefferson, Green)",
+   "phase": "under_construction",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.09606,
+      42.30978
+     ],
+     [
+      -83.09739,
+      42.31162
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_grand_river",
+   "name": "Grand River",
+   "phase": "open",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.14881,
+      42.37287
+     ],
+     [
+      -83.15058,
+      42.37356
+     ],
+     [
+      -83.15062,
+      42.3733
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_hamtramck_drive_joseph_campau_to_st_aubin",
+   "name": "Hamtramck Drive (Joseph Campau to St. Aubin)",
+   "phase": "under_construction",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.05046,
+      42.37369
+     ],
+     [
+      -83.05118,
+      42.37402
+     ],
+     [
+      -83.05506,
+      42.37989
+     ],
+     [
+      -83.05525,
+      42.38053
+     ],
+     [
+      -83.05506,
+      42.38129
+     ],
+     [
+      -83.05253,
+      42.38498
+     ],
+     [
+      -83.05185,
+      42.38562
+     ],
+     [
+      -83.05078,
+      42.38615
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_i_96_75_pedestrian_bridge",
+   "name": "I-96/75 Pedestrian Bridge",
+   "phase": "open",
+   "typology": "Bridge",
+   "lines": [
+    [
+     [
+      -83.08407,
+      42.32358
+     ],
+     [
+      -83.08399,
+      42.32378
+     ],
+     [
+      -83.08392,
+      42.32366
+     ],
+     [
+      -83.08181,
+      42.3245
+     ],
+     [
+      -83.08143,
+      42.32439
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_jos_campau_carpenter_to_caniff",
+   "name": "Jos Campau (Carpenter to Caniff)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.05985,
+      42.39982
+     ],
+     [
+      -83.0643,
+      42.40635
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_jos_campau_holbrook_to_hamtramck_drive",
+   "name": "Jos Campau (Holbrook to Hamtramck Drive)",
+   "phase": "open",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.05078,
+      42.38615
+     ],
+     [
+      -83.05579,
+      42.3937
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_jos_campau_mcnichols_to_carpenter",
+   "name": "Jos Campau (McNichols to Carpenter)",
+   "phase": "open",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.0643,
+      42.40635
+     ],
+     [
+      -83.07261,
+      42.41854
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_joseph_campau_alley_caniff_to_holbrook",
+   "name": "Joseph Campau Alley (Caniff to Holbrook)",
+   "phase": "planned",
+   "typology": "Alley",
+   "lines": [
+    [
+     [
+      -83.05579,
+      42.3937
+     ],
+     [
+      -83.05625,
+      42.39353
+     ],
+     [
+      -83.06027,
+      42.39965
+     ],
+     [
+      -83.05985,
+      42.39982
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_littlefield_fullerton_cherrylawn",
+   "name": "Littlefield (Fullerton, Cherrylawn)",
+   "phase": "funded",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.154,
+      42.38412
+     ],
+     [
+      -83.1539,
+      42.38092
+     ],
+     [
+      -83.1489,
+      42.38104
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_lonyo_arnold_to_radcliffe",
+   "name": "Lonyo (Arnold to Radcliffe)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.15082,
+      42.3388
+     ],
+     [
+      -83.14899,
+      42.33673
+     ],
+     [
+      -83.14309,
+      42.32858
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_lonyo_dix_to_st_john",
+   "name": "Lonyo (Dix to St. John)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.14024,
+      42.32465
+     ],
+     [
+      -83.1343,
+      42.31645
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_lonyo_radcliffe_to_west_warren",
+   "name": "Lonyo (Radcliffe to West Warren)",
+   "phase": "planned",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.15632,
+      42.34462
+     ],
+     [
+      -83.15082,
+      42.3388
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_m_10_bridge_rosa_parks_to_woodrow_wilson",
+   "name": "M-10 Bridge (Rosa Parks to Woodrow Wilson)",
+   "phase": "under_construction",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.11543,
+      42.40372
+     ],
+     [
+      -83.1176,
+      42.40255
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_oakman_boulevard",
+   "name": "Oakman Boulevard",
+   "phase": "open",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.15062,
+      42.3733
+     ],
+     [
+      -83.15138,
+      42.37125
+     ],
+     [
+      -83.15126,
+      42.36837
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_patton_park",
+   "name": "Patton Park",
+   "phase": "funded",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.1343,
+      42.31645
+     ],
+     [
+      -83.13424,
+      42.31634
+     ],
+     [
+      -83.13561,
+      42.31567
+     ],
+     [
+      -83.13993,
+      42.31183
+     ],
+     [
+      -83.1403,
+      42.31135
+     ],
+     [
+      -83.14005,
+      42.3104
+     ],
+     [
+      -83.14002,
+      42.30858
+     ],
+     [
+      -83.13984,
+      42.30819
+     ],
+     [
+      -83.1393,
+      42.30798
+     ],
+     [
+      -83.1385,
+      42.30805
+     ],
+     [
+      -83.13745,
+      42.30782
+     ],
+     [
+      -83.13637,
+      42.3079
+     ],
+     [
+      -83.1362,
+      42.30771
+     ],
+     [
+      -83.13605,
+      42.30777
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_riverfront_dequindre_cut_to_8th",
+   "name": "Riverfront (Dequindre Cut to 8th)",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.05912,
+      42.32387
+     ],
+     [
+      -83.05846,
+      42.32274
+     ],
+     [
+      -83.05318,
+      42.32402
+     ],
+     [
+      -83.05308,
+      42.32417
+     ],
+     [
+      -83.05209,
+      42.32443
+     ],
+     [
+      -83.05188,
+      42.32408
+     ],
+     [
+      -83.05132,
+      42.32424
+     ],
+     [
+      -83.03431,
+      42.3292
+     ],
+     [
+      -83.03408,
+      42.32942
+     ],
+     [
+      -83.0316,
+      42.33033
+     ],
+     [
+      -83.03096,
+      42.33076
+     ],
+     [
+      -83.02839,
+      42.3315
+     ],
+     [
+      -83.02892,
+      42.33232
+     ],
+     [
+      -83.02655,
+      42.33318
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_romanowski_park",
+   "name": "Romanowski Park",
+   "phase": "under_construction",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.14309,
+      42.32858
+     ],
+     [
+      -83.14324,
+      42.32716
+     ],
+     [
+      -83.14115,
+      42.32558
+     ],
+     [
+      -83.14063,
+      42.32488
+     ],
+     [
+      -83.14024,
+      42.32465
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_southwest_greenway",
+   "name": "Southwest Greenway",
+   "phase": "open",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.07414,
+      42.32662
+     ],
+     [
+      -83.07374,
+      42.3263
+     ],
+     [
+      -83.06938,
+      42.3246
+     ],
+     [
+      -83.06844,
+      42.32409
+     ],
+     [
+      -83.06387,
+      42.32256
+     ],
+     [
+      -83.06358,
+      42.32221
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_springwells_central",
+   "name": "Springwells (Central)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.12408,
+      42.31229
+     ],
+     [
+      -83.12046,
+      42.30728
+     ],
+     [
+      -83.12028,
+      42.3064
+     ],
+     [
+      -83.11843,
+      42.30385
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_springwells_green_lafayette",
+   "name": "Springwells (Green, Lafayette)",
+   "phase": "planned",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.11843,
+      42.30385
+     ],
+     [
+      -83.11505,
+      42.30519
+     ],
+     [
+      -83.11424,
+      42.30405
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_springwells_vernor_alley",
+   "name": "Springwells (Vernor Alley)",
+   "phase": "planned",
+   "typology": "Alley",
+   "lines": [
+    [
+     [
+      -83.12408,
+      42.31229
+     ],
+     [
+      -83.13585,
+      42.3075
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_west_grand_boulevard_riverfront_to_bagley",
+   "name": "West Grand Boulevard (Riverfront to Bagley)",
+   "phase": "open",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.08124,
+      42.31196
+     ],
+     [
+      -83.0885,
+      42.32201
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_west_jefferson_8th_to_rosa_parks",
+   "name": "West Jefferson (8th to Rosa Parks)",
+   "phase": "open",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.05912,
+      42.32387
+     ],
+     [
+      -83.06616,
+      42.3213
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_west_lafayette_west_grand_to_scotten",
+   "name": "West Lafayette (West Grand to Scotten)",
+   "phase": "funded",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.0896,
+      42.31478
+     ],
+     [
+      -83.08819,
+      42.31532
+     ],
+     [
+      -83.08711,
+      42.31608
+     ],
+     [
+      -83.08489,
+      42.31699
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_west_riverfront_rosa_parks_to_grand_boulevard",
+   "name": "West Riverfront (Rosa Parks to Grand Boulevard)",
+   "phase": "planned",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.08124,
+      42.31196
+     ],
+     [
+      -83.06548,
+      42.32014
+     ],
+     [
+      -83.06616,
+      42.3213
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_west_warren_lonyo_to_conrail",
+   "name": "West Warren (Lonyo to Conrail)",
+   "phase": "planned",
+   "typology": "On-Street",
+   "lines": [
+    [
+     [
+      -83.14779,
+      42.34483
+     ],
+     [
+      -83.15632,
+      42.34462
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_woodmere_vernor_to_fort",
+   "name": "Woodmere (Vernor to Fort)",
+   "phase": "funded",
+   "typology": "Adjacent",
+   "lines": [
+    [
+     [
+      -83.13605,
+      42.30777
+     ],
+     [
+      -83.1348,
+      42.30608
+     ],
+     [
+      -83.13668,
+      42.30535
+     ],
+     [
+      -83.13698,
+      42.30432
+     ],
+     [
+      -83.13105,
+      42.29578
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "seg_woodward_bridge",
+   "name": "Woodward Bridge",
+   "phase": "under_construction",
+   "typology": "Off-Street",
+   "lines": [
+    [
+     [
+      -83.10101,
+      42.41143
+     ],
+     [
+      -83.10104,
+      42.41142
+     ]
+    ]
+   ]
+  }
+ ]
+}

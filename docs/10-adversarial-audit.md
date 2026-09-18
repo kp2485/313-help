@@ -103,6 +103,7 @@ Also: the Good Samaritan summary must be reviewed by DHD/MDHHS or counsel; Michi
 - v2 local notifications for saved resources must never show sensitive categories on a lock screen.
 
 ### A9. The emergency strip's shelter number may already be dead **[checked]**
+**Resolved 2026-09-18 (Kyle): use the currently published numbers.** The strip carries what the responsible owner publishes — for shelter intake that is the City's 866-313-2520 — and `pnpm check:emergency` re-confirms each number against its source page; all three matched on 2026-09-18. 313-305-0311 stays out of the app while the City does not publish it. Residual risk, accepted: a published number can still be wrong; reports and the 30-day re-check are the net.
 *Docs: 02 CAM row, 05 emergency strip, 07 ("Keep" the 313-305-0311 line), CLAUDE.md non-negotiable on emergency numbers.*
 
 The docs put **CAM 313-305-0311** on the always-visible strip and call it "the correct front door for 'I need a bed tonight.'" The City's homelessness page and 2023+ reporting direct shelter seekers to the **Detroit Housing Resource HelpLine, 866-313-2520** (run by Wayne Metro), and local reporting says the CAM line was folded into it when the prior operator's contract ended in 2023; camdetroit.org still shows the old number. 02 lists 866-313-2520 only as the "Cold Weather Line." So the design's single most important phone number is unverified and possibly wrong, inherited from the D Compassion APK — the exact failure this app exists to prevent.

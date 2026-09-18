@@ -1,15 +1,16 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { badge, bundleAge, effectiveNow, nextOccurrences, openNow, rank } from '../src/index.js';
-import type { Alert, BundleRow } from '../src/index.js';
+import { badge, bundleAge, effectiveNow, helpAlong, milesToSegment, nearestSegment, nextOccurrences, openNow, rank } from '../src/index.js';
+import type { Alert, BundleRow, Segment } from '../src/index.js';
 
 // Fixtures are plain JSON so the iOS implementation can run the same cases.
 const dir = join(__dirname, '../../../schema/fixtures');
 
 interface Case {
   name: string;
-  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'bundleAge' | 'effectiveNow';
+  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment';
+  segment?: string; openOnly?: boolean; maxMiles?: number; tolerance?: number;
   now: string;
   row?: string;
   n?: number;
@@ -18,7 +19,7 @@ interface Case {
   expect: unknown;
 }
 type FixtureRow = Partial<BundleRow> & { id: string };
-interface Fixture { description: string; rows?: FixtureRow[]; alerts?: Alert[]; cases: Case[] }
+interface Fixture { description: string; segments?: Segment[]; rows?: FixtureRow[]; alerts?: Alert[]; cases: Case[] }
 
 const DEFAULTS = {
   org: 'Test Org', category: 'food.pantry', what: 'Free groceries', phones: [], flags: [],
@@ -30,6 +31,11 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
   const fx = JSON.parse(readFileSync(join(dir, file), 'utf8')) as Fixture;
   const rows = (fx.rows ?? []).map((r) => ({ ...DEFAULTS, ...r, name: r.name ?? r.id, facts: { ...DEFAULTS.facts, ...(r.facts ?? {}) } })) as BundleRow[];
   const alerts = fx.alerts ?? [];
+  const seg = (id?: string) => {
+    const s = (fx.segments ?? []).find((x) => x.id === id);
+    if (!s) throw new Error(`${file}: no segment ${id}`);
+    return s;
+  };
   const find = (id?: string) => {
     const r = rows.find((x) => x.id === id);
     if (!r) throw new Error(`${file}: no row ${id}`);
@@ -51,6 +57,17 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
             expect(rank(rows, c.query ?? {}, now, alerts).map((r) => r.row.id)).toEqual(c.expect); break;
           case 'bundleAge':
             expect(bundleAge(c.index!, now)).toBe(c.expect); break;
+          case 'helpAlong':
+            expect(helpAlong(rows, seg(c.segment)).map((x) => x.row.id)).toEqual(c.expect); break;
+          case 'milesToSegment': {
+            const r = find(c.row);
+            expect(Math.abs(milesToSegment({ lat: r.lat!, lon: r.lon! }, seg(c.segment)) - (c.expect as number))).toBeLessThan(c.tolerance ?? 0.01); break;
+          }
+          case 'nearestSegment': {
+            const r = find(c.row);
+            const hit = nearestSegment({ lat: r.lat!, lon: r.lon! }, fx.segments ?? [], { openOnly: c.openOnly, maxMiles: c.maxMiles });
+            expect(hit ? hit.segment.id : null).toBe(c.expect); break;
+          }
           case 'effectiveNow':
             expect(effectiveNow(now, c.index!.generated_at).toISOString()).toBe(c.expect); break;
         }
