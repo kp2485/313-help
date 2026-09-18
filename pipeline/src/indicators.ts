@@ -18,6 +18,7 @@ export interface NeighborhoodIndicators {
   rings: number[][];                                 // outline, same compact encoding as the street map
   help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; none_listed_yet: string[]; coverage_checked: boolean };
   places: { parks: number; rec_centers: number; greenway_open: number };
+  parcels?: number;                                  // the City's parcel count here: the base for "per 1,000 parcels"
   years: Record<string, YearStats>;
 }
 
@@ -29,7 +30,7 @@ export function milesToArea(pt: { lat: number; lon: number }, rings: Pt[][]): nu
 
 export function buildIndicators(input: {
   hoods: Neighborhood[]; rows: BundleRow[]; parks: { lat: number; lon: number }[]; segments: Segment[];
-  stats: { neighborhoods: Record<string, Record<string, YearStats>> }; coverageChecked?: Set<string>;
+  stats: { neighborhoods: Record<string, Record<string, YearStats>>; parcels?: Record<string, number> }; coverageChecked?: Set<string>;
 }): { neighborhoods: NeighborhoodIndicators[]; segments: Record<string, string[]> } {
   const located = input.rows.filter((r) => r.status === 'active' && r.lat !== undefined && r.lon !== undefined);
   const open = input.segments.filter((s) => s.phase === 'open');
@@ -63,6 +64,7 @@ export function buildIndicators(input: {
         rec_centers: help.filter((r) => r.category === 'rec.center').length,
         greenway_open: open.filter((s) => s.lines.some((l) => l.some(([lon, lat]) => near({ lat, lon })))).length,
       },
+      ...(input.stats.parcels?.[n.id] ? { parcels: input.stats.parcels[n.id] } : {}),
       years: input.stats.neighborhoods[n.id] ?? {},
     };
   });

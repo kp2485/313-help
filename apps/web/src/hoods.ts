@@ -9,16 +9,17 @@
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
 
 type Count = number | 'lt5';
-export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number }
+export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number }
 export interface Hood {
   id: string; name: string; district: number | null; jlg_study_area?: boolean; center: [number, number]; rings: number[][];
   help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; none_listed_yet: string[]; coverage_checked: boolean };
   places: { parks: number; rec_centers: number; greenway_open: number };
+  parcels?: number;
   years: Record<string, YearStats>;
 }
 interface Source { name: string; url: string; last_edited: string }
 export interface Indicators {
-  sources: { neighborhoods: Source; sales: Source; permits: Source }; stats_fetched_at: string; first_year: number; partial_year: number;
+  sources: { neighborhoods: Source; sales: Source; permits: Source; blight?: Source; demolitions?: Source; issues?: Source; parcels?: Source }; city_parcels?: number; issue_types?: string[]; stats_fetched_at: string; first_year: number; partial_year: number;
   near_miles: number; origin: [number, number]; city: Record<string, YearStats>; neighborhoods: Hood[]; segments: Record<string, string[]>;
 }
 
@@ -45,6 +46,8 @@ export function outline(h: Hood, origin: [number, number]): { lat: number; lon: 
 }
 
 export interface Ui { t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; date: (d: string) => string; link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string }
+/** Per 1,000 parcels. No rate without a count we can show and a base we can defend (honesty rules 2 and 3). */
+export const rate = (c: Count | undefined, parcels: number | undefined) => (typeof c === 'number' && parcels && parcels >= 100 ? (c / parcels) * 1000 : undefined);
 const money = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 const bigMoney = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', compactDisplay: 'long', maximumFractionDigits: 1 }).format(n);
 
@@ -58,12 +61,12 @@ export function hoodList(d: Indicators, ui: Ui, lens?: string): string {
     ${groups.map((g) => `<h2>${ui.esc(g.dist ? ui.t('hood.district', { n: g.dist }) : ui.t('hood.no_district'))}</h2><ul class="rows">${g.items.map(row).join('')}</ul>`).join('')}</main>`;
 }
 
-function yearsTable(h: Hood, d: Indicators, ui: Ui, o: { value: (y: YearStats) => number | undefined; count: (y: YearStats) => Count | undefined; fmt: (n: number) => string; head: string; countHead: string; missing: string; caption: string }): string {
+function yearsTable(h: Hood, d: Indicators, ui: Ui, o: { value: (y: YearStats) => number | undefined; cityValue?: (y: YearStats) => number | undefined; count?: (y: YearStats) => Count | undefined; fmt: (n: number) => string; head: string; countHead: string; missing: string; caption: string }): string {
   const years = Object.keys(d.city).sort(), max = Math.max(1, ...years.map((y) => o.value(h.years[y] ?? {}) ?? 0));
   const count = (c: Count | undefined) => (c === undefined ? ui.t('hood.none_recorded') : c === 'lt5' ? ui.t('hood.lt5') : String(c));
-  return `<table class="years"><caption>${ui.esc(o.caption)}</caption><thead><tr><th scope="col">${ui.esc(ui.t('hood.year'))}</th><th scope="col">${ui.esc(o.head)}</th><th scope="col">${ui.esc(o.countHead)}</th><th scope="col">${ui.esc(ui.t('hood.city'))}</th></tr></thead><tbody>
-    ${years.map((y) => { const v = o.value(h.years[y] ?? {}), cv = o.value(d.city[y] ?? {});
-      return `<tr><th scope="row">${Number(y) === d.partial_year ? ui.esc(ui.t('hood.so_far', { year: y })) : y}</th><td>${v === undefined ? `<small>${ui.esc(o.missing)}</small>` : `<span class="bar" aria-hidden="true" style="width:${Math.max(3, Math.round((v / max) * 100))}%"></span><span>${ui.esc(o.fmt(v))}</span>`}</td><td>${ui.esc(count(o.count(h.years[y] ?? {})))}</td><td>${cv === undefined ? '' : ui.esc(o.fmt(cv))}</td></tr>`; }).join('')}</tbody></table>`;
+  return `<table class="years"><caption>${ui.esc(o.caption)}</caption><thead><tr><th scope="col">${ui.esc(ui.t('hood.year'))}</th><th scope="col">${ui.esc(o.head)}</th>${o.count ? `<th scope="col">${ui.esc(o.countHead)}</th>` : ''}<th scope="col">${ui.esc(ui.t('hood.city'))}</th></tr></thead><tbody>
+    ${years.map((y) => { const v = o.value(h.years[y] ?? {}), cv = (o.cityValue ?? o.value)(d.city[y] ?? {});
+      return `<tr><th scope="row">${Number(y) === d.partial_year ? ui.esc(ui.t('hood.so_far', { year: y })) : y}</th><td>${v === undefined ? `<small>${ui.esc(o.missing)}</small>` : `<span class="bar" aria-hidden="true" style="width:${Math.max(3, Math.round((v / max) * 100))}%"></span><span>${ui.esc(o.fmt(v))}</span>`}</td>${o.count ? `<td>${ui.esc(count(o.count(h.years[y] ?? {})))}</td>` : ''}<td>${cv === undefined ? '' : ui.esc(o.fmt(cv))}</td></tr>`; }).join('')}</tbody></table>`;
 }
 
 export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
@@ -87,6 +90,13 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
       ${yearsTable(h, d, ui, { value: (y) => y.permit_cost, count: (y) => y.permits, fmt: bigMoney, head: ui.t('hood.permit_cost'), countHead: ui.t('hood.permits'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.permits_caption') })}
       <p class="foot">${T('hood.money_note')}</p></div>
 
-    <h2>${T('hood.sources_head')}</h2><ul class="srcs">${src(d.sources.sales)}${src(d.sources.permits)}${src(d.sources.neighborhoods)}<li>${T('hood.source_ours')}</li></ul>
+    ${d.sources.blight ? `<h2>${T('hood.cond_head')}</h2><div class="panel"><p>${T('hood.cond_lede')}</p>
+      ${yearsTable(h, d, ui, { value: (y) => rate(y.blight, h.parcels), cityValue: (y) => rate(y.blight, d.city_parcels), count: (y) => y.blight, fmt: (n) => n.toFixed(0), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.blight'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.blight_caption') })}
+      <p class="foot">${T('hood.blight_note')}</p>
+      ${yearsTable(h, d, ui, { value: (y) => (typeof y.demolitions === 'number' ? y.demolitions : undefined), fmt: (n) => String(n), head: ui.t('hood.demolitions'), countHead: '', missing: ui.t('hood.lt5_or_none'), caption: ui.t('hood.demo_caption') })}
+      ${yearsTable(h, d, ui, { value: (y) => y.issue_days, count: (y) => y.issues, fmt: (n) => ui.t('hood.days', { n }), head: ui.t('hood.issue_days'), countHead: ui.t('hood.issues'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.issues_caption') })}
+      <p class="foot">${T('hood.issues_note', { types: (d.issue_types ?? []).join(', ') })}</p></div>` : ''}
+
+    <h2>${T('hood.sources_head')}</h2><ul class="srcs">${[d.sources.sales, d.sources.permits, d.sources.blight, d.sources.demolitions, d.sources.issues, d.sources.parcels, d.sources.neighborhoods].filter((x): x is Source => !!x).map(src).join('')}<li>${T('hood.source_ours')}</li></ul>
     <p class="foot">${T('hood.left_out')}</p></main>`;
 }

@@ -10,7 +10,7 @@ import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
 import { FOOD_BENEFITS } from '../src/benefits.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
-import { hoodList, hoodPage, type Hood, type Indicators } from '../src/hoods.js';
+import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
 import { build as buildReport, nonce } from '../src/report.js';
 
 const root = join(__dirname, '../../..');
@@ -156,6 +156,15 @@ describe('neighborhood pages (docs/13 honesty rules)', () => {
     expect(panel.indexOf('<table')).toBeGreaterThan(-1);
     expect(panel.slice(0, panel.indexOf('</div>')).match(/<table/g)).toHaveLength(2);
     expect(html).toContain('We leave out crime numbers on purpose');
+  });
+  it('blight is a rate per 1,000 lots with its caveat on the chart, and a hidden count never becomes a rate', () => {
+    expect(rate(250, 5000)).toBe(50); expect(rate('lt5', 5000)).toBeUndefined(); expect(rate(250, 40)).toBeUndefined(); expect(rate(250, undefined)).toBeUndefined();
+    const withCond: Indicators = { ...d, city_parcels: 377000, issue_types: ['Illegal Dump Sites'], sources: { ...d.sources, blight: src, demolitions: src, issues: src, parcels: src },
+      neighborhoods: [{ ...d.neighborhoods[0]!, parcels: 5000, years: { 2025: { blight: 250, demolitions: 'lt5', issues: 40, issue_days: 8 } } }] };
+    const html = hoodPage(withCond.neighborhoods[0]!, withCond, ui);
+    expect(html).toContain('Tickets show where inspectors went as much as where blight is');
+    expect(html).toContain('We never count reports about people');
+    expect(html).toContain('8 days'); expect(html).toContain('fewer than 5, or none'); expect(html).not.toContain('MISSING:');
   });
   it('neighborhood numbers are fetched only when asked for, and checked against the signed index', () => {
     const src2 = readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8');

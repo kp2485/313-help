@@ -118,7 +118,7 @@ export async function build(opts: BuildOptions = {}) {
       parks: existsSync(parksFile) ? JSON.parse(readFileSync(parksFile, 'utf8')).parks : [],
       segments: existsSync(jlg) ? JSON.parse(readFileSync(jlg, 'utf8')).segments : [],
     });
-    const doc = { sources: { neighborhoods: h.source, ...st.sources }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, ...ind };
+    const doc = { sources: { neighborhoods: h.source, ...st.sources }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types, ...ind };
     putCompact('indicators/neighborhoods.json', doc);
     counts.neighborhoods = ind.neighborhoods.length;
     // Committed on publish, without the outlines, so the history of every number is in git (docs/13).

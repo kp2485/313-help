@@ -12,7 +12,7 @@ import { applyAggregates } from '../src/reports-sync.js';
 import { parseCalendar, toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea } from '../src/indicators.js';
-import { nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
+import { ISSUE_TYPES, nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
 
@@ -276,6 +276,15 @@ describe('neighborhood indicators (docs/13)', () => {
     expect(b.years['2025']).toEqual({ sales: 183, median_price: 190000 });
     expect(out.segments).toEqual({ seg_a: ['nbh_bagley'] });
     expect(JSON.stringify(out)).not.toMatch(/rank|score|worst|best/i);
+  });
+  it('conditions count things the City recorded, never reports about people, and never ask for an owner name', () => {
+    expect(ISSUE_TYPES.join(' ')).not.toMatch(/squat|person|people|homeless|encamp|loiter|vehicle/i);
+    const src = readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8');
+    expect(src).not.toMatch(/outFields[^\n]*(owner|inspector|taxpayer|grantor|grantee)/i);
+    const st = JSON.parse(readFileSync(p('data/ingested/city_stats.json'), 'utf8'));
+    expect(st.city_parcels).toBeGreaterThan(300000); expect(Object.keys(st.parcels).length).toBeGreaterThan(190);
+    for (const years of Object.values<any>(st.neighborhoods)) for (const y of Object.values<any>(years)) for (const k of ['blight', 'demolitions', 'issues']) if (y[k] !== undefined && y[k] !== 'lt5') expect(y[k]).toBeGreaterThanOrEqual(5);
+    expect(JSON.stringify(st)).not.toMatch(/owner|inspector|taxpayer/i);
   });
   it('the committed City numbers cover all 205 neighborhoods, hold no count under 5, and no names of buyers or sellers', () => {
     const h = JSON.parse(readFileSync(p('data/ingested/neighborhoods.json'), 'utf8')), st = readFileSync(p('data/ingested/city_stats.json'), 'utf8');

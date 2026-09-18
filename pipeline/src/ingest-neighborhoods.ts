@@ -4,7 +4,9 @@
 //   neighborhoods  the City's 205 named neighborhoods (polygons, council district)   -> data/ingested/neighborhoods.json
 //   stats          per neighborhood and year, added up BY THE CITY'S SERVER:
 //                    arm's-length residential sales (count, median price) and building permits issued
-//                    (count, estimated cost)                                          -> data/ingested/city_stats.json
+//                    (count, estimated cost); blight tickets and demolitions (counts); dumping, tree, park and
+//                    street-light issues people reported to the City (count, median days to close); parcels (count)
+//                                                                                     -> data/ingested/city_stats.json
 //
 // We never download a sale or a permit record, so buyer and seller names never reach this repo. Small numbers
 // are dropped here, before anything is written: a count under 5 is stored as "lt5", and a median needs 10 sales.
@@ -17,13 +19,19 @@ const HOODS = `${ORG}/Current_City_of_Detroit_Neighborhoods/FeatureServer/0`;
 const JLG_STUDY = `${ORG}/Joe_Louis_Greenway_Study_Area_Neighborhoods_Only_view/FeatureServer/0`;
 const SALES = `${ORG}/assessor_property_sales_view/FeatureServer/0`;
 const PERMITS = `${ORG}/bseed_building_permits/FeatureServer/0`;
+const BLIGHT = `${ORG}/blight_tickets/FeatureServer/0`;
+const DEMOS = `${ORG}/city_completed_demolitions/FeatureServer/0`;
+const ISSUES = `${ORG}/improve_detroit/FeatureServer/0`;
+const PARCELS = `${ORG}/parcel_file_current/FeatureServer/0`;
+/** Improve Detroit request types we count. Things, never people: "Squatters Issue" and the like are left out on purpose (docs/11). */
+export const ISSUE_TYPES = ['Illegal Dump Sites', 'Tree Issue', 'Park Issue', 'Street Light Out'];
 const UA = { 'user-agent': 'detroithelp-pipeline (open-source civic directory; one polite pass)' };
 export const FIRST_YEAR = 2019;
 
 type Pt = [number, number];
 export interface Neighborhood { id: string; name: string; district: number | null; center: Pt; rings: Pt[][]; jlg_study_area?: boolean }
 export type Count = number | 'lt5';
-export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number }
+export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number }
 
 const get = async (url: string) => { const j = (await (await fetch(url, { headers: UA })).json()) as any; if (j.error) throw new Error(`${url.slice(0, 120)}: ${JSON.stringify(j.error)}`); return j; };
 const edited = async (layer: string) => { const m = await get(`${layer}?f=json`); return new Date(m.editingInfo?.dataLastEditDate ?? m.editingInfo?.lastEditDate).toISOString().slice(0, 10); };
@@ -95,16 +103,38 @@ async function stats(hoods: Neighborhood[]): Promise<void> {
       await q(SALES, { where: salesWhere, groupByFieldsForStatistics: 'neighborhood', outStatistics: salesStats }), await q(SALES, { where: salesWhere, outStatistics: salesStats }),
       await q(PERMITS, { where: span('issued_date'), groupByFieldsForStatistics: 'neighborhood', outStatistics: permitStats }), await q(PERMITS, { where: span('issued_date'), outStatistics: permitStats }),
     ];
+    // Conditions (docs/13 step 4). Counts only: the blight layer carries owner names, which we never ask for.
+    const countStat = (field: string) => JSON.stringify([{ statisticType: 'count', onStatisticField: field, outStatisticFieldName: 'n' }]);
+    const issueWhere = `${span('created_at')} AND request_type IN (${ISSUE_TYPES.map((t) => `'${t}'`).join(', ')})`;
+    const issueStats = JSON.stringify([{ statisticType: 'count', onStatisticField: 'issue_id', outStatisticFieldName: 'n' }, { statisticType: 'PERCENTILE_CONT', statisticParameters: { value: 0.5 }, onStatisticField: 'num_days_to_close', outStatisticFieldName: 'median' }]);
+    const grouped = { groupByFieldsForStatistics: 'neighborhood' };
+    const [bl, blAll, de, deAll, is, isAll] = [
+      await q(BLIGHT, { where: span('ticket_issued_date'), ...grouped, outStatistics: countStat('ticket_id') }), await q(BLIGHT, { where: span('ticket_issued_date'), outStatistics: countStat('ticket_id') }),
+      await q(DEMOS, { where: span('demolition_date'), ...grouped, outStatistics: countStat('ObjectId') }), await q(DEMOS, { where: span('demolition_date'), outStatistics: countStat('ObjectId') }),
+      await q(ISSUES, { where: issueWhere, ...grouped, outStatistics: issueStats }), await q(ISSUES, { where: issueWhere, outStatistics: issueStats }),
+    ];
+    for (const f of bl.features ?? []) put(f.attributes.neighborhood, y, { blight: suppress(f.attributes.n).count });
+    for (const f of de.features ?? []) put(f.attributes.neighborhood, y, { demolitions: suppress(f.attributes.n).count });
+    for (const f of is.features ?? []) { const r = suppress(f.attributes.n, f.attributes.median); put(f.attributes.neighborhood, y, { issues: r.count, ...(r.median !== undefined ? { issue_days: r.median } : {}) }); }
+    const ci = suppress(isAll.features?.[0]?.attributes.n ?? 0, isAll.features?.[0]?.attributes.median);
+    const conditions: YearStats = { blight: suppress(blAll.features?.[0]?.attributes.n ?? 0).count, demolitions: suppress(deAll.features?.[0]?.attributes.n ?? 0).count, issues: ci.count, ...(ci.median !== undefined ? { issue_days: ci.median } : {}) };
     for (const f of s.features ?? []) { const r = suppress(f.attributes.n, f.attributes.median); put(f.attributes.neighborhood, y, { sales: r.count, ...(r.median ? { median_price: r.median } : {}) }); }
     for (const f of b.features ?? []) { const r = suppress(f.attributes.n, null, f.attributes.cost); put(f.attributes.neighborhood, y, { permits: r.count, ...(r.cost ? { permit_cost: r.cost } : {}) }); }
     const cs = suppress(sAll.features?.[0]?.attributes.n ?? 0, sAll.features?.[0]?.attributes.median), cb = suppress(bAll.features?.[0]?.attributes.n ?? 0, null, bAll.features?.[0]?.attributes.cost);
-    city[y] = { sales: cs.count, ...(cs.median ? { median_price: cs.median } : {}), permits: cb.count, ...(cb.cost ? { permit_cost: cb.cost } : {}) };
-    console.log(`stats ${y}: city sales ${cs.count} (median ${cs.median ?? 'n/a'}), permits ${cb.count}`);
+    city[y] = { sales: cs.count, ...(cs.median ? { median_price: cs.median } : {}), permits: cb.count, ...(cb.cost ? { permit_cost: cb.cost } : {}), ...conditions };
+    console.log(`stats ${y}: city sales ${cs.count} (median ${cs.median ?? 'n/a'}), permits ${cb.count}, blight tickets ${conditions.blight}, demolitions ${conditions.demolitions}, issues ${conditions.issues} (median ${conditions.issue_days ?? 'n/a'} days)`);
     await new Promise((r) => setTimeout(r, 300));
   }
+  // Parcels per neighborhood: the denominator for "blight tickets per 1,000 parcels" (honesty rule 3).
+  const parcels: Record<string, number> = {}; let cityParcels = 0;
+  const pc = await q(PARCELS, { where: '1=1', groupByFieldsForStatistics: 'neighborhood', outStatistics: JSON.stringify([{ statisticType: 'count', onStatisticField: 'ObjectId', outStatisticFieldName: 'n' }]) });
+  for (const f of pc.features ?? []) { cityParcels += f.attributes.n; const id = f.attributes.neighborhood ? byKey.get(nameKey(f.attributes.neighborhood)) : undefined; if (id) parcels[id] = (parcels[id] ?? 0) + f.attributes.n; }
   if (unmatched.size) console.warn(`stats: ${unmatched.size} neighborhood names in the City's sales/permit data match no neighborhood polygon and were left out: ${[...unmatched].sort().join('; ')}`);
   writeJson(p('data/ingested/city_stats.json'), {
-    sources: { sales: { name: 'City of Detroit Assessor: property sales', url: SALES, last_edited: await edited(SALES) }, permits: { name: 'City of Detroit BSEED: building permits', url: PERMITS, last_edited: await edited(PERMITS) } },
+    sources: { sales: { name: 'City of Detroit Assessor: property sales', url: SALES, last_edited: await edited(SALES) }, permits: { name: 'City of Detroit BSEED: building permits', url: PERMITS, last_edited: await edited(PERMITS) },
+      blight: { name: 'City of Detroit: blight tickets', url: BLIGHT, last_edited: await edited(BLIGHT) }, demolitions: { name: 'City of Detroit: completed demolitions', url: DEMOS, last_edited: await edited(DEMOS) },
+      issues: { name: 'Improve Detroit: issues people reported to the City', url: ISSUES, last_edited: await edited(ISSUES) }, parcels: { name: 'City of Detroit Assessor: parcels', url: PARCELS, last_edited: await edited(PARCELS) } },
+    issue_types: ISSUE_TYPES, parcels, city_parcels: cityParcels,
     fetched_at: new Date().toISOString().slice(0, 10), first_year: FIRST_YEAR, partial_year: thisYear, city, neighborhoods: out,
   });
 }
