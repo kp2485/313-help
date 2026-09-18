@@ -52,7 +52,7 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
 6. **Rate limiting.** A WAF rate-limiting rule on `POST /v1/*`, per IP, about 10 per minute. This lives in the dashboard on purpose: the Worker code never touches an IP address, and a test keeps it that way.
 7. **Logs.** `wrangler.toml` already turns invocation logs off. Leave Logpush off. Never add request logging.
 8. **Pages.** Build `apps/web` with `BUNDLE_PUBLIC_KEYS` set; deploy `apps/web/dist` (it contains the bundle under `/data/bundle/v1/`).
-9. **Nightly publish** (GitHub Actions, not yet written): `ingest:opendata` → `check:emergency` → `build:bundle:release` with `REPORTS_API`, `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET`, `BUNDLE_SIGNING_KEY` → commit `data/hsds/` → deploy. A failed check stops the publish; yesterday's bundle stays up.
+9. **Nightly publish**: `.github/workflows/publish.yml` (written 2026-09-18, never run). It stays off until the repository variable `PUBLISH_ENABLED` is `true`; it also needs the variables `BUNDLE_PUBLIC_KEYS`, `REPORTS_API`, `PAGES_PROJECT` and the secrets below. City events publish by themselves; any other open-data change (an address, a greenway phase, a street) opens a pull request instead, and merging it is the approval. In short: `ingest:opendata` → `check:emergency` → `build:bundle:release` with `REPORTS_API`, `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET`, `BUNDLE_SIGNING_KEY` → commit `data/hsds/` → deploy. A failed check stops the publish; yesterday's bundle stays up.
 
 ## Secrets (names only)
 

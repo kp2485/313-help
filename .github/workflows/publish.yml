@@ -1,0 +1,93 @@
+# Nightly publish (docs/06, docs/OPERATIONS.md step 9). Written 2026-09-18; NOT yet run: it does nothing until
+# Kyle creates the Cloudflare resources and sets the repository variable PUBLISH_ENABLED=true.
+#
+# What it does, in order:
+#   1. Refreshes City events (facts only: title, date, link) and commits them. Events carry no phone numbers.
+#   2. Checks the emergency numbers against their owners' pages and stamps the date of each match. One bad
+#      night (a page that is down) does not stop the publish; the release build does, once any number has gone
+#      30 days without a match. Then yesterday's bundle stays up and a person reads the page. The script never
+#      rewrites a number.
+#   3. Builds the signed release bundle from what is committed on main, builds the PWA, deploys to Pages,
+#      and commits data/hsds/ so every publish is in git.
+#   4. Re-reads the other open-data sources. Any change (a station's address, a greenway phase, a street) is
+#      NOT published: it opens a pull request. Merging it is the steward's approval (DECISIONS: "held for
+#      steward approval").
+#
+# Secrets (names only; docs/OPERATIONS.md): BUNDLE_SIGNING_KEY, ACCESS_CLIENT_ID, ACCESS_CLIENT_SECRET,
+# CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Variables: PUBLISH_ENABLED, BUNDLE_PUBLIC_KEYS, REPORTS_API,
+# PAGES_PROJECT.
+name: publish
+on:
+  schedule:
+    - cron: '0 8 * * *'          # 04:00 in Detroit (03:00 in winter)
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency: { group: publish, cancel-in-progress: false }
+jobs:
+  publish:
+    if: vars.PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: |
+          git config user.name "detroit-compass-publish"
+          git config user.email "actions@users.noreply.github.com"
+
+      # 1. Events. If the City's page is down or changed shape, the script keeps the last good file.
+      - name: City events
+        continue-on-error: true
+        run: pnpm --filter @detroithelp/pipeline ingest:city events
+
+      # 2 + 3. Gate, build, deploy. Any failure here stops the job before anything is published.
+      - name: Emergency numbers still match their owners' pages
+        continue-on-error: true       # the 30-day rule is enforced by the release build below
+        run: pnpm check:emergency
+      - run: pnpm test
+      - name: Signed release bundle
+        run: pnpm build:bundle:release
+        env:
+          BUNDLE_SIGNING_KEY: ${{ secrets.BUNDLE_SIGNING_KEY }}
+          REPORTS_API: ${{ vars.REPORTS_API }}
+          ACCESS_CLIENT_ID: ${{ secrets.ACCESS_CLIENT_ID }}
+          ACCESS_CLIENT_SECRET: ${{ secrets.ACCESS_CLIENT_SECRET }}
+      - name: Build the app with the pinned public keys
+        run: pnpm --filter @detroithelp/web build
+        env:
+          BUNDLE_PUBLIC_KEYS: ${{ vars.BUNDLE_PUBLIC_KEYS }}
+      - name: Deploy to Cloudflare Pages
+        run: pnpm --filter @detroithelp/api exec wrangler pages deploy ../apps/web/dist --project-name "${{ vars.PAGES_PROJECT }}" --branch main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Commit what was published
+        run: |
+          git add data/hsds data/ingested/city_events.json data/seed/emergency.csv
+          git diff --cached --quiet || git commit -m "Publish $(date -u +%F): HSDS export, events, emergency check date"
+          git push
+
+      # 4. Everything else from open data is held for a person. The street map changes rarely: monthly.
+      - name: Re-read open data
+        continue-on-error: true
+        run: |
+          pnpm --filter @detroithelp/pipeline ingest:opendata
+          pnpm --filter @detroithelp/pipeline ingest:greenway
+          pnpm --filter @detroithelp/pipeline ingest:city parks
+          pnpm --filter @detroithelp/pipeline ingest:city zips
+          if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; fi
+      - name: Open a pull request if a source changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add data/ingested data/staging
+          if git diff --cached --quiet; then echo "No source changed."; exit 0; fi
+          branch="ingest/$(date -u +%F)"
+          git checkout -b "$branch"
+          git commit -m "Open data changed on $(date -u +%F): review before it is published"
+          git push -u origin "$branch"
+          gh pr create --title "Open data changed $(date -u +%F)" --body "A City source changed. Read the diff: a changed phone number, address or coordinate is published only when this is merged. Nothing here was published tonight." --base main --head "$branch"
