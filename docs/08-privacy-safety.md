@@ -13,7 +13,7 @@ We can't leak what we never collect. Every design choice below is downstream of 
 | Location | Used in-memory for sorting; never written | Never | — |
 | Saved resources | Yes (local only) | Never | Until user clears |
 | Reports | Queued until sent | Yes, minus IP, minus device ID | 180 days raw, then aggregate counts only |
-| `install_id` | Yes (random UUID) | Never sent; only a daily hash of it (`client_nonce`) | User can reset in About |
+| `install_secret` | Yes (random) | Never sent; only per-target daily hashes of it (`client_nonce`), which cannot be linked to each other | User can reset in About |
 | Provider claim email | No | Yes — for providers only, verification + row ownership | Until provider removes it |
 | Analytics | Aggregate counters only | Aggregate counters only | 13 months |
 | Steward identities | — | Cloudflare Access allowlist + action log | Operational |
@@ -22,7 +22,7 @@ No resident-side account, email, phone, name, or persistent identifier ever cros
 
 ## Anonymous reporting — why it's safe enough
 
-- `client_nonce = sha256(install_id ‖ date)` prevents one device from double-counting on a target within a day, and is unlinkable across days without the `install_id`, which never leaves the device.
+- `client_nonce = sha256(install_secret ‖ target_id ‖ date)` prevents one device from double-counting on a target within a day. Every target and every day gives a different hash, so the server cannot connect one person's reports into a trail of places. It is a dedupe aid for honest devices, not a security control — abuse is limited at Cloudflare's edge, which processes IP addresses in transit; we never read or store them.
 - The Worker discards `cf-connecting-ip` and stores submission time at minute granularity.
 - Report text is limited to 280 chars and the UI copy says "Don't include your name or phone number." Steward tool auto-masks anything matching a phone/email pattern before display.
 - Abuse is bounded by design: no single report ever removes a resource (04).

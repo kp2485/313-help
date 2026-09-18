@@ -93,9 +93,9 @@ Expired alerts stay in the archive (they tell us which sites activate every wint
   "kind": "closed_permanently",   // closed_permanently | moved | wrong_hours | out_of_stock | wrong_phone | wrong_info | confirmed_ok | new_info
   "detail": "Sign on door says pantry ended in August",   // optional, max 280 chars, no PII solicited
   "suggested": { "hours": null, "address": null, "phone": null },  // optional structured correction
-  "observed_at": "2026-09-18T13:40:00-04:00",
-  "submitted_at": "2026-09-18T13:41:10-04:00",
-  "client_nonce": "sha256(app_install_id + day)",   // dedupe within a day; NOT an identity
+  "observed_at": "2026-09-18T13:40-04:00",
+  "submitted_at": "2026-09-18T13:41-04:00",       // minute granularity; server rejects finer
+  "client_nonce": "sha256(install_secret + target_id + day)",   // dedupes one device per target per day; unlinkable across targets and days
   "status": "open"                // open | accepted | rejected | duplicate
 }
 ```

@@ -4,12 +4,13 @@ You are building **DetroitHelp** (working name), a zero-PII resource directory a
 
 ## Non-negotiables (from docs/01 and docs/08)
 
-- No accounts, no names, no phone numbers, no emails, no persistent identifiers for residents — on device or server. If a feature seems to need one, it's out of scope.
+- No accounts, no names, no phone numbers, no emails for residents. **No identifier for a resident ever leaves the device.** The only on-device secret is random, resettable, and used solely to derive per-target daily dedupe hashes: `sha256(install_secret ‖ target_id ‖ day)`. If a feature seems to need more, it's out of scope.
 - Never log or persist client IPs in the Worker. Timestamps at minute granularity.
 - Triage answers live in memory only and are cleared on exit.
 - Nothing is deleted from the dataset; rows are archived with reason.
-- Every listing shows `last_verified_at`-derived freshness. Unknown is never rendered as "open."
-- Emergency numbers are static in the app and overridden by the bundle; verify each before any release.
+- Every listing shows freshness **computed on the device** from dated facts in the bundle (never frozen at build time). Badges state facts; never say "verified" for something no person checked. Unknown is never rendered as "open." Reports label rows; they never hide them.
+- 911 and 988 are hardcoded and never overridable. Other emergency numbers come from `data/seed/emergency.csv` via the **signed** bundle; each carries `verified_by_call_on`, and a release build fails if any is missing or older than 30 days. Any phone/address/coordinate change from any source is held for steward approval.
+- Bundles are Ed25519-signed; clients pin two public keys (active + spare) and refuse unsigned or mis-signed bundles.
 - Harm-reduction, DV, and crisis screens follow the ordering rules in docs/05 (911/hotline first).
 
 ## Build order for the hackathon (docs/09)
@@ -24,7 +25,8 @@ You are building **DetroitHelp** (working name), a zero-PII resource directory a
 
 - TypeScript strict for pipeline/api/web; SwiftUI (iOS 17+) for iOS. Node 22. pnpm workspaces.
 - IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`). Never reuse.
-- Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
+- Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements against the same fixtures.
+- Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline, used in floating wall-clock mode only — see DECISIONS.md; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
 - Detroit time zone `America/Detroit` everywhere. Bbox sanity: lat 42.25–42.46, lon −83.29 to −82.91.
 - Plain-language UI strings live in one `strings/en.json`; reading level ≤ 6th grade; no jargon ("Free groceries," not "Food pantry services").
 - Accessibility: every action has a descriptive label; dynamic type must not truncate phone numbers.

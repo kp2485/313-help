@@ -6,7 +6,7 @@ Source: reverse-engineering of `com.detroithealthdepartment.dcompassion` v1.0 (b
 
 | Feature | As built | Keep? |
 |---|---|---|
-| Home screen with shelter emergency line (313-305-0311) | Static text + tel link | **Keep** — becomes the emergency strip, add CAM/Cold Weather/988/Narcan |
+| Home screen with shelter emergency line (313-305-0311) | Static text + tel link | **Keep the idea, not the number** — 313-305-0311 may be retired (10-A9); the strip uses the Housing Resource HelpLine until both are phoned |
 | Services directory (~18 DHD programs, phone + website) | Hardcoded strings in the DLL | **Keep the content**, re-verified against DHD's public pages and maintained by us |
 | Intake wizard: services of interest → contact info → household → housing (living situation, problems, utilities threatened, feel safe, need safe place now) → Hunger Vital Sign (2 q) → transportation | Answers only controlled which steps appeared; nothing saved, nothing sent, nothing tailored | **Replace** with on-device triage that returns results and stores nothing |
 | Contact info + household profile pages | In-memory only; "saved!" toast was cosmetic | **Drop** — no profile |

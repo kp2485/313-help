@@ -17,7 +17,7 @@ This is the part D Compassion — and most resource directories — never solved
                  ┌──────────┐
   add-a-resource │ proposed │ community/owner submitted, not visible
                  └────┬─────┘
-            steward   │ accept (or open-data row appears) 
+            steward   │ accept after the entry check       
                       ▼
                  ┌──────────┐   cadence passes with     ┌──────────┐
                  │  active  │ ──no verification──────▶  │  stale   │  visible, labeled, sorted down
@@ -98,10 +98,10 @@ Detail screen → **"Something wrong?"** → one tap:
 Optional structured correction (new hours picker, new address) shown after the tap, skippable. Optional "when did you see this?" defaulting to now.
 
 Submission:
-- Sent to `POST /reports` with `client_nonce = sha256(install_id ‖ YYYY-MM-DD)`. The nonce dedupes one device's reports per day per target; it is not linkable across days and is never joined to anything else. `install_id` is a random UUID generated on first launch, stored only on the device, resettable.
+- Sent to `POST /v1/reports` with `client_nonce = sha256(install_secret ‖ target_id ‖ YYYY-MM-DD)`. The nonce dedupes one device's reports per target per day. It differs for every target and every day, so a helper's five reports cannot be linked into a trail. `install_secret` is random, generated on first launch, stored only on the device, resettable, and never sent.
 - No IP logged (Cloudflare Worker: don't persist `cf-connecting-ip`). No timestamps finer than the minute.
 - Offline: queued locally, sent on next connection. Show "We'll send this when you're back online."
-- Rate limit: 20 reports/day per nonce, 3 per target per nonce. Silent drop beyond that.
+- Rate limiting happens at Cloudflare's edge, keyed on IP that the Worker never reads or stores. Nonces are client-made and forgeable, so they dedupe honest devices only; they are not a security control (10-A1).
 
 Abuse model: a competitor pantry or a troll mass-reporting closures. Mitigations: independent-nonce requirement (2 reports from the same nonce count once), steward review before archive, and reports never delete — worst case is a false "might be closed" badge for a day.
 

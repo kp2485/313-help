@@ -4,9 +4,9 @@
 
 ```
 Home
-├─ Emergency strip (always visible, top)           911 · CAM 313-305-0311 · Cold Weather Line · 988 · Narcan
+├─ Emergency strip (always visible, top)           911 · Shelter (HelpLine 866-313-2520) · More urgent numbers ▸ (988, crisis line, overdose steps)
 ├─ Active alerts (0–3 cards, auto-expire)          "Overnight respite open through Wed noon"
-├─ "What do you need?"  →  Triage
+├─ "What do you need?" — the needs list itself, on Home (no interstitial)  →  Triage step 2 or results
 ├─ Categories grid       →  List/Map for a category
 ├─ Search               →  Name/address search incl. archived (warned)
 └─ Menu: Language · Saved · Add a place · About & data sources · Report a problem with the app
@@ -22,11 +22,11 @@ Tab bar (max 4): **Home · Map · Search · Saved**. No profile tab — there is
 
 ## Home
 
-- **Emergency strip**: pinned, high contrast, one row of large tap targets. Numbers are static in the app *and* in the bundle (bundle wins), so they can be corrected without a store release. Verify every number before v1 ships.
+- **Emergency strip**: pinned, high contrast. Two fixed buttons (**911**, **Shelter**) plus "More urgent numbers," so it survives the largest text sizes on a 320dp screen. **911 and 988 are hardcoded and can never be overridden.** Other numbers come from `emergency.csv` through the signed bundle, so they can be corrected without a store release but not by a tampered feed (10-A5). Each is phoned every 30 days; the release build fails otherwise.
 - **Alerts**: cards with title, ends-at ("through Wed 12pm"), one action button. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
-- **"What do you need?"** big button → Triage.
+- **"What do you need?"** is a heading, not a button: the needs are listed right on Home, one tap each (10-B13). Principle 3 path: need (1) → refinement if any (2) → **Call** (3).
 - **Category grid**: Food · Shelter tonight · Narcan · Warm/Cool · Health · Utilities · Rent help · Showers · More.
-- Small footer: "Data updated {relative time} · Works offline".
+- Small footer: "Data updated {relative time} · Works offline". Past 72 hours this becomes a banner ("Last updated 12 days ago — call before you go") and the alerts area says "Alerts may be missing"; past 30 and 120 days see doc 12.
 
 ## Triage — "Find what I need" (the D Compassion replacement)
 
@@ -35,7 +35,8 @@ Runs entirely on the device against the cached bundle. No answer is stored, tran
 Step 1 — **What's going on?** (pick one)
 - I need food
 - I need a safe place to sleep tonight
-- Someone might overdose / I need Narcan
+- **Someone is overdosing right now**
+- I want free Narcan to carry
 - My lights, heat, or water are being shut off
 - I need to see a doctor or nurse
 - I need to talk to someone right now
@@ -45,18 +46,20 @@ Step 1 — **What's going on?** (pick one)
 Step 2 — one refinement, only if it changes the result:
 - Food → *Today* (hot meals + any distribution today) vs *This week* (pantries + scheduled distributions) vs *Help paying* (SNAP/WIC/Double Up)
 - Shelter → *Just me* vs *With kids* vs *I'm under 25* (routes to youth-specific CAM path/agencies) — no further questions
-- Narcan → straight to results (no refinement; speed matters)
+- Overdosing right now → no refinement, no list, no map: **Call 911**, then the rescue steps (check, call, give naloxone if you have it, rescue breaths, recovery position, stay). Nothing else on the screen.
+- Narcan to carry → straight to results
 - Utilities → *Electric/gas (DTE)* vs *Water (DWSD)*
 - Doctor → *Today / urgent* vs *Regular care*
 
-Step 3 — **Near me?** Location permission requested *here*, in context, never on launch. Deny → ask for a ZIP or neighborhood (typed; not stored). Skip → citywide list sorted by "open now."
+Step 3 — **never a gate.** Results show immediately, citywide. An inline chip offers "Use my location" (permission asked only on that tap, never on launch) or "Type a ZIP" (not stored); choosing either re-sorts in place.
 
-Results — max 3 primary cards + "See all". Ranking: open-now first, then confidence, then distance. Each card: name, one-line what-you-get, open-now/next-open, distance, freshness badge, **Call** and **Directions** buttons.
+Results — max 3 primary cards + "See all". Ranking per `schema/query-spec.md`: eligibility → distance band → open-now/next-open → freshness → distance. Each card: name, one-line what-you-get, open-now/next-open, distance, freshness badge, **Call** and **Directions** buttons.
 
 Safety rules baked into the flow:
 - "I'm not safe at home" → results screen opens with the DV hotline and 911 at the top *before* any list. (Principle 8: never ask what you can't act on.)
 - "I need to talk to someone right now" → 988 and DWIHN crisis line first, then walk-in options.
-- "Someone might overdose" → screen shows **Call 911** first, then the nearest 2 stations, then "Narcan is also free at most pharmacies — ask at the counter," then a 4-step "how to use Narcan" card (static, illustrated, offline).
+- "Someone is overdosing right now" → 911 and rescue steps only (static, illustrated, offline). Never a station list: a bystander must not be sent on an errand (10-A7).
+- "I want free Narcan to carry" → nearest stations, then "Narcan is also sold without a prescription at most pharmacies — ask at the counter," then the how-to card.
 
 ## List / Map
 

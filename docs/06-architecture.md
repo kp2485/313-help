@@ -49,8 +49,8 @@ detroithelp/
 - Each source has a parser producing `NormalizedRecord[]`; normalize maps to HSDS entities with deterministic IDs.
 - **Validate**: HSDS JSON Schema + our extension schema + sanity (Detroit bbox, phone format, RRULE parse, no `until` in the past on active).
 - **Diff** against the last published HSDS: added / changed / dropped rows. Rows dropped by a source → steward task; never auto-archived. Diff summary posted to the admin tool and (optional) a Slack/email.
-- **Score** confidence (04) using D1's report/verification data pulled at build time.
-- **Bundle**: denormalize `service_at_location` + joins into per-category gzipped JSON; `alerts.json`; `archived.json` (compact); `index.json` with version = git SHA + timestamp and per-file checksums. Upload to R2 behind Cloudflare; Pages serves `/data/*` with long cache + versioned paths.
+- **Facts, not scores:** the bundle carries dated facts per row (`checked_at_entry`, `last_confirmed_at`, method, open report counts, `cadence_days`) pulled from the seed and D1. Badge, staleness, and sort are computed on the device by `packages/query` (10-A3).
+- **Bundle**: denormalize `service_at_location` + joins into per-category gzipped JSON; `alerts.json`; `archived.json` (compact); `index.json` with version = git SHA + timestamp, per-file SHA-256 checksums, `generated_at`, a human-advanced `heartbeat` date (doc 12), and `emergency_verified`. `index.json.sig` is an Ed25519 signature over the exact bytes of `index.json`; clients pin two public keys and keep the old bundle if verification fails. Upload to R2 behind Cloudflare; Pages serves `/data/*` with long cache + versioned paths.
 - HSDS output committed to `data/hsds/` so every publish is a git commit — free audit trail and rollback.
 
 ## Write API (Cloudflare Worker + D1)
