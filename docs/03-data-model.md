@@ -140,7 +140,7 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 
 ## Freshness rules (summary — full logic in 04)
 
-- `last_verified_at` older than `cadence_days` → `stale`.
-- Two independent `closed_permanently` reports within 30 days → `flagged` (hidden from default results, shown with warning if searched).
+- The phone derives staleness from `last_confirmed_at` / `checked_at_entry` and `cadence_days`; it is not a stored state (10-A3).
+- Two open `closed_permanently`/`moved` reports with no confirm since → `flagged`: **visible**, warned, sorted last in its distance band (10-A1).
 - Steward accept → `archived` (kept, hidden, with reason and optional replacement).
 - A source (open-data layer, watched page) drops a row → steward task; the row stays visible as `stale` until a human confirms — sources glitch.

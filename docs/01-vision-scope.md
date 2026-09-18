@@ -49,6 +49,6 @@ A **directory + triage + freshness system** for Detroit help resources:
 
 - A resident finds a real, open food distribution within 60 seconds on first launch, no account, no signal.
 - A church volunteer adds their pantry's schedule in under five minutes and gets a confirmation that it's live.
-- A closed resource is flagged by two people and disappears from default results within 24 hours, with a steward notified.
+- A closed resource reported by two people carries a "reported closed" warning within the hour and is archived at the next weekly steward pass — and if no steward ever comes, the warning stays.
 - DHD changes the Narcan station list on its public web page; our page watcher notices within a day, a steward confirms the diff, and the app reflects it — without anyone at DHD doing anything for us.
 - 211/CIE can pull our dataset as HSDS and find nothing they can't parse.

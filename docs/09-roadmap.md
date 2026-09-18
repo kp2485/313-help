@@ -22,7 +22,7 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 
 - Page watchers live on DHD's public harm-reduction and program pages. (No DHD feed or letter is assumed.)
 - iOS on TestFlight, PWA public, Android native started.
-- 150+ verified resources; every one phoned or in-person verified within 30 days of launch.
+- ~60–100 resources, each checked once at entry. No scheduled re-verification (04); the ~15 safety-critical rows are phoned monthly.
 - Steward roster: Kyle + 3 community stewards (CHW, librarian, church coordinator, or outreach worker). Row count is capped by what this roster can verify (doc 10-A6).
 - Spanish UI.
 - Privacy policy, About/data sources, open dataset published, repo public.
@@ -49,7 +49,7 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 
 1. **Name.** Needs to be findable, pronounceable in ES/AR, not confusable with a city product, domain available. Candidates to react to: *DetroitHelp*, *313Help*, *NearbyHelp Detroit*, *Detroit Doorway*, *OpenDoor Detroit*. (313SafeBeds already owns the "313" prefix in this space — coordinate with the 313SafeBeds team if you go that way.)
 2. **Android path for the hackathon:** PWA (recommended) vs. attempting Compose. Recommendation: PWA.
-3. **Code license:** MIT vs Apache-2.0. Recommendation: Apache-2.0 (patent grant matters if a vendor ever forks it for a city).
+3. **Code license:** MIT vs Apache-2.0. Recommendation: Apache-2.0 (patent grant matters if a vendor ever forks it for a city). The app is open source and intended as a gift to the city — see doc 12 for what that requires.
 4. **Analytics on or off at launch?** Recommendation: off for the hackathon; identifier-free aggregate counts at v1 with the About-screen disclosure.
 5. **Who are the first two community stewards?** Names, not roles.
 6. **313SafeBeds involvement:** teammate on the hackathon, or partner via link-out only?

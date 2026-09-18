@@ -5,11 +5,11 @@ This is the part D Compassion — and most resource directories — never solved
 ## Principles
 
 1. **Nothing is ever deleted.** Rows are archived with a reason and, when possible, a replacement. History is data.
-2. **Unknown is not "open."** A listing that hasn't been verified within its cadence is shown as stale, sorted down, and labeled. We never imply currency we don't have.
-3. **Two sources beat one.** A single anonymous report never takes a resource down. Two independent reports hide it from default results; a steward archives it.
+2. **Unknown is not "open."** A listing nobody has confirmed within its window is labeled with the plain fact ("Nobody has confirmed this since…"), and sorted down. We never imply currency we don't have — and we never say "verified" for something a person didn't check.
+3. **Reports label; only people remove.** Reports are anonymous and forgeable (10-A1), so no number of them hides a row. They add a warning and sort it down, automatically. Only a steward archives.
 4. **The person at the door is the fastest path to truth.** No institution maintains a feed for us (see 02), so nothing resolves a report automatically. The best evidence is someone physically there: a resident's report, a host's answer on the phone, a steward's visit. A published list never outranks the person standing at the empty box.
 5. **Make reporting cheaper than complaining.** One tap from the detail screen. No account. No form longer than a tweet.
-6. **Reward confirmation as much as correction.** "Still here, still open" reports reset the verification clock and are the cheapest verification we have.
+6. **Confirmation is the verification.** "Still open" taps from residents and helpers are how this directory stays current; there is no scheduled calling behind them. The button is as prominent as Call. Helpers (CHWs, librarians, outreach workers) who open the same rows every week are the real verifiers.
 
 ## States
 
@@ -36,46 +36,51 @@ This is the part D Compassion — and most resource directories — never solved
                  └───────────┘
 ```
 
-**Default results show:** `active` and `stale` (stale sorted after active within the same distance band, with a badge).
+*2026-09-18: `stale` is no longer a stored state; the phone derives it from dates. `flagged` rows stay visible with a warning. The diagram's transitions otherwise hold.*
+
+**Default results show:** everything except `proposed`, `suspended`, and `archived`, sorted as described under "What the badge says."
 **Search-by-name shows:** everything except `proposed`, with `flagged`/`archived` clearly warned ("Reported closed — call first" / "Closed as of Aug 2026").
 
-## Confidence score
+## What the badge says (facts, not a score)
 
-Computed at bundle build time; drives sort order and badge. Never shown as a number to residents — shown as one of three badges: **Verified recently** / **Might be out of date** / **Reported closed**.
+*Revised 2026-09-18 (DECISIONS.md): nobody phones listings on a schedule. The app is open source and meant to be handed over; it cannot depend on a standing verification job. Humans act on exceptions only. The price is that we stop saying "verified" and say what we know.*
 
-```
-base by source type:    partner_feed 0.85 | open_data 0.8 | watched_page 0.7 | press_release 0.7 | seed_list 0.5 | community 0.4   (owner_feed 0.9 reserved for opt-in orgs; none today. Formula under review — see 10-B1)
-age decay:              × max(0.3, 1 − days_since_verified / (2 × cadence_days))
-confirm boost:          + 0.05 per community "still open" in last 30 days (cap +0.15)
-report penalty:         − 0.25 per open "closed/moved" report (independent nonces)
-                        − 0.10 per open "wrong hours/phone" report
-auto-check penalty:     − 0.15 if phone number failed validity, − 0.10 if website 404 two fetches in a row
-clamp 0..1
-```
+The bundle ships facts per row: `checked_at_entry`, `last_confirmed_at`, `last_confirm_method`, open report counts by kind, `cadence_days`. **The phone computes the badge from those facts and today's date** (10-A3), so an offline phone ages its own data.
 
-Badges: ≥ 0.7 Verified recently; 0.4–0.7 Might be out of date; < 0.4 or state ≠ active → warning.
+| What we know | Badge text |
+|---|---|
+| Confirmed within its window | "A visitor said this was open 4 days ago" / "Checked by phone 4 days ago" (method shown plainly; a tap is not a phone call) |
+| Never confirmed, still inside its window | "Checked when added, Sept 18" |
+| Past its window, no reports | "Nobody has confirmed this since Sept 18 — call first" |
+| 1 open closed/moved report | "Someone reported this closed on Oct 2 — call first" |
+| 2+ open closed/moved reports, no confirm since | "2 people reported this closed this week" — sorted last in its distance band, **still visible** (10-A1: reports never hide a row) |
+| Steward archived | "Closed as of {date}. Try: {replacement}" |
 
-## Verification cadences by category
+Sort within a distance band: confirmed-in-window → checked-at-entry-in-window → past window → reported closed. A closed report outweighs a confirm of the same age. There is no numeric confidence shown or stored.
 
-| Category | Cadence | Why |
+## How long a confirmation stays good (`cadence_days`)
+
+Not a to-do list for anyone. It is only how fast a row's badge ages when nobody says anything.
+
+| Category | Window | Why |
 |---|---|---|
-| Alerts/activations | Hard end date — no cadence; expire automatically | By design |
-| Harm reduction stations | 30 days (host phone call) + community confirms | Vandalism, relocation, stock-outs. 14 days needed an owner we don't have; stock-outs travel as same-day signals instead |
-| Mobile food distributions | 7 days (schedule) / 30 days (site) | Schedules shift weekly |
-| Church/independent pantries | 30 days | Volunteer-run; holidays and summer breaks |
-| Shelter / CAM access points | 30 days | Hours change |
-| Utility/rent assistance programs | 90 days | Program cycles; funding runs out |
-| DHD programs, rec centers, libraries | 90 days | Stable institutions |
-| Benefits link-outs (SNAP, WIC) | 180 days | Rarely change |
+| Alerts/activations | Hard end date; expire automatically | By design |
+| Mobile food distributions | 14 days | Schedules shift |
+| Church/independent pantries | 45 days | Volunteer-run; holidays and summer breaks |
+| Harm reduction stations | 45 days | Relocation, vandalism. Stock-outs are same-day signals (10-B4), not part of this |
+| Shelter access points | 60 days | Hours change |
+| Utility/rent assistance | 90 days | Funding cycles |
+| DHD programs, rec centers, libraries, parks | 180 days | Stable institutions |
+| Benefits link-outs | 365 days | Rarely change |
 
-Cadence is a per-row override; category value is the default.
+**The exception: safety-critical rows** (emergency strip numbers, crisis lines, shelter front door, DV hotlines — about 15 rows, listed in `data/seed/emergency.csv`). These are phoned every 30 days by whoever operates the app, and the release build fails if any `verified_by_call_on` is older than that. This is the one scheduled human job, about 20 minutes a month.
 
 ## Verification methods (cheapest first)
 
 1. **Source still lists it** — the row is still present in its open-data layer or watched page. This is **not verification**; it only means the publisher hasn't removed it, and it never resets the clock. (If an org ever opts in to maintain its rows, a dated attestation from them does count — `method: owner_attest`.)
 2. **Auto-checks** (nightly, no human): phone number format + carrier validity (via a lookup API, if budget allows; otherwise format only); website HTTP status; geocode sanity (address resolves within Detroit bbox); schedule sanity (no `until` in the past on an active row).
-3. **Community confirm** — "Still open" tap from the detail screen. Resets clock only if ≥ 2 independent confirms in 30 days OR 1 confirm on a row ≤ 45 days stale.
-4. **Steward phone call** — the standard for anything community-added or flagged. Script: "Are you still running the pantry? Days/times? Any ID or residency requirement? Okay to list?" Log method, date, who (role only).
+3. **Community confirm** — "Still open" tap from the detail screen. Sets `last_confirmed_at` (method `community_confirm`) unless there is a newer open closed-report on the row. Forgeable, so it is always displayed as what it is ("a visitor said…"), and a closed report outweighs it.
+4. **Steward phone call** — used at entry and for exceptions only, never on a schedule (except the ~15 safety-critical rows). Script: "Are you still running the pantry? Days/times? Any ID or residency requirement? Okay to list?" Log method, date, who (role only).
 5. **In-person** — outreach workers, Health Hub students, Kyle. Highest trust; log as `in_person`.
 
 ## Reporting (in-app, anonymous)
@@ -104,16 +109,15 @@ Abuse model: a competitor pantry or a troll mass-reporting closures. Mitigations
 
 **Stewards** are trusted humans with a login to the admin tool (see 06) — Kyle plus community stewards (CHWs, librarians, church coordinators, outreach workers). No DHD seat is assumed. Stewards are the only people who can archive. Roles: `owner` (can edit own org's rows, can't archive others'), `steward` (city-wide), `admin`.
 
-Daily queue, sorted by urgency:
-1. Flagged rows (2+ closed/moved reports) — call or check; archive or clear.
-2. Proposed rows (add-a-resource submissions) — verify by phone; accept/reject with reason.
-3. Stale rows past 2× cadence in high-risk categories (harm reduction, mobile food).
-4. Auto-check failures.
-5. Pending alerts parsed from press releases (first season only; later, trusted parse → auto-publish with 1-hour retract window).
+**Exceptions queue** — worked in one sitting, about weekly. Nothing in the app waits on it except archiving and new listings:
+1. Proposed rows (add-a-place) — one check at entry (phone or web), accept/reject with reason. The entry check is not optional: it is what keeps scam numbers and private addresses out.
+2. Rows with 2+ open closed/moved reports and no confirm since — one call or look; archive or clear.
+3. Machine-raised tasks: watched page changed, row dropped from an open-data layer, website 404 twice, phone/address change held for approval (10-A5).
+4. Pending alerts drafted from press releases — always human-published (10-B10).
 
-Every steward action is logged: who (role + steward id), what, when, evidence (call notes). The log is part of the open dataset minus steward identity.
+Labeling and demotion happen automatically with no steward. If the queue is never worked, the directory degrades honestly (badges age, reported rows carry warnings) instead of lying. See doc 12 for what happens if nobody operates the app at all.
 
-Target SLA: flagged → resolved within 24h; proposed → within 72h.
+Every steward action is logged: role, what, when, reason code. The public dataset carries the structured log only — never free-text notes (10-B6).
 
 ## Adding a resource
 
@@ -138,8 +142,8 @@ Alerts carry `ends_at`. At `ends_at`, they leave the home screen automatically w
 
 ## Metrics that tell us if this is working
 
-- % of active rows verified within cadence (target ≥ 85%).
-- Median hours from first "closed" report to steward resolution.
+- % of visible rows confirmed inside their window (no target to staff against; it is a health reading, and it is published).
+- Median days from second "closed" report to steward resolution.
 - Reports per 1,000 detail views (healthy: 5–20; too low = button isn't found; too high = data's bad).
 - Confirm-to-correction ratio (healthy directory ≈ 3:1).
 - Proposed → accepted rate and time.

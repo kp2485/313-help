@@ -72,6 +72,7 @@ Fix:
 - Two-person rule (or at least a 1-hour delay + notification to all stewards) for edits to the emergency file.
 
 ### A6. The verification workload doesn't fit the steward roster, so everything will go stale
+**Resolved by redesign (2026-09-18, later).** Scheduled verification is gone. 04 now runs on exceptions only: one check at entry, a weekly pass over reported rows and machine-raised tasks, and a monthly call to ~15 safety-critical numbers. Badges state facts ("a visitor said this was open 4 days ago") instead of claiming "verified." The cost is accepted: a quiet listing can be dead and unreported; the app says how long it has been quiet rather than pretending to know.
 **Now the top risk (2026-09-18).** With no DHD owner, every DHD row — 25 stations, ~18 programs — lands on the same volunteer roster. Changes made in 01–09: station cadence moved from 14 to 30 days; stations are verified by phoning the **host** (the barbershop, store, or transit center has a phone even though the newsstand doesn't); stock-outs travel as same-day signals (B4) rather than as verification; the v1 roster drops the assumed DHD seat; row count is capped by roster capacity. QR markers on DHD's stations need DHD's cooperation, so don't count on them there — ask hosts and churches individually instead.
 *Docs: 04 cadences + steward workflow, 09 v1 roster.*
 

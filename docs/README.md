@@ -21,6 +21,7 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 09 | [Roadmap & open questions](09-roadmap.md) | Hackathon scope, v1, v2, decisions Kyle needs to make |
 | 10 | [Adversarial audit](10-adversarial-audit.md) | Where docs 01–09 break their own rules, ranked, with fixes and a web fact-check. **Read before building.** |
 | 11 | [Healthy places](11-greenway-public-places.md) | Proposal: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
+| 12 | [Gift & handoff](12-gift-and-handoff.md) | What "open-source gift to the city" demands of the design: unattended operation, dead-man switch, transfer checklist, costs |
 | — | [DECISIONS.md](DECISIONS.md) | Decisions the docs don't cover; audit fixes awaiting approval |
 | — | [CLAUDE.md](../CLAUDE.md) | Handoff instructions for Claude Code |
 
