@@ -66,6 +66,16 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 | Michigan 211 / UWSEM CIE | The authoritative human-services database, **not open data**. Their format aligns with HSDS. Goal: publish our dataset as HSDS so 211 can consume it and, eventually, negotiate read access. Don't scrape 211 |
 | findhelp.org, Lemon Tree (foodhelpline.org), 1degree.org, freefood.org | Tier D aggregators. Lemon Tree's crowd-sourced "average wait time" and "reviews" model is worth studying for our reporting UX. Do not rehost their data |
 
+### Recreation, transit, events (added 2026-09-18, all checked that day)
+
+| Source | What | Tier | Notes |
+|---|---|---|---|
+| City Parks layer (`city_parks/FeatureServer/0`) | 302 parks: name, address, type, acreage, coordinates. **No amenities.** Last edited 2026-09-14 | A | `pnpm ingest:opendata` → `data/ingested/city_parks.json`. A staff-owned `Parks_v2` layer has amenity columns but was last edited 2022 and isn't published by the open-data account: not used |
+| City calendar (detroitmi.gov/Calendar-and-Events) | ~70 upcoming events | B | **No RSS, iCal, or JSON feed exists** (every candidate URL is 404 or blocked). The pipeline reads the public listing pages once a day, spaced out, and keeps facts only: title, date, time, department, link. If fewer than 5 parse, the last good file is kept. Ask the City for a feed |
+| Recreation centers page | 17 centers, each with a subpage for address, phone, hours | B | Not seeded yet. The 2016 open-data layer is archived |
+| DDOT / SMART / People Mover / QLINE / MoGo | Links, fares, phone numbers | B | In `apps/web/src/transit.ts` with a `checked` date. The City's pages disagree about which app they recommend (Bus Tracker, Token Transit, Transit), so we list them without calling one official. MoGo's Access Pass asks for a state benefits case number: link out only |
+| DDOT GTFS (`ddot_gtfs.zip`, 9.4 MB, updated 2026-09-02) | Stops, routes, schedules | A | Not ingested yet. Next step for "nearest stop" on each listing |
+
 ## Ingestion strategy summary
 
 1. **Seed CSVs in the repo are the first pipeline** (`data/seed/*.csv`, maintained by stewards through the admin tool or a pull request). For DHD content, a **page watcher** fetches the public harm-reduction and program pages nightly, hashes the relevant section, and opens a steward task when it changes. We never auto-publish from a watched page. There is no DHD spreadsheet and none is planned; if any org later volunteers a feed, it plugs in as one more source.

@@ -10,7 +10,7 @@
     "typecheck": "pnpm -r typecheck",
     "build:bundle": "pnpm --filter @detroithelp/pipeline build:bundle",
     "build:bundle:release": "pnpm --filter @detroithelp/pipeline build:bundle -- --release",
-    "ingest:opendata": "pnpm --filter @detroithelp/pipeline ingest:opendata && pnpm --filter @detroithelp/pipeline ingest:greenway",
+    "ingest:opendata": "pnpm --filter @detroithelp/pipeline ingest:opendata && pnpm --filter @detroithelp/pipeline ingest:greenway && pnpm --filter @detroithelp/pipeline ingest:city",
     "geocode": "pnpm --filter @detroithelp/pipeline geocode",
     "keys:generate": "pnpm --filter @detroithelp/pipeline keys:generate",
     "check:emergency": "pnpm --filter @detroithelp/pipeline check:emergency",

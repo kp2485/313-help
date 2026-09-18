@@ -2,9 +2,10 @@ import { generateKeyPairSync, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { NEEDS, CATEGORIES, HARDCODED } from '../src/needs.js';
+import { NEEDS, CATEGORIES, HARDCODED, TABS } from '../src/needs.js';
 import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
+import { TRANSIT } from '../src/transit.js';
 import { build as buildReport, nonce } from '../src/report.js';
 
 const root = join(__dirname, '../../..');
@@ -38,6 +39,8 @@ describe('needs list', () => {
       for (const r of n.refine ?? []) expect(strings[`refine.${n.id}.${r.id}`], `${n.id}.${r.id}`).toBeTypeOf('string');
     }
     for (const c of CATEGORIES) expect(strings[`cat.${c.id}`], c.id).toBeTypeOf('string');
+    for (const tab of TABS) expect(strings[`tab.${tab.id}`], tab.id).toBeTypeOf('string');
+    for (const id of ['food', 'shelter', 'doctor', 'narcan']) expect(strings[`quick.${id}`], id).toBeTypeOf('string');
   });
   it('the overdose-now screen has 911 and steps, and no list of places', () => {
     const od = NEEDS.find((n) => n.id === 'overdose_now')!;
@@ -50,6 +53,14 @@ describe('needs list', () => {
     expect(NEEDS.find((n) => n.id === 'talk')!.first![0]).toBe('emg_988');
   });
   it('911 and 988 are hardcoded', () => expect(HARDCODED).toEqual({ emg_911: '911', emg_988: '988' }));
+  it('urgent needs come first on the Help tab, and urgent numbers are one tap from every screen', () => {
+    expect(NEEDS.filter((n) => n.group === 'now').map((n) => n.id)).toEqual(['overdose_now', 'shelter', 'unsafe', 'talk']);
+    expect(main).toMatch(/quickExit \? `<button class="exit" data-exit>[^`]+` : urgentBtn/);
+  });
+  it('transit links go to official sites only, over a known list of hosts', () => {
+    const hosts = new Set(TRANSIT.sections.flatMap((s) => s.links ?? []).concat(TRANSIT.bike).map((l) => new URL(l.url).hostname.replace(/^www\./, '')));
+    expect([...hosts].sort()).toEqual(['detroitmi.gov', 'mogodetroit.org', 'myddotbus.com', 'qlinedetroit.com', 'smartbus.org', 'thepeoplemover.com', 'tokentransit.com', 'transitapp.com']);
+  });
 });
 
 describe('reports from the phone', () => {
@@ -95,7 +106,7 @@ describe('privacy and copy rules, checked against the source', () => {
     }
   });
   it('need screens never put anything in the URL', () => {
-    expect(main).toMatch(/return null; \/\/ home, more, and every "need" screen: no trace/);
+    expect(main).toMatch(/return null; \/\/ the urgent sheet and every "need" screen: no trace/);
   });
   it('no third-party origins in the page shell', () => {
     const html = readFileSync(join(__dirname, '../index.html'), 'utf8');

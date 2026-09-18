@@ -12,7 +12,8 @@
     "check:sources": "tsx src/check-sources.ts",
     "keys:generate": "tsx src/keys.ts",
     "check:emergency": "tsx src/check-emergency.ts",
-    "ingest:greenway": "tsx src/ingest-greenway.ts"
+    "ingest:greenway": "tsx src/ingest-greenway.ts",
+    "ingest:city": "tsx src/ingest-city.ts"
   },
   "dependencies": {
     "@detroithelp/query": "workspace:*",

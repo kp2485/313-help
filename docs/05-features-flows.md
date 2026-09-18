@@ -18,7 +18,16 @@ Add a place
 Saved (local only)
 ```
 
-Tab bar (max 4): **Home · Map · Search · Saved**. No profile tab — there is no profile.
+**Revised 2026-09-18 (Kyle): five tabs — Home · Help · Recreation · Transit · Events.** No profile tab; there is no profile.
+
+- **Home**: a calm landing page — hero, one "Find free help" card, four quick needs, the next three City events, tiles into Recreation and Transit. No red, no emergency strip.
+- **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
+- **Recreation**: Joe Louis Greenway (map, segments, help within a 10-minute walk), City parks (302, nearest first with location), recreation centers, MoGo Access Pass.
+- **Transit**: DDOT trip planner and real-time links, fares, free rides (People Mover, QLINE), phone numbers. Every listing with an address gets a **Bus directions** button.
+- **Events**: the City calendar, read by the pipeline into the signed bundle, grouped by day; details link out.
+- **Urgent help**: a button in the top bar of every screen (replaced by quick-exit on DV and crisis screens) opens the numbers sheet: 911, 988, shelter, crisis line, DV hotline, 211, plus the overdose steps. One tap from anywhere (Principle 3). 911 is the only red element in the app besides quick exit.
+
+The earlier "emergency strip" and single-page Home described below are superseded by this structure; the rules about what each screen must show first are unchanged.
 
 ## Home
 

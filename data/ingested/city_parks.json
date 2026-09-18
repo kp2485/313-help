@@ -1,0 +1,2727 @@
+{
+ "source": {
+  "name": "City of Detroit parks layer",
+  "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0",
+  "last_edited": "2026-09-14"
+ },
+ "parks": [
+  {
+   "id": "plc_park_15th_butternut",
+   "name": "15th-Butternut",
+   "address": "2942 15th St",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.33575,
+   "lon": -83.08001
+  },
+  {
+   "id": "plc_park_4th_calumet",
+   "name": "4th-Calumet",
+   "address": "4245 4th St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.3492,
+   "lon": -83.06942
+  },
+  {
+   "id": "plc_park_4th_charlotte",
+   "name": "4th-Charlotte",
+   "address": "3008 4th St",
+   "type": "Park: Neighborhood",
+   "acres": 1.3,
+   "lat": 42.34156,
+   "lon": -83.06432
+  },
+  {
+   "id": "plc_park_adams_butzel",
+   "name": "Adams Butzel",
+   "address": "14640 Meyers Rd",
+   "type": "Park: Community",
+   "acres": 32.8,
+   "lat": 42.39706,
+   "lon": -83.16653
+  },
+  {
+   "id": "plc_park_alexandrine_elmwood",
+   "name": "Alexandrine-Elmwood",
+   "address": "3150 E Alexandrine St",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.36123,
+   "lon": -83.03043
+  },
+  {
+   "id": "plc_park_alfred_brush_ford",
+   "name": "Alfred Brush Ford",
+   "address": "100 Lenox St",
+   "type": "Park: Riverfront",
+   "acres": 33.9,
+   "lat": 42.35741,
+   "lon": -82.93923
+  },
+  {
+   "id": "plc_park_algonquin_goethe",
+   "name": "Algonquin-Goethe",
+   "address": "3030 Algonquin St",
+   "type": "Park: Neighborhood",
+   "acres": 2.7,
+   "lat": 42.38059,
+   "lon": -82.9626
+  },
+  {
+   "id": "plc_park_ames",
+   "name": "Ames",
+   "address": "3716 McGraw St",
+   "type": "Park: Mini",
+   "acres": 1,
+   "lat": 42.34972,
+   "lon": -83.10822
+  },
+  {
+   "id": "plc_park_aretha_franklin",
+   "name": "Aretha Franklin",
+   "address": "2200 Atwater St",
+   "type": "Park: Riverfront",
+   "acres": 9.1,
+   "lat": 42.33423,
+   "lon": -83.02132
+  },
+  {
+   "id": "plc_park_armour_knodell",
+   "name": "Armour-Knodell",
+   "address": "9300 Armour St",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.39856,
+   "lon": -83.00533
+  },
+  {
+   "id": "plc_park_arthur",
+   "name": "Arthur",
+   "address": "18550 Archdale St",
+   "type": "Park: Neighborhood",
+   "acres": 3.7,
+   "lat": 42.42733,
+   "lon": -83.21705
+  },
+  {
+   "id": "plc_park_balduck",
+   "name": "Balduck",
+   "address": "18151 E Warren Ave",
+   "type": "Park: Regional",
+   "acres": 58.5,
+   "lat": 42.415,
+   "lon": -82.91945
+  },
+  {
+   "id": "plc_park_bale",
+   "name": "Bale",
+   "address": "18673 Winthrop St",
+   "type": "Park: Neighborhood",
+   "acres": 3.8,
+   "lat": 42.42739,
+   "lon": -83.20104
+  },
+  {
+   "id": "plc_park_beard",
+   "name": "Beard",
+   "address": "8902 W Fort St",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.29775,
+   "lon": -83.12638
+  },
+  {
+   "id": "plc_park_beatrice_buck_s_paradise_valley",
+   "name": "Beatrice Buck's Paradise Valley",
+   "address": "1475 Randolph St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.33622,
+   "lon": -83.04619
+  },
+  {
+   "id": "plc_park_belden_santa_maria",
+   "name": "Belden-Santa Maria",
+   "address": "17181 Belden St",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.41843,
+   "lon": -83.13626
+  },
+  {
+   "id": "plc_park_belle_isle",
+   "name": "Belle Isle",
+   "address": "7200 E Jefferson Ave",
+   "type": "Park: Regional",
+   "acres": 981.8,
+   "lat": 42.34183,
+   "lon": -82.97627
+  },
+  {
+   "id": "plc_park_belton_mark_twain",
+   "name": "Belton-Mark Twain",
+   "address": "8279 Mark Twain St",
+   "type": "Park: Neighborhood",
+   "acres": 4.2,
+   "lat": 42.35425,
+   "lon": -83.18556
+  },
+  {
+   "id": "plc_park_bennett",
+   "name": "Bennett",
+   "address": "402 Smith St",
+   "type": "Park: Neighborhood",
+   "acres": 1.8,
+   "lat": 42.37472,
+   "lon": -83.06976
+  },
+  {
+   "id": "plc_park_benson_elmwood",
+   "name": "Benson-Elmwood",
+   "address": "3340 Benson St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.3564,
+   "lon": -83.02469
+  },
+  {
+   "id": "plc_park_bessy",
+   "name": "Bessy",
+   "address": "12020 E Seven Mile",
+   "type": "Park: Community",
+   "acres": 38.9,
+   "lat": 42.4306,
+   "lon": -83.00155
+  },
+  {
+   "id": "plc_park_bieniek",
+   "name": "Bieniek",
+   "address": "5981 Martin St",
+   "type": "Park: Neighborhood",
+   "acres": 3.7,
+   "lat": 42.34159,
+   "lon": -83.13648
+  },
+  {
+   "id": "plc_park_bishop",
+   "name": "Bishop",
+   "address": "6100 Grand River Ave",
+   "type": "Park: Community",
+   "acres": 34.9,
+   "lat": 42.35664,
+   "lon": -83.10326
+  },
+  {
+   "id": "plc_park_bloomfield",
+   "name": "Bloomfield",
+   "address": "3732 25th St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.33692,
+   "lon": -83.09637
+  },
+  {
+   "id": "plc_park_boyer",
+   "name": "Boyer",
+   "address": "6203 W Vernor Hwy",
+   "type": "Park: Neighborhood",
+   "acres": 1.8,
+   "lat": 42.31479,
+   "lon": -83.10821
+  },
+  {
+   "id": "plc_park_bradby",
+   "name": "Bradby",
+   "address": "9715 Cardoni St",
+   "type": "Park: Neighborhood",
+   "acres": 5.1,
+   "lat": 42.39207,
+   "lon": -83.07206
+  },
+  {
+   "id": "plc_park_bradley",
+   "name": "Bradley",
+   "address": "3571 Concord St",
+   "type": "Park: Neighborhood",
+   "acres": 2.1,
+   "lat": 42.36367,
+   "lon": -83.0175
+  },
+  {
+   "id": "plc_park_brewer",
+   "name": "Brewer",
+   "address": "4535 Fairview St",
+   "type": "Park: Neighborhood",
+   "acres": 8.2,
+   "lat": 42.383,
+   "lon": -82.98681
+  },
+  {
+   "id": "plc_park_bringard_boulder",
+   "name": "Bringard-Boulder",
+   "address": "16251 Bringard Dr",
+   "type": "Park: Neighborhood",
+   "acres": 1.8,
+   "lat": 42.44699,
+   "lon": -82.953
+  },
+  {
+   "id": "plc_park_bristol",
+   "name": "Bristol",
+   "address": "2781 E Larned St",
+   "type": "Park: Neighborhood",
+   "acres": 3.2,
+   "lat": 42.34145,
+   "lon": -83.02108
+  },
+  {
+   "id": "plc_park_brookins",
+   "name": "Brookins",
+   "address": "11164 Rossiter St",
+   "type": "Park: Neighborhood",
+   "acres": 1.8,
+   "lat": 42.42066,
+   "lon": -82.95202
+  },
+  {
+   "id": "plc_park_bryant_vermont",
+   "name": "Bryant-Vermont",
+   "address": "5170 Vermont St",
+   "type": "Park: Mini",
+   "acres": 0.6,
+   "lat": 42.35219,
+   "lon": -83.08483
+  },
+  {
+   "id": "plc_park_buchanan_tillman",
+   "name": "Buchanan-Tillman",
+   "address": "3318 Buchanan St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.34175,
+   "lon": -83.09611
+  },
+  {
+   "id": "plc_park_burlingame_parklot",
+   "name": "Burlingame Parklot",
+   "address": "11553 Woodward Ave",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.39166,
+   "lon": -83.08807
+  },
+  {
+   "id": "plc_park_burns_lambert",
+   "name": "Burns-Lambert",
+   "address": "5952 Burns St",
+   "type": "Park: Neighborhood",
+   "acres": 1.1,
+   "lat": 42.38682,
+   "lon": -83.01252
+  },
+  {
+   "id": "plc_park_butler",
+   "name": "Butler",
+   "address": "20230 Conant St",
+   "type": "Park: Neighborhood",
+   "acres": 5.7,
+   "lat": 42.4451,
+   "lon": -83.08041
+  },
+  {
+   "id": "plc_park_butzel_family",
+   "name": "Butzel Family",
+   "address": "7737 Kercheval St",
+   "type": "Park: Neighborhood",
+   "acres": 8.1,
+   "lat": 42.35854,
+   "lon": -83.00329
+  },
+  {
+   "id": "plc_park_calcara",
+   "name": "Calcara",
+   "address": "3420 Charlevoix St",
+   "type": "Park: Neighborhood",
+   "acres": 1.5,
+   "lat": 42.35534,
+   "lon": -83.02225
+  },
+  {
+   "id": "plc_park_calimera",
+   "name": "Calimera",
+   "address": "19493 Joann St",
+   "type": "Park: Neighborhood",
+   "acres": 4.4,
+   "lat": 42.43754,
+   "lon": -82.99007
+  },
+  {
+   "id": "plc_park_callahan",
+   "name": "Callahan",
+   "address": "3356 E Ferry St",
+   "type": "Park: Neighborhood",
+   "acres": 3.1,
+   "lat": 42.37218,
+   "lon": -83.03535
+  },
+  {
+   "id": "plc_park_calvert",
+   "name": "Calvert",
+   "address": "1624 Calvert St",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.38407,
+   "lon": -83.1015
+  },
+  {
+   "id": "plc_park_campus_martius_cadillac_square",
+   "name": "Campus Martius - Cadillac Square",
+   "address": "66 Cadillac Sq",
+   "type": "Park: Neighborhood",
+   "acres": 2.5,
+   "lat": 42.33158,
+   "lon": -83.04601
+  },
+  {
+   "id": "plc_park_capitol",
+   "name": "Capitol",
+   "address": "150 State St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.3329,
+   "lon": -83.04945
+  },
+  {
+   "id": "plc_park_cardoni_dakota",
+   "name": "Cardoni-Dakota",
+   "address": "17235 Cardoni St",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.42025,
+   "lon": -83.09179
+  },
+  {
+   "id": "plc_park_cass",
+   "name": "Cass",
+   "address": "2733 2nd Ave",
+   "type": "Park: Neighborhood",
+   "acres": 4,
+   "lat": 42.34042,
+   "lon": -83.06039
+  },
+  {
+   "id": "plc_park_castador",
+   "name": "Castador",
+   "address": "5995 Hurlbut St",
+   "type": "Park: Neighborhood",
+   "acres": 1.7,
+   "lat": 42.39135,
+   "lon": -83.00217
+  },
+  {
+   "id": "plc_park_chandler",
+   "name": "Chandler",
+   "address": "12831 Frankfort St",
+   "type": "Park: Regional",
+   "acres": 201,
+   "lat": 42.39598,
+   "lon": -82.97578
+  },
+  {
+   "id": "plc_park_charleston_colton",
+   "name": "Charleston-Colton",
+   "address": "20555 Charleston St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.44538,
+   "lon": -83.10751
+  },
+  {
+   "id": "plc_park_clarita_stout",
+   "name": "Clarita-Stout",
+   "address": "18512 Stout St",
+   "type": "Park: Neighborhood",
+   "acres": 2.8,
+   "lat": 42.42648,
+   "lon": -83.24297
+  },
+  {
+   "id": "plc_park_clark",
+   "name": "Clark",
+   "address": "4301 W Vernor Hwy",
+   "type": "Park: Community",
+   "acres": 29.8,
+   "lat": 42.31746,
+   "lon": -83.09261
+  },
+  {
+   "id": "plc_park_clemente",
+   "name": "Clemente",
+   "address": "2631 Bagley St",
+   "type": "Park: Neighborhood",
+   "acres": 1.1,
+   "lat": 42.32478,
+   "lon": -83.07867
+  },
+  {
+   "id": "plc_park_clinton",
+   "name": "Clinton",
+   "address": "8145 Chalfonte St",
+   "type": "Park: Neighborhood",
+   "acres": 4,
+   "lat": 42.39917,
+   "lon": -83.15079
+  },
+  {
+   "id": "plc_park_collins",
+   "name": "Collins",
+   "address": "11618 Alpena St",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.40902,
+   "lon": -83.04352
+  },
+  {
+   "id": "plc_park_commemoration",
+   "name": "Commemoration",
+   "address": "12545 Alma St",
+   "type": "Park: Neighborhood",
+   "acres": 3,
+   "lat": 42.42199,
+   "lon": -82.96383
+  },
+  {
+   "id": "plc_park_comstock",
+   "name": "Comstock",
+   "address": "20340 Greenfield Rd",
+   "type": "Park: Community",
+   "acres": 25.4,
+   "lat": 42.44229,
+   "lon": -83.19517
+  },
+  {
+   "id": "plc_park_conant_minnesota",
+   "name": "Conant-Minnesota",
+   "address": "17800 Conant St",
+   "type": "Park: Neighborhood",
+   "acres": 2.4,
+   "lat": 42.42452,
+   "lon": -83.06696
+  },
+  {
+   "id": "plc_park_conner_playfield",
+   "name": "Conner Playfield",
+   "address": "9701 Conner St",
+   "type": "Park: Community",
+   "acres": 18.9,
+   "lat": 42.39954,
+   "lon": -82.99272
+  },
+  {
+   "id": "plc_park_constance_st_marys",
+   "name": "Constance-St. Marys",
+   "address": "8324 Saint Marys St",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.35467,
+   "lon": -83.20383
+  },
+  {
+   "id": "plc_park_cook",
+   "name": "Cook",
+   "address": "16001 Fenkell St",
+   "type": "Park: Neighborhood",
+   "acres": 2.8,
+   "lat": 42.40104,
+   "lon": -83.20485
+  },
+  {
+   "id": "plc_park_corrigan",
+   "name": "Corrigan",
+   "address": "14723 E Warren Ave",
+   "type": "Park: Neighborhood",
+   "acres": 3.2,
+   "lat": 42.39757,
+   "lon": -82.95569
+  },
+  {
+   "id": "plc_park_cottrell_erie",
+   "name": "Cottrell-Erie",
+   "address": "749 S Cottrell St",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.2954,
+   "lon": -83.10884
+  },
+  {
+   "id": "plc_park_coventry",
+   "name": "Coventry",
+   "address": "19227 Coventry St",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.43376,
+   "lon": -83.10175
+  },
+  {
+   "id": "plc_park_crockett",
+   "name": "Crockett",
+   "address": "6093 14th St",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.3591,
+   "lon": -83.09288
+  },
+  {
+   "id": "plc_park_cross",
+   "name": "Cross",
+   "address": "8134 Manor",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.35344,
+   "lon": -83.16572
+  },
+  {
+   "id": "plc_park_dabrowski",
+   "name": "Dabrowski",
+   "address": "4671 Saint Aubin St",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.36171,
+   "lon": -83.04321
+  },
+  {
+   "id": "plc_park_delray",
+   "name": "Delray",
+   "address": "420 S Leigh St",
+   "type": "Park: Community",
+   "acres": 11.4,
+   "lat": 42.28991,
+   "lon": -83.12872
+  },
+  {
+   "id": "plc_park_dequindre_emery",
+   "name": "Dequindre-Emery",
+   "address": "19360 Dequindre St",
+   "type": "Park: Mini",
+   "acres": 0.8,
+   "lat": 42.43586,
+   "lon": -83.08262
+  },
+  {
+   "id": "plc_park_dequindre_grixdale",
+   "name": "Dequindre-Grixdale",
+   "address": "18551 Dequindre St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.42871,
+   "lon": -83.08303
+  },
+  {
+   "id": "plc_park_diack",
+   "name": "Diack",
+   "address": "13889 Curtis St",
+   "type": "Park: Neighborhood",
+   "acres": 3.5,
+   "lat": 42.42281,
+   "lon": -83.18306
+  },
+  {
+   "id": "plc_park_dinning",
+   "name": "Dinning",
+   "address": "9354 Prairie St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.36449,
+   "lon": -83.14274
+  },
+  {
+   "id": "plc_park_doan",
+   "name": "Doan",
+   "address": "9946 Prest St",
+   "type": "Park: Neighborhood",
+   "acres": 2.9,
+   "lat": 42.3695,
+   "lon": -83.1963
+  },
+  {
+   "id": "plc_park_dorais",
+   "name": "Dorais",
+   "address": "20101 Mound Rd",
+   "type": "Park: Community",
+   "acres": 28.6,
+   "lat": 42.44268,
+   "lon": -83.0471
+  },
+  {
+   "id": "plc_park_dover",
+   "name": "Dover",
+   "address": "6620 Diversey",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.35035,
+   "lon": -83.13802
+  },
+  {
+   "id": "plc_park_dues",
+   "name": "Dues",
+   "address": "2201 Antietam Ave",
+   "type": "Park: Neighborhood",
+   "acres": 7.1,
+   "lat": 42.34727,
+   "lon": -83.0325
+  },
+  {
+   "id": "plc_park_dueweke",
+   "name": "Dueweke",
+   "address": "4975 Sheridan St",
+   "type": "Park: Neighborhood",
+   "acres": 4.5,
+   "lat": 42.37341,
+   "lon": -83.01714
+  },
+  {
+   "id": "plc_park_ed_davis",
+   "name": "Ed Davis",
+   "address": "11743 Dexter Ave",
+   "type": "Park: Mini",
+   "acres": 3,
+   "lat": 42.38007,
+   "lon": -83.12525
+  },
+  {
+   "id": "plc_park_edmore_marbud",
+   "name": "Edmore-Marbud",
+   "address": "14689 Edmore Dr",
+   "type": "Park: Neighborhood",
+   "acres": 3.2,
+   "lat": 42.44706,
+   "lon": -82.97254
+  },
+  {
+   "id": "plc_park_elba_ellery",
+   "name": "Elba-Ellery",
+   "address": "3643 Elba Pl",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.35904,
+   "lon": -83.02227
+  },
+  {
+   "id": "plc_park_eliza_howell",
+   "name": "Eliza Howell",
+   "address": "23701 Fenkell St",
+   "type": "Park: Regional",
+   "acres": 249.3,
+   "lat": 42.39286,
+   "lon": -83.27013
+  },
+  {
+   "id": "plc_park_elmwood_central",
+   "name": "Elmwood-Central",
+   "address": "2019 Thornhill Pl",
+   "type": "Park: Community",
+   "acres": 16.4,
+   "lat": 42.34352,
+   "lon": -83.02857
+  },
+  {
+   "id": "plc_park_engel_reid_memorial",
+   "name": "Engel Reid Memorial",
+   "address": "10770 Freud St",
+   "type": "Park: Riverfront",
+   "acres": 68.1,
+   "lat": 42.35768,
+   "lon": -82.96732
+  },
+  {
+   "id": "plc_park_erma_henderson",
+   "name": "Erma Henderson",
+   "address": "8810 E Jefferson Ave",
+   "type": "Park: Riverfront",
+   "acres": 36.1,
+   "lat": 42.35381,
+   "lon": -82.98654
+  },
+  {
+   "id": "plc_park_evans",
+   "name": "Evans",
+   "address": "13950 Joseph Campau St",
+   "type": "Park: Neighborhood",
+   "acres": 2.4,
+   "lat": 42.41706,
+   "lon": -83.07059
+  },
+  {
+   "id": "plc_park_ewald",
+   "name": "Ewald",
+   "address": "5046 Jeffries Service Drive",
+   "type": "Park: Neighborhood",
+   "acres": 1.1,
+   "lat": 42.34748,
+   "lon": -83.0959
+  },
+  {
+   "id": "plc_park_fargo_fenton",
+   "name": "Fargo-Fenton",
+   "address": "20100 Fenton St",
+   "type": "Park: Neighborhood",
+   "acres": 2.8,
+   "lat": 42.43826,
+   "lon": -83.28172
+  },
+  {
+   "id": "plc_park_fargo_oakfield",
+   "name": "Fargo-Oakfield",
+   "address": "19974 Oakfield St",
+   "type": "Park: Neighborhood",
+   "acres": 3.6,
+   "lat": 42.44,
+   "lon": -83.21538
+  },
+  {
+   "id": "plc_park_farwell",
+   "name": "Farwell",
+   "address": "4444 E Eight Mile",
+   "type": "Park: District",
+   "acres": 0,
+   "lat": 42.44405,
+   "lon": -83.05783
+  },
+  {
+   "id": "plc_park_fields",
+   "name": "Fields",
+   "address": "16601 Florence St",
+   "type": "Park: Neighborhood",
+   "acres": 5.1,
+   "lat": 42.41138,
+   "lon": -83.20193
+  },
+  {
+   "id": "plc_park_fiori",
+   "name": "Fiori",
+   "address": "5939 Barham St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.40575,
+   "lon": -82.95553
+  },
+  {
+   "id": "plc_park_fitzgerald",
+   "name": "Fitzgerald",
+   "address": "16657 Prairie St",
+   "type": "Park: Neighborhood",
+   "acres": 2.1,
+   "lat": 42.41424,
+   "lon": -83.1454
+  },
+  {
+   "id": "plc_park_fitzpatrick",
+   "name": "Fitzpatrick",
+   "address": "18501 Fitzpatrick Ct",
+   "type": "Park: Neighborhood",
+   "acres": 2.7,
+   "lat": 42.36716,
+   "lon": -83.22272
+  },
+  {
+   "id": "plc_park_fitzpatrick_southfield",
+   "name": "Fitzpatrick-Southfield",
+   "address": "7884 Abington",
+   "type": "Park: Neighborhood",
+   "acres": 6.7,
+   "lat": 42.36178,
+   "lon": -83.21311
+  },
+  {
+   "id": "plc_park_fitzpatrick_warwick",
+   "name": "Fitzpatrick-Warwick",
+   "address": "18901 Fitzpatrick St",
+   "type": "Park: Neighborhood",
+   "acres": 1.7,
+   "lat": 42.37019,
+   "lon": -83.22566
+  },
+  {
+   "id": "plc_park_forest",
+   "name": "Forest",
+   "address": "1614 E Canfield St",
+   "type": "Park: Neighborhood",
+   "acres": 5.3,
+   "lat": 42.35744,
+   "lon": -83.04684
+  },
+  {
+   "id": "plc_park_forman",
+   "name": "Forman",
+   "address": "150 Forman St",
+   "type": "Park: Neighborhood",
+   "acres": 6.3,
+   "lat": 42.28846,
+   "lon": -83.13732
+  },
+  {
+   "id": "plc_park_fox_creek",
+   "name": "Fox Creek",
+   "address": "14742 E Jefferson Ave",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.37418,
+   "lon": -82.94025
+  },
+  {
+   "id": "plc_park_frisbee_pembroke",
+   "name": "Frisbee-Pembroke",
+   "address": "23060 Frisbee St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.43577,
+   "lon": -83.27275
+  },
+  {
+   "id": "plc_park_gabriel_richard",
+   "name": "Gabriel Richard",
+   "address": "7650 E Jefferson Ave",
+   "type": "Park: Riverfront",
+   "acres": 17.7,
+   "lat": 42.34698,
+   "lon": -82.99918
+  },
+  {
+   "id": "plc_park_glenfield_lannett",
+   "name": "Glenfield-Lannett",
+   "address": "14540 Lannette St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.41755,
+   "lon": -82.97182
+  },
+  {
+   "id": "plc_park_gmeiner",
+   "name": "Gmeiner",
+   "address": "10301 W 7 Mile Rd",
+   "type": "Park: Community",
+   "acres": 10.4,
+   "lat": 42.43025,
+   "lon": -83.16389
+  },
+  {
+   "id": "plc_park_gonzalez_garcia",
+   "name": "Gonzalez Garcia",
+   "address": "8118 W Lafayette Blvd",
+   "type": "Park: Mini",
+   "acres": 0.6,
+   "lat": 42.30232,
+   "lon": -83.12326
+  },
+  {
+   "id": "plc_park_gordon",
+   "name": "Gordon",
+   "address": "1935 Atkinson St",
+   "type": "Park: Neighborhood",
+   "acres": 1.2,
+   "lat": 42.37667,
+   "lon": -83.10023
+  },
+  {
+   "id": "plc_park_gorham",
+   "name": "Gorham",
+   "address": "19969 Saint Marys St",
+   "type": "Park: Neighborhood",
+   "acres": 3.1,
+   "lat": 42.43833,
+   "lon": -83.20819
+  },
+  {
+   "id": "plc_park_grand_circus_park",
+   "name": "Grand Circus Park",
+   "address": "1600 Woodward Ave",
+   "type": "Park: Neighborhood",
+   "acres": 4.1,
+   "lat": 42.33658,
+   "lon": -83.05065
+  },
+  {
+   "id": "plc_park_grand_parklet",
+   "name": "Grand Parklet",
+   "address": "19755 Grand River Ave",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.40791,
+   "lon": -83.23679
+  },
+  {
+   "id": "plc_park_grayfield_glenhurst",
+   "name": "Grayfield-Glenhurst",
+   "address": "18600 Grayfield St",
+   "type": "Park: Neighborhood",
+   "acres": 2.1,
+   "lat": 42.42712,
+   "lon": -83.2697
+  },
+  {
+   "id": "plc_park_greene",
+   "name": "Greene",
+   "address": "9177 Robson St",
+   "type": "Park: Neighborhood",
+   "acres": 3.5,
+   "lat": 42.36122,
+   "lon": -83.19257
+  },
+  {
+   "id": "plc_park_greenview_wadsworth",
+   "name": "Greenview-Wadsworth",
+   "address": "12101 Greenview Ave",
+   "type": "Park: Neighborhood",
+   "acres": 3.8,
+   "lat": 42.37508,
+   "lon": -83.22298
+  },
+  {
+   "id": "plc_park_hackett",
+   "name": "Hackett",
+   "address": "17232 Stahelin Ave",
+   "type": "Park: Neighborhood",
+   "acres": 3.2,
+   "lat": 42.41785,
+   "lon": -83.22591
+  },
+  {
+   "id": "plc_park_hansen",
+   "name": "Hansen",
+   "address": "452 Drexel St",
+   "type": "Park: Neighborhood",
+   "acres": 2.2,
+   "lat": 42.36342,
+   "lon": -82.94457
+  },
+  {
+   "id": "plc_park_hardstein",
+   "name": "Hardstein",
+   "address": "20178 Cheyenne St",
+   "type": "Park: Neighborhood",
+   "acres": 2.9,
+   "lat": 42.44245,
+   "lon": -83.17656
+  },
+  {
+   "id": "plc_park_harper_court",
+   "name": "Harper Court",
+   "address": "9110 Harper Ave",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.39168,
+   "lon": -83.01076
+  },
+  {
+   "id": "plc_park_hart_plaza",
+   "name": "Hart Plaza",
+   "address": "161 W Jefferson Ave",
+   "type": "Park: Riverfront",
+   "acres": 13.7,
+   "lat": 42.32743,
+   "lon": -83.04424
+  },
+  {
+   "id": "plc_park_harvey_junction",
+   "name": "Harvey-Junction",
+   "address": "341 Junction St",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.30563,
+   "lon": -83.09261
+  },
+  {
+   "id": "plc_park_hasse_emery",
+   "name": "Hasse-Emery",
+   "address": "19339 Healy St",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.43616,
+   "lon": -83.0564
+  },
+  {
+   "id": "plc_park_hawthorne",
+   "name": "Hawthorne",
+   "address": "18240 Hawthorne St",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.42709,
+   "lon": -83.09205
+  },
+  {
+   "id": "plc_park_heckel",
+   "name": "Heckel",
+   "address": "17273 Woodbine St",
+   "type": "Park: Neighborhood",
+   "acres": 6,
+   "lat": 42.41809,
+   "lon": -83.27946
+  },
+  {
+   "id": "plc_park_hecla",
+   "name": "Hecla",
+   "address": "5233 Hecla St",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.35377,
+   "lon": -83.0833
+  },
+  {
+   "id": "plc_park_heilmann",
+   "name": "Heilmann",
+   "address": "19601 Crusade St",
+   "type": "Park: Community",
+   "acres": 30.6,
+   "lat": 42.43958,
+   "lon": -82.96198
+  },
+  {
+   "id": "plc_park_helen_longyear",
+   "name": "Helen-Longyear",
+   "address": "5938 Helen St",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.38081,
+   "lon": -83.02536
+  },
+  {
+   "id": "plc_park_higgins",
+   "name": "Higgins",
+   "address": "9200 Olivet St",
+   "type": "Park: Neighborhood",
+   "acres": 2.9,
+   "lat": 42.29838,
+   "lon": -83.1315
+  },
+  {
+   "id": "plc_park_hill",
+   "name": "Hill",
+   "address": "2226 Fenkell St",
+   "type": "Park: Neighborhood",
+   "acres": 1.5,
+   "lat": 42.4035,
+   "lon": -83.12057
+  },
+  {
+   "id": "plc_park_historic_fort_wayne",
+   "name": "Historic Fort Wayne",
+   "address": "6301 W Jefferson Ave",
+   "type": "Park: Regional",
+   "acres": 75.8,
+   "lat": 42.29784,
+   "lon": -83.09756
+  },
+  {
+   "id": "plc_park_hope",
+   "name": "Hope",
+   "address": "16220 Lahser Rd",
+   "type": "Park: Community",
+   "acres": 17.6,
+   "lat": 42.40938,
+   "lon": -83.25595
+  },
+  {
+   "id": "plc_park_howarth",
+   "name": "Howarth",
+   "address": "6869 E Nevada St",
+   "type": "Park: Neighborhood",
+   "acres": 1.8,
+   "lat": 42.42704,
+   "lon": -83.0281
+  },
+  {
+   "id": "plc_park_hunt",
+   "name": "Hunt",
+   "address": "520 W Winchester Ave",
+   "type": "Park: Neighborhood",
+   "acres": 2.1,
+   "lat": 42.44351,
+   "lon": -83.10834
+  },
+  {
+   "id": "plc_park_hyde",
+   "name": "Hyde",
+   "address": "20001 Canterbury Rd",
+   "type": "Park: Mini",
+   "acres": 0.8,
+   "lat": 42.44077,
+   "lon": -83.14043
+  },
+  {
+   "id": "plc_park_illinois_moran",
+   "name": "Illinois-Moran",
+   "address": "3395 Illinois St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.36108,
+   "lon": -83.0274
+  },
+  {
+   "id": "plc_park_intervale_roselawn",
+   "name": "Intervale-Roselawn",
+   "address": "8101 Intervale St",
+   "type": "Park: Neighborhood",
+   "acres": 2.8,
+   "lat": 42.39142,
+   "lon": -83.14971
+  },
+  {
+   "id": "plc_park_jayne",
+   "name": "Jayne",
+   "address": "13280 Conant St",
+   "type": "Park: Regional",
+   "acres": 47.3,
+   "lat": 42.41361,
+   "lon": -83.05596
+  },
+  {
+   "id": "plc_park_joe_louis_fist_plaza",
+   "name": "Joe Louis Fist Plaza",
+   "address": "5 Woodward Ave",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.32864,
+   "lon": -83.04453
+  },
+  {
+   "id": "plc_park_john_r_watson",
+   "name": "John R.-Watson",
+   "address": "202 Watson St",
+   "type": "Park: Neighborhood",
+   "acres": 1.1,
+   "lat": 42.34557,
+   "lon": -83.05323
+  },
+  {
+   "id": "plc_park_johnston",
+   "name": "Johnston",
+   "address": "4635 Helen St",
+   "type": "Park: Neighborhood",
+   "acres": 2,
+   "lat": 42.36992,
+   "lon": -83.01924
+  },
+  {
+   "id": "plc_park_josefiak",
+   "name": "Josefiak",
+   "address": "13151 Greiner St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.42781,
+   "lon": -82.99029
+  },
+  {
+   "id": "plc_park_kantgias",
+   "name": "Kantgias",
+   "address": "2660 Hogarth St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.3627,
+   "lon": -83.10291
+  },
+  {
+   "id": "plc_park_karaniewski",
+   "name": "Karaniewski",
+   "address": "7661 Concord St",
+   "type": "Park: Mini",
+   "acres": 0.8,
+   "lat": 42.38653,
+   "lon": -83.03121
+  },
+  {
+   "id": "plc_park_keating_state_fair",
+   "name": "Keating-State Fair",
+   "address": "19723 Keating St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.43904,
+   "lon": -83.10073
+  },
+  {
+   "id": "plc_park_keidan",
+   "name": "Keidan",
+   "address": "2900 Rochester St",
+   "type": "Park: Mini",
+   "acres": 0.8,
+   "lat": 42.37638,
+   "lon": -83.11502
+  },
+  {
+   "id": "plc_park_kelley",
+   "name": "Kelley",
+   "address": "15825 Oakfield St",
+   "type": "Park: Neighborhood",
+   "acres": 4.8,
+   "lat": 42.40777,
+   "lon": -83.21461
+  },
+  {
+   "id": "plc_park_kemeny",
+   "name": "Kemeny",
+   "address": "2260 S Fort St",
+   "type": "Park: Community",
+   "acres": 21.9,
+   "lat": 42.27465,
+   "lon": -83.15888
+  },
+  {
+   "id": "plc_park_kern",
+   "name": "Kern",
+   "address": "18801 Mount Elliott St",
+   "type": "Park: Neighborhood",
+   "acres": 3.9,
+   "lat": 42.43266,
+   "lon": -83.03962
+  },
+  {
+   "id": "plc_park_kiwanis_no_1",
+   "name": "Kiwanis No. 1",
+   "address": "6531 Kercheval St",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.35475,
+   "lon": -83.01128
+  },
+  {
+   "id": "plc_park_knudsen",
+   "name": "Knudsen",
+   "address": "20468 Omira St",
+   "type": "Park: Neighborhood",
+   "acres": 1.4,
+   "lat": 42.44552,
+   "lon": -83.09608
+  },
+  {
+   "id": "plc_park_krainz",
+   "name": "Krainz",
+   "address": "18501 Healy St",
+   "type": "Park: Neighborhood",
+   "acres": 9.7,
+   "lat": 42.42874,
+   "lon": -83.05663
+  },
+  {
+   "id": "plc_park_lafayette_central",
+   "name": "Lafayette Central",
+   "address": "1400 E Lafayette St",
+   "type": "Park: Neighborhood",
+   "acres": 6.7,
+   "lat": 42.33652,
+   "lon": -83.03252
+  },
+  {
+   "id": "plc_park_lafayette_entrance",
+   "name": "Lafayette Entrance",
+   "address": "1435 E Jefferson Ave",
+   "type": "Park: Neighborhood",
+   "acres": 1.2,
+   "lat": 42.33501,
+   "lon": -83.03131
+  },
+  {
+   "id": "plc_park_lafayette_greens",
+   "name": "Lafayette Greens",
+   "address": "132 W Lafayette Blvd",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.33139,
+   "lon": -83.04931
+  },
+  {
+   "id": "plc_park_lafayette_plaisance",
+   "name": "Lafayette Plaisance",
+   "address": "1592 Antietam Ave",
+   "type": "Park: Community",
+   "acres": 13,
+   "lat": 42.34086,
+   "lon": -83.03553
+  },
+  {
+   "id": "plc_park_lafayette_st_aubin",
+   "name": "Lafayette-St. Aubin",
+   "address": "2101 E Larned St",
+   "type": "Park: Neighborhood",
+   "acres": 3.4,
+   "lat": 42.33926,
+   "lon": -83.02615
+  },
+  {
+   "id": "plc_park_lahser_clarita",
+   "name": "Lahser-Clarita",
+   "address": "18483 Burgess St",
+   "type": "Park: Neighborhood",
+   "acres": 4.4,
+   "lat": 42.42574,
+   "lon": -83.25666
+  },
+  {
+   "id": "plc_park_laker",
+   "name": "Laker",
+   "address": "7520 Central St",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.34838,
+   "lon": -83.14554
+  },
+  {
+   "id": "plc_park_lakewood_east",
+   "name": "Lakewood East",
+   "address": "14490 Riverside Blvd",
+   "type": "Park: Riverfront",
+   "acres": 28.1,
+   "lat": 42.35818,
+   "lon": -82.93417
+  },
+  {
+   "id": "plc_park_lasalle",
+   "name": "LaSalle",
+   "address": "2351 N La Salle Gdns",
+   "type": "Park: Neighborhood",
+   "acres": 3.8,
+   "lat": 42.36566,
+   "lon": -83.09999
+  },
+  {
+   "id": "plc_park_lasalle_ford",
+   "name": "Lasalle-Ford",
+   "address": "13950 La Salle Blvd",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.39753,
+   "lon": -83.12106
+  },
+  {
+   "id": "plc_park_lasky",
+   "name": "Lasky",
+   "address": "5001 Charles St",
+   "type": "Park: Regional",
+   "acres": 17.1,
+   "lat": 42.41353,
+   "lon": -83.05142
+  },
+  {
+   "id": "plc_park_latham",
+   "name": "Latham",
+   "address": "5082 Seneca St",
+   "type": "Park: Neighborhood",
+   "acres": 3,
+   "lat": 42.37952,
+   "lon": -83.00887
+  },
+  {
+   "id": "plc_park_lawrence",
+   "name": "Lawrence",
+   "address": "11491 Woodward Ave",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.39096,
+   "lon": -83.08762
+  },
+  {
+   "id": "plc_park_lifsitz",
+   "name": "Lifsitz",
+   "address": "2700 Gladstone St",
+   "type": "Park: Neighborhood",
+   "acres": 3.2,
+   "lat": 42.37018,
+   "lon": -83.1086
+  },
+  {
+   "id": "plc_park_lipke",
+   "name": "Lipke",
+   "address": "19314 Van Dyke St",
+   "type": "Park: Community",
+   "acres": 14.4,
+   "lat": 42.43631,
+   "lon": -83.02103
+  },
+  {
+   "id": "plc_park_littlefield",
+   "name": "Littlefield",
+   "address": "12416 Indiana St",
+   "type": "Park: Community",
+   "acres": 11.1,
+   "lat": 42.38277,
+   "lon": -83.15543
+  },
+  {
+   "id": "plc_park_liuzzo",
+   "name": "Liuzzo",
+   "address": "20053 Winthrop St",
+   "type": "Park: Neighborhood",
+   "acres": 2.5,
+   "lat": 42.4406,
+   "lon": -83.20242
+  },
+  {
+   "id": "plc_park_lollo",
+   "name": "Lollo",
+   "address": "8500 Puritan St",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.40998,
+   "lon": -83.15496
+  },
+  {
+   "id": "plc_park_luce_st_louis",
+   "name": "Luce-St. Louis",
+   "address": "13490 Saint Louis St",
+   "type": "Park: Neighborhood",
+   "acres": 2.5,
+   "lat": 42.41609,
+   "lon": -83.03939
+  },
+  {
+   "id": "plc_park_lucky_place",
+   "name": "Lucky Place",
+   "address": "3340 East Edsel Ford Freeway",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.37659,
+   "lon": -83.03857
+  },
+  {
+   "id": "plc_park_mackay_modern",
+   "name": "Mackay-Modern",
+   "address": "14275 Mackay St",
+   "type": "Park: Neighborhood",
+   "acres": 1,
+   "lat": 42.41734,
+   "lon": -83.07551
+  },
+  {
+   "id": "plc_park_macomb",
+   "name": "Macomb",
+   "address": "2311 17th St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.32974,
+   "lon": -83.07982
+  },
+  {
+   "id": "plc_park_mahaffey",
+   "name": "Mahaffey",
+   "address": "8010 Sylvester St",
+   "type": "Park: Neighborhood",
+   "acres": 8.1,
+   "lat": 42.36916,
+   "lon": -83.01003
+  },
+  {
+   "id": "plc_park_maheras_gentry",
+   "name": "Maheras-Gentry",
+   "address": "12550 Avondale St",
+   "type": "Park: Regional",
+   "acres": 52.5,
+   "lat": 42.35774,
+   "lon": -82.95011
+  },
+  {
+   "id": "plc_park_maiullo",
+   "name": "Maiullo",
+   "address": "1 W Chicago Blvd",
+   "type": "Park: Mini",
+   "acres": 0.8,
+   "lat": 42.38588,
+   "lon": -83.08451
+  },
+  {
+   "id": "plc_park_mallett",
+   "name": "Mallett",
+   "address": "12038 Hubbell St",
+   "type": "Park: Neighborhood",
+   "acres": 3.3,
+   "lat": 42.37582,
+   "lon": -83.18725
+  },
+  {
+   "id": "plc_park_manning_beland",
+   "name": "Manning-Beland",
+   "address": "19741 Beland St",
+   "type": "Park: Neighborhood",
+   "acres": 2.1,
+   "lat": 42.44029,
+   "lon": -83.01003
+  },
+  {
+   "id": "plc_park_mansfield_diversey",
+   "name": "Mansfield-Diversey",
+   "address": "7753 Rutherford St",
+   "type": "Park: Neighborhood",
+   "acres": 1.8,
+   "lat": 42.34879,
+   "lon": -83.20203
+  },
+  {
+   "id": "plc_park_manz",
+   "name": "Manz",
+   "address": "4351 Conner St",
+   "type": "Park: Neighborhood",
+   "acres": 7.4,
+   "lat": 42.38514,
+   "lon": -82.97015
+  },
+  {
+   "id": "plc_park_mariner",
+   "name": "Mariner",
+   "address": "14700 Riverside Blvd",
+   "type": "Park: Riverfront",
+   "acres": 7.2,
+   "lat": 42.35877,
+   "lon": -82.92982
+  },
+  {
+   "id": "plc_park_markulis",
+   "name": "Markulis",
+   "address": "18891 Shiawassee Dr",
+   "type": "Park: Neighborhood",
+   "acres": 4,
+   "lat": 42.42796,
+   "lon": -83.27394
+  },
+  {
+   "id": "plc_park_marlowe_stoudamire",
+   "name": "Marlowe Stoudamire",
+   "address": "15045 Troester St",
+   "type": "Park: Neighborhood",
+   "acres": 1.2,
+   "lat": 42.42677,
+   "lon": -82.96628
+  },
+  {
+   "id": "plc_park_marruso",
+   "name": "Marruso",
+   "address": "19908 Annott St",
+   "type": "Park: Neighborhood",
+   "acres": 5.4,
+   "lat": 42.44096,
+   "lon": -83.00153
+  },
+  {
+   "id": "plc_park_martz",
+   "name": "Martz",
+   "address": "11700 Saint Patrick St",
+   "type": "Park: Neighborhood",
+   "acres": 2.8,
+   "lat": 42.41085,
+   "lon": -82.99873
+  },
+  {
+   "id": "plc_park_marx",
+   "name": "Marx",
+   "address": "18201 Greenview Ave",
+   "type": "Park: Neighborhood",
+   "acres": 4.2,
+   "lat": 42.4239,
+   "lon": -83.22517
+  },
+  {
+   "id": "plc_park_marx_remington",
+   "name": "Marx-Remington",
+   "address": "20157 Marx St",
+   "type": "Park: Mini",
+   "acres": 0.8,
+   "lat": 42.44295,
+   "lon": -83.0848
+  },
+  {
+   "id": "plc_park_mccabe",
+   "name": "McCabe",
+   "address": "9995 Petoskey Ave",
+   "type": "Park: Neighborhood",
+   "acres": 7.7,
+   "lat": 42.37301,
+   "lon": -83.1274
+  },
+  {
+   "id": "plc_park_mcduffy",
+   "name": "McDuffy",
+   "address": "803 W Philadelphia St",
+   "type": "Park: Neighborhood",
+   "acres": 1.4,
+   "lat": 42.37517,
+   "lon": -83.08488
+  },
+  {
+   "id": "plc_park_mckinley_merrick",
+   "name": "McKinley-Merrick",
+   "address": "5200 McKinley St",
+   "type": "Park: Mini",
+   "acres": 0.6,
+   "lat": 42.34622,
+   "lon": -83.10476
+  },
+  {
+   "id": "plc_park_mcshane",
+   "name": "McShane",
+   "address": "8699 Heritage Pl",
+   "type": "Park: Neighborhood",
+   "acres": 1.3,
+   "lat": 42.36489,
+   "lon": -83.12125
+  },
+  {
+   "id": "plc_park_messmer",
+   "name": "Messmer",
+   "address": "4135 Bluehill St",
+   "type": "Park: Neighborhood",
+   "acres": 5,
+   "lat": 42.3996,
+   "lon": -82.9241
+  },
+  {
+   "id": "plc_park_michigan_third_kosciuszko_statue",
+   "name": "Michigan-Third (Kosciuszko Statue)",
+   "address": "868 Michigan Ave",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.33189,
+   "lon": -83.05831
+  },
+  {
+   "id": "plc_park_midland_bentler",
+   "name": "Midland-Bentler",
+   "address": "15502 Bentler St",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.40318,
+   "lon": -83.25165
+  },
+  {
+   "id": "plc_park_milan",
+   "name": "Milan",
+   "address": "19820 Curtis St",
+   "type": "Park: Community",
+   "acres": 12.9,
+   "lat": 42.42352,
+   "lon": -83.23664
+  },
+  {
+   "id": "plc_park_military_regular",
+   "name": "Military-Regular",
+   "address": "1238 Military St",
+   "type": "Park: Neighborhood",
+   "acres": 1.7,
+   "lat": 42.31258,
+   "lon": -83.10411
+  },
+  {
+   "id": "plc_park_mlk_memorial_park",
+   "name": "MLK Memorial Park",
+   "address": "2589 W Grand Blvd",
+   "type": "Park: Neighborhood",
+   "acres": 1.9,
+   "lat": 42.36486,
+   "lon": -83.09103
+  },
+  {
+   "id": "plc_park_mollicone",
+   "name": "Mollicone",
+   "address": "2969 Burns St",
+   "type": "Park: Neighborhood",
+   "acres": 2.2,
+   "lat": 42.36637,
+   "lon": -82.99895
+  },
+  {
+   "id": "plc_park_mt_elliott_park",
+   "name": "Mt. Elliott Park",
+   "address": "160 Mount Elliott St",
+   "type": "Park: Riverfront",
+   "acres": 5.4,
+   "lat": 42.3414,
+   "lon": -83.00732
+  },
+  {
+   "id": "plc_park_mt_elliott_zender",
+   "name": "Mt. Elliott-Zender",
+   "address": "3741 Mount Elliott St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.36243,
+   "lon": -83.02273
+  },
+  {
+   "id": "plc_park_muliett",
+   "name": "Muliett",
+   "address": "2001 Vermont St",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.32927,
+   "lon": -83.07279
+  },
+  {
+   "id": "plc_park_murphy",
+   "name": "Murphy",
+   "address": "1240 Porter St",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.32931,
+   "lon": -83.06165
+  },
+  {
+   "id": "plc_park_nagel",
+   "name": "Nagel",
+   "address": "3100 Wabash St",
+   "type": "Park: Neighborhood",
+   "acres": 4.7,
+   "lat": 42.33812,
+   "lon": -83.0773
+  },
+  {
+   "id": "plc_park_northwest_activities_center",
+   "name": "Northwest Activities Center",
+   "address": "18100 Meyers Rd",
+   "type": "Park: Neighborhood",
+   "acres": 8.9,
+   "lat": 42.4231,
+   "lon": -83.16903
+  },
+  {
+   "id": "plc_park_o_brien",
+   "name": "O'Brien",
+   "address": "11938 E McNichols Rd",
+   "type": "Park: Neighborhood",
+   "acres": 1.4,
+   "lat": 42.42081,
+   "lon": -83.00015
+  },
+  {
+   "id": "plc_park_o_hair",
+   "name": "O'Hair",
+   "address": "19400 Pembroke Ave",
+   "type": "Park: Regional",
+   "acres": 78,
+   "lat": 42.43898,
+   "lon": -83.23135
+  },
+  {
+   "id": "plc_park_o_shea",
+   "name": "O'Shea",
+   "address": "15810 Capitol St",
+   "type": "Park: Community",
+   "acres": 21.2,
+   "lat": 42.37799,
+   "lon": -83.20206
+  },
+  {
+   "id": "plc_park_optimist_parkgrove",
+   "name": "Optimist-Parkgrove",
+   "address": "18400 Teppert St",
+   "type": "Park: Neighborhood",
+   "acres": 3.3,
+   "lat": 42.42985,
+   "lon": -83.00755
+  },
+  {
+   "id": "plc_park_optimist_stout",
+   "name": "Optimist-Stout",
+   "address": "13630 Stout St",
+   "type": "Park: Neighborhood",
+   "acres": 4.4,
+   "lat": 42.38756,
+   "lon": -83.24107
+  },
+  {
+   "id": "plc_park_orleans_atwater_milliken",
+   "name": "Orleans Atwater (Milliken)",
+   "address": "1980 Atwater St",
+   "type": "Park: Riverfront",
+   "acres": 14.6,
+   "lat": 42.33272,
+   "lon": -83.02563
+  },
+  {
+   "id": "plc_park_ossian_sweet",
+   "name": "Ossian Sweet",
+   "address": "2921 Garland St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.37029,
+   "lon": -82.98464
+  },
+  {
+   "id": "plc_park_outer_drive_burgess",
+   "name": "Outer Drive-Burgess",
+   "address": "14858 Burgess St",
+   "type": "Park: Neighborhood",
+   "acres": 2.7,
+   "lat": 42.39688,
+   "lon": -83.25364
+  },
+  {
+   "id": "plc_park_outer_drive_fullerton",
+   "name": "Outer Drive-Fullerton",
+   "address": "12700 W Outer Dr",
+   "type": "Park: Regional",
+   "acres": 52,
+   "lat": 42.38139,
+   "lon": -83.25825
+  },
+  {
+   "id": "plc_park_owen",
+   "name": "Owen",
+   "address": "8380 E Jefferson Ave",
+   "type": "Park: Riverfront",
+   "acres": 8.2,
+   "lat": 42.35224,
+   "lon": -82.98997
+  },
+  {
+   "id": "plc_park_palmer",
+   "name": "Palmer",
+   "address": "19021 Woodward Ave",
+   "type": "Park: Regional",
+   "acres": 297,
+   "lat": 42.42653,
+   "lon": -83.11754
+  },
+  {
+   "id": "plc_park_pattengill",
+   "name": "Pattengill",
+   "address": "8411 Northfield St",
+   "type": "Park: Neighborhood",
+   "acres": 3.3,
+   "lat": 42.35739,
+   "lon": -83.13082
+  },
+  {
+   "id": "plc_park_patton",
+   "name": "Patton",
+   "address": "8151 Dix St",
+   "type": "Park: Regional",
+   "acres": 84.7,
+   "lat": 42.31074,
+   "lon": -83.13834
+  },
+  {
+   "id": "plc_park_peck",
+   "name": "Peck",
+   "address": "Frederick St",
+   "type": "Park: Neighborhood",
+   "acres": 2.1,
+   "lat": 42.36164,
+   "lon": -83.06104
+  },
+  {
+   "id": "plc_park_penz",
+   "name": "Penz",
+   "address": "550 S Greyfriars St",
+   "type": "Park: Mini",
+   "acres": 0.1,
+   "lat": 42.28719,
+   "lon": -83.14858
+  },
+  {
+   "id": "plc_park_perrien",
+   "name": "Perrien",
+   "address": "4840 Chene St",
+   "type": "Park: Neighborhood",
+   "acres": 4.6,
+   "lat": 42.36555,
+   "lon": -83.03942
+  },
+  {
+   "id": "plc_park_peterson",
+   "name": "Peterson",
+   "address": "18294 Greenfield Rd",
+   "type": "Park: Community",
+   "acres": 17,
+   "lat": 42.42415,
+   "lon": -83.19713
+  },
+  {
+   "id": "plc_park_phelps",
+   "name": "Phelps",
+   "address": "9982 Sorrento St",
+   "type": "Park: Neighborhood",
+   "acres": 3.8,
+   "lat": 42.37016,
+   "lon": -83.1709
+  },
+  {
+   "id": "plc_park_pingree",
+   "name": "Pingree",
+   "address": "8501 E Canfield St",
+   "type": "Park: Community",
+   "acres": 18.6,
+   "lat": 42.37586,
+   "lon": -83.00619
+  },
+  {
+   "id": "plc_park_piwok",
+   "name": "Piwok",
+   "address": "12226 Visger St",
+   "type": "Park: Neighborhood",
+   "acres": 4.9,
+   "lat": 42.26733,
+   "lon": -83.15621
+  },
+  {
+   "id": "plc_park_puritan_coyle",
+   "name": "Puritan-Coyle",
+   "address": "15068 Puritan St",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.40917,
+   "lon": -83.19447
+  },
+  {
+   "id": "plc_park_puritan_normandy",
+   "name": "Puritan-Normandy",
+   "address": "2503 Puritan St",
+   "type": "Park: Mini",
+   "acres": 0.6,
+   "lat": 42.40997,
+   "lon": -83.12575
+  },
+  {
+   "id": "plc_park_quincy_midland",
+   "name": "Quincy-Midland",
+   "address": "15400 Quincy St",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.40606,
+   "lon": -83.13808
+  },
+  {
+   "id": "plc_park_ramsay",
+   "name": "Ramsay",
+   "address": "17425 Grand River Ave",
+   "type": "Park: Neighborhood",
+   "acres": 1.3,
+   "lat": 42.39749,
+   "lon": -83.21463
+  },
+  {
+   "id": "plc_park_redmond_plaza",
+   "name": "Redmond Plaza",
+   "address": "3915 2nd Ave",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.34755,
+   "lon": -83.06495
+  },
+  {
+   "id": "plc_park_reid",
+   "name": "Reid",
+   "address": "20625 Santa Clara Ave",
+   "type": "Park: Neighborhood",
+   "acres": 1.2,
+   "lat": 42.41943,
+   "lon": -83.24438
+  },
+  {
+   "id": "plc_park_richard_allen",
+   "name": "Richard Allen",
+   "address": "9516 Grand River Ave",
+   "type": "Park: Neighborhood",
+   "acres": 5.2,
+   "lat": 42.36771,
+   "lon": -83.13259
+  },
+  {
+   "id": "plc_park_richardson",
+   "name": "Richardson",
+   "address": "5000 30th St",
+   "type": "Park: Neighborhood",
+   "acres": 1,
+   "lat": 42.34126,
+   "lon": -83.11333
+  },
+  {
+   "id": "plc_park_riordan",
+   "name": "Riordan",
+   "address": "16101 Lamphere St",
+   "type": "Park: Neighborhood",
+   "acres": 3.9,
+   "lat": 42.40656,
+   "lon": -83.26267
+  },
+  {
+   "id": "plc_park_riverside",
+   "name": "Riverside",
+   "address": "3621 W Jefferson Ave",
+   "type": "Park: Riverfront",
+   "acres": 28.7,
+   "lat": 42.31305,
+   "lon": -83.07962
+  },
+  {
+   "id": "plc_park_robinwood",
+   "name": "Robinwood",
+   "address": "8340 E Robinwood St",
+   "type": "Park: Neighborhood",
+   "acres": 2.5,
+   "lat": 42.43209,
+   "lon": -83.01879
+  },
+  {
+   "id": "plc_park_rockdale_kendall",
+   "name": "Rockdale-Kendall",
+   "address": "14144 Rockdale St",
+   "type": "Park: Neighborhood",
+   "acres": 1.7,
+   "lat": 42.38869,
+   "lon": -83.25771
+  },
+  {
+   "id": "plc_park_rogell",
+   "name": "Rogell",
+   "address": "18601 Berg Rd",
+   "type": "Park: Regional",
+   "acres": 98,
+   "lat": 42.42562,
+   "lon": -83.26479
+  },
+  {
+   "id": "plc_park_romanowski",
+   "name": "Romanowski",
+   "address": "4795 Lonyo St",
+   "type": "Park: Community",
+   "acres": 24.4,
+   "lat": 42.32601,
+   "lon": -83.14281
+  },
+  {
+   "id": "plc_park_roosevelt",
+   "name": "Roosevelt",
+   "address": "2231 Michigan Ave",
+   "type": "Park: Neighborhood",
+   "acres": 9.4,
+   "lat": 42.33025,
+   "lon": -83.07738
+  },
+  {
+   "id": "plc_park_roseberry_promenade",
+   "name": "Roseberry-Promenade",
+   "address": "10033 Roseberry St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.40794,
+   "lon": -82.98703
+  },
+  {
+   "id": "plc_park_rosemont_acacia",
+   "name": "Rosemont-Acacia",
+   "address": "14310 Rosemont Ave",
+   "type": "Park: Neighborhood",
+   "acres": 1.9,
+   "lat": 42.3918,
+   "lon": -83.21909
+  },
+  {
+   "id": "plc_park_rouge_park",
+   "name": "Rouge Park",
+   "address": "21800 Joy Rd",
+   "type": "Park: Regional",
+   "acres": 1122.7,
+   "lat": 42.36141,
+   "lon": -83.25359
+  },
+  {
+   "id": "plc_park_rouge_valley_parkway",
+   "name": "Rouge Valley Parkway",
+   "address": "23680 Fenkell St",
+   "type": "Park: Regional",
+   "acres": 90.2,
+   "lat": 42.40894,
+   "lon": -83.27177
+  },
+  {
+   "id": "plc_park_russell_maderia",
+   "name": "Russell-Maderia",
+   "address": "17542 Russell St",
+   "type": "Park: Mini",
+   "acres": 0.4,
+   "lat": 42.42266,
+   "lon": -83.08942
+  },
+  {
+   "id": "plc_park_russell_woods",
+   "name": "Russell Woods",
+   "address": "12655 Broadstreet Ave",
+   "type": "Park: Neighborhood",
+   "acres": 3.2,
+   "lat": 42.38215,
+   "lon": -83.13725
+  },
+  {
+   "id": "plc_park_ryan",
+   "name": "Ryan",
+   "address": "5741 Faust Ave",
+   "type": "Park: Neighborhood",
+   "acres": 3.1,
+   "lat": 42.33169,
+   "lon": -83.22099
+  },
+  {
+   "id": "plc_park_sak",
+   "name": "Sak",
+   "address": "4322 Kinsman St",
+   "type": "Park: Neighborhood",
+   "acres": 1.1,
+   "lat": 42.33863,
+   "lon": -83.1088
+  },
+  {
+   "id": "plc_park_salsinger",
+   "name": "Salsinger",
+   "address": "14711 Linwood St",
+   "type": "Park: Neighborhood",
+   "acres": 5.3,
+   "lat": 42.40011,
+   "lon": -83.12864
+  },
+  {
+   "id": "plc_park_sasser",
+   "name": "Sasser",
+   "address": "10576 Lanark St",
+   "type": "Park: Neighborhood",
+   "acres": 9.4,
+   "lat": 42.42323,
+   "lon": -82.93221
+  },
+  {
+   "id": "plc_park_savage",
+   "name": "Savage",
+   "address": "1420 Abbott St",
+   "type": "Park: Neighborhood",
+   "acres": 2.2,
+   "lat": 42.32777,
+   "lon": -83.06321
+  },
+  {
+   "id": "plc_park_sawyer",
+   "name": "Sawyer",
+   "address": "14000 Lyndon St",
+   "type": "Park: Neighborhood",
+   "acres": 2.2,
+   "lat": 42.39511,
+   "lon": -83.1825
+  },
+  {
+   "id": "plc_park_schultz",
+   "name": "Schultz",
+   "address": "9740 N Martindale St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.37217,
+   "lon": -83.12698
+  },
+  {
+   "id": "plc_park_schuster",
+   "name": "Schuster",
+   "address": "17220 Conley St",
+   "type": "Park: Neighborhood",
+   "acres": 3.4,
+   "lat": 42.42144,
+   "lon": -83.05087
+  },
+  {
+   "id": "plc_park_scripps",
+   "name": "Scripps",
+   "address": "3666 Grand River Ave",
+   "type": "Park: Neighborhood",
+   "acres": 2.2,
+   "lat": 42.34312,
+   "lon": -83.07416
+  },
+  {
+   "id": "plc_park_seven_mile_appleton",
+   "name": "Seven Mile-Appleton",
+   "address": "19257 Appleton St",
+   "type": "Park: Neighborhood",
+   "acres": 1.4,
+   "lat": 42.43122,
+   "lon": -83.27467
+  },
+  {
+   "id": "plc_park_sherwood",
+   "name": "Sherwood",
+   "address": "19701 Canterbury Rd",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.43734,
+   "lon": -83.14026
+  },
+  {
+   "id": "plc_park_shirley_plymouth",
+   "name": "Shirley-Plymouth",
+   "address": "12101 Shirley Ave",
+   "type": "Park: Neighborhood",
+   "acres": 4.9,
+   "lat": 42.37568,
+   "lon": -83.18275
+  },
+  {
+   "id": "plc_park_sidney_barthwell",
+   "name": "Sidney Barthwell",
+   "address": "2318 Fullerton St",
+   "type": "Park: Neighborhood",
+   "acres": 5.9,
+   "lat": 42.39133,
+   "lon": -83.11414
+  },
+  {
+   "id": "plc_park_simanek",
+   "name": "Simanek",
+   "address": "7461 Rutland St",
+   "type": "Park: Neighborhood",
+   "acres": 6.6,
+   "lat": 42.34608,
+   "lon": -83.21422
+  },
+  {
+   "id": "plc_park_simmons",
+   "name": "Simmons",
+   "address": "19450 Chapel St",
+   "type": "Park: Neighborhood",
+   "acres": 3.6,
+   "lat": 42.43373,
+   "lon": -83.2542
+  },
+  {
+   "id": "plc_park_skinner",
+   "name": "Skinner",
+   "address": "12800 Kelly Rd",
+   "type": "Park: Neighborhood",
+   "acres": 7.5,
+   "lat": 42.42664,
+   "lon": -82.95698
+  },
+  {
+   "id": "plc_park_spirit_plaza",
+   "name": "Spirit Plaza",
+   "address": "1 E Jefferson Ave",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.32912,
+   "lon": -83.04493
+  },
+  {
+   "id": "plc_park_st_anthony",
+   "name": "St. Anthony",
+   "address": "5330 Field St",
+   "type": "Park: Neighborhood",
+   "acres": 1.7,
+   "lat": 42.37689,
+   "lon": -83.01911
+  },
+  {
+   "id": "plc_park_st_hedwig",
+   "name": "St. Hedwig",
+   "address": "2900 Junction St",
+   "type": "Park: Community",
+   "acres": 13.4,
+   "lat": 42.32588,
+   "lon": -83.10985
+  },
+  {
+   "id": "plc_park_st_martins",
+   "name": "St. Martins",
+   "address": "19701 Roselawn St",
+   "type": "Park: Neighborhood",
+   "acres": 3.4,
+   "lat": 42.43695,
+   "lon": -83.15386
+  },
+  {
+   "id": "plc_park_stanton",
+   "name": "Stanton",
+   "address": "2500 Porter St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.32351,
+   "lon": -83.07635
+  },
+  {
+   "id": "plc_park_state_fair_greyling",
+   "name": "State Fair-Greyling",
+   "address": "744 Adeline St",
+   "type": "Park: Neighborhood",
+   "acres": 2.9,
+   "lat": 42.43898,
+   "lon": -83.11137
+  },
+  {
+   "id": "plc_park_steel_wadsworth",
+   "name": "Steel-Wadsworth",
+   "address": "11748 Steel St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.37538,
+   "lon": -83.17007
+  },
+  {
+   "id": "plc_park_stein",
+   "name": "Stein",
+   "address": "18501 W Chicago St",
+   "type": "Park: Community",
+   "acres": 25.3,
+   "lat": 42.36319,
+   "lon": -83.22329
+  },
+  {
+   "id": "plc_park_stockton",
+   "name": "Stockton",
+   "address": "9250 Dwight St",
+   "type": "Park: Riverfront",
+   "acres": 1.9,
+   "lat": 42.35378,
+   "lon": -82.98079
+  },
+  {
+   "id": "plc_park_stoepel_no_1",
+   "name": "Stoepel No. 1",
+   "address": "10363 W Outer Dr",
+   "type": "Park: Community",
+   "acres": 29.3,
+   "lat": 42.39609,
+   "lon": -83.23492
+  },
+  {
+   "id": "plc_park_stoepel_no_2",
+   "name": "Stoepel No. 2",
+   "address": "16411 W Chicago St",
+   "type": "Park: Community",
+   "acres": 36.6,
+   "lat": 42.36283,
+   "lon": -83.20716
+  },
+  {
+   "id": "plc_park_sylvester_field",
+   "name": "Sylvester-Field",
+   "address": "3751 Field St",
+   "type": "Park: Mini",
+   "acres": 0.3,
+   "lat": 42.36683,
+   "lon": -83.0135
+  },
+  {
+   "id": "plc_park_syracuse",
+   "name": "Syracuse",
+   "address": "19255 Syracuse St",
+   "type": "Park: Neighborhood",
+   "acres": 3.8,
+   "lat": 42.43531,
+   "lon": -83.04707
+  },
+  {
+   "id": "plc_park_syracuse_hildale",
+   "name": "Syracuse-Hildale",
+   "address": "18444 Syracuse St",
+   "type": "Park: Neighborhood",
+   "acres": 1.7,
+   "lat": 42.42934,
+   "lon": -83.04579
+  },
+  {
+   "id": "plc_park_szafraniec",
+   "name": "Szafraniec",
+   "address": "4513 N Campbell St",
+   "type": "Park: Neighborhood",
+   "acres": 2,
+   "lat": 42.33526,
+   "lon": -83.11771
+  },
+  {
+   "id": "plc_park_tarnow_kirkwood",
+   "name": "Tarnow-Kirkwood",
+   "address": "5837 Tarnow St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.33842,
+   "lon": -83.1401
+  },
+  {
+   "id": "plc_park_the_villages",
+   "name": "The Villages",
+   "address": "8820 Georgia St",
+   "type": "Park: Neighborhood",
+   "acres": 1.1,
+   "lat": 42.39391,
+   "lon": -83.01479
+  },
+  {
+   "id": "plc_park_three_mile_munich",
+   "name": "Three Mile-Munich",
+   "address": "4400 3 Mile Dr",
+   "type": "Park: Neighborhood",
+   "acres": 2,
+   "lat": 42.39886,
+   "lon": -82.93778
+  },
+  {
+   "id": "plc_park_tireman_littlefield",
+   "name": "Tireman-Littlefield",
+   "address": "8051 Littlefield St",
+   "type": "Park: Neighborhood",
+   "acres": 1.9,
+   "lat": 42.35199,
+   "lon": -83.1674
+  },
+  {
+   "id": "plc_park_tireman_minock",
+   "name": "Tireman-Minock",
+   "address": "19590 Tireman St",
+   "type": "Park: Neighborhood",
+   "acres": 3.7,
+   "lat": 42.35131,
+   "lon": -83.23265
+  },
+  {
+   "id": "plc_park_tolan",
+   "name": "Tolan",
+   "address": "601 Mack Ave",
+   "type": "Park: Neighborhood",
+   "acres": 9.2,
+   "lat": 42.35165,
+   "lon": -83.05033
+  },
+  {
+   "id": "plc_park_traverse_mcclellan",
+   "name": "Traverse-McClellan",
+   "address": "9368 Traverse St",
+   "type": "Park: Mini",
+   "acres": 0.8,
+   "lat": 42.40003,
+   "lon": -83.01163
+  },
+  {
+   "id": "plc_park_tuttle",
+   "name": "Tuttle",
+   "address": "19976 Stout St",
+   "type": "Park: Neighborhood",
+   "acres": 3.8,
+   "lat": 42.43931,
+   "lon": -83.24348
+  },
+  {
+   "id": "plc_park_twork",
+   "name": "Twork",
+   "address": "17432 Charest St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.42323,
+   "lon": -83.06953
+  },
+  {
+   "id": "plc_park_van_antwerp",
+   "name": "Van Antwerp",
+   "address": "19891 Wyoming St",
+   "type": "Park: Community",
+   "acres": 18.2,
+   "lat": 42.43781,
+   "lon": -83.16566
+  },
+  {
+   "id": "plc_park_varier",
+   "name": "Varier",
+   "address": "15639 Thatcher St",
+   "type": "Park: Neighborhood",
+   "acres": 3.1,
+   "lat": 42.42051,
+   "lon": -83.20237
+  },
+  {
+   "id": "plc_park_vermont_alexandrine",
+   "name": "Vermont-Alexandrine",
+   "address": "4111 Vermont St",
+   "type": "Park: Mini",
+   "acres": 0.2,
+   "lat": 42.34389,
+   "lon": -83.08072
+  },
+  {
+   "id": "plc_park_vernor",
+   "name": "Vernor",
+   "address": "5947 Grandy St",
+   "type": "Park: Neighborhood",
+   "acres": 3.3,
+   "lat": 42.37395,
+   "lon": -83.04472
+  },
+  {
+   "id": "plc_park_voigt",
+   "name": "Voigt",
+   "address": "795 Longfellow St",
+   "type": "Park: Neighborhood",
+   "acres": 6.8,
+   "lat": 42.38337,
+   "lon": -83.08774
+  },
+  {
+   "id": "plc_park_votrobeck",
+   "name": "Votrobeck",
+   "address": "19361 Votrobeck Dr",
+   "type": "Park: Neighborhood",
+   "acres": 3,
+   "lat": 42.43253,
+   "lon": -83.24301
+  },
+  {
+   "id": "plc_park_warren_gateway_trailhead_park_jlg",
+   "name": "Warren Gateway Trailhead Park (JLG)",
+   "address": "8034 W Warren Ave",
+   "type": "Park: Neighborhood",
+   "acres": 4.5,
+   "lat": 42.34549,
+   "lon": -83.14763
+  },
+  {
+   "id": "plc_park_warren_meldrum",
+   "name": "Warren-Meldrum",
+   "address": "4742 Meldrum St",
+   "type": "Park: Neighborhood",
+   "acres": 3.5,
+   "lat": 42.37059,
+   "lon": -83.02554
+  },
+  {
+   "id": "plc_park_watson",
+   "name": "Watson",
+   "address": "5159 Scotten St",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.34398,
+   "lon": -83.11135
+  },
+  {
+   "id": "plc_park_weaver_penrod",
+   "name": "Weaver-Penrod",
+   "address": "18350 Weaver St",
+   "type": "Park: Neighborhood",
+   "acres": 7.7,
+   "lat": 42.36958,
+   "lon": -83.22066
+  },
+  {
+   "id": "plc_park_weiss",
+   "name": "Weiss",
+   "address": "9215 Mandale St",
+   "type": "Park: Neighborhood",
+   "acres": 1.1,
+   "lat": 42.30524,
+   "lon": -83.13602
+  },
+  {
+   "id": "plc_park_wells",
+   "name": "Wells",
+   "address": "20159 Griggs St",
+   "type": "Park: Neighborhood",
+   "acres": 3.8,
+   "lat": 42.44198,
+   "lon": -83.16541
+  },
+  {
+   "id": "plc_park_wigle",
+   "name": "Wigle",
+   "address": "910 Brainard St",
+   "type": "Park: Neighborhood",
+   "acres": 1,
+   "lat": 42.34509,
+   "lon": -83.06723
+  },
+  {
+   "id": "plc_park_wiley",
+   "name": "Wiley",
+   "address": "9039 Stoepel St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.36126,
+   "lon": -83.13991
+  },
+  {
+   "id": "plc_park_williams",
+   "name": "Williams",
+   "address": "8431 Rosa Parks Blvd",
+   "type": "Park: Neighborhood",
+   "acres": 8.2,
+   "lat": 42.37055,
+   "lon": -83.09781
+  },
+  {
+   "id": "plc_park_wilson",
+   "name": "Wilson",
+   "address": "12701 Dale St",
+   "type": "Park: Mini",
+   "acres": 0.9,
+   "lat": 42.38037,
+   "lon": -83.27473
+  },
+  {
+   "id": "plc_park_wingle",
+   "name": "Wingle",
+   "address": "6936 Waldo St",
+   "type": "Park: Mini",
+   "acres": 0.5,
+   "lat": 42.32802,
+   "lon": -83.12856
+  },
+  {
+   "id": "plc_park_wish_egan",
+   "name": "Wish-Egan",
+   "address": "19800 Schoenherr St",
+   "type": "Park: Community",
+   "acres": 10.3,
+   "lat": 42.44344,
+   "lon": -82.98418
+  },
+  {
+   "id": "plc_park_wolf",
+   "name": "Wolf",
+   "address": "8405 Carlin St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.3564,
+   "lon": -83.17955
+  },
+  {
+   "id": "plc_park_woodrow_wilson_fullerton",
+   "name": "Woodrow Wilson-Fullerton",
+   "address": "12500 Woodrow Wilson St",
+   "type": "Park: Mini",
+   "acres": 0.7,
+   "lat": 42.39241,
+   "lon": -83.1072
+  },
+  {
+   "id": "plc_park_yakisch",
+   "name": "Yakisch",
+   "address": "18160 Anglin St",
+   "type": "Park: Neighborhood",
+   "acres": 1.6,
+   "lat": 42.42769,
+   "lon": -83.07432
+  },
+  {
+   "id": "plc_park_yates",
+   "name": "Yates",
+   "address": "2501 Blaine St",
+   "type": "Park: Neighborhood",
+   "acres": 2.4,
+   "lat": 42.36977,
+   "lon": -83.10488
+  },
+  {
+   "id": "plc_park_young",
+   "name": "Young",
+   "address": "2751 Robert Bradby Dr",
+   "type": "Park: Community",
+   "acres": 12.4,
+   "lat": 42.34494,
+   "lon": -83.02461
+  },
+  {
+   "id": "plc_park_zussman",
+   "name": "Zussman",
+   "address": "3959 W Davison St",
+   "type": "Park: Neighborhood",
+   "acres": 2.3,
+   "lat": 42.38875,
+   "lon": -83.13231
+  }
+ ]
+}

@@ -84,6 +84,10 @@ export async function build(opts: BuildOptions = {}) {
   // loads food never downloads a trail map.
   const jlg = p('data/ingested/jlg_segments.json');
   if (existsSync(jlg)) { const g = JSON.parse(readFileSync(jlg, 'utf8')); counts.greenway_segments = g.segments.length; put('places/greenway.json', g); }
+  // Recreation and Events tabs. Past events are dropped at build time and again on the device.
+  const parksFile = p('data/ingested/city_parks.json'), eventsFile = p('data/ingested/city_events.json');
+  if (existsSync(parksFile)) { const d = JSON.parse(readFileSync(parksFile, 'utf8')); counts.parks = d.parks.length; put('places/parks.json', d); }
+  if (existsSync(eventsFile)) { const d = JSON.parse(readFileSync(eventsFile, 'utf8')); d.events = d.events.filter((e: { starts_at: string }) => e.starts_at.slice(0, 10) >= todayStr); counts.events = d.events.length; put('events.json', d); }
   put('alerts.json', alerts.filter((a) => a.status === 'published' && Date.parse(a.ends_at) > now.getTime()));
   put('emergency.json', emergency.sort((a, b) => Number(a.sort) - Number(b.sort))
     .map((r) => ({ id: r.id, label: r.label, number: r.number, ...(r.sms ? { sms: r.sms } : {}), hardcoded: r.hardcoded === 'yes' })));

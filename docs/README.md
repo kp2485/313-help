@@ -42,6 +42,7 @@ pnpm geocode             # fill coordinates in data/seed/resources.csv (U.S. Cen
 
 ## Status
 
+- 2026-09-18: **Redesign** — five tabs (Home · Help · Recreation · Transit · Events), green design system, Urgent help in the top bar instead of a red strip, City events and 302 parks in the bundle, bus directions on every listing. See 05 and DECISIONS.
 - 2026-09-18: **Build step 3 done** — `api/` Worker (Hono) + D1 schema: anonymous reports and proposals, steward endpoints behind Cloudflare Access, retention, circuit breaker; report buttons and offline queue in the PWA; report facts flow into the bundle build. Runs locally end to end; **nothing is deployed** (see [OPERATIONS.md](OPERATIONS.md)). Next: `admin/` steward queue.
 - 2026-09-18: **Build step 2 done** — `apps/web` PWA: needs list on Home, results, detail, greenway with offline SVG map, signed-bundle verification, IndexedDB offline, 29 KB gzipped. `pnpm --filter @detroithelp/web dev`. Next: `api/` Worker + D1 for reports.
 - 2026-09-18: **Build step 1 done** — seed CSVs, shared query package with fixtures, pipeline, HSDS 3.2-valid export, signed bundle (86 rows). Next: `apps/web` PWA.

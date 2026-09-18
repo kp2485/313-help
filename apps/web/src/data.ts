@@ -17,6 +17,10 @@ export interface Bundle {
   emergency: EmergencyNumber[];
   archived: { id: string; name: string; category: string; archived: { at: string; reason: string; replacement_id?: string } }[];
   greenway: { source: { name: string; last_edited: string }; segments: Segment[] } | null;
+  events?: { id: string; title: string; starts_at: string; ends_at?: string; time_text?: string; department?: string; location?: string; url: string }[];
+  events_source?: { name: string; page: string; fetched_at: string };
+  parks?: { id: string; name: string; address: string; type: string; acres: number; lat: number; lon: number }[];
+  parks_source?: { name: string; last_edited: string };
 }
 
 const BASE = '/data/bundle/v1/';
@@ -72,6 +76,10 @@ export async function refresh(current?: Bundle): Promise<Bundle | null> {
     emergency: (files['emergency.json'] ?? []) as EmergencyNumber[],
     archived: (files['archived.json'] ?? []) as Bundle['archived'],
     greenway: (files['places/greenway.json'] ?? null) as Bundle['greenway'],
+    events: (files['events.json'] as { events?: Bundle['events'] } | undefined)?.events,
+    events_source: (files['events.json'] as { source?: Bundle['events_source'] } | undefined)?.source,
+    parks: (files['places/parks.json'] as { parks?: Bundle['parks'] } | undefined)?.parks,
+    parks_source: (files['places/parks.json'] as { source?: Bundle['parks_source'] } | undefined)?.source,
   };
   await idbSet('bundle', next); // one put = atomic swap
   return next;
