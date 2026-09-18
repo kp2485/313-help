@@ -42,6 +42,10 @@ strong { white-space:nowrap; }
 .badge.unconfirmed,.badge.never_checked,.badge.reported_once,.badge.reported_closed,.badge.archived { background:var(--warnbg); color:var(--warn); font-weight:600; }
 .notice,.banner { padding:.5rem .75rem; border-radius:.5rem; background:var(--warnbg); color:var(--warn); font-weight:600; } .banner.stop { background:var(--urgent); color:#fff; } .banner.stop a { color:#fff; }
 .alert { border-left:.4rem solid var(--call); background:var(--soft); padding:.6rem .75rem; border-radius:.4rem; margin:.5rem 0; }
+.banner.ok { background:var(--soft); color:var(--ink); border-left:.4rem solid var(--call); }
+.report { margin-top:1.5rem; display:grid; gap:.5rem; } .report summary { min-height:2.75rem; padding:.6rem 0; font-weight:600; cursor:pointer; }
+.report label { display:grid; gap:.25rem; font-size:.95rem; color:var(--muted); } .report textarea { font:inherit; padding:.5rem; border-radius:.5rem; border:1px solid var(--line); background:var(--bg); color:var(--ink); width:100%; }
+.kinds { display:grid; gap:.4rem; margin-top:.5rem; } .kinds button { min-height:2.75rem; text-align:left; padding:.5rem .8rem; border-radius:.5rem; border:1px solid var(--line); background:var(--soft); }
 .empty { padding:1rem; background:var(--soft); border-radius:.6rem; }
 .loc { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; }
 .hours li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.25rem 1rem; padding:.3rem 0; border-bottom:1px solid var(--line); }

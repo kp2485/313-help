@@ -8,6 +8,7 @@ import { toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, uuid5 } from '../src/util.js';
 import { validateEmergency, validateRows } from '../src/validate.js';
+import { applyAggregates } from '../src/reports-sync.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
@@ -88,6 +89,21 @@ describe('open-data ingester', () => {
   });
 });
 
+describe('report facts from the write API', () => {
+  const agg = (over = {}) => ({ circuit_breaker: false, targets: [{ target_id: 'sal_test', closed_open: 2, closed_last_at: '2026-09-17T10:00Z', wrong_open: 1, last_confirmed_at: '2026-09-16T09:00Z' }], ...over });
+  it('turn into badges on the device', () => {
+    const r = row({});
+    applyAggregates([r], agg());
+    expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
+    expect(r.facts.last_confirm_method).toBe('community_confirm');
+  });
+  it('a tripped circuit breaker keeps closure reports off the badges', () => {
+    const r = row({ facts: { ...row({}).facts, checked_at_entry: '2026-09-10', entry_method: 'phone' } });
+    applyAggregates([r], agg({ circuit_breaker: true, targets: [{ target_id: 'sal_test', closed_open: 9, closed_last_at: '2026-09-18T10:00Z', wrong_open: 0, last_confirmed_at: null }] }));
+    expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('entry_checked');
+  });
+});
+
 describe('helpers', () => {
   it('parses the phone formats found in real sources', () => {
     expect(parsePhone('(313) 579-2100 ext. 4217')).toEqual({ number: '3135792100', ext: '4217' });
@@ -106,7 +122,7 @@ describe('the real bundle', () => {
   let out: string, index: any, rows: BundleRow[];
   beforeAll(async () => {
     out = mkdtempSync(join(tmpdir(), 'dh-bundle-'));
-    const r = await build({ outDir: out, hsdsDir: null, quiet: true, now: new Date('2026-09-18T17:45:00Z') });
+    const r = await build({ aggregates: null, outDir: out, hsdsDir: null, quiet: true, now: new Date('2026-09-18T17:45:00Z') });
     index = r.index; rows = r.rows;
   }, 60000);
 

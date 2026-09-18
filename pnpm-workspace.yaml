@@ -2,3 +2,4 @@ packages:
   - "packages/*"
   - "pipeline"
   - "apps/web"
+  - "api"

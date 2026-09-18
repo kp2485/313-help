@@ -23,6 +23,7 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 11 | [Healthy places](11-greenway-public-places.md) | Approved: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
 | 12 | [Gift & handoff](12-gift-and-handoff.md) | What "open-source gift to the city" demands of the design: unattended operation, dead-man switch, transfer checklist, costs |
 | 13 | [Neighborhood indicators](13-neighborhood-indicators.md) | Citywide public-data picture for all 205 neighborhoods; honesty rules; the greenway as one lens |
+| — | [OPERATIONS.md](OPERATIONS.md) | Running it locally, the regular work, first deployment (needs Kyle), secrets, handover |
 | — | [DECISIONS.md](DECISIONS.md) | Decisions the docs don't cover; audit fixes awaiting approval |
 | — | [CLAUDE.md](../CLAUDE.md) | Handoff instructions for Claude Code |
 
@@ -41,6 +42,7 @@ pnpm geocode             # fill coordinates in data/seed/resources.csv (U.S. Cen
 
 ## Status
 
+- 2026-09-18: **Build step 3 done** — `api/` Worker (Hono) + D1 schema: anonymous reports and proposals, steward endpoints behind Cloudflare Access, retention, circuit breaker; report buttons and offline queue in the PWA; report facts flow into the bundle build. Runs locally end to end; **nothing is deployed** (see [OPERATIONS.md](OPERATIONS.md)). Next: `admin/` steward queue.
 - 2026-09-18: **Build step 2 done** — `apps/web` PWA: needs list on Home, results, detail, greenway with offline SVG map, signed-bundle verification, IndexedDB offline, 29 KB gzipped. `pnpm --filter @detroithelp/web dev`. Next: `api/` Worker + D1 for reports.
 - 2026-09-18: **Build step 1 done** — seed CSVs, shared query package with fixtures, pipeline, HSDS 3.2-valid export, signed bundle (86 rows). Next: `apps/web` PWA.
 - 2026-09-18: Drafted for review. Nothing built yet. Audited the same day (doc 10); fixes are listed as *Proposed* in DECISIONS.md and are not yet applied to docs 01–09.

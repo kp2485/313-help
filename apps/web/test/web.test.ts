@@ -3,7 +3,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { NEEDS, CATEGORIES, HARDCODED } from '../src/needs.js';
+import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
+import { build as buildReport, nonce } from '../src/report.js';
 
 const root = join(__dirname, '../../..');
 const strings = JSON.parse(readFileSync(join(root, 'strings/en.json'), 'utf8')) as Record<string, string>;
@@ -50,12 +52,38 @@ describe('needs list', () => {
   it('911 and 988 are hardcoded', () => expect(HARDCODED).toEqual({ emg_911: '911', emg_988: '988' }));
 });
 
+describe('reports from the phone', () => {
+  const day1 = new Date('2026-09-18T17:45:00Z'), day2 = new Date('2026-09-19T17:45:00Z');
+  it('the dedupe hash is stable within a day, and unlinkable across targets and across days', async () => {
+    const a = await nonce('sal_a', day1, 'secret'), again = await nonce('sal_a', new Date('2026-09-18T23:00:00Z'), 'secret');
+    expect(a).toMatch(/^[a-f0-9]{64}$/); expect(again).toBe(a);
+    expect(await nonce('sal_b', day1, 'secret')).not.toBe(a);
+    expect(await nonce('sal_a', day2, 'secret')).not.toBe(a);
+    expect(await nonce('sal_a', day1, 'other-phone')).not.toBe(a);
+  });
+  it('the day rolls over at Detroit midnight, not UTC midnight', async () =>
+    expect(await nonce('sal_a', new Date('2026-09-19T03:30:00Z'), 's')).toBe(await nonce('sal_a', day1, 's')));
+  it('a report carries exactly the fields the API accepts, and nothing about the device', async () => {
+    const r = await buildReport('sal_a', 'moved', '  the sign says they moved  ', day1);
+    expect(Object.keys(r).sort()).toEqual(['client_nonce', 'detail', 'kind', 'observed_at', 'target_id']);
+    expect(r).toMatchObject({ target_id: 'sal_a', kind: 'moved', detail: 'the sign says they moved', observed_at: '2026-09-18T17:45Z' });
+    expect(Object.keys(await buildReport('sal_a', 'confirmed_ok', '', day1))).not.toContain('detail');
+    const src = readFileSync(join(__dirname, '../src/report.ts'), 'utf8');
+    expect(src).toMatch(/credentials: 'omit'/);
+    expect(src).not.toMatch(/navigator\.|geolocation|userAgent|localStorage|document\.cookie/);
+  });
+  it('place reports offer no way to report a person', () => {
+    expect([...PLACE_KINDS].join(' ')).not.toMatch(/person|people|tent|camp|homeless|suspicious|loiter|vehicle/);
+  });
+});
+
 describe('privacy and copy rules, checked against the source', () => {
   it('every strings key used in main.ts exists', () => {
     // Whole literal keys only: t('od.s' + i) is a prefix, covered by the steps test below.
     const used = [...main.matchAll(/\b[tT]\('([a-z_]+\.[\w.]*\w)'\s*[,)]/g)].map((m) => m[1]!);
     for (let i = 1; i <= 6; i++) used.push(`od.s${i}`);
     for (const ph of ['open', 'under_construction', 'funded', 'planned']) used.push(`gw.${ph}`);
+    for (const k of [...LISTING_KINDS, ...PLACE_KINDS]) used.push(`report.kind.${k}`);
     expect(used.length).toBeGreaterThan(40);
     for (const k of used) expect(strings[k], k).toBeTypeOf('string');
   });

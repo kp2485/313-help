@@ -11,8 +11,9 @@ import { loadSources } from './ingest-arcgis.js';
 import { fromIngested, fromSeed, toHsds, type Normalized } from './normalize.js';
 import { hsdsSchema, validateAlerts, validateEmergency, validateHsds, validateRows } from './validate.js';
 import { loadSigningKey, publicKeyB64, signBytes } from './sign.js';
+import { applyAggregates, fetchAggregates, pushTargets, type Aggregates } from './reports-sync.js';
 
-export interface BuildOptions { release?: boolean; offline?: boolean; outDir?: string; hsdsDir?: string | null; now?: Date; quiet?: boolean }
+export interface BuildOptions { aggregates?: Aggregates | null; release?: boolean; offline?: boolean; outDir?: string; hsdsDir?: string | null; now?: Date; quiet?: boolean }
 
 export interface BundleIndex {
   schema: 1;
@@ -41,6 +42,9 @@ export async function build(opts: BuildOptions = {}) {
     parts.push(fromIngested(src, readCsv(p('data/ingested', `${src.id}.csv`))));
   }
   const rows: BundleRow[] = parts.flatMap((x) => x.rows).sort((a, b) => a.id.localeCompare(b.id));
+  // Report counts and visitor confirms from the write API (none until it is deployed and configured).
+  const agg = opts.aggregates !== undefined ? opts.aggregates : await fetchAggregates();
+  if (agg) { const a = applyAggregates(rows, agg); log(`reports: facts applied to ${a.applied} rows${a.frozen ? ' — CIRCUIT BREAKER tripped: closure counts ignored until a steward looks' : ''}`); }
   const emergency: CsvRow[] = readCsv(p('data/seed/emergency.csv'));
   const alerts = JSON.parse(readFileSync(p('data/seed/alerts.json'), 'utf8')) as Alert[];
 
@@ -99,6 +103,7 @@ export async function build(opts: BuildOptions = {}) {
   const indexBytes = writeJson(`${out}/index.json`, index);
   writeJson(`${out}/index.json.sig`, { alg: 'Ed25519', signature: signBytes(indexBytes, key), public_key: publicKeyB64(key) });
 
+  if (opts.aggregates === undefined) await pushTargets(rows.map((r) => r.id), existsSync(jlg) ? (JSON.parse(readFileSync(jlg, 'utf8')).segments as { id: string }[]).map((s) => s.id) : []);
   const total = Object.values(files).reduce((n, f) => n + f.bytes, 0) + indexBytes.length;
   log(`bundle ${index.version}: ${live.length} rows in ${Object.keys(counts).length} categories, ${(total / 1024).toFixed(0)} KB, signed (${kind}), emergency numbers ${emg.verified ? 'match their published sources' : 'NOT yet checked'}`);
   log('  ', Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(' · '));

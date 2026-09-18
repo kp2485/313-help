@@ -5,6 +5,7 @@ import {
 import strings from '../../../strings/en.json';
 import { cached, refresh, type Bundle } from './data.js';
 import { CATEGORIES, HARDCODED, NEEDS, type Need } from './needs.js';
+import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, submit } from './report.js';
 import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
@@ -17,6 +18,7 @@ let bundle: Bundle | undefined;
 let loadError = false;
 let here: { lat: number; lon: number } | null = null;   // device location: this variable only, never stored
 let locDenied = false;
+const reported = new Map<string, 'sent' | 'queued'>();   // this visit only, so the thank-you stays put
 const stack: View[] = [{ v: 'home' }];
 const app = document.getElementById('app')!;
 
@@ -111,6 +113,18 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
     ${opts.seeAll && ranked.length > shown.length ? `<button class="btn ghost" ${go(opts.seeAll)}>${T('results.see_all', { count: ranked.length })}</button>` : ''}`;
 }
 
+// One tap to confirm, one tap to correct (docs/04). Places get the things-not-people list (docs/11).
+function reportBox(targetId: string, place: boolean, category = ''): string {
+  const done = reported.get(targetId);
+  if (done) return `<p class="banner ok" role="status">${T(done === 'queued' ? 'report.queued' : place ? 'report.sent_place' : 'report.sent')}</p>`;
+  const kinds = place ? PLACE_KINDS : LISTING_KINDS.filter((k) => k !== 'out_of_stock' || /^(food|harm)/.test(category));
+  return `<section class="report" data-target="${esc(targetId)}">
+    <button class="btn ghost" data-report="${place ? CONFIRM.place : CONFIRM.listing}">✓ ${T(place ? 'report.confirm.place' : 'report.confirm.listing')}</button>
+    <details><summary>${T(place ? 'report.fix' : 'report.wrong')}</summary>${place ? `<p class="foot">${T('report.things_only')}</p>` : ''}
+      <label>${T('report.note_label')}<textarea maxlength="280" rows="2"></textarea></label>
+      <div class="kinds">${kinds.map((k) => `<button data-report="${k}">${T('report.kind.' + k)}</button>`).join('')}</div></details></section>`;
+}
+
 // ---- views ------------------------------------------------------------------
 function home(): string {
   if (!bundle) return `${strip()}<main><h1>${T('app.name')}</h1><p>${T(loadError ? 'home.no_data' : 'home.loading')}</p></main>`;
@@ -183,7 +197,7 @@ function detail(id: string): string {
     ${r.address ? `<address>${esc(r.address.line1)}<br>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</address><p class="foot">${T('detail.directions_note')}</p>` : ''}
     ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
     ${r.website ? `<p><a href="${esc(r.website)}" rel="noopener noreferrer">${T('detail.website')}</a></p>` : ''}
-    <h2>${T('detail.source')}</h2><p>${esc(r.facts.source.name)}</p><p class="foot">${T('detail.report_soon')}</p></main>`;
+    <h2>${T('detail.source')}</h2><p>${esc(r.facts.source.name)}</p>${reportBox(r.id, false, r.category)}</main>`;
 }
 
 // Greenway drawn as plain SVG: no map tiles, no third party, works offline (audit B8).
@@ -213,7 +227,8 @@ function segment(id: string): string {
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `${header(s.name)}<main><p class="open ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}${s.phase === 'open' ? '' : ` · ${T('gw.not_open')}`}</p>
     ${gwMap(g.segments, s, near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon! })))}
-    <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}</main>`;
+    <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
+    ${s.phase === 'open' ? reportBox(s.id, true) : ''}</main>`;
 }
 function about(): string {
   const i = bundle?.index;
@@ -254,9 +269,15 @@ function navigate(view: View): void {
 window.addEventListener('popstate', () => { if (stack.length > 1) stack.pop(); else stack[0] = fromHash(location.hash); render(); });
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-exit],[data-loc],[data-share]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report]');
   if (!el) return;
   if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
+  else if (el.dataset.report) {
+    const box = el.closest<HTMLElement>('.report')!, target = box.dataset.target!;
+    const note = box.querySelector('textarea')?.value ?? '';
+    reported.set(target, await submit(await buildReport(target, el.dataset.report, note)));
+    render(false);
+  }
   else if ('back' in el.dataset) { if (stack.length > 1) history.back(); else { stack[0] = { v: 'home' }; history.replaceState(null, '', location.pathname); render(); } }
   else if ('exit' in el.dataset) { stack.length = 0; location.replace('https://www.weather.gov/'); }   // replace(): this page leaves the back button too
   else if (el.dataset.loc === 'off') { here = null; render(false); }
@@ -278,6 +299,8 @@ async function start(): Promise<void> {
   if (bundle) render(false);
   try { const next = await refresh(bundle); if (next) { bundle = next; render(false); } }
   catch (e) { console.warn('bundle refresh failed; keeping what we have', e); if (!bundle) { loadError = true; render(false); } }
+  void flush();
+  window.addEventListener('online', () => void flush());
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;

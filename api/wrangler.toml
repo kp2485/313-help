@@ -1,0 +1,29 @@
+# Nothing here has been deployed. Creating the D1 database, the Worker, the Access application,
+# and the rate-limiting rule all need Kyle's go-ahead (CLAUDE.md). See docs/OPERATIONS.md.
+name = "detroithelp-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+# Zero-PII: Cloudflare's default invocation logs record request metadata. Off. Logpush stays off.
+# The Worker itself never reads an IP header and never logs a request (a test enforces both).
+[observability.logs]
+enabled = true
+invocation_logs = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "detroithelp"
+database_id = "00000000-0000-0000-0000-000000000000"   # placeholder until the database exists
+migrations_dir = "migrations"
+
+[vars]
+ALLOWED_ORIGIN = "http://localhost:5173"
+ACCESS_TEAM_DOMAIN = ""      # e.g. detroithelp.cloudflareaccess.com
+ACCESS_AUD = ""              # the Access application's audience tag
+
+[triggers]
+crons = ["17 8 * * *"]       # daily retention pass: raw reports older than 180 days become monthly counts
+
+# Abuse control lives at Cloudflare's edge as a WAF rate-limiting rule on POST /v1/* (per IP, e.g.
+# 10 requests per minute). It is configured in the dashboard, not here, so that this code never
+# has to touch an IP address. Cloudflare processes IPs in transit; we never read or store them.

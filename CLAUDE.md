@@ -5,7 +5,7 @@ You are building **DetroitHelp** (working name), a zero-PII resource directory a
 ## Non-negotiables (from docs/01 and docs/08)
 
 - No accounts, no names, no phone numbers, no emails for residents. **No identifier for a resident ever leaves the device.** The only on-device secret is random, resettable, and used solely to derive per-target daily dedupe hashes: `sha256(install_secret ‖ target_id ‖ day)`. If a feature seems to need more, it's out of scope.
-- Never log or persist client IPs in the Worker. Timestamps at minute granularity.
+- Never log or persist client IPs in the Worker. The Worker source never reads an IP or user-agent header at all (rate limiting is a Cloudflare WAF rule); request bodies are closed schemas, so an unknown field is a 400. `api/test` enforces all of this. Timestamps at minute granularity.
 - Triage answers live in memory only and are cleared on exit.
 - Nothing is deleted from the dataset; rows are archived with reason.
 - Every listing shows freshness **computed on the device** from dated facts in the bundle (never frozen at build time). Badges state facts; never say "verified" for something no person checked. Unknown is never rendered as "open." Reports label rows; they never hide them.
@@ -24,7 +24,7 @@ You are building **DetroitHelp** (working name), a zero-PII resource directory a
 ## Conventions
 
 - TypeScript strict for pipeline/api/web; SwiftUI (iOS 17+) for iOS. Node 22. pnpm workspaces.
-- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report). Never reuse.
+- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal). Never reuse.
 - Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements against the same fixtures.
 - Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline, used in floating wall-clock mode only — see DECISIONS.md; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
 - Detroit time zone `America/Detroit` everywhere. Bbox sanity: lat 42.25–42.46, lon −83.29 to −82.91.

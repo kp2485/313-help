@@ -30,11 +30,11 @@ function db(): Promise<IDBDatabase> {
     r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error);
   });
 }
-async function idbGet<T>(key: string): Promise<T | undefined> {
+export async function idbGet<T>(key: string): Promise<T | undefined> {
   try { const d = await db(); return await new Promise((ok, no) => { const q = d.transaction('kv').objectStore('kv').get(key); q.onsuccess = () => ok(q.result as T); q.onerror = () => no(q.error); }); }
   catch { return undefined; } // private mode or blocked storage: the app still works online
 }
-async function idbSet(key: string, val: unknown): Promise<void> {
+export async function idbSet(key: string, val: unknown): Promise<void> {
   try { const d = await db(); await new Promise<void>((ok, no) => { const tx = d.transaction('kv', 'readwrite'); tx.objectStore('kv').put(val, key); tx.oncomplete = () => ok(); tx.onerror = () => no(tx.error); }); }
   catch { /* ignore */ }
 }
