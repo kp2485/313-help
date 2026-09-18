@@ -349,15 +349,26 @@ app.addEventListener('click', async (ev) => {
 });
 
 // ---- start ------------------------------------------------------------------
+let lastCheck = 0;
+async function checkForUpdate(): Promise<void> {
+  if (Date.now() - lastCheck < 15 * 60000) return;
+  lastCheck = Date.now();
+  try { const next = await refresh(bundle); if (next) { bundle = next; render(false); } }
+  catch (e) { console.warn('bundle refresh failed; keeping what we have', e); if (!bundle) { loadError = true; render(false); } }
+}
 async function start(): Promise<void> {
   stack[0] = fromHash(location.hash);
   render(false);
   bundle = await cached();
   if (bundle) render(false);
-  try { const next = await refresh(bundle); if (next) { bundle = next; render(false); } }
-  catch (e) { console.warn('bundle refresh failed; keeping what we have', e); if (!bundle) { loadError = true; render(false); } }
+  await checkForUpdate();
   void flush();
-  window.addEventListener('online', () => void flush());
+  window.addEventListener('online', () => { void flush(); void checkForUpdate(); });
+  // An installed app can stay open for days. Look for a newer list whenever it comes back into view
+  // (at most every 15 minutes), so nobody is reading last week's list on a phone that has signal.
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void checkForUpdate(); });
+  // A shared link opened while the app is already open only changes the hash.
+  window.addEventListener('hashchange', () => { const v = fromHash(location.hash); if (JSON.stringify(v) !== JSON.stringify(stack[stack.length - 1])) { stack.length = 0; stack.push(v); render(); } });
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;

@@ -1,5 +1,220 @@
 [
  {
+  "id": "53773f22-8129-51c4-88a5-4f96e9e910f8",
+  "name": "Medical clinic",
+  "status": "active",
+  "description": "Medical care and counseling.",
+  "eligibility_description": "Their site says they serve American Indian and Alaska Native people and other underserved people. Call to ask.",
+  "url": "https://www.aihfs.org/",
+  "organization": {
+   "id": "072bef98-3552-577b-a8cc-22d1352945f3",
+   "name": "American Indian Health and Family Services",
+   "description": "American Indian Health and Family Services",
+   "x_detroit": {
+    "id": "org_american_indian_health_and_family_servic"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "977e827a-732b-5e3e-b30f-74b0cf56ae91",
+    "location": {
+     "id": "3e62e86d-7f01-565c-9d57-7ce9b9658657",
+     "name": "Medical clinic, American Indian Health and Family Services",
+     "location_type": "physical",
+     "latitude": 42.327962,
+     "longitude": -83.147027,
+     "addresses": [
+      {
+       "id": "ab9a10cc-a73f-5a70-81f1-2ca92bf807ca",
+       "address_1": "4880 Lawndale",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_american_indian_medical_clinic"
+     }
+    },
+    "phones": [
+     {
+      "id": "08c80740-65fa-5151-ac66-dd396b4c8467",
+      "number": "313-846-6030"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "5b7a4b61-4167-59b2-9cd4-d0666dc34220",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "45c0cadc-aaa7-53f8-a4fb-001dbac8191d",
+      "freq": "WEEKLY",
+      "byday": "TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:30",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "8ad8ee6a-4181-59a0-b8c5-d9a230a41098",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_american_indian_medical_clinic",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "American Indian Health and Family Services website",
+      "url": "https://www.aihfs.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_american_indian_medical_clinic",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "85ff2291-ac72-506e-ade4-2a273c70ad9f",
+  "name": "Free food boxes",
+  "status": "active",
+  "description": "A free box of food, plus free clothes and hygiene kits.",
+  "url": "https://www.auntienasvillage.org/",
+  "organization": {
+   "id": "6448d2de-2f88-5b61-a619-76d1b559415f",
+   "name": "Auntie Na's Village",
+   "description": "Auntie Na's Village",
+   "x_detroit": {
+    "id": "org_auntie_na_s_village"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "42cbb86d-229c-5fea-8272-9b1ea7cc5b42",
+    "location": {
+     "id": "9e04f985-ad4b-5677-9ce8-41f4a5673282",
+     "name": "Free food boxes, Auntie Na's Village",
+     "location_type": "physical",
+     "latitude": 42.377459,
+     "longitude": -83.135296,
+     "addresses": [
+      {
+       "id": "7adf999a-a41b-58bb-bbe8-fe80617a2e73",
+       "address_1": "12028 Yellowstone St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48204",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_auntie_na_s_free_food_boxes"
+     }
+    },
+    "phones": [
+     {
+      "id": "8e7c213f-1dbf-513d-95b9-5667b2a0fa57",
+      "number": "313-808-8940"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "8e381818-dd3d-5b64-a23b-d68b86082868",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "14:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "706ab061-72f8-5853-8c70-61ace6566168",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_auntie_na_s_free_food_boxes",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Auntie Na's Village website",
+      "url": "https://www.auntienasvillage.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_auntie_na_s_free_food_boxes",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "da91ce6b-fc17-55b5-82e7-fa6a4664cddd",
   "name": "Doctor visits and pharmacy",
   "status": "active",
@@ -861,6 +1076,285 @@
   ],
   "x_detroit": {
    "id": "svc_csk_shoppers_choice_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "0f2ef352-c264-5e58-805b-37cb3cb5109e",
+  "name": "After school program",
+  "status": "active",
+  "description": "An after-school program for kids. The group also helps with food.",
+  "url": "https://dabodetroitinc.com/",
+  "organization": {
+   "id": "c9e32840-7e8d-55c0-9fa8-9567c6c2d9ce",
+   "name": "Detroit Association of Black Organizations",
+   "description": "Detroit Association of Black Organizations",
+   "x_detroit": {
+    "id": "org_detroit_association_of_black_organizatio"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "37a826b7-ff9c-5a18-9ce9-c68b53d6aeab",
+    "location": {
+     "id": "fb00ddc4-f805-5f29-9570-2ea06c6d0ebf",
+     "name": "After school program, Detroit Association of Black Organizations",
+     "location_type": "physical",
+     "latitude": 42.376703,
+     "longitude": -83.158581,
+     "addresses": [
+      {
+       "id": "13dc4bc8-7f3d-512f-bf1e-e0eaac7ca323",
+       "address_1": "12048 Grand River Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48204",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_association_after_school_program"
+     }
+    },
+    "phones": [
+     {
+      "id": "3fc0da2e-7d01-50b8-89de-1e912545bbec",
+      "number": "313-491-0003"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_association_after_school_program",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Association of Black Organizations website",
+      "url": "https://dabodetroitinc.com/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_association_after_school_program",
+   "category": "youth"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "282f7f77-2f2c-5106-9130-735389819b32",
+  "name": "Dr. Feleta Wilson Health Center",
+  "status": "active",
+  "description": "See a doctor or a dentist.",
+  "url": "https://www.dchcquality.org/",
+  "organization": {
+   "id": "6ecff2fa-c233-5c00-8438-29fa7dacb208",
+   "name": "Detroit Community Health Connection",
+   "description": "Detroit Community Health Connection",
+   "x_detroit": {
+    "id": "org_detroit_community_health_connection"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "1913f08b-7c50-55f8-abf1-c0c0f47b83fc",
+    "location": {
+     "id": "24a0945a-2b6a-583b-91da-82a30c46f84d",
+     "name": "Dr. Feleta Wilson Health Center",
+     "location_type": "physical",
+     "latitude": 42.34495,
+     "longitude": -83.134687,
+     "addresses": [
+      {
+       "id": "e1563bac-58dc-5267-aae5-c1b761c0d697",
+       "address_1": "6550 W Warren Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_community_dr_feleta_wilson_health_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "e53eaf52-9759-58e8-a858-70be11fb2c09",
+      "number": "313-897-7700"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "89138177-32c9-50e1-a0c9-dfc2bd8fb400",
+      "freq": "WEEKLY",
+      "byday": "MO",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:30",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "f6066732-5e06-58ee-a1b8-a03ffb78be42",
+      "freq": "WEEKLY",
+      "byday": "TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_community_dr_feleta_wilson_health_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Community Health Connection website",
+      "url": "https://www.dchcquality.org/dr-feleta-wilson-health-center"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_community_dr_feleta_wilson_health_center",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "2f9ea12e-b8a4-5e6e-94c0-549ced21bece",
+  "name": "Nutrition Pantry",
+  "status": "active",
+  "description": "Free groceries for people who live in ZIP code 48212.",
+  "eligibility_description": "Live in 48212 with low income. Bring ID, proof of income, and the names and birthdates of people in your home. Sign up Tue or Thu 10am-1pm or Sat 9am-noon.",
+  "url": "https://www.detroitfriendshiphouse.org/",
+  "organization": {
+   "id": "d4ad4a56-bf52-59a7-9eab-dd8d086e400f",
+   "name": "Detroit Friendship House",
+   "description": "Detroit Friendship House",
+   "x_detroit": {
+    "id": "org_detroit_friendship_house"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "13effb0b-8708-583b-bd5f-8f7d59771986",
+    "location": {
+     "id": "1f1533aa-444a-58cc-a1fa-9a6709706b47",
+     "name": "Nutrition Pantry, Detroit Friendship House",
+     "location_type": "physical",
+     "latitude": 42.398048,
+     "longitude": -83.049637,
+     "addresses": [
+      {
+       "id": "0197d143-d76c-570e-a569-8c59fbf6c7b1",
+       "address_1": "9540 Conant",
+       "city": "Hamtramck",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_friendship_nutrition_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "ca653bd6-24b5-52cf-80e8-83728698149a",
+      "number": "313-871-7443"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "580261e5-7738-576f-9684-6645e16c12f6",
+      "freq": "WEEKLY",
+      "byday": "TU,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "14:00",
+      "closes_at": "16:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "c972e756-0f88-5b9d-94e5-48ab1227b954",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_friendship_nutrition_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Friendship House website",
+      "url": "https://www.detroitfriendshiphouse.org/get-help-1"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_friendship_nutrition_pantry",
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
@@ -2380,6 +2874,143 @@
   "x_detroit": {
    "id": "svc_detroit_parks_patton_community_center",
    "category": "rec.center"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "c7ecb1c9-a01e-50a8-af81-ff6a229c7426",
+  "name": "Bowen Branch Library",
+  "status": "active",
+  "description": "Free computers, Wi-Fi, and books. A free place to sit inside.",
+  "url": "https://detroitpubliclibrary.org/",
+  "organization": {
+   "id": "b965d9b5-3d16-52cb-8cb7-8bd81f53cd55",
+   "name": "Detroit Public Library",
+   "description": "Detroit Public Library",
+   "x_detroit": {
+    "id": "org_detroit_public_library"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f2b83527-1059-57df-bf50-5152465d5371",
+    "location": {
+     "id": "42c5b135-3dbd-5c60-8968-6940039ad79b",
+     "name": "Bowen Branch Library",
+     "location_type": "physical",
+     "latitude": 42.323252,
+     "longitude": -83.088398,
+     "addresses": [
+      {
+       "id": "051b1d33-157e-50f5-8b13-faf3337afe1c",
+       "address_1": "3648 W Vernor Hwy",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48216",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_public_bowen_branch_library"
+     }
+    },
+    "phones": [
+     {
+      "id": "fcd348a7-155d-5962-9044-79da38cab7cd",
+      "number": "313-481-1540"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "3e7a05fa-87a1-59d7-841b-3bbddfa481e5",
+      "freq": "WEEKLY",
+      "byday": "MO",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "ceeab06e-48cf-50ff-b6b8-64c48cac76d6",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "06f9529a-04f7-5c80-b35d-2302e98e533a",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "3aef5024-760d-503a-805e-d9a2e1699b0d",
+      "freq": "WEEKLY",
+      "byday": "TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "eae56663-03ce-5d4c-a656-93b3601d230d",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_public_bowen_branch_library",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Public Library website",
+      "url": "https://detroitpubliclibrary.org/locations/bowen"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_public_bowen_branch_library",
+   "category": "rec.library"
   },
   "assured_date": "2026-09-18"
  },
@@ -6638,6 +7269,119 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "28f77446-0b99-5e3f-b74f-c706cf281f89",
+  "name": "Hamtramck Public Library",
+  "status": "active",
+  "description": "Free computers, Wi-Fi, and books. A free place to sit inside.",
+  "url": "https://hamtramck.lib.mi.us/",
+  "organization": {
+   "id": "c8c317b2-fd8e-5ce1-810b-fc89da7ba9e3",
+   "name": "Hamtramck Public Library",
+   "description": "Hamtramck Public Library",
+   "x_detroit": {
+    "id": "org_hamtramck_public_library"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "3f33a853-bee1-587a-b3c6-464d643d86c6",
+    "location": {
+     "id": "8ded59b6-db64-58f0-9bb5-a952156647ce",
+     "name": "Hamtramck Public Library",
+     "location_type": "physical",
+     "latitude": 42.398084,
+     "longitude": -83.064344,
+     "addresses": [
+      {
+       "id": "b82261a6-33dd-5841-9452-325c7f6e7fbe",
+       "address_1": "2360 Caniff",
+       "city": "Hamtramck",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_hamtramck_public_library"
+     }
+    },
+    "phones": [
+     {
+      "id": "fdd1b015-5efd-5dab-9358-ab58481cc0e5",
+      "number": "313-733-6821"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "cd823de9-25f7-5178-b4a7-08f0aa1470bd",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "c3225196-4347-5062-a78e-af380058b7ef",
+      "freq": "WEEKLY",
+      "byday": "TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "c2185a24-ccf4-5bc6-b925-ccebac01526d",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_hamtramck_public_library",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Hamtramck Public Library website",
+      "url": "https://hamtramck.lib.mi.us/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_hamtramck_public_library",
+   "category": "rec.library"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "3994388c-07b1-59b8-88ea-4d1c986e4561",
   "name": "Tindal Recreation Center",
   "status": "active",
@@ -6772,6 +7516,91 @@
   "x_detroit": {
    "id": "svc_housing_helpline",
    "category": "shelter.emergency"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "04162f20-7e89-5148-8bb6-2aa9155fdb0e",
+  "name": "Ste. Anne Pantry",
+  "status": "active",
+  "description": "Free groceries. Use the gray door on the parking lot side.",
+  "eligibility_description": "For people who live in ZIP codes 48216 or 48209, and parish members.",
+  "url": "https://loavesandfishesswdetroit.org/",
+  "organization": {
+   "id": "2fcb5a91-e672-52e6-a993-c36cb64bd166",
+   "name": "Loaves and Fishes Southwest Detroit",
+   "description": "Loaves and Fishes Southwest Detroit",
+   "x_detroit": {
+    "id": "org_loaves_and_fishes_southwest_detroit"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a60dcd1c-cc96-5d4b-85e7-83bed35843b3",
+    "location": {
+     "id": "6be4f176-5295-5012-b65e-4ddb4fc73de5",
+     "name": "Ste. Anne Pantry, Loaves and Fishes Southwest Detroit",
+     "location_type": "physical",
+     "latitude": 42.320029,
+     "longitude": -83.076624,
+     "addresses": [
+      {
+       "id": "c7f6cf43-5d73-517f-98df-11c08e9ab6a9",
+       "address_1": "1000 Ste Anne St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48216",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_loaves_and_ste_anne_pantry"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "ed1cc051-76a6-5d5f-beb2-cd3767983896",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "15:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_loaves_and_ste_anne_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Loaves and Fishes Southwest Detroit website",
+      "url": "https://loavesandfishesswdetroit.org/pantry-locations/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_loaves_and_ste_anne_pantry",
+   "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
  },
@@ -6980,6 +7809,83 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "c5397649-218c-5e84-9b5b-f65a2db0d597",
+  "name": "Food give-away",
+  "status": "active",
+  "description": "Free fresh food at the church on give-away days.",
+  "url": "https://www.northwestcofcdet.com/",
+  "organization": {
+   "id": "3bab1e9a-3d2f-5c86-a198-fa1d84da3189",
+   "name": "Northwest Church of Christ",
+   "description": "Northwest Church of Christ",
+   "x_detroit": {
+    "id": "org_northwest_church_of_christ"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a6cad10c-bbc6-51e6-896a-f08618e8e542",
+    "location": {
+     "id": "9f162674-9224-590f-968a-3bdc895db760",
+     "name": "Food give-away, Northwest Church of Christ",
+     "location_type": "physical",
+     "latitude": 42.36238,
+     "longitude": -83.156901,
+     "addresses": [
+      {
+       "id": "78e9e298-87ae-541d-bf0a-7ad570ef9bfd",
+       "address_1": "5151 Oakman Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48204",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_northwest_church_food_give_away"
+     }
+    },
+    "phones": [
+     {
+      "id": "31a51680-8436-5651-a592-a26b3d1aa9bf",
+      "number": "313-834-0562"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_northwest_church_food_give_away",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Their site says every 1st and 3rd Tuesday at noon, but its calendar shows other Tuesdays",
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Northwest Church of Christ website",
+      "url": "https://www.northwestcofcdet.com/event-details/forgotten-harvest-food-give-away-2026-08-11-12-00"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_northwest_church_food_give_away",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "c788171e-4bf2-5637-9e0c-8633d5cd508e",
   "name": "Morning meals, showers, and laundry",
   "status": "active",
@@ -7179,6 +8085,377 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "d87a32e3-1e31-543b-acd9-13856bc1141c",
+  "name": "Cabrini Clinic",
+  "status": "active",
+  "description": "Free health care if you have no insurance.",
+  "eligibility_description": "For people with no insurance or little money. Your immigration status does not matter.",
+  "url": "https://www.cabrini-clinic.org",
+  "organization": {
+   "id": "fc0eeb47-37a5-5992-a72b-139a05d6d57d",
+   "name": "St. Frances Cabrini Clinic",
+   "description": "St. Frances Cabrini Clinic",
+   "x_detroit": {
+    "id": "org_st_frances_cabrini_clinic"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "afae51dd-3ce8-5907-92a2-79e52fc8c408",
+    "location": {
+     "id": "a53478cc-d815-5142-a49e-db6e9d41f41b",
+     "name": "Cabrini Clinic",
+     "location_type": "physical",
+     "latitude": 42.329353,
+     "longitude": -83.061015,
+     "addresses": [
+      {
+       "id": "2bc145dd-5f98-551c-8c8f-ac3b6095b0e1",
+       "address_1": "1234 Porter St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48226",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_frances_cabrini_clinic"
+     }
+    },
+    "phones": [
+     {
+      "id": "7b8c28f5-4649-5a3d-b422-fdd4eedd3542",
+      "number": "313-961-7863"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "a7df24a2-848f-5f82-97ff-baed42ecb53c",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "81148cbe-932c-57e7-9db7-995507bc71c8",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "4c9296ae-d686-5d39-89c9-b79ebc87f8e2",
+      "freq": "WEEKLY",
+      "byday": "TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_st_frances_cabrini_clinic",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "St. Frances Cabrini Clinic website",
+      "url": "https://www.cabrini-clinic.org"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_frances_cabrini_clinic",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "2cbb8617-50f3-5dce-badd-d23282b0c3bd",
+  "name": "Corner Shower and Laundry",
+  "status": "active",
+  "description": "A free shower and a place to wash your clothes.",
+  "eligibility_description": "All are welcome.",
+  "url": "https://www.stpetersdetroit.com/",
+  "organization": {
+   "id": "09367989-4972-5ebf-a1e0-0427c8c21a4d",
+   "name": "St. Peter's Episcopal Church",
+   "description": "St. Peter's Episcopal Church",
+   "x_detroit": {
+    "id": "org_st_peter_s_episcopal_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "39c61245-87e1-58ae-ad9d-679787630f8a",
+    "location": {
+     "id": "c785d091-c789-5419-96de-b9cf2d15c8f1",
+     "name": "Corner Shower and Laundry, St. Peter's Episcopal Church",
+     "location_type": "physical",
+     "latitude": 42.330753,
+     "longitude": -83.066414,
+     "addresses": [
+      {
+       "id": "8e331a73-f857-582e-9ec6-cb7091145edc",
+       "address_1": "1950 Trumbull St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48216",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_peter_s_corner_shower_and_laundry"
+     }
+    },
+    "phones": [
+     {
+      "id": "7f4c3b77-2330-5c83-a5a0-47563ad29a93",
+      "number": "313-400-7040"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "d54a2aa7-23c7-58c9-a713-3f6d3da00094",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "07:30",
+      "closes_at": "11:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_st_peter_s_corner_shower_and_laundry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "St. Peter's Episcopal Church website",
+      "url": "https://www.stpetersdetroit.com/copy-of-ministries-2"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_peter_s_corner_shower_and_laundry",
+   "category": "hygiene.shower"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "45420aca-c201-5fc9-826e-8577a97fb686",
+  "name": "Manna Community Meal",
+  "status": "active",
+  "description": "A free hot breakfast.",
+  "url": "https://www.stpetersdetroit.com/",
+  "organization": {
+   "id": "09367989-4972-5ebf-a1e0-0427c8c21a4d",
+   "name": "St. Peter's Episcopal Church",
+   "description": "St. Peter's Episcopal Church",
+   "x_detroit": {
+    "id": "org_st_peter_s_episcopal_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "065bab01-d0e3-55f1-9f8d-816a248736b2",
+    "location": {
+     "id": "2e0fe015-5734-596d-90bc-17b4e8cc8761",
+     "name": "Manna Community Meal, St. Peter's Episcopal Church",
+     "location_type": "physical",
+     "latitude": 42.330753,
+     "longitude": -83.066414,
+     "addresses": [
+      {
+       "id": "b75ada0f-9de6-5b48-b1ec-438b08471689",
+       "address_1": "1950 Trumbull St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48216",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_peter_s_manna_community_meal"
+     }
+    },
+    "phones": [
+     {
+      "id": "fb7bef1e-8345-5407-a282-f25d7240affe",
+      "number": "313-444-5143"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "c0cac990-4dc7-5f9e-9b85-8958400d5cac",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "10:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_st_peter_s_manna_community_meal",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "St. Peter's Episcopal Church website",
+      "url": "https://www.stpetersdetroit.com/manna-meal"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_peter_s_manna_community_meal",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "0135fa62-dddd-578b-b66a-4acb0b81ffb8",
+  "name": "Drive-thru food pantry",
+  "status": "active",
+  "description": "Drive up and get free food. No one is turned away.",
+  "eligibility_description": "No qualifications needed.",
+  "url": "https://straightgate.net/",
+  "organization": {
+   "id": "8473432e-b393-53ff-8ee1-82399ddc305b",
+   "name": "Straight Gate International Church",
+   "description": "Straight Gate International Church",
+   "x_detroit": {
+    "id": "org_straight_gate_international_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "bb1f1166-f611-532b-b89b-63dd762ef594",
+    "location": {
+     "id": "0e438b11-b93a-5c59-bd78-f940165c722e",
+     "name": "Drive-thru food pantry, Straight Gate International Church",
+     "location_type": "physical",
+     "latitude": 42.370198,
+     "longitude": -83.142453,
+     "addresses": [
+      {
+       "id": "4d61358e-726a-58f3-b0e1-c4b576368e9d",
+       "address_1": "10100 Grand River",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48204",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_straight_gate_drive_thru_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "60b0ccac-51a8-5d57-a999-8fc3494df068",
+      "number": "313-491-8430"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_straight_gate_drive_thru_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "1st and 4th Thursdays of each month, starting at 9am",
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Straight Gate International Church website",
+      "url": "https://straightgate.net/food-pantry"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_straight_gate_drive_thru_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "f5813338-06a1-51f6-b841-9589cfb3af97",
   "name": "Utility bill help",
   "status": "active",
@@ -7253,6 +8530,108 @@
   "x_detroit": {
    "id": "svc_thaw_utility_help",
    "category": "utilities"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "45f6f606-6152-5e96-ad89-574678207650",
+  "name": "Hamtramck Health Center",
+  "status": "active",
+  "description": "See a doctor or a dentist and pay based on your income. Saturday hours change week to week, so call first on Saturdays.",
+  "eligibility_description": "Care no matter what you can pay.",
+  "url": "https://www.waynecountyhealthy.com/",
+  "organization": {
+   "id": "25825e79-cad5-5535-b854-89f4746830c2",
+   "name": "Wayne County Healthy Communities",
+   "description": "Wayne County Healthy Communities",
+   "x_detroit": {
+    "id": "org_wayne_county_healthy_communities"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f4d22fe7-bbce-5a6f-8884-aaa5494cb137",
+    "location": {
+     "id": "081d5eda-e623-5bf4-9067-9ea4cf03f27d",
+     "name": "Hamtramck Health Center",
+     "location_type": "physical",
+     "latitude": 42.39197,
+     "longitude": -83.054752,
+     "addresses": [
+      {
+       "id": "be84c8d7-256f-568f-8c50-2240072ea8bd",
+       "address_1": "9021 Joseph Campau",
+       "city": "Hamtramck",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_wayne_county_hamtramck_health_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "106d253e-6e9f-5990-a456-30a03159eaf5",
+      "number": "313-871-1926"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "29230490-35c8-5ed6-adc3-7161f20181e8",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "754b8064-6cb8-5c2a-aebf-563c1e94db6e",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "21:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_wayne_county_hamtramck_health_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Wayne County Healthy Communities website",
+      "url": "https://www.waynecountyhealthy.com/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_wayne_county_hamtramck_health_center",
+   "category": "health.clinic"
   },
   "assured_date": "2026-09-18"
  },

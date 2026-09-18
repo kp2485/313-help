@@ -42,6 +42,7 @@ pnpm geocode             # fill coordinates in data/seed/resources.csv (U.S. Cen
 
 ## Status
 
+- 2026-09-18: **Directory grew from 91 to 121 listings**: 16 City recreation centers, 2 libraries, and 12 help listings near greenway segments that had nothing nearby. Open segments with no help within a 10-minute walk: 9 → 3.
 - 2026-09-18: **Build step 4 done** — `admin/` steward queue (plain HTML + JS, no build step): reported listings first, proposals, archive/restore with reasons, circuit-breaker banner. Steward decisions live in D1 and are applied at build time; the full demo loop (report → queue → archive → rebuild → "Closed as of today") runs locally. Repo renamed `detroit-compass` and made public.
 - 2026-09-18: **Redesign** — five tabs (Home · Help · Recreation · Transit · Events), green design system, Urgent help in the top bar instead of a red strip, City events and 302 parks in the bundle, bus directions on every listing. See 05 and DECISIONS.
 - 2026-09-18: **Build step 3 done** — `api/` Worker (Hono) + D1 schema: anonymous reports and proposals, steward endpoints behind Cloudflare Access, retention, circuit breaker; report buttons and offline queue in the PWA; report facts flow into the bundle build. Runs locally end to end; **nothing is deployed** (see [OPERATIONS.md](OPERATIONS.md)). Next: `admin/` steward queue.

@@ -11,18 +11,18 @@
   {
    "id": "seg_bagley_16th_to_15th",
    "name": "Bagley (16th to 15th)",
-   "total": 0,
+   "total": 4,
    "by_category": {
-    "food": 0,
+    "food": 2,
     "health": 0,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
-    "hygiene": 0,
-    "youth": 0
+    "hygiene": 1,
+    "youth": 0,
+    "rec": 1
    },
    "none_listed_yet": [
-    "food",
     "health",
     "harm"
    ]
@@ -30,18 +30,18 @@
   {
    "id": "seg_bagley_streetscape_i_96_to_24th",
    "name": "Bagley Streetscape (I-96 to 24th)",
-   "total": 0,
+   "total": 3,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 2
    },
    "none_listed_yet": [
-    "food",
     "health",
     "harm"
    ]
@@ -57,7 +57,8 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
     "food",
@@ -68,18 +69,18 @@
   {
    "id": "seg_chicago_connector_chicago_to_oakman",
    "name": "Chicago Connector (Chicago to Oakman)",
-   "total": 0,
+   "total": 1,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
     "health",
     "harm"
    ]
@@ -95,7 +96,8 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
     "food",
@@ -106,18 +108,18 @@
   {
    "id": "seg_conrail_grand_river_to_oakman",
    "name": "Conrail (Grand River to Oakman)",
-   "total": 0,
+   "total": 1,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
     "health",
     "harm"
    ]
@@ -125,18 +127,18 @@
   {
    "id": "seg_conrail_joy_to_chicago",
    "name": "Conrail (Joy to Chicago)",
-   "total": 0,
+   "total": 2,
    "by_category": {
-    "food": 0,
+    "food": 2,
     "health": 0,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
     "health",
     "harm"
    ]
@@ -152,7 +154,8 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
     "food",
@@ -163,18 +166,18 @@
   {
    "id": "seg_conrail_warren_to_joy",
    "name": "Conrail (Warren to Joy)",
-   "total": 0,
+   "total": 1,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
     "health",
     "harm"
    ]
@@ -182,7 +185,7 @@
   {
    "id": "seg_dequindre_cut_detroit_riverwalk",
    "name": "Dequindre Cut/Detroit Riverwalk",
-   "total": 1,
+   "total": 2,
    "by_category": {
     "food": 0,
     "health": 0,
@@ -190,7 +193,8 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 1
    },
    "none_listed_yet": [
     "food",
@@ -208,7 +212,8 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
     "food"
@@ -217,36 +222,36 @@
   {
    "id": "seg_grand_river",
    "name": "Grand River",
-   "total": 1,
+   "total": 3,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 1,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 1,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
     "health"
    ]
   },
   {
    "id": "seg_i_96_75_pedestrian_bridge",
    "name": "I-96/75 Pedestrian Bridge",
-   "total": 0,
+   "total": 3,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 2
    },
    "none_listed_yet": [
-    "food",
     "health",
     "harm"
    ]
@@ -254,19 +259,18 @@
   {
    "id": "seg_jos_campau_holbrook_to_hamtramck_drive",
    "name": "Jos Campau (Holbrook to Hamtramck Drive)",
-   "total": 0,
+   "total": 2,
    "by_category": {
-    "food": 0,
-    "health": 0,
+    "food": 1,
+    "health": 1,
     "harm": 0,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
-    "health",
     "harm"
    ]
   },
@@ -281,7 +285,8 @@
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
     "food",
@@ -291,90 +296,87 @@
   {
    "id": "seg_oakman_boulevard",
    "name": "Oakman Boulevard",
-   "total": 1,
+   "total": 3,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 1,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 1,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
     "health"
    ]
   },
   {
    "id": "seg_riverfront_dequindre_cut_to_8th",
    "name": "Riverfront (Dequindre Cut to 8th)",
-   "total": 5,
+   "total": 6,
    "by_category": {
     "food": 1,
-    "health": 0,
+    "health": 1,
     "harm": 4,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
-   "none_listed_yet": [
-    "health"
-   ]
+   "none_listed_yet": []
   },
   {
    "id": "seg_southwest_greenway",
    "name": "Southwest Greenway",
-   "total": 1,
+   "total": 6,
    "by_category": {
-    "food": 0,
-    "health": 0,
+    "food": 2,
+    "health": 1,
     "harm": 1,
     "shelter": 0,
     "utilities": 0,
-    "hygiene": 0,
-    "youth": 0
+    "hygiene": 1,
+    "youth": 0,
+    "rec": 1
    },
-   "none_listed_yet": [
-    "food",
-    "health"
-   ]
+   "none_listed_yet": []
   },
   {
    "id": "seg_west_grand_boulevard_riverfront_to_bagley",
    "name": "West Grand Boulevard (Riverfront to Bagley)",
-   "total": 2,
+   "total": 4,
    "by_category": {
-    "food": 0,
+    "food": 1,
     "health": 0,
     "harm": 2,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 1
    },
    "none_listed_yet": [
-    "food",
     "health"
    ]
   },
   {
    "id": "seg_west_jefferson_8th_to_rosa_parks",
    "name": "West Jefferson (8th to Rosa Parks)",
-   "total": 1,
+   "total": 2,
    "by_category": {
     "food": 0,
-    "health": 0,
+    "health": 1,
     "harm": 1,
     "shelter": 0,
     "utilities": 0,
     "hygiene": 0,
-    "youth": 0
+    "youth": 0,
+    "rec": 0
    },
    "none_listed_yet": [
-    "food",
-    "health"
+    "food"
    ]
   }
  ]

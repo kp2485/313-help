@@ -36,7 +36,8 @@ for (const r of rows) {
   }
   const phone = parsePhone(r.phone ?? '');
   const digits = text.replace(/\D/g, ''), digitsKeypad = keypad(text).replace(/\D/g, '');
-  const phoneFound = !!phone && (digits.includes(phone.number) || digitsKeypad.includes(phone.number));
+  // A listing with no phone (a church pantry door) is checked on its street address alone, and must have one.
+  const phoneFound = r.phone ? !!phone && (digits.includes(phone.number) || digitsKeypad.includes(phone.number)) : !!r.address_1;
   const streetNo = /^\d+/.exec(r.address_1 ?? '')?.[0];
   const addressFound = !streetNo || new RegExp(`(^|\\D)${streetNo}(\\D|$)`).test(text);
   if (phoneFound && addressFound) {

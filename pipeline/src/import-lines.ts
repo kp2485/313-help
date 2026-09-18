@@ -70,6 +70,11 @@ export function parseSchedule(text: string): ParsedWindow[] | null {
   return windows.length ? windows : null;
 }
 
+export function titleFor(name: string, org: string): string {
+  const words = org.toLowerCase().split(/[^a-z0-9']+/).filter((w) => w.length > 3 && !['church', 'detroit', 'center', 'community', 'services'].includes(w));
+  return !org || org === name || words.some((w) => name.toLowerCase().includes(w)) ? name : `${name}, ${org}`;
+}
+
 export function lineToRows(line: string): { resource: CsvRow; schedules: CsvRow[] } | string {
   const f = line.split('|').map((x) => x.trim());
   if (f.length !== FIELDS.length) return `expected ${FIELDS.length} fields, got ${f.length}`;
@@ -81,7 +86,8 @@ export function lineToRows(line: string): { resource: CsvRow; schedules: CsvRow[
   const hoursText = !always && !windows && v.schedule && !/^not stated$/i.test(v.schedule) ? v.schedule.slice(0, 160) : '';
   return {
     resource: {
-      sal_id: id, svc_id: '', org_id: `org_${slug(v.org || v.name).slice(0, 40)}`, org_name: v.org || v.name, service_name: v.name, location_name: v.name,
+      // "Food give-away" alone doesn't say whose it is; a title names the place unless the name already does.
+      sal_id: id, svc_id: '', org_id: `org_${slug(v.org || v.name).slice(0, 40)}`, org_name: v.org || v.name, service_name: v.name, location_name: titleFor(v.name, v.org),
       category: v.category, what: v.what, eligibility: v.eligibility, address_1: v.address, city: v.address ? v.city || 'Detroit' : '', zip: v.zip, lat: '', lon: '',
       phone: v.phone, phone_label: '', phone2: '', phone2_label: '', website: v.website, availability: always ? 'always' : windows ? 'scheduled' : 'call_first',
       hours_text: hoursText, flags: '', notice: '', status: 'proposed', checked_at_entry: '', entry_method: '', source_type: 'seed_list',
