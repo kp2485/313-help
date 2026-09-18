@@ -40,10 +40,10 @@ export function coarseTime(v: unknown, now: Date, hourOnly: boolean): string | n
   return hourOnly ? d.toISOString().slice(0, 13) + ':00Z' : d.toISOString().slice(0, 16) + 'Z';
 }
 
-export interface ReportInput { target_id: string; place: boolean; kind: string; detail: string | null; suggested: string | null; observed_at: string | null; client_nonce: string }
+export interface ReportInput { target_id: string; place: boolean; kind: string; detail: string | null; suggested: string | null; observed_at: string | null; client_nonce: string; photo: string | null }
 
 export function parseReport(body: unknown, now: Date): Result<ReportInput> {
-  const b = closed(body, ['target_id', 'kind', 'detail', 'suggested', 'observed_at', 'client_nonce']);
+  const b = closed(body, ['target_id', 'kind', 'detail', 'suggested', 'observed_at', 'client_nonce', 'photo']);
   if (!b.ok) return b;
   const { target_id, kind, client_nonce } = b.value;
   if (typeof target_id !== 'string' || !(LISTING_ID.test(target_id) || PLACE_ID.test(target_id))) return fail('bad target_id');
@@ -59,8 +59,15 @@ export function parseReport(body: unknown, now: Date): Result<ReportInput> {
     const clean = Object.fromEntries(Object.entries(s.value).map(([k, v]) => [k, text(v, 200)]).filter(([, v]) => v));
     if (Object.keys(clean).length) suggested = JSON.stringify(clean);
   }
+  // A photo is only ever about a place (a thing), never about a listing, and only by the key the upload returned.
+  let photo: string | null = null;
+  if (b.value.photo != null) {
+    if (!place) return fail('photo is only accepted for places');
+    if (typeof b.value.photo !== 'string' || !/^ph_[a-f0-9]{32}$/.test(b.value.photo)) return fail('bad photo');
+    photo = b.value.photo;
+  }
   const detail = text(b.value.detail, 280);
-  return { ok: true, value: { target_id, place, kind, detail: detail ? mask(detail) : null, suggested, observed_at: coarseTime(b.value.observed_at, now, place), client_nonce } };
+  return { ok: true, value: { photo, target_id, place, kind, detail: detail ? mask(detail) : null, suggested, observed_at: coarseTime(b.value.observed_at, now, place), client_nonce } };
 }
 
 export interface ProposalInput { name: string; category: string; what: string; address: string | null; phone: string | null; schedule_text: string | null; how_known: string; notes: string | null }

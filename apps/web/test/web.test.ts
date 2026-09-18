@@ -11,7 +11,7 @@ import { FOOD_BENEFITS } from '../src/benefits.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
 import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
-import { build as buildReport, nonce } from '../src/report.js';
+import { build as buildReport, fitWithin, nonce, plainJpeg } from '../src/report.js';
 
 const root = join(__dirname, '../../..');
 const strings = JSON.parse(readFileSync(join(root, 'strings/en.json'), 'utf8')) as Record<string, string>;
@@ -87,6 +87,20 @@ describe('reports from the phone', () => {
     const src = readFileSync(join(__dirname, '../src/report.ts'), 'utf8');
     expect(src).toMatch(/credentials: 'omit'/);
     expect(src).not.toMatch(/navigator\.|geolocation|userAgent|localStorage|document\.cookie/);
+  });
+  it('a photo is re-drawn small on a canvas before it leaves, goes only with a place report, and the camera is asked for, not the gallery', async () => {
+    expect(fitWithin(4032, 3024)).toEqual({ w: 1280, h: 960 }); expect(fitWithin(3024, 4032)).toEqual({ w: 960, h: 1280 }); expect(fitWithin(800, 600)).toEqual({ w: 800, h: 600 });
+    expect(Object.keys(await buildReport('seg_a', 'light_out', '', day1, 'ph_' + 'a'.repeat(32))).sort()).toEqual(['client_nonce', 'kind', 'observed_at', 'photo', 'target_id']);
+    const src = readFileSync(join(__dirname, '../src/report.ts'), 'utf8');
+    expect(src).toContain("canvas.toBlob((b) => ok(b), 'image/jpeg'");
+    // The browser's own color-profile block (APP2) and anything else extra is cut out; the picture data is untouched.
+    const sg = (mk: number, n: number) => [0xff, mk, 0, n + 2, ...new Array(n).fill(7)];
+    const made = new Uint8Array([0xff, 0xd8, ...sg(0xe0, 14), ...sg(0xe2, 40), ...sg(0xe1, 20), ...sg(0xfe, 9), ...sg(0xdb, 65), ...sg(0xc0, 15), ...sg(0xc4, 20), ...sg(0xda, 10), 1, 2, 3, 0xff, 0xd9]);
+    const plain = plainJpeg(made)!;
+    expect(plain.length).toBe(made.length - 44 - 24 - 13); expect([...plain.slice(-5)]).toEqual([1, 2, 3, 0xff, 0xd9]);
+    expect(plainJpeg(new Uint8Array([1, 2, 3, 4]))).toBeNull(); expect(src).toContain("fetch('/v1/photos'");
+    expect(main).toContain('capture="environment" data-photo'); expect(main).toContain("isPlace ? `<label>${T('report.photo_label')}");
+    expect(strings['report.photo_note']).toMatch(/not of people/);
   });
   it('place reports offer no way to report a person', () => {
     expect([...PLACE_KINDS].join(' ')).not.toMatch(/person|people|tent|camp|homeless|suspicious|loiter|vehicle/);

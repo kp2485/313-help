@@ -6,11 +6,12 @@
 
 import { Hono, type Context } from 'hono';
 import { verifyAccess, type JwksFetcher } from './access.js';
+import { MAX_PHOTO_BYTES, PHOTO_KEY, checkJpeg, type PhotoStore } from './photo.js';
 import { ARCHIVE_REASONS, CLOSED_KINDS, WRONG_KINDS, isListingId, parseProposal, parseReport } from './validate.js';
 
 export interface Stmt { bind(...args: unknown[]): Stmt; run(): Promise<{ meta: { changes: number } }>; all<T = Record<string, unknown>>(): Promise<{ results: T[] }>; first<T = Record<string, unknown>>(): Promise<T | null> }
 export interface Db { prepare(sql: string): Stmt; batch(stmts: Stmt[]): Promise<unknown> }
-export interface Env { DB: Db; ALLOWED_ORIGIN?: string; ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string; DEV_STEWARD?: string }
+export interface Env { DB: Db; PHOTOS?: PhotoStore; ALLOWED_ORIGIN?: string; ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string; DEV_STEWARD?: string }
 interface Deps { now: () => Date; jwks?: JwksFetcher }
 
 const minute = (d: Date) => d.toISOString().slice(0, 16) + 'Z';
@@ -42,11 +43,29 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     const r = parsed.value;
     const target = await c.env.DB.prepare('SELECT kind FROM targets WHERE id = ?').bind(r.target_id).first();
     if (!target) return c.json({ error: 'unknown target' }, 422);
+    if (r.photo && !(await c.env.DB.prepare('SELECT key FROM photos WHERE key = ? AND report_id IS NULL').bind(r.photo).first())) return c.json({ error: 'unknown photo' }, 422);
     // OR IGNORE: the same device reporting the same thing about the same target on the same day counts once.
     // The answer is 202 either way, so a repeat looks exactly like a first report.
-    await c.env.DB.prepare('INSERT OR IGNORE INTO reports (id, target_id, kind, detail, suggested, observed_at, submitted_at, client_nonce) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(randomId(r.place ? 'cond_' : 'rpt_'), r.target_id, r.kind, r.detail, r.suggested, r.observed_at, minute(deps.now()), r.client_nonce).run();
+    const id = randomId(r.place ? 'cond_' : 'rpt_');
+    const made = await c.env.DB.prepare('INSERT OR IGNORE INTO reports (id, target_id, kind, detail, suggested, observed_at, submitted_at, client_nonce, photo_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(id, r.target_id, r.kind, r.detail, r.suggested, r.observed_at, minute(deps.now()), r.client_nonce, r.photo).run();
+    // A repeat report stores nothing, so its photo stays unclaimed and the daily pass deletes it.
+    if (r.photo && made.meta.changes) await c.env.DB.prepare('UPDATE photos SET report_id = ? WHERE key = ?').bind(id, r.photo).run();
     return c.json({ accepted: true }, 202);
+  });
+
+  // A photo for a condition report (docs/11). The phone has already re-drawn it without metadata; checkJpeg
+  // refuses anything that still carries any. The picture goes to a private bucket and is never served to the public.
+  app.post('/v1/photos', async (c) => {
+    if (!c.env.PHOTOS) return c.json({ error: 'photos are off' }, 503);
+    if ((c.req.header('content-type') ?? '').split(';')[0]!.trim() !== 'image/jpeg') return c.json({ error: 'send a JPEG' }, 415);
+    if (Number(c.req.header('content-length') ?? 0) > MAX_PHOTO_BYTES) return c.json({ error: 'photo is too large' }, 413);
+    const checked = checkJpeg(new Uint8Array(await c.req.arrayBuffer()));
+    if (!checked.ok) return c.json({ error: checked.error }, 422);
+    const key = randomId('ph_', 16);
+    await c.env.PHOTOS.put(key, checked.clean, { httpMetadata: { contentType: 'image/jpeg' } });
+    await c.env.DB.prepare('INSERT INTO photos (key, uploaded_at) VALUES (?, ?)').bind(key, minute(deps.now())).run();
+    return c.json({ photo: key }, 201);
   });
 
   app.post('/v1/proposals', async (c) => {
@@ -71,9 +90,24 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
   });
 
   app.get('/v1/steward/queue', async (c) => {
-    const reports = await c.env.DB.prepare("SELECT id, target_id, kind, detail, suggested, observed_at, submitted_at FROM reports WHERE status = 'open' ORDER BY submitted_at DESC LIMIT 500").all();
+    const reports = await c.env.DB.prepare("SELECT id, target_id, kind, detail, suggested, observed_at, submitted_at, photo_key FROM reports WHERE status = 'open' ORDER BY submitted_at DESC LIMIT 500").all();
     const proposals = await c.env.DB.prepare("SELECT id, ref, name, category, what, address, phone, schedule_text, how_known, notes, submitted_at FROM proposals WHERE status = 'open' ORDER BY (how_known = 'heard'), submitted_at DESC LIMIT 200").all();
     return c.json({ reports: reports.results, proposals: proposals.results });
+  });
+
+  // Photos are for stewards' eyes only, and a steward can throw one away at once (a face, a house number, abuse).
+  app.get('/v1/steward/photos/:key', async (c) => {
+    const key = c.req.param('key'), obj = PHOTO_KEY.test(key) ? await c.env.PHOTOS?.get(key) : null;
+    if (!obj) return c.json({ error: 'no such photo' }, 404);
+    return c.body(await obj.arrayBuffer(), 200, { 'content-type': 'image/jpeg', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
+  });
+  app.post('/v1/steward/photos/:key/discard', async (c) => {
+    const key = c.req.param('key');
+    if (!PHOTO_KEY.test(key) || !c.env.PHOTOS) return c.json({ error: 'no such photo' }, 404);
+    await c.env.PHOTOS.delete(key);
+    await c.env.DB.batch([c.env.DB.prepare('UPDATE reports SET photo_key = NULL WHERE photo_key = ?').bind(key), c.env.DB.prepare('DELETE FROM photos WHERE key = ?').bind(key),
+      c.env.DB.prepare('INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) VALUES (?, ?, ?, ?, ?, ?)').bind(minute(deps.now()), c.get('who'), 'discard_photo', key, 'discarded', null)]);
+    return c.json({ discarded: true });
   });
 
   const resolve = (table: 'reports' | 'proposals') => async (c: Context<{ Bindings: Env; Variables: { who: string } }>) => {
@@ -135,6 +169,19 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
 }
 
 /** After 180 days a report becomes a monthly count and the row is removed (docs/06, docs/08). */
+/** Photos go 30 days after their report closes, or after one day if no report claimed them (docs/11). */
+export async function photoRetention(db: Db, photos: PhotoStore | undefined, now: Date): Promise<number> {
+  if (!photos) return 0;
+  const ago = (days: number) => new Date(now.getTime() - days * 86400000).toISOString().slice(0, 16) + 'Z';
+  const due = await db.prepare(`SELECT p.key FROM photos p LEFT JOIN reports r ON r.id = p.report_id
+    WHERE (p.report_id IS NULL AND p.uploaded_at < ?) OR (r.status != 'open' AND r.resolved_at < ?) OR (p.report_id IS NOT NULL AND r.id IS NULL)`).bind(ago(1), ago(30)).all<{ key: string }>();
+  for (const { key } of due.results) {
+    await photos.delete(key);
+    await db.batch([db.prepare('UPDATE reports SET photo_key = NULL WHERE photo_key = ?').bind(key), db.prepare('DELETE FROM photos WHERE key = ?').bind(key)]);
+  }
+  return due.results.length;
+}
+
 export async function retention(db: Db, now: Date): Promise<number> {
   const cutoff = new Date(now.getTime() - 180 * 86400000).toISOString().slice(0, 16) + 'Z';
   await db.prepare(`INSERT INTO report_counts (target_id, kind, month, n) SELECT target_id, kind, substr(submitted_at, 1, 7), COUNT(*) FROM reports WHERE submitted_at < ? GROUP BY 1, 2, 3
@@ -145,5 +192,5 @@ export async function retention(db: Db, now: Date): Promise<number> {
 const app = createApp();
 export default {
   fetch: app.fetch,
-  scheduled: async (_event: unknown, env: Env) => { await retention(env.DB, new Date()); },
+  scheduled: async (_event: unknown, env: Env) => { await photoRetention(env.DB, env.PHOTOS, new Date()); await retention(env.DB, new Date()); },
 };

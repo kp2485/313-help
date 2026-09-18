@@ -41,6 +41,10 @@ In production the pipeline syncs every id at each publish.
 
 If nobody does any of this, the app ages its own badges, warns after 30 days, and goes to sunset mode after 120 (doc 12). That is by design.
 
+## Photos on condition reports
+
+A photo shows up in the steward queue under its report, and nowhere else. Never share, post or forward one outside the greenway team. If it shows a person, a face, a license plate or a house number, press **Delete this photo now**: the report stays. Photos delete themselves 30 days after their report is closed. If a photo shows something illegal, delete nothing, close the laptop, and call Kyle: there are legal reporting duties, and written guidance for this is still owed (docs/11).
+
 ## How to publish an alert
 
 An alert says something is happening now (warming centers open, a pantry closed today). Write it only from the owner's own announcement.

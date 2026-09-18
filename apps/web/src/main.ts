@@ -8,7 +8,7 @@ import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators
 import { icon } from './icons.js';
 import { MapView, type MapDot, type MapSpec } from './map.js';
 import { CATEGORIES, HARDCODED, NEEDS, TABS, type Need, type TabId } from './needs.js';
-import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, submit } from './report.js';
+import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, preparePhoto, submit, uploadPhoto } from './report.js';
 import { TRANSIT } from './transit.js';
 import { FOOD_BENEFITS } from './benefits.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitProposal } from './propose.js';
@@ -31,7 +31,7 @@ let proposed: { state: 'sent' | 'queued'; ref?: string } | null = null, proposeE
 let indicators: Indicators | null | undefined;           // neighborhood numbers (docs/13): fetched the first time a neighborhood screen opens
 let listMap = false;                                      // "Show these on a map" is open on the current list
 let searchText = '';                                     // memory only: never stored, sent, or put in the URL
-const reported = new Map<string, 'sent' | 'queued'>();   // this visit only, so the thank-you stays put
+const reported = new Map<string, 'sent' | 'queued' | 'sent_no_photo'>();   // this visit only, so the thank-you stays put
 const stack: View[] = [{ v: 'tab', tab: 'home' }];
 const app = document.getElementById('app')!;
 
@@ -141,12 +141,13 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
 // One tap to confirm, one tap to correct (docs/04). Places get the things-not-people list (docs/11).
 function reportBox(targetId: string, isPlace: boolean, category = ''): string {
   const done = reported.get(targetId);
-  if (done) return `<p class="banner ok" role="status">${icon('check', 'sm')} ${T(done === 'queued' ? 'report.queued' : isPlace ? 'report.sent_place' : 'report.sent')}</p>`;
+  if (done) return `<p class="banner ok" role="status">${icon('check', 'sm')} ${T(done === 'queued' ? 'report.queued' : isPlace ? 'report.sent_place' : 'report.sent')}${done === 'sent_no_photo' ? ` ${T('report.photo_failed')}` : ''}</p>`;
   const kinds = isPlace ? PLACE_KINDS : LISTING_KINDS.filter((k) => k !== 'out_of_stock' || /^(food|harm)/.test(category));
   return `<section class="report" data-target="${esc(targetId)}">
     <button class="btn ghost" data-report="${isPlace ? CONFIRM.place : CONFIRM.listing}">${icon('check', 'sm')}${T(isPlace ? 'report.confirm.place' : 'report.confirm.listing')}</button>
     <details><summary>${T(isPlace ? 'report.fix' : 'report.wrong')}</summary>${isPlace ? `<p class="foot">${T('report.things_only')}</p>` : ''}
       <label>${T('report.note_label')}<textarea maxlength="280" rows="2"></textarea></label>
+      ${isPlace ? `<label>${T('report.photo_label')}<input type="file" accept="image/*" capture="environment" data-photo></label><p class="foot">${T('report.photo_note')}</p>` : ''}
       <div class="kinds">${kinds.map((k) => `<button data-report="${k}">${T('report.kind.' + k)}</button>`).join('')}</div></details></section>`;
 }
 
@@ -435,7 +436,12 @@ app.addEventListener('click', async (ev) => {
   else if ('addAgain' in el.dataset) { proposed = null; render(); }
   else if (el.dataset.report) {
     const box = el.closest<HTMLElement>('.report')!, target = box.dataset.target!;
-    reported.set(target, await submit(await buildReport(target, el.dataset.report, box.querySelector('textarea')?.value ?? '')));
+    // A photo, if there is one, is re-drawn without its hidden data and sent first; the report then names it.
+    const file = box.querySelector<HTMLInputElement>('[data-photo]')?.files?.[0];
+    box.querySelectorAll('button').forEach((b) => (b.disabled = true));
+    const photo = file ? await preparePhoto(file).then((b) => (b ? uploadPhoto(b) : null)) : null;
+    const state = await submit(await buildReport(target, el.dataset.report, box.querySelector('textarea')?.value ?? '', new Date(), photo));
+    reported.set(target, file && !photo && state === 'sent' ? 'sent_no_photo' : state);
     render(false);
   }
   else if ('back' in el.dataset) { if (stack.length > 1) history.back(); else navigate({ v: 'tab', tab: TAB_OF[stack[0]!.v] ?? 'home' }); }

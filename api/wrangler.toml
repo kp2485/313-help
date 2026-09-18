@@ -16,6 +16,15 @@ database_name = "detroithelp"
 database_id = "00000000-0000-0000-0000-000000000000"   # placeholder until the database exists
 migrations_dir = "migrations"
 
+# Photos on condition reports (docs/11): a PRIVATE bucket. No public access, no custom domain, ever.
+# `wrangler dev` fakes it locally. For production the bucket has to be created first (needs Kyle's go-ahead):
+#   wrangler r2 bucket create detroit-compass-photos
+# Until it exists, delete this block before `wrangler deploy`; the Worker then answers 503 to photo uploads and
+# the app sends the report without the photo.
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "detroit-compass-photos"
+
 [vars]
 ALLOWED_ORIGIN = "http://localhost:5173"
 ACCESS_TEAM_DOMAIN = ""      # e.g. detroithelp.cloudflareaccess.com

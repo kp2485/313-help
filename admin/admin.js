@@ -43,7 +43,7 @@ function reportGroup(targetId, reports) {
     <h3>${esc(meta.name)}</h3>
     <p class="sub">${esc(targetId)}${meta.phone ? ` · <a href="tel:${esc(meta.phone)}">${esc(meta.phone)}</a>` : ''}</p>
     <p class="tags">${Object.entries(counts).map(([k, n]) => `<span class="tag ${CLOSED.includes(k) ? 'warn' : ''}">${esc(KIND[k] ?? k)} × ${n}</span>`).join(' ')}</p>
-    <ul class="notes">${reports.filter((r) => r.detail || r.suggested).map((r) => `<li><strong>${esc(KIND[r.kind] ?? r.kind)}</strong> · ${esc(r.submitted_at.slice(0, 10))}${r.detail ? ` · “${esc(r.detail)}”` : ''}${r.suggested ? ` · suggested: ${esc(r.suggested)}` : ''}</li>`).join('')}</ul>
+    <ul class="notes">${reports.filter((r) => r.detail || r.suggested || r.photo_key).map((r) => `<li><strong>${esc(KIND[r.kind] ?? r.kind)}</strong> · ${esc(r.submitted_at.slice(0, 10))}${r.detail ? ` · “${esc(r.detail)}”` : ''}${r.suggested ? ` · suggested: ${esc(r.suggested)}` : ''}${r.photo_key ? `<div class="photo"><img src="/v1/steward/photos/${esc(r.photo_key)}" alt="Photo sent with this report" loading="lazy"><button data-act="discard-photo" data-photo="${esc(r.photo_key)}">Delete this photo now</button><small>Never share or post a photo. If it shows a person, a face, a license plate or a house number, delete it. It deletes itself 30 days after the report is closed.</small></div>` : ''}</li>`).join('')}</ul>
     ${isListing ? `<p class="script">${esc(SCRIPT)}</p>
     <div class="actions">
       <button data-act="archive" data-reason="closed_permanently">Archive: closed for good</button>
@@ -95,7 +95,10 @@ app.addEventListener('click', async (ev) => {
   const item = btn.closest('.item'), { act, reason, status } = btn.dataset;
   btn.disabled = true;
   try {
-    if (act === 'archive' || act === 'active') {
+    if (act === 'discard-photo') {
+      await api(`/v1/steward/photos/${btn.dataset.photo}/discard`, { method: 'POST' });
+      message = 'Photo deleted. The report is still here.';
+    } else if (act === 'archive' || act === 'active') {
       if (act === 'archive' && !confirm(`Archive “${names.get(item.dataset.target)?.name ?? item.dataset.target}”? It stays in the dataset with its reason, and the app will say it closed.`)) { btn.disabled = false; return; }
       await api(`/v1/steward/listings/${item.dataset.target}/status`, { method: 'POST', body: JSON.stringify(act === 'archive' ? { status: 'archived', reason_code: reason } : { status: 'active' }) });
       message = act === 'archive' ? 'Archived. It will show as closed after the next build.' : 'Marked open. Closed reports cleared.';

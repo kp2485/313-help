@@ -13,3 +13,5 @@ button[data-act="archive"] { border-color:var(--danger); color:var(--danger); } 
 button:focus-visible, a:focus-visible { outline:3px solid #0a57c2; outline-offset:2px; }
 .flash { padding:.7rem 1rem; border-radius:.6rem; background:var(--soft); font-weight:600; } .breaker { padding:.9rem 1rem; border-radius:.6rem; background:var(--warn-bg); color:var(--warn); }
 pre { padding:.7rem 1rem; border-radius:.6rem; background:var(--surface); border:1px solid var(--line); overflow:auto; }
+
+.photo { display: grid; gap: .375rem; margin-top: .5rem; max-width: 24rem; } .photo img { max-width: 100%; border-radius: .5rem; border: 1px solid #d9e3dc; } .photo small { color: #47584f; }
