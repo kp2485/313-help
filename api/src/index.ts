@@ -6,11 +6,11 @@
 
 import { Hono, type Context } from 'hono';
 import { verifyAccess, type JwksFetcher } from './access.js';
-import { CLOSED_KINDS, WRONG_KINDS, parseProposal, parseReport } from './validate.js';
+import { ARCHIVE_REASONS, CLOSED_KINDS, WRONG_KINDS, isListingId, parseProposal, parseReport } from './validate.js';
 
 export interface Stmt { bind(...args: unknown[]): Stmt; run(): Promise<{ meta: { changes: number } }>; all<T = Record<string, unknown>>(): Promise<{ results: T[] }>; first<T = Record<string, unknown>>(): Promise<T | null> }
 export interface Db { prepare(sql: string): Stmt; batch(stmts: Stmt[]): Promise<unknown> }
-export interface Env { DB: Db; ALLOWED_ORIGIN?: string; ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string }
+export interface Env { DB: Db; ALLOWED_ORIGIN?: string; ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string; DEV_STEWARD?: string }
 interface Deps { now: () => Date; jwks?: JwksFetcher }
 
 const minute = (d: Date) => d.toISOString().slice(0, 16) + 'Z';
@@ -60,7 +60,11 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
 
   // ---- stewards and the pipeline, behind Cloudflare Access --------------------------------
   app.use('/v1/steward/*', async (c, next) => {
-    const id = await verifyAccess(c.req.header('Cf-Access-Jwt-Assertion'), c.env, deps.now(), deps.jwks);
+    // Local development only: `DEV_STEWARD` in api/.dev.vars stands in for Cloudflare Access, and only when the
+    // Worker is being reached as localhost. A deployed Worker is never localhost, so this cannot open production.
+    const host = new URL(c.req.url).hostname;
+    const dev = c.env.DEV_STEWARD && (host === 'localhost' || host === '127.0.0.1') ? { who: `dev:${c.env.DEV_STEWARD}` } : null;
+    const id = dev ?? (await verifyAccess(c.req.header('Cf-Access-Jwt-Assertion'), c.env, deps.now(), deps.jwks));
     if (!id) return c.json({ error: 'not signed in' }, 401);
     c.set('who', id.who);
     await next();
@@ -85,6 +89,25 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
   app.post('/v1/steward/reports/:id/resolve', resolve('reports'));
   app.post('/v1/steward/proposals/:id/resolve', resolve('proposals'));
 
+  // Archive, pause, or restore a listing. Open closure reports on it are settled in the same step.
+  app.post('/v1/steward/listings/:id/status', async (c) => {
+    const id = c.req.param('id');
+    const b = (await body(c)) as { status?: string; reason_code?: string; replacement_id?: string; note?: string } | undefined;
+    if (!isListingId(id) || !b || !['archived', 'suspended', 'active'].includes(b.status ?? '')) return c.json({ error: 'status must be archived, suspended, or active' }, 400);
+    const reason = b.status === 'archived' ? b.reason_code : b.reason_code ?? (b.status === 'active' ? 'confirmed_by_phone' : 'seasonal');
+    if (b.status === 'archived' && !ARCHIVE_REASONS.includes(reason ?? '')) return c.json({ error: `archiving needs a reason: ${ARCHIVE_REASONS.join(', ')}` }, 400);
+    if (b.replacement_id != null && !isListingId(b.replacement_id)) return c.json({ error: 'bad replacement_id' }, 400);
+    if (!(await c.env.DB.prepare('SELECT 1 AS ok FROM targets WHERE id = ?').bind(id).first())) return c.json({ error: 'unknown listing' }, 404);
+    const at = minute(deps.now());
+    await c.env.DB.prepare('INSERT INTO listing_overrides (target_id, status, reason_code, replacement_id, at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (target_id) DO UPDATE SET status = excluded.status, reason_code = excluded.reason_code, replacement_id = excluded.replacement_id, at = excluded.at')
+      .bind(id, b.status, reason, b.replacement_id ?? null, at).run();
+    const settle = b.status === 'archived' ? 'accepted' : b.status === 'active' ? 'rejected' : null;
+    if (settle) await c.env.DB.prepare(`UPDATE reports SET status = ?, reason_code = ?, resolved_at = ? WHERE target_id = ? AND status = 'open' AND kind IN (${CLOSED_KINDS.map((k) => `'${k}'`).join(',')})`).bind(settle, reason, at, id).run();
+    await c.env.DB.prepare('INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) VALUES (?, ?, ?, ?, ?, ?)')
+      .bind(at, c.get('who'), `listing.${b.status}`, id, reason, typeof b.note === 'string' ? b.note.slice(0, 500) : null).run();
+    return c.json({ ok: true });
+  });
+
   // The pipeline tells us which ids exist at each publish, so reports can only target real rows.
   app.put('/v1/steward/targets', async (c) => {
     const b = (await c.req.json().catch(() => null)) as { listings?: string[]; places?: string[] } | null;
@@ -104,7 +127,8 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     // Either way a person should look before badges change, so the pipeline ignores closure counts while it is tripped.
     const since = new Date(deps.now().getTime() - 86400000).toISOString().slice(0, 16) + 'Z';
     const burst = await c.env.DB.prepare(`SELECT COUNT(DISTINCT target_id) AS n FROM reports WHERE status = 'open' AND submitted_at >= ? AND kind IN (${CLOSED_KINDS.map((k) => `'${k}'`).join(',')})`).bind(since).first<{ n: number }>();
-    return c.json({ circuit_breaker: (burst?.n ?? 0) > 5, targets: open.results });
+    const overrides = await c.env.DB.prepare('SELECT target_id, status, reason_code, replacement_id, at FROM listing_overrides').all();
+    return c.json({ circuit_breaker: (burst?.n ?? 0) > 5, targets: open.results, overrides: overrides.results });
   });
 
   return app;

@@ -99,7 +99,8 @@ export async function build(opts: BuildOptions = {}) {
     .filter((d): d is string => !!d).map((d) => d.slice(0, 10)).sort();
   const { key, kind } = loadSigningKey(!!opts.release);
   const index: BundleIndex = {
-    schema: 1, version: `${gitSha()}-${now.toISOString().replace(/[-:]/g, '').slice(0, 13)}`,
+    // The content hash makes every distinct bundle a distinct version, even two builds in the same minute.
+    schema: 1, version: `${gitSha()}-${now.toISOString().replace(/[-:]/g, '').slice(0, 13)}-${sha256(JSON.stringify(files)).slice(0, 8)}`,
     generated_at: now.toISOString().slice(0, 16) + 'Z',
     heartbeat: humanDates.pop() ?? '1970-01-01',
     emergency_verified: emg.verified, signing: kind, counts, files,

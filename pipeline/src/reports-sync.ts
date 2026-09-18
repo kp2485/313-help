@@ -7,6 +7,8 @@ import type { BundleRow } from '@detroithelp/query';
 export interface Aggregates {
   circuit_breaker: boolean;
   targets: { target_id: string; closed_open: number; closed_last_at: string | null; wrong_open: number; last_confirmed_at: string | null }[];
+  /** Steward decisions (admin tool). The seed files are never edited; these are applied at build time. */
+  overrides?: { target_id: string; status: 'archived' | 'suspended' | 'active'; reason_code: string; replacement_id: string | null; at: string }[];
 }
 
 export function applyAggregates(rows: BundleRow[], agg: Aggregates): { applied: number; frozen: boolean } {
@@ -24,6 +26,15 @@ export function applyAggregates(rows: BundleRow[], agg: Aggregates): { applied: 
       r.facts.last_confirmed_at = a.last_confirmed_at;
       r.facts.last_confirm_method = 'community_confirm';
     }
+  }
+  // A steward's decision is not subject to the circuit breaker: a person already looked.
+  const rowsById = new Map(rows.map((r) => [r.id, r]));
+  for (const o of agg.overrides ?? []) {
+    const r = rowsById.get(o.target_id);
+    if (!r) continue;
+    r.status = o.status;
+    r.archived = o.status === 'archived' ? { at: o.at.slice(0, 10), reason: o.reason_code, ...(o.replacement_id ? { replacement_id: o.replacement_id } : {}) } : null;
+    if (o.status === 'active') { r.facts.last_confirmed_at = o.at; r.facts.last_confirm_method = 'phone'; r.facts.reports = { closed_open: 0, closed_last_at: null, wrong_open: r.facts.reports.wrong_open }; }
   }
   return { applied, frozen: agg.circuit_breaker };
 }

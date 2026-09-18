@@ -19,6 +19,9 @@ const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
 /** Masks contact details before anything is stored (audit B6). */
 export const mask = (s: string) => s.replace(EMAIL, '[removed]').replace(PHONE, '[removed]');
 
+export const isListingId = (s: unknown): s is string => typeof s === 'string' && LISTING_ID.test(s);
+export const ARCHIVE_REASONS = ['closed_permanently', 'moved', 'duplicate', 'never_existed', 'program_ended'];
+
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 const fail = (error: string): Result<never> => ({ ok: false, error });
 

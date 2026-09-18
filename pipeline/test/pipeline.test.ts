@@ -98,6 +98,13 @@ describe('report facts from the write API', () => {
     expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
     expect(r.facts.last_confirm_method).toBe('community_confirm');
   });
+  it('a steward archive closes the listing with its reason, even while the breaker is tripped', () => {
+    const r = row({});
+    applyAggregates([r], agg({ circuit_breaker: true, overrides: [{ target_id: 'sal_test', status: 'archived', reason_code: 'closed_permanently', replacement_id: 'sal_other', at: '2026-09-18T17:41Z' }] }));
+    expect(r).toMatchObject({ status: 'archived', archived: { at: '2026-09-18', reason: 'closed_permanently', replacement_id: 'sal_other' } });
+    expect(badge(r, new Date('2026-09-18T18:00:00Z'))).toMatchObject({ level: 'archived', params: { date: '2026-09-18' } });
+    expect(validateRows([r], '2026-09-18').errors).toEqual([]);
+  });
   it('a tripped circuit breaker keeps closure reports off the badges', () => {
     const r = row({ facts: { ...row({}).facts, checked_at_entry: '2026-09-10', entry_method: 'phone' } });
     applyAggregates([r], agg({ circuit_breaker: true, targets: [{ target_id: 'sal_test', closed_open: 9, closed_last_at: '2026-09-18T10:00Z', wrong_open: 0, last_confirmed_at: null }] }));

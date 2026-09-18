@@ -1,0 +1,15 @@
+:root { --bg:#f4f7f4; --surface:#fff; --ink:#10201a; --muted:#47584f; --line:#d9e3dc; --brand:#0b6b43; --soft:#e0f0e6; --warn-bg:#fdf1d8; --warn:#6b4300; --danger:#8f1d1d; color-scheme: light dark; }
+@media (prefers-color-scheme: dark) { :root { --bg:#0b1410; --surface:#121e18; --ink:#e9f1ec; --muted:#a3b5aa; --line:#25362d; --brand:#4fcf93; --soft:#15311f; --warn-bg:#33270a; --warn:#ffd98a; --danger:#e26a6a; } }
+* { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--ink); font:1rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+header, main { max-width:52rem; margin:0 auto; padding:1rem 1.25rem; } header h1 { margin:0; font-size:1.5rem; } header p { margin:.25rem 0 0; color:var(--muted); }
+h2 { font-size:1.05rem; margin:2rem 0 .75rem; } h3 { margin:0; font-size:1.05rem; } p { margin:.4rem 0; } a { color:var(--brand); }
+.count { display:inline-block; padding:0 .55rem; border-radius:99rem; background:var(--soft); font-size:.9rem; }
+.item { background:var(--surface); border:1px solid var(--line); border-radius:.9rem; padding:1rem 1.1rem; margin-bottom:.75rem; } .item.hot { border-color:var(--warn); border-width:2px; }
+.sub, .script, .empty { color:var(--muted); font-size:.95rem; } .script { font-style:italic; } .empty { padding:1rem; background:var(--surface); border:1px dashed var(--line); border-radius:.9rem; }
+.tag { display:inline-block; padding:.1rem .6rem; border-radius:99rem; background:var(--soft); font-size:.9rem; font-weight:600; } .tag.warn { background:var(--warn-bg); color:var(--warn); }
+.notes { margin:.5rem 0; padding-left:1.1rem; font-size:.95rem; } .actions { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.6rem; }
+button { font:inherit; min-height:2.75rem; padding:.4rem .9rem; border-radius:.6rem; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:600; }
+button[data-act="archive"] { border-color:var(--danger); color:var(--danger); } button.good { background:var(--brand); border-color:var(--brand); color:var(--bg); } .quiet button { font-weight:500; font-size:.95rem; } button:disabled { opacity:.5; }
+button:focus-visible, a:focus-visible { outline:3px solid #0a57c2; outline-offset:2px; }
+.flash { padding:.7rem 1rem; border-radius:.6rem; background:var(--soft); font-weight:600; } .breaker { padding:.9rem 1rem; border-radius:.6rem; background:var(--warn-bg); color:var(--warn); }
+pre { padding:.7rem 1rem; border-radius:.6rem; background:var(--surface); border:1px solid var(--line); overflow:auto; }

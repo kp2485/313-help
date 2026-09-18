@@ -12,9 +12,22 @@ pnpm --filter @detroithelp/api dev                  # write API on http://localh
 pnpm --filter @detroithelp/web dev                  # the app on http://localhost:5173 (proxies /v1 to the API)
 ```
 
+The steward queue is at **http://localhost:5173/admin/**. Locally, `api/.dev.vars` (git-ignored) holds `DEV_STEWARD=local`, which stands in for the Cloudflare Access login and is honored **only when the API is reached as localhost**.
+
+To pull report counts and steward decisions into the bundle, and to tell the API which ids exist:
+`REPORTS_API=http://localhost:8787 pnpm build:bundle`. Do not commit `data/hsds/` from a build that used local test reports; run a plain `pnpm build:bundle` first.
+
 Reports only accept ids the API knows. Locally, add some:
 `pnpm --filter @detroithelp/api exec wrangler d1 execute detroithelp --local --command "INSERT OR IGNORE INTO targets VALUES ('sal_csk_conner_meals','listing')"`.
 In production the pipeline syncs every id at each publish.
+
+## The demo loop (about two minutes, all local)
+
+1. In the app, open a listing → **Something wrong?** → *Closed for good*. Do it again as *Moved* (one phone counts once per kind per day).
+2. `REPORTS_API=http://localhost:8787 pnpm build:bundle`, reload: the listing now says **"2 people said this was closed. Call first."** It is still listed. Reports label; they never hide.
+3. Open `/admin/`: the listing is at the top, highlighted, with the note (phone numbers already masked) and the phone script. Press **Archive: closed for good**.
+4. Build again, reload: the listing is gone from results; its link says **"Closed as of {today}. Call 211 for other options."** `data/hsds/services.json` marks the service `defunct`, so a 211 importer won't treat it as live. Nothing was deleted.
+5. Press **It's open** in the API (or `POST …/status {"status":"active"}`) to restore it, then a plain `pnpm build:bundle`.
 
 ## The regular work
 
@@ -35,7 +48,7 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
 2. **Signing keys.** `pnpm keys:generate` twice. Key 1 → GitHub Actions secret `BUNDLE_SIGNING_KEY`. Key 2 → offline (password manager + paper). Both *public* keys → `BUNDLE_PUBLIC_KEYS="key1,key2"` for the web build. Losing both private keys means shipping a new app build, so keep the spare safe.
 3. **D1.** `wrangler d1 create detroithelp`, put the id in `api/wrangler.toml`, `wrangler d1 migrations apply detroithelp --remote`.
 4. **Worker.** `wrangler deploy` from `api/`. Route it at `https://<domain>/v1/*` so the app and API share an origin (no CORS, no third party).
-5. **Cloudflare Access.** One application covering `/v1/steward/*`. Policy: allow listed steward emails, plus one **service token** for the pipeline. Put the team domain and the application's AUD tag in `wrangler.toml` (`ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`). The Worker verifies the Access token itself and fails closed if these are empty.
+5. **Cloudflare Access.** One application covering `/v1/steward/*` **and `/admin/*`**. Never set `DEV_STEWARD` in production (it would do nothing anyway: the Worker only honors it on localhost). Policy: allow listed steward emails, plus one **service token** for the pipeline. Put the team domain and the application's AUD tag in `wrangler.toml` (`ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`). The Worker verifies the Access token itself and fails closed if these are empty.
 6. **Rate limiting.** A WAF rate-limiting rule on `POST /v1/*`, per IP, about 10 per minute. This lives in the dashboard on purpose: the Worker code never touches an IP address, and a test keeps it that way.
 7. **Logs.** `wrangler.toml` already turns invocation logs off. Leave Logpush off. Never add request logging.
 8. **Pages.** Build `apps/web` with `BUNDLE_PUBLIC_KEYS` set; deploy `apps/web/dist` (it contains the bundle under `/data/bundle/v1/`).

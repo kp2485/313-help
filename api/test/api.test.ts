@@ -157,6 +157,37 @@ describe('steward endpoints', () => {
   });
 });
 
+describe('archiving a listing', () => {
+  it('needs a reason, records the decision, settles the closure reports, and reaches the pipeline', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'closed_permanently', client_nonce: NONCE });
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'wrong_hours', client_nonce: 'e'.repeat(64) });
+    const call = (b: object) => steward('/v1/steward/listings/sal_b/status', { method: 'POST', body: JSON.stringify(b) });
+    expect((await call({ status: 'archived' })).status).toBe(400);
+    expect((await call({ status: 'archived', reason_code: 'because' })).status).toBe(400);
+    expect((await steward('/v1/steward/listings/sal_nope/status', { method: 'POST', body: JSON.stringify({ status: 'archived', reason_code: 'moved' }) })).status).toBe(404);
+    expect((await call({ status: 'archived', reason_code: 'closed_permanently' })).status).toBe(200);
+
+    expect(db.raw.prepare("SELECT kind, status FROM reports ORDER BY kind").all()).toEqual([{ kind: 'closed_permanently', status: 'accepted' }, { kind: 'wrong_hours', status: 'open' }]);
+    expect(db.raw.prepare('SELECT action, subject_id, reason_code FROM steward_actions').get()).toEqual({ action: 'listing.archived', subject_id: 'sal_b', reason_code: 'closed_permanently' });
+    const agg = (await (await steward('/v1/steward/aggregates')).json()) as { overrides: object[] };
+    expect(agg.overrides).toEqual([{ target_id: 'sal_b', status: 'archived', reason_code: 'closed_permanently', replacement_id: null, at: '2026-09-18T17:41Z' }]);
+    // Nothing is deleted: the listing is still a known target, and it can be restored.
+    expect((await call({ status: 'active' })).status).toBe(200);
+    expect(((await (await steward('/v1/steward/aggregates')).json()) as { overrides: { status: string }[] }).overrides[0]!.status).toBe('active');
+  });
+});
+
+describe('local development login', () => {
+  it('works on localhost only, and only when DEV_STEWARD is set', async () => {
+    const at = (url: string, e: Env) => app.request(url, {}, e);
+    expect((await at('http://localhost:8787/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(200);
+    expect((await at('http://127.0.0.1:8787/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(200);
+    expect((await at('https://detroitcompass.example/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(401);
+    expect((await at('https://localhost.evil.example/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(401);
+    expect((await at('http://localhost:8787/v1/steward/queue', { DB: db })).status).toBe(401);
+  });
+});
+
 describe('retention', () => {
   it('turns reports older than 180 days into monthly counts and removes the rows', async () => {
     db.raw.exec(`INSERT INTO reports (id, target_id, kind, detail, submitted_at, client_nonce) VALUES
