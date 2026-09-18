@@ -29,7 +29,7 @@
   "bundle.alerts_may_be_missing": "Alerts may be missing.",
   "bundle.old": "This list has not been updated since {date}. Call first, or call 211.",
   "bundle.sunset": "This list is no longer being updated. For help finding services, call 211.",
-  "app.name": "DetroitHelp",
+  "app.name": "Detroit Compass",
   "app.tagline": "Free help, places to go, and ways to get there. We never ask who you are.",
   "strip.more": "Urgent help",
   "strip.call_label": "Call {label}, {number}",

@@ -1,6 +1,6 @@
 {
-  "name": "DetroitHelp",
-  "short_name": "DetroitHelp",
+  "name": "Detroit Compass",
+  "short_name": "Compass",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -12,5 +12,6 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "description": "Free help, places to go, and ways to get there in Detroit. No accounts. Works offline."
 }

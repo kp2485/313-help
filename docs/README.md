@@ -1,6 +1,6 @@
-# Detroit Resident Resource App — Design Documents
+# Detroit Compass — Design Documents
 
-Working name: **DetroitHelp** (placeholder — see 09-roadmap.md for naming). A standalone app, separate from CommunityChest, that rebuilds the intent of the Detroit Health Department's "D Compassion" app (released by a vendor in 2025 as the "Detroit Compassion App") without collecting anything about the people who use it.
+**Detroit Compass** (named 2026-09-18; older docs and internal package names say "DetroitHelp"). A standalone app, separate from CommunityChest, that rebuilds the intent of the Detroit Health Department's "D Compassion" app (released by a vendor in 2025 as the "Detroit Compassion App") without collecting anything about the people who use it.
 
 ## One-sentence pitch
 
