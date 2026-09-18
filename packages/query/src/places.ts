@@ -12,6 +12,8 @@ export interface Segment {
   name: string;
   phase: Phase;
   typology?: string;
+  /** Streets this stretch crosses, in order along the path. Worked out by the pipeline from the City's road layer. */
+  cross_streets?: string[];
   /** One or more polylines of [lon, lat]. */
   lines: [number, number][][];
 }

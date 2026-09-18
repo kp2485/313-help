@@ -6,6 +6,7 @@ import { NEEDS, CATEGORIES, HARDCODED, TABS } from '../src/needs.js';
 import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
+import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
 import { build as buildReport, nonce } from '../src/report.js';
 
 const root = join(__dirname, '../../..');
@@ -88,6 +89,31 @@ describe('reports from the phone', () => {
   });
 });
 
+describe('map', () => {
+  const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
+  it('reads the pipeline line format: whole 1e-5 degrees from an origin, then steps', () => {
+    const pts = decodeLine([5000, 5000, 2000, 0, 0, 1000], [-83.1, 42.3]);
+    expect(pts[0]).toBeCloseTo(wx(-83.05), 6); expect(pts[1]).toBeCloseTo(wy(42.35), 6);
+    expect(pts[2]).toBeCloseTo(wx(-83.03), 6); expect(pts[5]).toBeCloseTo(wy(42.36), 6);
+  });
+  it('clips a line to the screen for label placement, and knows when a tap is inside a park', () => {
+    expect(clip(-10, 5, 30, 5, 0, 0, 20, 10)).toEqual([0, 5, 20, 5]);
+    expect(clip(-10, -5, -1, 50, 0, 0, 20, 10)).toBeNull();
+    const square = new Float32Array([0, 0, 10, 0, 10, 10, 0, 10]);
+    expect(inside(5, 5, square)).toBe(true); expect(inside(15, 5, square)).toBe(false);
+  });
+  it('asks no other site for anything: no tile server, no URL at all; files are checked against the signed index', () => {
+    expect(mapSrc).not.toContain('http');
+    expect(mapSrc).toContain("fetchVerified(index, 'map/base.json')");
+    expect(mapSrc).not.toContain(' fetch(');
+  });
+  it('a typed ZIP is never drawn as "you are here", and sensitive listings get no map', () => {
+    expect(main).toContain('me: here && !hereZip ? here : null');
+    expect(main).toContain('!sensitive && r.lat !== undefined ? mapBox');
+  });
+  it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
+});
+
 describe('privacy and copy rules, checked against the source', () => {
   it('every strings key used in main.ts exists', () => {
     // Whole literal keys only: t('od.s' + i) is a prefix, covered by the steps test below.
@@ -99,14 +125,28 @@ describe('privacy and copy rules, checked against the source', () => {
     for (const k of used) expect(strings[k], k).toBeTypeOf('string');
   });
   it('never writes to localStorage, sessionStorage, or cookies, and never sends anything', () => {
-    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts']) {
+    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts']) {
       const src = readFileSync(join(__dirname, '../src', f), 'utf8');
       expect(src, f).not.toMatch(/localStorage|sessionStorage|document\.cookie|sendBeacon|XMLHttpRequest/);
       expect(src.match(/method:\s*'POST'/), f).toBeNull();
     }
   });
-  it('need screens never put anything in the URL', () => {
-    expect(main).toMatch(/return null; \/\/ the urgent sheet and every "need" screen: no trace/);
+  it('need screens and search never put anything in the URL', () => {
+    expect(main).toMatch(/return null; \/\/ the urgent sheet, search, and every "need" screen: no trace/);
+    const hashFor = main.slice(main.indexOf('function hashFor'), main.indexOf('function fromHash'));
+    expect(hashFor).not.toMatch(/'search'|'need'|'urgent'/);
+  });
+  it('what a person types (search text, ZIP) stays in a variable: never in storage, a request, or the URL', () => {
+    // idbSet is the only way this app writes to the phone, and main.ts never calls it.
+    expect(main).not.toMatch(/idbSet|indexedDB/);
+    for (const name of ['searchText', 'hereZip']) {
+      const lines = main.split('\n').filter((l) => l.includes(name));
+      expect(lines.length, name).toBeGreaterThan(0);
+      for (const l of lines) expect(l, name).not.toMatch(/fetch\(|pushState|location\.|href=/);
+    }
+    expect(main).toMatch(/if \(view\.v === 'tab'\) \{ stack\.length = 0; searchText = ''; \}/);
+    expect(main).toMatch(/<input id="q"[^>]*autocomplete="off"/);
+    expect(main).toMatch(/<input name="zip"[^>]*autocomplete="off"/);
   });
   it('no third-party origins in the page shell', () => {
     const html = readFileSync(join(__dirname, '../index.html'), 'utf8');

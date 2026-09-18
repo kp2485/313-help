@@ -10,8 +10,8 @@ export const p = (...parts: string[]) => join(ROOT, ...parts);
 
 // Detroit bbox sanity (CLAUDE.md).
 export const BBOX = { latMin: 42.25, latMax: 42.46, lonMin: -83.29, lonMax: -82.91 };
-export const inBbox = (lat: number, lon: number) =>
-  lat >= BBOX.latMin && lat <= BBOX.latMax && lon >= BBOX.lonMin && lon <= BBOX.lonMax;
+export const inBbox = (lat: number, lon: number, slack = 0) =>
+  lat >= BBOX.latMin - slack && lat <= BBOX.latMax + slack && lon >= BBOX.lonMin - slack && lon <= BBOX.lonMax + slack;
 
 export type CsvRow = Record<string, string>;
 

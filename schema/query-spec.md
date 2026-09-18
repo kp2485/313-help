@@ -57,6 +57,15 @@ Tiers in that freshness order (confirmed = 0) are sort keys only. No number is e
 
 Distance comes before openness and freshness because many users have no car.
 
+## Search
+
+Search runs on the device. The typed text is never stored, sent, or put in a URL.
+
+1. **Normalize** both sides: remove accents, lowercase, turn anything that is not a letter or digit into a space.
+2. **Tokens** are the words of the query. A query with fewer than 2 letters or digits in total matches nothing.
+3. A row **matches** when every token is the start of a word in the searched text. Match tier: 0 = name only; 1 = name + organization; 2 = name, organization, what, who, street, ZIP.
+4. **Order**: match tier, then the one ranking rule above. Only active rows; archived rows (≤ 90 days) are matched by name by the client and shown apart, labeled.
+
 ## Bundle age
 
 | Condition | Stage |

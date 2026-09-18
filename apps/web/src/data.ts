@@ -21,6 +21,8 @@ export interface Bundle {
   events_source?: { name: string; page: string; fetched_at: string };
   parks?: { id: string; name: string; address: string; type: string; acres: number; lat: number; lon: number }[];
   parks_source?: { name: string; last_edited: string };
+  /** ZIP -> [lat, lon] center point, for "Type a ZIP". */
+  zips?: Record<string, [number, number]>;
 }
 
 const BASE = '/data/bundle/v1/';
@@ -52,6 +54,15 @@ async function bytes(path: string): Promise<Uint8Array> {
 }
 const parse = (b: Uint8Array) => JSON.parse(new TextDecoder().decode(b));
 
+/** One file of the bundle, checked against the checksum in the (already signature-checked) index. */
+export async function fetchVerified(index: BundleIndex, name: string): Promise<unknown> {
+  const meta = index.files[name];
+  if (!meta) throw new Error(`not in the bundle: ${name}`);
+  const b = await bytes(name);
+  if ((await sha256Hex(b)) !== meta.sha256) throw new Error(`checksum mismatch: ${name}`);
+  return parse(b);
+}
+
 /** Returns a new verified bundle, or null when there is nothing newer. Throws on any verification failure. */
 export async function refresh(current?: Bundle): Promise<Bundle | null> {
   const [indexBytes, sigBytes] = await Promise.all([bytes('index.json'), bytes('index.json.sig')]);
@@ -63,7 +74,8 @@ export async function refresh(current?: Bundle): Promise<Bundle | null> {
   if (current && index.generated_at < current.index.generated_at) throw new Error('bundle is older than the one we have');
 
   const files: Record<string, unknown> = {};
-  await Promise.all(Object.entries(index.files).map(async ([name, meta]) => {
+  // map/ files are big and only needed when a person opens a map: map.ts fetches and checks them then.
+  await Promise.all(Object.entries(index.files).filter(([name]) => !name.startsWith('map/')).map(async ([name, meta]) => {
     const b = await bytes(name);
     if ((await sha256Hex(b)) !== meta.sha256) throw new Error(`checksum mismatch: ${name}`);
     files[name] = parse(b);
@@ -80,6 +92,7 @@ export async function refresh(current?: Bundle): Promise<Bundle | null> {
     events_source: (files['events.json'] as { source?: Bundle['events_source'] } | undefined)?.source,
     parks: (files['places/parks.json'] as { parks?: Bundle['parks'] } | undefined)?.parks,
     parks_source: (files['places/parks.json'] as { source?: Bundle['parks_source'] } | undefined)?.source,
+    zips: (files['places/zips.json'] as { zips?: Bundle['zips'] } | undefined)?.zips,
   };
   await idbSet('bundle', next); // one put = atomic swap
   return next;

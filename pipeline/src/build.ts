@@ -4,7 +4,7 @@
 //                                and BUNDLE_SIGNING_KEY is set
 
 import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import type { Alert, BundleRow } from '@detroithelp/query';
 import { p, readCsv, sha256, today, writeJson, type CsvRow } from './util.js';
 import { loadSources } from './ingest-arcgis.js';
@@ -83,10 +83,31 @@ export async function build(opts: BuildOptions = {}) {
   // Greenway segments (docs/11): fetched after the help categories, so a phone that only ever
   // loads food never downloads a trail map.
   const jlg = p('data/ingested/jlg_segments.json');
-  if (existsSync(jlg)) { const g = JSON.parse(readFileSync(jlg, 'utf8')); counts.greenway_segments = g.segments.length; put('places/greenway.json', g); }
+  // Street map made from City open data (ingest-basemap.ts). The files are listed here so the signature covers
+  // them, but a phone downloads them only when a person first opens a map (apps/web/src/map.ts).
+  const mapDir = p('data/ingested/basemap');
+  const hasMap = existsSync(`${mapDir}/base.json`);
+  const crossings: Record<string, string[]> = hasMap ? JSON.parse(readFileSync(`${mapDir}/crossings.json`, 'utf8')) : {};
+  if (existsSync(jlg)) {
+    const g = JSON.parse(readFileSync(jlg, 'utf8'));
+    for (const s of g.segments as { id: string; cross_streets?: string[] }[]) if (crossings[s.id]?.length) s.cross_streets = crossings[s.id];
+    counts.greenway_segments = g.segments.length; put('places/greenway.json', g);
+  }
+  if (hasMap) {
+    const putCompact = (name: string, data: unknown) => { const buf = Buffer.from(JSON.stringify(data)); mkdirSync(`${out}/map`, { recursive: true }); writeFileSync(`${out}/${name}`, buf); files[name] = { sha256: sha256(buf), bytes: buf.length }; };
+    const cells: Record<string, unknown> = {};
+    for (const f of readdirSync(`${mapDir}/cells`).sort()) cells[f.replace('.json', '')] = JSON.parse(readFileSync(`${mapDir}/cells/${f}`, 'utf8'));
+    const source = JSON.parse(readFileSync(`${mapDir}/source.json`, 'utf8'));
+    putCompact('map/base.json', { source, ...JSON.parse(readFileSync(`${mapDir}/base.json`, 'utf8')) });
+    putCompact('map/streets.json', { grid: source.grid, cells });
+    counts.map_cells = Object.keys(cells).length;
+  }
   // Recreation and Events tabs. Past events are dropped at build time and again on the device.
   const parksFile = p('data/ingested/city_parks.json'), eventsFile = p('data/ingested/city_events.json');
   if (existsSync(parksFile)) { const d = JSON.parse(readFileSync(parksFile, 'utf8')); counts.parks = d.parks.length; put('places/parks.json', d); }
+  // ZIP center points for "Type a ZIP" (docs/05): about 1 KB, and the typed ZIP never leaves the phone.
+  const zipsFile = p('data/ingested/city_zips.json');
+  if (existsSync(zipsFile)) put('places/zips.json', JSON.parse(readFileSync(zipsFile, 'utf8')));
   if (existsSync(eventsFile)) { const d = JSON.parse(readFileSync(eventsFile, 'utf8')); d.events = d.events.filter((e: { starts_at: string }) => e.starts_at.slice(0, 10) >= todayStr); counts.events = d.events.length; put('events.json', d); }
   put('alerts.json', alerts.filter((a) => a.status === 'published' && Date.parse(a.ends_at) > now.getTime()));
   put('emergency.json', emergency.sort((a, b) => Number(a.sort) - Number(b.sort))

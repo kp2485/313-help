@@ -9,8 +9,9 @@ import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, uuid5 } from '../src/util.js';
 import { validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
-import { parseCalendar } from '../src/ingest-city.js';
+import { parseCalendar, toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
+import { crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
@@ -159,6 +160,63 @@ describe('helpers', () => {
   });
 });
 
+describe('ZIP center points', () => {
+  it('keeps 5-digit ZIPs near Detroit, rounded to about 100 m, and drops everything else', () => {
+    expect(toZipCenters([
+      { attributes: { zipcode: '48201' }, centroid: { x: -83.06012, y: 42.34731 } },
+      { attributes: { zipcode: '48236' }, centroid: { x: -82.9, y: 42.425 } },      // border ZIP, a little outside the bbox
+      { attributes: { zipcode: '49503' }, centroid: { x: -85.67, y: 42.96 } },      // Grand Rapids
+      { attributes: { zipcode: '4820' }, centroid: { x: -83.06, y: 42.34 } },
+      { attributes: { zipcode: '48202' } },
+    ])).toEqual({ '48201': [42.347, -83.06], '48236': [42.425, -82.9] });
+  });
+  it('the committed file covers the city, corner to corner', () => {
+    const { zips } = JSON.parse(readFileSync(p('data/ingested/city_zips.json'), 'utf8')) as { zips: Record<string, [number, number]> };
+    expect(Object.keys(zips).length).toBeGreaterThanOrEqual(25);
+    for (const z of ['48201', '48209', '48219', '48224', '48238']) expect(zips[z], z).toBeDefined();
+  });
+});
+
+describe('street map from City open data', () => {
+  const road = (name: string, cls: number, line: [number, number][]): Road => ({ name, cls, line });
+  it('names: freeways the way people say them; turn lanes and ramps have no name', () => {
+    expect(roadName('N I 75')).toBe('I-75'); expect(roadName('W I 96 CD')).toBe('I-96'); expect(roadName('S M 10')).toBe('M-10');
+    expect(roadName('W I 94 Service Drive')).toBe('I-94 Service Drive');
+    expect(roadName('  Mack   Ave ')).toBe('Mack Ave'); expect(roadName('8 Mile/Kelly TURN')).toBe(''); expect(roadName(null)).toBe('');
+  });
+  it('joins block-long pieces of one street, in any order and direction, and keeps other streets apart', () => {
+    const out = mergeChains([
+      road('Mack Ave', 1, [[-83.03, 42.35], [-83.02, 42.35]]), road('Mack Ave', 1, [[-83.01, 42.35], [-83.02, 42.35]]),
+      road('Mack Ave', 1, [[-83.04, 42.35], [-83.03, 42.35]]), road('Russell St', 4, [[-83.03, 42.35], [-83.03, 42.36]]),
+    ]);
+    expect(out).toHaveLength(2);
+    expect(out.find((r) => r.name === 'Mack Ave')!.line.map((q) => q[0])).toEqual([-83.04, -83.03, -83.02, -83.01]);
+  });
+  it('drops points that do not change the shape, keeps corners, and encodes to whole meters-ish', () => {
+    const line: [number, number][] = [[-83.05, 42.35], [-83.04, 42.350001], [-83.03, 42.35], [-83.03, 42.36]];
+    expect(simplify(line, 1.5)).toEqual([[-83.05, 42.35], [-83.03, 42.35], [-83.03, 42.36]]);
+    expect(encodeLine([[-83.05, 42.35], [-83.03, 42.35], [-83.03, 42.36]], [-83.1, 42.3])).toEqual([5000, 5000, 2000, 0, 0, 1000]);
+    const packed = packRoads([road('A St', 4, line), road('', 0, [[-83.05, 42.35], [-83.04, 42.36]])], [-83.1, 42.3], 1.5);
+    expect(packed.names).toEqual(['A St']); expect(packed.roads.map((r) => [r[0], r[1]])).toEqual([[0, -1], [4, 0]]);
+  });
+  it('cross streets come out in order along the path; a street alongside, a freeway, and a tunnel are not crossings', () => {
+    const path: [number, number][][] = [[[-83.03, 42.33], [-83.03, 42.36]]];
+    expect(crossings(path, [
+      road('Mack Ave', 1, [[-83.04, 42.35], [-83.02, 42.35]]), road('E Jefferson Ave', 1, [[-83.04, 42.335], [-83.02, 42.335]]),
+      road('Gratiot Ave', 1, [[-83.04, 42.34], [-83.02, 42.345]]), road('Mack Ave', 1, [[-83.04, 42.3501], [-83.02, 42.3501]]),
+      road('St Aubin St', 4, [[-83.0301, 42.33], [-83.0299, 42.36]]), road('I-75', 0, [[-83.04, 42.355], [-83.02, 42.355]]),
+      road('Detroit Windsor Tunnel', 1, [[-83.04, 42.332], [-83.02, 42.332]]), road('Far St', 4, [[-83.0, 42.35], [-82.99, 42.35]]),
+    ])).toEqual(['E Jefferson Ave', 'Gratiot Ave', 'Mack Ave']);
+  });
+  it('the committed map covers the city and the greenway has its cross streets', () => {
+    const base = JSON.parse(readFileSync(p('data/ingested/basemap/base.json'), 'utf8'));
+    expect(base.roads.length).toBeGreaterThan(300); expect(base.parks.length).toBeGreaterThan(250); expect(base.boundary.length).toBeGreaterThan(0);
+    for (const n of ['Woodward Ave', 'Gratiot Ave', 'Michigan Ave', 'I-75']) expect(base.names, n).toContain(n);
+    const cross = JSON.parse(readFileSync(p('data/ingested/basemap/crossings.json'), 'utf8'));
+    expect(cross.seg_dequindre_cut_detroit_riverwalk).toEqual(expect.arrayContaining(['E Jefferson Ave', 'Gratiot Ave']));
+  });
+});
+
 describe('the real bundle', () => {
   let out: string, index: any, rows: BundleRow[];
   beforeAll(async () => {
@@ -167,6 +225,11 @@ describe('the real bundle', () => {
     index = r.index; rows = r.rows;
   }, 60000);
 
+  it('carries the street map under the same signature, and cross streets on greenway segments', () => {
+    expect(Object.keys(index.files)).toEqual(expect.arrayContaining(['map/base.json', 'map/streets.json']));
+    const g = JSON.parse(readFileSync(join(out, 'places/greenway.json'), 'utf8'));
+    expect(g.segments.find((x: any) => x.id === 'seg_dequindre_cut_detroit_riverwalk').cross_streets).toContain('Gratiot Ave');
+  });
   it('is signed, and the signature covers every file through its checksum', () => {
     const bytes = readFileSync(join(out, 'index.json'));
     const sig = JSON.parse(readFileSync(join(out, 'index.json.sig'), 'utf8'));

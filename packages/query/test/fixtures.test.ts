@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { badge, bundleAge, effectiveNow, helpAlong, milesToSegment, nearestSegment, nextOccurrences, openNow, rank } from '../src/index.js';
+import { badge, bundleAge, effectiveNow, helpAlong, milesToSegment, nearestSegment, nextOccurrences, openNow, rank, search } from '../src/index.js';
 import type { Alert, BundleRow, Segment } from '../src/index.js';
 
 // Fixtures are plain JSON so the iOS implementation can run the same cases.
@@ -9,9 +9,10 @@ const dir = join(__dirname, '../../../schema/fixtures');
 
 interface Case {
   name: string;
-  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment';
+  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment' | 'search';
   segment?: string; openOnly?: boolean; maxMiles?: number; tolerance?: number;
   now: string;
+  text?: string;
   row?: string;
   n?: number;
   query?: Record<string, unknown>;
@@ -55,6 +56,8 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
             expect(badge(find(c.row), now)).toMatchObject(c.expect as object); break;
           case 'rank':
             expect(rank(rows, c.query ?? {}, now, alerts).map((r) => r.row.id)).toEqual(c.expect); break;
+          case 'search':
+            expect(search(rows, c.text ?? '', c.query ?? {}, now, alerts).map((r) => r.row.id)).toEqual(c.expect); break;
           case 'bundleAge':
             expect(bundleAge(c.index!, now)).toBe(c.expect); break;
           case 'helpAlong':

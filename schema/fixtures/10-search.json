@@ -1,0 +1,175 @@
+{
+  "description": "Search. Friday 2026-09-18 1:45pm. Every token must start a word. Tier 0 name, 1 name+org, 2 any searched text; then the ranking rule (here: id order, since nothing has hours or a location).",
+  "rows": [
+    {
+      "id": "a_pantry",
+      "name": "St. Moses Food Pantry",
+      "org": "St. Moses Church",
+      "what": "Free groceries",
+      "address": {
+        "line1": "1125 Oakman Blvd",
+        "city": "Detroit",
+        "zip": "48238"
+      }
+    },
+    {
+      "id": "b_cafe",
+      "name": "Café Esperanza",
+      "org": "Southwest Solutions",
+      "what": "Free hot meals",
+      "address": {
+        "line1": "5716 Michigan Ave",
+        "city": "Detroit",
+        "zip": "48210"
+      }
+    },
+    {
+      "id": "c_clinic",
+      "name": "Oakman Clinic",
+      "org": "Health Partners",
+      "what": "Doctor visits. Food pantry on Fridays.",
+      "eligibility": "Anyone without insurance"
+    },
+    {
+      "id": "d_moses_org",
+      "name": "Winter Coats",
+      "org": "St. Moses Church",
+      "what": "Free coats"
+    },
+    {
+      "id": "e_archived",
+      "name": "Old Food Pantry",
+      "status": "archived"
+    }
+  ],
+  "cases": [
+    {
+      "name": "name match beats a match in the description",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "pantry",
+      "expect": [
+        "a_pantry",
+        "c_clinic"
+      ]
+    },
+    {
+      "name": "a token may be the start of a word",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "pant",
+      "expect": [
+        "a_pantry",
+        "c_clinic"
+      ]
+    },
+    {
+      "name": "but not the middle of one",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "antry",
+      "expect": []
+    },
+    {
+      "name": "every token must match",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "food coats",
+      "expect": []
+    },
+    {
+      "name": "organization match comes after name match",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "moses",
+      "expect": [
+        "a_pantry",
+        "d_moses_org"
+      ]
+    },
+    {
+      "name": "tokens may be spread over name and organization",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "coats church",
+      "expect": [
+        "d_moses_org"
+      ]
+    },
+    {
+      "name": "accents and case are ignored",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "CAFE",
+      "expect": [
+        "b_cafe"
+      ]
+    },
+    {
+      "name": "punctuation is ignored",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "st moses",
+      "expect": [
+        "a_pantry",
+        "d_moses_org"
+      ]
+    },
+    {
+      "name": "street name: name match first, then address match",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "oakman",
+      "expect": [
+        "c_clinic",
+        "a_pantry"
+      ]
+    },
+    {
+      "name": "ZIP code",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "48210",
+      "expect": [
+        "b_cafe"
+      ]
+    },
+    {
+      "name": "who it is for is searched",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "insurance",
+      "expect": [
+        "c_clinic"
+      ]
+    },
+    {
+      "name": "one letter matches nothing",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "f",
+      "expect": []
+    },
+    {
+      "name": "empty text matches nothing",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "  ",
+      "expect": []
+    },
+    {
+      "name": "a category filter still applies",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "free",
+      "query": {
+        "category": "food"
+      },
+      "expect": [
+        "a_pantry",
+        "b_cafe",
+        "d_moses_org"
+      ]
+    }
+  ]
+}

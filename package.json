@@ -13,6 +13,7 @@
     "ingest:opendata": "pnpm --filter @detroithelp/pipeline ingest:opendata && pnpm --filter @detroithelp/pipeline ingest:greenway && pnpm --filter @detroithelp/pipeline ingest:city",
     "geocode": "pnpm --filter @detroithelp/pipeline geocode",
     "keys:generate": "pnpm --filter @detroithelp/pipeline keys:generate",
+    "ingest:basemap": "pnpm --filter @detroithelp/pipeline ingest:basemap",
     "check:emergency": "pnpm --filter @detroithelp/pipeline check:emergency",
     "check:sources": "pnpm --filter @detroithelp/pipeline check:sources",
     "import:lines": "pnpm --filter @detroithelp/pipeline import:lines"

@@ -85,7 +85,10 @@ Options, honestly ranked for *this* project:
 3. **KMP / Flutter / React Native** — not worth a new stack for two thin read-mostly clients over a static bundle.
 
 ### Web (PWA)
-- SvelteKit or vanilla + Leaflet (OSM tiles) or MapLibre; must work with the map failing.
+- Vanilla TypeScript. **Map:** our own street map, drawn on a canvas from the signed bundle (`apps/web/src/map.ts`): no tile server, no map library, works offline. Must work with the map failing: every map screen also lists the same places and cross streets as text.
+  - `pnpm ingest:basemap` reads three City open-data layers (roads with names and class, park outlines, city boundary) into `data/ingested/basemap/` (committed, about 450 KB). The build ships them as `map/base.json` (boundary, parks, freeways and arterials) and `map/streets.json` (every smaller street, in about 2-mile cells for fast drawing): about 140 KB gzipped together. Both are in the signed index; a phone fetches them the first time a map opens, checks them against the index, and keeps them in IndexedDB.
+  - Format: coordinates are whole numbers of 1e-5 degrees from the file's `origin`; a line is `[x0, y0, dx1, dy1, ...]`; a road is `[class, nameIndex, line]` with class 0 freeway to 4 local street.
+  - The same ingest works out the streets each greenway segment crosses (`cross_streets` on the segment), so the facts on the map are also on the page as text.
 - Service worker caches the bundle; IndexedDB queues reports.
 - Also serves as the shareable deep-link target (`detroithelp.org/r/sal_…`) that resolves for people without the app.
 

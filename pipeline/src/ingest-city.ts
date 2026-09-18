@@ -1,8 +1,10 @@
-// Two read-only City of Detroit sources for the Events and Recreation tabs.
+// Read-only City of Detroit sources for the Events and Recreation tabs, and for "Type a ZIP".
 //   events: the City has no RSS/iCal/JSON feed (checked 2026-09-18), so we read its public calendar
 //           pages: a handful of requests, spaced out, once a day. We keep facts only (title, date,
 //           time, department, link) and link out for everything else. Tier B (docs/02).
 //   parks:  the open-data "City Parks" layer (names, addresses, coordinates; no amenities).
+//   zips:   the open-data ZIP code areas layer, reduced to one center point per ZIP, so a person who
+//           does not want to share a location can type a ZIP and still sort by distance (docs/05).
 // Output is committed under data/ingested/ so builds are reproducible and changes are reviewable.
 
 import { inBbox, p, writeJson } from './util.js';
@@ -10,6 +12,7 @@ import { inBbox, p, writeJson } from './util.js';
 const UA = { 'user-agent': 'detroithelp-pipeline (open-source civic directory; one polite pass per day)' };
 const CAL = 'https://detroitmi.gov/Calendar-and-Events';
 const PARKS = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0';
+const ZIPS = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/City_of_Detroit_Zip_Code_Tabulation_Areas/FeatureServer/0';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export interface CityEvent { id: string; title: string; starts_at: string; time_text?: string; department?: string; url: string }
@@ -74,7 +77,29 @@ async function parks(): Promise<void> {
   console.log(`parks: ${list.length} of ${feats.length} (inside the bbox, named); layer last edited ${lastEdited}`);
 }
 
+/** ZIP -> [lat, lon] of the area's center, 3 decimals (about 100 m): plenty for sorting by distance. */
+export function toZipCenters(features: { attributes: { zipcode?: unknown }; centroid?: { x: number; y: number } }[]): Record<string, [number, number]> {
+  const out: Record<string, [number, number]> = {};
+  for (const f of features) {
+    const zip = String(f.attributes.zipcode ?? '').trim(), c = f.centroid;
+    // Border ZIPs reach into the suburbs, so a center may sit a little outside the city bbox: allow 0.05 degrees.
+    if (!/^\d{5}$/.test(zip) || !c || !inBbox(c.y, c.x, 0.05)) continue;
+    out[zip] = [Number(c.y.toFixed(3)), Number(c.x.toFixed(3))];
+  }
+  return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
+}
+
+async function zips(): Promise<void> {
+  const meta = (await (await fetch(`${ZIPS}?f=json`, { headers: UA })).json()) as any;
+  const lastEdited = new Date(meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate).toISOString().slice(0, 10);
+  const q = `${ZIPS}/query?where=1%3D1&outFields=zipcode&returnGeometry=false&returnCentroid=true&outSR=4326&f=json`;
+  const centers = toZipCenters(((await (await fetch(q, { headers: UA })).json()) as any).features ?? []);
+  if (Object.keys(centers).length < 20) throw new Error(`zips: only ${Object.keys(centers).length} parsed. Not overwriting the last good file.`);
+  writeJson(p('data/ingested/city_zips.json'), { source: { name: 'City of Detroit ZIP code areas layer', url: ZIPS, last_edited: lastEdited }, zips: centers });
+  console.log(`zips: ${Object.keys(centers).length} center points; layer last edited ${lastEdited}`);
+}
+
 if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/ingest-city.ts')) {
   const only = process.argv[2];
-  (async () => { if (only !== 'parks') await events(); if (only !== 'events') await parks(); })().catch((e) => { console.error(String(e.message ?? e)); process.exit(1); });
+  (async () => { if (!only || only === 'events') await events(); if (!only || only === 'parks') await parks(); if (!only || only === 'zips') await zips(); })().catch((e) => { console.error(String(e.message ?? e)); process.exit(1); });
 }

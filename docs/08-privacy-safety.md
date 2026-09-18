@@ -69,3 +69,7 @@ This app is separate from CommunityChest specifically so youth-meetup safety que
 ## Open-source & data license
 
 Publishing the dataset (CC BY 4.0) and code (MIT/Apache — decide) is part of the safety story: anyone, including DHD, can audit that we do what we say.
+
+## Maps
+
+The street map is part of the signed bundle and is drawn on the phone (docs/06). No map company, tile server, or third party is contacted, so nobody learns where a person is looking. The map files are downloaded whole, the same two files for everyone. The map does not move to the person's location on its own; the location dot is drawn on the phone only after "Use my location," and a typed ZIP is never drawn as a location. **Directions** and **Bus directions** still hand the destination address to the maps app the person chooses; the screen says so.

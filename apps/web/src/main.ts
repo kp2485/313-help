@@ -1,10 +1,11 @@
 import {
-  badge, bundleAge, effectiveNow, helpAlong, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank,
+  badge, bundleAge, effectiveNow, helpAlong, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens,
   type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@detroithelp/query';
 import strings from '../../../strings/en.json';
 import { cached, refresh, type Bundle } from './data.js';
 import { icon } from './icons.js';
+import { MapView, type MapDot, type MapSpec } from './map.js';
 import { CATEGORIES, HARDCODED, NEEDS, TABS, type Need, type TabId } from './needs.js';
 import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, submit } from './report.js';
 import { TRANSIT } from './transit.js';
@@ -12,14 +13,16 @@ import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
 type View =
-  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'greenway' } | { v: 'parks' }
+  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'search' } | { v: 'greenway' } | { v: 'parks' }
   | { v: 'need'; id: string; refine?: string; all?: boolean }
   | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
 
 let bundle: Bundle | undefined;
 let loadError = false;
-let here: { lat: number; lon: number } | null = null;   // device location: this variable only, never stored
-let locDenied = false;
+let here: { lat: number; lon: number } | null = null;   // device location, or a ZIP's center: this variable only, never stored
+let hereZip = '';                                        // the ZIP a person typed, when `here` came from one
+let locDenied = false, zipOpen = false, zipUnknown = false;
+let searchText = '';                                     // memory only: never stored, sent, or put in the URL
 const reported = new Map<string, 'sent' | 'queued'>();   // this visit only, so the thank-you stays put
 const stack: View[] = [{ v: 'tab', tab: 'home' }];
 const app = document.getElementById('app')!;
@@ -95,9 +98,14 @@ function ageBanner(): string {
   return '';
 }
 function locChip(): string {
-  if (here) return `<p class="loc">${icon('pin', 'sm')}<span>${T('loc.using')}</span> <button class="chip" data-loc="off">${T('loc.off')}</button></p>`;
-  return `<p class="loc"><button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button> <small>${T(locDenied ? 'loc.denied' : 'loc.note')}</small></p>`;
+  if (here) return `<p class="loc">${icon('pin', 'sm')}<span>${T(hereZip ? 'loc.zip_using' : 'loc.using', { zip: hereZip })}</span> <button class="chip" data-loc="off">${T(hereZip ? 'loc.zip_off' : 'loc.off')}</button></p>`;
+  // "Type a ZIP" (docs/05): for a person who would rather not share a location. The ZIP is looked up in the bundle, on the phone.
+  const zip = !bundle?.zips ? '' : zipOpen
+    ? `<form class="zipform" data-zip><label>${T('loc.zip_label')} <input name="zip" inputmode="numeric" autocomplete="off" pattern="[0-9]{5}" maxlength="5" required></label><button class="chip" type="submit">${T('loc.zip_go')}</button></form>`
+    : `<button class="chip" data-loc="zip">${T('loc.zip')}</button>`;
+  return `<div class="loc"><button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button>${zip}<small role="status">${T(zipUnknown ? 'loc.zip_unknown' : locDenied ? 'loc.denied' : 'loc.note')}</small></div>`;
 }
+const searchBtn = () => `<button class="searchbtn" ${go({ v: 'search' })}>${icon('search', 'sm')}<span>${T('search.open')}</span></button>`;
 const rowLink = (view: View, ic: string, title: string, sub = '') =>
   `<li><button class="row" ${go(view)}><span class="rowic">${icon(ic)}</span><span class="rowtx"><strong>${esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${icon('chevron', 'sm dim')}</button></li>`;
 
@@ -146,7 +154,7 @@ function homeTab(): string {
   const alerts = bundle.alerts.filter((a) => Date.parse(a.ends_at) > now().getTime() && Date.parse(a.starts_at) <= now().getTime());
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const quick = ['food', 'shelter', 'doctor', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
-  return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}
+  return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
     ${alerts.map((a) => `<div class="alert"><strong>${esc(a.title)}</strong>${a.body_plain ? `<p>${esc(a.body_plain)}</p>` : ''}${(a.actions ?? []).filter((x) => x.tel).map((x) => `<a class="btn" href="${telHref(x.tel!)}">${esc(x.label)}</a>`).join('')}</div>`).join('')}
     ${sunset ? '' : `<button class="feature" ${go({ v: 'tab', tab: 'help' })}><span class="rowic big">${icon('help')}</span><span class="rowtx"><strong>${T('home.help_title')}</strong><small>${T('home.help_sub')}</small></span>${icon('chevron', 'dim')}</button>
     <ul class="quick">${quick.map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>`).join('')}</ul>`}
@@ -157,7 +165,7 @@ function homeTab(): string {
 }
 function helpTab(): string {
   const group = (g: Need['group']) => `<ul class="rows">${NEEDS.filter((n) => n.group === g).map((n) => rowLink({ v: 'need', id: n.id }, n.icon, t('need.' + n.id))).join('')}</ul>`;
-  return `<main><h1 class="page" tabindex="-1">${T('home.needs')}</h1><p class="lede">${T('help.lede')}</p>
+  return `<main><h1 class="page" tabindex="-1">${T('home.needs')}</h1><p class="lede">${T('help.lede')}</p>${searchBtn()}
     <h2>${T('help.now')}</h2>${group('now')}<h2>${T('help.soon')}</h2>${group('soon')}
     <h2>${T('home.categories')}</h2><ul class="chips">${CATEGORIES.map((c) => `<li><button class="chip lg" ${go({ v: 'list', cat: c.id })}>${icon(c.icon, 'sm')}${T('cat.' + c.id)}</button></li>`).join('')}</ul></main>`;
 }
@@ -167,7 +175,7 @@ function recTab(): string {
   const nearParks = here ? [...parks].map((p) => ({ p, mi: milesBetween(here!, p) })).sort((a, b) => a.mi - b.mi).slice(0, 5) : [];
   const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now());
   return `<main><h1 class="page" tabindex="-1">${T('tab.rec')}</h1><p class="lede">${T('rec.lede')}</p>
-    ${g ? `<button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'dim')}</button>${gwMap(g.segments)}` : ''}
+    ${g ? `<button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'dim')}</button>${mapBox({ key: 'rec', label: t('map.label_rec') })}` : ''}
     ${parks.length ? `<h2>${T('rec.parks')}</h2>${locChip()}${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => `<li><div class="row static"><span class="rowic">${icon('rec')}</span><span class="rowtx"><strong>${esc(p.name)}</strong><small>${[p.address, t('miles', { miles: mi.toFixed(1) })].filter(Boolean).map(esc).join(' · ')}</small></span></div></li>`).join('')}</ul>` : ''}
       <button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.all_parks', { count: parks.length })}</button>` : ''}
     <h2>${T('rec.centers')}</h2>${centers.length ? `<ul class="cards">${centers.map((r) => card(r)).join('')}</ul>` : `<p class="empty">${T('rec.centers_none')}</p>`}
@@ -175,7 +183,7 @@ function recTab(): string {
 }
 function parksList(): string {
   const parks = [...(bundle?.parks ?? [])].sort((a, b) => (here ? milesBetween(here, a) - milesBetween(here, b) : a.name.localeCompare(b.name)));
-  return `<main>${locChip()}<ul class="rows">${parks.map((p) => `<li><div class="row static"><span class="rowtx"><strong>${esc(p.name)}</strong><small>${[p.address, here ? t('miles', { miles: milesBetween(here, p).toFixed(1) }) : ''].filter(Boolean).map(esc).join(' · ')}</small></span></div></li>`).join('')}</ul>
+  return `<main>${mapBox({ key: 'parks', label: t('map.label_parks'), ...(here ? { fit: [here], minMeters: 3000 } : { fit: CITY, cover: true }) })}${locChip()}<ul class="rows">${parks.map((p) => `<li><div class="row static"><span class="rowtx"><strong>${esc(p.name)}</strong><small>${[p.address, here ? t('miles', { miles: milesBetween(here, p).toFixed(1) }) : ''].filter(Boolean).map(esc).join(' · ')}</small></span></div></li>`).join('')}</ul>
     <p class="foot">${T('rec.parks_source', { date: prettyDate(bundle?.parks_source?.last_edited ?? '') })}</p></main>`;
 }
 function transitTab(): string {
@@ -241,38 +249,60 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
     <h2>${T('detail.what')}</h2><p>${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${esc(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: r.hours_text })}</p>` : ''}
     ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${esc(clock(n.opens_at))} – ${esc(clock(n.closes_at))}</span></li>`).join('')}</ul>` : ''}
-    ${r.address ? `<h2>${T('detail.where')}</h2><address>${esc(r.address.line1)}<br>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</address><p class="foot">${T('detail.directions_note')}</p>` : ''}
+    ${r.address ? `<h2>${T('detail.where')}</h2><address>${esc(r.address.line1)}<br>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</address>${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
     ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
     ${r.website ? `<p>${ext(r.website, t('detail.website'), 'link')}</p>` : ''}
     <h2>${T('detail.source')}</h2><p>${esc(r.facts.source.name)}</p>${reportBox(r.id, false, r.category)}</main>` };
 }
-// Greenway drawn as plain SVG: no map tiles, no third party, works offline (audit B8).
-function gwMap(segs: Segment[], focus?: Segment, dots: { lat: number; lon: number }[] = []): string {
-  const pts = (focus ? focus.lines : segs.flatMap((s) => s.lines)).flat();
-  const pad = focus ? 0.012 : 0.004;
-  const minLon = Math.min(...pts.map((p) => p[0])) - pad, maxLon = Math.max(...pts.map((p) => p[0])) + pad;
-  const minLat = Math.min(...pts.map((p) => p[1])) - pad, maxLat = Math.max(...pts.map((p) => p[1])) + pad;
-  const k = Math.cos((((minLat + maxLat) / 2) * Math.PI) / 180), W = 320, scale = W / ((maxLon - minLon) * k), H = Math.max(120, (maxLat - minLat) * scale);
-  const xy = (lon: number, lat: number): [string, string] => [((lon - minLon) * k * scale).toFixed(1), ((maxLat - lat) * scale).toFixed(1)];
-  const path = (s: Segment) => s.lines.map((l) => `<polyline points="${l.map((p) => xy(p[0], p[1]).join(',')).join(' ')}" class="gw ${s.phase} ${focus && s.id === focus.id ? 'focus' : ''}"/>`).join('');
-  const dot = (d: { lat: number; lon: number }, cls: string, r: number) => { const [x, y] = xy(d.lon, d.lat); return `<circle cx="${x}" cy="${y}" r="${r}" class="${cls}"/>`; };
-  return `<svg class="gwmap" viewBox="0 0 ${W} ${H.toFixed(0)}" role="img" aria-label="${T('gw.map_label')}">${segs.filter((s) => s.phase !== 'open').map(path).join('')}${segs.filter((s) => s.phase === 'open').map(path).join('')}
-    ${dots.map((d) => dot(d, 'dot', 5)).join('')}${here ? dot(here, 'me', 6) : ''}</svg>`;
+// Maps (map.ts): streets, parks and the greenway, drawn on the phone from the signed bundle. No third party.
+// A screen asks for a map here; the views are attached after the screen is drawn.
+let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
+const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
+const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
+function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean }): string {
+  const segments = bundle?.greenway?.segments ?? [];
+  const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
+  mapSpecs.push({
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover,
+    me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
+    fit: o.fit?.length ? o.fit : segPoints(segments),
+    segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
+    strings: { zoomIn: t('map.zoom_in'), zoomOut: t('map.zoom_out'), reset: t('map.reset'), bigger: t('map.bigger'), smaller: t('map.smaller'), details: t('map.details'), park: t('map.park'), noStreets: t('map.no_streets'), source: (date) => t('map.source', { date: prettyDate(date) }), phase },
+  });
+  return `<div class="mapbox${o.small ? ' small' : ''}" data-map="${mapSpecs.length - 1}"></div>`;
+}
+function mountMaps(): void {
+  if (!bundle) return;
+  for (const el of app.querySelectorAll<HTMLElement>('.mapbox[data-map]')) mapViews.push(new MapView(el, mapSpecs[Number(el.dataset.map)]!, bundle.index));
 }
 function greenway(): string {
   const g = bundle!.greenway;
   if (!g) return `<main><p class="empty">${T('results.none')}</p></main>`;
   const group = (phase: string) => { const s = g.segments.filter((x) => x.phase === phase); return s.length ? `<h2>${T('gw.' + phase)} <span class="count">${s.length}</span></h2><ul class="rows">${s.map((x) => rowLink({ v: 'segment', id: x.id }, 'path', x.name)).join('')}</ul>` : ''; };
-  return `<main><p class="lede">${T('gw.intro')}</p>${gwMap(g.segments)}${group('open')}${group('under_construction')}${group('funded')}${group('planned')}<p class="foot">${T('gw.source', { date: prettyDate(g.source.last_edited) })}</p></main>`;
+  return `<main><p class="lede">${T('gw.intro')}</p>${mapBox({ key: 'greenway', label: t('gw.map_label') })}${group('open')}${group('under_construction')}${group('funded')}${group('planned')}<p class="foot">${T('gw.source', { date: prettyDate(g.source.last_edited) })}</p></main>`;
 }
 function segment(s: Segment): string {
-  const g = bundle!.greenway!;
   const near = helpAlong(bundle!.rows.filter((r) => r.category !== 'shelter.dv'), s);
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `<main><p class="meta"><span class="pill ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}</span></p>${s.phase === 'open' ? '' : `<p class="lede">${T('gw.not_open')}</p>`}
-    ${gwMap(g.segments, s, near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon! })))}
+    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
+    ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${esc(s.cross_streets.join(' · '))}</p>` : ''}
     <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
     ${s.phase === 'open' ? reportBox(s.id, true) : ''}</main>`;
+}
+// Search: the text lives in one variable. It is never stored, sent, or put in the URL (docs/05).
+function searchResults(): string {
+  const tokens = searchTokens(searchText);
+  if (!tokens.length) return `<p class="foot">${T('search.hint')}</p>`;
+  const found = search(bundle!.rows, searchText, here ? { near: here } : {}, now(), bundle!.alerts);
+  const closed = bundle!.archived.filter((a) => matchTier(tokens, a) !== null);
+  if (!found.length && !closed.length) return `<p class="empty">${T('search.none')} <a href="tel:211">211</a></p>`;
+  return `${found.length ? `${locChip()}<ul class="cards">${found.slice(0, 30).map((r) => card(r)).join('')}</ul>` : ''}
+    ${closed.length ? `<h2>${T('search.closed_head')}</h2><ul class="rows">${closed.map((a) => rowLink({ v: 'detail', id: a.id }, 'info', a.name, t('badge.archived', { date: prettyDate(a.archived.at) }))).join('')}</ul>` : ''}`;
+}
+function searchScreen(): string {
+  return `<main><label class="searchbox">${T('search.label')}<input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" maxlength="60" value="${esc(searchText)}"></label>
+    <div id="searchout" aria-live="polite">${searchResults()}</div></main>`;
 }
 function about(): string {
   const i = bundle?.index;
@@ -289,7 +319,7 @@ function hashFor(v: View): string | null {
   if (v.v === 'segment') return `#/greenway/${v.id}`;
   if (v.v === 'parks') return '#/parks';
   if (v.v === 'about') return '#/about';
-  return null; // the urgent sheet and every "need" screen: no trace
+  return null; // the urgent sheet, search, and every "need" screen: no trace
 }
 function fromHash(h: string): View {
   const m = /^#\/(r|c|greenway|about|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
@@ -300,13 +330,16 @@ function fromHash(h: string): View {
   if (m[1] === 'about' || m[1] === 'parks') return { v: m[1] };
   return { v: 'tab', tab: m[1] as TabId };
 }
-const TAB_OF: Partial<Record<View['v'], TabId>> = { need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
+const TAB_OF: Partial<Record<View['v'], TabId>> = { search: 'help', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
 function render(focus = true): void {
   const v = stack[stack.length - 1]!;
+  for (const m of mapViews) m.destroy();
+  mapViews = []; mapSpecs = [];
   let title: string | undefined, body: string, exit = false;
   if (v.v === 'tab' || !bundle) { const tab = v.v === 'tab' ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'rec' ? recTab() : tab === 'transit' ? transitTab() : eventsTab(); }
   else if (v.v === 'urgent') { title = t('strip.more'); body = urgent(); }
   else if (v.v === 'about') { title = t('about.title'); body = about(); }
+  else if (v.v === 'search') { title = t('search.title'); body = searchScreen(); }
   else if (v.v === 'need') { const n = NEEDS.find((x) => x.id === v.id)!; title = t(n.stepsOnly ? 'od.title' : 'need.' + n.id); exit = !!n.quickExit; body = need(v); }
   else if (v.v === 'list') { title = t('cat.' + v.cat); body = `<main>${results(CATEGORIES.find((c) => c.id === v.cat)?.query ?? {}, {})}</main>`; }
   else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; body = d.html; }
@@ -316,10 +349,11 @@ function render(focus = true): void {
   const fromStack = stack.map((x) => (x.v === 'tab' ? x.tab : undefined)).filter(Boolean).pop();
   const active = v.v === 'tab' ? v.tab : fromStack ?? TAB_OF[v.v];
   app.innerHTML = topBar(title, exit) + body + tabBar(active);
-  if (focus) { window.scrollTo(0, 0); app.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true }); }
+  mountMaps();
+  if (focus) { window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true }); }
 }
 function navigate(view: View): void {
-  if (view.v === 'tab') stack.length = 0;   // a tab is a fresh start, not one more screen to back out of
+  if (view.v === 'tab') { stack.length = 0; searchText = ''; }   // a tab is a fresh start, not one more screen to back out of
   stack.push(view);
   history.pushState({ n: stack.length }, '', hashFor(view) ?? location.pathname + location.search);
   render();
@@ -337,15 +371,33 @@ app.addEventListener('click', async (ev) => {
   }
   else if ('back' in el.dataset) { if (stack.length > 1) history.back(); else navigate({ v: 'tab', tab: TAB_OF[stack[0]!.v] ?? 'home' }); }
   else if ('exit' in el.dataset) { stack.length = 0; location.replace('https://www.weather.gov/'); }   // replace(): this page leaves the back button too
-  else if (el.dataset.loc === 'off') { here = null; render(false); }
+  else if (el.dataset.loc === 'off') { here = null; hereZip = ''; redraw(); }
+  else if (el.dataset.loc === 'zip') { zipOpen = true; zipUnknown = false; redraw(); app.querySelector<HTMLInputElement>('.zipform input')?.focus(); }
   else if (el.dataset.loc === 'on') {
     navigator.geolocation?.getCurrentPosition(
-      (pos) => { here = { lat: pos.coords.latitude, lon: pos.coords.longitude }; locDenied = false; render(false); },
-      () => { locDenied = true; render(false); }, { maximumAge: 60000, timeout: 10000 });
+      (pos) => { here = { lat: pos.coords.latitude, lon: pos.coords.longitude }; hereZip = ''; locDenied = zipUnknown = zipOpen = false; redraw(); },
+      () => { locDenied = true; zipUnknown = false; redraw(); }, { maximumAge: 60000, timeout: 10000 });
   } else if (el.dataset.share) {
     const url = `${location.origin}/#/r/${el.dataset.share}`;   // a listing id only; nothing about the person
     try { if (navigator.share) await navigator.share({ url }); else await navigator.clipboard.writeText(url); } catch { /* cancelled */ }
   }
+});
+// On the search screen only the results are re-drawn, so the keyboard and the cursor stay put.
+function redraw(): void {
+  const out = stack[stack.length - 1]!.v === 'search' ? app.querySelector('#searchout') : null;
+  if (out) out.innerHTML = searchResults(); else render(false);
+}
+app.addEventListener('input', (ev) => {
+  const el = ev.target as HTMLInputElement;
+  if (el.id === 'q') { searchText = el.value; redraw(); }
+});
+app.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const form = ev.target as HTMLFormElement;
+  if (!('zip' in form.dataset)) return;
+  const zip = String(new FormData(form).get('zip') ?? '').trim(), c = bundle?.zips?.[zip];
+  if (c) { here = { lat: c[0], lon: c[1] }; hereZip = zip; zipOpen = zipUnknown = locDenied = false; } else zipUnknown = true;
+  redraw();
 });
 
 // ---- start ------------------------------------------------------------------
