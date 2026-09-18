@@ -1,6 +1,6 @@
 # Operations
 
-How to run DetroitHelp. Written so someone other than Kyle could take it over in an afternoon (doc 12).
+How to run Detroit Compass. Written so someone other than Kyle could take it over in an afternoon (doc 12).
 
 ## Run it on your own machine
 
@@ -27,7 +27,7 @@ In production the pipeline syncs every id at each publish.
 2. `REPORTS_API=http://localhost:8787 pnpm build:bundle`, reload: the listing now says **"2 people said this was closed. Call first."** It is still listed. Reports label; they never hide.
 3. Open `/admin/`: the listing is at the top, highlighted, with the note (phone numbers already masked) and the phone script. Press **Archive: closed for good**.
 4. Build again, reload: the listing is gone from results; its link says **"Closed as of {today}. Call 211 for other options."** `data/hsds/services.json` marks the service `defunct`, so a 211 importer won't treat it as live. Nothing was deleted.
-5. Press **It's open** in the API (or `POST …/status {"status":"active"}`) to restore it, then a plain `pnpm build:bundle`.
+5. Restore it. An archived listing has left the queue, so for now this is one call: `curl -X POST http://localhost:8787/v1/steward/listings/<id>/status -H "content-type: application/json" -d '{"status":"active"}'`, then a plain `pnpm build:bundle`. (A "recently archived" list with an undo button is the obvious next addition to the admin page.)
 
 ## The regular work
 
