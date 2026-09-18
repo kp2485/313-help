@@ -7,12 +7,13 @@ import { build } from '../src/build.js';
 import { toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, uuid5 } from '../src/util.js';
-import { validateEmergency, validateRows } from '../src/validate.js';
+import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { parseCalendar, toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea } from '../src/indicators.js';
 import { nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
+import { makeAlert } from '../src/alert-new.js';
 import { crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
@@ -216,6 +217,28 @@ describe('street map from City open data', () => {
     for (const n of ['Woodward Ave', 'Gratiot Ave', 'Michigan Ave', 'I-75']) expect(base.names, n).toContain(n);
     const cross = JSON.parse(readFileSync(p('data/ingested/basemap/crossings.json'), 'utf8'));
     expect(cross.seg_dequindre_cut_detroit_riverwalk).toEqual(expect.arrayContaining(['E Jefferson Ave', 'Gratiot Ave']));
+  });
+});
+
+describe('writing an alert', () => {
+  const now = new Date('2026-09-18T17:45:30Z');
+  it('always ends, names its source, and carries a checked phone number', () => {
+    const a = makeAlert({ title: 'Overnight warming centers are open', body: 'Open through Wednesday noon.', hours: 60, category: 'warming', sourceUrl: 'https://detroitmi.gov/news/x', tel: ['Shelter help line=866-313-2520'] }, now);
+    expect(a).toMatchObject({ id: 'alert_overnight_warming_centers_are_open_2026-09-18', status: 'published', starts_at: '2026-09-18T17:45:00Z', ends_at: '2026-09-21T05:45:00Z', source: { type: 'press_release', url: 'https://detroitmi.gov/news/x' }, actions: [{ label: 'Shelter help line', tel: '8663132520' }] });
+    expect(validateAlerts([a], new Set()).errors).toEqual([]);
+  });
+  it('refuses an alert with no end, one longer than 7 days, no source, or a bad phone number', () => {
+    const ok = { title: 'x', hours: 5, sourceUrl: 'https://detroitmi.gov/news/x' };
+    expect(() => makeAlert({ ...ok, hours: undefined }, now)).toThrow(/every alert ends/);
+    expect(() => makeAlert({ ...ok, hours: 200 }, now)).toThrow(/at most 7 days/);
+    expect(() => makeAlert({ ...ok, sourceUrl: undefined }, now)).toThrow(/source-url/);
+    expect(() => makeAlert({ ...ok, tel: ['Call=555-0100'] }, now)).toThrow(/--tel/);
+  });
+  it('a demo alert says so in its title and body, lasts at most 3 hours, and has no phone number', () => {
+    const a = makeAlert({ demo: true, title: 'This is what an alert looks like', hours: 1 }, now);
+    expect(a.title).toBe('Demo: This is what an alert looks like'); expect(a.body_plain).toMatch(/This is a demo. Nothing is happening/); expect(a.category).toBe('demo');
+    expect(() => makeAlert({ demo: true, title: 'x', hours: 4 }, now)).toThrow(/at most 3 hours/);
+    expect(() => makeAlert({ demo: true, title: 'x', hours: 1, tel: ['A=313-555-0100'] }, now)).toThrow(/cannot carry a phone/);
   });
 });
 

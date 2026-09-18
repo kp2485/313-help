@@ -41,6 +41,19 @@ In production the pipeline syncs every id at each publish.
 
 If nobody does any of this, the app ages its own badges, warns after 30 days, and goes to sunset mode after 120 (doc 12). That is by design.
 
+## How to publish an alert
+
+An alert says something is happening now (warming centers open, a pantry closed today). Write it only from the owner's own announcement.
+
+```
+pnpm alert:new -- --title "Overnight warming centers are open" --body "Open tonight through Wednesday noon." \n     --hours 60 --category warming --source-url https://detroitmi.gov/news/... --tel "Shelter help line=866-313-2520"
+pnpm build:bundle        # or wait for the nightly publish
+```
+
+The command refuses an alert with no end time, one longer than 7 days, one with no source link, or a phone number that isn't a real number. The app hides the alert by itself at its end time, even offline. To cancel one listing's hours for a day, add `--cancellation --target sal_...`. To take an alert back early, set its `status` to `retracted` in `data/seed/alerts.json`. Ended alerts stay in the file; nothing is deleted.
+
+**For a demo:** `pnpm alert:new -- --demo --title "This is what an alert looks like" --hours 1`. The title and body say it is a demo, it lasts at most 3 hours, and it cannot carry a phone number. Never publish a made-up alert without `--demo`.
+
 ## First deployment — every step here needs Kyle's go-ahead (accounts, and a few dollars for a domain)
 
 Nothing below has been done. The Cloudflare free tier covers all of it at expected traffic.

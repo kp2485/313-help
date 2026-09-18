@@ -16,6 +16,7 @@
     "ingest:city": "tsx src/ingest-city.ts",
     "ingest:neighborhoods": "tsx src/ingest-neighborhoods.ts",
     "ingest:basemap": "tsx src/ingest-basemap.ts",
+    "alert:new": "tsx src/alert-new.ts",
     "import:lines": "tsx src/import-lines.ts"
   },
   "dependencies": {

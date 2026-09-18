@@ -189,6 +189,8 @@
   "hood.updated": "updated {date}",
   "hood.source_ours": "Help listings: the Detroit Compass list on this phone.",
   "hood.left_out": "We leave out crime numbers on purpose. Nothing here comes from people who use this app.",
+  "alert.until": "Until {when}",
+  "alert.source": "Where this was announced",
   "search.title": "Search",
   "search.open": "Search by name or street",
   "search.label": "Name, street, or ZIP code",

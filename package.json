@@ -17,6 +17,7 @@
     "ingest:basemap": "pnpm --filter @detroithelp/pipeline ingest:basemap",
     "check:emergency": "pnpm --filter @detroithelp/pipeline check:emergency",
     "check:sources": "pnpm --filter @detroithelp/pipeline check:sources",
+    "alert:new": "pnpm --filter @detroithelp/pipeline alert:new",
     "import:lines": "pnpm --filter @detroithelp/pipeline import:lines"
   }
 }

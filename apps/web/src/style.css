@@ -86,6 +86,7 @@ table.years { width:100%; border-collapse:collapse; margin-top:1rem; font-size:.
 .fresh { font-size:.9375rem; color:var(--muted); } .fresh.unconfirmed,.fresh.never_checked,.fresh.reported_once,.fresh.reported_closed,.fresh.archived { color:var(--warn-ink); background:var(--warn-bg); padding:.3rem .625rem; border-radius:var(--r-sm); font-weight:600; justify-self:start; }
 .notice,.banner { margin-top:.75rem; padding:.625rem .875rem; border-radius:var(--r-sm); background:var(--warn-bg); color:var(--warn-ink); font-weight:600; }
 .banner.ok { display:flex; gap:.5rem; align-items:flex-start; background:var(--brand-soft); color:var(--brand-soft-ink); } .banner.stop { background:var(--danger); color:var(--danger-ink); } .banner.stop a { color:inherit; }
+.alert + .feature { margin-top:.75rem; } .alert .foot { margin-top:0; color:inherit; opacity:.85; }
 .alert { margin-top:.75rem; padding:.875rem 1rem; border-radius:var(--r); background:var(--brand-soft); color:var(--brand-soft-ink); display:grid; gap:.5rem; }
 .empty { margin-top:.75rem; padding:1rem 1.125rem; border-radius:var(--r); background:var(--sunken); color:var(--muted); }
 .panel { display:grid; gap:.625rem; padding:1rem 1.125rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); } .fact { display:flex; gap:.5rem; align-items:flex-start; } .fact .ic { color:var(--brand); margin-top:.2rem; }

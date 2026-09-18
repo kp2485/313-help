@@ -169,7 +169,8 @@ function homeTab(): string {
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const quick = ['food', 'shelter', 'doctor', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
   return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
-    ${alerts.map((a) => `<div class="alert"><strong>${esc(a.title)}</strong>${a.body_plain ? `<p>${esc(a.body_plain)}</p>` : ''}${(a.actions ?? []).filter((x) => x.tel).map((x) => `<a class="btn" href="${telHref(x.tel!)}">${esc(x.label)}</a>`).join('')}</div>`).join('')}
+    ${alerts.map((a) => `<div class="alert"><strong>${esc(a.title)}</strong>${a.body_plain ? `<p>${esc(a.body_plain)}</p>` : ''}${(a.actions ?? []).filter((x) => x.tel).map((x) => `<a class="btn" href="${telHref(x.tel!)}">${icon('phone', 'sm')}${esc(x.label)}</a>`).join('')}
+      <p class="foot">${T('alert.until', { when: new Intl.DateTimeFormat('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/Detroit' }).format(new Date(a.ends_at)) })}${a.source?.url ? ` · ${ext(a.source.url, t('alert.source'), 'link')}` : ''}</p></div>`).join('')}
     ${sunset ? '' : `<button class="feature" ${go({ v: 'tab', tab: 'help' })}><span class="rowic big">${icon('help')}</span><span class="rowtx"><strong>${T('home.help_title')}</strong><small>${T('home.help_sub')}</small></span>${icon('chevron', 'dim')}</button>
     <ul class="quick">${quick.map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>`).join('')}</ul>`}
     ${ev.length ? `<div class="sechead"><h2>${T('home.events')}</h2><button class="link" ${go({ v: 'tab', tab: 'events' })}>${T('home.see_all')}</button></div><ul class="events">${ev.map(eventItem).join('')}</ul>` : ''}
