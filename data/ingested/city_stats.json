@@ -18,7 +18,7 @@
   "demolitions": {
    "name": "City of Detroit: completed demolitions",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_completed_demolitions/FeatureServer/0",
-   "last_edited": "2026-09-17"
+   "last_edited": "2026-09-18"
   },
   "issues": {
    "name": "Improve Detroit: issues people reported to the City",
@@ -245,7 +245,7 @@
   "nbh_yorkshire_woods": 1759
  },
  "city_parcels": 377940,
- "fetched_at": "2026-09-18",
+ "fetched_at": "2026-09-19",
  "first_year": 2019,
  "partial_year": 2026,
  "city": {
@@ -324,7 +324,7 @@
    "median_price": 86900,
    "permits": 4254,
    "permit_cost": 2102224712,
-   "blight": 38943,
+   "blight": 38945,
    "demolitions": 317,
    "issues": 12742,
    "issue_days": 8
@@ -8769,7 +8769,7 @@
     "permit_cost": 38641228
    },
    "2026": {
-    "blight": 114,
+    "blight": 115,
     "issues": 54,
     "issue_days": 18,
     "sales": "lt5",
@@ -14698,7 +14698,7 @@
     "permit_cost": 391695
    },
    "2026": {
-    "blight": 108,
+    "blight": 109,
     "demolitions": "lt5",
     "issues": 64,
     "issue_days": 15,

@@ -1,12 +1,12 @@
 sal_id,record_ref,name,address_1,zip,lat,lon,phone,website,hours_text,extra,source_id,source_last_edited,fetched_at
-sal_rec_10500_lyndon,,Adams Butzel Rec Center,10500 Lyndon,48238,42.395153,-83.165060,(313) 628-0990,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_13200_fenelon,,Lasky Recreation Center,13200 Fenelon,48212,42.414118,-83.052613,(313) 628-2030,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_16630_lahser,,Crowell Recreation Center,16630 Lahser,48219,42.410548,-83.257220,(313) 628-2050,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_19601_crusade,,Heilmann Recreation Center,19601 Crusade,48205,42.439210,-82.960767,(313) 224-9334,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_2260_s_fort,,Kemeny Recreation Center,2260 S. Fort,48217,42.273628,-83.157824,(313) 628-0956,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_2301_woodmere,,Patton Recreation Center,2301 Woodmere,48209,42.309516,-83.137443,(313) 628-2000,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_2631_bagley,,Clemente Recreation Center,2631 Bagley,48216,42.325261,-83.078490,(313) 224-0228,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_2711_e_outer_dr,,Farwell Recreation Center,2711 E. Outer Dr.,48234,42.440652,-83.058027,(313) 628-2028,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_2751_robert_bradby_drive,,Coleman A. Young Recreation Center,2751 Robert Bradby Drive,48207,42.345385,-83.024511,(313) 628-0995,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_7737_kercheval,,Butzel Family Recreation Center,7737 Kercheval,48214,42.357448,-83.002443,(313) 628-2100,,,,rec_centers,2016-11-16,2026-09-18
-sal_rec_8431_rosa_parks_blvd,,Williams Community Center,8431 Rosa Parks Blvd,48206,42.371281,-83.095938,"(313) 628-2039, 224-1100",,,,rec_centers,2016-11-16,2026-09-18
+sal_rec_10500_lyndon,,Adams Butzel Rec Center,10500 Lyndon,48238,42.395153,-83.165060,(313) 628-0990,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_13200_fenelon,,Lasky Recreation Center,13200 Fenelon,48212,42.414118,-83.052613,(313) 628-2030,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_16630_lahser,,Crowell Recreation Center,16630 Lahser,48219,42.410548,-83.257220,(313) 628-2050,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_19601_crusade,,Heilmann Recreation Center,19601 Crusade,48205,42.439210,-82.960767,(313) 224-9334,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_2260_s_fort,,Kemeny Recreation Center,2260 S. Fort,48217,42.273628,-83.157824,(313) 628-0956,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_2301_woodmere,,Patton Recreation Center,2301 Woodmere,48209,42.309516,-83.137443,(313) 628-2000,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_2631_bagley,,Clemente Recreation Center,2631 Bagley,48216,42.325261,-83.078490,(313) 224-0228,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_2711_e_outer_dr,,Farwell Recreation Center,2711 E. Outer Dr.,48234,42.440652,-83.058027,(313) 628-2028,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_2751_robert_bradby_drive,,Coleman A. Young Recreation Center,2751 Robert Bradby Drive,48207,42.345385,-83.024511,(313) 628-0995,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_7737_kercheval,,Butzel Family Recreation Center,7737 Kercheval,48214,42.357448,-83.002443,(313) 628-2100,,,,rec_centers,2016-11-16,2026-09-19
+sal_rec_8431_rosa_parks_blvd,,Williams Community Center,8431 Rosa Parks Blvd,48206,42.371281,-83.095938,"(313) 628-2039, 224-1100",,,,rec_centers,2016-11-16,2026-09-19
