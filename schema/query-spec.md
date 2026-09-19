@@ -49,10 +49,11 @@ Dates are calendar days on a Detroit calendar: a timestamp of `2026-09-20T01:30Z
 ## Ranking
 
 1. **Eligibility**: active rows, category match (exact or prefix), every requested flag present.
-2. **Distance band**: 0–1 mi, 1–3 mi, 3+ mi. With no location, or for a row with no coordinates (hotlines, DV), band 0.
-3. **Reported-closed rows go last in their band** (still visible).
-4. **Open key.** Mode `now`: open → closes soon → opens later today → call first → opens another day → no upcoming time → unknown. Mode `week`: open now or any time in the next 7 days → call first → nothing this week → unknown.
-5. **Distance**, then **id** for a stable order.
+2. **Preferred flags** (only when the query asks, e.g. "I'm under 25" prefers `youth`): rows carrying every preferred flag come first. Nothing is left out.
+3. **Distance band**: 0–1 mi, 1–3 mi, 3+ mi. With no location, or for a row with no coordinates (hotlines, DV), band 0.
+4. **Reported-closed rows go last in their band** (still visible).
+5. **Open key.** Mode `now`: open → closes soon → opens later today → call first → opens another day → no upcoming time → unknown. Mode `week`: open now or any time in the next 7 days → call first → nothing this week → unknown.
+6. **Distance**, then **id** for a stable order.
 
 Distance comes before openness because many users have no car. There is no freshness key: time since a check never reorders a list; only reports do.
 

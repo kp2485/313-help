@@ -210,6 +210,124 @@
           "closes_at": "14:30"
         }
       ]
+    },
+    {
+      "id": "s_near_open_shelter",
+      "category": "shelter.emergency",
+      "lat": 42.371,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "facts": {
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "s_far_youth_shelter",
+      "category": "shelter.emergency",
+      "flags": [
+        "youth"
+      ],
+      "lat": 42.45,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "facts": {
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "s_near_youth_closed",
+      "category": "shelter.emergency",
+      "flags": [
+        "youth"
+      ],
+      "lat": 42.372,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "MO",
+          "dtstart": "2026-09-07",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ],
+      "facts": {
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "s_youth_reported",
+      "category": "shelter.emergency",
+      "flags": [
+        "youth"
+      ],
+      "lat": 42.373,
+      "lon": -83.08,
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "13:30",
+          "closes_at": "14:30"
+        }
+      ],
+      "facts": {
+        "reports": {
+          "closed_open": 2,
+          "wrong_open": 0,
+          "closed_last_at": "2026-09-17"
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-10",
+        "entry_method": "web"
+      }
     }
   ],
   "cases": [
@@ -296,6 +414,45 @@
       },
       "expect": [
         "h_clinic"
+      ]
+    },
+    {
+      "name": "prefer: rows with the preferred flag come first, nearest band first among them; nothing is filtered out",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": {
+        "category": "shelter.emergency",
+        "prefer": [
+          "youth"
+        ],
+        "near": {
+          "lat": 42.37,
+          "lon": -83.08
+        }
+      },
+      "expect": [
+        "s_near_youth_closed",
+        "s_youth_reported",
+        "s_far_youth_shelter",
+        "s_near_open_shelter"
+      ]
+    },
+    {
+      "name": "without prefer, the same rows rank by the usual rule",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": {
+        "category": "shelter.emergency",
+        "near": {
+          "lat": 42.37,
+          "lon": -83.08
+        }
+      },
+      "expect": [
+        "s_near_open_shelter",
+        "s_near_youth_closed",
+        "s_youth_reported",
+        "s_far_youth_shelter"
       ]
     }
   ]

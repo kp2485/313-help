@@ -1,16 +1,18 @@
 // One ranking rule (schema/query-spec.md "Ranking"), port of packages/query/src/rank.ts:
-//   eligibility -> distance band -> reported-closed last -> open-now / next-open -> distance -> id (no freshness key)
+//   eligibility -> preferred flags (if asked) -> distance band -> reported-closed last -> open-now / next-open -> distance -> id (no freshness key)
 // Distance comes before everything except eligibility because many users have no car.
 import Foundation
 
 public struct Query: Sendable {
     public var category: String?
     public var flags: [String] = []
+    /// Rows with every one of these flags come first; nothing is left out ("I'm under 25": youth shelters first).
+    public var prefer: [String] = []
     /// Device location or a typed ZIP's center. Held in memory only, never written or sent.
     public var near: LatLon?
     public var mode: String = "now"          // "now" | "week"
-    public init(category: String? = nil, flags: [String] = [], near: LatLon? = nil, mode: String = "now") {
-        self.category = category; self.flags = flags; self.near = near; self.mode = mode
+    public init(category: String? = nil, flags: [String] = [], prefer: [String] = [], near: LatLon? = nil, mode: String = "now") {
+        self.category = category; self.flags = flags; self.prefer = prefer; self.near = near; self.mode = mode
     }
 }
 
@@ -70,8 +72,10 @@ public func rank(_ rows: [BundleRow], _ q: Query, now: Date, alerts: [Alert] = [
         }
     // Rows with 2+ standing closed reports stay visible but go last in their band (docs/04).
     let reported = { (r: Ranked) in r.badge.level == "reported_closed" ? 1 : 0 }
+    let preferred = { (r: Ranked) in !q.prefer.isEmpty && q.prefer.allSatisfy(r.row.flags.contains) ? 0 : 1 }
     return scored.sorted { a, b in
         let (x, kx) = a, (y, ky) = b
+        if preferred(x) != preferred(y) { return preferred(x) < preferred(y) }
         if x.band != y.band { return x.band < y.band }
         if reported(x) != reported(y) { return reported(x) < reported(y) }
         if kx != ky { return kx < ky }

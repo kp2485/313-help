@@ -4,7 +4,7 @@ import { nextOccurrences, openNow } from './schedule.js';
 import { nowWallMinutes } from './time.js';
 
 // One ranking rule (DECISIONS 10-B2):
-//   eligibility -> distance band -> reported-closed last -> open-now / next-open -> distance -> id
+//   eligibility -> preferred flags (if asked) -> distance band -> reported-closed last -> open-now / next-open -> distance -> id
 // No freshness tier: time passing never reorders a list; only reports do (DECISIONS 2026-09-19).
 // Distance comes before everything except eligibility because many users have no car.
 
@@ -13,6 +13,8 @@ export interface Query {
   category?: string;
   /** Every flag listed must be on the row. */
   flags?: string[];
+  /** Rows with every one of these flags come first; nothing is left out ("I'm under 25": youth shelters first). */
+  prefer?: string[];
   /** Device location; held in memory only, never written or sent. */
   near?: { lat: number; lon: number };
   /** "now": who is open right now. "week": who has a time in the next 7 days. */
@@ -79,8 +81,11 @@ export function rank(rows: BundleRow[], q: Query, now: Date, alerts: Alert[] = [
   // Rows with 2+ standing closed reports stay visible but go last in their band (docs/04).
   const reported = (r: { badge: Badge }) => (r.badge.level === 'reported_closed' ? 1 : 0);
 
+  const preferred = (r: { row: BundleRow }) => (q.prefer?.length && q.prefer.every((f) => r.row.flags.includes(f)) ? 0 : 1);
+
   out.sort((a, b) =>
-    a.band - b.band
+    preferred(a) - preferred(b)
+    || a.band - b.band
     || reported(a) - reported(b)
     || a.key - b.key
     || (a.miles ?? 0) - (b.miles ?? 0)

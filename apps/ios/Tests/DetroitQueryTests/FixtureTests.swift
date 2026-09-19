@@ -55,7 +55,7 @@ final class FixtureTests: XCTestCase {
     }
 
     func query(_ raw: [String: Any]?) -> Query {
-        var q = Query(category: raw?["category"] as? String, flags: raw?["flags"] as? [String] ?? [], mode: raw?["mode"] as? String ?? "now")
+        var q = Query(category: raw?["category"] as? String, flags: raw?["flags"] as? [String] ?? [], prefer: raw?["prefer"] as? [String] ?? [], mode: raw?["mode"] as? String ?? "now")
         if let n = raw?["near"] as? [String: Double], let lat = n["lat"], let lon = n["lon"] { q.near = LatLon(lat: lat, lon: lon) }
         return q
     }

@@ -48,6 +48,12 @@ describe('needs list', () => {
     for (const tab of TABS) expect(strings[`tab.${tab.id}`], tab.id).toBeTypeOf('string');
     for (const id of ['food', 'shelter', 'doctor', 'narcan']) expect(strings[`quick.${id}`], id).toBeTypeOf('string');
   });
+  it('"I\'m under 25" lists emergency shelters, youth shelters first (not after-school programs)', () => {
+    const young = NEEDS.find((n) => n.id === 'shelter')!.refine!.find((r) => r.id === 'young')!;
+    expect(young.query).toEqual({ category: 'shelter.emergency', prefer: ['youth'] });
+    const seed = readFileSync(join(root, 'data/seed/resources.csv'), 'utf8');
+    expect(seed).toMatch(/^sal_covenant_house_detroit,(?:[^,]*,){5}shelter\.emergency,/m);
+  });
   it('the overdose-now screen has 911 and steps, and no list of places', () => {
     const od = NEEDS.find((n) => n.id === 'overdose_now')!;
     expect(od).toMatchObject({ stepsOnly: true, first: ['emg_911'] });

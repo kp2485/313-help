@@ -39,7 +39,7 @@ struct Need: Identifiable {
 let needs: [Need] = [
     Need(id: "overdose_now", symbol: "waveform.path.ecg", now: true, first: ["emg_911"], stepsOnly: true, sensitive: true),
     Need(id: "shelter", symbol: "bed.double", now: true, first: ["emg_shelter_helpline"], refine: [
-        .init(id: "me", query: Query(category: "shelter.emergency")), .init(id: "kids", query: Query(category: "shelter.emergency")), .init(id: "young", query: Query(category: "youth"))]),
+        .init(id: "me", query: Query(category: "shelter.emergency")), .init(id: "kids", query: Query(category: "shelter.emergency")), .init(id: "young", query: Query(category: "shelter.emergency", prefer: ["youth"]))]),   // youth shelters first
     Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], query: Query(category: "shelter.dv"), sensitive: true, intro: "safe.dv_intro"),
     Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], query: Query(category: "health.mental"), sensitive: true, intro: "talk.intro"),
     Need(id: "food", symbol: "fork.knife", now: false, refine: [.init(id: "today", query: Query(category: "food.meal")), .init(id: "week", query: Query(category: "food", mode: "week"))]),

@@ -27,7 +27,8 @@ export const NEEDS: Need[] = [
   { id: 'shelter', icon: 'bed', group: 'now', first: ['emg_shelter_helpline'], refine: [
     { id: 'me', query: { category: 'shelter.emergency' } },
     { id: 'kids', query: { category: 'shelter.emergency' } },
-    { id: 'young', query: { category: 'youth' } },
+    // Every emergency shelter, with the ones for young people first (DECISIONS 2026-09-19). Not after-school programs.
+    { id: 'young', query: { category: 'shelter.emergency', prefer: ['youth'] } },
   ] },
   // DV: hotline and 911 before anything else; rows have no address and never show a distance.
   { id: 'unsafe', icon: 'shield', group: 'now', first: ['emg_ndvh', 'emg_911'], query: { category: 'shelter.dv' }, sensitive: true, quickExit: true, intro: 'safe.dv_intro' },
