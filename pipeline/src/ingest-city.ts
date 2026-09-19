@@ -37,14 +37,35 @@ export function toZipCenters(features: { attributes: { zipcode?: unknown }; cent
   return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
 }
 
+// Hamtramck, Highland Park and Dearborn are in scope (Kyle, 2026-09-19). The City's layer covers Detroit's ZIPs; the
+// neighbors' ZIPs it lacks come from the Census Bureau's ZIP Code Tabulation Areas (public domain), internal points.
+export const NEIGHBOR_ZIPS = ['48203', '48212', '48120', '48124', '48126', '48128'];
+const CENSUS_ZCTA = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/PUMA_TAD_TAZ_UGA_ZCTA/MapServer/1';
+
+/** The City's centers, plus Census centers only for wanted ZIPs the City's layer doesn't have. */
+export function addNeighborZips(city: Record<string, [number, number]>, census: { attributes: { ZCTA5?: unknown; INTPTLAT?: unknown; INTPTLON?: unknown } }[], wanted = NEIGHBOR_ZIPS): Record<string, [number, number]> {
+  const out = { ...city };
+  for (const f of census) {
+    const zip = String(f.attributes.ZCTA5 ?? ''), lat = Number(f.attributes.INTPTLAT), lon = Number(f.attributes.INTPTLON);
+    if (!wanted.includes(zip) || zip in out || !inBbox(lat, lon, 0.05)) continue;
+    out[zip] = [Number(lat.toFixed(3)), Number(lon.toFixed(3))];
+  }
+  return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
+}
+
 async function zips(): Promise<void> {
   const meta = (await (await fetch(`${ZIPS}?f=json`, { headers: UA })).json()) as any;
   const lastEdited = today(new Date(meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate));
   const q = `${ZIPS}/query?where=1%3D1&outFields=zipcode&returnGeometry=false&returnCentroid=true&outSR=4326&f=json`;
-  const centers = toZipCenters(((await (await fetch(q, { headers: UA })).json()) as any).features ?? []);
-  if (Object.keys(centers).length < 20) throw new Error(`zips: only ${Object.keys(centers).length} parsed. Not overwriting the last good file.`);
-  writeJson(p('data/ingested/city_zips.json'), { source: { name: 'City of Detroit ZIP code areas layer', url: ZIPS, last_edited: lastEdited }, zips: centers });
-  console.log(`zips: ${Object.keys(centers).length} center points; layer last edited ${lastEdited}`);
+  const city = toZipCenters(((await (await fetch(q, { headers: UA })).json()) as any).features ?? []);
+  if (Object.keys(city).length < 20) throw new Error(`zips: only ${Object.keys(city).length} parsed. Not overwriting the last good file.`);
+  const where = encodeURIComponent(`ZCTA5 IN (${NEIGHBOR_ZIPS.map((z) => `'${z}'`).join(',')})`);
+  const census = (await (await fetch(`${CENSUS_ZCTA}/query?where=${where}&outFields=ZCTA5,INTPTLAT,INTPTLON&returnGeometry=false&f=json`, { headers: UA })).json()) as any;
+  if (census.error) throw new Error(`zips: Census layer answered ${census.error.message ?? 'an error'}. Not overwriting the last good file.`);
+  const centers = addNeighborZips(city, census.features ?? []);
+  const added = Object.keys(centers).filter((z) => !(z in city));
+  writeJson(p('data/ingested/city_zips.json'), { source: { name: 'City of Detroit ZIP code areas layer', url: ZIPS, last_edited: lastEdited, neighbors: { name: 'US Census Bureau ZIP Code Tabulation Areas (TIGERweb)', url: CENSUS_ZCTA, zips: added } }, zips: centers });
+  console.log(`zips: ${Object.keys(centers).length} center points (${added.length} from the Census layer: ${added.join(' ')}); City layer last edited ${lastEdited}`);
 }
 
 if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/ingest-city.ts')) {

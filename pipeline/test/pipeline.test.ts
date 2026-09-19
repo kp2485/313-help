@@ -10,7 +10,7 @@ import { p, parsePhone, sha256, today, uuid5 } from '../src/util.js';
 import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
-import { toZipCenters } from '../src/ingest-city.js';
+import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea } from '../src/indicators.js';
 import { ISSUE_TYPES, nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
@@ -33,7 +33,10 @@ describe('row validation', () => {
     expect(errs({ category: 'shelter.dv', address: { line1: '1 Main St', city: 'Detroit' } })).toMatch(/must not have an address/));
   it('rejects a DV row that carries coordinates', () =>
     expect(errs({ category: 'shelter.dv', lat: 42.35, lon: -83.05 })).toMatch(/must not have an address or coordinates/));
-  it('rejects coordinates outside the Detroit bbox', () => expect(errs({ lat: 42.6, lon: -83.05 })).toMatch(/outside the Detroit bbox/));
+  it('rejects coordinates outside the service area', () => expect(errs({ lat: 42.6, lon: -83.05 })).toMatch(/outside the service area/));
+  it('accepts places in Dearborn, Hamtramck and Highland Park (Kyle, 2026-09-19)', () => {
+    for (const [lat, lon] of [[42.322, -83.176], [42.33, -83.312], [42.395, -83.049], [42.405, -83.097]]) expect(errs({ lat, lon }), `${lat},${lon}`).toBe('');
+  });
   it('rejects a malformed phone number', () => expect(errs({ phones: [{ number: '555-0100' }] })).toMatch(/not a valid number/));
   it('rejects "scheduled" with no schedule rows (it would render as unknown forever)', () =>
     expect(errs({ availability: 'scheduled' })).toMatch(/no schedule rows/));
@@ -119,7 +122,7 @@ describe('open-data ingester', () => {
       feat({ Site: 'A', Address: '1 Main' }), feat({ Site: 'B', Address: '1 Main' }), feat({ Site: 'Far', Address: '9 Elsewhere' }, -84, 43),
     ], '2026-09-18');
     expect(rows.map((r) => r.sal_id).sort()).toEqual(['sal_rec_1_main', 'sal_rec_1_main_b']);
-    expect(warnings.join()).toMatch(/outside the Detroit bbox/);
+    expect(warnings.join()).toMatch(/outside the service area/);
   });
   it('ids at a shared address don\'t depend on the order the layer returns features', () => {
     const a = feat({ Site: 'A', Address: '1 Main' }), b = feat({ Site: 'B', Address: '1 Main' });
@@ -299,10 +302,19 @@ describe('ZIP center points', () => {
       { attributes: { zipcode: '48202' } },
     ])).toEqual({ '48201': [42.347, -83.06], '48236': [42.425, -82.9] });
   });
+  it('Hamtramck, Highland Park and Dearborn ZIPs come from the Census layer only when the City\'s layer lacks them', () => {
+    const census = [
+      { attributes: { ZCTA5: '48124', INTPTLAT: '+42.2980362', INTPTLON: '-083.2476095' } },
+      { attributes: { ZCTA5: '48126', INTPTLAT: '+42.3303262', INTPTLON: '-083.1871333' } },   // the City has it: City wins
+      { attributes: { ZCTA5: '48301', INTPTLAT: '+42.54', INTPTLON: '-083.28' } },             // Bloomfield Hills: not wanted
+    ];
+    expect(addNeighborZips({ '48126': [42.33, -83.18] }, census)).toEqual({ '48124': [42.298, -83.248], '48126': [42.33, -83.18] });
+  });
   it('the committed file covers the city, corner to corner', () => {
     const { zips } = JSON.parse(readFileSync(p('data/ingested/city_zips.json'), 'utf8')) as { zips: Record<string, [number, number]> };
     expect(Object.keys(zips).length).toBeGreaterThanOrEqual(25);
     for (const z of ['48201', '48209', '48219', '48224', '48238']) expect(zips[z], z).toBeDefined();
+    for (const z of ['48203', '48212', '48120', '48124', '48126', '48128']) expect(zips[z], `${z} (Highland Park, Hamtramck, Dearborn)`).toBeDefined();
   });
 });
 

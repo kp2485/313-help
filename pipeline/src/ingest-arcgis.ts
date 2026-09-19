@@ -77,7 +77,7 @@ export function toRows(src: Source, lastEdited: string | null, features: any[], 
     const [lon, lat] = feat.geometry?.coordinates ?? [];
     const name = get(props, f.name), address = get(props, f.address);
     if (!name || !address) { warnings.push(`${src.id}: skipped a feature with no name or address`); continue; }
-    if (typeof lat !== 'number' || !inBbox(lat, lon)) { warnings.push(`${src.id}: "${name}" is outside the Detroit bbox; skipped`); continue; }
+    if (typeof lat !== 'number' || !inBbox(lat, lon)) { warnings.push(`${src.id}: "${name}" is outside the service area; skipped`); continue; }
 
     // Stable id from the address. If two features share an address, the second gets the name too.
     let id = `sal_${src.id_prefix ?? src.id}_${slug(address)}`;

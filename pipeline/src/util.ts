@@ -9,7 +9,8 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const p = (...parts: string[]) => join(ROOT, ...parts);
 
 // Detroit bbox sanity (CLAUDE.md).
-export const BBOX = { latMin: 42.25, latMax: 42.46, lonMin: -83.29, lonMax: -82.91 };
+// Detroit, Hamtramck, Highland Park and Dearborn (Kyle, 2026-09-19). Dearborn reaches west to about -83.32.
+export const BBOX = { latMin: 42.25, latMax: 42.46, lonMin: -83.33, lonMax: -82.91 };
 export const inBbox = (lat: number, lon: number, slack = 0) =>
   lat >= BBOX.latMin - slack && lat <= BBOX.latMax + slack && lon >= BBOX.lonMin - slack && lon <= BBOX.lonMax + slack;
 

@@ -30,7 +30,7 @@ Steps 1–4 were done on 2026-09-18. Step 5: `apps/ios` has `DetroitQuery`, the 
 - IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal, `nbh_` neighborhood, `ph_` photo key, `emg_` emergency number). HSDS ids are UUIDv5 of the slug; the slug rides in `x_detroit.id`. Never reuse.
 - Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements against the same fixtures.
 - Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline, used in floating wall-clock mode only — see DECISIONS.md; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
-- Detroit time zone `America/Detroit` everywhere. Bbox sanity: lat 42.25–42.46, lon −83.29 to −82.91.
+- Detroit time zone `America/Detroit` everywhere. Service area: Detroit, Hamtramck, Highland Park and Dearborn (Kyle, 2026-09-19). Bbox sanity: lat 42.25–42.46, lon −83.33 to −82.91.
 - Plain-language UI strings live in `strings/en.json`, with `strings/es.json` carrying the same keys (tests check keys and placeholders); reading level ≤ 6th grade; no jargon ("Free groceries," not "Food pantry services"). What a place wrote about itself is never machine-translated.
 - Accessibility: every action has a descriptive label; dynamic type must not truncate phone numbers.
 - Commit `data/hsds/` on publish; never commit `data/bundle/`.

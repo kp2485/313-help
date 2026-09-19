@@ -2,12 +2,33 @@
  "source": {
   "name": "City of Detroit ZIP code areas layer",
   "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/City_of_Detroit_Zip_Code_Tabulation_Areas/FeatureServer/0",
-  "last_edited": "2026-06-25"
+  "last_edited": "2026-06-25",
+  "neighbors": {
+   "name": "US Census Bureau ZIP Code Tabulation Areas (TIGERweb)",
+   "url": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/PUMA_TAD_TAZ_UGA_ZCTA/MapServer/1",
+   "zips": [
+    "48120",
+    "48124",
+    "48128"
+   ]
+  }
  },
  "zips": {
+  "48120": [
+   42.303,
+   -83.164
+  ],
+  "48124": [
+   42.298,
+   -83.248
+  ],
   "48126": [
    42.328,
    -83.156
+  ],
+  "48128": [
+   42.32,
+   -83.26
   ],
   "48201": [
    42.347,

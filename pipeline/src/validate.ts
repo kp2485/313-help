@@ -33,7 +33,7 @@ export function validateRows(rows: BundleRow[], todayStr: string): Issues {
     if (r.category === 'shelter.dv' && (r.address || r.lat !== undefined || r.lon !== undefined)) e('domestic violence rows must not have an address or coordinates');
 
     if ((r.lat === undefined) !== (r.lon === undefined)) e('lat and lon must come together');
-    if (r.lat !== undefined && !inBbox(r.lat, r.lon!)) e(`coordinates ${r.lat},${r.lon} are outside the Detroit bbox`);
+    if (r.lat !== undefined && !inBbox(r.lat, r.lon!)) e(`coordinates ${r.lat},${r.lon} are outside the service area (Detroit, Hamtramck, Highland Park, Dearborn)`);
     if (r.address && r.lat === undefined && r.status === 'active') w('has an address but no coordinates; it will not sort by distance');
 
     if (r.phones.length === 0 && !r.address) e('needs a phone number or an address');

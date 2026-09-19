@@ -8,6 +8,8 @@ The Health Department tried to solve this with D Compassion (built Dec 2024; rel
 
 ## Who it's for
 
+**Service area:** Detroit, plus Hamtramck and Highland Park (inside Detroit's borders) and Dearborn (Kyle, 2026-09-19). Places in those four cities are listed; other suburbs are not.
+
 Primary: **any Detroit resident who needs help right now** — food this week, a bed tonight, Narcan, utility shutoff help, a cooling center, a clinic. Assume: an older or budget Android phone, prepaid data that may be off, low tolerance for forms, possibly in crisis, possibly reading at a 6th-grade level, possibly Spanish-, Arabic-, or Bengali-speaking.
 
 Secondary:

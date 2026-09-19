@@ -19,7 +19,7 @@ for (const r of rows) {
   const street = r.address_1.replace(/,?\s*(suite|ste|unit|#)\s*[\w-]+$/i, '');
   const hit = await geocode(`${street}, ${r.city || 'Detroit'}, MI ${r.zip ?? ''}`);
   if (!hit) { console.warn(`no match: ${r.sal_id} (${r.address_1})`); continue; }
-  if (!inBbox(hit.lat, hit.lon)) { console.warn(`outside Detroit bbox, ignored: ${r.sal_id}`); continue; }
+  if (!inBbox(hit.lat, hit.lon)) { console.warn(`outside the service area, ignored: ${r.sal_id}`); continue; }
   r.lat = hit.lat.toFixed(6); r.lon = hit.lon.toFixed(6);
   if (!r.zip && hit.zip) r.zip = hit.zip;
   console.log(`${r.sal_id}: ${r.lat}, ${r.lon}`);
