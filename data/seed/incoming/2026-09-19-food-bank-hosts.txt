@@ -1,0 +1,66 @@
+# Gleaners partner pantries in Detroit and Hamtramck, chosen first for neighborhoods with no food listed nearby.
+# Rule change from Kyle, 2026-09-19 (via the coordinator; DECISIONS row to follow): Forgotten Harvest and Gleaners own
+# the facts about their own distributions and partner-pantry lists, so their own pages count as source pages.
+# Source for every row below: Gleaners' PantryNet location data, https://pantrynet.org/wp-json/pantrynet/v1/locations,
+# the public JSON that draws the map at pantrynet.org. It answers plain requests that say who we are (robots.txt allows
+# everything); nothing was got around. Each row's name, phone, address, days, hours and rules are that entry's own
+# words. No fact comes from a search snippet or a directory. Read 2026-09-19.
+# Notes:
+# - The matcher checks the phone and street address anywhere in that one file (222 entries). Each was also read in its
+#   own entry by hand; the file has no page per pantry.
+# - Rows whose days are numbered ("1st and 3rd Saturdays", "last Wednesday") get a MONTHLY schedule by hand after
+#   import:lines, only where Gleaners gives the day and both times: Gospel Tabernacle 1SA,3SA; Word In Action 3FR;
+#   Caring Community 1SA; Shrine of the Black Madonna 3SA; New Hope Tabernacle -1WE; Lomax Temple 1TH,3TH;
+#   Community Services CDC 3TH (plus weekly Sat); Dexter Avenue 2TH; Nazarene 1MO,2MO,3MO; Word Of Truth 1SA;
+#   Greater Northwest 2TH; King David 4WE; The Open Door 1MO; Linwood Church of Christ 2SA; Metropolitan Baptist 3SA;
+#   PHG 3SA; In the Trenches 2FR-5FR and 2SA-5SA ("closed 1st Friday / 1st Saturday"); First Baptist World Changers 1SA.
+# - Call first, hours as written: "every other Thursday/Friday" (which weeks is not stated), a start time with no end
+#   (St. John Community Center, True Love, DABO, Our Lady Queen of Apostles), by appointment (Salvation Army Temple and
+#   Grandale, Tri-Unity, Greater Quinn, St. Cunegunda), and My Father's Business (days change by season).
+# - Caring Community Center and Nazarene Community Outreach have no phone in Gleaners' data; they match on address.
+# - Left out: St. Christine and Twelfth Street (already listed), St. Timothy UMC (no phone, no hours), Cass Community
+#   Care Services at 18500 Woodrow Wilson ("7am-5pm" every day looks like building hours, not meal times), the two
+#   shelters (Michigan Veterans Foundation, COTS), and every "Drive-Up Only" mobile stop (Perfecting Community Church,
+#   Lasky Recreation Center, Urban Neighborhood Initiative, New Paradigm School, MISide, Our Lady Queen of Angels,
+#   Ford Center in Dearborn): Gleaners lists them only as dated events two weeks ahead, with no phone and no pattern.
+# name | org | category | what | address | city | zip | phone | website | schedule | eligibility | source_url
+Drive-up food pantry | Gospel Tabernacle | food.pantry | Free groceries. Stay in your car. It ends when the food runs out. | 12935 Buena Vista | Detroit | 48227 | 248-518-0876 | | 1st and 3rd Saturdays 12pm-2pm | Bring your green and white Gleaners or Forgotten Harvest card. No card? You can fill out a form there. | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | New Liberty Community Services | food.pantry | Free groceries. | 8425 Fenkell | Detroit | 48238 | 313-342-2424 | | Wed 4pm-6pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Word In Action Christian Center | food.pantry | Free groceries. | 19760 Meyers Rd | Detroit | 48235 | 313-864-5300 | | 3rd Friday 12pm-3pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Love Joy Church Of God In Christ | food.pantry | Free groceries. | 17801 Greeley | Detroit | 48203 | 734-352-0577 | | Sat 12:30pm-1:30pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Caring Community Center | food.pantry | Free groceries. | 14531 Grand River Ave | Detroit | 48227 | | | 1st Saturday 10am-1pm | For people who live in ZIP code 48227. Bring ID. | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Muslim Family Services ICNA Relief | food.pantry | Free groceries. | 12500 Mitchell | Detroit | 48212 | 313-366-6800 | | Tue, Thu 10am-3pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Calvary Presbyterian Church | food.pantry | Free groceries. | 19125 Greenview | Detroit | 48219 | 313-537-2590 | | Sat 10am-12:30pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Tri-Unity Enterprise at Third New Hope | food.pantry | Free groceries. You need an appointment. | 12850 Plymouth Rd | Detroit | 48227 | 313-491-7890 ext. 13 | | 4th Friday 9am-noon, by appointment | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Puritan Street Church of Christ | food.pantry | Free groceries. | 19451 Conant | Detroit | 48234 | 313-893-1002 | | Every other Thursday 8:30am-noon. Call to ask which weeks. | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Shrine of the Black Madonna | food.pantry | Free groceries. | 7625 Linwood | Detroit | 48206 | 313-244-6660 | http://www.shrineoftheblackmadonna.org | 3rd Saturday 11am-1pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | New Hope Tabernacle Church | food.pantry | Free groceries. | 20221 Lahser Rd | Detroit | 48219 | 313-535-7999 | | Last Wednesday 9am-11:30am | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Lomax Temple A.M.E. Zion Church | food.pantry | Free groceries. Check-in starts at 10am. First come, first served. | 17461 Dequindre St | Detroit | 48212 | 313-893-1463 | | 1st and 3rd Thursdays 11am-noon | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Temple Corps food pantry | Salvation Army | food.pantry | Free groceries. You need an appointment. | 3729 W. Chicago | Detroit | 48206 | 313-897-2914 | | Thu 10am-11:30am, by appointment | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | My Father's Business | food.pantry | Free groceries. You pick what you need. No appointment needed. | 21001 Moross Rd | Detroit | 48236 | 313-936-1537 | | Check-in 9am-11am. 2nd and 4th Saturdays, January to October. 2nd and 3rd Saturdays, November and December. Call first. | Bring photo ID, and your Link2Feed card if you have one. You can sign up on your first visit. | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry and meals | Pure Word Missionary Baptist Church | food.pantry | Free groceries and free meals. | 20011 Grand River Ave | Detroit | 48219 | 313-936-7039 | | Wed 10am-1pm; Fri 10am-noon | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Conant Gardens | food.pantry | Free groceries. | 18801 Joseph Campau St | Detroit | 48234 | 313-369-1227 | | Tue 10am-11:45am | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Mt. Vernon Baptist Church | food.pantry | Free groceries. | 15125 Burt Rd | Detroit | 48223 | 313-538-1355 | | Thu 2pm-5pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry and meals | Community Services CDC | food.pantry | Free groceries and free meals. | 11529 Linwood St | Detroit | 48206 | 313-865-6770 | | 3rd Thursday 10am-2pm and every Saturday 10am-2pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Dexter Avenue Baptist Church | food.pantry | Free groceries. | 3350 West Davison | Detroit | 48238 | 313-869-4878 | | 2nd Thursday 12pm-3pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Drive-thru produce | Nazarene Community Outreach | food.pantry | Free fresh fruits and vegetables. Drive through to pick them up. | 901 Melbourne St | Detroit | 48211 | | | 1st, 2nd and 3rd Monday 11am-12:30pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Word Of Truth | food.pantry | Free groceries. | 4900 Lovett St | Detroit | 48210 | 313-897-5213 | | 1st Saturday 10am-1pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Lunch and food giveaway | Our Lady Queen of Apostles Church | food.meal | A free lunch to take with you, and some groceries. Walk up or drive through. It ends when the food runs out. | 3851 Prescott St | Hamtramck | 48212 | 313-891-1520 | | Thursdays at 10am, for up to 60 people. 4th Friday at 10am, for up to 110 people. First come, first served. | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | St. John Community Center | food.pantry | Free groceries for people on the Lower East Side. | 14320 Kercheval | Detroit | 48215 | 313-823-8323 | | Fridays at 1pm. No closing time given. | For people on the Lower East Side. | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Grandale Corps food pantry | Salvation Army | food.pantry | Free groceries and meals. You need an appointment. | 11325 Montrose | Detroit | 48227 | 313-835-3736 | | Mon-Fri 12:30pm-4:30pm, by appointment | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Greater Northwest C.O.G.I.C. | food.pantry | Free groceries. | 15811 Rosa Parks Blvd | Detroit | 48238 | 313-757-7722 | | 2nd Thursday 1:30pm-2:30pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | True Love Evangelistic Ministries | food.pantry | Free groceries. | 20501 Plymouth Rd | Detroit | 48228 | 313-342-2182 | | 3rd Saturday at 9:30am. No closing time given. | Bring ID. | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Kadesh Missionary Baptist Church | food.pantry | Free groceries. | 20361 Plymouth Rd | Detroit | 48228 | 313-272-7887 | | Wed noon-1pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | King David CDC | food.pantry | Free groceries. | 18001 Sunset | Detroit | 48234 | 313-891-4160 | | 4th Wednesday noon-2pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Conner Creek food pantry | Salvation Army | food.pantry | Free groceries. | 3000 Conner Ave | Detroit | 48215 | 313-822-2800 | | Mon-Fri 9am-4pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | The Open Door | food.pantry | Free groceries. | 12411 E. Seven Mile Road | Detroit | 48205 | 313-526-3460 | | 1st Monday 10am-noon | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | New Visions Missionary Baptist Church | food.pantry | Free groceries. | 14548 Joy Road | Detroit | 48228 | 313-870-8788 | | Sat 10am-12:45pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Linwood Church of Christ | food.pantry | Free groceries. | 14001 Linwood | Detroit | 48238 | 313-868-7795 | | 2nd Saturday noon-2pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Metropolitan Baptist Church | food.pantry | Free groceries. | 13110 14th Street | Detroit | 48238 | 313-869-6676 | | 3rd Saturday 10am-noon | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | DABO | food.pantry | Free groceries. | 9928 Grand River | Detroit | 48204 | 313-491-0003 | | 4th Friday at noon. No closing time given. | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Greater Quinn A.M.E. Church | food.pantry | Free groceries. You need an appointment. | 13501 Rosa Parks Blvd | Detroit | 48238 | 313-867-8380 | | Mon-Fri 9am-3pm, by appointment | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | Our Lady Queen of Angels | food.pantry | Free groceries. | 4200 Martin Street | Detroit | 48210 | 313-841-0783 | | Fri 9am-11am | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Drive-thru food | PHG Urban Life Center | food.pantry | Free food. Drive through to pick it up. Emergency food boxes are also given by appointment. | 6495 W. Warren | Detroit | 48210 | 313-897-2381 | | 3rd Saturday 10am-11:30am | They will ask for your address. | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | In the Trenches | food.pantry | Free groceries. | 304 S. Morrell | Detroit | 48209 | 313-554-3533 | | Fri 3:30pm-4:30pm and Sat 10:30am-11:30am, but not the 1st Friday or 1st Saturday of the month | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food Hub | St. Cunegunda | food.pantry | Free groceries. You need an appointment. | 5900 St. Lawrence Street | Detroit | 48210 | 313-963-8880 | | By appointment. No days given. | | https://pantrynet.org/wp-json/pantrynet/v1/locations
+Food pantry | First Baptist World Changers | food.pantry | Free groceries. | 22575 W. 8 Mile Rd | Detroit | 48219 | 313-255-0212 | | 1st Saturday 10am-12:30pm | | https://pantrynet.org/wp-json/pantrynet/v1/locations

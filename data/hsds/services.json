@@ -1552,6 +1552,177 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "e599245e-1bd5-5434-a02d-14c94a296576",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "3d9a65f7-bfdd-50a2-92c9-aa024b8dd3cc",
+   "name": "Calvary Presbyterian Church",
+   "description": "Calvary Presbyterian Church",
+   "x_detroit": {
+    "id": "org_calvary_presbyterian_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4535ba1f-3ef8-5666-ba4a-9f11a6f8af95",
+    "location": {
+     "id": "c62f0570-c93f-5bfe-8559-3657070d5e2b",
+     "name": "Food pantry, Calvary Presbyterian Church",
+     "location_type": "physical",
+     "latitude": 42.430154,
+     "longitude": -83.225527,
+     "addresses": [
+      {
+       "id": "5db51c39-8dde-59f7-a4ad-512aacbc531d",
+       "address_1": "19125 Greenview",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_calvary_presbyterian_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "0f87ace0-8211-5da6-b828-515f87e88bcf",
+      "number": "313-537-2590"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "9d38c2f0-60af-5030-a856-ae67fbccecbc",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "12:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_calvary_presbyterian_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_calvary_presbyterian_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "6bb0398a-fa26-5c00-bf44-706f77cd62c5",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "eligibility_description": "For people who live in ZIP code 48227. Bring ID.",
+  "organization": {
+   "id": "805e0aa0-b044-59ea-a9d2-eddd22b50aa1",
+   "name": "Caring Community Center",
+   "description": "Caring Community Center",
+   "x_detroit": {
+    "id": "org_caring_community_center"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "6dc25ae3-9437-50ff-97a2-65eed4a91657",
+    "location": {
+     "id": "dd34d1e8-7a1f-5c9d-9e06-26a411df3e49",
+     "name": "Food pantry, Caring Community Center",
+     "location_type": "physical",
+     "latitude": 42.388268,
+     "longitude": -83.187632,
+     "addresses": [
+      {
+       "id": "a2b3fbcd-a3dd-5ec7-bf35-6366a25639d8",
+       "address_1": "14531 Grand River Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48227",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_caring_community_food_pantry"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "b8b01cc7-ee76-5c54-b3ad-dc918dcd785b",
+      "freq": "MONTHLY",
+      "byday": "1SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_caring_community_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_caring_community_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "49934731-c96a-5f1e-87df-26ba6f09c16a",
   "name": "Free meals and food pantry",
   "status": "active",
@@ -2130,6 +2301,193 @@
   "x_detroit": {
    "id": "svc_city_of_help_paying_a_dearborn_water_bill",
    "category": "utilities"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "8d8ec45e-5d7c-5f0d-ab2b-85bfc294e109",
+  "name": "Food pantry and meals",
+  "status": "active",
+  "description": "Free groceries and free meals.",
+  "organization": {
+   "id": "33d07930-fb09-5c36-8c84-791dd3bb078c",
+   "name": "Community Services CDC",
+   "description": "Community Services CDC",
+   "x_detroit": {
+    "id": "org_community_services_cdc"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "0532b85b-c663-5dea-91b9-a490a3a345fc",
+    "location": {
+     "id": "63fa8966-02ce-539b-bfc2-2aaf7bd29653",
+     "name": "Food pantry and meals, Community Services CDC",
+     "location_type": "physical",
+     "latitude": 42.38148,
+     "longitude": -83.114184,
+     "addresses": [
+      {
+       "id": "6611e993-77f5-51a6-9041-47054d404347",
+       "address_1": "11529 Linwood St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_community_services_food_pantry_and_meals"
+     }
+    },
+    "phones": [
+     {
+      "id": "dfbac35c-2356-52f6-8a7c-60b6117ab43d",
+      "number": "313-865-6770"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "3ce9568f-0dbe-5d2d-b810-598a702982da",
+      "freq": "MONTHLY",
+      "byday": "3TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "3rd Thursday of the month"
+     },
+     {
+      "id": "359de3d2-d2be-5c71-a956-57c2463ceaff",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_community_services_food_pantry_and_meals",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_community_services_food_pantry_and_meals",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "797b16df-997f-555d-b182-17bb2bb26947",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "165fbb76-990c-53aa-93c5-e0826dcf6e02",
+   "name": "Conant Gardens",
+   "description": "Conant Gardens",
+   "x_detroit": {
+    "id": "org_conant_gardens"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "5490b8cd-22bb-543e-85f9-d7ff2de533b4",
+    "location": {
+     "id": "1c9f620d-d17e-59ad-a025-38d3e326c6a0",
+     "name": "Food pantry, Conant Gardens",
+     "location_type": "physical",
+     "latitude": 42.430549,
+     "longitude": -83.072931,
+     "addresses": [
+      {
+       "id": "dad8b414-6474-5070-a72f-5145dd67be46",
+       "address_1": "18801 Joseph Campau St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48234",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_conant_gardens_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "fdc0008e-168d-52f5-811e-6aacfe923250",
+      "number": "313-369-1227"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "da7d2580-b899-5b0d-b28d-409af956759b",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "11:45",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_conant_gardens_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_conant_gardens_food_pantry",
+   "category": "food.pantry"
   },
   "assured_date": "2026-09-19"
  },
@@ -2976,6 +3334,81 @@
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "12cdbbfc-ce31-503e-a4b6-66bdf4a63262",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "cf45dec7-7b55-5171-951e-4aedb63c55c4",
+   "name": "DABO",
+   "description": "DABO",
+   "x_detroit": {
+    "id": "org_dabo"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d8cc6410-5af4-5444-9696-8188e3b6efe2",
+    "location": {
+     "id": "00815f89-5f36-558e-9f1b-c8738d41f5ff",
+     "name": "Food pantry, DABO",
+     "location_type": "physical",
+     "latitude": 42.369323,
+     "longitude": -83.14027,
+     "addresses": [
+      {
+       "id": "5cd0375b-de34-54ec-82f1-3864603fe35b",
+       "address_1": "9928 Grand River",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48204",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dabo_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "c71560c7-a432-5f69-8f29-37218025ecd0",
+      "number": "313-491-0003"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dabo_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "4th Friday at noon. No closing time given.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dabo_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "3e7174ae-9218-527c-921b-94e50c34fb5f",
@@ -6603,6 +7036,94 @@
   "x_detroit": {
    "id": "svc_detroit_rescue_the_oasis_shelter",
    "category": "shelter.emergency"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "53260c60-cd99-54ed-982f-e7671346376e",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "862c848e-87b2-552b-9315-03f4871d7591",
+   "name": "Dexter Avenue Baptist Church",
+   "description": "Dexter Avenue Baptist Church",
+   "x_detroit": {
+    "id": "org_dexter_avenue_baptist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "feaeb293-496a-5dfb-9a79-44bc7dd72b3b",
+    "location": {
+     "id": "46b1aa51-0e2d-585c-ae03-06daf89e01a7",
+     "name": "Food pantry, Dexter Avenue Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.390668,
+     "longitude": -83.128538,
+     "addresses": [
+      {
+       "id": "959c61fa-d680-5eff-8eed-ceb89cef02da",
+       "address_1": "3350 West Davison",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dexter_avenue_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "41b72f99-c35a-57ff-a6dd-e3874aca69c9",
+      "number": "313-869-4878"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "6dc76b90-5343-5412-b481-c279904b9f06",
+      "freq": "MONTHLY",
+      "byday": "2TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "15:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "2nd Thursday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_dexter_avenue_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dexter_avenue_food_pantry",
+   "category": "food.pantry"
   },
   "assured_date": "2026-09-19"
  },
@@ -10710,6 +11231,94 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "b6874107-2296-543a-b881-e8480413574d",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "6346990b-bbdb-58c7-8727-40947499817f",
+   "name": "First Baptist World Changers",
+   "description": "First Baptist World Changers",
+   "x_detroit": {
+    "id": "org_first_baptist_world_changers"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "426edda1-5635-58cb-83f3-e60e407daed7",
+    "location": {
+     "id": "cc28d1ee-a1be-55b1-bd24-a048e85036f4",
+     "name": "Food pantry, First Baptist World Changers",
+     "location_type": "physical",
+     "latitude": 42.443,
+     "longitude": -83.265917,
+     "addresses": [
+      {
+       "id": "173b1db5-02cc-5732-b4ca-2ab56941d570",
+       "address_1": "22575 W. 8 Mile Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_first_baptist_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "258f9235-aa44-5f36-8416-9c755f7a2727",
+      "number": "313-255-0212"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "32d7fb43-5c15-5456-92ce-4b11f870b1bb",
+      "freq": "MONTHLY",
+      "byday": "1SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "12:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_first_baptist_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_first_baptist_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "f8422b20-b69a-56c3-be9b-12e3c2adad9b",
   "name": "24-hour helpline",
   "status": "active",
@@ -10957,6 +11566,489 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "9ccf3101-48b6-5b9c-ad54-eeb1f048101f",
+  "name": "Mobile food pantry at Alternatives For Girls",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "945b1eac-fd0e-5bdb-81a4-c2fd19f30ba6",
+    "location": {
+     "id": "29110b14-89ee-5447-bc06-21d35f418f83",
+     "name": "Mobile food pantry at Alternatives For Girls, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.332798,
+     "longitude": -83.096254,
+     "addresses": [
+      {
+       "id": "c6a031b7-e975-5f88-aaad-d0779f414bcc",
+       "address_1": "903 West Grand Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48208",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_alternatives_for"
+     }
+    },
+    "phones": [
+     {
+      "id": "5afda51b-0c2a-5760-809e-736d60cfa7c9",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_alternatives_for",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Some Thursdays 9am-11am. Forgotten Harvest lists the dates two weeks at a time. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_alternatives_for",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "5d63bf9c-67f4-5120-b51a-d0e40a792a17",
+  "name": "Mobile food pantry at Equity Alliance of Michigan",
+  "status": "active",
+  "description": "Free fresh food from Forgotten Harvest. It ends when the food runs out.",
+  "eligibility_description": "Everyone is welcome.",
+  "url": "https://www.equityallianceofmichigan.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "8ba09e2e-c9cb-53ed-a34a-c0a468d62e1f",
+    "location": {
+     "id": "534558ab-fe59-5e65-97ea-d29f16e0d7d6",
+     "name": "Mobile food pantry at Equity Alliance of Michigan, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.34568,
+     "longitude": -83.13516,
+     "addresses": [
+      {
+       "id": "d0b277d6-88f1-5013-b9f5-47142dad28ef",
+       "address_1": "6602 Walton",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_equity_alliance_"
+     }
+    },
+    "phones": [
+     {
+      "id": "2598137f-713c-5854-bf52-9b052d9bef75",
+      "number": "248-219-3488"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_equity_alliance_",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "1st and 3rd Wednesdays. The time on Forgotten Harvest's page is unclear. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Equity Alliance of Michigan website",
+      "url": "https://www.equityallianceofmichigan.org/communityfooddrive"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_equity_alliance_",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "443fed22-faa5-5e25-92a1-ba9f13144756",
+  "name": "Mobile food pantry at Historic Little Rock church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck at Historic Little Rock Missionary Baptist Church. It ends when the food runs out.",
+  "url": "https://historiclittlerockbc.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "191eda9c-b0e9-5507-a291-6875aead666b",
+    "location": {
+     "id": "e59e911f-ea7d-51b5-aec7-5b209cc1a430",
+     "name": "Mobile food pantry at Historic Little Rock church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.381867,
+     "longitude": -83.081012,
+     "addresses": [
+      {
+       "id": "4abc1280-bde2-5884-8991-82217681cec8",
+       "address_1": "9000 Woodward Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_historic_little_"
+     }
+    },
+    "phones": [
+     {
+      "id": "9ddc05e5-102d-5df1-bf65-4b1dcbc8ad06",
+      "number": "313-872-2900"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "11735cf2-83db-5c38-a1e5-614732c0fda9",
+      "freq": "MONTHLY",
+      "byday": "2FR,4FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "2nd and 4th Friday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_historic_little_",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Historic Little Rock Missionary Baptist Church website",
+      "url": "https://historiclittlerockbc.org/outreach"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_historic_little_",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "63518e53-4cf1-57f3-858f-944b8c5a71fa",
+  "name": "Mobile food pantry at New Bethel Baptist Church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f33abeb9-87cb-5be1-be79-a19c2abf25d5",
+    "location": {
+     "id": "2d8c89bb-4164-5b35-a215-3a348ba97fc8",
+     "name": "Mobile food pantry at New Bethel Baptist Church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.367538,
+     "longitude": -83.104726,
+     "addresses": [
+      {
+       "id": "7864178f-1f9a-5f55-9786-c992737c84c5",
+       "address_1": "8430 Linwood St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_new_bethel_bapti"
+     }
+    },
+    "phones": [
+     {
+      "id": "395499d8-7880-537a-b83d-b4593c94a582",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_new_bethel_bapti",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Tuesdays. The church says 7:30am to noon; Forgotten Harvest says 9am to noon. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_new_bethel_bapti",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "33b2c16f-fc45-5a85-8986-8b9ab61172dd",
+  "name": "Mobile food pantry at St. John Presbyterian Church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a6882911-f64d-57b3-88f4-d00935dae1a5",
+    "location": {
+     "id": "a3576126-2a47-5ddd-9634-559110018286",
+     "name": "Mobile food pantry at St. John Presbyterian Church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.339484,
+     "longitude": -83.029497,
+     "addresses": [
+      {
+       "id": "29bdc5cb-378b-5f66-b585-c006080b7959",
+       "address_1": "1961 East Lafayette",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_st_john_presbyte"
+     }
+    },
+    "phones": [
+     {
+      "id": "50cf83ba-ad45-5c14-9fc4-04e51c3f6c49",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_st_john_presbyte",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Some Fridays 9am-11am. Forgotten Harvest lists the dates two weeks at a time. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_st_john_presbyte",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "3da402bb-488b-5c4d-a66f-6319861598f2",
+  "name": "Mobile food pantry at Triumph Church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. Drive through and stay in your car. First come, first served.",
+  "url": "https://www.triumphch.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "3c63bd28-82ca-52f0-b6c7-5b97d9df35e0",
+    "location": {
+     "id": "7909fe9e-b8bf-5962-8914-a26cad259a91",
+     "name": "Mobile food pantry at Triumph Church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.374576,
+     "longitude": -83.061823,
+     "addresses": [
+      {
+       "id": "57c19b2a-1f70-556a-ab79-a094f2614b8d",
+       "address_1": "2760 E Grand Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48211",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_triumph_church"
+     }
+    },
+    "phones": [
+     {
+      "id": "eeed441b-c99c-5f52-958d-65491b41afe2",
+      "number": "313-386-8044"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "cbc9d2c4-e35d-55d3-a964-6c900ecdde2a",
+      "freq": "MONTHLY",
+      "byday": "1FR,3FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st and 3rd Friday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_triumph_church",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Triumph Church website",
+      "url": "https://www.triumphch.org/community"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_triumph_church",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "4689cfa6-2ecf-552b-aa6a-e7c56d8933a4",
   "name": "Food and clothes",
   "status": "active",
@@ -11105,6 +12197,258 @@
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "4f7c3f95-9e7e-5e77-8e0f-7067bd58b8b7",
+  "name": "Drive-up food pantry",
+  "status": "active",
+  "description": "Free groceries. Stay in your car. It ends when the food runs out.",
+  "eligibility_description": "Bring your green and white Gleaners or Forgotten Harvest card. No card? You can fill out a form there.",
+  "organization": {
+   "id": "4c70fc0d-3f09-553f-b89c-fcf18f0d3fa3",
+   "name": "Gospel Tabernacle",
+   "description": "Gospel Tabernacle",
+   "x_detroit": {
+    "id": "org_gospel_tabernacle"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "bcee4b7e-9ec9-5e9d-9335-0ce7a8eb9efb",
+    "location": {
+     "id": "bffe70c6-35d2-5e55-b367-91fcf6a7ffd2",
+     "name": "Drive-up food pantry, Gospel Tabernacle",
+     "location_type": "physical",
+     "latitude": 42.383274,
+     "longitude": -83.171155,
+     "addresses": [
+      {
+       "id": "887aecf0-aadd-5d2a-b196-39612c56a53f",
+       "address_1": "12935 Buena Vista",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48227",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_gospel_tabernacle_drive_up_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "d2d969a8-dafd-5ae8-9338-f1aef48d31d6",
+      "number": "248-518-0876"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "da83d684-bb66-59b1-ade8-6a0b2dd53eb6",
+      "freq": "MONTHLY",
+      "byday": "1SA,3SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st and 3rd Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_gospel_tabernacle_drive_up_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_gospel_tabernacle_drive_up_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "bb1a9831-847a-55f6-a790-d3dcb24631c4",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "e621d55f-a9a0-5c6f-9072-49220238209a",
+   "name": "Greater Northwest C.O.G.I.C.",
+   "description": "Greater Northwest C.O.G.I.C.",
+   "x_detroit": {
+    "id": "org_greater_northwest_c_o_g_i_c"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "bc47e778-c176-540e-a382-d93ecee57257",
+    "location": {
+     "id": "58a8e165-ff12-520f-afa9-ff07a2b98f92",
+     "name": "Food pantry, Greater Northwest C.O.G.I.C.",
+     "location_type": "physical",
+     "latitude": 42.4085,
+     "longitude": -83.118466,
+     "addresses": [
+      {
+       "id": "56760b77-f240-56a7-82f6-794972503502",
+       "address_1": "15811 Rosa Parks Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_greater_northwest_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "8c350100-cd1b-59f6-90fb-bc6e99476850",
+      "number": "313-757-7722"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "d6127b33-fa27-5906-ac2b-d7232db2a159",
+      "freq": "MONTHLY",
+      "byday": "2TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:30",
+      "closes_at": "14:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "2nd Thursday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_greater_northwest_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_greater_northwest_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "e7f2b7f3-8430-5af0-bfb4-d9fd5f950c73",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries. You need an appointment.",
+  "organization": {
+   "id": "7c6c2a55-0dcd-56b9-a84f-3dee432e60a9",
+   "name": "Greater Quinn A.M.E. Church",
+   "description": "Greater Quinn A.M.E. Church",
+   "x_detroit": {
+    "id": "org_greater_quinn_a_m_e_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a8e59f0c-6e2a-5b06-b527-ff5aa709f622",
+    "location": {
+     "id": "989093e0-cbe9-560d-bc2a-c09d81213260",
+     "name": "Food pantry, Greater Quinn A.M.E. Church",
+     "location_type": "physical",
+     "latitude": 42.396669,
+     "longitude": -83.113543,
+     "addresses": [
+      {
+       "id": "cda7deb4-bda5-5983-9a74-0e5e4867039b",
+       "address_1": "13501 Rosa Parks Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_greater_quinn_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "9aea48cb-0a0a-5776-b079-521390c72330",
+      "number": "313-867-8380"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_greater_quinn_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Mon-Fri 9am-3pm, by appointment",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_greater_quinn_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "28f77446-0b99-5e3f-b74f-c706cf281f89",
@@ -11522,6 +12866,107 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "6a6244af-7e16-5e30-9298-cb847098ae36",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "a25fc3c5-2ef9-5707-965f-4c636318508a",
+   "name": "In the Trenches",
+   "description": "In the Trenches",
+   "x_detroit": {
+    "id": "org_in_the_trenches"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "9f3bf084-4d73-5dbd-83e2-4c3111d3a765",
+    "location": {
+     "id": "7b121007-faa7-51f5-99ec-942fc9b009bd",
+     "name": "Food pantry, In the Trenches",
+     "location_type": "physical",
+     "latitude": 42.305513,
+     "longitude": -83.091573,
+     "addresses": [
+      {
+       "id": "f9ffdf9d-290c-5f62-b16f-132652452a68",
+       "address_1": "304 S. Morrell",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_in_the_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "a1d3a387-09b4-5eb0-bb0e-60f7f8cf3035",
+      "number": "313-554-3533"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "dcf1d527-4018-5e80-bf27-7618eed7d7d5",
+      "freq": "MONTHLY",
+      "byday": "2FR,3FR,4FR,5FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "15:30",
+      "closes_at": "16:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Fridays except the 1st Friday of the month"
+     },
+     {
+      "id": "f748beec-f9ec-515a-9d38-5b0d5047eea3",
+      "freq": "MONTHLY",
+      "byday": "2SA,3SA,4SA,5SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:30",
+      "closes_at": "11:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Saturdays except the 1st Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_in_the_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_in_the_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "3fd1c0f3-038d-510c-aad3-491b94de07d7",
   "name": "IPH Health Center, James Couzens",
   "status": "active",
@@ -11776,6 +13221,181 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "0a1c5d1b-1825-5b9c-bb2a-2a429517937b",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "ad7080ce-a5cf-5367-9545-5c26a5705272",
+   "name": "Kadesh Missionary Baptist Church",
+   "description": "Kadesh Missionary Baptist Church",
+   "x_detroit": {
+    "id": "org_kadesh_missionary_baptist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "2829386d-e36f-520a-bdee-fdff844f2bbb",
+    "location": {
+     "id": "42417ed9-0489-5ce0-85e4-c80c1918a7a6",
+     "name": "Food pantry, Kadesh Missionary Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.371811,
+     "longitude": -83.240348,
+     "addresses": [
+      {
+       "id": "cfb4f9e3-9b52-5163-8c3c-07c462de0d0d",
+       "address_1": "20361 Plymouth Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_kadesh_missionary_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "d29172e8-a4c3-5172-b20b-d70a2301a829",
+      "number": "313-272-7887"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "0cc27e15-3c36-5594-87b4-196fae8102f4",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_kadesh_missionary_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_kadesh_missionary_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "792e7c9b-fb49-56a7-8814-5485367fe5de",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "4e674ff3-3228-5dfd-930b-92f49237be6f",
+   "name": "King David CDC",
+   "description": "King David CDC",
+   "x_detroit": {
+    "id": "org_king_david_cdc"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "356f8e83-8b41-52c8-9ed0-3d0056d65924",
+    "location": {
+     "id": "763b47fd-a9ca-540d-b198-9ebe2e4c0747",
+     "name": "Food pantry, King David CDC",
+     "location_type": "physical",
+     "latitude": 42.426002,
+     "longitude": -83.060635,
+     "addresses": [
+      {
+       "id": "d00b9914-3d46-5164-b832-8ec0d08a3427",
+       "address_1": "18001 Sunset",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48234",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_king_david_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "d296a67f-cee9-5a3b-bc00-b0404d070fb9",
+      "number": "313-891-4160"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "8db4e171-ace8-5428-bc20-a1f31261f18d",
+      "freq": "MONTHLY",
+      "byday": "4WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "4th Wednesday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_king_david_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_king_david_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "a07e6294-e003-5639-957c-be71477648f0",
   "name": "LAHC food pantry by appointment",
   "status": "active",
@@ -11928,6 +13548,94 @@
    "category": "youth"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "49e11446-c626-5680-aea8-50b5abba0440",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "92ccb72f-659e-5a46-b820-d203617b7d0b",
+   "name": "Linwood Church of Christ",
+   "description": "Linwood Church of Christ",
+   "x_detroit": {
+    "id": "org_linwood_church_of_christ"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f33084b6-e310-5451-a9a0-d484858b4291",
+    "location": {
+     "id": "02804c95-dd80-5c9a-abc6-07ef2d5e4047",
+     "name": "Food pantry, Linwood Church of Christ",
+     "location_type": "physical",
+     "latitude": 42.396772,
+     "longitude": -83.124636,
+     "addresses": [
+      {
+       "id": "55a2ff38-3c80-511e-8da3-0b68c3f10f9f",
+       "address_1": "14001 Linwood",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_linwood_church_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "e3cb8f58-6da4-5a2a-8e73-1a8db52c2b90",
+      "number": "313-868-7795"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "27031ef8-5947-5fd7-8d9b-0af39d0362b5",
+      "freq": "MONTHLY",
+      "byday": "2SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "2nd Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_linwood_church_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_linwood_church_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "c3fc7955-d883-53b1-8b48-ec11b40cf0f3",
@@ -12098,6 +13806,181 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "d8a8f7d0-76f1-52b9-a017-14d93baac443",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries. Check-in starts at 10am. First come, first served.",
+  "organization": {
+   "id": "99e71393-1531-5ebd-9e6d-399a3fb4ff55",
+   "name": "Lomax Temple A.M.E. Zion Church",
+   "description": "Lomax Temple A.M.E. Zion Church",
+   "x_detroit": {
+    "id": "org_lomax_temple_a_m_e_zion_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "2bee32c0-02f0-5973-8f53-33c451469453",
+    "location": {
+     "id": "c3737378-4c40-54df-8cf4-e3a302f320dc",
+     "name": "Food pantry, Lomax Temple A.M.E. Zion Church",
+     "location_type": "physical",
+     "latitude": 42.421584,
+     "longitude": -83.082462,
+     "addresses": [
+      {
+       "id": "ae2aeac1-0b3a-5c8a-96e5-371706d2a24f",
+       "address_1": "17461 Dequindre St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_lomax_temple_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "9ff562de-b219-5a42-b2cb-34a6f4f30b6a",
+      "number": "313-893-1463"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "0d89a686-18d2-5eb2-9e1c-876460bf34e1",
+      "freq": "MONTHLY",
+      "byday": "1TH,3TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st and 3rd Thursday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_lomax_temple_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_lomax_temple_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "d8380849-86e4-5e24-8c87-38f562bae553",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "6f1ee52f-c2af-5228-bf7c-6bb9f1ffefa8",
+   "name": "Love Joy Church Of God In Christ",
+   "description": "Love Joy Church Of God In Christ",
+   "x_detroit": {
+    "id": "org_love_joy_church_of_god_in_christ"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "678e9df7-b147-5257-8d02-b3402f30790b",
+    "location": {
+     "id": "2e3e35b3-ed5e-5de1-9ef3-ec905764513e",
+     "name": "Food pantry, Love Joy Church Of God In Christ",
+     "location_type": "physical",
+     "latitude": 42.423707,
+     "longitude": -83.087446,
+     "addresses": [
+      {
+       "id": "718300ca-574c-5a3d-9110-e369ff4bc6df",
+       "address_1": "17801 Greeley",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_love_joy_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "de896ac2-96c7-5faa-a980-5202bfab3f37",
+      "number": "734-352-0577"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "1000ee5e-878e-54b5-b47a-ddade8d0540a",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:30",
+      "closes_at": "13:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_love_joy_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_love_joy_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "0d48b6d5-c29e-5601-82e3-9e836f348a4c",
   "name": "Food pantry and clothing closet",
   "status": "active",
@@ -12247,6 +14130,94 @@
    "category": "youth"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "c81e0b24-9f88-5470-9736-2a7cb5c86954",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "f40a66dc-b2d7-532e-9a2b-bd3de9004556",
+   "name": "Metropolitan Baptist Church",
+   "description": "Metropolitan Baptist Church",
+   "x_detroit": {
+    "id": "org_metropolitan_baptist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f1aac640-61f8-5913-85d5-b9d296dae6d6",
+    "location": {
+     "id": "bf5519a6-be17-50e2-9dce-66c46e1843cc",
+     "name": "Food pantry, Metropolitan Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.393244,
+     "longitude": -83.114574,
+     "addresses": [
+      {
+       "id": "db9ab4dc-8ab8-529e-b85a-467472059cf0",
+       "address_1": "13110 14th Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_metropolitan_baptist_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "bec4c7a2-bfc1-594a-8fdc-9b54ff11d137",
+      "number": "313-869-6676"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "ae14cf77-fafa-5ff4-9e79-b4deae169b20",
+      "freq": "MONTHLY",
+      "byday": "3SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "3rd Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_metropolitan_baptist_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_metropolitan_baptist_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "8919f9b0-5f04-5a15-ab77-c07bbf5cd721",
@@ -12421,6 +14392,256 @@
   ],
   "x_detroit": {
    "id": "svc_most_holy_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "e24b0957-9891-545d-8bee-73ba321f83ab",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "cb3843b5-a41a-571c-ac37-03910fadfe36",
+   "name": "Mt. Vernon Baptist Church",
+   "description": "Mt. Vernon Baptist Church",
+   "x_detroit": {
+    "id": "org_mt_vernon_baptist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d9b50eca-e6db-5443-8318-f1280ac75cd9",
+    "location": {
+     "id": "f9399c51-3768-5121-beff-b911c4fd5489",
+     "name": "Food pantry, Mt. Vernon Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.399018,
+     "longitude": -83.247143,
+     "addresses": [
+      {
+       "id": "23c1a9e2-aa44-5928-9043-efacf0edbdbe",
+       "address_1": "15125 Burt Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_mt_vernon_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "db9358e4-1ef9-529d-b88a-d51cdf6482de",
+      "number": "313-538-1355"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "7750e9f0-c571-52e2-8d4a-7a4a86bc2fff",
+      "freq": "WEEKLY",
+      "byday": "TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "14:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_mt_vernon_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_mt_vernon_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "3aff4170-7878-504d-898a-162392c30d08",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "3160880f-2c8a-539f-9018-0b51c80bc266",
+   "name": "Muslim Family Services ICNA Relief",
+   "description": "Muslim Family Services ICNA Relief",
+   "x_detroit": {
+    "id": "org_muslim_family_services_icna_relief"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "c8e53a29-1292-5f72-bbee-e0101ba73d5e",
+    "location": {
+     "id": "30dbc249-9824-52eb-80d5-195b7713cd0e",
+     "name": "Food pantry, Muslim Family Services ICNA Relief",
+     "location_type": "physical",
+     "latitude": 42.40887,
+     "longitude": -83.06425,
+     "addresses": [
+      {
+       "id": "93223412-6ceb-56a4-9a4c-fabb8db54051",
+       "address_1": "12500 Mitchell",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_muslim_family_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "2052662f-4eab-52a2-9b21-4f472f5335b1",
+      "number": "313-366-6800"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "bee63134-a3be-55f1-b0a1-bcbe5517fb06",
+      "freq": "WEEKLY",
+      "byday": "TU,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "15:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_muslim_family_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_muslim_family_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "2e61ad11-7356-5e2d-9eb0-139cc4735d28",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries. You pick what you need. No appointment needed.",
+  "eligibility_description": "Bring photo ID, and your Link2Feed card if you have one. You can sign up on your first visit.",
+  "organization": {
+   "id": "a9cfb0c0-61bf-5074-ac09-99a213a7f646",
+   "name": "My Father's Business",
+   "description": "My Father's Business",
+   "x_detroit": {
+    "id": "org_my_father_s_business"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "3b3fc502-ed0e-5796-840f-60ec127221a2",
+    "location": {
+     "id": "10a599eb-db36-57d4-995f-e59d65adf9c6",
+     "name": "Food pantry, My Father's Business",
+     "location_type": "physical",
+     "latitude": 42.423889,
+     "longitude": -82.926638,
+     "addresses": [
+      {
+       "id": "f4cd482e-9930-5b9f-8ded-db6b397df970",
+       "address_1": "21001 Moross Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48236",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_my_father_s_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "029efe4a-a0bf-507b-bc54-2257609a4fa4",
+      "number": "313-936-1537"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_my_father_s_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Check-in 9am-11am. 2nd and 4th Saturdays, January to October. 2nd and 3rd Saturdays, November and December. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_my_father_s_food_pantry",
    "category": "food.pantry"
   },
   "assured_date": "2026-09-19"
@@ -12628,6 +14849,264 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "96cf90c9-19b7-519a-acc3-00db90f90332",
+  "name": "Drive-thru produce",
+  "status": "active",
+  "description": "Free fresh fruits and vegetables. Drive through to pick them up.",
+  "organization": {
+   "id": "9178b5ce-01c5-5d86-ad9b-ad4de37c442f",
+   "name": "Nazarene Community Outreach",
+   "description": "Nazarene Community Outreach",
+   "x_detroit": {
+    "id": "org_nazarene_community_outreach"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "3671582e-19ed-56de-8152-6b37b2e0d720",
+    "location": {
+     "id": "872b3f26-010b-5bec-915a-b7767c1589a3",
+     "name": "Drive-thru produce, Nazarene Community Outreach",
+     "location_type": "physical",
+     "latitude": 42.379812,
+     "longitude": -83.068463,
+     "addresses": [
+      {
+       "id": "3611d2de-2232-5738-ba1c-7c4571952fa4",
+       "address_1": "901 Melbourne St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48211",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_nazarene_community_drive_thru_produce"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "db9a6eac-e0f4-5675-8a18-5d231a8bd5f3",
+      "freq": "MONTHLY",
+      "byday": "1MO,2MO,3MO",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "12:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st, 2nd and 3rd Monday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_nazarene_community_drive_thru_produce",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_nazarene_community_drive_thru_produce",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "1a91b19b-aca2-5ba7-abd8-fc19953301da",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "bf55ca92-5673-52af-a261-ea315d65a6ce",
+   "name": "New Hope Tabernacle Church",
+   "description": "New Hope Tabernacle Church",
+   "x_detroit": {
+    "id": "org_new_hope_tabernacle_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d782ef93-e056-5220-a5c8-4cc9c44a41eb",
+    "location": {
+     "id": "79732ff5-5255-5cef-8e8b-47afff004c55",
+     "name": "Food pantry, New Hope Tabernacle Church",
+     "location_type": "physical",
+     "latitude": 42.439999,
+     "longitude": -83.258794,
+     "addresses": [
+      {
+       "id": "1e71edf0-1162-5f5a-8476-309b63f320a3",
+       "address_1": "20221 Lahser Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_new_hope_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "11184146-184d-50d9-9a5b-39801709384d",
+      "number": "313-535-7999"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "729a7307-b90c-5691-b5da-055f9c3a5d5d",
+      "freq": "MONTHLY",
+      "byday": "-1WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "11:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Last Wednesday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_new_hope_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_new_hope_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "26683dec-86bd-52a7-a02f-535139f257ba",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "2a1df177-e3a5-5c49-9824-3f2d9654f009",
+   "name": "New Liberty Community Services",
+   "description": "New Liberty Community Services",
+   "x_detroit": {
+    "id": "org_new_liberty_community_services"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "c19355f1-166b-5549-8ebe-c60e50ba3303",
+    "location": {
+     "id": "6e4380c1-027d-58e3-924d-25d6148dc33d",
+     "name": "Food pantry, New Liberty Community Services",
+     "location_type": "physical",
+     "latitude": 42.402499,
+     "longitude": -83.153648,
+     "addresses": [
+      {
+       "id": "e307453e-0e6d-508e-9f53-d5c9fbdeafb0",
+       "address_1": "8425 Fenkell",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_new_liberty_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "7ad3fb63-4bd2-5c52-a87b-07690094ec93",
+      "number": "313-342-2424"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "7e081ec0-c2e4-5cb8-8542-eff79cd462b1",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "16:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_new_liberty_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_new_liberty_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "0e16a23d-036f-5c83-85d8-40e66dd94f0c",
   "name": "Grocery give-away",
   "status": "active",
@@ -12791,6 +15270,93 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "015f5d9e-395c-556b-a0e1-67ae91dbe522",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "6fc99bcb-3022-5b4c-9232-ca7f2da31379",
+   "name": "New Visions Missionary Baptist Church",
+   "description": "New Visions Missionary Baptist Church",
+   "x_detroit": {
+    "id": "org_new_visions_missionary_baptist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "40dadf10-9693-5b5f-a66a-899e59af7e6f",
+    "location": {
+     "id": "43cc5c47-5b60-58e3-a5a6-ef1e91715238",
+     "name": "Food pantry, New Visions Missionary Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.358419,
+     "longitude": -83.18662,
+     "addresses": [
+      {
+       "id": "de09bd96-6263-5a55-9590-2df736480e20",
+       "address_1": "14548 Joy Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_new_visions_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "0ff0f2bc-0633-54d9-a2eb-e3b187d01912",
+      "number": "313-870-8788"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "ca07b065-30fb-5ec7-b1eb-767e61ce6f2e",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "12:45",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_new_visions_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_new_visions_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "cc2d166d-aaba-5eb7-931b-6ab1e22d286a",
   "name": "Bag lunch and drop-in help",
   "status": "active",
@@ -12940,6 +15506,168 @@
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "dcf32ac8-a769-5623-8576-9a20061ee2b2",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "44d9269b-e5f4-54c6-9d37-273df6f4a2aa",
+   "name": "Our Lady Queen of Angels",
+   "description": "Our Lady Queen of Angels",
+   "x_detroit": {
+    "id": "org_our_lady_queen_of_angels"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "eb3596fe-ae62-5e22-9d40-adc8ae69b288",
+    "location": {
+     "id": "6438c1fe-e345-5640-bca5-b1d0157ae822",
+     "name": "Food pantry, Our Lady Queen of Angels",
+     "location_type": "physical",
+     "latitude": 42.329607,
+     "longitude": -83.126329,
+     "addresses": [
+      {
+       "id": "72ce3b4c-7a3b-5216-bdfc-cd3cb668dd42",
+       "address_1": "4200 Martin Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_our_lady_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "1124e273-d708-5939-868e-314d3c9d910f",
+      "number": "313-841-0783"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "a92d8c14-d493-50aa-bafa-df3d6c99218b",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "11:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_our_lady_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_our_lady_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "a98725f1-7aed-5adb-8c4e-043af56861eb",
+  "name": "Lunch and food giveaway",
+  "status": "active",
+  "description": "A free lunch to take with you, and some groceries. Walk up or drive through. It ends when the food runs out.",
+  "organization": {
+   "id": "bc34303f-8e2f-5cc1-9068-9b401edcc2c2",
+   "name": "Our Lady Queen of Apostles Church",
+   "description": "Our Lady Queen of Apostles Church",
+   "x_detroit": {
+    "id": "org_our_lady_queen_of_apostles_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "3fce60a9-b606-5e73-8fd9-79f25c868992",
+    "location": {
+     "id": "8d85cf53-d7f2-500c-89b7-8e28dc0078d6",
+     "name": "Lunch and food giveaway, Our Lady Queen of Apostles Church",
+     "location_type": "physical",
+     "latitude": 42.403592,
+     "longitude": -83.052601,
+     "addresses": [
+      {
+       "id": "d5bb4691-19fb-5c9a-b016-78c0751292c7",
+       "address_1": "3851 Prescott St",
+       "city": "Hamtramck",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_our_lady_lunch_and_food_giveaway"
+     }
+    },
+    "phones": [
+     {
+      "id": "49e4fcd4-f0fa-5048-abc0-a4066b8ebbea",
+      "number": "313-891-1520"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_our_lady_lunch_and_food_giveaway",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Thursdays at 10am, for up to 60 people. 4th Friday at 10am, for up to 110 people. First come, first served.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_our_lady_lunch_and_food_giveaway",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "cff9699b-1ffd-59d0-bd76-4ab97a3ea866",
@@ -13165,6 +15893,95 @@
   ],
   "x_detroit": {
    "id": "svc_perry_outreach_food_boxes",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "9d1be29d-b40c-5b66-8d2d-352e30e462a4",
+  "name": "Drive-thru food",
+  "status": "active",
+  "description": "Free food. Drive through to pick it up. Emergency food boxes are also given by appointment.",
+  "eligibility_description": "They will ask for your address.",
+  "organization": {
+   "id": "3836a6ce-f8aa-53b5-b57c-e40b39786e11",
+   "name": "PHG Urban Life Center",
+   "description": "PHG Urban Life Center",
+   "x_detroit": {
+    "id": "org_phg_urban_life_center"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "ce2da4c2-9d58-5b98-9e9f-e1c1b1e01b05",
+    "location": {
+     "id": "76bdf8a1-adff-5306-9665-e56e239a5498",
+     "name": "Drive-thru food, PHG Urban Life Center",
+     "location_type": "physical",
+     "latitude": 42.344786,
+     "longitude": -83.133812,
+     "addresses": [
+      {
+       "id": "b4c8dec5-246d-585e-9d3e-9632453f21a8",
+       "address_1": "6495 W. Warren",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_phg_urban_drive_thru_food"
+     }
+    },
+    "phones": [
+     {
+      "id": "4cb43746-37d6-5d35-b8d7-4a06066a6fcd",
+      "number": "313-897-2381"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "fd1968bd-fa34-5850-9650-e26f78a3aac9",
+      "freq": "MONTHLY",
+      "byday": "3SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "11:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "3rd Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_phg_urban_drive_thru_food",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_phg_urban_drive_thru_food",
    "category": "food.pantry"
   },
   "assured_date": "2026-09-19"
@@ -13426,6 +16243,180 @@
   "x_detroit": {
    "id": "svc_pope_francis_showers",
    "category": "hygiene.shower"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "77f96db3-d3ae-56c8-9afc-aa411dfa7492",
+  "name": "Food pantry and meals",
+  "status": "active",
+  "description": "Free groceries and free meals.",
+  "organization": {
+   "id": "aee0287d-5b17-52e5-b6af-15ded49e8058",
+   "name": "Pure Word Missionary Baptist Church",
+   "description": "Pure Word Missionary Baptist Church",
+   "x_detroit": {
+    "id": "org_pure_word_missionary_baptist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "01c28fa3-7b63-5da7-b66c-1b4239135182",
+    "location": {
+     "id": "e4b7c3ef-fdea-5bd3-8e5e-3eeecc6ab2f1",
+     "name": "Food pantry and meals, Pure Word Missionary Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.408542,
+     "longitude": -83.237956,
+     "addresses": [
+      {
+       "id": "74bfc889-adbe-521e-9dce-2f2dd7c86817",
+       "address_1": "20011 Grand River Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_pure_word_food_pantry_and_meals"
+     }
+    },
+    "phones": [
+     {
+      "id": "a92c187f-7ab9-51b4-8a5f-40cdbfee0c4d",
+      "number": "313-936-7039"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "95f7000b-b168-5b09-9445-a82762920bfb",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "9371c0aa-508b-5c2b-86a9-af45cc36d786",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_pure_word_food_pantry_and_meals",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_pure_word_food_pantry_and_meals",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "0ea5d960-5dab-5bf5-9725-4991787853e6",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "680d7a4a-79b3-5506-a456-3d3d12da6dad",
+   "name": "Puritan Street Church of Christ",
+   "description": "Puritan Street Church of Christ",
+   "x_detroit": {
+    "id": "org_puritan_street_church_of_christ"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "c0d25026-b90c-53c2-b9c3-39eb3569e90b",
+    "location": {
+     "id": "f2885358-f9bc-5f08-a3b1-8db7f48fa73b",
+     "name": "Food pantry, Puritan Street Church of Christ",
+     "location_type": "physical",
+     "latitude": 42.436957,
+     "longitude": -83.076663,
+     "addresses": [
+      {
+       "id": "b2a75d86-42ce-51d2-a15c-93ecacf61ca1",
+       "address_1": "19451 Conant",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48234",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_puritan_street_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "5f46d058-5068-5226-b9de-4a379f45a641",
+      "number": "313-893-1002"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_puritan_street_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Every other Thursday 8:30am-noon. Call to ask which weeks.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_puritan_street_food_pantry",
+   "category": "food.pantry"
   },
   "assured_date": "2026-09-19"
  },
@@ -13706,6 +16697,243 @@
   "assured_date": "2026-09-19"
  },
  {
+  "id": "70a5b917-1411-5bcb-8272-316e9d28db44",
+  "name": "Conner Creek food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "6c500dd8-d960-5dc4-84e6-2ba0ae8be054",
+   "name": "Salvation Army",
+   "description": "Salvation Army",
+   "x_detroit": {
+    "id": "org_salvation_army"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "85b5509b-c16a-56d6-8df5-42590bd5ca01",
+    "location": {
+     "id": "2a5ec7a3-96a9-50ed-bed5-62dc7e6f7e07",
+     "name": "Conner Creek food pantry, Salvation Army",
+     "location_type": "physical",
+     "latitude": 42.378555,
+     "longitude": -82.964397,
+     "addresses": [
+      {
+       "id": "353766bd-d9e5-5b90-b5ee-ea2914d5e638",
+       "address_1": "3000 Conner Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48215",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_salvation_army_conner_creek_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "92e1db78-1faf-53c0-b031-bbc61e357522",
+      "number": "313-822-2800"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "534c103f-90ae-5ab8-8de7-9476a720253c",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "16:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_salvation_army_conner_creek_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_salvation_army_conner_creek_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "14698468-e2df-5b2a-9c3b-0f5f9b57882d",
+  "name": "Grandale Corps food pantry",
+  "status": "active",
+  "description": "Free groceries and meals. You need an appointment.",
+  "organization": {
+   "id": "6c500dd8-d960-5dc4-84e6-2ba0ae8be054",
+   "name": "Salvation Army",
+   "description": "Salvation Army",
+   "x_detroit": {
+    "id": "org_salvation_army"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "5045884c-42f5-5ee9-a046-13577579a6a2",
+    "location": {
+     "id": "d82ac5bd-ed6a-5291-be7c-2748235a2678",
+     "name": "Grandale Corps food pantry, Salvation Army",
+     "location_type": "physical",
+     "latitude": 42.370402,
+     "longitude": -83.199956,
+     "addresses": [
+      {
+       "id": "22e81734-720b-5144-abfb-adcff3073fac",
+       "address_1": "11325 Montrose",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48227",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_salvation_army_grandale_corps_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "eb9f8bde-e520-59a4-89ce-2f1c1967b377",
+      "number": "313-835-3736"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_salvation_army_grandale_corps_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Mon-Fri 12:30pm-4:30pm, by appointment",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_salvation_army_grandale_corps_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "f868c8ab-ebf8-515d-9962-7ec4a4bcdf9d",
+  "name": "Temple Corps food pantry",
+  "status": "active",
+  "description": "Free groceries. You need an appointment.",
+  "organization": {
+   "id": "6c500dd8-d960-5dc4-84e6-2ba0ae8be054",
+   "name": "Salvation Army",
+   "description": "Salvation Army",
+   "x_detroit": {
+    "id": "org_salvation_army"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d2b1c59d-d168-5a99-b65b-ca29c8b06e18",
+    "location": {
+     "id": "4c19bee7-3720-5352-832a-facc2047f5cd",
+     "name": "Temple Corps food pantry, Salvation Army",
+     "location_type": "physical",
+     "latitude": 42.373254,
+     "longitude": -83.12011,
+     "addresses": [
+      {
+       "id": "ad17048a-3960-5f6e-8dfc-00c27e32d273",
+       "address_1": "3729 W. Chicago",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_salvation_army_temple_corps_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "b1bf29dd-5c56-58e1-80c8-17ef4742095d",
+      "number": "313-897-2914"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_salvation_army_temple_corps_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Thu 10am-11:30am, by appointment",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_salvation_army_temple_corps_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "eb3ad5f1-71f8-5c64-8ab0-17f5dbd0cc47",
   "name": "SAY Detroit Play Center",
   "status": "active",
@@ -13856,6 +17084,95 @@
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "1e3f36b7-44c6-5069-b3e9-7791278bd8ad",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "url": "http://www.shrineoftheblackmadonna.org",
+  "organization": {
+   "id": "8483ee82-19ac-59b8-8f59-e947fc3ae6f1",
+   "name": "Shrine of the Black Madonna",
+   "description": "Shrine of the Black Madonna",
+   "x_detroit": {
+    "id": "org_shrine_of_the_black_madonna"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cab13e0d-c403-53fb-a158-0aa3952c48eb",
+    "location": {
+     "id": "55f019f0-b9d0-5bf7-90e3-2d778d338e68",
+     "name": "Food pantry, Shrine of the Black Madonna",
+     "location_type": "physical",
+     "latitude": 42.363088,
+     "longitude": -83.101918,
+     "addresses": [
+      {
+       "id": "3b7c51b7-b26c-55a8-880c-bd7db6387470",
+       "address_1": "7625 Linwood",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_shrine_of_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "2d1356aa-43cf-5d69-abb7-5f8393bef1da",
+      "number": "313-244-6660"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "70db15d1-f496-574d-8557-0d86a1a638a2",
+      "freq": "MONTHLY",
+      "byday": "3SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "3rd Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_shrine_of_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_shrine_of_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "b72a4307-c067-5192-9d2c-2d113e45155d",
@@ -14223,6 +17540,82 @@
    "category": "health.clinic"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "9e5f82ed-315b-559a-a1c8-0b2d78ad28ae",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries for people on the Lower East Side.",
+  "eligibility_description": "For people on the Lower East Side.",
+  "organization": {
+   "id": "9947f32a-41e8-5ad6-8003-4e91d7f7fc8e",
+   "name": "St. John Community Center",
+   "description": "St. John Community Center",
+   "x_detroit": {
+    "id": "org_st_john_community_center"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e6c48117-1db9-5408-8441-25200202a0b8",
+    "location": {
+     "id": "8cf6577c-7a60-566e-9204-3db214783da5",
+     "name": "Food pantry, St. John Community Center",
+     "location_type": "physical",
+     "latitude": 42.378351,
+     "longitude": -82.94874,
+     "addresses": [
+      {
+       "id": "e616790b-320a-5ce5-af28-cf4da1c33797",
+       "address_1": "14320 Kercheval",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48215",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_john_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "50a8ea3e-293e-54d7-983b-a771256e4952",
+      "number": "313-823-8323"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_st_john_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Fridays at 1pm. No closing time given.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_john_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "e841651d-b684-5db3-a11b-913e278aebaf",
@@ -15063,6 +18456,94 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "4e2dea75-0949-5f07-bbcc-0066525ef98d",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "b77c614f-add6-556a-96c3-7b8e486fab2a",
+   "name": "The Open Door",
+   "description": "The Open Door",
+   "x_detroit": {
+    "id": "org_the_open_door"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "38bd0922-74b3-56c1-a0cd-22ba136d7dd0",
+    "location": {
+     "id": "459ce3a4-e28a-5941-9957-bcb5dbb7bb5e",
+     "name": "Food pantry, The Open Door",
+     "location_type": "physical",
+     "latitude": 42.434668,
+     "longitude": -82.998338,
+     "addresses": [
+      {
+       "id": "4ed109ec-48b2-5f0c-8fb4-3f03e0d3d720",
+       "address_1": "12411 E. Seven Mile Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48205",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_the_open_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "294cc1f5-5de5-5f72-81f3-15d8d619057c",
+      "number": "313-526-3460"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "e33ef092-31a2-5b97-ba95-4e2ab1034625",
+      "freq": "MONTHLY",
+      "byday": "1MO",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st Monday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_the_open_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_the_open_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "ea88a8d3-a990-576e-9d0e-24179e310f85",
   "name": "East Medical Center",
   "status": "active",
@@ -15150,6 +18631,81 @@
    "category": "health.clinic"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "82e399ee-6b94-5497-aad2-3d4cf063f9fa",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries. You need an appointment.",
+  "organization": {
+   "id": "1c2706a9-43cc-5c50-96d4-2a0b4d9bdbeb",
+   "name": "Tri-Unity Enterprise at Third New Hope",
+   "description": "Tri-Unity Enterprise at Third New Hope",
+   "x_detroit": {
+    "id": "org_tri_unity_enterprise_at_third_new_hope"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "9872b4d4-87bd-508a-94e5-df00d08f13fc",
+    "location": {
+     "id": "dc08b054-3170-5033-836c-85149e082dd7",
+     "name": "Food pantry, Tri-Unity Enterprise at Third New Hope",
+     "location_type": "physical",
+     "latitude": 42.373245,
+     "longitude": -83.170087,
+     "addresses": [
+      {
+       "id": "e0841fd8-df40-5af1-9282-aa8054fe6396",
+       "address_1": "12850 Plymouth Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48227",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_tri_unity_enterprise_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "89b2e5e3-7952-57ce-ace1-df4d161d9fd0",
+      "number": "313-491-7890 ext. 13"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_tri_unity_enterprise_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "4th Friday 9am-noon, by appointment",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_tri_unity_enterprise_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "ca7f5d76-1430-5a22-a77e-309ef2b0f749",
@@ -15263,6 +18819,82 @@
    "category": "health.clinic"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "4d33f3c9-9fd3-526b-9134-d041814e26c3",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "eligibility_description": "Bring ID.",
+  "organization": {
+   "id": "7c731ad3-43ed-5186-9339-9502459938a9",
+   "name": "True Love Evangelistic Ministries",
+   "description": "True Love Evangelistic Ministries",
+   "x_detroit": {
+    "id": "org_true_love_evangelistic_ministries"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "5f9bcc55-4cc3-59b6-945d-6cb81ccb2ed5",
+    "location": {
+     "id": "18322d09-ae63-5796-91c2-028dfd1acd5e",
+     "name": "Food pantry, True Love Evangelistic Ministries",
+     "location_type": "physical",
+     "latitude": 42.371818,
+     "longitude": -83.241307,
+     "addresses": [
+      {
+       "id": "71b13b4c-9b5f-572b-bffd-edda7841ca09",
+       "address_1": "20501 Plymouth Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_true_love_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "daa43bd1-be60-54ff-96e3-1ee3de6e1d13",
+      "number": "313-342-2182"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_true_love_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "3rd Saturday at 9:30am. No closing time given.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_true_love_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "d041bc53-fc13-52a4-940e-1277c753a9ae",
@@ -16100,6 +19732,182 @@
    "category": "food.meal"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "fa1d62a9-8816-558b-a51c-83eeb34762a0",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "9d38758e-ed9a-5b2b-af87-5bcbe0d8ed5d",
+   "name": "Word In Action Christian Center",
+   "description": "Word In Action Christian Center",
+   "x_detroit": {
+    "id": "org_word_in_action_christian_center"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cfaeb752-7513-5447-8750-c8ad6cebc43e",
+    "location": {
+     "id": "e2003e6e-3fb8-5c40-8583-86adf4650b78",
+     "name": "Food pantry, Word In Action Christian Center",
+     "location_type": "physical",
+     "latitude": 42.437193,
+     "longitude": -83.170867,
+     "addresses": [
+      {
+       "id": "d1a4397c-a2f0-5ebe-a34f-60a3f924b25e",
+       "address_1": "19760 Meyers Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48235",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_word_in_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "db2071d9-ed19-5073-92aa-63ea2e96d36c",
+      "number": "313-864-5300"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "35c35c6a-aed7-56d2-8315-f76e307d4844",
+      "freq": "MONTHLY",
+      "byday": "3FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "15:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "3rd Friday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_word_in_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_word_in_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "4335163a-4b18-5f19-bce4-8b9312885238",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free groceries.",
+  "organization": {
+   "id": "17b05e55-1bdb-5be3-81b3-f584af82f558",
+   "name": "Word Of Truth",
+   "description": "Word Of Truth",
+   "x_detroit": {
+    "id": "org_word_of_truth"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "9eb9f71e-b5ac-555b-9c47-7493dc642613",
+    "location": {
+     "id": "48042b78-c731-5095-8db9-577100783263",
+     "name": "Food pantry, Word Of Truth",
+     "location_type": "physical",
+     "latitude": 42.341064,
+     "longitude": -83.109901,
+     "addresses": [
+      {
+       "id": "fc929681-d9a1-581b-9e3f-c21019899629",
+       "address_1": "4900 Lovett St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_word_of_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "37189fcd-c921-55a6-8a06-32c15cddd092",
+      "number": "313-897-5213"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "bccb62c8-c443-5c07-94ec-13859987d69d",
+      "freq": "MONTHLY",
+      "byday": "1SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "1st Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_word_of_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_word_of_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "09c31602-ca5b-5d42-adda-9f1c3bc71392",
