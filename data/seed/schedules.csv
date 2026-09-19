@@ -121,3 +121,8 @@ sal_detroit_health_neighborhood_wellness_center_at_wcccd_nor,WEEKLY,,WE,,2026-09
 sal_detroit_health_neighborhood_wellness_center_at_wcccd_nor,WEEKLY,,SA,,2026-09-14,,,,10:00,14:00,
 sal_pope_francis_showers,WEEKLY,,"MO,TU,WE,TH,FR,SA",,2026-09-14,,,,07:00,11:00,Day center
 sal_ruth_ellis_showers,WEEKLY,,"MO,WE",,2026-09-14,,,,15:00,20:30,"Drop-in, full service"
+sal_dearborn_public_henry_ford_centennial_library,WEEKLY,,"MO,TU,WE,TH",,2026-09-14,,,,10:00,20:00,
+sal_dearborn_public_henry_ford_centennial_library,WEEKLY,,"FR,SA",,2026-09-14,,,,10:00,17:30,
+sal_dearborn_first_dearborn_community_food_pantry,MONTHLY,,3SA,,2026-09-14,,,,09:00,10:00,3rd Saturday of the month
+sal_cherry_hill_helping_hand_food_pantry,MONTHLY,,"1WE,3WE",,2026-09-14,,,,09:30,12:00,1st and 3rd Wednesday of the month
+sal_dearborn_public_henry_ford_centennial_library,WEEKLY,,SU,,2026-09-14,,2026-09-01,2027-05-24,13:00,17:00,Closed Sundays May 25 to August 31

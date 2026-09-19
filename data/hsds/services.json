@@ -1,5 +1,305 @@
 [
  {
+  "id": "ef71e94b-b1ae-5afa-9a5a-1de79223ab11",
+  "name": "Benefits help at the East Dearborn office",
+  "status": "active",
+  "description": "Help signing up for food stamps, Medicaid, cash help, and State Emergency Relief. Help in Arabic and English.",
+  "url": "https://www.accesscommunity.org/",
+  "organization": {
+   "id": "6b1abd7b-f771-5453-abce-fa09ac43a6ff",
+   "name": "ACCESS",
+   "description": "ACCESS",
+   "x_detroit": {
+    "id": "org_access"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "68bce77b-7a24-5141-a94b-13a609c96322",
+    "location": {
+     "id": "2128e194-65f8-5dfe-8d4a-6a0a1cb02fbc",
+     "name": "Benefits help at the East Dearborn office, ACCESS",
+     "location_type": "physical",
+     "latitude": 42.337654,
+     "longitude": -83.176647,
+     "addresses": [
+      {
+       "id": "ddd6ebd3-4151-58a8-a82a-9b7e9b9ffc98",
+       "address_1": "6451 Schaefer Rd",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48126",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_access_benefits_help_at_the_east_dearborn_office"
+     }
+    },
+    "phones": [
+     {
+      "id": "6e9982da-d89f-5a7c-8677-e2175a47a3fa",
+      "number": "313-203-1874"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_access_benefits_help_at_the_east_dearborn_office",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "ACCESS website",
+      "url": "https://www.accesscommunity.org/human-services/basic-needs"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_access_benefits_help_at_the_east_dearborn_office",
+   "category": "food.benefits"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "635375d9-cb74-5976-9fe8-88b3a1e8948f",
+  "name": "Benefits help at the Hamtramck office",
+  "status": "active",
+  "description": "Help signing up for food stamps, Medicaid, cash help, and State Emergency Relief. Help in Arabic and English.",
+  "url": "https://www.accesscommunity.org/",
+  "organization": {
+   "id": "6b1abd7b-f771-5453-abce-fa09ac43a6ff",
+   "name": "ACCESS",
+   "description": "ACCESS",
+   "x_detroit": {
+    "id": "org_access"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "ad490ec4-65c1-5b8e-8472-d4f78f802157",
+    "location": {
+     "id": "bba1c5bf-bfe5-54e9-8343-2aeab52369c3",
+     "name": "Benefits help at the Hamtramck office, ACCESS",
+     "location_type": "physical",
+     "latitude": 42.393723,
+     "longitude": -83.05589,
+     "addresses": [
+      {
+       "id": "dce9d1c5-2ac5-573a-8eb8-171be47f49c4",
+       "address_1": "9301 Joseph Campau Ave",
+       "city": "Hamtramck",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_access_benefits_help_at_the_hamtramck_office"
+     }
+    },
+    "phones": [
+     {
+      "id": "cd1f5418-935d-560c-8998-ad5d44266f10",
+      "number": "313-842-7726"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_access_benefits_help_at_the_hamtramck_office",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "ACCESS website",
+      "url": "https://www.accesscommunity.org/human-services/basic-needs"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_access_benefits_help_at_the_hamtramck_office",
+   "category": "food.benefits"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "0803cb72-ce95-5382-afb5-a64096b03f6d",
+  "name": "Benefits help at the main Dearborn office",
+  "status": "active",
+  "description": "Help signing up for food stamps, Medicaid, cash help, and State Emergency Relief. Help in Arabic and English.",
+  "url": "https://www.accesscommunity.org/",
+  "organization": {
+   "id": "6b1abd7b-f771-5453-abce-fa09ac43a6ff",
+   "name": "ACCESS",
+   "description": "ACCESS",
+   "x_detroit": {
+    "id": "org_access"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "da3fcbf4-b14d-5ac6-9dc5-a99afd15eb59",
+    "location": {
+     "id": "05792333-3467-5396-9b50-5567b17edcd2",
+     "name": "Benefits help at the main Dearborn office, ACCESS",
+     "location_type": "physical",
+     "latitude": 42.307519,
+     "longitude": -83.144146,
+     "addresses": [
+      {
+       "id": "475bb018-86e9-55e8-bd82-17a0d7a1db5e",
+       "address_1": "2651 Saulino Ct",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48120",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_access_benefits_help_at_the_main_dearborn_office"
+     }
+    },
+    "phones": [
+     {
+      "id": "1a0166db-3a6a-5c9d-b382-c2f2d4104286",
+      "number": "313-203-3392"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_access_benefits_help_at_the_main_dearborn_office",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "ACCESS website",
+      "url": "https://www.accesscommunity.org/human-services/basic-needs"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_access_benefits_help_at_the_main_dearborn_office",
+   "category": "food.benefits"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "60c27384-ef51-5318-a66e-0855b88eb29f",
+  "name": "ACCESS Medical Center",
+  "status": "active",
+  "description": "See a doctor for checkups, shots, and sick visits. If you have no insurance, you pay based on your income.",
+  "url": "https://www.accesscommunity.org/",
+  "organization": {
+   "id": "6b1abd7b-f771-5453-abce-fa09ac43a6ff",
+   "name": "ACCESS",
+   "description": "ACCESS",
+   "x_detroit": {
+    "id": "org_access"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e8142ce3-8794-5e2a-abbe-f64881491534",
+    "location": {
+     "id": "eb443dd3-3fe1-5874-8a26-235f72c45d6a",
+     "name": "ACCESS Medical Center",
+     "location_type": "physical",
+     "latitude": 42.339704,
+     "longitude": -83.179022,
+     "addresses": [
+      {
+       "id": "1498c858-ddcd-5ec4-9746-7a92fca8bbdc",
+       "address_1": "6450 Maple St",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48126",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_access_medical_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "fa3b7c54-ad08-5702-95df-20408db57294",
+      "number": "313-216-2200"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_access_medical_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "ACCESS website",
+      "url": "https://www.accesscommunity.org/health-wellness/medical"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_access_medical_center",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "57c81174-dd2c-5874-b643-b063b7ddd49b",
   "name": "Advantage Health, Oakman",
   "status": "active",
@@ -1454,6 +1754,69 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "0de0ac7c-1466-5eaa-a6de-fed4836bf8f7",
+  "name": "Help paying a Dearborn water bill",
+  "status": "active",
+  "description": "If you can't pay your Dearborn water bill, Wayne Metro's water program (WRAP) may help. Call to see if you qualify and what papers you need.",
+  "eligibility_description": "For Dearborn water customers who are having money trouble.",
+  "url": "https://dearborn.gov/water",
+  "organization": {
+   "id": "525b2f19-38a9-5f77-8c05-284a66cd475d",
+   "name": "City of Dearborn",
+   "description": "City of Dearborn",
+   "x_detroit": {
+    "id": "org_city_of_dearborn"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "bc80977b-3f9f-527c-ad3c-e762dfc3bb84",
+    "location": {
+     "id": "b14b45bc-88b5-5321-9f3b-97f0a845fe2a",
+     "name": "Help paying a Dearborn water bill",
+     "location_type": "virtual",
+     "x_detroit": {
+      "id": "loc_city_of_help_paying_a_dearborn_water_bill"
+     }
+    },
+    "phones": [
+     {
+      "id": "c678eb81-e87d-5587-bf18-04122f53e902",
+      "number": "313-386-9727"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_city_of_help_paying_a_dearborn_water_bill",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "City of Dearborn website",
+      "url": "https://dearborn.gov/water"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_city_of_help_paying_a_dearborn_water_bill",
+   "category": "utilities"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "5aaa79f8-2a7b-555f-acae-792b82f8dabd",
   "name": "Medical, dental, and counseling",
   "status": "active",
@@ -2298,6 +2661,514 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "3e7174ae-9218-527c-921b-94e50c34fb5f",
+  "name": "Free Narcan and test strips at the Wagner parking deck",
+  "status": "active",
+  "description": "A box with free Narcan (naloxone) and fentanyl test strips. Narcan can stop an overdose.",
+  "url": "https://dearborn.gov/PublicHealth",
+  "organization": {
+   "id": "95409a2a-6f4c-5517-9909-971f62ec895a",
+   "name": "Dearborn Department of Public Health",
+   "description": "Dearborn Department of Public Health",
+   "x_detroit": {
+    "id": "org_dearborn_department_of_public_health"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "6f456a21-b076-5bf9-9e1e-63c4db5aa752",
+    "location": {
+     "id": "e37bf7f2-4919-52d5-9839-b47b67fe8c3a",
+     "name": "Free Narcan and test strips at the Wagner parking deck, Dearborn Department of Public Health",
+     "location_type": "physical",
+     "latitude": 42.305952,
+     "longitude": -83.244008,
+     "addresses": [
+      {
+       "id": "1d7a261b-7017-53ac-931a-069619c4c898",
+       "address_1": "1034 Monroe St",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48124",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dearborn_department_free_narcan_and_test_strips_at_the_w"
+     }
+    },
+    "phones": [
+     {
+      "id": "f332da4b-a548-5abe-bac9-24b1d7364403",
+      "number": "313-943-2150"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dearborn_department_free_narcan_and_test_strips_at_the_w",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [],
+     "hours_text": "Their page does not give hours.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Dearborn Department of Public Health website",
+      "url": "https://dearborn.gov/residents/public-health/responding-overdose"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dearborn_department_free_narcan_and_test_strips_at_the_w",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "6fe876d4-767e-5908-8202-2adb76742d67",
+  "name": "Free Narcan box at the Islamic Center of Detroit",
+  "status": "active",
+  "description": "A box with free Narcan (naloxone). Narcan can stop an overdose.",
+  "url": "https://dearborn.gov/PublicHealth",
+  "organization": {
+   "id": "95409a2a-6f4c-5517-9909-971f62ec895a",
+   "name": "Dearborn Department of Public Health",
+   "description": "Dearborn Department of Public Health",
+   "x_detroit": {
+    "id": "org_dearborn_department_of_public_health"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e73387db-0a97-5fb4-a634-a6c025e9ff5b",
+    "location": {
+     "id": "1f806546-efd4-5880-a2a3-5399c9f4ffb4",
+     "name": "Free Narcan box at the Islamic Center of Detroit, Dearborn Department of Public Health",
+     "location_type": "physical",
+     "latitude": 42.351199,
+     "longitude": -83.183858,
+     "addresses": [
+      {
+       "id": "b6789497-b979-548a-9fff-b68e39b6088c",
+       "address_1": "14350 Tireman Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dearborn_department_free_narcan_box_at_the_islamic_cente"
+     }
+    },
+    "phones": [
+     {
+      "id": "d388c84b-04c0-560c-a7fd-d1fefd6a0021",
+      "number": "313-943-2150"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dearborn_department_free_narcan_box_at_the_islamic_cente",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [],
+     "hours_text": "Their page does not give hours.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Dearborn Department of Public Health website",
+      "url": "https://dearborn.gov/residents/public-health/responding-overdose"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dearborn_department_free_narcan_box_at_the_islamic_cente",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "873f6c7f-3028-553d-9a16-c3561ecaddf6",
+  "name": "Free Narcan box at the West Village parking deck",
+  "status": "active",
+  "description": "A box with free Narcan (naloxone) at the east parking deck. Narcan can stop an overdose.",
+  "url": "https://dearborn.gov/PublicHealth",
+  "organization": {
+   "id": "95409a2a-6f4c-5517-9909-971f62ec895a",
+   "name": "Dearborn Department of Public Health",
+   "description": "Dearborn Department of Public Health",
+   "x_detroit": {
+    "id": "org_dearborn_department_of_public_health"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "7cfa6e01-424d-5b12-b41f-389286810cf2",
+    "location": {
+     "id": "2041dbad-e352-507b-a599-c8c040fa52bc",
+     "name": "Free Narcan box at the West Village parking deck, Dearborn Department of Public Health",
+     "location_type": "physical",
+     "latitude": 42.304557,
+     "longitude": -83.247797,
+     "addresses": [
+      {
+       "id": "3ed91a18-2fa0-5f84-9ac5-874d37b628f6",
+       "address_1": "22201 W Village Dr",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48124",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dearborn_department_free_narcan_box_at_the_west_village_"
+     }
+    },
+    "phones": [
+     {
+      "id": "58f6fbba-a670-59a3-89ee-3bad2b2dbf63",
+      "number": "313-943-2150"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dearborn_department_free_narcan_box_at_the_west_village_",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [],
+     "hours_text": "Their page does not give hours.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Dearborn Department of Public Health website",
+      "url": "https://dearborn.gov/residents/public-health/responding-overdose"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dearborn_department_free_narcan_box_at_the_west_village_",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "7f9dd5e5-be63-59c1-89c8-adf38b952f4a",
+  "name": "Free Narcan machine at the transit center",
+  "status": "active",
+  "description": "A machine that gives out free Narcan (naloxone). Narcan can stop an overdose.",
+  "url": "https://dearborn.gov/PublicHealth",
+  "organization": {
+   "id": "95409a2a-6f4c-5517-9909-971f62ec895a",
+   "name": "Dearborn Department of Public Health",
+   "description": "Dearborn Department of Public Health",
+   "x_detroit": {
+    "id": "org_dearborn_department_of_public_health"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "df02a406-ba8e-5132-9b5e-bdbe31a34fc2",
+    "location": {
+     "id": "66e560d1-0bb1-5b2e-a523-0cf5e0b34bb3",
+     "name": "Free Narcan machine at the transit center, Dearborn Department of Public Health",
+     "location_type": "physical",
+     "latitude": 42.307948,
+     "longitude": -83.233544,
+     "addresses": [
+      {
+       "id": "9401cb22-b928-590f-922d-c5cdc274f597",
+       "address_1": "21201 Michigan Ave",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48124",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dearborn_department_free_narcan_machine_at_the_transit_c"
+     }
+    },
+    "phones": [
+     {
+      "id": "fd41d37d-5b71-5211-b90c-2413779d37ec",
+      "number": "313-943-2150"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dearborn_department_free_narcan_machine_at_the_transit_c",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [],
+     "hours_text": "Their page does not give hours.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Dearborn Department of Public Health website",
+      "url": "https://dearborn.gov/residents/public-health/responding-overdose"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dearborn_department_free_narcan_machine_at_the_transit_c",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "a248bb05-ae6c-53ab-87be-7de2e759f4ce",
+  "name": "Dearborn Community Food Pantry",
+  "status": "active",
+  "description": "A free bag of groceries once a month. It is at Good Shepherd church on Mason St.",
+  "url": "https://dearbornfirstumc.org/",
+  "organization": {
+   "id": "3d1d4290-44a8-5e8a-ba9e-227c488a2e69",
+   "name": "Dearborn First United Methodist Church",
+   "description": "Dearborn First United Methodist Church",
+   "x_detroit": {
+    "id": "org_dearborn_first_united_methodist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "9eed0ec3-4ad9-51bd-8eb5-0b0b39d09ac4",
+    "location": {
+     "id": "3b6c3dde-b02f-5d63-9af5-7ae7b94ba886",
+     "name": "Dearborn Community Food Pantry",
+     "location_type": "physical",
+     "latitude": 42.300408,
+     "longitude": -83.243869,
+     "addresses": [
+      {
+       "id": "bd815232-9f65-5702-9816-c126a77e97d4",
+       "address_1": "1570 Mason St",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48124",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dearborn_first_dearborn_community_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "0f073150-5d02-500d-bf2d-35a5abda5467",
+      "number": "313-563-5200"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "11698194-5013-5b64-9629-f043533f4b3a",
+      "freq": "MONTHLY",
+      "byday": "3SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "10:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "3rd Saturday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_dearborn_first_dearborn_community_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Dearborn First United Methodist Church website",
+      "url": "https://dearbornfirstumc.org/groups/food-pantry"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dearborn_first_dearborn_community_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "0226e4b0-8169-5b32-84e0-2ca17b263887",
+  "name": "Henry Ford Centennial Library",
+  "status": "active",
+  "description": "Free books, computers, and Wi-Fi. A free place to sit inside.",
+  "url": "https://dearbornlibrary.org/",
+  "organization": {
+   "id": "6a5dbeeb-ab50-5573-ad4e-5afc751ddb12",
+   "name": "Dearborn Public Library",
+   "description": "Dearborn Public Library",
+   "x_detroit": {
+    "id": "org_dearborn_public_library"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "0fcdb673-6d78-50b4-8cab-1bc877a324d0",
+    "location": {
+     "id": "b9106c88-1e82-5814-b240-780c4b696c31",
+     "name": "Henry Ford Centennial Library",
+     "location_type": "physical",
+     "latitude": 42.313441,
+     "longitude": -83.204681,
+     "addresses": [
+      {
+       "id": "f7ab14ee-592d-5460-b442-b7b8af0b122d",
+       "address_1": "16301 Michigan Ave",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48126",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dearborn_public_henry_ford_centennial_library"
+     }
+    },
+    "phones": [
+     {
+      "id": "f8be322c-28d7-52b3-a634-b7eea69f868a",
+      "number": "313-943-2330"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "215a6104-70e5-579a-95f1-b6fa02b91681",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "aaac4026-d04a-59c3-b607-c69737ef2f88",
+      "freq": "WEEKLY",
+      "byday": "FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "17:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "76e16b14-c652-57df-9b53-597447026a32",
+      "freq": "WEEKLY",
+      "byday": "SU",
+      "dtstart": "2026-09-14",
+      "valid_from": "2026-09-01",
+      "valid_to": "2027-05-24",
+      "opens_at": "13:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Closed Sundays May 25 to August 31"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_dearborn_public_henry_ford_centennial_library",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Dearborn Public Library website",
+      "url": "https://dearbornlibrary.org/about/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_dearborn_public_henry_ford_centennial_library",
+   "category": "rec.library"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "b2afde32-f23d-59d7-ac48-f66a7792e401",
   "name": "Children's tutoring",
   "status": "active",
@@ -2625,6 +3496,74 @@
    "category": "youth"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f373c94d-c7a2-5175-b7ce-2a08d1db7dab",
+  "name": "Dearborn community fridge",
+  "status": "active",
+  "description": "A free community fridge, open all the time. Take the food you need. It may be empty, so it is worth checking back.",
+  "url": "https://detfridge.com/",
+  "organization": {
+   "id": "a7529737-8dee-54c4-8e1f-0f39b11b4e0e",
+   "name": "Detroit Community Fridge",
+   "description": "Detroit Community Fridge",
+   "x_detroit": {
+    "id": "org_detroit_community_fridge"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "5877cfd0-0cb4-5b06-9f6d-5688e2496222",
+    "location": {
+     "id": "23a6ee7e-11d4-5cfa-9203-831844bc3d4f",
+     "name": "Dearborn community fridge",
+     "location_type": "physical",
+     "addresses": [
+      {
+       "id": "12789832-aa9d-59f6-a3fa-04ecd71d1c59",
+       "address_1": "1176 Abbey Ln",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48124",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_community_dearborn_community_fridge"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_community_dearborn_community_fridge",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Community Fridge website",
+      "url": "https://detfridge.com/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_community_dearborn_community_fridge",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "282f7f77-2f2c-5106-9130-735389819b32",
@@ -4965,6 +5904,82 @@
    "category": "rec.library"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "cbf22ab6-1ac6-57db-9a25-60a2a2fda1a5",
+  "name": "The Oasis shelter",
+  "status": "active",
+  "description": "A shelter for men. Call first.",
+  "eligibility_description": "Men. The mission's site also calls it housing for people coming home from prison. Call to ask.",
+  "url": "https://drmm.org",
+  "organization": {
+   "id": "8a618a8f-d24d-5496-b7bc-c9a666de3f62",
+   "name": "Detroit Rescue Mission Ministries",
+   "description": "Detroit Rescue Mission Ministries",
+   "x_detroit": {
+    "id": "org_drmm"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "04cab3a5-b044-5635-b07a-e53120bb8f1f",
+    "location": {
+     "id": "e18cc696-0441-537c-83f3-3a5b69846a1f",
+     "name": "The Oasis shelter, Detroit Rescue Mission Ministries",
+     "location_type": "physical",
+     "latitude": 42.402033,
+     "longitude": -83.094597,
+     "addresses": [
+      {
+       "id": "9054c1d9-8b0b-50b6-82fd-e32a6d86d006",
+       "address_1": "13220 Woodward Ave",
+       "city": "Highland Park",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_rescue_the_oasis_shelter"
+     }
+    },
+    "phones": [
+     {
+      "id": "e4ca5df9-c956-5365-8f94-227d92038d6c",
+      "number": "313-859-5050"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_rescue_the_oasis_shelter",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Rescue Mission Ministries website",
+      "url": "https://drmm.org/about-us/locations/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_rescue_the_oasis_shelter",
+   "category": "shelter.emergency"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "798632f5-a3cd-5e42-8093-b41ee370b0f0",
@@ -10136,6 +11151,83 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "a07e6294-e003-5639-957c-be71477648f0",
+  "name": "LAHC food pantry by appointment",
+  "status": "active",
+  "description": "Free groceries. You pick the foods your family needs. Call to make an appointment.",
+  "eligibility_description": "For families in Dearborn.",
+  "url": "https://lahc.org/",
+  "organization": {
+   "id": "9096faf0-739c-5a63-beea-3836f2183b0b",
+   "name": "Leaders Advancing and Helping Communities",
+   "description": "Leaders Advancing and Helping Communities",
+   "x_detroit": {
+    "id": "org_leaders_advancing_and_helping_communitie"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4abe99cf-7f6a-5799-b6e0-b1e8621824e5",
+    "location": {
+     "id": "cbf03508-cdba-5e0e-9e31-95c17e5542aa",
+     "name": "LAHC food pantry by appointment, Leaders Advancing and Helping Communities",
+     "location_type": "physical",
+     "latitude": 42.325967,
+     "longitude": -83.183804,
+     "addresses": [
+      {
+       "id": "f3245227-c357-5040-94bd-caf70cb2a57c",
+       "address_1": "5275 Kenilworth St",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48126",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_leaders_advancing_lahc_food_pantry_by_appointment"
+     }
+    },
+    "phones": [
+     {
+      "id": "0c9d77f8-9698-5ee0-bba3-28cc92638278",
+      "number": "313-846-8480"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_leaders_advancing_lahc_food_pantry_by_appointment",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Appointments on Thursdays. Their site gives no times. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Leaders Advancing and Helping Communities website",
+      "url": "https://lahc.org/food-pantry-dearborn-snap-benefits-resources-lahc/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_leaders_advancing_lahc_food_pantry_by_appointment",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "a836a8f8-4f04-568f-9a31-0aeaaa5fde1e",
   "name": "After-school programs in Regent Park",
   "status": "active",
@@ -13818,6 +14910,83 @@
    "category": "youth"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "da14457a-803c-5ceb-a448-c260ad9cd685",
+  "name": "Dearborn health center",
+  "status": "active",
+  "description": "See a doctor. Family care is in Suite 255. Kids' care and women's health care are in Suite 245. If you have no insurance, you pay based on your income.",
+  "eligibility_description": "Care for anyone, with or without insurance.",
+  "url": "https://wwfhc.org/",
+  "organization": {
+   "id": "75ec5250-5369-51f3-9ed0-924fa4ea6826",
+   "name": "Western Wayne Family Health Centers",
+   "description": "Western Wayne Family Health Centers",
+   "x_detroit": {
+    "id": "org_western_wayne_family_health_centers"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "16589c46-b408-5df9-944b-0702804d2a35",
+    "location": {
+     "id": "3abfdc27-9fea-5da4-b81b-0f87930aa78d",
+     "name": "Dearborn Health Center, Western Wayne Family Health Centers",
+     "location_type": "physical",
+     "latitude": 42.321784,
+     "longitude": -83.175856,
+     "addresses": [
+      {
+       "id": "a9d98318-4fdc-5c9c-9f98-838e59c912cd",
+       "address_1": "4700 Schaefer Rd",
+       "city": "Dearborn",
+       "state_province": "MI",
+       "postal_code": "48126",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_western_wayne_dearborn_health_center"
+     }
+    },
+    "phones": [
+     {
+      "id": "f91f071c-794d-55c4-933c-01202382e722",
+      "number": "313-561-5100"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_western_wayne_dearborn_health_center",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Hours are different for each suite. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Western Wayne Family Health Centers website",
+      "url": "https://wwfhc.org/locations/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_western_wayne_dearborn_health_center",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "95905c82-58f4-5c49-a690-c35b35faeea9",

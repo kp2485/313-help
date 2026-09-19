@@ -539,7 +539,8 @@ describe('the real bundle', () => {
     }
   });
   it('station rows state their source and date, never claim to be checked, and do not change as time passes', () => {
-    const st = rows.find((r) => r.category === 'harm.narcan')!;
+    // DHD's open-data stations; Narcan boxes from a seed list (e.g. Dearborn's) carry their own entry check instead.
+    const st = rows.find((r) => r.category === 'harm.narcan' && r.facts.source.type === 'open_data')!;
     expect(badge(st, new Date('2026-09-18T17:45:00Z'))).toMatchObject({ level: 'source_listed', params: { source_date: '2026-08-26' } });
     // No timers (DECISIONS 2026-09-19): months later the badge states the same fact.
     expect(badge(st, new Date('2027-01-15T17:45:00Z'))).toMatchObject({ level: 'source_listed', params: { source_date: '2026-08-26' } });
