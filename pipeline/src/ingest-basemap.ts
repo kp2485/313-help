@@ -15,7 +15,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type { Segment } from '@detroithelp/query';
-import { BBOX, p, today } from './util.js';
+import { p, today } from './util.js';
 
 const ORG = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services';
 const ROADS = `${ORG}/City_of_Detroit_Roads/FeatureServer/0`;
@@ -23,7 +23,9 @@ const PARKS = `${ORG}/city_parks/FeatureServer/0`;
 const BOUNDARY = `${ORG}/City_of_Detroit_Boundary/FeatureServer/0`;
 const UA = { 'user-agent': 'detroithelp-pipeline (open-source civic directory; one polite pass)' };
 
-export const GRID = { lon0: BBOX.lonMin - 0.03, lat0: BBOX.latMin - 0.03, dLon: 0.04, dLat: 0.03 };
+// Fixed numbers, not derived from BBOX: every committed map cell (c_X_Y) and encoded outline is measured from this
+// origin, so widening the service area (Dearborn, 2026-09-19) must not move it. Points west of it get negative cells.
+export const GRID = { lon0: -83.32, lat0: 42.22, dLon: 0.04, dLat: 0.03 };
 export const SCALE = 1e5;
 type Pt = [number, number];                       // [lon, lat]
 export interface Road { cls: number; name: string; line: Pt[] }

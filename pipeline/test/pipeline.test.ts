@@ -17,7 +17,7 @@ import { ISSUE_TYPES, nameKey, suppress, toNeighborhoods } from '../src/ingest-n
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
 import { addressOnPage, isChallenge, listingOnPage, pageText, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
-import { crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
+import { GRID, crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
@@ -319,6 +319,13 @@ describe('ZIP center points', () => {
 });
 
 describe('street map from City open data', () => {
+  it('the grid is pinned to the origin the committed map cells were cut from (it must not move with the service area)', () => {
+    const base = JSON.parse(readFileSync(p('data/ingested/basemap/base.json'), 'utf8')) as { origin: [number, number] };
+    expect(GRID.lon0).toBeCloseTo(base.origin[0], 6);
+    expect(GRID.lat0).toBeCloseTo(base.origin[1], 6);
+    const hoods = readFileSync(p('data/indicators/neighborhoods.json'), 'utf8');
+    expect(hoods).not.toMatch(/-83\.36\b/);
+  });
   const road = (name: string, cls: number, line: [number, number][]): Road => ({ name, cls, line });
   it('names: freeways the way people say them; turn lanes and ramps have no name', () => {
     expect(roadName('N I 75')).toBe('I-75'); expect(roadName('W I 96 CD')).toBe('I-96'); expect(roadName('S M 10')).toBe('M-10');
