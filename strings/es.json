@@ -257,7 +257,7 @@
   "safe.calls_note": "Su teléfono guarda un registro de llamadas y mensajes de texto.",
   "safe.dv_intro": "Puede llamar a cualquier hora. Es gratis y privado.",
   "talk.intro": "Puede hablar con una persona de verdad ahora mismo.",
-  "hotcold.none": "Ahora no hay centros para calentarse o refrescarse en la lista. Las bibliotecas y los centros recreativos están abiertos para todos durante el día. Llame al 211 para encontrar uno cerca de usted.",
+  "hotcold.none": "Ahora no hay centros para calentarse o refrescarse en la lista. Las bibliotecas son gratis y están abiertas para todos durante el día. Llame al 211 para encontrar un lugar cerca de usted.",
   "gw.title": "Joe Louis Greenway",
   "gw.intro": "Un camino para caminar y andar en bicicleta alrededor de la ciudad. Unas 29 millas cuando esté terminado.",
   "gw.open": "Abierto para caminar y andar en bicicleta",
@@ -343,5 +343,5 @@
   "events.all": "Ver el calendario completo de la Ciudad",
   "detail.bus": "Cómo llegar en autobús",
   "detail.where": "Dónde",
-  "hotcold.intro": "Las bibliotecas y los centros recreativos son gratis y están abiertos para todos durante el día. Cuando la Ciudad abre centros para calentarse o refrescarse, aparecen en la página de Inicio."
+  "hotcold.intro": "Las bibliotecas son gratis y están abiertas para todos durante el día. Los centros recreativos son para miembros; pregunte cuánto cuesta. Cuando la Ciudad abre centros para calentarse o refrescarse, aparecen en la página de Inicio."
 }

@@ -554,7 +554,7 @@
      "source": {
       "type": "seed_list",
       "name": "Brightmoor Artisans Collective website",
-      "url": "https://brightmoorartisans.org/contact-us"
+      "url": "https://brightmoorartisans.org/contact"
      },
      "archived": null
     }
@@ -611,50 +611,14 @@
       "number": "313-740-7688"
      }
     ],
-    "schedules": [
-     {
-      "id": "dcce0a7f-b00d-53dd-a4ac-9b1926121f22",
-      "freq": "WEEKLY",
-      "byday": "MO",
-      "dtstart": "2026-09-14",
-      "opens_at": "13:00",
-      "closes_at": "18:00",
-      "x_detroit": {
-       "timezone": "America/Detroit",
-       "wall_clock": true
-      }
-     },
-     {
-      "id": "1ce65e4d-d484-5ac4-a2d5-82c65f9af782",
-      "freq": "WEEKLY",
-      "byday": "TU",
-      "dtstart": "2026-09-14",
-      "opens_at": "14:00",
-      "closes_at": "19:00",
-      "x_detroit": {
-       "timezone": "America/Detroit",
-       "wall_clock": true
-      }
-     },
-     {
-      "id": "3d0d16e5-8119-53eb-8368-879fa912a4e5",
-      "freq": "WEEKLY",
-      "byday": "WE",
-      "dtstart": "2026-09-14",
-      "opens_at": "10:00",
-      "closes_at": "13:00",
-      "x_detroit": {
-       "timezone": "America/Detroit",
-       "wall_clock": true
-      }
-     }
-    ],
+    "schedules": [],
     "x_detroit": {
      "id": "sal_brightmoor_connection_client_choice_food_pantry",
      "status": "active",
      "hsds_status": "active",
-     "availability": "scheduled",
+     "availability": "call_first",
      "flags": [],
+     "hours_text": "Mon 1-6pm, Tue 2-7pm, Wed 10am-1pm, by appointment. Closed the first Monday and the last week of each month.",
      "checked_at_entry": "2026-09-18",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -9752,7 +9716,7 @@
      },
      "source": {
       "type": "seed_list",
-      "name": "Healthy Kidz, Inc. website",
+      "name": "City of Detroit, Tindal Recreation Center page",
       "url": "https://detroitmi.gov/departments/detroit-parks-recreation/recreation-centers/tindal-recreation-center"
      },
      "archived": null
@@ -9878,11 +9842,12 @@
       "byday": "TU,TH,SA",
       "dtstart": "2026-09-14",
       "opens_at": "08:30",
-      "closes_at": "14:00",
+      "closes_at": "10:30",
       "x_detroit": {
        "timezone": "America/Detroit",
        "wall_clock": true
-      }
+      },
+      "description": "Walk-ins (primary care)"
      }
     ],
     "x_detroit": {
@@ -9891,6 +9856,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
+     "hours_text": "Tue, Thu, Sat 8:30am-2pm; walk-ins until 10:30am or until full. Wed 9am-noon telemedicine only.",
      "checked_at_entry": "2026-09-18",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -11317,6 +11283,99 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "a606483d-e71b-5689-867f-620cb28e6893",
+  "name": "Hot showers",
+  "status": "active",
+  "description": "A free hot shower, with hygiene items and laundry, at the day center.",
+  "eligibility_description": "Anyone. No ID or paperwork.",
+  "url": "https://popefranciscenter.org",
+  "organization": {
+   "id": "8d618f68-ff20-5203-b67a-cedbdd0f0760",
+   "name": "Pope Francis Center",
+   "description": "Pope Francis Center",
+   "x_detroit": {
+    "id": "org_pope_francis_center"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4df88465-39b2-55f9-843e-b8cbcbd08b07",
+    "location": {
+     "id": "026af3e1-c48d-5b95-8175-eebe06f5ce52",
+     "name": "Pope Francis Center",
+     "location_type": "physical",
+     "latitude": 42.331843,
+     "longitude": -83.038401,
+     "addresses": [
+      {
+       "id": "e2543726-820b-5e04-b5c4-284a02501763",
+       "address_1": "438 Saint Antoine St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48226",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_pope_francis_showers"
+     }
+    },
+    "phones": [
+     {
+      "id": "8a43517a-3b86-57d0-8fe1-0fb9d6caa887",
+      "number": "313-964-2823"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "5b24dbe8-8dfc-5881-aae4-01073d07e78d",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "07:00",
+      "closes_at": "11:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Day center"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_pope_francis_showers",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in",
+      "no_id_required"
+     ],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Pope Francis Center website",
+      "url": "https://popefranciscenter.org/get-help/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_pope_francis_showers",
+   "category": "hygiene.shower"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "38aad305-50d2-582b-8bc8-392fe6f52773",
   "name": "Racquet Up Detroit",
   "status": "active",
@@ -11497,6 +11556,100 @@
    "category": "youth"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "791005cf-37cb-5eaa-b844-e9a6eb2b405c",
+  "name": "Showers and laundry",
+  "status": "active",
+  "description": "A free shower and laundry for LGBTQ+ young people, at the drop-in center.",
+  "eligibility_description": "Ages 13 to 30.",
+  "url": "https://www.ruthelliscenter.org",
+  "organization": {
+   "id": "aecab26f-25b1-5aac-93d8-d80d72033122",
+   "name": "Ruth Ellis Center",
+   "description": "Ruth Ellis Center",
+   "x_detroit": {
+    "id": "org_ruth_ellis"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "c742db58-ac37-55de-a87e-d1be6a216e88",
+    "location": {
+     "id": "76005437-7f69-57a4-9620-f291aecc0469",
+     "name": "Ruth Ellis Center",
+     "location_type": "physical",
+     "latitude": 42.407545,
+     "longitude": -83.094256,
+     "addresses": [
+      {
+       "id": "1e9fb775-ba90-5d8f-83ec-3f9e4307c918",
+       "address_1": "95 Victor St",
+       "city": "Highland Park",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ruth_ellis_showers"
+     }
+    },
+    "phones": [
+     {
+      "id": "48b957bc-2767-5172-9a5e-003a15926546",
+      "number": "313-252-1950"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "65d2de98-b57d-5d72-af2c-a58db137882f",
+      "freq": "WEEKLY",
+      "byday": "MO,WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "15:00",
+      "closes_at": "20:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "Drop-in, full service"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_ruth_ellis_showers",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "youth",
+      "lgbtq",
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Ruth Ellis Center website",
+      "url": "https://ruthelliscenter.org/what-we-do/health-equity-outreach/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_ruth_ellis_showers",
+   "category": "hygiene.shower"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "eb3ad5f1-71f8-5c64-8ab0-17f5dbd0cc47",
@@ -12376,7 +12529,7 @@
   "name": "After-school programs with dinner",
   "status": "active",
   "description": "After-school coding and robots, arts and crafts, chess, nature club, basketball, and one-on-one reading help. Dinner is provided.",
-  "eligibility_description": "Call 313-493-9129 ext. 1 to learn more.",
+  "eligibility_description": "Call to learn more.",
   "url": "https://www.stsuzannecodyrouge.org/",
   "organization": {
    "id": "6554d4bf-3175-5f42-88e7-b399b9d9c59d",
@@ -12413,7 +12566,7 @@
     "phones": [
      {
       "id": "12e4d1ae-6cd2-5ec7-b662-cc207a46af86",
-      "number": "313-493-9129"
+      "number": "313-493-9129 ext. 1"
      }
     ],
     "schedules": [
@@ -12554,7 +12707,7 @@
   "name": "Gleaners drive-up food",
   "status": "active",
   "description": "Drive up and get groceries from the Gleaners Community Food Bank truck.",
-  "eligibility_description": "Call 313-963-8880 to make an appointment.",
+  "eligibility_description": "Call to ask how to sign up.",
   "url": "https://www.stsuzannecodyrouge.org/",
   "organization": {
    "id": "6554d4bf-3175-5f42-88e7-b399b9d9c59d",

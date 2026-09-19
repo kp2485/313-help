@@ -56,7 +56,7 @@ The earlier "emergency strip" and needs-on-Home layout are superseded by this st
 ## Urgent help
 
 - A button in the top bar of every screen, so the numbers are one tap from anywhere (Principle 3). On DV and crisis screens that slot holds "Leave this page fast" instead, and the numbers are already first on the page.
-- The sheet: 911 · Suicide and crisis lifeline (988) · Shelter tonight · Local mental health crisis line · Domestic violence hotline · Help finding services (211) · then "Someone is overdosing right now" with the steps. 911 is the only red row.
+- The sheet: 911 · Suicide and crisis lifeline (988) · Shelter tonight · Local mental health crisis line · Domestic violence hotline · Find help near you (211) · then "Someone is overdosing right now" with the steps. 911 is the only red row.
 - **911 and 988 are hardcoded and can never be overridden.** Other numbers come from `emergency.csv` through the signed bundle, so they can be corrected without a store release but not by a tampered feed (10-A5). Each must match what its owner currently publishes, machine-checked within 30 days (`pnpm check:emergency`); the release build fails otherwise.
 
 ## Triage — "Find what I need" (the D Compassion replacement)

@@ -257,7 +257,7 @@
   "safe.calls_note": "Your phone keeps a record of calls and texts.",
   "safe.dv_intro": "You can call any time. It's free and private.",
   "talk.intro": "You can talk to a real person right now.",
-  "hotcold.none": "No warming or cooling centers are listed right now. Libraries and recreation centers are open to everyone during the day. Call 211 to find one near you.",
+  "hotcold.none": "No warming or cooling centers are listed right now. Libraries are free and open to everyone during the day. Call 211 to find a place near you.",
   "gw.title": "Joe Louis Greenway",
   "gw.intro": "A walking and biking path around the city. About 29 miles when finished.",
   "gw.open": "Open to walk and bike",
@@ -343,5 +343,5 @@
   "events.all": "See the City's full calendar",
   "detail.bus": "Bus directions",
   "detail.where": "Where",
-  "hotcold.intro": "Libraries and recreation centers are free and open to everyone during the day. When the City opens warming or cooling centers, they show up on the Home page."
+  "hotcold.intro": "Libraries are free and open to everyone during the day. Recreation centers are open to members; ask about the fee. When the City opens warming or cooling centers, they show up on the Home page."
 }

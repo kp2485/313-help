@@ -5091,14 +5091,14 @@
     -83.04659
    ],
    "help": {
-    "total": 13,
+    "total": 14,
     "by": {
      "food": 3,
      "health": 1,
      "harm": 8,
      "shelter": 0,
      "utilities": 0,
-     "hygiene": 1,
+     "hygiene": 2,
      "youth": 0,
      "rec": 0
     },
@@ -8779,14 +8779,14 @@
     -83.04073
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 2,
      "health": 0,
      "harm": 6,
      "shelter": 0,
      "utilities": 0,
-     "hygiene": 0,
+     "hygiene": 1,
      "youth": 0,
      "rec": 0
     },
@@ -11546,14 +11546,14 @@
     -83.03515
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 1,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
-     "hygiene": 0,
+     "hygiene": 1,
      "youth": 0,
      "rec": 1
     },
@@ -18427,14 +18427,14 @@
     -83.01792
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 2,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
-     "hygiene": 0,
+     "hygiene": 1,
      "youth": 0,
      "rec": 1
     },
