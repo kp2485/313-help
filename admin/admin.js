@@ -85,7 +85,9 @@ async function render() {
       <section><h2>Reported listings and places <span class="count">${sorted.length}</span></h2>${sorted.map(([id, rs]) => reportGroup(id, rs)).join('') || '<p class="empty">Nothing to look at. Visitor confirmations are counted automatically.</p>'}</section>
       <section><h2>Proposed new places <span class="count">${queue.proposals.length}</span></h2>${queue.proposals.map(proposal).join('') || '<p class="empty">No proposals waiting.</p>'}</section>
       <section><h2>Publish</h2><p>Archiving and clearing take effect at the next bundle build. The nightly job does this; to do it now:</p><pre>pnpm build:bundle</pre>
-        <p class="sub">${archived.length} listing${archived.length === 1 ? '' : 's'} archived by stewards so far${archived.length ? ': ' + archived.map((o) => esc(names.get(o.target_id)?.name ?? o.target_id)).join(', ') : ''}.</p></section>`;
+      </section>
+      <section><h2>Archived by a steward <span class="count">${archived.length}</span></h2><p class="sub">Nothing here was deleted. If a place turns out to be open, restore it; it comes back at the next build.</p>
+        ${archived.sort((a, b) => b.at.localeCompare(a.at)).map((o) => `<article class="item" data-target="${esc(o.target_id)}"><h3>${esc(names.get(o.target_id)?.name ?? o.target_id)}</h3><p class="sub">${esc(o.target_id)} · ${esc(o.reason_code)} · ${esc(o.at.slice(0, 10))}</p><div class="actions"><button data-act="active" class="good">It's open again: restore it</button></div></article>`).join('') || '<p class="empty">None.</p>'}</section>`;
   } catch (e) { app.innerHTML = `<p class="breaker">${esc(e.message)}</p>`; }
 }
 
@@ -101,7 +103,7 @@ app.addEventListener('click', async (ev) => {
     } else if (act === 'archive' || act === 'active') {
       if (act === 'archive' && !confirm(`Archive “${names.get(item.dataset.target)?.name ?? item.dataset.target}”? It stays in the dataset with its reason, and the app will say it closed.`)) { btn.disabled = false; return; }
       await api(`/v1/steward/listings/${item.dataset.target}/status`, { method: 'POST', body: JSON.stringify(act === 'archive' ? { status: 'archived', reason_code: reason } : { status: 'active' }) });
-      message = act === 'archive' ? 'Archived. It will show as closed after the next build.' : 'Marked open. Closed reports cleared.';
+      message = act === 'archive' ? 'Archived. It will show as closed after the next build.' : 'Marked open. It shows as open again after the next build.';
     }
     if (act === 'dismiss' || act === 'active' || act === 'archive') {
       // Settle whatever is still open on this target (the status call only settles closure reports).
