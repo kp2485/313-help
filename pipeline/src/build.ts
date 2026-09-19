@@ -21,8 +21,8 @@ export interface BundleIndex {
   schema: 1;
   version: string;
   generated_at: string;
-  /** Advanced only by a human action (the newest emergency-number call). docs/12 dead-man switch. */
-  heartbeat: string;
+  /** Set only when a person retires the directory on purpose (data/seed/directory.json). No timer ever sets it. */
+  retired?: true;
   emergency_verified: boolean;
   signing: 'release' | 'dev';
   counts: Record<string, number>;
@@ -131,17 +131,15 @@ export async function build(opts: BuildOptions = {}) {
   put('emergency.json', emergency.sort((a, b) => Number(a.sort) - Number(b.sort))
     .map((r) => ({ id: r.id, label: r.label, number: r.number, ...(r.sms ? { sms: r.sms } : {}), hardcoded: r.hardcoded === 'yes' })));
 
-  // Dates a person did something: phoned an emergency number, or checked a row in. These live in
-  // committed CSVs, so a nightly job that only rebuilds cannot move the heartbeat forward.
-  // verified_published_on is a machine check, so it does not count as a human date.
-  const humanDates = [...emergency.map((r) => r.verified_by_call_on), ...rows.map((r) => r.facts.checked_at_entry)]
-    .filter((d): d is string => !!d).map((d) => d.slice(0, 10)).sort();
+  // Retiring the directory is a person's decision, committed to git (docs/OPERATIONS "How to retire the directory").
+  const directoryFile = p('data/seed/directory.json');
+  const retired = existsSync(directoryFile) && JSON.parse(readFileSync(directoryFile, 'utf8')).retired === true;
   const { key, kind } = loadSigningKey(!!opts.release);
   const index: BundleIndex = {
     // The content hash makes every distinct bundle a distinct version, even two builds in the same minute.
     schema: 1, version: `${gitSha()}-${now.toISOString().replace(/[-:]/g, '').slice(0, 13)}-${sha256(JSON.stringify(files)).slice(0, 8)}`,
     generated_at: now.toISOString().slice(0, 16) + 'Z',
-    heartbeat: humanDates.pop() ?? '1970-01-01',
+    ...(retired ? { retired: true as const } : {}),
     emergency_verified: emg.verified, signing: kind, counts, files,
   };
   const indexBytes = writeJson(`${out}/index.json`, index);

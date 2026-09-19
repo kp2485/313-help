@@ -49,7 +49,6 @@ export function validateRows(rows: BundleRow[], todayStr: string): Issues {
 
     if (r.status === 'archived' && !r.archived) e('archived rows need an archive record (date and reason)');
     if (!r.facts.source?.name) e('source name is required');
-    if (r.facts.cadence_days <= 0) e('cadence_days must be positive');
   }
   return { errors, warnings };
 }

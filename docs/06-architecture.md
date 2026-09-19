@@ -32,7 +32,7 @@ Two halves, deliberately separated:
 detroit-compass/
   data/
     seed/            hand-kept CSVs and alerts.json (listings, schedules, emergency numbers, alerts)
-    sources.yaml     registry of sources: url, tier, cadence, parser, owner contact
+    sources.yaml     registry of sources: url, tier, publish or stage, field mapping
     ingested/        what the ingesters read from City open data — committed; a change comes as a pull request
     staging/         ingested rows held back (e.g. a layer too old to publish)
     hsds/            generated — services.json, committed on each publish so history is in git
@@ -61,7 +61,7 @@ detroit-compass/
 - Each source has its own ingester file; `normalize.ts` turns seed and ingested rows into bundle rows and HSDS entities with deterministic IDs.
 - **Validate**: HSDS 3.2 JSON Schema + our own checks (Detroit bbox, phone format, known category, schedule parse). A schedule whose `until` is past on an active row is a warning, not an error.
 - **Diff** is git: open-data changes land in `data/ingested/` on a branch and become a pull request. Merging it is the steward's approval. Rows a source drops are never auto-archived.
-- **Facts, not scores:** the bundle carries dated facts per row (`checked_at_entry`, `last_confirmed_at`, method, open report counts, `cadence_days`) pulled from the seed and D1. Badge, staleness, and sort are computed on the device by `packages/query` (10-A3).
+- **Facts, not scores:** the bundle carries dated facts per row (`checked_at_entry`, `last_confirmed_at`, method, open report countsdays`) pulled from the seed and D1. Badge, staleness, and sort are computed on the device by `packages/query` (10-A3).
 - **Bundle**: per-category plain JSON (the host compresses it in transit), plus `alerts.json`, `archived.json`, `emergency.json`, `events.json`, `places/`, `map/`, `indicators/` (full list in 03). `index.json` has version = git SHA + build minute + an 8-character hash of the file checksums, per-file SHA-256 checksums, `generated_at`, a human-advanced `heartbeat` date (doc 12), and `emergency_verified`. `index.json.sig` is an Ed25519 signature over the exact bytes of `index.json`; clients pin two public keys and keep the old bundle if verification fails. Cloudflare Pages serves the app and `/data/bundle/v1/`; R2 is not used for the bundle.
 - HSDS output committed to `data/hsds/` so every publish is a git commit — free audit trail and rollback.
 

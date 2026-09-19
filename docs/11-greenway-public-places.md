@@ -68,7 +68,7 @@ So the feature is not "a parks app bolted on." It is one map where the greenway 
 
 Rights: none of those City datasets states a license **[checked]** — "unstated" is not "open." Add this to the DHD/City ask; 10-B12 applies.
 
-**Freshness applies to places too.** "Restroom: open" is a claim that goes stale exactly like pantry hours. Amenity states carry `last_verified_at` and get the same badges. An unknown restroom renders "Restroom — not sure if it's open," never "open."
+**Freshness applies to places too.** "Restroom: open" is a claim, like pantry hours. Amenity states would carry the date they were checked and change on people's reports, like listings. An unknown restroom renders "Restroom — not sure if it's open," never "open."
 
 ### 2. Condition reports ("Tell the greenway team")
 

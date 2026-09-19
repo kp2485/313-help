@@ -20,26 +20,26 @@ A crisis directory that is abandoned but still looks alive is worse than no app.
 ## Design rules that follow
 
 ### 1. Unattended by default
-Everything that keeps the directory honest runs without a person: badges age on the phone, reports label rows automatically, alerts expire by their own end time, watched pages and open-data diffs raise tasks rather than needing someone to look. Steward work improves the data; its absence never makes the app lie. (This is why 04 dropped scheduled verification.)
+Everything that keeps the directory honest runs without a person: every badge states its date, reports label rows automatically, alerts expire by their own end time, watched pages and open-data diffs raise tasks rather than needing someone to look. Steward work improves the data; its absence never makes the app lie. (This is why 04 dropped scheduled verification.)
 
-### 2. Dead-man switch
-Driven by the age of the newest signed bundle, computed on the phone — no server needed, works offline:
+### 2. Old copies and shutting down
 
-| Bundle age | App behavior |
+*Revised 2026-09-19 (Kyle): no artificial timers.* Nothing shuts the directory down automatically, and no listing changes because time passed.
+
+What the phone does know is how old its own copy of the list is. That is a fact about the phone, not about any listing: an old copy may be missing recent "this closed" reports. So, on every list and listing:
+
+| This phone's copy | App shows |
 |---|---|
-| > 72 hours | "Last updated {n} days ago — call before you go." Alerts area: "Alerts may be missing." |
-| > 30 days | Persistent banner on every list and detail: "This list hasn't been updated since {date}. Call first, or call 211." |
-| > 120 days | Directory goes to **sunset mode**: emergency strip (911, 988, and the last-verified crisis numbers), "Call 211 for help finding services," and a read-only list marked "Old information from {date}." No triage results presented as current. No reporting UI. |
+| > 72 hours old | "Your phone last got updates {n} days ago. Call before you go. Recent reports and alerts may be missing." |
+| > 30 days old | "Your phone last got updates on {date}. Call first, or call 211." |
 
-The pipeline also publishes a `heartbeat` date in `index.json` that only a human action advances (the monthly safety-number check). If the nightly job keeps building bundles but no human has touched anything for 120 days, sunset mode still triggers. An automated job must not be able to keep a dead project looking alive.
-
-Sunset mode is reversible: one new signed bundle with a fresh heartbeat restores everything.
+**Retiring the directory is a person's decision.** A steward sets `"retired": true` in `data/seed/directory.json` and publishes one final list. Every phone that gets it shows "This list is no longer being updated. Call 211 and a person can help you find a place." and hides the report buttons and add-a-place. Setting it back to `false` and publishing again undoes it. There is no heartbeat.
 
 ### 3. Transferable in an afternoon
 - **No personal accounts in the path.** Apple/Play under the Linwood Technologies organization (both stores support transferring an app to another organization). Domain, Cloudflare account, and GitHub org are separate from Kyle's personal ones, so ownership can move without a rebuild.
 - **Infrastructure as code.** `wrangler.toml`, D1 migrations, R2 bucket names, Access policy, and GitHub Actions workflows all live in the repo. Nothing is configured only in a dashboard, except the WAF rate-limit rule and the Access policy, which `docs/OPERATIONS.md` describes step by step.
 - **Secrets inventory** in `docs/OPERATIONS.md` (names and purposes, never values): bundle signing key, Cloudflare API token, D1 binding. Includes the signing-key rotation procedure — the pinned public key is the one thing that needs an app release to change, so ship the app with **two** pinned keys (active + spare, spare kept offline) from day one.
-- **`docs/OPERATIONS.md`**: the weekly pass, the 30-day emergency-number check (`pnpm check:emergency`), how to publish an alert, how to add a steward, how to trigger sunset on purpose, how to hand over.
+- **`docs/OPERATIONS.md`**: the weekly pass, the emergency-number check (`pnpm check:emergency`), how to publish an alert, how to add a steward, how to retire the directory on purpose, how to hand over.
 - **A city that adopts it never has to touch resident data,** because there isn't any. Put that sentence at the top of any adoption conversation.
 
 ### 4. Forkable by another city

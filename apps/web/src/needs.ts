@@ -61,5 +61,9 @@ export const TABS = [
 ] as const;
 export type TabId = (typeof TABS)[number]['id'];
 
+/** Domestic violence and mental-health crisis listings: no URL, no map dot, no distance, can't be saved (docs/08, 10-A8). */
+export const SENSITIVE = ['shelter.dv', 'health.mental'];
+export const isSensitive = (category: string) => SENSITIVE.some((c) => category === c || category.startsWith(c + '.'));
+
 // 911 and 988 are hardcoded. No bundle, feed, or server can change them (audit A5).
 export const HARDCODED = { emg_911: '911', emg_988: '988' } as const;

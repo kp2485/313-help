@@ -1,5 +1,5 @@
 {
-  "description": "Friday 2026-09-18 1:45pm. One rule: eligibility -> distance band (0-1, 1-3, 3+ mi) -> reported-closed last in band -> open-now/next-open -> freshness -> distance -> id. Near point is 42.3700,-83.0800.",
+  "description": "Friday 2026-09-18 1:45pm. One rule: eligibility -> distance band (0-1, 1-3, 3+ mi) -> reported-closed last in band -> open-now/next-open -> distance -> id (no freshness tier: time passing never reorders a list). Near point is 42.3700,-83.0800.",
   "rows": [
     {
       "id": "a_near_closed",
@@ -15,7 +15,6 @@
         }
       ],
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -45,7 +44,6 @@
         "no_id_required"
       ],
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -72,7 +70,6 @@
         }
       ],
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -99,7 +96,6 @@
         }
       ],
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -126,7 +122,6 @@
         }
       ],
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 2,
           "closed_last_at": "2026-09-17",
@@ -146,7 +141,6 @@
       "lon": -83.08,
       "availability": "unknown",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -163,7 +157,6 @@
       "id": "g_hotline_nocoords",
       "availability": "always",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -191,7 +184,6 @@
         }
       ],
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -243,16 +235,16 @@
       ]
     },
     {
-      "name": "no location: one band, open first, then freshness",
+      "name": "no location: one band; open first, then id (time since a check never reorders the list)",
       "fn": "rank",
       "now": "2026-09-18T17:45:00Z",
       "query": {
         "category": "food"
       },
       "expect": [
+        "b_near_open",
         "c_mid_open_confirmed",
         "d_far_open_confirmed",
-        "b_near_open",
         "g_hotline_nocoords",
         "a_near_closed",
         "f_near_unknown",

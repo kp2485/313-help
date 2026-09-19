@@ -19,12 +19,12 @@ This is the part D Compassion — and most resource directories — never solved
                  └────┬─────┘
      entry check      │ passes (see "How a row goes live" below)
                       ▼
-                 ┌──────────┐   cadence passes with     ┌──────────┐
-                 │  active  │ ──no verification──────▶  │  stale   │  visible, labeled, sorted down
-                 └────┬─────┘ ◀──verify/confirm──────── └────┬─────┘
-                      │                                      │
-      2 independent   │  "closed"/"moved" reports            │ same
-      within 30 days  ▼                                      ▼
+                 ┌──────────┐
+                 │  active  │  stays active until people report otherwise (no timers)
+                 └────┬─────┘
+                      │
+      2 different     │  "closed"/"moved" reports
+      phones          ▼
                  ┌──────────┐   steward accepts          ┌──────────┐
                  │ flagged  │ ────────────────────────▶  │ archived │  hidden; reason + replacement kept
                  └────┬─────┘                            └──────────┘
@@ -36,7 +36,7 @@ This is the part D Compassion — and most resource directories — never solved
                  └───────────┘
 ```
 
-*2026-09-18: `stale` is no longer a stored state; the phone derives it from dates. `flagged` rows stay visible with a warning. The diagram's transitions otherwise hold.*
+*2026-09-19: there is no `stale` state at all (no timers). `flagged` rows stay visible with a warning. The diagram's transitions otherwise hold.*
 
 **How a row goes live.** A listing we researched goes from `proposed` to `active` when `pnpm check:sources` finds its phone number and street number on its own web page (`entry_method: auto_check`), or when a person reads the page in a browser because the site blocks scripts (`entry_method: web`). A place sent from the app ("Add a place") waits in the steward queue. If it checks out, a steward adds it to `data/seed/resources.csv` by hand. Nothing in the queue goes live by itself.
 
@@ -47,47 +47,38 @@ This is the part D Compassion — and most resource directories — never solved
 
 *Revised 2026-09-18 (DECISIONS.md): nobody phones listings on a schedule. The app is open source and meant to be handed over; it cannot depend on a standing verification job. Humans act on exceptions only. The price is that we stop saying "verified" and say what we know.*
 
-The bundle ships facts per row: `checked_at_entry`, `last_confirmed_at`, `last_confirm_method`, open report counts by kind, `cadence_days`. **The phone computes the badge from those facts and today's date** (10-A3), so an offline phone ages its own data.
+The bundle ships facts per row: `checked_at_entry`, `last_confirmed_at`, `last_confirm_method`, open report counts by kind. **The phone computes the badge from those facts** (10-A3). No timers (DECISIONS 2026-09-19): the wording changes only when people report something; time passing only changes the dates shown, and they are always shown.
 
 | What we know | Badge text |
 |---|---|
-| Confirmed within its window | "A visitor said this was open {days} days ago" / "We checked by phone {days} days ago" (method shown plainly; a tap is not a phone call) |
-| Checked when added, still inside its window | "Matched their website when added, {date}" / "Checked by phone when added, {date}" |
-| From a public list the publisher edited in the last 90 days; no person checked the row (`source_listed`) | "From the {source}, last updated {source_date}" |
-| From a list, no person checked the row, and the list is older than 90 days (`never_checked`) | "From the {source}. Nobody has checked it. Call first." |
-| Past its window, no reports | "Nobody has confirmed this since {date}. Call first." |
+| Confirmed (any age) | "A visitor said this was open {days} days ago" / "We checked by phone {days} days ago" (method shown plainly; a tap is not a phone call) |
+| Checked when added (any age) | "Matched their website when added, {date}" / "Checked by phone when added, {date}" |
+| From a public list with a known edit date; no person checked the row (`source_listed`) | "From the {source}, last updated {source_date}" |
+| From a list with no date, and no person checked the row (`never_checked`) | "From the {source}. Nobody has checked it. Call first." |
 | 1 open closed/moved report | "Someone said this was closed on {date}. Call first." |
 | 2+ open closed/moved reports, no confirm since | "{count} people said this was closed. Call first." Sorted last in its distance band, **still visible** (10-A1: reports never hide a row) |
 | Steward archived | "Closed as of {date}", then "Call 211 for other options." (Showing the replacement: not built yet.) |
 
-Sort within a distance band: confirmed-in-window → checked-at-entry-in-window → past window, or from a recent list → from an old list, never checked → reported closed once → reported closed by 2 or more. A closed report outweighs a confirm of the same age. There is no numeric confidence shown or stored.
+Sort within a distance band: listings reported closed by 2 or more phones go last; everything else is sorted by open hours, then distance. How long ago something was checked never reorders a list. A closed report outweighs a confirm of the same age. There is no numeric confidence shown or stored.
 
-## How long a confirmation stays good (`cadence_days`)
+## No timers on listings
 
-Not a to-do list for anyone. It is only how fast a row's badge ages when nobody says anything.
+*Decided 2026-09-19 (Kyle): "I don't want resources to disappear unless there is good reason, i.e. a person telling the app that the resource no longer exists."*
 
-| Category | Window | Why |
-|---|---|---|
-| Alerts/activations | Hard end date; expire automatically | By design |
-| Mobile food distributions (`food.mobile`) | 14 days | Schedules shift |
-| Church/independent pantries and hot meals (`food.pantry`, `food.meal`) | 45 days | Volunteer-run; holidays and summer breaks |
-| Harm reduction stations | 45 days | Relocation, vandalism. Stock-outs are same-day signals (10-B4), not part of this |
-| Showers and laundry (`hygiene.`) | 45 days | Same window as pantries |
-| Shelter access points (`shelter.`) | 60 days | Hours change |
-| Help for young people (`youth`) | 60 days | Same window as shelter |
-| Utility/rent assistance (`utilities`, `housing.`) | 90 days | Funding cycles |
-| Clinics and other health listings (`health.`) | 180 days | Stable institutions |
-| DHD programs, rec centers, libraries, parks | 180 days | Stable institutions |
-| Benefits (`food.benefits`) | 365 days | Rarely change. Today benefits are link-outs on the "Help paying for food" screen, not listings, so no row uses this yet |
-| Anything not listed above | 90 days | The code's default |
+A listing never changes because time passed. There is no check-by date, no "stale" state, and no automatic "Call first." What a listing shows changes only when:
 
-The code's list is `CADENCE` in `pipeline/src/normalize.ts`. A row can set its own `cadence_days`, and an open-data source can set one for all its rows in `data/sources.yaml`.
+- people report it (closed, moved, wrong hours or phone) — it is labeled, and 2+ phones reporting it closed puts it last in its band;
+- a visitor confirms it is still there;
+- a steward archives, pauses or restores it;
+- its own web page stops showing its phone or street number — then it goes to the steward queue (the nightly re-check); the app doesn't change until a person decides.
 
-**The exception: safety-critical rows** (the Urgent help numbers: 911, 988, shelter, the local crisis line, the DV hotline, and 211. That is 6 rows in `data/seed/emergency.csv`). Each number must be found on its owner's current web page within the last 30 days (`pnpm check:emergency` stamps `verified_published_on`), or a person must log a call (`verified_by_call_on`). Otherwise a release build fails. The three-digit national numbers (911, 988, 211) are not checked this way. The script never rewrites a number. If one stops matching, a person reads the page and decides.
+Alerts are different: they end at the time their owner announced (`ends_at`, 7 days at most).
+
+**The exception: safety-critical rows** (the Urgent help numbers: 911, 988, shelter, the local crisis line, the DV hotline, and 211. That is 6 rows in `data/seed/emergency.csv`). `pnpm check:emergency` reads each number's own page. A release build fails only when a page is read and shows a different number (a mismatch); a page that can't be fetched is logged for a person but doesn't stop a release (DECISIONS 2026-09-19). The three-digit national numbers (911, 988, 211) are not checked this way. The script never rewrites a number. If one stops matching, a person reads the page and decides.
 
 ## Verification methods (cheapest first)
 
-1. **Source still lists it** — the row is still present in its open-data layer or watched page. This is **not verification**; it only means the publisher hasn't removed it, and it never resets the clock. (If an org ever opts in to maintain its rows, a dated attestation from them does count — `method: owner_attest`.)
+1. **Source still lists it** — the row is still present in its open-data layer or watched page. This is **not verification**; it only means the publisher hasn't removed it. (If an org ever opts in to maintain its rows, a dated attestation from them does count — `method: owner_attest`.)
 2. **Auto-checks** (no human): at entry, `pnpm check:sources` looks for the row's phone number and street number on its own web page. At every bundle build, `pipeline/src/validate.ts` checks that each phone number is a valid number, that coordinates are inside the Detroit bbox, and that schedules are well formed (it warns when an active row has a schedule that already ended). A nightly re-check of each row's page is not built yet.
 3. **Community confirm** — "Still open" tap from the detail screen. Sets `last_confirmed_at` (method `community_confirm`) unless there is a newer open closed-report on the row. Forgeable, so it is always displayed as what it is ("a visitor said…"), and a closed report outweighs it.
 4. **Steward phone call** — used at entry and for exceptions only, never on a schedule. Script: "Are you still running the pantry? Days/times? Any ID or residency requirement? Okay to list?" Log method, date, who (role only).

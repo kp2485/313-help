@@ -10,7 +10,7 @@ final class FixtureTests: XCTestCase {
     static let defaults: [String: Any] = [
         "org": "Test Org", "category": "food.pantry", "what": "Free groceries", "phones": [], "flags": [],
         "availability": "scheduled", "schedules": [], "status": "active",
-        "facts": ["cadence_days": 45, "reports": ["closed_open": 0, "wrong_open": 0], "source": ["type": "seed_list", "name": "test"]],
+        "facts": ["reports": ["closed_open": 0, "wrong_open": 0], "source": ["type": "seed_list", "name": "test"]],
     ]
 
     func decode<T: Decodable>(_ type: T.Type, _ obj: Any) throws -> T {
@@ -92,10 +92,10 @@ final class FixtureTests: XCTestCase {
                     let got = search(rows, c["text"] as? String ?? "", query(c["query"] as? [String: Any]), now: now, alerts: alerts).map(\.row.id)
                     ok = got == expect as? [String]; if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
                 case "bundleAge":
-                    let i = c["index"] as! [String: String]
-                    ok = bundleAge(generatedAt: i["generated_at"]!, heartbeat: i["heartbeat"]!, now: now).rawValue == expect as? String
+                    let i = c["index"] as! [String: Any]
+                    ok = bundleAge(generatedAt: i["generated_at"] as! String, retired: i["retired"] as? Bool ?? false, now: now).rawValue == expect as? String
                 case "effectiveNow":
-                    ok = iso(effectiveNow(now, bundleGeneratedAt: (c["index"] as! [String: String])["generated_at"])) == expect as? String
+                    ok = iso(effectiveNow(now, bundleGeneratedAt: (c["index"] as! [String: Any])["generated_at"] as? String)) == expect as? String
                 case "helpAlong": ok = helpAlong(rows, seg!).map(\.row.id) == expect as? [String]
                 case "milesToSegment": ok = abs(milesToSegment(LatLon(lat: r!.lat!, lon: r!.lon!), seg!) - (expect as! Double)) < (c["tolerance"] as? Double ?? 0.01)
                 case "nearestSegment":
@@ -108,7 +108,7 @@ final class FixtureTests: XCTestCase {
             }
         }
         print("fixtures: \(ran) cases, \(failures.count) failed")
-        XCTAssertGreaterThan(ran, 70)
+        XCTAssertGreaterThan(ran, 80)
         XCTAssertEqual(failures, [], failures.joined(separator: "\n"))
     }
 

@@ -7,7 +7,7 @@ import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
 import { MapView, type MapDot, type MapSpec } from './map.js';
-import { CATEGORIES, HARDCODED, NEEDS, TABS, type Need, type TabId } from './needs.js';
+import { CATEGORIES, HARDCODED, NEEDS, TABS, isSensitive, type Need, type TabId } from './needs.js';
 import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, preparePhoto, submit, uploadPhoto } from './report.js';
 import { TRANSIT } from './transit.js';
 import { FOOD_BENEFITS } from './benefits.js';
@@ -100,11 +100,13 @@ function ageBanner(): string {
   if (!bundle) return '';
   const age = bundleAge(bundle.index, now());
   const days = Math.floor((now().getTime() - Date.parse(bundle.index.generated_at)) / 86400000);
-  if (age === 'aging') return `<p class="banner warn">${T('bundle.aging', { days })} ${T('bundle.alerts_may_be_missing')}</p>`;
-  if (age === 'old') return `<p class="banner warn">${T('bundle.old', { date: prettyDate(bundle.index.generated_at) })}</p>`;
-  if (age === 'sunset') return `<p class="banner stop">${T('bundle.sunset')} <a href="tel:211">211</a></p>`;
+  if (age === 'aging') return `<p class="banner warn" role="note">${T('bundle.aging', { days })} ${T('bundle.alerts_may_be_missing')}</p>`;
+  if (age === 'old') return `<p class="banner warn" role="note">${T('bundle.old', { date: prettyDate(bundle.index.generated_at) })}</p>`;
+  if (age === 'retired') return `<p class="banner stop" role="note">${T('bundle.sunset')} <a href="tel:211">211</a></p>`;
   return '';
 }
+/** Retired only when a person published a final list marked retired: no report buttons, no new places. */
+const retired = () => bundle?.index.retired === true;
 function locChip(): string {
   if (here) return `<p class="loc">${icon('pin', 'sm')}<span>${T(hereZip ? 'loc.zip_using' : 'loc.using', { zip: hereZip })}</span> <button class="chip" data-loc="off">${T(hereZip ? 'loc.zip_off' : 'loc.off')}</button></p>`;
   // "Type a ZIP" (docs/05): for a person who would rather not share a location. The ZIP is looked up in the bundle, on the phone.
@@ -131,7 +133,7 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
   const shown = opts.limit ? ranked.slice(0, opts.limit) : ranked;
   // The map is closed until asked for, so the first Call button stays near the top. Never on the "not safe at home"
   // screen, and never a dot for a sensitive listing (those carry no coordinates in the first place).
-  const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && r.row.category !== 'shelter.dv' && r.row.category !== 'health.mental');
+  const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && !isSensitive(r.row.category));
   const map = !pins.length ? '' : listMap
     ? `${mapBox({ key: 'list:' + JSON.stringify(query), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, go: JSON.stringify({ v: 'detail', id: r.row.id }) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
     : `<button class="chip" data-listmap>${icon('pin', 'sm')}${T('map.show', { count: pins.length })}</button>`;
@@ -140,6 +142,7 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
 }
 // One tap to confirm, one tap to correct (docs/04). Places get the things-not-people list (docs/11).
 function reportBox(targetId: string, isPlace: boolean, category = ''): string {
+  if (retired()) return '';
   const done = reported.get(targetId);
   if (done) return `<p class="banner ok" role="status">${icon('check', 'sm')} ${T(done === 'queued' ? 'report.queued' : isPlace ? 'report.sent_place' : 'report.sent')}${done === 'sent_no_photo' ? ` ${T('report.photo_failed')}` : ''}</p>`;
   const kinds = isPlace ? PLACE_KINDS : LISTING_KINDS.filter((k) => k !== 'out_of_stock' || /^(food|harm)/.test(category));
@@ -165,7 +168,7 @@ function eventItem(e: CityEvent): string {
 }
 function homeTab(): string {
   if (!bundle) return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T(loadError ? 'home.no_data' : 'home.loading')}</p></section></main>`;
-  const sunset = bundleAge(bundle.index, now()) === 'sunset';
+  const sunset = retired();
   const alerts = bundle.alerts.filter((a) => Date.parse(a.ends_at) > now().getTime() && Date.parse(a.starts_at) <= now().getTime());
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const quick = ['food', 'shelter', 'doctor', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
@@ -184,7 +187,7 @@ function helpTab(): string {
   return `<main><h1 class="page" tabindex="-1">${T('home.needs')}</h1><p class="lede">${T('help.lede')}</p>${searchBtn()}
     <h2>${T('help.now')}</h2>${group('now')}<h2>${T('help.soon')}</h2>${group('soon')}
     <h2>${T('home.categories')}</h2><ul class="chips">${CATEGORIES.map((c) => `<li><button class="chip lg" ${go({ v: 'list', cat: c.id })}>${icon(c.icon, 'sm')}${T('cat.' + c.id)}</button></li>`).join('')}</ul>
-    <h2>${T('help.more')}</h2><ul class="rows">${rowLink({ v: 'saved' }, 'bookmark', t('saved.title'), t('saved.sub'))}${rowLink({ v: 'add' }, 'plus', t('add.title'), t('add.sub'))}</ul></main>`;
+    <h2>${T('help.more')}</h2><ul class="rows">${rowLink({ v: 'saved' }, 'bookmark', t('saved.title'), t('saved.sub'))}${(retired() ? '' : rowLink({ v: 'add' }, 'plus', t('add.title'), t('add.sub')))}</ul></main>`;
 }
 function recTab(): string {
   const g = bundle?.greenway, parks = bundle?.parks ?? [];
@@ -257,7 +260,7 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
     return { title: gone?.name ?? t('app.name'), exit: false, html: `<main><p class="banner warn">${gone ? T('badge.archived', { date: prettyDate(gone.archived.at) }) : T('detail.not_found')} ${T('detail.archived_try_211')} <a href="tel:211">211</a></p></main>` };
   }
   const b = badgeText(r), o = openNow(r, now(), bundle!.alerts), next = nextOccurrences(r, now(), 3, bundle!.alerts);
-  const sensitive = r.category === 'shelter.dv' || r.category === 'health.mental';
+  const sensitive = isSensitive(r.category);
   const gw = !sensitive && r.lat !== undefined && bundle!.greenway ? nearestSegment({ lat: r.lat, lon: r.lon! }, bundle!.greenway.segments, { openOnly: true, maxMiles: 0.5 }) : null;
   return { title: r.name, exit: sensitive, html: `<main class="detail"><p class="org">${esc(r.org)}</p>
     <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${r.notice ? `<p class="notice">${esc(r.notice)}</p>` : ''}
@@ -266,7 +269,7 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
         <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${placeQ(r)}&travelmode=transit" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>` : ''}
       <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}" aria-pressed="${savedIds.includes(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button></div>
       ${savedIds.includes(r.id) ? `<p class="foot" role="status">${T('saved.note')}</p>` : ''}</div>
-    ${r.category === 'shelter.dv' ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
+    ${sensitive ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
     ${currentLang() !== 'en' ? `<p class="foot" lang="${currentLang()}">${T('detail.in_english')}</p>` : ''}<h2>${T('detail.what')}</h2><p lang="en">${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${esc(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: r.hours_text })}</p>` : ''}
     ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${esc(clock(n.opens_at))} – ${esc(clock(n.closes_at))}</span></li>`).join('')}</ul>` : ''}
@@ -303,7 +306,7 @@ function greenway(): string {
   return `<main><p class="lede">${T('gw.intro')}</p>${mapBox({ key: 'greenway', label: t('gw.map_label') })}${group('open')}${group('under_construction')}${group('funded')}${group('planned')}<p class="foot">${T('gw.source', { date: prettyDate(g.source.last_edited) })}</p></main>`;
 }
 function segment(s: Segment): string {
-  const near = helpAlong(bundle!.rows.filter((r) => r.category !== 'shelter.dv'), s);
+  const near = helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s);
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `<main><p class="meta"><span class="pill ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}</span></p>${s.phase === 'open' ? '' : `<p class="lede">${T('gw.not_open')}</p>`}
     ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
@@ -370,7 +373,7 @@ function about(): string {
 // ---- router: in-memory stack. Need screens and sensitive listings never touch the URL (audit A8). ----
 function hashFor(v: View): string | null {
   if (v.v === 'tab') return v.tab === 'home' ? location.pathname : `#/${v.tab}`;
-  if (v.v === 'detail') { const r = bundle?.rows.find((x) => x.id === v.id); return r && (r.category === 'shelter.dv' || r.category === 'health.mental') ? null : `#/r/${v.id}`; }
+  if (v.v === 'detail') { const r = bundle?.rows.find((x) => x.id === v.id); return r && isSensitive(r.category) ? null : `#/r/${v.id}`; }
   if (v.v === 'list') return `#/c/${v.cat}`;
   if (v.v === 'greenway') return '#/greenway';
   if (v.v === 'segment') return `#/greenway/${v.id}`;
@@ -412,6 +415,8 @@ function render(focus = true): void {
   else { const s = bundle.greenway?.segments.find((x) => x.id === v.id); title = s?.name ?? t('gw.title'); body = s ? segment(s) : greenway(); }
   const fromStack = stack.map((x) => (x.v === 'tab' ? x.tab : undefined)).filter(Boolean).pop();
   const active = v.v === 'tab' ? v.tab : fromStack ?? TAB_OF[v.v];
+  // Every list and listing says when this phone last got updates, if that was a while ago. Home has its own spot.
+  if (['need', 'list', 'detail', 'segment', 'search', 'saved'].includes(v.v) || (v.v === 'tab' && v.tab === 'rec')) body = body.replace(/^<main([^>]*)>/, (m) => m + ageBanner());
   app.innerHTML = topBar(title, exit) + body + tabBar(active);
   mountMaps();
   if (focus) { window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true }); }

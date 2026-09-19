@@ -4,7 +4,8 @@ import { nextOccurrences, openNow } from './schedule.js';
 import { nowWallMinutes } from './time.js';
 
 // One ranking rule (DECISIONS 10-B2):
-//   eligibility -> distance band -> reported-closed last -> open-now / next-open -> freshness -> distance -> id
+//   eligibility -> distance band -> reported-closed last -> open-now / next-open -> distance -> id
+// No freshness tier: time passing never reorders a list; only reports do (DECISIONS 2026-09-19).
 // Distance comes before everything except eligibility because many users have no car.
 
 export interface Query {
@@ -82,7 +83,6 @@ export function rank(rows: BundleRow[], q: Query, now: Date, alerts: Alert[] = [
     a.band - b.band
     || reported(a) - reported(b)
     || a.key - b.key
-    || a.badge.tier - b.badge.tier
     || (a.miles ?? 0) - (b.miles ?? 0)
     || a.row.id.localeCompare(b.row.id));
 

@@ -39,11 +39,11 @@ In production the pipeline syncs every id at each publish.
 |---|---|---|
 | About weekly | Work the exceptions queue: new proposals (one entry check each), listings with 2+ "closed" reports, machine-raised tasks | under an hour |
 | Every month | `pnpm ingest:neighborhoods` and `pnpm ingest:basemap` refresh the neighborhood numbers and the street map from City open data (the nightly job does this on the 1st and opens a pull request). Read the diff, merge it | 5 minutes |
-| Every 30 days | `pnpm check:emergency` — confirms each emergency number still matches its owner's page. If it fails, a published number changed: read the page, edit `data/seed/emergency.csv` by hand | 5 minutes |
+| Every month or so | `pnpm check:emergency` — reads each emergency number's own page. A mismatch means a published number changed: read the page, edit `data/seed/emergency.csv` by hand. A page that can't be fetched (the City's site blocks scripts) is checked in a normal browser and the date recorded | 5 minutes |
 | When adding listings | Put one pipe-delimited line per listing in `data/seed/incoming/*.txt` (format at the top of `pipeline/src/import-lines.ts`), then `pnpm import:lines` → `pnpm check:sources` → `pnpm geocode` → `pnpm build:bundle`. Imported rows are `proposed` and invisible until their own source page matches. Hours become a schedule only if every part parses; otherwise they're shown as written with "call first." Rows whose site blocks scripts: read the page in a browser, then set `status=active`, `entry_method=web` | — |
 | Monthly or so | `pnpm ingest:opendata`, then read the git diff of `data/ingested/`. A changed phone number or address is approved by committing it | 10 minutes |
 
-If nobody does any of this, the app ages its own badges, warns after 30 days, and goes to sunset mode after 120 (doc 12). That is by design.
+If nobody does any of this, listings keep saying what they said, with their dates, and people's reports keep labeling them. Phones that haven't updated in a while say so. Nothing shuts down on its own; retiring the directory is a person's decision (below).
 
 ## Photos on condition reports
 
@@ -74,16 +74,16 @@ Their email is recorded next to each decision they make (`steward_actions`) and 
 
 **Restoring a listing** someone archived by mistake: `/admin/` → **Archived by a steward** → *It's open again: restore it*. It comes back at the next build. Nothing was deleted.
 
-## How to trigger sunset on purpose
+## How to retire the directory on purpose
 
-The app goes to sunset mode by itself (doc 12) when **either** the bundle is more than 120 days old **or** the `heartbeat` in `index.json` is more than 120 days old (`packages/query/src/freshness.ts`). The heartbeat is the newest date in the committed CSVs that a person phoned an emergency number (`verified_by_call_on`) or a listing was checked in (`checked_at_entry`). A nightly rebuild does not move it.
+Only a person does this; no timer ever will (DECISIONS 2026-09-19).
 
-To wind the app down on purpose:
+1. Set `"retired": true` in `data/seed/directory.json` and commit it.
+2. Publish (the nightly job, or `pnpm build:bundle:release` and deploy).
 
-- Stop advancing the heartbeat: no new call dates, no new listings checked in. 120 days after the last one, every phone shows sunset mode, even if the nightly job keeps running.
-- Or, faster to reason about: turn the nightly job off (`PUBLISH_ENABLED` to anything but `true`) and let the bundle age. Or publish one final bundle, then turn it off.
+Every phone that gets that list shows "This list is no longer being updated. Call 211 and a person can help you find a place." and hides the report buttons and add-a-place. 911, 988 and the other urgent numbers stay.
 
-To undo it: one new signed bundle with a fresh heartbeat restores everything.
+To undo it: set it back to `false` and publish again.
 
 ## How to run the greenway access report
 

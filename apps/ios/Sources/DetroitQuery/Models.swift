@@ -22,7 +22,6 @@ public struct Facts: Codable, Equatable, Sendable {
     public var entryMethod: String?
     public var lastConfirmedAt: String?
     public var lastConfirmMethod: String?
-    public var cadenceDays: Int
     public var reports: Reports
     public var source: Source
 }

@@ -91,7 +91,7 @@ export function lineToRows(line: string): { resource: CsvRow; schedules: CsvRow[
       category: v.category, what: v.what, eligibility: v.eligibility, address_1: v.address, city: v.address ? v.city || 'Detroit' : '', zip: v.zip, lat: '', lon: '',
       phone: v.phone, phone_label: '', phone2: '', phone2_label: '', website: v.website, availability: always ? 'always' : windows ? 'scheduled' : 'call_first',
       hours_text: hoursText, flags: '', notice: '', status: 'proposed', checked_at_entry: '', entry_method: '', source_type: 'seed_list',
-      source_name: `${v.org || v.name} website`, source_url: v.source_url, cadence_days: '', internal_note: '',
+      source_name: `${v.org || v.name} website`, source_url: v.source_url, internal_note: '',
     },
     schedules: (windows ?? []).map((w) => ({ sal_id: id, freq: 'WEEKLY', interval: '', byday: w.byday, bymonthday: '', dtstart: '2026-09-14', until: '', valid_from: '', valid_to: '', opens_at: w.opens_at, closes_at: w.closes_at, description: '' })),
   };

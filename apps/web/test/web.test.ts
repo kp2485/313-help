@@ -2,7 +2,7 @@ import { generateKeyPairSync, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { NEEDS, CATEGORIES, HARDCODED, TABS } from '../src/needs.js';
+import { NEEDS, CATEGORIES, HARDCODED, TABS, isSensitive } from '../src/needs.js';
 import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
@@ -224,7 +224,14 @@ describe('map', () => {
   });
   it('the list map is closed until asked for, and is never offered on the "not safe at home" screen', () => {
     expect(main).toContain('let listMap = false;');
-    expect(main).toContain("const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && r.row.category !== 'shelter.dv' && r.row.category !== 'health.mental');");
+    expect(main).toContain('ranked.filter((r) => r.row.lat !== undefined && !isSensitive(r.row.category))');
+  });
+  it('one sensitivity rule: DV and crisis listings get no map dot anywhere, including greenway segments, and no URL', () => {
+    for (const c of ['shelter.dv', 'health.mental', 'health.mental.crisis']) expect(isSensitive(c), c).toBe(true);
+    for (const c of ['shelter.emergency', 'health.clinic', 'food.pantry']) expect(isSensitive(c), c).toBe(false);
+    expect(main).toContain('helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s)');
+    expect(main).toContain('return r && isSensitive(r.category) ? null');
+    expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
   });
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
 });

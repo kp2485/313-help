@@ -127,10 +127,10 @@ struct AgeBanner: View {
     let index: BundleIndex
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: index.generatedAt)
-        switch bundleAge(generatedAt: index.generatedAt, heartbeat: index.heartbeat, now: now) {
+        switch bundleAge(generatedAt: index.generatedAt, retired: index.retired ?? false, now: now) {
         case .aging: Text(L.t("bundle.aging", ["days": String(Int(now.timeIntervalSince(parseInstant(index.generatedAt) ?? now) / 86400))]) + " " + L.t("bundle.alerts_may_be_missing")).banner()
         case .old: Text(L.t("bundle.old", ["date": String(index.generatedAt.prefix(10))])).banner()
-        case .sunset: Text(L.t("bundle.sunset") + " 211").banner()
+        case .retired: Text(L.t("bundle.sunset")).banner()
         case .fresh: EmptyView()
         }
     }

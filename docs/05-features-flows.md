@@ -51,7 +51,7 @@ The earlier "emergency strip" and needs-on-Home layout are superseded by this st
 - **Alerts**: cards with title, plain-language body, a call button for each phone number, when it ends ("Until {when}"), and a link to where it was announced. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
 - **"What do you need?"** now heads the Help tab (see above). Principle 3 path: Help → need (1) → refinement if any (2) → **Call** (3); from Home, a quick need skips the first tap.
 - **Browse by type** (Help tab chips): Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people.
-- Small footer: "List updated {when} · Works offline". Past 72 hours this becomes a banner ("Last updated 12 days ago — call before you go") and the alerts area says "Alerts may be missing"; past 30 and 120 days see doc 12.
+- Small footer: "List updated {when} · Works offline". When this phone's copy is more than 72 hours old, every list and listing says so ("Your phone last got updates 12 days ago. Call before you go."); see doc 12.
 
 ## Urgent help
 

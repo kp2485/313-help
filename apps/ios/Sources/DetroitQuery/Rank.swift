@@ -1,5 +1,5 @@
 // One ranking rule (schema/query-spec.md "Ranking"), port of packages/query/src/rank.ts:
-//   eligibility -> distance band -> reported-closed last -> open-now / next-open -> freshness -> distance -> id
+//   eligibility -> distance band -> reported-closed last -> open-now / next-open -> distance -> id (no freshness key)
 // Distance comes before everything except eligibility because many users have no car.
 import Foundation
 
@@ -75,7 +75,6 @@ public func rank(_ rows: [BundleRow], _ q: Query, now: Date, alerts: [Alert] = [
         if x.band != y.band { return x.band < y.band }
         if reported(x) != reported(y) { return reported(x) < reported(y) }
         if kx != ky { return kx < ky }
-        if x.badge.tier != y.badge.tier { return x.badge.tier < y.badge.tier }
         if (x.miles ?? 0) != (y.miles ?? 0) { return (x.miles ?? 0) < (y.miles ?? 0) }
         return x.row.id < y.row.id
     }.map(\.0)

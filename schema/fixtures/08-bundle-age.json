@@ -1,13 +1,12 @@
 {
-  "description": "Bundle-age banner and dead-man switch (docs/12), plus the broken-clock guard.",
+  "description": "How old the phone's copy of the list is, and the broken-clock guard. No heartbeat and no automatic shutdown: only a person retires the directory.",
   "cases": [
     {
       "name": "one day old",
       "fn": "bundleAge",
       "now": "2026-09-19T08:00:00Z",
       "index": {
-        "generated_at": "2026-09-18T08:00:00Z",
-        "heartbeat": "2026-09-18"
+        "generated_at": "2026-09-18T08:00:00Z"
       },
       "expect": "fresh"
     },
@@ -16,8 +15,7 @@
       "fn": "bundleAge",
       "now": "2026-09-22T09:00:00Z",
       "index": {
-        "generated_at": "2026-09-18T08:00:00Z",
-        "heartbeat": "2026-09-18"
+        "generated_at": "2026-09-18T08:00:00Z"
       },
       "expect": "aging"
     },
@@ -26,38 +24,35 @@
       "fn": "bundleAge",
       "now": "2026-10-19T09:00:00Z",
       "index": {
-        "generated_at": "2026-09-18T08:00:00Z",
-        "heartbeat": "2026-09-18"
+        "generated_at": "2026-09-18T08:00:00Z"
       },
       "expect": "old"
     },
     {
-      "name": "121 days old",
+      "name": "121 days old: still just an old copy, never shut down by a timer",
       "fn": "bundleAge",
       "now": "2027-01-17T09:00:00Z",
       "index": {
-        "generated_at": "2026-09-18T08:00:00Z",
-        "heartbeat": "2026-09-18"
+        "generated_at": "2026-09-18T08:00:00Z"
       },
-      "expect": "sunset"
+      "expect": "old"
     },
     {
-      "name": "fresh bundle but no human heartbeat for 137 days: a cron job cannot keep a dead project alive",
+      "name": "a steward published a final list marked retired",
       "fn": "bundleAge",
-      "now": "2027-02-02T09:00:00Z",
+      "now": "2026-09-19T12:00:00Z",
       "index": {
-        "generated_at": "2027-02-01T08:00:00Z",
-        "heartbeat": "2026-09-18"
+        "generated_at": "2026-09-19T08:00Z",
+        "retired": true
       },
-      "expect": "sunset"
+      "expect": "retired"
     },
     {
       "name": "device clock reset to 2010: use the bundle's build time",
       "fn": "effectiveNow",
       "now": "2010-01-01T00:00:00Z",
       "index": {
-        "generated_at": "2026-09-18T08:00:00Z",
-        "heartbeat": "2026-09-18"
+        "generated_at": "2026-09-18T08:00:00Z"
       },
       "expect": "2026-09-18T08:00:00.000Z"
     },
@@ -66,10 +61,18 @@
       "fn": "effectiveNow",
       "now": "2026-09-20T00:00:00Z",
       "index": {
-        "generated_at": "2026-09-18T08:00:00Z",
-        "heartbeat": "2026-09-18"
+        "generated_at": "2026-09-18T08:00:00Z"
       },
       "expect": "2026-09-20T00:00:00.000Z"
+    },
+    {
+      "name": "an unreadable build date is never shown as fresh",
+      "fn": "bundleAge",
+      "now": "2026-09-19T12:00:00Z",
+      "index": {
+        "generated_at": "not a date"
+      },
+      "expect": "old"
     }
   ]
 }

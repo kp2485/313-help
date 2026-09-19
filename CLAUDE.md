@@ -38,7 +38,7 @@ Steps 1–4 were done on 2026-09-18. Step 5: `apps/ios` has `DetroitQuery`, the 
 
 ## Data sources
 
-Registry in `data/sources.yaml` for the layers that become listings (see docs/02 for tiers and cadences); the City layers behind the map, parks, ZIPs, events and neighborhood numbers are named at the top of their ingest scripts (`pipeline/src/ingest-*.ts`). Do not scrape any Tier C/D source. No institution maintains a feed for us (DHD included): stewards maintain `data/seed/`; a change in an open-data source arrives as a pull request and is published only when a steward merges it. Page watchers are planned, not built, and would only open steward tasks. All sources are read-only; never write back. Identify our requests honestly; if a site blocks them, check by hand rather than disguising the request.
+Registry in `data/sources.yaml` for the layers that become listings (see docs/02 for tiers); the City layers behind the map, parks, ZIPs, events and neighborhood numbers are named at the top of their ingest scripts (`pipeline/src/ingest-*.ts`). Do not scrape any Tier C/D source. No institution maintains a feed for us (DHD included): stewards maintain `data/seed/`; a change in an open-data source arrives as a pull request and is published only when a steward merges it. Page watchers are planned, not built, and would only open steward tasks. All sources are read-only; never write back. Identify our requests honestly; if a site blocks them, check by hand rather than disguising the request.
 
 ## Places and condition reports (docs/11, approved)
 

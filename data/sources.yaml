@@ -16,7 +16,6 @@ sources:
     mode: publish
     max_age_days: 90
     category: harm.narcan
-    cadence_days: 45
     org: { id: org_dhd, name: Detroit Health Department }
     fields: { name: Location_Description, address: Address, phone: Phone_Number, website: Website, hours: Hours_of_Operations, ref: GlobalID }
     extra: [Distribution_Device_Type, Box_Location, Type_of_Business]
@@ -31,7 +30,6 @@ sources:
     mode: stage          # last edited 2016-11-16: names/addresses/coordinates only, check each at entry
     max_age_days: 90
     category: shelter.cooling
-    cadence_days: 180
     org: { id: org_detroit_parks_rec, name: Detroit Parks & Recreation }
     fields: { name: Site, address: Address, zip: Zip, phone: Phone }   # Contact (staff names) deliberately not mapped
     id_prefix: rec

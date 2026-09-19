@@ -1,0 +1,4 @@
+{
+  "retired": false,
+  "note": "Set retired to true only to shut the directory down on purpose. The app then tells everyone to call 211 and hides report buttons. See docs/OPERATIONS.md."
+}

@@ -16,7 +16,7 @@ interface Case {
   row?: string;
   n?: number;
   query?: Record<string, unknown>;
-  index?: { generated_at: string; heartbeat: string };
+  index?: { generated_at: string; retired?: boolean };
   expect: unknown;
 }
 type FixtureRow = Partial<BundleRow> & { id: string };
@@ -25,7 +25,7 @@ interface Fixture { description: string; segments?: Segment[]; rows?: FixtureRow
 const DEFAULTS = {
   org: 'Test Org', category: 'food.pantry', what: 'Free groceries', phones: [], flags: [],
   availability: 'scheduled', schedules: [], status: 'active',
-  facts: { cadence_days: 45, reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' } },
+  facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' } },
 };
 
 for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {

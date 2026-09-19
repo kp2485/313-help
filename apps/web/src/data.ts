@@ -6,7 +6,7 @@ import type { Alert, BundleRow, Segment } from '@detroithelp/query';
 import { sha256Hex, signatureOk } from './verify.js';
 
 export interface BundleIndex {
-  version: string; generated_at: string; heartbeat: string; emergency_verified: boolean; signing: 'release' | 'dev';
+  version: string; generated_at: string; retired?: boolean; emergency_verified: boolean; signing: 'release' | 'dev';
   counts: Record<string, number>; files: Record<string, { sha256: string; bytes: number }>;
 }
 export interface EmergencyNumber { id: string; label: string; number: string; sms?: string; hardcoded: boolean }

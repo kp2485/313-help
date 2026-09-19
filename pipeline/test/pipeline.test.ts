@@ -19,7 +19,7 @@ import { crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
   phones: [{ number: '313-555-0100' }], availability: 'call_first', schedules: [], flags: [], status: 'active',
-  facts: { cadence_days: 45, reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' } },
+  facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' } },
   ...over,
 });
 const errs = (r: Partial<BundleRow>) => validateRows([row(r)], '2026-09-18').errors.join(' | ');
@@ -340,9 +340,12 @@ describe('the real bundle', () => {
     const sig = JSON.parse(readFileSync(join(out, 'index.json.sig'), 'utf8'));
     expect(verifyBytes(readFileSync(join(out, 'index.json')), sig.signature, ['MCowBQYDK2VwAyEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='])).toBe(false);
   });
-  it('reports whether emergency numbers are verified, and the heartbeat is a human date', () => {
+  it('reports whether emergency numbers are verified; no heartbeat, and never retired unless a person says so', () => {
     expect(typeof index.emergency_verified).toBe('boolean');
-    expect(index.heartbeat).toBe('2026-09-18');
+    expect(index).not.toHaveProperty('heartbeat');
+    expect(index).not.toHaveProperty('retired');
+    expect(JSON.parse(readFileSync(p('data/seed/directory.json'), 'utf8')).retired).toBe(false);
+    for (const r of rows) expect(r.facts).not.toHaveProperty('cadence_days');
   });
   it('no DV row has a place', () => {
     const dv = rows.filter((r) => r.category === 'shelter.dv');
@@ -355,10 +358,11 @@ describe('the real bundle', () => {
       for (const r of rows) expect(strings[badge(r, new Date(when)).key], `${r.id} @ ${when}`).toBeTypeOf('string');
     }
   });
-  it('station rows state their source and never claim to be checked', () => {
+  it('station rows state their source and date, never claim to be checked, and do not change as time passes', () => {
     const st = rows.find((r) => r.category === 'harm.narcan')!;
     expect(badge(st, new Date('2026-09-18T17:45:00Z'))).toMatchObject({ level: 'source_listed', params: { source_date: '2026-08-26' } });
-    expect(badge(st, new Date('2027-01-15T17:45:00Z')).level).toBe('never_checked');
+    // No timers (DECISIONS 2026-09-19): months later the badge states the same fact.
+    expect(badge(st, new Date('2027-01-15T17:45:00Z'))).toMatchObject({ level: 'source_listed', params: { source_date: '2026-08-26' } });
   });
   it('only an unambiguous "24 hours" becomes open-now; other hours text is shown as written', () => {
     for (const r of rows.filter((x) => x.category === 'harm.narcan')) {

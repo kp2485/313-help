@@ -23,7 +23,7 @@ Source: reverse-engineering of `com.detroithealthdepartment.dcompassion` v1.0 (b
 |---|---|---|
 | No back end | Nothing worked past the UI | Static data plane + thin anonymous write plane (06) |
 | No data ownership model | Directory could only change with a code release | Watched public sources, community reports, stewards, open HSDS dataset — no dependency on any institution maintaining a feed (03, 04) |
-| No freshness concept | A wrong phone number lived forever | Verification dates, cadences, confidence badges (04) |
+| No freshness concept | A wrong phone number lived forever | Dated facts on every listing, and labels from people's reports (04) |
 | No way to report a problem | Residents had no voice | One-tap anonymous reports + "still open" confirms (04, 05) |
 | No way to add a resource | Only DHD programs existed; no food, no churches, no mutual aid | Add-a-place (built); provider self-listing (v1.1) (04) |
 | No archiving | Closed resources would have remained listed | Archive with reason and replacement, visible history (04) |

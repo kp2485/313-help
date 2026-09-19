@@ -6,7 +6,7 @@ import CryptoKit
 import DetroitQuery
 import Foundation
 
-struct BundleIndex: Codable { var version: String; var generatedAt: String; var heartbeat: String; var signing: String; var files: [String: FileMeta]
+struct BundleIndex: Codable { var version: String; var generatedAt: String; var retired: Bool?; var signing: String; var files: [String: FileMeta]
     struct FileMeta: Codable { var sha256: String; var bytes: Int } }
 struct EmergencyNumber: Codable, Identifiable { var id: String; var label: String; var number: String; var hardcoded: Bool }
 struct CityEvent: Codable, Identifiable { var id: String; var title: String; var startsAt: String; var endsAt: String?; var location: String?; var url: String }

@@ -33,18 +33,17 @@ A window is open from `opens_at` inclusive to `closes_at` exclusive.
 
 ## Badge (freshness)
 
-Computed on the device from dated facts. First match wins:
+Computed on the device from dated facts. **No timers** (DECISIONS 2026-09-19): the wording changes only when people report something, never because time passed. Every badge shows its date, so a reader can judge "checked in September" for themselves. First match wins:
 
 1. `archived` — status archived.
-2. `reported_closed` — 2+ open closed/moved reports, and no confirm dated **after** the latest one.
+2. `reported_closed` — 2+ open closed/moved reports (counted per phone, not per kind), and no confirm dated **after** the latest one. A report with no date still counts.
 3. `reported_once` — exactly 1 such report. A same-day confirm does not outweigh a report.
-4. `confirmed` — `last_confirmed_at` within `cadence_days`. String key carries the method (`badge.confirmed.phone` vs `badge.confirmed.community_confirm`): a tap is not a phone call.
-5. `entry_checked` — `checked_at_entry` within `cadence_days`.
-6. `unconfirmed` — has a date, but past its window.
-7. `source_listed` — never checked by us, but it is on a publisher's list that the publisher edited within 90 days. The badge names the list and its date and claims nothing else. Same sort tier as `unconfirmed`.
-8. `never_checked` — no person has ever checked it and the source is old or undated. Being present in a source is not verification.
+4. `confirmed` — a confirm exists (any age). The key carries the method (`badge.confirmed.phone` vs `badge.confirmed.community_confirm`): a tap is not a phone call. Shows how many days ago.
+5. `entry_checked` — checked when added (any age). Shows the date.
+6. `source_listed` — never checked by us, on a publisher's list with a known edit date. Names the list and its date and claims nothing else.
+7. `never_checked` — no person has checked it and the list has no date. Being present in a source is not verification.
 
-Tiers in that freshness order (confirmed = 0) are sort keys only. No number is ever shown.
+Dates are calendar days on a Detroit calendar: a timestamp of `2026-09-20T01:30Z` is Sept 19. Tiers exist as sort keys but only "reported closed" affects ranking. No number is ever shown.
 
 ## Ranking
 
@@ -52,10 +51,9 @@ Tiers in that freshness order (confirmed = 0) are sort keys only. No number is e
 2. **Distance band**: 0–1 mi, 1–3 mi, 3+ mi. With no location, or for a row with no coordinates (hotlines, DV), band 0.
 3. **Reported-closed rows go last in their band** (still visible).
 4. **Open key.** Mode `now`: open → closes soon → opens later today → call first → opens another day → no upcoming time → unknown. Mode `week`: open now or any time in the next 7 days → call first → nothing this week → unknown.
-5. **Freshness tier.**
-6. **Distance**, then **id** for a stable order.
+5. **Distance**, then **id** for a stable order.
 
-Distance comes before openness and freshness because many users have no car.
+Distance comes before openness because many users have no car. There is no freshness key: time since a check never reorders a list; only reports do.
 
 ## Search
 
@@ -68,11 +66,13 @@ Search runs on the device. The typed text is never stored, sent, or put in a URL
 
 ## Bundle age
 
+How old the phone's copy of the list is. It says nothing about any listing: it tells the person their phone may be missing recent reports, and the app shows it on every list and listing.
+
 | Condition | Stage |
 |---|---|
-| bundle ≤ 72 h old | `fresh` |
-| > 72 h | `aging` — banner; "alerts may be missing" |
-| > 30 days | `old` — persistent warning |
-| > 120 days, **or** `heartbeat` > 120 days old | `sunset` (docs/12) |
+| copy ≤ 72 h old | `fresh` |
+| > 72 h | `aging` — "Your phone last got updates N days ago. Call before you go." |
+| > 30 days, or the build date can't be read | `old` — the same note, stronger |
+| the published index says `retired: true` | `retired` — "This list is no longer being updated. Call 211." No report buttons. |
 
-`heartbeat` only advances by human action, so an automated job cannot keep an abandoned directory looking alive.
+Only a person retires the directory, by publishing a final list marked retired. No timer and no heartbeat ever does.

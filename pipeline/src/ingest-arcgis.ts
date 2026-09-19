@@ -11,7 +11,7 @@ import { p, writeCsv, slug, inBbox, type CsvRow, today } from './util.js';
 export interface Source {
   id: string; name: string; kind: string; url: string; page?: string; license?: string;
   mode?: 'publish' | 'stage'; enabled?: boolean; max_age_days?: number;
-  category?: string; cadence_days?: number; org?: { id: string; name: string };
+  category?: string; org?: { id: string; name: string };
   fields?: Record<string, string>; extra?: string[]; id_prefix?: string;
 }
 
@@ -81,6 +81,8 @@ async function main() {
     const { lastEdited, features } = await fetchLayer(src);
     const { rows, warnings } = toRows(src, lastEdited, features, fetchedAt);
     const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
+    // A layer its publisher hasn't edited in max_age_days publishes nothing new: fresh rows go to staging for a person,
+    // and the last published file stays live. Nothing disappears on a timer.
     let mode = src.mode ?? 'stage';
     if (mode === 'publish' && ageDays > (src.max_age_days ?? 90)) {
       warnings.push(`${src.id}: layer last edited ${lastEdited} (${ageDays} days ago); too old to publish, staging instead`);

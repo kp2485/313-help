@@ -4,13 +4,6 @@ import type { BundleRow, Schedule, SourceType, VerifyMethod, Availability, RowSt
 import { formatPhone, parsePhone, uuid5, type CsvRow } from './util.js';
 import type { Source } from './ingest-arcgis.js';
 
-// How long a confirmation stays good, by category (docs/04). Not a to-do list for anyone.
-const CADENCE: [string, number][] = [
-  ['food.mobile', 14], ['food.pantry', 45], ['food.meal', 45], ['harm.', 45], ['shelter.', 60], ['youth', 60],
-  ['hygiene.', 45], ['utilities', 90], ['housing.', 90], ['health.', 180], ['rec.', 180], ['food.benefits', 365],
-];
-export const cadenceFor = (category: string) => CADENCE.find(([k]) => category.startsWith(k))?.[1] ?? 90;
-
 export interface Normalized { rows: BundleRow[]; orgs: Map<string, string>; svcOf: Map<string, { svc_id: string; service_name: string; org_id: string }> }
 
 function phones(r: CsvRow): BundleRow['phones'] {
@@ -55,7 +48,6 @@ export function fromSeed(resources: CsvRow[], schedules: CsvRow[]): Normalized {
         checked_at_entry: r.checked_at_entry || null,
         entry_method: (r.entry_method || null) as VerifyMethod | null,
         last_confirmed_at: null, last_confirm_method: null,
-        cadence_days: r.cadence_days ? Number(r.cadence_days) : cadenceFor(r.category!),
         reports: { closed_open: 0, closed_last_at: null, wrong_open: 0 },   // filled from D1 once the Worker exists (build step 3)
         source: { type: (r.source_type || 'seed_list') as SourceType, name: r.source_name!, ...(r.source_url ? { url: r.source_url } : {}) },
       },
@@ -90,7 +82,6 @@ export function fromIngested(src: Source, ingested: CsvRow[]): Normalized {
       schedules: [], flags: ['walk_in', 'no_id_required'], status: 'active',
       facts: {
         checked_at_entry: null, entry_method: null, last_confirmed_at: null, last_confirm_method: null,
-        cadence_days: src.cadence_days ?? cadenceFor(src.category!),
         reports: { closed_open: 0, closed_last_at: null, wrong_open: 0 },
         source: { type: 'open_data', name: src.name, url: src.page ?? src.url, last_edited: r.source_last_edited || null },
       },

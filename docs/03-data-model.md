@@ -56,7 +56,6 @@ A real row: the app bundle's row for Auntie Na's Village food boxes (`data/bundl
     "entry_method": "auto_check",   // phone | in_person | web | community_confirm | owner_attest | auto_check
     "last_confirmed_at": null,
     "last_confirm_method": null,
-    "cadence_days": 45,             // category default, overridable per row
     "reports": { "closed_open": 0, "closed_last_at": null, "wrong_open": 0 },
     "source": {
       "type": "seed_list",          // watched_page | open_data | partner_feed | press_release | seed_list | community | owner_feed
@@ -160,7 +159,7 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 
 - `data/hsds/services.json` — one file: every service as nested HSDS 3.2 (organization, service_at_locations, location, address, phones, schedules inside it), with `x_detroit` extensions. Committed on each publish.
 - `data/bundle/v1/` — the app bundle, plain JSON (the web server compresses it in transit). Not committed.
-  - `index.json` + `index.json.sig` — version, `generated_at`, `heartbeat`, `emergency_verified`, counts, and a SHA-256 and byte size for every file below. The signature covers the exact bytes of `index.json`.
+  - `index.json` + `index.json.sig` — version, `generated_at`, `retired` (only when a person retires the directory), `emergency_verified`, counts, and a SHA-256 and byte size for every file below. The signature covers the exact bytes of `index.json`.
   - `category/*.json` — one file per top-level category (food, harm, health, hygiene, rec, shelter, utilities, youth).
   - `alerts.json`, `archived.json`, `emergency.json`, `events.json`.
   - `places/greenway.json`, `places/parks.json`, `places/zips.json`.
@@ -170,7 +169,7 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 
 ## Freshness rules (summary — full logic in 04)
 
-- The phone derives staleness from `last_confirmed_at` / `checked_at_entry` and `cadence_days`; it is not a stored state (10-A3).
+- There is no staleness state. The phone shows the dates it has; only reports change what a listing says (DECISIONS 2026-09-19).
 - Two or more open `closed_permanently`/`moved` reports with no confirm since → badge "{count} people said this was closed. Call first." There is no separate "flagged" state: the row is **still listed**, sorted last in its distance band (10-A1).
 - Steward archives it → `archived` (kept, hidden, with reason and optional replacement).
 - A change in an open-data source (a row dropped or changed) shows up in the nightly pull request; the row stays as it was until a steward decides. Sources glitch.

@@ -3,9 +3,9 @@
 // mental-health crisis cannot be saved at all, and the screen is named plainly: "Saved places."
 
 import { idbGet, idbSet } from './data.js';
+import { isSensitive } from './needs.js';
 
-const NEVER = ['shelter.dv', 'health.mental'];
-export const canSave = (category: string) => !NEVER.some((c) => category === c || category.startsWith(c + '.'));
+export const canSave = (category: string) => !isSensitive(category);
 
 export async function loadSaved(): Promise<string[]> {
   const ids = await idbGet<unknown>('saved');

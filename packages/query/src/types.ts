@@ -32,7 +32,6 @@ export interface Facts {
   entry_method?: VerifyMethod | null;
   last_confirmed_at?: string | null;
   last_confirm_method?: VerifyMethod | null;
-  cadence_days: number;
   reports: {
     /** Open closed/moved reports (distinct nonces). */
     closed_open: number;
@@ -109,7 +108,7 @@ export interface OpenResult {
 }
 
 export type BadgeLevel =
-  | 'confirmed' | 'entry_checked' | 'unconfirmed' | 'source_listed' | 'never_checked'
+  | 'confirmed' | 'entry_checked' | 'source_listed' | 'never_checked'
   | 'reported_once' | 'reported_closed' | 'archived';
 
 export interface Badge {

@@ -40,7 +40,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 ## Design principles (test every decision against these)
 
 1. **Zero PII, by construction.** No accounts, no names, no phone numbers, no location history stored server-side. Reports are anonymous. If a feature needs PII, it's out of scope.
-2. **Never lie about freshness.** Every listing shows when it was last verified and by whom (source type). Stale listings are visibly stale. Unknown is shown as unknown, never as "open."
+2. **Never lie about freshness.** Every listing shows when it was last checked and how (source type), and what people have reported. Listings change only when people report something, never because time passed (DECISIONS 2026-09-19). Unknown is shown as unknown, never as "open."
 3. **Three taps to a phone number.** In crisis, the path to "call this" or "go here" must be shorter than the path to anything else. Emergency contacts are always one screen away.
 4. **Works on the worst phone with no signal.** Offline-first, small bundle, no heavy map SDK required for core function, no login walls, no video.
 5. **Plain language, multiple languages.** English first. Spanish is built; Arabic next, then Bengali. Reading level ≤ 6th grade for all UI copy.

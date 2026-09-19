@@ -1,10 +1,9 @@
 {
-  "description": "Badges are computed on the device from dated facts and today's date. They state what is known; source presence is never verification.",
+  "description": "Badges are computed on the device from dated facts. They state what is known; source presence is never verification. No timers: time passing never changes the wording, only reports do (the dates are always shown).",
   "rows": [
     {
       "id": "sal_confirmed",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -22,7 +21,6 @@
     {
       "id": "sal_entry",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -38,7 +36,6 @@
     {
       "id": "sal_never",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -53,7 +50,6 @@
     {
       "id": "sal_reported_once",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 1,
           "closed_last_at": "2026-10-18",
@@ -70,7 +66,6 @@
     {
       "id": "sal_reported_twice",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 2,
           "closed_last_at": "2026-10-19",
@@ -87,7 +82,6 @@
     {
       "id": "sal_confirm_after_report",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 1,
           "closed_last_at": "2026-10-10",
@@ -104,7 +98,6 @@
     {
       "id": "sal_same_day",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 1,
           "closed_last_at": "2026-10-15",
@@ -121,7 +114,6 @@
     {
       "id": "sal_community_phone",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -146,7 +138,6 @@
       "id": "sal_station",
       "category": "harm.narcan",
       "facts": {
-        "cadence_days": 45,
         "reports": {
           "closed_open": 0,
           "wrong_open": 0
@@ -156,6 +147,49 @@
           "name": "Detroit Health Department station list",
           "last_edited": "2026-08-26"
         }
+      }
+    },
+    {
+      "id": "sal_undated_source",
+      "facts": {
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "a printed flyer"
+        }
+      }
+    },
+    {
+      "id": "sal_evening_confirm",
+      "facts": {
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-09-20T01:30Z",
+        "last_confirm_method": "community_confirm"
+      }
+    },
+    {
+      "id": "sal_reports_no_date",
+      "facts": {
+        "reports": {
+          "closed_open": 3,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-18",
+        "entry_method": "web"
       }
     }
   ],
@@ -175,7 +209,7 @@
       }
     },
     {
-      "name": "checked at entry, inside window",
+      "name": "checked at entry: states the date it was checked",
       "fn": "badge",
       "row": "sal_entry",
       "now": "2026-10-20T16:00:00Z",
@@ -188,24 +222,25 @@
       }
     },
     {
-      "name": "same row, clock forward past the window: badge flips with no new bundle",
+      "name": "same row two months later: the same dated fact, no \"call first\" just because time passed",
       "fn": "badge",
       "row": "sal_entry",
       "now": "2026-11-15T16:00:00Z",
       "expect": {
-        "level": "unconfirmed",
+        "level": "entry_checked",
+        "key": "badge.entry_checked.web",
         "params": {
           "date": "2026-09-18"
         }
       }
     },
     {
-      "name": "listed in a 2016 data layer and never checked by a person",
+      "name": "listed in a 2016 data layer and never checked by a person: say whose list and when, nothing more",
       "fn": "badge",
       "row": "sal_never",
       "now": "2026-10-20T16:00:00Z",
       "expect": {
-        "level": "never_checked",
+        "level": "source_listed",
         "params": {
           "source_date": "2016-11-16"
         }
@@ -292,12 +327,50 @@
       }
     },
     {
-      "name": "same row once the list has gone 90+ days without an edit",
+      "name": "same row months later: still names the list and its date",
       "fn": "badge",
       "row": "sal_station",
       "now": "2026-12-01T16:00:00Z",
       "expect": {
-        "level": "never_checked"
+        "level": "source_listed",
+        "params": {
+          "source_date": "2026-08-26"
+        }
+      }
+    },
+    {
+      "name": "no date and no person check: says nobody has checked it",
+      "fn": "badge",
+      "row": "sal_undated_source",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "never_checked",
+        "key": "badge.never_checked"
+      }
+    },
+    {
+      "name": "a confirm at 9:30pm in Detroit is dated that day, not the next UTC day",
+      "fn": "badge",
+      "row": "sal_evening_confirm",
+      "now": "2026-09-20T02:00:00Z",
+      "expect": {
+        "level": "confirmed",
+        "params": {
+          "date": "2026-09-19",
+          "days": 0
+        }
+      }
+    },
+    {
+      "name": "closed reports with no date still count",
+      "fn": "badge",
+      "row": "sal_reports_no_date",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_closed",
+        "params": {
+          "count": 3
+        }
       }
     }
   ]
