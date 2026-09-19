@@ -1552,6 +1552,323 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "49934731-c96a-5f1e-87df-26ba6f09c16a",
+  "name": "Free meals and food pantry",
+  "status": "active",
+  "description": "Free meals and free food. Call to ask when and where to go.",
+  "url": "https://casscommunity.org/",
+  "organization": {
+   "id": "b47e0093-772b-5b4f-a90b-c5270d21f6b4",
+   "name": "Cass Community Social Services",
+   "description": "Cass Community Social Services",
+   "x_detroit": {
+    "id": "org_cass_community_social_services"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d16bf90e-4d3e-557c-a90f-ac450842c008",
+    "location": {
+     "id": "d548257e-f371-5dce-8c65-a5cb3a795211",
+     "name": "Free meals and food pantry, Cass Community Social Services",
+     "location_type": "physical",
+     "latitude": 42.386598,
+     "longitude": -83.106585,
+     "addresses": [
+      {
+       "id": "3ef4dfc7-4aac-5b0b-b291-d37956c7177d",
+       "address_1": "11745 Rosa Parks Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_cass_community_free_meals_and_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "50adccf7-7ee8-5367-991d-075535f4bf9c",
+      "number": "313-883-2277"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_cass_community_free_meals_and_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Cass Community Social Services website",
+      "url": "https://casscommunity.org/contact-us/locations/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_cass_community_free_meals_and_food_pantry",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "fdc9c8c8-351c-56ff-9b7c-f85299e885c1",
+  "name": "All Saints Food Pantry",
+  "status": "active",
+  "description": "Free groceries, including cold and frozen food. You need an appointment. New visitors call to set one up.",
+  "eligibility_description": "For people with low income who live in ZIP codes 48209 or 48210. Bring ID. You can come once every 30 days, up to 6 times a year.",
+  "url": "https://www.ccsem.org/",
+  "organization": {
+   "id": "8164b278-10c9-548c-b62a-989194f41562",
+   "name": "Catholic Charities of Southeast Michigan",
+   "description": "Catholic Charities of Southeast Michigan",
+   "x_detroit": {
+    "id": "org_catholic_charities_of_southeast_michigan"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a7d2a740-2f6f-5f70-b07b-f3d0f5873e39",
+    "location": {
+     "id": "9d5f16ec-5528-5b4e-8ed0-e241bd6a1320",
+     "name": "All Saints Food Pantry, Catholic Charities of Southeast Michigan",
+     "location_type": "physical",
+     "latitude": 42.339399,
+     "longitude": -83.135857,
+     "addresses": [
+      {
+       "id": "69cce0a8-a5c1-5e42-9362-c160ebaf116b",
+       "address_1": "6945 Wagner St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_catholic_charities_all_saints_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "f1bf7961-cb69-50fa-a786-9a0c3cec297c",
+      "number": "855-882-2736 ext. 3321"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_catholic_charities_all_saints_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Mon, Thu, Fri 1pm-3pm, by appointment",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Catholic Charities of Southeast Michigan website",
+      "url": "https://www.ccsem.org/all-saints-soup-kitchen-food-pantry"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_catholic_charities_all_saints_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "de166309-a1b2-525b-9099-bb21a11180ff",
+  "name": "All Saints Soup Kitchen",
+  "status": "active",
+  "description": "A free hot lunch. No appointment, ID, or proof of address needed.",
+  "eligibility_description": "Anyone can come.",
+  "url": "https://www.ccsem.org/",
+  "organization": {
+   "id": "8164b278-10c9-548c-b62a-989194f41562",
+   "name": "Catholic Charities of Southeast Michigan",
+   "description": "Catholic Charities of Southeast Michigan",
+   "x_detroit": {
+    "id": "org_catholic_charities_of_southeast_michigan"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "af433f97-c7e9-59fc-9ed2-095ab6adcf2b",
+    "location": {
+     "id": "0e466cb1-ce83-503b-93d2-b21991926a95",
+     "name": "All Saints Soup Kitchen, Catholic Charities of Southeast Michigan",
+     "location_type": "physical",
+     "latitude": 42.339399,
+     "longitude": -83.135857,
+     "addresses": [
+      {
+       "id": "505e67a9-1768-5da4-b4f9-48539353c515",
+       "address_1": "6945 Wagner St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_catholic_charities_all_saints_soup_kitchen"
+     }
+    },
+    "phones": [
+     {
+      "id": "aab0a3ef-0747-5f4a-8910-d3fb689557f2",
+      "number": "855-882-2736 ext. 3321"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "dfdc5244-5044-5c44-8435-5ecb7f90ceb9",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "13:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_catholic_charities_all_saints_soup_kitchen",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Catholic Charities of Southeast Michigan website",
+      "url": "https://www.ccsem.org/all-saints-soup-kitchen-food-pantry"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_catholic_charities_all_saints_soup_kitchen",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "bcc367e3-bde1-5db6-90eb-07731f7e9626",
+  "name": "Mercy Food Pantry",
+  "status": "active",
+  "description": "Free groceries at the Center for the Works of Mercy. Call to make an appointment.",
+  "url": "https://www.ccsem.org/",
+  "organization": {
+   "id": "8164b278-10c9-548c-b62a-989194f41562",
+   "name": "Catholic Charities of Southeast Michigan",
+   "description": "Catholic Charities of Southeast Michigan",
+   "x_detroit": {
+    "id": "org_catholic_charities_of_southeast_michigan"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "02ce7cda-bd4e-58a9-873f-b0b971111508",
+    "location": {
+     "id": "2d5ce82f-f998-5298-8165-6c365a4b3138",
+     "name": "Mercy Food Pantry, Catholic Charities of Southeast Michigan",
+     "location_type": "physical",
+     "latitude": 42.389442,
+     "longitude": -83.086286,
+     "addresses": [
+      {
+       "id": "d457af84-0b63-5cb8-8bb6-b28a179d7782",
+       "address_1": "10301 Woodward Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_catholic_charities_mercy_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "9da65965-dfee-56ef-b68d-d081aade0060",
+      "number": "313-335-3261"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_catholic_charities_mercy_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "By appointment. The center is open Mon-Fri 9am-3pm.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Catholic Charities of Southeast Michigan website",
+      "url": "https://www.ccsem.org/CWM"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_catholic_charities_mercy_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "da91ce6b-fc17-55b5-82e7-fa6a4664cddd",
   "name": "Doctor visits and pharmacy",
   "status": "active",
@@ -3421,6 +3738,314 @@
    "category": "food.meal"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f004087f-4e65-5c96-80f5-9dfab9fbee84",
+  "name": "Senior meals at 8330 On The River",
+  "status": "active",
+  "description": "A free meal for people 60 and older, Monday to Friday, at the Belle Maison apartments. Call to ask if you can come.",
+  "eligibility_description": "For people 60 and older and their husband or wife.",
+  "url": "https://www.detroitseniorsolution.org/",
+  "organization": {
+   "id": "fb179da9-29f5-5949-b032-71677328a918",
+   "name": "Detroit Area Agency on Aging",
+   "description": "Detroit Area Agency on Aging",
+   "x_detroit": {
+    "id": "org_detroit_area_agency_on_aging"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "60faeb95-f985-5f61-9bca-32b2e29e3e54",
+    "location": {
+     "id": "776db065-6f26-521a-9be2-632bc64cc732",
+     "name": "Senior meals at 8330 On The River, Detroit Area Agency on Aging",
+     "location_type": "physical",
+     "latitude": 42.353437,
+     "longitude": -82.991614,
+     "addresses": [
+      {
+       "id": "28d41633-4a4e-5f31-80fb-366fe7462b3f",
+       "address_1": "8330 E. Jefferson",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48214",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_area_senior_meals_at_8330_on_the_river"
+     }
+    },
+    "phones": [
+     {
+      "id": "3b9ba0c2-d54e-5d54-b5dc-91b3d35e3d0f",
+      "number": "313-331-7780"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_area_senior_meals_at_8330_on_the_river",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Monday to Friday, no times given. Their list is from 2024 and says some sites have not reopened. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Area Agency on Aging website",
+      "url": "https://www.detroitseniorsolution.org/nutrition-services/congregate-meal-program/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_area_senior_meals_at_8330_on_the_river",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "d7d6cf67-3ff1-5a06-96a2-e9b0e86298ee",
+  "name": "Senior meals at Bicentennial Towers",
+  "status": "active",
+  "description": "A free meal for people 60 and older, Monday to Friday, in a senior apartment building. Call to ask if you can come.",
+  "eligibility_description": "For people 60 and older and their husband or wife.",
+  "url": "https://www.detroitseniorsolution.org/",
+  "organization": {
+   "id": "fb179da9-29f5-5949-b032-71677328a918",
+   "name": "Detroit Area Agency on Aging",
+   "description": "Detroit Area Agency on Aging",
+   "x_detroit": {
+    "id": "org_detroit_area_agency_on_aging"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4e86e5de-8cfa-5a58-9a8e-be4c72c42ad4",
+    "location": {
+     "id": "26f19779-80dd-5c57-b58f-0e1a011bd3a4",
+     "name": "Senior meals at Bicentennial Towers, Detroit Area Agency on Aging",
+     "location_type": "physical",
+     "latitude": 42.350568,
+     "longitude": -83.059894,
+     "addresses": [
+      {
+       "id": "f7a11a65-1cc6-5fd3-bebe-053951e4dae8",
+       "address_1": "4 E. Alexandrine",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48201",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_area_senior_meals_at_bicentennial_towers"
+     }
+    },
+    "phones": [
+     {
+      "id": "c3679cc4-e9ce-5816-9dc3-003f346f7364",
+      "number": "313-494-0217"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_area_senior_meals_at_bicentennial_towers",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Monday to Friday, no times given. Their list is from 2024 and says some sites have not reopened. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Area Agency on Aging website",
+      "url": "https://www.detroitseniorsolution.org/nutrition-services/congregate-meal-program/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_area_senior_meals_at_bicentennial_towers",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "7affa232-4330-5885-9868-2ac3219778f5",
+  "name": "Senior meals at Delray United Action Council",
+  "status": "active",
+  "description": "A free meal for people 60 and older, Monday to Friday. Gifts are welcome but not needed.",
+  "eligibility_description": "For people 60 and older and their husband or wife.",
+  "url": "https://www.detroitseniorsolution.org/",
+  "organization": {
+   "id": "fb179da9-29f5-5949-b032-71677328a918",
+   "name": "Detroit Area Agency on Aging",
+   "description": "Detroit Area Agency on Aging",
+   "x_detroit": {
+    "id": "org_detroit_area_agency_on_aging"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "b2ca9c03-aa05-5780-b5be-ba301fe1c621",
+    "location": {
+     "id": "31099272-694f-50f6-afb5-f7a2754cc06b",
+     "name": "Senior meals at Delray United Action Council, Detroit Area Agency on Aging",
+     "location_type": "physical",
+     "latitude": 42.318115,
+     "longitude": -83.086027,
+     "addresses": [
+      {
+       "id": "663e506b-eca5-5a95-9e75-7247bbfd9bf9",
+       "address_1": "275 West Grand Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48216",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_area_senior_meals_at_delray_united_action_counci"
+     }
+    },
+    "phones": [
+     {
+      "id": "fd1c7634-9cd2-5aa2-b11f-578495db665c",
+      "number": "313-861-1285"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_area_senior_meals_at_delray_united_action_counci",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Monday to Friday, no times given. Their list is from 2024 and says some sites have not reopened. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Area Agency on Aging website",
+      "url": "https://www.detroitseniorsolution.org/nutrition-services/congregate-meal-program/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_area_senior_meals_at_delray_united_action_counci",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "f2ca9df5-a114-5411-a762-5b3bf21982a9",
+  "name": "Senior meals at LA SED",
+  "status": "active",
+  "description": "A free meal for people 60 and older, Monday to Friday. They may be able to give you a ride.",
+  "eligibility_description": "For people 60 and older and their husband or wife.",
+  "url": "https://www.detroitseniorsolution.org/",
+  "organization": {
+   "id": "fb179da9-29f5-5949-b032-71677328a918",
+   "name": "Detroit Area Agency on Aging",
+   "description": "Detroit Area Agency on Aging",
+   "x_detroit": {
+    "id": "org_detroit_area_agency_on_aging"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "5d4d0975-3434-50b5-8efa-16b1179cf832",
+    "location": {
+     "id": "7617df54-56b7-58b8-98ac-a971d11eaf6c",
+     "name": "Senior meals at LA SED, Detroit Area Agency on Aging",
+     "location_type": "physical",
+     "latitude": 42.314218,
+     "longitude": -83.12064,
+     "addresses": [
+      {
+       "id": "c1bae6e8-a182-504e-8249-f5ab4d77b831",
+       "address_1": "7150 W. Vernor",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_area_senior_meals_at_la_sed"
+     }
+    },
+    "phones": [
+     {
+      "id": "a56f17e8-bdf2-5f1e-beb0-6c4f0e193753",
+      "number": "313-841-8840"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_area_senior_meals_at_la_sed",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Monday to Friday, no times given. Their list is from 2024 and says some sites have not reopened. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Area Agency on Aging website",
+      "url": "https://www.detroitseniorsolution.org/nutrition-services/congregate-meal-program/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_area_senior_meals_at_la_sed",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "0f2ef352-c264-5e58-805b-37cb3cb5109e",
@@ -10332,6 +10957,475 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "9ccf3101-48b6-5b9c-ad54-eeb1f048101f",
+  "name": "Mobile food pantry at Alternatives For Girls",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "945b1eac-fd0e-5bdb-81a4-c2fd19f30ba6",
+    "location": {
+     "id": "29110b14-89ee-5447-bc06-21d35f418f83",
+     "name": "Mobile food pantry at Alternatives For Girls, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.332798,
+     "longitude": -83.096254,
+     "addresses": [
+      {
+       "id": "c6a031b7-e975-5f88-aaad-d0779f414bcc",
+       "address_1": "903 West Grand Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48208",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_alternatives_for"
+     }
+    },
+    "phones": [
+     {
+      "id": "5afda51b-0c2a-5760-809e-736d60cfa7c9",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_alternatives_for",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Some Thursdays 9am-11am. Forgotten Harvest lists the dates two weeks at a time. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_alternatives_for",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "5d63bf9c-67f4-5120-b51a-d0e40a792a17",
+  "name": "Mobile food pantry at Equity Alliance of Michigan",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "8ba09e2e-c9cb-53ed-a34a-c0a468d62e1f",
+    "location": {
+     "id": "534558ab-fe59-5e65-97ea-d29f16e0d7d6",
+     "name": "Mobile food pantry at Equity Alliance of Michigan, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.34568,
+     "longitude": -83.13516,
+     "addresses": [
+      {
+       "id": "d0b277d6-88f1-5013-b9f5-47142dad28ef",
+       "address_1": "6602 Walton",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_equity_alliance_"
+     }
+    },
+    "phones": [
+     {
+      "id": "2598137f-713c-5854-bf52-9b052d9bef75",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_equity_alliance_",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Some Wednesdays. The time on their page is unclear. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_equity_alliance_",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "443fed22-faa5-5e25-92a1-ba9f13144756",
+  "name": "Mobile food pantry at Historic Little Rock church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck at Historic Little Rock Missionary Baptist Church. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "191eda9c-b0e9-5507-a291-6875aead666b",
+    "location": {
+     "id": "e59e911f-ea7d-51b5-aec7-5b209cc1a430",
+     "name": "Mobile food pantry at Historic Little Rock church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.381867,
+     "longitude": -83.081012,
+     "addresses": [
+      {
+       "id": "4abc1280-bde2-5884-8991-82217681cec8",
+       "address_1": "9000 Woodward Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_historic_little_"
+     }
+    },
+    "phones": [
+     {
+      "id": "9ddc05e5-102d-5df1-bf65-4b1dcbc8ad06",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "11735cf2-83db-5c38-a1e5-614732c0fda9",
+      "freq": "MONTHLY",
+      "byday": "2FR,4FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      },
+      "description": "2nd and 4th Friday of the month"
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_historic_little_",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_historic_little_",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "63518e53-4cf1-57f3-858f-944b8c5a71fa",
+  "name": "Mobile food pantry at New Bethel Baptist Church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f33abeb9-87cb-5be1-be79-a19c2abf25d5",
+    "location": {
+     "id": "2d8c89bb-4164-5b35-a215-3a348ba97fc8",
+     "name": "Mobile food pantry at New Bethel Baptist Church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.367538,
+     "longitude": -83.104726,
+     "addresses": [
+      {
+       "id": "7864178f-1f9a-5f55-9786-c992737c84c5",
+       "address_1": "8430 Linwood St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_new_bethel_bapti"
+     }
+    },
+    "phones": [
+     {
+      "id": "395499d8-7880-537a-b83d-b4593c94a582",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_new_bethel_bapti",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Some Tuesdays 9am-noon. Forgotten Harvest lists the dates two weeks at a time. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_new_bethel_bapti",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "33b2c16f-fc45-5a85-8986-8b9ab61172dd",
+  "name": "Mobile food pantry at St. John Presbyterian Church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a6882911-f64d-57b3-88f4-d00935dae1a5",
+    "location": {
+     "id": "a3576126-2a47-5ddd-9634-559110018286",
+     "name": "Mobile food pantry at St. John Presbyterian Church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.339484,
+     "longitude": -83.029497,
+     "addresses": [
+      {
+       "id": "29bdc5cb-378b-5f66-b585-c006080b7959",
+       "address_1": "1961 East Lafayette",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_st_john_presbyte"
+     }
+    },
+    "phones": [
+     {
+      "id": "50cf83ba-ad45-5c14-9fc4-04e51c3f6c49",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_st_john_presbyte",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Some Fridays 9am-11am. Forgotten Harvest lists the dates two weeks at a time. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_st_john_presbyte",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "3da402bb-488b-5c4d-a66f-6319861598f2",
+  "name": "Mobile food pantry at Triumph Church",
+  "status": "active",
+  "description": "Free groceries from a Forgotten Harvest truck. It ends when the food runs out.",
+  "url": "https://www.forgottenharvest.org/",
+  "organization": {
+   "id": "e0c2b703-0b83-5bb1-add1-7925930bfd02",
+   "name": "Forgotten Harvest",
+   "description": "Forgotten Harvest",
+   "x_detroit": {
+    "id": "org_forgotten_harvest"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "3c63bd28-82ca-52f0-b6c7-5b97d9df35e0",
+    "location": {
+     "id": "7909fe9e-b8bf-5962-8914-a26cad259a91",
+     "name": "Mobile food pantry at Triumph Church, Forgotten Harvest",
+     "location_type": "physical",
+     "latitude": 42.374576,
+     "longitude": -83.061823,
+     "addresses": [
+      {
+       "id": "57c19b2a-1f70-556a-ab79-a094f2614b8d",
+       "address_1": "2760 E Grand Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48211",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_forgotten_harvest_mobile_food_pantry_at_triumph_church"
+     }
+    },
+    "phones": [
+     {
+      "id": "eeed441b-c99c-5f52-958d-65491b41afe2",
+      "number": "248-268-7756"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_forgotten_harvest_mobile_food_pantry_at_triumph_church",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Some Fridays 9am-noon. Forgotten Harvest lists the dates two weeks at a time. Call first.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Forgotten Harvest website",
+      "url": "https://www.forgottenharvest.org/find-food/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_forgotten_harvest_mobile_food_pantry_at_triumph_church",
+   "category": "food.mobile"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "4689cfa6-2ecf-552b-aa6a-e7c56d8933a4",
   "name": "Food and clothes",
   "status": "active",
@@ -11305,6 +12399,90 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "c3fc7955-d883-53b1-8b48-ec11b40cf0f3",
+  "name": "St. Stephen Pantry",
+  "status": "active",
+  "description": "Free groceries at Our Lady of Guadalupe church. It may not open in bad weather.",
+  "eligibility_description": "For people who live in ZIP code 48210, and parish members.",
+  "url": "https://loavesandfishesswdetroit.org/",
+  "organization": {
+   "id": "2fcb5a91-e672-52e6-a993-c36cb64bd166",
+   "name": "Loaves and Fishes Southwest Detroit",
+   "description": "Loaves and Fishes Southwest Detroit",
+   "x_detroit": {
+    "id": "org_loaves_and_fishes_southwest_detroit"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "ad91fedf-c279-5e3a-9627-fa353fa2ad7a",
+    "location": {
+     "id": "b6abf666-dd70-584b-9d6a-f2669a737268",
+     "name": "St. Stephen Pantry, Loaves and Fishes Southwest Detroit",
+     "location_type": "physical",
+     "latitude": 42.327327,
+     "longitude": -83.13485,
+     "addresses": [
+      {
+       "id": "8c9e1bcd-ee3c-5b3f-8583-48a267171249",
+       "address_1": "4330 Central St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_loaves_and_st_stephen_pantry"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "90c741ef-a002-5763-918f-3acbd26270b7",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "11:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_loaves_and_st_stephen_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Loaves and Fishes Southwest Detroit website",
+      "url": "https://loavesandfishesswdetroit.org/pantry-locations/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_loaves_and_st_stephen_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "04162f20-7e89-5148-8bb6-2aa9155fdb0e",
   "name": "Ste. Anne Pantry",
   "status": "active",
@@ -11538,6 +12716,183 @@
    "category": "youth"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "8919f9b0-5f04-5a15-ab77-c07bbf5cd721",
+  "name": "Good Samaritan food pantry",
+  "status": "active",
+  "description": "Free food. Get in line before 11am. It ends when the food runs out.",
+  "url": "https://www.metroumcdetroit.org/",
+  "organization": {
+   "id": "d918cb03-4038-5e55-899b-e2d4a431388c",
+   "name": "Metropolitan United Methodist Church",
+   "description": "Metropolitan United Methodist Church",
+   "x_detroit": {
+    "id": "org_metropolitan_united_methodist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "fae5924a-d132-51bb-917d-770c56907ec2",
+    "location": {
+     "id": "21a67130-b0cf-57e7-8086-381aca6761e8",
+     "name": "Good Samaritan food pantry, Metropolitan United Methodist Church",
+     "location_type": "physical",
+     "latitude": 42.374175,
+     "longitude": -83.075834,
+     "addresses": [
+      {
+       "id": "ce7b8913-6f8f-5df2-97d7-c6860ca060d6",
+       "address_1": "8000 Woodward Ave",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_metropolitan_united_good_samaritan_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "35a315b2-caf5-5f1d-929b-e48de1b727c0",
+      "number": "313-875-7407"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "5c80299d-ff61-5d2f-8554-8fd94a26c30a",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_metropolitan_united_good_samaritan_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Metropolitan United Methodist Church website",
+      "url": "https://www.metroumcdetroit.org/goodsam"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_metropolitan_united_good_samaritan_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
+  "id": "7e863641-a347-52c4-8867-03069c890038",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free shelf food, like cans, pasta, peanut butter, rice, and beans.",
+  "eligibility_description": "Please come no more than every other Thursday.",
+  "url": "https://mhtdetroit.org/",
+  "organization": {
+   "id": "56c7c346-0d8b-539e-bc51-5d75801e9ae0",
+   "name": "Most Holy Trinity Parish",
+   "description": "Most Holy Trinity Parish",
+   "x_detroit": {
+    "id": "org_most_holy_trinity_parish"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "16e12f8a-2ace-5af9-a638-7e8284fa087a",
+    "location": {
+     "id": "08fd6eb6-d16f-50ce-ae56-f9d157af4e79",
+     "name": "Food pantry, Most Holy Trinity Parish",
+     "location_type": "physical",
+     "latitude": 42.329701,
+     "longitude": -83.060278,
+     "addresses": [
+      {
+       "id": "fd84580e-a467-5337-b1eb-68bf4759514e",
+       "address_1": "1050 Porter St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48226",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_most_holy_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "4b96f497-8352-5b8b-b0de-7987a2583379",
+      "number": "313-965-4450"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "4ffe6981-3aa5-5078-9f14-f4e5b894100a",
+      "freq": "WEEKLY",
+      "byday": "TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_most_holy_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Most Holy Trinity Parish website",
+      "url": "https://mhtdetroit.org/outreach/food-pantry/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_most_holy_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "91e68322-f24c-5d08-842b-abc3d86deafd",
@@ -12206,6 +13561,82 @@
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "9444420b-9eba-5ffb-ae01-274640120f69",
+  "name": "Food boxes",
+  "status": "active",
+  "description": "Free food boxes with cans, frozen meat, fresh vegetables, and dairy. Call to ask when to come.",
+  "eligibility_description": "Their main area is ZIP code 48217. They also help people from River Rouge, Ecorse, Lincoln Park, and Melvindale.",
+  "url": "https://perryoutreach.org/",
+  "organization": {
+   "id": "9d5b29d5-7110-51d6-88ad-c41f9cca0c76",
+   "name": "Perry Outreach Center",
+   "description": "Perry Outreach Center",
+   "x_detroit": {
+    "id": "org_perry_outreach_center"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "2756ebb2-5ff8-5595-897e-b72979cebc1a",
+    "location": {
+     "id": "11e919e6-3676-541e-bc37-4174e4d1ec9e",
+     "name": "Food boxes, Perry Outreach Center",
+     "location_type": "physical",
+     "latitude": 42.271498,
+     "longitude": -83.150978,
+     "addresses": [
+      {
+       "id": "6e56b892-e6c2-5301-bf25-147fc729f7b7",
+       "address_1": "12047 Miami St",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48217",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_perry_outreach_food_boxes"
+     }
+    },
+    "phones": [
+     {
+      "id": "435079b8-2ff0-5026-99ba-0b53516dd963",
+      "number": "313-749-7324"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_perry_outreach_food_boxes",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Perry Outreach Center website",
+      "url": "https://perryoutreach.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_perry_outreach_food_boxes",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "6531bd9e-13ca-55e5-bfbe-f94e78b0f42d",
@@ -13261,6 +14692,81 @@
    "category": "health.clinic"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "e841651d-b684-5db3-a11b-913e278aebaf",
+  "name": "Hot meal",
+  "status": "active",
+  "description": "A free hot meal. Their site says they serve one every week. Call to ask which days.",
+  "url": "https://sjpcdetroit.org/",
+  "organization": {
+   "id": "69d83893-54e3-5ef0-982b-3b6b1b4afee1",
+   "name": "St. John's Presbyterian Church",
+   "description": "St. John's Presbyterian Church",
+   "x_detroit": {
+    "id": "org_st_john_s_presbyterian_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "0f37ee2f-701f-54dc-84b6-065dd1e95f17",
+    "location": {
+     "id": "945e8c5a-1c9f-5732-9b6c-b339f8667246",
+     "name": "Hot meal, St. John's Presbyterian Church",
+     "location_type": "physical",
+     "latitude": 42.339484,
+     "longitude": -83.029497,
+     "addresses": [
+      {
+       "id": "fa6edade-d6be-5e64-93d5-bb3117701ae8",
+       "address_1": "1961 E Lafayette Blvd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_john_s_hot_meal"
+     }
+    },
+    "phones": [
+     {
+      "id": "b1967629-786e-5d25-91ba-27a3a47dcc3d",
+      "number": "313-567-0213"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_st_john_s_hot_meal",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "St. John's Presbyterian Church website",
+      "url": "https://sjpcdetroit.org/community-garden"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_john_s_hot_meal",
+   "category": "food.meal"
+  },
+  "assured_date": "2026-09-19"
  },
  {
   "id": "2cbb8617-50f3-5dce-badd-d23282b0c3bd",
