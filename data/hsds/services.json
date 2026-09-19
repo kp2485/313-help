@@ -67,7 +67,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -168,7 +167,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -282,7 +280,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -383,7 +380,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -461,7 +457,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -551,7 +546,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -665,7 +659,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -742,7 +735,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -819,7 +811,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -896,7 +887,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -973,7 +963,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1050,7 +1039,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1127,7 +1115,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1204,7 +1191,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1281,7 +1267,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1396,7 +1381,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1485,7 +1469,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1588,7 +1571,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1671,7 +1653,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1773,7 +1754,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1852,7 +1832,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -1943,7 +1922,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2062,7 +2040,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2153,7 +2130,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2259,7 +2235,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2338,7 +2313,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2428,7 +2402,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2506,7 +2479,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2595,7 +2567,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2671,7 +2642,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2772,7 +2742,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2873,7 +2842,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -2974,7 +2942,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3087,7 +3054,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3189,7 +3155,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3302,7 +3267,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3379,7 +3343,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3481,7 +3444,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3571,7 +3533,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3673,7 +3634,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3775,7 +3735,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3877,7 +3836,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -3979,7 +3937,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4081,7 +4038,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4183,7 +4139,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4285,7 +4240,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4387,7 +4341,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4489,7 +4442,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4591,7 +4543,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4693,7 +4644,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4795,7 +4745,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -4897,7 +4846,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5034,7 +4982,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5113,7 +5060,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5173,7 +5119,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5233,7 +5178,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5292,7 +5236,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5352,7 +5295,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5411,7 +5353,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5471,7 +5412,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5531,7 +5471,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5590,7 +5529,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5650,7 +5588,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5710,7 +5647,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5770,7 +5706,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5830,7 +5765,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5889,7 +5823,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -5948,7 +5881,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6008,7 +5940,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6067,7 +5998,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6126,7 +6056,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6186,7 +6115,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6246,7 +6174,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6306,7 +6233,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6366,7 +6292,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6426,7 +6351,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6486,7 +6410,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6545,7 +6468,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6605,7 +6527,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6664,7 +6585,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6723,7 +6643,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6782,7 +6701,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6841,7 +6759,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6901,7 +6818,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -6960,7 +6876,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7020,7 +6935,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7080,7 +6994,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7140,7 +7053,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7200,7 +7112,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7260,7 +7171,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7320,7 +7230,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7380,7 +7289,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7440,7 +7348,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7500,7 +7407,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7560,7 +7466,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7619,7 +7524,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7679,7 +7583,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7738,7 +7641,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7797,7 +7699,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7857,7 +7758,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7917,7 +7817,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -7976,7 +7875,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8035,7 +7933,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8094,7 +7991,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8154,7 +8050,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8214,7 +8109,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8274,7 +8168,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8334,7 +8227,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8394,7 +8286,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8448,7 +8339,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8508,7 +8398,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8561,7 +8450,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8614,7 +8502,6 @@
      "entry_method": null,
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8690,7 +8577,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8768,7 +8654,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8831,7 +8716,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8910,7 +8794,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -8973,7 +8856,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9038,7 +8920,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9127,7 +9008,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9205,7 +9085,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9268,7 +9147,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9373,7 +9251,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9455,7 +9332,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9531,7 +9407,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9607,7 +9482,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9720,7 +9594,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9797,7 +9670,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9873,7 +9745,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -9935,7 +9806,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10025,7 +9895,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10115,7 +9984,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10193,7 +10061,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10282,7 +10149,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10360,7 +10226,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10445,7 +10310,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10522,7 +10386,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10598,7 +10461,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10661,7 +10523,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10726,7 +10587,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10803,7 +10663,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10879,7 +10738,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -10968,7 +10826,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11044,7 +10901,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11121,7 +10977,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11198,7 +11053,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11275,7 +11129,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11352,7 +11205,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11444,7 +11296,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11521,7 +11372,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11628,7 +11478,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11705,7 +11554,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11782,7 +11630,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11860,7 +11707,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -11950,7 +11796,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12039,7 +11884,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12153,7 +11997,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12243,7 +12086,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12332,7 +12174,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12421,7 +12262,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12511,7 +12351,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12601,7 +12440,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12691,7 +12529,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12769,7 +12606,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 14,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12847,7 +12683,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -12925,7 +12760,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13015,7 +12849,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13129,7 +12962,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13206,7 +13038,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13308,7 +13139,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 180,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13398,7 +13228,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13501,7 +13330,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13582,7 +13410,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13663,7 +13490,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13744,7 +13570,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 90,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13821,7 +13646,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13898,7 +13722,6 @@
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 45,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
@@ -13961,7 +13784,6 @@
      "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
-     "cadence_days": 60,
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
