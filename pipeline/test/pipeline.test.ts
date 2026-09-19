@@ -1,10 +1,10 @@
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { badge, openNow, rank, type BundleRow } from '@detroithelp/query';
 import { build } from '../src/build.js';
-import { toRows, type Source } from '../src/ingest-arcgis.js';
+import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, today, uuid5 } from '../src/util.js';
 import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
@@ -113,6 +113,46 @@ describe('open-data ingester', () => {
     ], '2026-09-18');
     expect(rows.map((r) => r.sal_id).sort()).toEqual(['sal_rec_1_main', 'sal_rec_1_main_b']);
     expect(warnings.join()).toMatch(/outside the Detroit bbox/);
+  });
+  it('ids at a shared address don\'t depend on the order the layer returns features', () => {
+    const a = feat({ Site: 'A', Address: '1 Main' }), b = feat({ Site: 'B', Address: '1 Main' });
+    const ids = (fs: object[]) => Object.fromEntries(toRows(src, null, fs, '2026-09-18').rows.map((r) => [r.name, r.sal_id]));
+    expect(ids([b, a])).toEqual(ids([a, b]));
+  });
+  it('a layer that suddenly lost most of its rows does not overwrite the last good file', () => {
+    expect(sharpDrop(40, 12)).toBe(true);
+    expect(sharpDrop(40, 30)).toBe(false);
+    expect(sharpDrop(4, 1)).toBe(false);    // tiny layers change by a lot for real
+    expect(sharpDrop(0, 0)).toBe(false);
+  });
+  describe('reading a layer', () => {
+    const layer = 'https://example.test/FeatureServer/0';
+    const pt = (i: number) => ({ geometry: { coordinates: [-83.1, 42.35] }, properties: { Site: `S${i}`, Address: `${i} Main` } });
+    const serve = (pages: Record<string, unknown>) => vi.stubGlobal('fetch', async (url: string) => {
+      const key = Object.keys(pages).find((k) => url.includes(k));
+      return { ok: true, status: 200, json: async () => pages[key!] };
+    });
+    afterEach(() => vi.unstubAllGlobals());
+    it('an error answered with HTTP 200 is an error, not an empty layer', async () => {
+      serve({ '?f=json': { error: { code: 400, message: 'Invalid or missing input parameters.' } } });
+      await expect(fetchLayer({ id: 'x', name: 'x', kind: 'arcgis', url: layer })).rejects.toThrow(/Invalid or missing/);
+      serve({ '?f=json': { objectIdField: 'OBJECTID', maxRecordCount: 2 }, 'resultOffset=0': { error: { code: 500, message: 'Unable to complete operation.' } } });
+      await expect(fetchLayer({ id: 'x', name: 'x', kind: 'arcgis', url: layer })).rejects.toThrow(/Unable to complete/);
+    });
+    it('pages in a stable order by the layer\'s id field, by how many came back, up to the server\'s page size', async () => {
+      const seen: string[] = [];
+      vi.stubGlobal('fetch', async (url: string) => {
+        seen.push(url);
+        const body = url.includes('?f=json') ? { objectIdField: 'OBJECTID', maxRecordCount: 2 }
+          : url.includes('resultOffset=0') ? { features: [pt(1), pt(2)] }          // no exceededTransferLimit flag at all
+          : url.includes('resultOffset=2') ? { features: [pt(3), pt(4)] }
+          : { features: [pt(5)] };
+        return { ok: true, status: 200, json: async () => body };
+      });
+      const { features } = await fetchLayer({ id: 'x', name: 'x', kind: 'arcgis', url: layer });
+      expect(features).toHaveLength(5);
+      expect(seen.filter((u) => u.includes('/query')).every((u) => u.includes('orderByFields=OBJECTID') && u.includes('resultRecordCount=2'))).toBe(true);
+    });
   });
 });
 

@@ -38,7 +38,7 @@ export function pageText(html: string): string {
     .replace(/&#(\d+);/g, (_, n: string) => String.fromCodePoint(Number(n)))
     .replace(/&#x([0-9a-f]+);/gi, (_, n: string) => String.fromCodePoint(parseInt(n, 16)))
     .replace(/&([a-z]+);/gi, (m, n: string) => ENTITIES[n.toLowerCase()] ?? m)
-    .replace(/[‐-―−]/g, '-')
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
     .replace(/\s+/g, ' ')
     .trim();
 }

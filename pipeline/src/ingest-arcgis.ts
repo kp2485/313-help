@@ -4,9 +4,9 @@
 // gets seen and approved by a person before it reaches the bundle (10-A5).
 // Never maps staff-name fields. Never writes back to a source.
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import YAML from 'yaml';
-import { p, writeCsv, slug, inBbox, type CsvRow, today } from './util.js';
+import { p, readCsv, writeCsv, slug, inBbox, type CsvRow, today } from './util.js';
 
 export interface Source {
   id: string; name: string; kind: string; url: string; page?: string; license?: string;
@@ -28,21 +28,36 @@ export function loadSources(): Source[] {
 async function getJson(url: string): Promise<any> {
   const res = await fetch(url, { headers: { 'user-agent': 'detroithelp-pipeline (open-source civic directory)' } });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
-  return res.json();
+  const body: any = await res.json();
+  // ArcGIS answers many failures with HTTP 200 and an error object. That is an error, never an empty layer.
+  if (body?.error) throw new Error(`${url}: ${body.error.message ?? 'error'} (${body.error.code ?? '?'})`);
+  return body;
 }
 
+/**
+ * Every feature, page by page. Pages are ordered by the layer's id field so none is skipped or repeated, sized to
+ * what the server allows, and the next page is asked for whenever a page comes back full (some servers never set
+ * exceededTransferLimit on GeoJSON). A page that fails stops the whole read: nothing partial is ever written.
+ */
 export async function fetchLayer(src: Source): Promise<{ lastEdited: string | null; features: any[] }> {
   const meta = await getJson(`${src.url}?f=json`);
   const ms = meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate;
   const lastEdited = ms ? today(new Date(ms)) : null;
+  const size = Math.min(1000, Number(meta.maxRecordCount) || 1000);
+  const oid = meta.objectIdField ?? (meta.fields ?? []).find((f: { type?: string }) => f.type === 'esriFieldTypeOID')?.name ?? 'OBJECTID';
   const features: any[] = [];
-  for (let offset = 0; ; offset += 1000) {
-    const page = await getJson(`${src.url}/query?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=1000`);
-    features.push(...(page.features ?? []));
-    if (!page.properties?.exceededTransferLimit || !page.features?.length) break;
+  for (let offset = 0; offset < 1_000_000;) {
+    const page = await getJson(`${src.url}/query?where=1%3D1&outFields=*&f=geojson&orderByFields=${encodeURIComponent(oid)}&resultOffset=${offset}&resultRecordCount=${size}`);
+    const got: any[] = page.features ?? [];
+    features.push(...got);
+    offset += got.length;
+    if (!got.length || (got.length < size && !(page.exceededTransferLimit || page.properties?.exceededTransferLimit))) break;
   }
   return { lastEdited, features };
 }
+
+/** A layer that lost more than half its rows since the last good file is more likely broken than emptied. */
+export const sharpDrop = (before: number, after: number) => before >= 10 && after < before / 2;
 
 export function toRows(src: Source, lastEdited: string | null, features: any[], fetchedAt: string): { rows: CsvRow[]; warnings: string[] } {
   const f = src.fields ?? {};
@@ -50,8 +65,14 @@ export function toRows(src: Source, lastEdited: string | null, features: any[], 
   const seen = new Map<string, number>();
   const rows: CsvRow[] = [];
   const get = (props: any, key?: string) => (key && props[key] != null ? String(props[key]).replace(/\s+/g, ' ').trim() : '');
+  // Features in a fixed order (address, then name), so which one keeps the plain id at a shared address never
+  // depends on the order the server happened to return them.
+  const ordered = [...features].sort((x, y) => {
+    const k = (ft: any) => `${slug(get(ft.properties ?? {}, f.address))}|${get(ft.properties ?? {}, f.name).toLowerCase()}|${get(ft.properties ?? {}, f.ref)}`;
+    return k(x) < k(y) ? -1 : k(x) > k(y) ? 1 : 0;
+  });
 
-  for (const feat of features) {
+  for (const feat of ordered) {
     const props = feat.properties ?? {};
     const [lon, lat] = feat.geometry?.coordinates ?? [];
     const name = get(props, f.name), address = get(props, f.address);
@@ -89,6 +110,12 @@ async function main() {
       mode = 'stage';
     }
     const out = p(mode === 'publish' ? 'data/ingested' : 'data/staging', `${src.id}.csv`);
+    const before = existsSync(out) ? readCsv(out).length : 0;
+    if (sharpDrop(before, rows.length)) {
+      console.warn(`${src.id}: ${rows.length} rows, down from ${before}. Not overwriting ${out}; a person should look at the layer first.`);
+      process.exitCode = 1;
+      continue;
+    }
     writeCsv(out, rows, INGESTED_COLUMNS);
     console.log(`${src.id}: ${rows.length} rows, layer last edited ${lastEdited ?? 'unknown'} -> ${mode} (${out})`);
     for (const w of warnings) console.warn('  warn:', w);
