@@ -23,6 +23,7 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 11 | [Healthy places](11-greenway-public-places.md) | Approved: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
 | 12 | [Gift & handoff](12-gift-and-handoff.md) | What "open-source gift to the city" demands of the design: unattended operation, dead-man switch, transfer checklist, costs |
 | 13 | [Neighborhood indicators](13-neighborhood-indicators.md) | Citywide public-data picture for all 205 neighborhoods; honesty rules; the greenway as one lens |
+| — | [DEMO.md](DEMO.md) | Demo-day checklist: commands, the beats, what to do if something breaks |
 | — | [OPERATIONS.md](OPERATIONS.md) | Running it locally, the regular work, first deployment (needs Kyle), secrets, handover |
 | — | [DECISIONS.md](DECISIONS.md) | Decisions the docs don't cover; audit fixes awaiting approval |
 | — | [CLAUDE.md](../CLAUDE.md) | Handoff instructions for Claude Code |

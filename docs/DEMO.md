@@ -34,7 +34,7 @@ The demo alert says "Demo" in its title and body and disappears on its own an ho
 | 3 | "One tap to say it's wrong. No account." | Open a listing → *Something wrong?* → *Closed for good*. |
 | 4 | "A person decides, not an algorithm." | `/admin/` → the listing is at the top → **Archive: closed for good**. `pnpm build:bundle`, reload the phone: "Closed as of today." |
 | 5 | "Nobody at the City had to do anything." | The badge line on any listing ("Matched their website when added…"), and `pnpm check:sources` output. |
-| 6 | "Same machinery, pointed at the greenway." | Recreation → a Conrail segment → cross streets and help within a 10-minute walk. Report *Glass or trash* with a photo, then show it in `/admin/`: no location, no metadata, and one tap deletes it. "There is no button to report a person." |
+| 6 | "Same machinery, pointed at the greenway." | Recreation → a Conrail segment → cross streets and help within a 10-minute walk. Report *Broken glass or trash* with a photo, then show it in `/admin/`: no location, no metadata, and one tap deletes it. "There is no button to report a person." |
 | 7 | "And for every neighborhood, not just the greenway." | About → Neighborhoods → Bagley: home prices next to building permits; "our list is short here," with the add-a-place button. |
 | 8 | "En español también." | Home → **Español**. |
 | 9 | Close | "It stores nothing. Freshness is the product. The data outlives the app." |
