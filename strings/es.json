@@ -86,7 +86,7 @@
   "map.details": "Ver detalles",
   "map.park": "Parque de la ciudad",
   "map.no_streets": "No se pudieron cargar los nombres de las calles. Se verán la próxima vez que tenga internet.",
-  "map.source": "Calles y parques de los datos abiertos de la Ciudad de Detroit, actualizados {date}. Arrastre para mover. Junte los dedos o use + y - para acercar o alejar. Toque el camino, un punto o un parque.",
+  "map.source": "Calles y parques de los datos abiertos de la Ciudad de Detroit, actualizados {date}. Calles de Hamtramck, Highland Park y Dearborn de la Oficina del Censo de EE. UU. Arrastre para mover. Junte los dedos o use + y - para acercar o alejar. Toque el camino, un punto o un parque.",
   "map.label_rec": "Mapa de las calles y parques de Detroit con el Joe Louis Greenway. Los mismos lugares aparecen abajo.",
   "map.label_parks": "Mapa de los parques de Detroit. Los mismos parques aparecen abajo.",
   "map.label_segment": "Mapa de {name} con las calles que cruza. Las calles y la ayuda cercana aparecen abajo.",

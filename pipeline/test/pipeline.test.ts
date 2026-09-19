@@ -17,7 +17,7 @@ import { ISSUE_TYPES, nameKey, suppress, toNeighborhoods } from '../src/ingest-n
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
 import { addressOnPage, isChallenge, listingOnPage, pageText, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
-import { GRID, crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
+import { GRID, crossings, encodeLine, insideRings, mergeChains, packRoads, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
@@ -319,6 +319,17 @@ describe('ZIP center points', () => {
 });
 
 describe('street map from City open data', () => {
+  it('neighbor-city streets from TIGER: main roads and local streets kept, ramps and alleys dropped, names tidied', () => {
+    expect([tigerClass('S1100'), tigerClass('S1200'), tigerClass('S1400'), tigerClass('S1630'), tigerClass('S1730'), tigerClass(undefined)]).toEqual([0, 1, 4, null, null, null]);
+    expect(tigerName('I- 94')).toBe('I-94'); expect(tigerName('  Michigan   Ave ')).toBe('Michigan Ave');
+  });
+  it('point in polygon honors holes (a street in Hamtramck is not "in Detroit")', () => {
+    const outer: [number, number][] = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]], hole: [number, number][] = [[4, 4], [6, 4], [6, 6], [4, 6], [4, 4]];
+    expect(insideRings([2, 2], [outer, hole])).toBe(true);
+    expect(insideRings([5, 5], [outer, hole])).toBe(false);
+    expect(insideRings([5, 5], [hole])).toBe(true);
+    expect(insideRings([11, 5], [outer])).toBe(false);
+  });
   it('the grid is pinned to the origin the committed map cells were cut from (it must not move with the service area)', () => {
     const base = JSON.parse(readFileSync(p('data/ingested/basemap/base.json'), 'utf8')) as { origin: [number, number] };
     expect(GRID.lon0).toBeCloseTo(base.origin[0], 6);
@@ -355,6 +366,11 @@ describe('street map from City open data', () => {
       road('St Aubin St', 4, [[-83.0301, 42.33], [-83.0299, 42.36]]), road('I-75', 0, [[-83.04, 42.355], [-83.02, 42.355]]),
       road('Detroit Windsor Tunnel', 1, [[-83.04, 42.332], [-83.02, 42.332]]), road('Far St', 4, [[-83.0, 42.35], [-82.99, 42.35]]),
     ])).toEqual(['E Jefferson Ave', 'Gratiot Ave', 'Mack Ave']);
+  });
+  it('a street typed differently on each side of a city line is one cross street', () => {
+    const path: [number, number][][] = [[[-83.03, 42.33], [-83.03, 42.36]]];
+    expect(crossings(path, [road('Tireman Ave', 1, [[-83.04, 42.34], [-83.029, 42.34]]), road('Tireman St', 4, [[-83.031, 42.3401], [-83.02, 42.3401]]),
+      road('Belmont St', 4, [[-83.04, 42.35], [-83.02, 42.35]])])).toEqual(['Tireman Ave', 'Belmont St']);
   });
   it('the committed map covers the city and the greenway has its cross streets', () => {
     const base = JSON.parse(readFileSync(p('data/ingested/basemap/base.json'), 'utf8'));

@@ -86,7 +86,7 @@
   "map.details": "See details",
   "map.park": "City park",
   "map.no_streets": "Street names could not load. They will show the next time you are online.",
-  "map.source": "Streets and parks from City of Detroit open data, updated {date}. Drag to move. Pinch or use + and - to zoom. Tap the path, a dot, or a park.",
+  "map.source": "Streets and parks from City of Detroit open data, updated {date}. Streets in Hamtramck, Highland Park and Dearborn from the US Census Bureau. Drag to move. Pinch or use + and - to zoom. Tap the path, a dot, or a park.",
   "map.label_rec": "Map of Detroit streets and parks with the Joe Louis Greenway. The same places are listed below.",
   "map.label_parks": "Map of Detroit parks. The same parks are listed below.",
   "map.label_segment": "Map of {name} with the streets it crosses. The streets and nearby help are listed below.",

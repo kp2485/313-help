@@ -139,8 +139,11 @@ export function crossings(lines: Pt[][], roads: Road[]): string[] {
     }
     base += line.length;
   }
+  // One street, once. At a city line the City's layer and TIGER can type the same street differently
+  // ("Tireman Ave" / "Tireman St"), so the street type doesn't count as a difference.
   const seen = new Set<string>();
-  return hits.sort((a, b) => a.at - b.at).map((h) => h.name).filter((n) => !seen.has(n) && !!seen.add(n));
+  const key = (n: string) => n.toLowerCase().replace(/\s+(st|street|ave|avenue|rd|road|blvd|dr|drive|ct|pl|ln|way|hwy|pkwy)\.?$/, '');
+  return hits.sort((a, b) => a.at - b.at).map((h) => h.name).filter((n) => !seen.has(key(n)) && !!seen.add(key(n)));
 }
 
 // ---- fetch ---------------------------------------------------------------------
@@ -163,6 +166,69 @@ const linesOf = (g: any): Pt[][] => (!g ? [] : g.type === 'LineString' ? [g.coor
 const ringsOf = (g: any): Pt[][] => (!g ? [] : g.type === 'Polygon' ? g.coordinates : g.type === 'MultiPolygon' ? g.coordinates.flat() : []);
 const compact = (path: string, data: unknown) => { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, JSON.stringify(data) + '\n'); };
 
+// ---- the neighbor cities (Kyle, 2026-09-19) -------------------------------------
+// Hamtramck, Highland Park and Dearborn are in the service area, and the City's layers stop at Detroit. Their streets
+// and all four city outlines come from the Census Bureau's TIGER data (public domain). The four outlines come from
+// one source so their shared borders line up exactly: no seams, and Hamtramck and Highland Park fill the hole in
+// Detroit's outline instead of reading as water.
+const TIGER = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb';
+const TIGER_PLACES = `${TIGER}/Places_CouSub_ConCity_SubMCD/MapServer/4`;
+const TIGER_ROADS = [`${TIGER}/Transportation/MapServer/2`, `${TIGER}/Transportation/MapServer/6`, `${TIGER}/Transportation/MapServer/8`];
+export const NEIGHBOR_CITIES = ['Hamtramck', 'Highland Park', 'Dearborn'];
+
+/** TIGER's road codes to ours: limited-access 0, other main roads 1, local streets 4. Ramps, alleys, paths: none. */
+export function tigerClass(mtfcc: unknown): number | null {
+  return ({ S1100: 0, S1200: 1, S1400: 4 } as Record<string, number>)[String(mtfcc ?? '')] ?? null;
+}
+/** "I- 94" -> "I-94"; everything else as written. */
+export const tigerName = (raw: unknown) => String(raw ?? '').replace(/\s+/g, ' ').trim().replace(/^(I|US|M)- ?(\d+)/, '$1-$2');
+
+/** Even-odd point in polygon over all rings (holes included). */
+export function insideRings(pt: Pt, rings: Pt[][]): boolean {
+  let inside = false;
+  for (const ring of rings) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i]!, [xj, yj] = ring[j]!;
+      if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+  }
+  return inside;
+}
+
+async function tigerQuery(layer: string, where: string, extra = ''): Promise<any[]> {
+  const all: any[] = [];
+  for (let offset = 0; ; offset += 2000) {
+    const q = `${layer}/query?where=${encodeURIComponent(where)}&outFields=*&outSR=4326&geometryPrecision=6&returnGeometry=true&resultOffset=${offset}&resultRecordCount=2000&orderByFields=OBJECTID&f=geojson${extra}`;
+    const fc = (await (await fetch(q, { headers: UA })).json()) as any;
+    if (fc.error) throw new Error(`${layer}: ${JSON.stringify(fc.error)}`);
+    all.push(...(fc.features ?? []));
+    if ((fc.features ?? []).length < 2000) return all;
+    await new Promise((r) => setTimeout(r, 300));
+  }
+}
+
+/** The four city outlines, and every named street whose middle lies in Hamtramck, Highland Park or Dearborn. */
+async function neighbors(): Promise<{ outlines: Pt[][]; roads: Road[] }> {
+  const names = ['Detroit', ...NEIGHBOR_CITIES].map((n) => `'${n}'`).join(',');
+  const places = await tigerQuery(TIGER_PLACES, `STATE='26' AND BASENAME IN (${names})`);
+  if (places.length !== 4) throw new Error(`basemap: expected 4 city outlines from TIGER, got ${places.length}. Not overwriting the last good files.`);
+  const outlines = places.flatMap((f) => ringsOf(f.geometry));
+  const near = places.filter((f) => NEIGHBOR_CITIES.includes(String(f.properties?.BASENAME)));
+  const nearRings = near.flatMap((f) => ringsOf(f.geometry));
+  const all = nearRings.flat(), env = { xmin: Math.min(...all.map((q) => q[0])), ymin: Math.min(...all.map((q) => q[1])), xmax: Math.max(...all.map((q) => q[0])), ymax: Math.max(...all.map((q) => q[1])), spatialReference: { wkid: 4326 } };
+  const box = `&geometry=${encodeURIComponent(JSON.stringify(env))}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects`;
+  const roads: Road[] = [];
+  for (const layer of TIGER_ROADS) {
+    for (const f of await tigerQuery(layer, '1=1', box)) {
+      const cls = tigerClass(f.properties?.MTFCC), name = tigerName(f.properties?.NAME);
+      if (cls === null || (!name && cls !== 0)) continue;
+      for (const line of linesOf(f.geometry)) if (line.length > 1 && insideRings(line[Math.floor(line.length / 2)]!, nearRings)) roads.push({ cls, name, line });
+    }
+  }
+  if (roads.length < 1000) throw new Error(`basemap: only ${roads.length} neighbor-city streets parsed. Not overwriting the last good files.`);
+  return { outlines, roads };
+}
+
 /** Turn a list of roads into the compact file shape. */
 export function packRoads(roads: Road[], origin: Pt, tol: number): { names: string[]; roads: [number, number, number[]][] } {
   const names: string[] = [], idx = new Map<string, number>();
@@ -182,6 +248,8 @@ async function main() {
     for (const line of linesOf(f.geometry)) if (line.length > 1) roads.push({ cls, name, line });
   }
   if (roads.length < 20000) throw new Error(`basemap: only ${roads.length} roads parsed. Not overwriting the last good files.`);
+  const near = await neighbors();
+  roads.push(...near.roads);
 
   rmSync(dir, { recursive: true, force: true });
   const origin: Pt = [GRID.lon0, GRID.lat0];
@@ -191,8 +259,11 @@ async function main() {
     return ringsOf(f.geometry).slice(0, 1).map((ring) => [n ? parkNames.push(n) - 1 : -1, encodeLine(simplify(ring, 3), origin)] as [number, number[]]);
   }).filter((x) => x[1].length >= 8);
   const big = packRoads(roads.filter((r) => r.cls <= 2), origin, 4);
-  const boundary = cityFeats.flatMap((f) => ringsOf(f.geometry)).map((ring) => encodeLine(simplify(ring, 15), origin)).filter((r) => r.length >= 8);
-  const sources = { roads: await lastEdited(ROADS), parks: await lastEdited(PARKS), boundary: await lastEdited(BOUNDARY) };
+  // All four outlines from TIGER, simplified alike, so shared borders stay shared. (The City's boundary layer is
+  // still read, to date it in source.json, but the drawn outline is TIGER's.)
+  void cityFeats;
+  const boundary = near.outlines.map((ring) => encodeLine(simplify(ring, 15), origin)).filter((r) => r.length >= 8);
+  const sources = { roads: await lastEdited(ROADS), parks: await lastEdited(PARKS), boundary: await lastEdited(BOUNDARY), neighbors: today() };
   compact(`${dir}/base.json`, { origin, names: big.names, roads: big.roads, park_names: parkNames, parks, boundary });
 
   const byCell = new Map<string, Road[]>();
@@ -210,7 +281,7 @@ async function main() {
   const cross: Record<string, string[]> = {};
   if (existsSync(jlg)) for (const s of (JSON.parse(readFileSync(jlg, 'utf8')).segments as Segment[])) cross[s.id] = crossings(s.lines, roads);
   compact(`${dir}/crossings.json`, cross);
-  compact(`${dir}/source.json`, { name: 'City of Detroit open data: roads, parks, city boundary', urls: { roads: ROADS, parks: PARKS, boundary: BOUNDARY }, last_edited: sources, grid: GRID, scale: SCALE });
+  compact(`${dir}/source.json`, { name: 'City of Detroit open data (Detroit roads and parks); US Census Bureau TIGER (city outlines; Hamtramck, Highland Park and Dearborn streets)', urls: { roads: ROADS, parks: PARKS, boundary: BOUNDARY, tiger_places: TIGER_PLACES, tiger_roads: TIGER_ROADS }, last_edited: sources, grid: GRID, scale: SCALE });
   console.log(`basemap: ${roads.length} road pieces -> ${big.roads.length} main-road lines in base.json, ${byCell.size} cells; ${parks.length} parks; crossings for ${Object.keys(cross).length} greenway segments`);
 }
 
