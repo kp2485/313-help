@@ -9,6 +9,7 @@ import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, today, uuid5 } from '../src/util.js';
 import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
+import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea } from '../src/indicators.js';
@@ -170,15 +171,21 @@ describe('report facts from the write API', () => {
     expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
     expect(r.facts.last_confirm_method).toBe('community_confirm');
   });
-  it('a steward restore puts the listing back and clears closure reports, but never claims anyone phoned (review 10b)', () => {
-    const r = row({ facts: { reports: { closed_open: 2, closed_last_at: '2026-09-10', wrong_open: 1 }, source: { type: 'seed_list', name: 'test' }, checked_at_entry: '2026-09-01', entry_method: 'web' } });
+  it('a steward restore puts the listing back but never claims anyone phoned (review 10b)', () => {
     for (const reason_code of ['restored', 'confirmed_by_phone']) {   // older overrides said confirmed_by_phone by default
+      const r = row({ facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' }, checked_at_entry: '2026-09-01', entry_method: 'web' } });
       applyAggregates([r], { circuit_breaker: false, targets: [], overrides: [{ target_id: 'sal_test', status: 'active', reason_code, replacement_id: null, at: '2026-09-18T17:41Z' }] });
       expect(r.facts.last_confirm_method).toBeUndefined();
       expect(r.facts.last_confirmed_at).toBeUndefined();
-      expect(r.facts.reports).toMatchObject({ closed_open: 0, wrong_open: 1 });
       expect(badge(r, new Date('2026-09-18T18:00:00Z')).level).toBe('entry_checked');
     }
+  });
+  it('a "closed" report made after a restore still counts (the rejected ones are already settled in the Worker)', () => {
+    const r = row({});
+    applyAggregates([r], { circuit_breaker: false, targets: [{ target_id: 'sal_test', closed_open: 1, closed_last_at: '2026-09-19T09:00Z', wrong_open: 0, last_confirmed_at: null }],
+      overrides: [{ target_id: 'sal_test', status: 'active', reason_code: 'restored', replacement_id: null, at: '2026-09-18T17:41Z' }] });
+    expect(r.facts.reports.closed_open).toBe(1);
+    expect(badge(r, new Date('2026-09-19T12:00:00Z')).level).toBe('reported_once');
   });
   it('a steward archive closes the listing with its reason, even while the breaker is tripped', () => {
     const r = row({});
@@ -513,5 +520,47 @@ describe('the real bundle', () => {
     expect(top.length).toBeGreaterThanOrEqual(3);
     expect(top[0]!.miles).toBeLessThan(3);
     for (const t of top) expect(['open', 'closes_soon', 'closed', 'call_first', 'unknown']).toContain(t.open.state);
+  });
+});
+
+describe('nightly re-check becomes a steward task (DECISIONS 2026-09-19)', () => {
+  const day = '2026-09-19';
+  it('a miss names what the matcher found missing; an unreadable page says why; a match is no task', () => {
+    expect(recheckTask('sal_x', { missing: [] }, day)).toBeNull();
+    expect(recheckTask('sal_x', { missing: ['phone 313-555-0100', 'street address "1 Main St"'] }, day))
+      .toEqual({ target_id: 'sal_x', result: 'missing', detail: 'phone 313-555-0100, street address "1 Main St"', checked_on: day });
+    expect(recheckTask('sal_x', { why: 'HTTP 503' }, day)).toEqual({ target_id: 'sal_x', result: 'unreadable', detail: 'HTTP 503', checked_on: day });
+    expect(recheckTask('sal_x', { why: 'x'.repeat(400) }, day)!.detail).toHaveLength(300);
+  });
+  const task = { target_id: 'sal_x', result: 'missing', detail: 'phone 313-555-0100', checked_on: day };
+  const env = { REPORTS_API: 'https://api.example', ACCESS_CLIENT_ID: 'client-id', ACCESS_CLIENT_SECRET: 'client-secret' };
+  const setup = (status = 200) => {
+    const calls: { url: string; init: RequestInit }[] = [];
+    const fake = async (url: string | URL | Request, init?: RequestInit) => { calls.push({ url: String(url), init: init ?? {} }); return new Response('{}', { status }); };
+    const file = join(mkdtempSync(join(tmpdir(), 'recheck-')), 'recheck.json');
+    return { calls, fake, file };
+  };
+  it('PUTs the list to the steward API with the service token; does nothing without REPORTS_API', async () => {
+    const { calls, fake, file } = setup();
+    writeFileSync(file, JSON.stringify([task]));
+    expect(await syncTasks(file, {}, fake)).toBe('skipped');
+    expect(calls).toHaveLength(0);
+    expect(await syncTasks(file, env, fake)).toBe(1);
+    expect(calls[0]!.url).toBe('https://api.example/v1/steward/tasks');
+    expect(calls[0]!.init.method).toBe('PUT');
+    expect(calls[0]!.init.headers).toMatchObject({ 'content-type': 'application/json', 'CF-Access-Client-Id': 'client-id', 'CF-Access-Client-Secret': 'client-secret' });
+    expect(JSON.parse(String(calls[0]!.init.body))).toEqual({ tasks: [task] });
+  });
+  it('sends nothing when the re-check wrote no list: an empty PUT would close every open task', async () => {
+    const { calls, fake, file } = setup();
+    await expect(syncTasks(file, env, fake)).rejects.toThrow(/no re-check list/);
+    writeFileSync(file, '{"not": "a list"}');
+    await expect(syncTasks(file, env, fake)).rejects.toThrow(/not a list/);
+    expect(calls).toHaveLength(0);
+  });
+  it('fails loudly when the API refuses', async () => {
+    const { fake, file } = setup(500);
+    writeFileSync(file, JSON.stringify([task]));
+    await expect(syncTasks(file, env, fake)).rejects.toThrow(/500/);
   });
 });

@@ -1,5 +1,7 @@
 # generated — built in CI, never committed (see CLAUDE.md)
 data/bundle/
+# the nightly re-check's list for the steward queue (check:sources --recheck); sent by tasks:sync, never committed
+data/staging/recheck.json
 
 node_modules/
 dist/

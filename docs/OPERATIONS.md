@@ -37,7 +37,7 @@ In production the pipeline syncs every id at each publish.
 
 | When | What | How long |
 |---|---|---|
-| About weekly | Work the exceptions queue: new proposals (one entry check each), listings with 2+ "closed" reports, machine-raised tasks | under an hour |
+| About weekly | Work the exceptions queue at `/admin/`: listings 2+ phones reported closed (highlighted), other corrections, new proposals (one entry check each), and **Pages that changed**: listings whose own web page, read again each night, no longer shows the phone number or street address we list, or could not be read. Open the page (`source_url` in `data/seed/resources.csv`). If the place changed, fix its row and press *I'll fix it*; if the page just moved things around, press *Checked: it's fine*. Either way the task stays closed until the check says something different. A task closes itself when the page matches again. The app never changes because of one | under an hour |
 | Every month | `pnpm ingest:neighborhoods` and `pnpm ingest:basemap` refresh the neighborhood numbers and the street map from City open data (the nightly job does this on the 1st and opens a pull request). Read the diff, merge it | 5 minutes |
 | Every month or so | `pnpm check:emergency` — reads each emergency number's own page. A mismatch means a published number changed: read the page, edit `data/seed/emergency.csv` by hand. A page that can't be fetched (the City's site blocks scripts) is checked in a normal browser and the date recorded | 5 minutes |
 | When adding listings | Put one pipe-delimited line per listing in `data/seed/incoming/*.txt` (format at the top of `pipeline/src/import-lines.ts`), then `pnpm import:lines` → `pnpm check:sources` → `pnpm geocode` → `pnpm build:bundle`. Imported rows are `proposed` and invisible until their own source page matches. Hours become a schedule only if every part parses; otherwise they're shown as written with "call first." Rows whose site blocks scripts: read the page in a browser, then set `status=active`, `entry_method=web` | — |
@@ -123,9 +123,13 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
    4. `pnpm build:bundle:release` with `BUNDLE_SIGNING_KEY`, `REPORTS_API`, `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET`.
    5. Build the web app with `BUNDLE_PUBLIC_KEYS` and `WEB_RELEASE=1`: it refuses unless exactly two different keys (active and spare) are pinned and the list it copies in is release-signed.
    6. Deploy to Cloudflare Pages.
-   7. Commit `data/hsds/`, the events file and `data/seed/emergency.csv`.
+   7. Commit `data/hsds/` and `data/seed/emergency.csv`. Nothing else is committed to `main` by the job.
    8. Re-read open data (`ingest:opendata`, `ingest:greenway`, `ingest:city parks`, `ingest:city zips`; on the 1st of the month also `ingest:basemap` and `ingest:neighborhoods`).
    9. If any of that changed, open a pull request. Nothing from step 8 is published that night.
+   10. `check:sources --recheck`: read each active listing's own page again with the same strict matcher used at entry, and write `data/staging/recheck.json` (git-ignored). It also writes notes into `data/seed/resources.csv` on the runner; those are never committed.
+   11. `pnpm tasks:sync`: send that list to the Worker (`PUT /v1/steward/tasks`, with `REPORTS_API` and the Access service token). It shows up under **Pages that changed** on `/admin/`. If step 10 didn't finish, nothing is sent.
+
+   Steps 10 and 11 run even if an earlier step failed, and never fail the job (`continue-on-error`): a flaky page never blocks a publish, and nothing in the app changes because of them (DECISIONS 2026-09-19).
 
    An emergency number whose own page shows a different number (`mismatch_on`, set by step 2) stops the release build at step 4 until a person fixes `emergency.csv`. Then nothing is deployed and yesterday's bundle stays up. A page that can't be read never stops it (DECISIONS 2026-09-19).
 
@@ -135,7 +139,7 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
 |---|---|---|
 | `BUNDLE_SIGNING_KEY` | GitHub Actions | Ed25519 private key that signs `index.json` |
 | spare signing key | offline only | Second pinned key, for rotation |
-| `ACCESS_CLIENT_ID` / `ACCESS_CLIENT_SECRET` | GitHub Actions | Access service token the pipeline uses to read report counts and sync ids |
+| `ACCESS_CLIENT_ID` / `ACCESS_CLIENT_SECRET` | GitHub Actions | Access service token the pipeline uses to read report counts, sync ids and send the nightly re-check's tasks |
 | `CLOUDFLARE_API_TOKEN` | GitHub Actions | Deploys Pages (the Worker is deployed by hand with `wrangler deploy`) |
 | `CLOUDFLARE_ACCOUNT_ID` | GitHub Actions | Which Cloudflare account to deploy to |
 
@@ -149,6 +153,7 @@ Repository **variables** (not secret): `PUBLISH_ENABLED` (`true` turns the night
 `photos`: a random key, the upload hour, and which report it belongs to. The picture itself is in a private R2 bucket and is deleted 30 days after its report closes (one day if no report claimed it), or when its report becomes a monthly count, whichever comes first.
 `proposals`: the place's name, category, what it offers and schedule text (both masked like a note), address (never for DV), public phone, how the submitter knows, masked note. Removed 180 days after a steward settles it; an open proposal waits for a steward.
 `listing_overrides`: a steward's decision about a listing (archived, paused, or active again), the reason (`restored` for active again: a restore is never recorded as a phone check), a replacement id if there is one, and the minute. The pipeline applies these at build time.
+`steward_tasks`: tasks the machine raised for a steward. Today only the nightly re-check: a listing id, `missing` or `unreadable`, the page matcher's own words (which of the listing's published phone numbers or street address it could not find, or why the page could not be read), the day, and whether it is open, dismissed by a steward (`checked_fine` or `will_fix`), or closed because the page matched again.
 `steward_actions`: steward email, action, reason code, optional note. Never published.
 There is no table of residents, and no column anywhere for an IP address, device, user agent, or location.
 

@@ -12,6 +12,9 @@
 #   4. Re-reads the other open-data sources. Any change (a station's address, a greenway phase, a street) is
 #      NOT published: it opens a pull request. Merging it is the steward's approval (DECISIONS: "held for
 #      steward approval").
+#   5. Re-reads each active listing's own web page. A page that no longer shows the listing's phone or street
+#      address, or can't be read, becomes a task in the steward queue ("Pages that changed"); nothing in the app
+#      changes (DECISIONS 2026-09-19). The notes this writes into data/seed/resources.csv are NOT committed.
 #
 # Secrets (names only; docs/OPERATIONS.md): BUNDLE_SIGNING_KEY, ACCESS_CLIENT_ID, ACCESS_CLIENT_SECRET,
 # CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Variables: PUBLISH_ENABLED, BUNDLE_PUBLIC_KEYS, REPORTS_API,
@@ -88,3 +91,19 @@ jobs:
           git commit -m "Open data changed on $(date -u +%F): review before it is published"
           git push -u origin "$branch"
           gh pr create --title "Open data changed $(date -u +%F)" --body "A City source changed. Read the diff: a changed phone number, address or coordinate is published only when this is merged. Nothing here was published tonight." --base main --head "$branch"
+
+      # 5. The nightly re-check. It runs even if a step above failed, and never fails the job: a flaky page must
+      #    not block a publish. Nothing here is committed: the resources.csv notes stay on this runner, and
+      #    data/staging/recheck.json is git-ignored. tasks:sync sends nothing if the re-check didn't finish.
+      - name: Re-check each listing's own page
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: pnpm --filter @detroithelp/pipeline check:sources --recheck
+      - name: Send pages that changed to the steward queue
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: pnpm tasks:sync
+        env:
+          REPORTS_API: ${{ vars.REPORTS_API }}
+          ACCESS_CLIENT_ID: ${{ secrets.ACCESS_CLIENT_ID }}
+          ACCESS_CLIENT_SECRET: ${{ secrets.ACCESS_CLIENT_SECRET }}

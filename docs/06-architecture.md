@@ -19,7 +19,7 @@
   (targets, reports, proposals, steward actions, overrides, photos)    R2: condition-report photos only
 ```
 
-ArcGIS layers read today: DHD harm-reduction stations, recreation centers, Joe Louis Greenway segments, parks, ZIP areas, neighborhoods, and for docs/13 property sales, building permits, blight tickets, demolitions, Improve Detroit issues and parcels; for the street map, roads and the city boundary. Page watchers are planned, not built. Press releases are not read by a machine: a person writes the alert with `pnpm alert:new`.
+ArcGIS layers read today: DHD harm-reduction stations, recreation centers, Joe Louis Greenway segments, parks, ZIP areas, neighborhoods, and for docs/13 property sales, building permits, blight tickets, demolitions, Improve Detroit issues and parcels; for the street map, roads and the city boundary. Page watchers are planned, not built; what runs today is the nightly re-check of each listing's own page, which only raises steward tasks. Press releases are not read by a machine: a person writes the alert with `pnpm alert:new`.
 
 Two halves, deliberately separated:
 
@@ -58,6 +58,7 @@ detroit-compass/
   2. Checks the emergency numbers against their owners' pages (`pnpm check:emergency`) and stamps each match's date. A page that can't be read changes nothing. A page that shows a different number stamps `mismatch_on`, and the release build then fails until a person fixes `emergency.csv` (DECISIONS 2026-09-19).
   3. Runs the tests, builds the signed release bundle (pulling report counts and steward decisions from the Worker), builds the web app with the pinned public keys, deploys to Cloudflare Pages, and commits `data/hsds/` and the emergency check dates.
   4. Re-reads the other open-data sources. Nothing from this step is published: if anything changed, it opens a pull request.
+  5. Re-reads each active listing's own web page (`check:sources --recheck`, the same strict matcher as the entry check) and sends every miss or unreadable page to the Worker as a steward task (`pnpm tasks:sync`). The app never changes because of it (DECISIONS 2026-09-19). This step can't fail the job, and the notes it writes into `data/seed/resources.csv` are not committed.
 - Each source has its own ingester file; `normalize.ts` turns seed and ingested rows into bundle rows and HSDS entities with deterministic IDs.
 - **Validate**: HSDS 3.2 JSON Schema + our own checks (Detroit bbox, phone format, known category, schedule parse). A schedule whose `until` is past on an active row is a warning, not an error.
 - **Diff** is git: open-data changes land in `data/ingested/` on a branch and become a pull request. Merging it is the steward's approval. Rows a source drops are never auto-archived.
@@ -75,15 +76,19 @@ Public endpoints (all anonymous). Rate limiting is a Cloudflare WAF rule in fron
 - `POST /v1/provider/claim` — provider requests ownership; sends a verification email (the only email we would ever hold; see 08). **(later, v1.1; not built)**
 
 Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a service token for the pipeline):
-- `GET /v1/steward/queue` — open reports and proposals.
-- `GET /v1/steward/aggregates` — counts and dates per target, steward decisions, and the circuit-breaker flag, for the bundle build.
+- `GET /v1/steward/queue` — open reports (not confirmations: those only feed the badge), proposals, and per target the number of different phones that said closed (`closed_phones`; the hashes never leave D1).
+- `GET /v1/steward/aggregates` — counts and dates per target, steward decisions, and the circuit-breaker flag, for the bundle build. Closure and wrong-info counts are different phones, not reports.
 - `GET /v1/steward/photos/:key` — view one photo.
 - `POST /v1/steward/reports/:id/resolve`, `POST /v1/steward/proposals/:id/resolve` — accept / reject / duplicate, with a reason code.
-- `POST /v1/steward/listings/:id/status` — archive, pause (suspend), or restore a listing.
+- `POST /v1/steward/reports/settle` — settle the reports the steward page showed on one target: only those ids, only on that target, only while still open, never a confirmation. A report that came in after the page loaded stays open.
+- `POST /v1/steward/listings/:id/status` — archive, pause (suspend), or restore a listing; settles the closure reports among the `report_ids` the page showed.
 - `POST /v1/steward/photos/:key/discard` — delete a photo now.
 - `PUT /v1/steward/targets` — the pipeline sends the ids that exist.
+- `PUT /v1/steward/tasks` — the pipeline sends the whole list from the nightly re-check; it replaces the open `source_check` tasks (ones no longer reported close as `resolved_by_check`; one a steward dismissed stays dismissed unless the result changes). `GET /v1/steward/tasks` lists the open ones; `POST /v1/steward/tasks/:id/dismiss` with `checked_fine` or `will_fix` closes one and logs it.
 
-D1 tables: `targets`, `reports`, `proposals`, `steward_actions`, `report_counts`, `listing_overrides`, `photos`. No `users` table for residents. Ever. No alerts: alerts live in `data/seed/alerts.json`.
+The Worker checks the Access token's signature itself. It keeps Access's public keys for an hour; a token naming a key it doesn't have makes it fetch them again (Access rotates keys), at most once per 5 minutes.
+
+D1 tables: `targets`, `reports`, `proposals`, `steward_actions`, `report_counts`, `listing_overrides`, `photos`, `steward_tasks`. No `users` table for residents. Ever. No alerts: alerts live in `data/seed/alerts.json`.
 
 Retention: raw reports 180 days, then aggregated to counts per target/kind/month and purged, together with any photo (one transaction). Proposals are purged 180 days after a steward settles them.
 
@@ -91,8 +96,9 @@ Retention: raw reports 180 days, then aggregated to counts per target/kind/month
 
 Boring on purpose. One page, `/admin/`, behind Cloudflare Access. On it, in order:
 - A circuit-breaker banner when more than 5 listings were reported closed in one day (closure reports then change no badges until a person looks).
-- Reported listings and places first, grouped by target, with the phone-call script inline and buttons to archive (closed, moved, program ended), mark it open and clear the reports, or close reports as fixed, can't confirm, spam, or "about a person: discard." A photo on a condition report shows here, with "Delete this photo now."
+- Reported listings and places first, grouped by target, with the phone-call script inline and buttons to archive (closed, moved, program ended), mark it open and clear the reports, or close reports as fixed, can't confirm, spam, or "about a person: discard." A listing is highlighted when 2 or more different phones said closed, the same count that changes its badge. A button settles only the reports the page showed. A photo on a condition report shows here, with "Delete this photo now."
 - Proposed new places: checked and listed, already listed, can't confirm, or not a fit.
+- Pages that changed: the nightly re-check's tasks, with the listing's name and what its page no longer shows, and "Checked: it's fine" or "I'll fix it."
 - How to publish now (`pnpm build:bundle`); otherwise the nightly job picks the changes up.
 - "Archived by a steward", with a restore button on each.
 

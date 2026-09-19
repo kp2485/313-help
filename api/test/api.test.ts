@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createApp, retention, type Db, type Env, type Stmt } from '../src/index.js';
+import { keyring, verifyAccess } from '../src/access.js';
 import { mask } from '../src/validate.js';
 
 // A D1-shaped wrapper over Node's built-in SQLite, so tests run the real migration and real SQL.
@@ -185,6 +186,170 @@ describe('steward endpoints', () => {
     await post('/v1/reports', { target_id: 'sal_b', kind: 'moved', client_nonce: 'e'.repeat(64) });
     expect(((await (await steward('/v1/steward/aggregates')).json()) as Agg).targets[0]!.closed_open).toBe(2);
   });
+  it('wrong_open counts phones too: one phone saying wrong hours and wrong phone counts once', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'wrong_hours', client_nonce: NONCE });
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'wrong_phone', client_nonce: NONCE });
+    type Agg = { targets: { wrong_open: number }[] };
+    expect(((await (await steward('/v1/steward/aggregates')).json()) as Agg).targets[0]!.wrong_open).toBe(1);
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'wrong_info', client_nonce: 'e'.repeat(64) });
+    expect(((await (await steward('/v1/steward/aggregates')).json()) as Agg).targets[0]!.wrong_open).toBe(2);
+  });
+});
+
+describe('the steward queue settles only what the steward saw', () => {
+  type Queue = { reports: { id: string; target_id: string; kind: string }[]; closed_phones: Record<string, number> };
+  const queue = async () => (await (await steward('/v1/steward/queue')).json()) as Queue;
+  const settle = (b: object) => steward('/v1/steward/reports/settle', { method: 'POST', body: JSON.stringify(b) });
+  const rows = () => db.raw.prepare('SELECT target_id, kind, status FROM reports ORDER BY kind').all();
+
+  it('settles only the ids sent, only on that target, and only while still open', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'wrong_hours', client_nonce: NONCE });
+    await post('/v1/reports', { target_id: 'sal_csk_conner_meals', kind: 'wrong_phone', client_nonce: 'c'.repeat(64) });
+    const shown = (await queue()).reports;
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'moved', client_nonce: 'e'.repeat(64) });     // came in after the page loaded
+    const res = await settle({ target_id: 'sal_b', ids: shown.map((r) => r.id), status: 'rejected', reason_code: 'could_not_confirm' });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, settled: 1 });
+    expect(rows()).toEqual([{ target_id: 'sal_b', kind: 'moved', status: 'open' }, { target_id: 'sal_b', kind: 'wrong_hours', status: 'rejected' },
+      { target_id: 'sal_csk_conner_meals', kind: 'wrong_phone', status: 'open' }]);
+    const settled = shown.find((r) => r.target_id === 'sal_b')!.id;
+    expect(db.raw.prepare('SELECT steward, action, subject_id, reason_code FROM steward_actions').all()).toEqual([{ steward: 'steward@example.org', action: 'reports.rejected', subject_id: settled, reason_code: 'could_not_confirm' }]);
+    expect(await (await settle({ target_id: 'sal_b', ids: [settled], status: 'rejected', reason_code: 'spam' })).json()).toEqual({ ok: true, settled: 0 });
+  });
+  it('settling takes a closed body: unknown fields, bad ids, statuses or reasons are 400', async () => {
+    const good = { target_id: 'sal_b', ids: ['rpt_0011223344556677'], status: 'rejected', reason_code: 'spam' };
+    expect((await settle(good)).status).toBe(200);
+    for (const bad of [{ ...good, note: 'x' }, { ...good, ids: 'rpt_0011223344556677' }, { ...good, ids: ['sal_b'] }, { ...good, status: 'open' },
+      { ...good, reason_code: 'because' }, { ...good, target_id: 'nope' }, { ...good, ids: Array.from({ length: 501 }, (_, i) => `rpt_${i}`) }])
+      expect((await settle(bad)).status, JSON.stringify(bad).slice(0, 80)).toBe(400);
+  });
+  it('archiving settles only the closure reports the page sent; one that came in later stays open', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'closed_permanently', client_nonce: NONCE });
+    const shown = (await queue()).reports.map((r) => r.id);
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'moved', client_nonce: 'e'.repeat(64) });
+    expect((await steward('/v1/steward/listings/sal_b/status', { method: 'POST', body: JSON.stringify({ status: 'archived', reason_code: 'closed_permanently', report_ids: shown }) })).status).toBe(200);
+    expect(rows()).toEqual([{ target_id: 'sal_b', kind: 'closed_permanently', status: 'accepted' }, { target_id: 'sal_b', kind: 'moved', status: 'open' }]);
+  });
+  it('confirmations are not in the queue, and settling a listing never settles one', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'confirmed_ok', client_nonce: 'c'.repeat(64) });
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'closed_permanently', client_nonce: NONCE });
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'wrong_hours', client_nonce: 'e'.repeat(64) });
+    await post('/v1/reports', { target_id: 'seg_conrail_warren_to_joy', kind: 'looks_good', client_nonce: 'd'.repeat(64) });
+    expect((await queue()).reports.map((r) => r.kind).sort()).toEqual(['closed_permanently', 'wrong_hours']);
+    // Even a page that somehow sent a confirmation's id can't settle it.
+    const all = (db.raw.prepare('SELECT id FROM reports').all() as { id: string }[]).map((r) => r.id);
+    await steward('/v1/steward/listings/sal_b/status', { method: 'POST', body: JSON.stringify({ status: 'archived', reason_code: 'moved', report_ids: all }) });
+    await settle({ target_id: 'sal_b', ids: all, status: 'accepted', reason_code: 'confirmed_by_phone' });
+    expect(rows()).toEqual([{ target_id: 'sal_b', kind: 'closed_permanently', status: 'accepted' }, { target_id: 'sal_b', kind: 'confirmed_ok', status: 'open' },
+      { target_id: 'seg_conrail_warren_to_joy', kind: 'looks_good', status: 'open' }, { target_id: 'sal_b', kind: 'wrong_hours', status: 'accepted' }]);
+    const agg = (await (await steward('/v1/steward/aggregates')).json()) as { targets: { target_id: string; last_confirmed_at: string | null }[] };
+    expect(agg.targets.find((t) => t.target_id === 'sal_b')!.last_confirmed_at).toBe('2026-09-18T17:41Z');
+  });
+  it('the queue says how many different phones said closed, and never sends the hashes', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'closed_permanently', client_nonce: NONCE });
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'moved', client_nonce: NONCE });
+    let q = await queue();
+    expect(q.closed_phones).toEqual({ sal_b: 1 });
+    expect(JSON.stringify(q)).not.toContain(NONCE);
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'moved', client_nonce: 'e'.repeat(64) });
+    q = await queue();
+    expect(q.closed_phones).toEqual({ sal_b: 2 });
+  });
+});
+
+describe('Cloudflare Access key rotation', () => {
+  const second = generateKeyPairSync('rsa', { modulusLength: 2048 });
+  const jwk2 = { ...(second.publicKey.export({ format: 'jwk' }) as { n: string; e: string; kty: string }), kid: 'k2' };
+  const accessEnv = { ACCESS_TEAM_DOMAIN: 'team.cloudflareaccess.com', ACCESS_AUD: 'aud123' };
+  const claims = { ...goodClaims, exp: NOW.getTime() / 1000 + 3600 };
+  const at = (minutes: number) => new Date(NOW.getTime() + minutes * 60000);
+  const fake = () => {
+    const f: { served: (typeof jwk)[]; calls: number; keys: ReturnType<typeof keyring> } = { served: [jwk], calls: 0, keys: keyring(async () => { f.calls++; return f.served; }) };
+    return f;
+  };
+  it('a token signed with a key it has not seen makes it fetch the keys again, then it verifies', async () => {
+    const f = fake();
+    expect(await verifyAccess(accessToken(claims), accessEnv, at(0), f.keys)).toEqual({ who: 'steward@example.org' });
+    f.served = [jwk, jwk2];                                                      // Access rotates its keys
+    expect(await verifyAccess(accessToken(claims, second.privateKey, 'k2'), accessEnv, at(6), f.keys)).toEqual({ who: 'steward@example.org' });
+    expect(f.calls).toBe(2);
+    expect(await verifyAccess(accessToken(claims), accessEnv, at(7), f.keys)).toEqual({ who: 'steward@example.org' });
+    expect(f.calls).toBe(2);
+  });
+  it('unknown keys fetch at most once per 5 minutes, so a flood of bad tokens cannot hammer the certs endpoint', async () => {
+    const f = fake();
+    await verifyAccess(accessToken(claims), accessEnv, at(0), f.keys);
+    f.served = [jwk, jwk2];
+    for (const m of [1, 2, 3, 4]) expect(await verifyAccess(accessToken(claims, second.privateKey, 'k2'), accessEnv, at(m), f.keys)).toBeNull();
+    expect(f.calls).toBe(1);
+    expect(await verifyAccess(accessToken(claims, second.privateKey, 'kX'), accessEnv, at(6), f.keys)).toBeNull();
+    expect(await verifyAccess(accessToken(claims, second.privateKey, 'kX'), accessEnv, at(8), f.keys)).toBeNull();
+    expect(f.calls).toBe(2);
+    expect(await verifyAccess(accessToken(claims, second.privateKey, 'k2'), accessEnv, at(8), f.keys)).toEqual({ who: 'steward@example.org' });
+    expect(f.calls).toBe(2);
+  });
+  it('a failed re-fetch keeps the keys it had', async () => {
+    let fail = false;
+    const keys = keyring(async () => { if (fail) throw new Error('down'); return [jwk]; });
+    await verifyAccess(accessToken(claims), accessEnv, at(0), keys);
+    fail = true;
+    expect(await verifyAccess(accessToken(claims, second.privateKey, 'k2'), accessEnv, at(6), keys)).toBeNull();
+    expect(await verifyAccess(accessToken(claims), accessEnv, at(7), keys)).toEqual({ who: 'steward@example.org' });
+  });
+});
+
+describe('steward tasks from the nightly re-check', () => {
+  type Task = { id: string; target_id: string; result: string; detail: string; checked_on: string };
+  const service = accessToken({ ...goodClaims, email: undefined, common_name: 'pipeline' });
+  const put = (tasks: unknown, token = service, headers: Record<string, string> = {}) => steward('/v1/steward/tasks', { method: 'PUT', body: JSON.stringify({ tasks }) }, token, headers);
+  const list = async () => ((await (await steward('/v1/steward/tasks')).json()) as { tasks: Task[] }).tasks;
+  const miss = (target_id: string, detail = 'phone 313-555-0100', result = 'missing') => ({ target_id, result, detail, checked_on: '2026-09-18' });
+  const dismiss = (id: string, b: object) => steward(`/v1/steward/tasks/${id}/dismiss`, { method: 'POST', body: JSON.stringify(b) });
+
+  it('a PUT replaces the open set: new misses open, ones no longer reported close as resolved_by_check', async () => {
+    expect((await put([miss('sal_b'), miss('sal_csk_conner_meals', 'HTTP 503', 'unreadable')])).status).toBe(200);
+    expect((await list()).map((t) => [t.target_id, t.result, t.detail])).toEqual([['sal_b', 'missing', 'phone 313-555-0100'], ['sal_csk_conner_meals', 'unreadable', 'HTTP 503']]);
+    expect((await list())[0]!.id).toMatch(/^task_[a-f0-9]{16}$/);
+    await put([miss('sal_b')]);
+    expect((await list()).map((t) => t.target_id)).toEqual(['sal_b']);
+    expect(db.raw.prepare('SELECT target_id, status FROM steward_tasks ORDER BY target_id').all()).toEqual([{ target_id: 'sal_b', status: 'open' }, { target_id: 'sal_csk_conner_meals', status: 'resolved_by_check' }]);
+    await put([]);
+    expect(await list()).toEqual([]);
+  });
+  it('a dismissed task stays dismissed while the check says the same thing, and opens again when it changes', async () => {
+    await put([miss('sal_b')]);
+    const [t] = await list();
+    for (const bad of [{}, { reason: 'because' }, { reason: 'checked_fine', note: 'hi' }]) expect((await dismiss(t!.id, bad)).status).toBe(400);
+    expect((await dismiss(t!.id, { reason: 'checked_fine' })).status).toBe(200);
+    expect((await dismiss(t!.id, { reason: 'checked_fine' })).status).toBe(404);
+    expect(await list()).toEqual([]);
+    expect(db.raw.prepare('SELECT steward, action, subject_id, reason_code FROM steward_actions').all()).toEqual([{ steward: 'steward@example.org', action: 'tasks.dismissed', subject_id: t!.id, reason_code: 'checked_fine' }]);
+    await put([miss('sal_b')]);
+    expect(await list()).toEqual([]);
+    await put([miss('sal_b', 'street address "1 Main St"')]);
+    const again = await list();
+    expect(again.map((x) => x.detail)).toEqual(['street address "1 Main St"']);
+    expect(again[0]!.id).not.toBe(t!.id);
+  });
+  it('a dismissed task whose page matched again is forgotten: the next miss is news', async () => {
+    await put([miss('sal_b')]);
+    await dismiss((await list())[0]!.id, { reason: 'will_fix' });
+    await put([]);
+    await put([miss('sal_b')]);
+    expect(await list()).toHaveLength(1);
+  });
+  it('takes a closed body: unknown fields, bad ids, results or dates, and repeated targets are 400 and change nothing', async () => {
+    for (const bad of [[{ ...miss('sal_b'), phone: '313' }], [miss('seg_x')], [miss('sal_b', 'x', 'closed')], [{ ...miss('sal_b'), checked_on: 'yesterday' }],
+      [miss('sal_b', '')], [miss('sal_b', 'x'.repeat(301))], [miss('sal_b'), miss('sal_b')], 'sal_b'])
+      expect((await put(bad)).status, JSON.stringify(bad).slice(0, 60)).toBe(400);
+    expect((await steward('/v1/steward/tasks', { method: 'PUT', body: JSON.stringify({ tasks: [], extra: 1 }) }, service, {})).status).toBe(400);
+    expect(db.raw.prepare('SELECT COUNT(*) AS n FROM steward_tasks').get()).toEqual({ n: 0 });
+  });
+  it('needs a steward login or the pipeline token, and a browser write from the page itself', async () => {
+    expect((await app.request('/v1/steward/tasks', {}, env)).status).toBe(401);
+    expect((await put([miss('sal_b')], accessToken(goodClaims))).status).toBe(403);                 // a browser with no Origin
+    expect((await put([miss('sal_b')], accessToken(goodClaims), { origin: 'http://localhost' })).status).toBe(200);
+  });
 });
 
 describe('steward writes refuse cross-site requests', () => {
@@ -208,6 +373,8 @@ describe('steward writes refuse cross-site requests', () => {
     expect((await steward('/v1/steward/proposals/prop_x/resolve', resolveBody, accessToken(goodClaims), {})).status).toBe(403);
     expect((await steward(`/v1/steward/photos/ph_${'0'.repeat(32)}/discard`, { method: 'POST' }, accessToken(goodClaims), {})).status).toBe(403);
     expect((await steward('/v1/steward/targets', { method: 'PUT', body: JSON.stringify({ listings: ['sal_new'], places: [] }) }, accessToken(goodClaims), {})).status).toBe(403);
+    expect((await steward('/v1/steward/reports/settle', { method: 'POST', body: JSON.stringify({ target_id: 'sal_b', ids: [id], status: 'accepted', reason_code: 'confirmed_by_phone' }) }, accessToken(goodClaims), {})).status).toBe(403);
+    expect((await steward('/v1/steward/tasks/task_0011223344556677/dismiss', { method: 'POST', body: JSON.stringify({ reason: 'checked_fine' }) }, accessToken(goodClaims), {})).status).toBe(403);
     expect(db.raw.prepare("SELECT status FROM reports").get()).toEqual({ status: 'open' });
     expect(db.raw.prepare("SELECT COUNT(*) AS n FROM targets WHERE id = 'sal_new'").get()).toEqual({ n: 0 });
     expect((await steward(`/v1/steward/reports/${id}/resolve`, resolveBody)).status).toBe(200);
@@ -247,8 +414,11 @@ describe('archiving a listing', () => {
     expect((await call({ status: 'archived' })).status).toBe(400);
     expect((await call({ status: 'archived', reason_code: 'because' })).status).toBe(400);
     expect((await steward('/v1/steward/listings/sal_nope/status', { method: 'POST', body: JSON.stringify({ status: 'archived', reason_code: 'moved' }) })).status).toBe(404);
-    expect((await call({ status: 'archived', reason_code: 'closed_permanently' })).status).toBe(200);
+    const shown = ((await (await steward('/v1/steward/queue')).json()) as { reports: { id: string }[] }).reports.map((r) => r.id);
+    expect((await call({ status: 'archived', reason_code: 'closed_permanently', report_ids: 'all' })).status).toBe(400);
+    expect((await call({ status: 'archived', reason_code: 'closed_permanently', report_ids: shown })).status).toBe(200);
 
+    // The status call settles the closure reports it was sent; the page settles the rest with its own call.
     expect(db.raw.prepare("SELECT kind, status FROM reports ORDER BY kind").all()).toEqual([{ kind: 'closed_permanently', status: 'accepted' }, { kind: 'wrong_hours', status: 'open' }]);
     expect(db.raw.prepare('SELECT action, subject_id, reason_code FROM steward_actions').get()).toEqual({ action: 'listing.archived', subject_id: 'sal_b', reason_code: 'closed_permanently' });
     const agg = (await (await steward('/v1/steward/aggregates')).json()) as { overrides: object[] };

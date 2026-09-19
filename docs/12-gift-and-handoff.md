@@ -20,7 +20,7 @@ A crisis directory that is abandoned but still looks alive is worse than no app.
 ## Design rules that follow
 
 ### 1. Unattended by default
-Everything that keeps the directory honest runs without a person: every badge states its date, reports label rows automatically, alerts expire by their own end time, watched pages and open-data diffs raise tasks rather than needing someone to look. Steward work improves the data; its absence never makes the app lie. (This is why 04 dropped scheduled verification.)
+Everything that keeps the directory honest runs without a person: every badge states its date, reports label rows automatically, alerts expire by their own end time, the nightly re-check of each listing's own page and open-data diffs raise tasks rather than needing someone to look. No listing changes because time passed. Steward work improves the data; its absence never makes the app lie. (This is why 04 dropped scheduled verification.)
 
 ### 2. Old copies and shutting down
 

@@ -7,6 +7,8 @@ export const LISTING_KINDS = ['confirmed_ok', 'closed_permanently', 'moved', 'wr
 export const PLACE_KINDS = ['looks_good', 'light_out', 'glass_trash', 'flooding_ice', 'path_damaged', 'overgrown', 'broken_fixture', 'restroom', 'dumping'] as const;
 export const CLOSED_KINDS = ['closed_permanently', 'moved'];
 export const WRONG_KINDS = ['wrong_hours', 'wrong_phone', 'wrong_info'];
+// "Still open" and "looks good": counted for the badge, never something a steward has to settle.
+export const CONFIRM_KINDS = ['confirmed_ok', 'looks_good'];
 export const HOW_KNOWN = ['run_it', 'volunteer', 'went_there', 'heard'] as const;
 
 const LISTING_ID = /^sal_[a-z0-9_]{1,80}$/;
@@ -89,4 +91,55 @@ export function parseProposal(body: unknown): Result<ProposalInput> {
     phone: text(b.value.phone, 40), schedule_text: schedule ? mask(schedule) : null,
     how_known: b.value.how_known as string, notes: notes ? mask(notes) : null,
   } };
+}
+
+const REPORT_ID = /^(rpt|cond)_[a-z0-9]{1,40}$/;
+const TARGET_ID = /^(sal|seg|plc)_[a-z0-9_]{1,80}$/;
+const idList = (v: unknown, re: RegExp, max: number): string[] | null => (Array.isArray(v) && v.length <= max && v.every((x) => typeof x === 'string' && re.test(x)) ? v as string[] : null);
+/** Report ids the steward page showed (at most 500). A missing list is an empty one. */
+export const reportIds = (v: unknown): string[] | null => (v == null ? [] : idList(v, REPORT_ID, 500));
+
+export interface SettleInput { target_id: string; ids: string[]; status: string; reason_code: string }
+
+/** Settle the reports a steward was shown on one listing or place, and no others. */
+export function parseSettle(body: unknown, reasons: string[]): Result<SettleInput> {
+  const b = closed(body, ['target_id', 'ids', 'status', 'reason_code']);
+  if (!b.ok) return b;
+  const { target_id, status, reason_code } = b.value, ids = idList(b.value.ids, REPORT_ID, 500);
+  if (typeof target_id !== 'string' || !TARGET_ID.test(target_id)) return fail('bad target_id');
+  if (!ids) return fail('ids must be a list of at most 500 report ids');
+  if (!['accepted', 'rejected', 'duplicate'].includes(status as string) || !reasons.includes(reason_code as string)) return fail('status and a known reason_code are required');
+  return { ok: true, value: { target_id, ids, status: status as string, reason_code: reason_code as string } };
+}
+
+// Tasks the machine raises for a steward (DECISIONS 2026-09-19). The detail is the page matcher's own words: which of
+// the listing's published phone numbers or street address it could not find, or why the page could not be read.
+export const TASK_RESULTS = ['missing', 'unreadable'];
+export const TASK_REASONS = ['checked_fine', 'will_fix'];
+export interface TaskInput { target_id: string; result: string; detail: string; checked_on: string }
+
+export function parseTasks(body: unknown): Result<TaskInput[]> {
+  const b = closed(body, ['tasks']);
+  if (!b.ok) return b;
+  const list = b.value.tasks;
+  if (!Array.isArray(list) || list.length > 2000) return fail('tasks must be a list');
+  const out: TaskInput[] = [];
+  for (const t of list) {
+    const c = closed(t, ['target_id', 'result', 'detail', 'checked_on']);
+    if (!c.ok) return c;
+    const { target_id, result, detail, checked_on } = c.value;
+    if (!isListingId(target_id)) return fail('bad target_id');
+    if (!TASK_RESULTS.includes(result as string)) return fail('bad result');
+    if (typeof detail !== 'string' || !detail.trim() || detail.length > 300) return fail('detail must be 1 to 300 characters');
+    if (typeof checked_on !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(checked_on)) return fail('checked_on must be a date');
+    if (out.some((o) => o.target_id === target_id)) return fail(`${target_id} is listed twice`);
+    out.push({ target_id, result: result as string, detail: detail.trim(), checked_on });
+  }
+  return { ok: true, value: out };
+}
+
+export function parseDismiss(body: unknown): Result<{ reason: string }> {
+  const b = closed(body, ['reason']);
+  if (!b.ok) return b;
+  return TASK_REASONS.includes(b.value.reason as string) ? { ok: true, value: { reason: b.value.reason as string } } : fail(`reason must be one of: ${TASK_REASONS.join(', ')}`);
 }

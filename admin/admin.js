@@ -2,16 +2,19 @@
 // In production this page and /v1/steward/* sit behind Cloudflare Access; the browser's Access
 // session authenticates every request, so there are no tokens or passwords in this file.
 // Exceptions only: nobody works through listings on a schedule. What lands here is
-//   1. listings that visitors reported closed or moved   2. other corrections   3. proposed new places.
+//   1. listings that visitors reported closed or moved   2. other corrections   3. proposed new places
+//   4. listings whose own web page changed (the nightly re-check).
+
+import { CLOSED, esc, groupReports, settleBody, taskItem } from './queue.js';
 
 const app = document.getElementById('app');
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const KIND = { closed_permanently: 'Closed for good', moved: 'Moved', wrong_hours: 'Hours are different', wrong_phone: 'Wrong phone', out_of_stock: 'Out of supplies', wrong_info: 'Something else', confirmed_ok: 'Still open', looks_good: 'Looks good',
   light_out: 'Light out', glass_trash: 'Glass or trash', flooding_ice: 'Flooding or ice', path_damaged: 'Path damaged', overgrown: 'Overgrown', broken_fixture: 'Broken fixture', restroom: 'Restroom', dumping: 'Dumping' };
-const CLOSED = ['closed_permanently', 'moved'];
 const SCRIPT = 'Phone script: “Are you still running this? What days and times? Any ID or address needed? Is it okay to list you?”';
 
-let names = new Map(), message = '';
+// `shown` is what the page last showed, by listing: a button settles those reports and no others (a report that
+// came in since stays open for the next look).
+let names = new Map(), shown = new Map(), message = '';
 
 // Every write is JSON (an empty object when there is nothing to say): the API refuses any other steward write,
 // which is what stops another site from posting a form here with the steward's login (and the browser adds Origin).
@@ -36,13 +39,12 @@ async function loadNames() {
   } catch { /* the queue still works with ids only */ }
 }
 
-function reportGroup(targetId, reports) {
+function reportGroup({ target_id: targetId, reports, hot }) {
   const meta = names.get(targetId) ?? { name: targetId };
   const counts = {};
   for (const r of reports) counts[r.kind] = (counts[r.kind] ?? 0) + 1;
-  const closed = reports.filter((r) => CLOSED.includes(r.kind)).length;
   const isListing = targetId.startsWith('sal_');
-  return `<article class="item ${closed >= 2 ? 'hot' : ''}" data-target="${esc(targetId)}">
+  return `<article class="item ${hot ? 'hot' : ''}" data-target="${esc(targetId)}">
     <h3>${esc(meta.name)}</h3>
     <p class="sub">${esc(targetId)}${meta.phone ? ` · <a href="tel:${esc(meta.phone)}">${esc(meta.phone)}</a>` : ''}</p>
     <p class="tags">${Object.entries(counts).map(([k, n]) => `<span class="tag ${CLOSED.includes(k) ? 'warn' : ''}">${esc(KIND[k] ?? k)} × ${n}</span>`).join(' ')}</p>
@@ -77,16 +79,16 @@ function proposal(p) {
 
 async function render() {
   try {
-    const [queue, agg] = await Promise.all([api('/v1/steward/queue'), api('/v1/steward/aggregates')]);
-    const groups = new Map();
-    for (const r of queue.reports) groups.set(r.target_id, [...(groups.get(r.target_id) ?? []), r]);
-    const weight = (rs) => rs.filter((r) => CLOSED.includes(r.kind)).length * 100 + rs.filter((r) => r.kind !== 'confirmed_ok' && r.kind !== 'looks_good').length;
-    const sorted = [...groups.entries()].filter(([, rs]) => weight(rs) > 0).sort((a, b) => weight(b[1]) - weight(a[1]));
+    const [queue, agg, tasks] = await Promise.all([api('/v1/steward/queue'), api('/v1/steward/aggregates'), api('/v1/steward/tasks')]);
+    const groups = groupReports(queue.reports, queue.closed_phones);
+    shown = new Map(groups.map((g) => [g.target_id, g]));
     const archived = (agg.overrides ?? []).filter((o) => o.status === 'archived');
     app.innerHTML = `${message ? `<p class="flash" role="status">${esc(message)}</p>` : ''}
       ${agg.circuit_breaker ? '<p class="breaker"><strong>Circuit breaker is on.</strong> More than 5 listings were reported closed in the last day. Closure reports are not changing any badges until you work through them below. This is either an attack or a real emergency; look before you archive.</p>' : ''}
-      <section><h2>Reported listings and places <span class="count">${sorted.length}</span></h2>${sorted.map(([id, rs]) => reportGroup(id, rs)).join('') || '<p class="empty">Nothing to look at. Visitor confirmations are counted automatically.</p>'}</section>
+      <section><h2>Reported listings and places <span class="count">${groups.length}</span></h2>${groups.map(reportGroup).join('') || '<p class="empty">Nothing to look at. Visitor confirmations are counted automatically.</p>'}</section>
       <section><h2>Proposed new places <span class="count">${queue.proposals.length}</span></h2>${queue.proposals.map(proposal).join('') || '<p class="empty">No proposals waiting.</p>'}</section>
+      <section><h2>Pages that changed <span class="count">${tasks.tasks.length}</span></h2><p class="sub">Each night the listing's own web page is read again. These no longer show the phone number or street address we list, or could not be read. Nothing in the app has changed. Open the page (its link is <code>source_url</code> in data/seed/resources.csv); if the place changed, fix the row there.</p>
+        ${tasks.tasks.map((t) => taskItem(t, names)).join('') || '<p class="empty">Every page still matches.</p>'}</section>
       <section><h2>Publish</h2><p>Archiving and clearing take effect at the next bundle build. The nightly job does this; to do it now:</p><pre>pnpm build:bundle</pre>
       </section>
       <section><h2>Archived by a steward <span class="count">${archived.length}</span></h2><p class="sub">Nothing here was deleted. If a place turns out to be open, restore it; it comes back at the next build.</p>
@@ -98,6 +100,8 @@ app.addEventListener('click', async (ev) => {
   const btn = ev.target.closest('button[data-act]');
   if (!btn) return;
   const item = btn.closest('.item'), { act, reason, status } = btn.dataset;
+  // Only what this page showed for this listing (nothing, for one that had no open reports).
+  const group = shown.get(item.dataset.target) ?? { target_id: item.dataset.target, reports: [] };
   btn.disabled = true;
   try {
     if (act === 'discard-photo') {
@@ -105,16 +109,19 @@ app.addEventListener('click', async (ev) => {
       message = 'Photo deleted. The report is still here.';
     } else if (act === 'archive' || act === 'active') {
       if (act === 'archive' && !confirm(`Archive “${names.get(item.dataset.target)?.name ?? item.dataset.target}”? It stays in the dataset with its reason, and the app will say it closed.`)) { btn.disabled = false; return; }
-      await api(`/v1/steward/listings/${item.dataset.target}/status`, { method: 'POST', body: JSON.stringify(act === 'archive' ? { status: 'archived', reason_code: reason } : { status: 'active' }) });
+      const report_ids = group.reports.map((r) => r.id);
+      await api(`/v1/steward/listings/${item.dataset.target}/status`, { method: 'POST', body: JSON.stringify(act === 'archive' ? { status: 'archived', reason_code: reason, report_ids } : { status: 'active', report_ids }) });
       message = act === 'archive' ? 'Archived. It will show as closed after the next build.' : 'Marked open. It shows as open again after the next build.';
     }
-    if (act === 'dismiss' || act === 'active' || act === 'archive') {
-      // Settle whatever is still open on this target (the status call only settles closure reports).
+    if ((act === 'dismiss' || act === 'active' || act === 'archive') && group.reports.length) {
+      // Settle the rest of what was shown (the status call only settles closure reports).
       // Restoring is not a phone call, so it never records one (review 10b).
-      const queue = await api('/v1/steward/queue');
-      for (const r of queue.reports.filter((x) => x.target_id === item.dataset.target))
-        await api(`/v1/steward/reports/${r.id}/resolve`, { method: 'POST', body: JSON.stringify({ status: status ?? 'accepted', reason_code: act === 'dismiss' ? reason : act === 'active' ? 'restored' : 'confirmed_by_phone' }) });
+      await api('/v1/steward/reports/settle', { method: 'POST', body: JSON.stringify(settleBody(group, status ?? 'accepted', act === 'dismiss' ? reason : act === 'active' ? 'restored' : 'confirmed_by_phone')) });
       if (act === 'dismiss') message = 'Reports closed.';
+    }
+    if (act === 'task') {
+      await api(`/v1/steward/tasks/${item.dataset.task}/dismiss`, { method: 'POST', body: JSON.stringify({ reason }) });
+      message = reason === 'will_fix' ? 'Noted. Fix the row in data/seed/resources.csv; the task stays closed unless the page changes again.' : 'Closed. It comes back only if the page says something different.';
     }
     if (act === 'proposal') { await api(`/v1/steward/proposals/${item.dataset.proposal}/resolve`, { method: 'POST', body: JSON.stringify({ status, reason_code: reason }) }); message = 'Proposal settled.'; }
   } catch (e) { message = e.message; }

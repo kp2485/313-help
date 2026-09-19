@@ -5,10 +5,13 @@
 // of the bundle until a person looks. A page that can't be read (an error, or bot protection) is never a mismatch:
 // the row waits for a person with a browser. `--recheck` also re-reads active rows (the nightly re-check); a miss
 // there only leaves a note for a steward. Nothing changes in the app until a person decides (DECISIONS 2026-09-19).
+// `--recheck` also writes data/staging/recheck.json: each active listing whose page missed or could not be read, for
+// `pnpm tasks:sync` to send to the steward queue as a task.
 
-import { today } from './util.js';
+import { today, writeJson } from './util.js';
 import { readResources, writeResources } from './seed-io.js';
 import { fetchPage, listingOnPage, type PageResult } from './page-match.js';
+import { RECHECK, recheckTask, type RecheckTask } from './tasks-sync.js';
 
 const cache = new Map<string, PageResult>();
 const page = async (url: string) => { if (!cache.has(url)) cache.set(url, await fetchPage(url)); return cache.get(url)!; };
@@ -23,12 +26,18 @@ const note = (r: Record<string, string | undefined>, why: string) => {
 const promoteOnly = !process.argv.includes('--recheck');
 const rows = readResources();
 let ok = 0, held = 0, unread = 0;
+const tasks: RecheckTask[] = [];
+const task = (r: Record<string, string | undefined>, outcome: { missing: string[] } | { why: string }) => {
+  const t = r.status === 'active' && r.sal_id ? recheckTask(r.sal_id, outcome, today()) : null;
+  if (t) tasks.push(t);
+};
 for (const r of rows) {
   if (promoteOnly && r.status !== 'proposed') continue;
   if (!r.source_url) { held++; continue; }
   const got = await page(r.source_url);
-  if (!got.ok) { note(r, `source page could not be read (${got.why}); check by eye`); unread++; continue; }
+  if (!got.ok) { task(r, { why: got.why }); note(r, `source page could not be read (${got.why}); check by eye`); unread++; continue; }
   const m = listingOnPage(got.html, r);
+  task(r, { missing: m.missing });
   if (m.ok) {
     if (r.status === 'proposed') { r.status = 'active'; r.checked_at_entry = today(); r.entry_method = 'auto_check'; }
     ok++;
@@ -40,4 +49,5 @@ for (const r of rows) {
   }
 }
 writeResources(rows);
+if (!promoteOnly) { writeJson(RECHECK, tasks); console.log(`${tasks.length} re-check tasks written to ${RECHECK}`); }
 console.log(`${ok} matched their source page, ${held} held for a person to check, ${unread} pages could not be read`);

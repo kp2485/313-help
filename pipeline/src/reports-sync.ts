@@ -34,15 +34,16 @@ export function applyAggregates(rows: BundleRow[], agg: Aggregates): { applied: 
     if (!r) continue;
     r.status = o.status;
     r.archived = o.status === 'archived' ? { at: o.at.slice(0, 10), reason: o.reason_code, ...(o.replacement_id ? { replacement_id: o.replacement_id } : {}) } : null;
-    // A restore clears the closure reports the steward rejected. It is not a check: nobody called, so the badge keeps
-    // whatever dated check the listing already had (review 10b). Older overrides said "confirmed_by_phone" by default.
-    if (o.status === 'active') r.facts.reports = { closed_open: 0, closed_last_at: null, wrong_open: r.facts.reports.wrong_open };
+    // A restore is not a check: nobody called, so the badge keeps whatever dated check the listing already had
+    // (review 10b). The closure reports the steward rejected are settled in the Worker, so they're already out of the
+    // counts; reports made after the restore stay counted.
   }
   return { applied, frozen: agg.circuit_breaker };
 }
 
-function headers(): Record<string, string> {
-  return { 'content-type': 'application/json', 'CF-Access-Client-Id': process.env.ACCESS_CLIENT_ID ?? '', 'CF-Access-Client-Secret': process.env.ACCESS_CLIENT_SECRET ?? '' };
+/** The Access service token's headers. */
+export function headers(env: Record<string, string | undefined> = process.env): Record<string, string> {
+  return { 'content-type': 'application/json', 'CF-Access-Client-Id': env.ACCESS_CLIENT_ID ?? '', 'CF-Access-Client-Secret': env.ACCESS_CLIENT_SECRET ?? '' };
 }
 
 export async function fetchAggregates(): Promise<Aggregates | null> {

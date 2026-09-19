@@ -5,9 +5,9 @@
 //   - times are coarsened before storage; free text is masked before storage
 
 import { Hono, type Context } from 'hono';
-import { verifyAccess, type JwksFetcher } from './access.js';
+import { keyring, verifyAccess, type JwksFetcher } from './access.js';
 import { MAX_PHOTO_BYTES, PHOTO_KEY, checkJpeg, type PhotoStore } from './photo.js';
-import { ARCHIVE_REASONS, CLOSED_KINDS, WRONG_KINDS, isListingId, parseProposal, parseReport } from './validate.js';
+import { ARCHIVE_REASONS, CLOSED_KINDS, CONFIRM_KINDS, WRONG_KINDS, isListingId, parseDismiss, parseProposal, parseReport, parseSettle, parseTasks, reportIds } from './validate.js';
 
 export interface Stmt { bind(...args: unknown[]): Stmt; run(): Promise<{ meta: { changes: number } }>; all<T = Record<string, unknown>>(): Promise<{ results: T[] }>; first<T = Record<string, unknown>>(): Promise<T | null> }
 /** A batch is one transaction (D1), answering one result per statement. */
@@ -25,6 +25,7 @@ const inList = (kinds: string[]) => kinds.map((k) => `'${k}'`).join(',');
 
 export function createApp(deps: Deps = { now: () => new Date() }) {
   const app = new Hono<{ Bindings: Env; Variables: { who: string } }>();
+  const keys = keyring(deps.jwks);
 
   app.use('/v1/*', async (c, next) => {
     const origin = c.env.ALLOWED_ORIGIN;
@@ -36,9 +37,9 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
 
   app.get('/v1/health', (c) => c.json({ ok: true }));
 
-  const body = async (c: Context): Promise<unknown> => {
+  const body = async (c: Context, max = 4096): Promise<unknown> => {
     const raw = await c.req.text();
-    if (raw.length > 4096) return undefined;
+    if (raw.length > max) return undefined;
     try { return JSON.parse(raw); } catch { return undefined; }
   };
 
@@ -97,7 +98,7 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     // Worker is being reached as localhost. A deployed Worker is never localhost, so this cannot open production.
     const url = new URL(c.req.url), local = (h: string) => h === 'localhost' || h === '127.0.0.1';
     const dev = c.env.DEV_STEWARD && local(url.hostname) ? { who: `dev:${c.env.DEV_STEWARD}` } : null;
-    const id = dev ?? (await verifyAccess(c.req.header('Cf-Access-Jwt-Assertion'), c.env, deps.now(), deps.jwks));
+    const id = dev ?? (await verifyAccess(c.req.header('Cf-Access-Jwt-Assertion'), c.env, deps.now(), keys));
     if (!id) return c.json({ error: 'not signed in' }, 401);
     // Cross-site request forgery: a steward's browser carries the Access cookie to any site that posts here. A form
     // can't send a JSON content type, and every browser names the page it posts from in Origin. So a write must be JSON
@@ -115,10 +116,14 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     await next();
   });
 
+  // Reports to look at: confirmations are counted for the badge and never need a steward, so they are not here.
+  // `closed_phones` is how many different phones said closed or moved, counted like the aggregates (one phone = one
+  // report, DECISIONS 2026-09-19); the hashes themselves never leave the database.
   app.get('/v1/steward/queue', async (c) => {
-    const reports = await c.env.DB.prepare("SELECT id, target_id, kind, detail, suggested, observed_at, submitted_at, photo_key FROM reports WHERE status = 'open' ORDER BY submitted_at DESC LIMIT 500").all();
+    const reports = await c.env.DB.prepare(`SELECT id, target_id, kind, detail, suggested, observed_at, submitted_at, photo_key FROM reports WHERE status = 'open' AND kind NOT IN (${inList(CONFIRM_KINDS)}) ORDER BY submitted_at DESC LIMIT 500`).all();
+    const closedPhones = await c.env.DB.prepare(`SELECT target_id, COUNT(DISTINCT client_nonce) AS n FROM reports WHERE status = 'open' AND kind IN (${inList(CLOSED_KINDS)}) GROUP BY target_id`).all<{ target_id: string; n: number }>();
     const proposals = await c.env.DB.prepare("SELECT id, ref, name, category, what, address, phone, schedule_text, how_known, notes, submitted_at FROM proposals WHERE status = 'open' ORDER BY (how_known = 'heard'), submitted_at DESC LIMIT 200").all();
-    return c.json({ reports: reports.results, proposals: proposals.results });
+    return c.json({ reports: reports.results, closed_phones: Object.fromEntries(closedPhones.results.map((r) => [r.target_id, r.n])), proposals: proposals.results });
   });
 
   // Photos are for stewards' eyes only, and a steward can throw one away at once (a face, a house number, abuse).
@@ -147,13 +152,30 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     return c.json({ ok: true });
   };
   app.post('/v1/steward/reports/:id/resolve', resolve('reports'));
+
+  // Settle the reports a steward was shown on one listing or place. Only those ids, only on that target, only while
+  // still open, and never a confirmation: a report that came in after the page loaded stays open for the next look.
+  app.post('/v1/steward/reports/settle', async (c) => {
+    const parsed = parseSettle(await body(c, 32768), REASONS);
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const { target_id, ids, status, reason_code } = parsed.value, at = minute(deps.now());
+    if (!ids.length) return c.json({ ok: true, settled: 0 });
+    const match = `FROM reports WHERE target_id = ? AND status = 'open' AND kind NOT IN (${inList(CONFIRM_KINDS)}) AND id IN (${ids.map(() => '?').join(',')})`;
+    const [, done] = await c.env.DB.batch([
+      c.env.DB.prepare(`INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) SELECT ?, ?, ?, id, ?, NULL ${match}`).bind(at, c.get('who'), `reports.${status}`, reason_code, target_id, ...ids),
+      c.env.DB.prepare(`UPDATE reports SET status = ?, reason_code = ?, resolved_at = ? WHERE id IN (SELECT id ${match})`).bind(status, reason_code, at, target_id, ...ids)]);
+    return c.json({ ok: true, settled: done?.meta.changes ?? 0 });
+  });
   app.post('/v1/steward/proposals/:id/resolve', resolve('proposals'));
 
-  // Archive, pause, or restore a listing. Open closure reports on it are settled in the same step.
+  // Archive, pause, or restore a listing. The closure reports the page showed (`report_ids`) are settled in the same
+  // step; one that came in after the page loaded stays open.
   app.post('/v1/steward/listings/:id/status', async (c) => {
     const id = c.req.param('id');
-    const b = (await body(c)) as { status?: string; reason_code?: string; replacement_id?: string; note?: string } | undefined;
+    const b = (await body(c, 32768)) as { status?: string; reason_code?: string; replacement_id?: string; note?: string; report_ids?: unknown } | undefined;
     if (!isListingId(id) || !b || !['archived', 'suspended', 'active'].includes(b.status ?? '')) return c.json({ error: 'status must be archived, suspended, or active' }, 400);
+    const shown = reportIds(b.report_ids);
+    if (!shown) return c.json({ error: 'report_ids must be a list of at most 500 report ids' }, 400);
     // Restoring records `restored`, never a phone check: nobody called, so the badge must not say anyone did (review 10b).
     const reason = b.status === 'archived' ? b.reason_code : b.status === 'active' ? 'restored' : b.reason_code ?? 'seasonal';
     if (b.status === 'archived' && !ARCHIVE_REASONS.includes(reason ?? '')) return c.json({ error: `archiving needs a reason: ${ARCHIVE_REASONS.join(', ')}` }, 400);
@@ -164,7 +186,7 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     await c.env.DB.prepare('INSERT INTO listing_overrides (target_id, status, reason_code, replacement_id, at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (target_id) DO UPDATE SET status = excluded.status, reason_code = excluded.reason_code, replacement_id = excluded.replacement_id, at = excluded.at')
       .bind(id, b.status, reason, b.replacement_id ?? null, at).run();
     const settle = b.status === 'archived' ? 'accepted' : b.status === 'active' ? 'rejected' : null;
-    if (settle) await c.env.DB.prepare(`UPDATE reports SET status = ?, reason_code = ?, resolved_at = ? WHERE target_id = ? AND status = 'open' AND kind IN (${inList(CLOSED_KINDS)})`).bind(settle, reason, at, id).run();
+    if (settle && shown.length) await c.env.DB.prepare(`UPDATE reports SET status = ?, reason_code = ?, resolved_at = ? WHERE target_id = ? AND status = 'open' AND kind IN (${inList(CLOSED_KINDS)}) AND id IN (${shown.map(() => '?').join(',')})`).bind(settle, reason, at, id, ...shown).run();
     await c.env.DB.prepare('INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(at, c.get('who'), `listing.${b.status}`, id, reason, typeof b.note === 'string' ? b.note.slice(0, 500) : null).run();
     return c.json({ ok: true });
@@ -182,17 +204,65 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
 
   // Facts for the bundle build: counts and dates only. No free text leaves through here.
   app.get('/v1/steward/aggregates', async (c) => {
-    const q = (kinds: string[]) => `SUM(CASE WHEN kind IN (${inList(kinds)}) THEN 1 ELSE 0 END)`;
-    // One phone = one report (DECISIONS 2026-09-19): closure reports count distinct per-target daily hashes, so one
-    // phone saying both "closed" and "moved" counts once. (The hash differs every day, so a phone counts once a day.)
-    const open = await c.env.DB.prepare(`SELECT target_id, COUNT(DISTINCT CASE WHEN kind IN (${inList(CLOSED_KINDS)}) THEN client_nonce END) AS closed_open, MAX(CASE WHEN kind IN (${inList(CLOSED_KINDS)}) THEN submitted_at END) AS closed_last_at, ${q(WRONG_KINDS)} AS wrong_open,
-        MAX(CASE WHEN kind IN ('confirmed_ok', 'looks_good') THEN submitted_at END) AS last_confirmed_at FROM reports WHERE status = 'open' GROUP BY target_id`).all<{ target_id: string; closed_open: number }>();
+    const phones = (kinds: string[]) => `COUNT(DISTINCT CASE WHEN kind IN (${inList(kinds)}) THEN client_nonce END)`;
+    // One phone = one report (DECISIONS 2026-09-19): closure and wrong-info reports count distinct per-target daily
+    // hashes, so one phone saying both "closed" and "moved" counts once. (The hash differs every day, so a phone
+    // counts once a day.)
+    const open = await c.env.DB.prepare(`SELECT target_id, ${phones(CLOSED_KINDS)} AS closed_open, MAX(CASE WHEN kind IN (${inList(CLOSED_KINDS)}) THEN submitted_at END) AS closed_last_at, ${phones(WRONG_KINDS)} AS wrong_open,
+        MAX(CASE WHEN kind IN (${inList(CONFIRM_KINDS)}) THEN submitted_at END) AS last_confirmed_at FROM reports WHERE status = 'open' GROUP BY target_id`).all<{ target_id: string; closed_open: number }>();
     // Circuit breaker (audit A1): closure reports on many listings in one day is an attack or a disaster.
     // Either way a person should look before badges change, so the pipeline ignores closure counts while it is tripped.
     const since = new Date(deps.now().getTime() - 86400000).toISOString().slice(0, 16) + 'Z';
     const burst = await c.env.DB.prepare(`SELECT COUNT(DISTINCT target_id) AS n FROM reports WHERE status = 'open' AND submitted_at >= ? AND kind IN (${inList(CLOSED_KINDS)})`).bind(since).first<{ n: number }>();
     const overrides = await c.env.DB.prepare('SELECT target_id, status, reason_code, replacement_id, at FROM listing_overrides').all();
     return c.json({ circuit_breaker: (burst?.n ?? 0) > 5, targets: open.results, overrides: overrides.results });
+  });
+
+  // ---- tasks the machine raises for a steward (DECISIONS 2026-09-19) ------------------------------
+  // The nightly re-check sends every listing whose own page no longer shows its phone or street address, or could not
+  // be read. The app never changes because of it; a steward looks. The list replaces the open set: a listing no longer
+  // reported closes as resolved_by_check. A task a steward dismissed stays dismissed while the check says the same
+  // thing; a different result (or the same one after the page matched again in between) is a new task.
+  app.put('/v1/steward/tasks', async (c) => {
+    const parsed = parseTasks(await body(c, 512 * 1024));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const at = minute(deps.now()), DB = c.env.DB;
+    type Live = { id: string; target_id: string; result: string; detail: string; status: string };
+    const live = new Map((await DB.prepare("SELECT id, target_id, result, detail, status FROM steward_tasks WHERE kind = 'source_check' AND cleared_at IS NULL").all<Live>()).results.map((t) => [t.target_id, t]));
+    // For a page that can't be read the reason varies night to night (a 503, a timeout); only the result counts.
+    const same = (t: Live, n: { result: string; detail: string }) => t.result === n.result && (n.result === 'unreadable' || t.detail === n.detail);
+    const stmts: Stmt[] = [];
+    let opened = 0;
+    for (const n of parsed.value) {
+      const cur = live.get(n.target_id);
+      live.delete(n.target_id);
+      if (cur && same(cur, n)) continue;
+      if (cur?.status === 'open') { stmts.push(DB.prepare('UPDATE steward_tasks SET result = ?, detail = ?, checked_on = ? WHERE id = ?').bind(n.result, n.detail, n.checked_on, cur.id)); continue; }
+      if (cur) stmts.push(DB.prepare('UPDATE steward_tasks SET cleared_at = ? WHERE id = ?').bind(at, cur.id));
+      opened++;
+      stmts.push(DB.prepare("INSERT INTO steward_tasks (id, kind, target_id, result, detail, checked_on, opened_at) VALUES (?, 'source_check', ?, ?, ?, ?, ?)").bind(randomId('task_'), n.target_id, n.result, n.detail, n.checked_on, at));
+    }
+    // Whatever is left was not reported tonight: the page matched again.
+    for (const t of live.values()) stmts.push(DB.prepare("UPDATE steward_tasks SET status = CASE WHEN status = 'open' THEN 'resolved_by_check' ELSE status END, closed_at = COALESCE(closed_at, ?), cleared_at = ? WHERE id = ?").bind(at, at, t.id));
+    if (stmts.length) await DB.batch(stmts);
+    return c.json({ ok: true, opened, cleared: live.size });
+  });
+
+  app.get('/v1/steward/tasks', async (c) => {
+    const tasks = await c.env.DB.prepare("SELECT id, target_id, result, detail, checked_on FROM steward_tasks WHERE status = 'open' ORDER BY checked_on, target_id").all();
+    return c.json({ tasks: tasks.results });
+  });
+
+  app.post('/v1/steward/tasks/:id/dismiss', async (c) => {
+    const parsed = parseDismiss(await body(c));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const id = c.req.param('id'), at = minute(deps.now()), { reason } = parsed.value;
+    // Logging first, from the row as it stands, keeps the two in one transaction: no log without a dismissal.
+    const [, done] = await c.env.DB.batch([
+      c.env.DB.prepare("INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) SELECT ?, ?, 'tasks.dismissed', id, ?, NULL FROM steward_tasks WHERE id = ? AND status = 'open'").bind(at, c.get('who'), reason, id),
+      c.env.DB.prepare("UPDATE steward_tasks SET status = 'dismissed', reason_code = ?, closed_at = ? WHERE id = ? AND status = 'open'").bind(reason, at, id)]);
+    if (!done?.meta.changes) return c.json({ error: 'not found or already closed' }, 404);
+    return c.json({ ok: true });
   });
 
   return app;

@@ -3,23 +3,39 @@
 // Stewards sign in with their email; the pipeline uses an Access service token (no email, a common_name).
 
 export interface Jwk { kid: string; kty: string; n: string; e: string; alg?: string }
+/** Reads the team's public keys from Access, every time it is called. */
 export type JwksFetcher = (teamDomain: string) => Promise<Jwk[]>;
+/** Finds the key a token names, fetching the keys only when needed. */
+export type Keyring = (teamDomain: string, kid: string | undefined, now: Date) => Promise<Jwk | undefined>;
 export interface AccessEnv { ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string }
 
 const b64url = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '=')), (c) => c.charCodeAt(0));
 
-let cache: { domain: string; at: number; keys: Jwk[] } | null = null;
 export const fetchJwks: JwksFetcher = async (domain) => {
-  if (cache && cache.domain === domain && Date.now() - cache.at < 3600_000) return cache.keys;
   const res = await fetch(`https://${domain}/cdn-cgi/access/certs`);
   if (!res.ok) throw new Error('could not load Access certs');
-  const keys = ((await res.json()) as { keys: Jwk[] }).keys;
-  cache = { domain, at: Date.now(), keys };
-  return keys;
+  return ((await res.json()) as { keys: Jwk[] }).keys;
 };
 
+const HOUR = 3600_000, RETRY = 300_000;
+/**
+ * Keys are kept for an hour. Access rotates them now and then, so a token naming a key we don't have makes us fetch
+ * again, but at most once per 5 minutes: a flood of made-up key ids can't hammer the certs endpoint. A failed fetch
+ * keeps the keys we had and waits the same 5 minutes.
+ */
+export function keyring(fetchKeys: JwksFetcher = fetchJwks): Keyring {
+  let domain = '', keys: Jwk[] = [], at = -Infinity;
+  return async (d, kid, now) => {
+    if (d !== domain) { domain = d; keys = []; at = -Infinity; }
+    const find = () => keys.find((k) => k.kid === kid);
+    const t = now.getTime();
+    if ((t - at >= HOUR || !find()) && t - at >= RETRY) { at = t; keys = await fetchKeys(d).catch(() => keys); }
+    return find();
+  };
+}
+
 /** Returns who is calling, or null. Fails closed: no configuration means no access. */
-export async function verifyAccess(token: string | undefined, env: AccessEnv, now: Date, jwks: JwksFetcher = fetchJwks): Promise<{ who: string } | null> {
+export async function verifyAccess(token: string | undefined, env: AccessEnv, now: Date, keys: Keyring): Promise<{ who: string } | null> {
   if (!token || !env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD) return null;
   const parts = token.split('.');
   if (parts.length !== 3) return null;
@@ -27,7 +43,7 @@ export async function verifyAccess(token: string | undefined, env: AccessEnv, no
     const header = JSON.parse(new TextDecoder().decode(b64url(parts[0]!))) as { kid?: string; alg?: string };
     const claims = JSON.parse(new TextDecoder().decode(b64url(parts[1]!))) as { aud?: string | string[]; iss?: string; exp?: number; email?: string; common_name?: string };
     if (header.alg !== 'RS256') return null;
-    const jwk = (await jwks(env.ACCESS_TEAM_DOMAIN)).find((k) => k.kid === header.kid);
+    const jwk = await keys(env.ACCESS_TEAM_DOMAIN, header.kid, now);
     if (!jwk) return null;
     const key = await crypto.subtle.importKey('jwk', { kty: jwk.kty, n: jwk.n, e: jwk.e, alg: 'RS256', ext: true }, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
     const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(parts[2]!), new TextEncoder().encode(`${parts[0]}.${parts[1]}`));
