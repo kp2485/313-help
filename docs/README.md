@@ -44,7 +44,7 @@ pnpm geocode             # fill coordinates in data/seed/resources.csv (U.S. Cen
 ## Status
 
 - 2026-09-18 (evening): **Everything in the hackathon scope is built** except what needs Kyle's accounts (domain, Cloudflare, signing keys), legal advice (public photos), or a Mac (compiling the iPhone screens). In this pass:
-  - **167 listings.** 46 were researched on each organization's own site in Districts 2, 3, 4 and 7 and published only after `check:sources` matched the phone number and street number on that page; three sites that block scripts were checked by a person in a browser. Neighborhoods with no food listed within half a mile went from 160 to 110. District 1 (far northwest) is still the thinnest.
+  - **178 listings.** 57 were researched on each organization's own site in Districts 1, 2, 3, 4 and 7 and published only after `check:sources` matched the phone number and street number on that page; four sites that block scripts were checked by a person in a browser. Neighborhoods with no food listed within half a mile went from 160 to 93 of 205.
   - **Street map** drawn on the phone from City open data: streets, parks, the greenway and cross streets, with no tile server (docs/06).
   - **Search, Type a ZIP, Saved places, Add a place, help paying for food** (docs/05).
   - **Neighborhood pages for all 205 neighborhoods** (docs/13 steps 2–4): help nearby, home sales next to building permits, and conditions (blight tickets per 1,000 lots, demolitions, time to close reported problems). No rankings; counts under 5 hidden. Crash data isn't available as current open data (DECISIONS).
