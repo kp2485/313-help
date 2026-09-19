@@ -1,4 +1,4 @@
-// Detroit Compass for iPhone: the same screens as the PWA, reading the same signed bundle. Zero PII:
+// 313 Help for iPhone: the same screens as the PWA, reading the same signed bundle. Zero PII:
 // no account, no analytics, no identifier. Location is asked for only when the person taps "Use my location",
 // held in memory, and never sent. Screens about domestic violence or a mental-health crisis show numbers first.
 import CoreLocation

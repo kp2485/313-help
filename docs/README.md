@@ -1,6 +1,6 @@
-# Detroit Compass — Design Documents
+# 313 Help — Design Documents
 
-**Detroit Compass** (named 2026-09-18; older docs and internal package names say "DetroitHelp"). A standalone app, separate from CommunityChest, that rebuilds the intent of the Detroit Health Department's "D Compassion" app (released by a vendor in 2025 as the "Detroit Compassion App") without collecting anything about the people who use it.
+**313 Help** (renamed 2026-09-19 from "Detroit Compass", which a local organization's name was too close to; older docs and internal package names say "DetroitHelp" or "Detroit Compass"). A standalone app, separate from CommunityChest, that rebuilds the intent of the Detroit Health Department's "D Compassion" app (released by a vendor in 2025 as the "Detroit Compassion App") without collecting anything about the people who use it.
 
 ## One-sentence pitch
 

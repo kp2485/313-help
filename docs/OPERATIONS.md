@@ -1,6 +1,6 @@
 # Operations
 
-How to run Detroit Compass. Written so someone other than Kyle could take it over in an afternoon (doc 12).
+How to run 313 Help. Written so someone other than Kyle could take it over in an afternoon (doc 12).
 
 ## Run it on your own machine
 

@@ -1,6 +1,6 @@
 # CLAUDE.md — handoff for Claude Code
 
-You are building **Detroit Compass** (named by Kyle 2026-09-18; internal package names still say `detroithelp`), a zero-PII app that points Detroit residents to free help, recreation, transit, and City events. Read `docs/README.md` first, then `docs/04-resource-lifecycle.md` and `docs/06-architecture.md`. Every design decision is in `docs/`; if a task conflicts with a doc, stop and ask rather than silently diverging. If you make a decision the docs don't cover, add it to `docs/DECISIONS.md` with a date and one-line rationale.
+You are building **313 Help** (renamed by Kyle 2026-09-19 from "Detroit Compass"; internal package, folder and Swift type names still say `detroithelp` / `DetroitCompass`), a zero-PII app that points Detroit residents to free help, recreation, transit, and City events. Read `docs/README.md` first, then `docs/04-resource-lifecycle.md` and `docs/06-architecture.md`. Every design decision is in `docs/`; if a task conflicts with a doc, stop and ask rather than silently diverging. If you make a decision the docs don't cover, add it to `docs/DECISIONS.md` with a date and one-line rationale.
 
 ## Non-negotiables (from docs/01 and docs/08)
 
@@ -51,4 +51,4 @@ Registry in `data/sources.yaml` for the layers that become listings (see docs/02
 - Registering a domain, creating Cloudflare resources, or anything that costs money.
 - Adding a dependency with a non-permissive license.
 - Any deviation from the zero-PII rules, even "temporary for debugging."
-- Changing the app's name. It is **Detroit Compass** and lives in `app.name` in `strings/en.json` and `strings/es.json`, the web manifest, and the page title.
+- Changing the app's name. It is **313 Help** and lives in `app.name` in `strings/en.json` and `strings/es.json`, the web manifest, and the page title.

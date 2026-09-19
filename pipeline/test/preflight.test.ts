@@ -12,9 +12,9 @@ const ready: Record<string, string> = {
   'data/seed/directory.json': '{"retired": false, "photos": false}',
   'data/seed/emergency.csv': 'id,label,number,sms,hardcoded,sort,verified_by_call_on,verified_published_on,mismatch_on,source_url,internal_note\nemg_911,Emergency,911,,yes,1,,,,,\nemg_x,Shelter,866-313-2520,,no,2,,2026-09-18,,https://x,\n',
   'apps/web/public/_headers': "/admin/*\n  Content-Security-Policy: frame-ancestors 'none'\n  X-Frame-Options: DENY\n",
-  'strings/en.json': '{"app.name": "Detroit Compass", "about.p3": "Not an official City of Detroit app."}',
-  'apps/web/public/manifest.webmanifest': '{"name": "Detroit Compass"}',
-  'apps/web/index.html': '<title>Detroit Compass</title>',
+  'strings/en.json': '{"app.name": "313 Help", "about.p3": "Not an official City of Detroit app."}',
+  'apps/web/public/manifest.webmanifest': '{"name": "313 Help"}',
+  'apps/web/index.html': '<title>313 Help</title>',
   'docs/CHECKS-2026-09-19.md': '| a | b | ok |\n',
 };
 const env = { BUNDLE_SIGNING_KEY: active.priv, BUNDLE_PUBLIC_KEYS: `${active.pub},${spare.pub}` };
@@ -38,7 +38,7 @@ describe('preflight', () => {
     const csv = ready['data/seed/emergency.csv']!.replace('2026-09-18,,https', '2026-09-18,2026-09-19,https');
     expect(stops(run({ 'data/seed/emergency.csv': csv })).join()).toMatch(/emergency number/);
     expect(stops(run({ 'apps/web/public/_headers': null })).join()).toMatch(/framed/);
-    expect(stops(run({ 'apps/web/index.html': '<title>Other</title>' })).join()).toMatch(/named Detroit Compass/);
+    expect(stops(run({ 'apps/web/index.html': '<title>Other</title>' })).join()).toMatch(/named 313 Help/);
   });
   it('photos on, or open worksheet rows, only ask a person to look', () => {
     const r = run({ 'data/seed/directory.json': '{"photos": true}', 'docs/CHECKS-2026-09-19.md': '| a | b | |\n| c | d | |\n' });

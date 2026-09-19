@@ -3,7 +3,7 @@
 ## Information architecture
 
 ```
-Top bar, every screen:  Detroit Compass · [Urgent help]      (on DV and crisis screens: [Leave this page fast] instead)
+Top bar, every screen:  313 Help · [Urgent help]      (on DV and crisis screens: [Leave this page fast] instead)
 Tab bar, every screen:  Home · Help · Recreation · Transit · Events
 
 Home

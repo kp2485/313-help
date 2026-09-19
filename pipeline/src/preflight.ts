@@ -55,7 +55,7 @@ export function preflight({ env, file }: Inputs): Check[] {
   check(/frame-ancestors 'none'/.test(headers) && /X-Frame-Options:\s*DENY/i.test(headers), 'stop', 'the steward page can\'t be framed (apps/web/public/_headers)', 'restore apps/web/public/_headers');
   const en = JSON.parse(file('strings/en.json') ?? '{}') as Record<string, string>;
   const manifest = JSON.parse(file('apps/web/public/manifest.webmanifest') ?? '{}') as { name?: string };
-  check(en['app.name'] === 'Detroit Compass' && manifest.name === 'Detroit Compass' && /<title>Detroit Compass<\/title>/.test(file('apps/web/index.html') ?? ''), 'stop', 'the app is named Detroit Compass in the strings, the manifest and the page title', 'the name changes only with Kyle (CLAUDE.md)');
+  check(en['app.name'] === '313 Help' && manifest.name === '313 Help' && /<title>313 Help<\/title>/.test(file('apps/web/index.html') ?? ''), 'stop', 'the app is named 313 Help in the strings, the manifest and the page title', 'the name changes only with Kyle (CLAUDE.md)');
   check(/Not an official City of Detroit app/.test(en['about.p3'] ?? ''), 'stop', 'the "not an official City of Detroit app" line is there');
 
   // Work a person still owes.

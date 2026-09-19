@@ -1,4 +1,4 @@
-# Detroit Compass for iPhone
+# 313 Help for iPhone
 
 Two parts:
 
@@ -7,7 +7,7 @@ Two parts:
 
 ## First build on a Mac
 
-1. In Xcode: File → New → Project → iOS App, named "Detroit Compass", with interface SwiftUI and language Swift. Save it in `apps/ios/Xcode/`. The folder is git-ignored until the project settles.
+1. In Xcode: File → New → Project → iOS App, named "313 Help", with interface SwiftUI and language Swift. Save it in `apps/ios/Xcode/`. The folder is git-ignored until the project settles.
 2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in the four files from `DetroitCompassApp/`, choosing **Create groups** and leaving **Copy items** unticked.
 3. File → Add Package Dependencies → Add Local… → select `apps/ios`. Add the **DetroitQuery** library to the app target.
 4. Resources: drag `strings/en.json` and `strings/es.json` from the repo root into the project, without copying. Add a Run Script build phase that copies the latest bundle, so the app works with no signal on first launch:
