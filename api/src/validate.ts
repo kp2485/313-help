@@ -56,7 +56,8 @@ export function parseReport(body: unknown, now: Date): Result<ReportInput> {
     if (place) return fail('suggested is not accepted for places');
     const s = closed(b.value.suggested, ['hours', 'address', 'phone']);
     if (!s.ok) return s;
-    const clean = Object.fromEntries(Object.entries(s.value).map(([k, v]) => [k, text(v, 200)]).filter(([, v]) => v));
+    // Hours and address are typed words and get masked; phone is the listing's own number, the point of the correction.
+    const clean = Object.fromEntries(Object.entries(s.value).map(([k, v]) => [k, text(v, 200)]).filter(([, v]) => v).map(([k, v]) => [k, k === 'phone' ? v : mask(v!)]));
     if (Object.keys(clean).length) suggested = JSON.stringify(clean);
   }
   // A photo is only ever about a place (a thing), never about a listing, and only by the key the upload returned.
@@ -79,12 +80,13 @@ export function parseProposal(body: unknown): Result<ProposalInput> {
   if (!name || !what) return fail('name and what are required');
   if (!category || !CATEGORY.test(category)) return fail('bad category');
   if (!HOW_KNOWN.includes(b.value.how_known as never)) return fail('bad how_known');
-  const notes = text(b.value.notes, 280);
+  const notes = text(b.value.notes, 280), schedule = text(b.value.schedule_text, 200);
   return { ok: true, value: {
-    name, category, what,
+    // Free text is masked like a report note; `phone` is the place's public number and is kept as typed.
+    name, category, what: mask(what),
     // A DV shelter's address must never enter the system, even as a proposal (docs/08).
     address: category === 'shelter.dv' ? null : text(b.value.address, 200),
-    phone: text(b.value.phone, 40), schedule_text: text(b.value.schedule_text, 200),
+    phone: text(b.value.phone, 40), schedule_text: schedule ? mask(schedule) : null,
     how_known: b.value.how_known as string, notes: notes ? mask(notes) : null,
   } };
 }

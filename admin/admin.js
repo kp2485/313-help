@@ -13,8 +13,11 @@ const SCRIPT = 'Phone script: “Are you still running this? What days and times
 
 let names = new Map(), message = '';
 
+// Every write is JSON (an empty object when there is nothing to say): the API refuses any other steward write,
+// which is what stops another site from posting a form here with the steward's login (and the browser adds Origin).
 async function api(path, options = {}) {
-  const res = await fetch(path, { ...options, headers: { 'content-type': 'application/json' }, credentials: 'same-origin' });
+  const write = options.method && options.method !== 'GET';
+  const res = await fetch(path, { ...options, ...(write ? { body: options.body ?? '{}' } : {}), headers: { 'content-type': 'application/json' }, credentials: 'same-origin' });
   if (res.status === 401) throw new Error('Not signed in. In production, sign in through Cloudflare Access. Locally, set DEV_STEWARD in api/.dev.vars.');
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `The server answered ${res.status}`);
@@ -107,9 +110,10 @@ app.addEventListener('click', async (ev) => {
     }
     if (act === 'dismiss' || act === 'active' || act === 'archive') {
       // Settle whatever is still open on this target (the status call only settles closure reports).
+      // Restoring is not a phone call, so it never records one (review 10b).
       const queue = await api('/v1/steward/queue');
       for (const r of queue.reports.filter((x) => x.target_id === item.dataset.target))
-        await api(`/v1/steward/reports/${r.id}/resolve`, { method: 'POST', body: JSON.stringify({ status: status ?? 'accepted', reason_code: act === 'dismiss' ? reason : 'confirmed_by_phone' }) });
+        await api(`/v1/steward/reports/${r.id}/resolve`, { method: 'POST', body: JSON.stringify({ status: status ?? 'accepted', reason_code: act === 'dismiss' ? reason : act === 'active' ? 'restored' : 'confirmed_by_phone' }) });
       if (act === 'dismiss') message = 'Reports closed.';
     }
     if (act === 'proposal') { await api(`/v1/steward/proposals/${item.dataset.proposal}/resolve`, { method: 'POST', body: JSON.stringify({ status, reason_code: reason }) }); message = 'Proposal settled.'; }

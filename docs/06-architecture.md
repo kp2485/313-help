@@ -85,7 +85,7 @@ Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a ser
 
 D1 tables: `targets`, `reports`, `proposals`, `steward_actions`, `report_counts`, `listing_overrides`, `photos`. No `users` table for residents. Ever. No alerts: alerts live in `data/seed/alerts.json`.
 
-Retention: raw reports 180 days, then aggregated to counts per target/kind/month and purged.
+Retention: raw reports 180 days, then aggregated to counts per target/kind/month and purged, together with any photo (one transaction). Proposals are purged 180 days after a steward settles them.
 
 ## Admin / steward tool
 

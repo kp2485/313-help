@@ -124,6 +124,16 @@ describe('report facts from the write API', () => {
     expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
     expect(r.facts.last_confirm_method).toBe('community_confirm');
   });
+  it('a steward restore puts the listing back and clears closure reports, but never claims anyone phoned (review 10b)', () => {
+    const r = row({ facts: { reports: { closed_open: 2, closed_last_at: '2026-09-10', wrong_open: 1 }, source: { type: 'seed_list', name: 'test' }, checked_at_entry: '2026-09-01', entry_method: 'web' } });
+    for (const reason_code of ['restored', 'confirmed_by_phone']) {   // older overrides said confirmed_by_phone by default
+      applyAggregates([r], { circuit_breaker: false, targets: [], overrides: [{ target_id: 'sal_test', status: 'active', reason_code, replacement_id: null, at: '2026-09-18T17:41Z' }] });
+      expect(r.facts.last_confirm_method).toBeUndefined();
+      expect(r.facts.last_confirmed_at).toBeUndefined();
+      expect(r.facts.reports).toMatchObject({ closed_open: 0, wrong_open: 1 });
+      expect(badge(r, new Date('2026-09-18T18:00:00Z')).level).toBe('entry_checked');
+    }
+  });
   it('a steward archive closes the listing with its reason, even while the breaker is tripped', () => {
     const r = row({});
     applyAggregates([r], agg({ circuit_breaker: true, overrides: [{ target_id: 'sal_test', status: 'archived', reason_code: 'closed_permanently', replacement_id: 'sal_other', at: '2026-09-18T17:41Z' }] }));
@@ -184,6 +194,18 @@ describe('hours from research text', () => {
     expect(parseSchedule('Monday through Thursday: 8:30 a.m. - 12:00 p.m. & 1:00 p.m. - 5:00 p.m.')).toEqual([{ byday: 'MO,TU,WE,TH', opens_at: '08:30', closes_at: '12:00' }, { byday: 'MO,TU,WE,TH', opens_at: '13:00', closes_at: '17:00' }]);
     expect(parseSchedule('Tuesdays and Thursdays 10 am to noon')).toEqual([{ byday: 'TU,TH', opens_at: '10:00', closes_at: '12:00' }]);
     expect(parseSchedule('M-F 9-5pm')).toEqual([{ byday: 'MO,TU,WE,TH,FR', opens_at: '09:00', closes_at: '17:00' }]);
+  });
+  it('an opening time with no am/pm is read as afternoon when that makes sense ("1-3pm" is 1 pm, not 1 am)', () => {
+    expect(parseSchedule('Wed 1-3pm')).toEqual([{ byday: 'WE', opens_at: '13:00', closes_at: '15:00' }]);
+    expect(parseSchedule('Sat 12-2pm')).toEqual([{ byday: 'SA', opens_at: '12:00', closes_at: '14:00' }]);
+    expect(parseSchedule('Sat 11-1pm')).toEqual([{ byday: 'SA', opens_at: '11:00', closes_at: '13:00' }]);
+    expect(parseSchedule('Tue 9-11am')).toEqual([{ byday: 'TU', opens_at: '09:00', closes_at: '11:00' }]);
+  });
+  it('"always open" only when the whole text says so, not when "24 hours" appears somewhere in it', () => {
+    const line = (hours: string) => lineToRows(`Hope Pantry | Hope Church | food.pantry | Free groceries. | 1 Main St | Detroit | 48204 | 313-555-0100 | https://x.org | ${hours} | | https://x.org/pantry`) as { resource: Record<string, string> };
+    for (const h of ['24 hours', 'Open 24 hours', '24/7', '24 hours a day, 7 days a week', 'Open 24/7.']) expect(line(h).resource.availability, h).toBe('always');
+    for (const h of ['Mon 9am-5pm; hotline 24 hours', 'Closed 24 hours before holidays', 'Mon-Fri 9am-5pm, call 24/7 line after hours'])
+      expect(line(h).resource.availability, h).not.toBe('always');
   });
   it('refuses to guess', () => {
     for (const text of ['Second Saturday of the month 10am-noon', 'Mon-Fri 8am-9pm; weekends vary', 'By appointment', 'Wednesdays after service', 'Fri 1pm until food runs out', 'Sat 5pm-9am', 'not stated'])

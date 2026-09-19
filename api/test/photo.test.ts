@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createApp, photoRetention, type Db, type Env, type Stmt } from '../src/index.js';
+import { createApp, photoRetention, retention, type Db, type Env, type Stmt } from '../src/index.js';
 import { checkJpeg, type PhotoStore } from '../src/photo.js';
 
 // Photos on condition reports (docs/11): no metadata can be stored, photos are never public, and they are deleted on time.
@@ -16,7 +16,12 @@ function fakeD1(): Db & { raw: InstanceType<typeof DatabaseSync> } {
     all: async <T>() => ({ results: raw.prepare(sql).all(...(args as never[])) as T[] }),
     first: async <T>() => (raw.prepare(sql).get(...(args as never[])) ?? null) as T | null,
   });
-  return { raw, prepare: (sql) => stmt(sql), batch: async (s) => { for (const x of s) await x.run(); } };
+  // Like D1, a batch is one transaction and answers one result per statement.
+  const batch = async (s: Stmt[]) => {
+    raw.exec('BEGIN');
+    try { const out = []; for (const x of s) out.push(await x.run()); raw.exec('COMMIT'); return out; } catch (e) { raw.exec('ROLLBACK'); throw e; }
+  };
+  return { raw, prepare: (sql) => stmt(sql), batch };
 }
 function fakeBucket(): PhotoStore & { files: Map<string, Uint8Array> } {
   const files = new Map<string, Uint8Array>();
@@ -40,7 +45,8 @@ let db: ReturnType<typeof fakeD1>, bucket: ReturnType<typeof fakeBucket>, env: E
 const app = createApp({ now: () => NOW });
 const upload = (bytes: Uint8Array, headers: Record<string, string> = {}, e: Env = env) => app.request('/v1/photos', { method: 'POST', body: bytes as unknown as BodyInit, headers: { 'content-type': 'image/jpeg', ...headers } }, e);
 const report = (body: object) => app.request('/v1/reports', { method: 'POST', body: JSON.stringify(body), headers: { 'content-type': 'application/json' } }, env);
-const steward = (path: string, init: RequestInit = {}) => app.request(`http://localhost${path}`, init, { ...env, DEV_STEWARD: 'kyle' });
+const steward = (path: string, init: RequestInit = {}) =>
+  app.request(`http://localhost${path}`, { ...init, headers: { 'content-type': 'application/json', origin: 'http://localhost', ...(init.headers as Record<string, string>) } }, { ...env, DEV_STEWARD: 'kyle' });
 beforeEach(() => {
   db = fakeD1(); bucket = fakeBucket(); env = { DB: db, PHOTOS: bucket, PHOTOS_ENABLED: 'true' };
   db.raw.exec("INSERT INTO targets VALUES ('sal_b', 'listing'), ('seg_conrail_warren_to_joy', 'place')");
@@ -52,6 +58,16 @@ describe('a photo can never carry metadata into storage', () => {
     expect(checkJpeg(jpeg({ extra: EXIF }))).toEqual({ ok: false, error: 'photo carries metadata (Exif or XMP)' });
     for (const marker of [0xe2, 0xed, 0xee, 0xfe]) expect(checkJpeg(jpeg({ extra: seg(marker, ascii('made on a phone by someone')) })).ok, marker.toString(16)).toBe(false);
     expect(checkJpeg(jpeg({ app0: 'JFXX' })).ok).toBe(false);
+  });
+  it('APP0 must be exactly the 16-byte JFIF header: no thumbnail, nothing tucked in after it', () => {
+    const app0 = (payload: number[]) => [0xff, 0xd8, ...seg(0xe0, payload)];
+    const base = [...ascii('JFIF'), 0, 1, 1, 0, 0, 1, 0, 1, 0, 0];
+    const rest = jpeg().slice(2 + 18);                                          // everything after the normal APP0
+    const withApp0 = (payload: number[]) => new Uint8Array([...app0(payload), ...rest]);
+    expect(checkJpeg(withApp0(base)).ok).toBe(true);
+    expect(checkJpeg(withApp0([...base.slice(0, 12), 2, 2, ...new Array(12).fill(0x80)])).ok).toBe(false);   // a 2x2 thumbnail
+    expect(checkJpeg(withApp0([...base, ...ascii('GPS 42.33 -83.04')])).ok).toBe(false);                      // hidden text
+    expect(checkJpeg(withApp0(base.slice(0, 10))).ok).toBe(false);                                             // too short
   });
   it('drops anything hidden after the end of the picture', () => {
     const r = checkJpeg(jpeg({ after: ascii('<script>PK..zip or anything else</script>') }));
@@ -75,7 +91,8 @@ describe('POST /v1/photos', () => {
     expect(bucket.files.get(photo)!.length).toBe(jpeg().length);
     const all = JSON.stringify(db.raw.prepare('SELECT * FROM photos').all());
     for (const leak of ['203.0.113', 'TestPhone', 'abc123secret', ':37']) expect(all).not.toContain(leak);
-    expect(all).toContain('2026-09-18T17:41Z');
+    expect(all).toContain('2026-09-18T17:00Z');                // to the hour, like the report it rides on (docs/11)
+    expect(all).not.toContain('17:41');
   });
   it('refuses a photo with Exif, a non-JPEG content type, and everything when photos are off', async () => {
     expect((await upload(jpeg({ extra: EXIF }))).status).toBe(422);
@@ -117,6 +134,18 @@ describe('a photo belongs to one report about a place', () => {
     expect((await report({ target_id: 'seg_conrail_warren_to_joy', kind: 'light_out', client_nonce: NONCE, photo })).status).toBe(202);
     expect((await report({ target_id: 'seg_conrail_warren_to_joy', kind: 'glass_trash', client_nonce: 'c'.repeat(64), photo })).status).toBe(422);
   });
+  it('two reports racing for one photo: only the first claims it, and the second is not stored with it', async () => {
+    const photo = await key();
+    expect((await report({ target_id: 'seg_conrail_warren_to_joy', kind: 'light_out', client_nonce: NONCE, photo })).status).toBe(202);
+    const first = (db.raw.prepare('SELECT id FROM reports').get() as { id: string }).id;
+    // The second request's "is this photo free?" look happened before the first one claimed it.
+    const stale: Db = { ...db, prepare: (sql) => (sql.startsWith('SELECT key FROM photos') ? { ...db.prepare(sql), bind: () => ({ ...db.prepare(sql), first: async () => ({ key: photo }) }) as Stmt } as Stmt : db.prepare(sql)) };
+    const res = await app.request('/v1/reports', { method: 'POST', body: JSON.stringify({ target_id: 'seg_conrail_warren_to_joy', kind: 'glass_trash', client_nonce: 'c'.repeat(64), photo }), headers: { 'content-type': 'application/json' } }, { ...env, DB: stale });
+    expect(res.status).toBe(422);
+    expect(db.raw.prepare('SELECT report_id FROM photos').all()).toEqual([{ report_id: first }]);
+    expect(db.raw.prepare('SELECT photo_key FROM reports WHERE id != ?').all(first)).toEqual([]);
+    expect(db.raw.prepare('SELECT COUNT(*) AS n FROM reports WHERE photo_key = ?').get(photo)).toEqual({ n: 1 });
+  });
   it('a steward can discard a photo at once; the report stays', async () => {
     const photo = await key();
     await report({ target_id: 'seg_conrail_warren_to_joy', kind: 'light_out', client_nonce: NONCE, photo });
@@ -140,5 +169,27 @@ describe('photos are deleted on time', () => {
     expect(await photoRetention(db, bucket, NOW)).toBe(2);
     expect([...bucket.files.keys()].sort()).toEqual(['ph_closed_new', 'ph_open', 'ph_orphan_new']);
     expect(db.raw.prepare("SELECT photo_key FROM reports WHERE id = 'cond_1'").get()).toEqual({ photo_key: null });
+  });
+  it('a report that turns into a monthly count takes its photo with it, and does not block the rest (review 12)', async () => {
+    await bucket.put('ph_still_open', jpeg());
+    db.raw.exec(`INSERT INTO reports (id, target_id, kind, submitted_at, client_nonce, status, photo_key) VALUES
+      ('cond_old', 'seg_conrail_warren_to_joy', 'light_out', '2026-02-01T10:00Z', '${'4'.repeat(64)}', 'open', 'ph_still_open'),
+      ('cond_old2', 'seg_conrail_warren_to_joy', 'light_out', '2026-02-02T10:00Z', '${'5'.repeat(64)}', 'open', NULL)`);
+    db.raw.exec("INSERT INTO photos VALUES ('ph_still_open', '2026-02-01T10:00Z', 'cond_old')");
+    expect(await retention(db, NOW, bucket)).toBe(2);
+    expect(bucket.files.size).toBe(0);
+    expect(db.raw.prepare('SELECT COUNT(*) AS n FROM photos').get()).toEqual({ n: 0 });
+    expect(db.raw.prepare('SELECT COUNT(*) AS n FROM reports').get()).toEqual({ n: 0 });
+    expect(await retention(db, NOW, bucket)).toBe(0);                                        // the next night counts nothing twice
+    expect(db.raw.prepare('SELECT n FROM report_counts').all()).toEqual([{ n: 2 }]);
+  });
+  it('without the bucket, a report with a photo waits rather than leave the picture behind', async () => {
+    db.raw.exec(`INSERT INTO reports (id, target_id, kind, submitted_at, client_nonce, status, photo_key) VALUES
+      ('cond_old', 'seg_conrail_warren_to_joy', 'light_out', '2026-02-01T10:00Z', '${'4'.repeat(64)}', 'open', 'ph_x'),
+      ('cond_old2', 'seg_conrail_warren_to_joy', 'light_out', '2026-02-02T10:00Z', '${'5'.repeat(64)}', 'open', NULL)`);
+    db.raw.exec("INSERT INTO photos VALUES ('ph_x', '2026-02-01T10:00Z', 'cond_old')");
+    expect(await retention(db, NOW, undefined)).toBe(1);
+    expect(db.raw.prepare('SELECT id FROM reports').all()).toEqual([{ id: 'cond_old' }]);
+    expect(db.raw.prepare('SELECT n FROM report_counts').all()).toEqual([{ n: 1 }]);
   });
 });

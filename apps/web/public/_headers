@@ -1,0 +1,10 @@
+# Cloudflare Pages response headers. Vite copies public/ to the root of dist/, where Pages reads this file.
+# The steward page must never be shown inside another site's frame (clickjacking). frame-ancestors can't be set
+# from a <meta> tag, so it is sent here. An api/ test checks these lines.
+/admin
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY
+
+/admin/*
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY

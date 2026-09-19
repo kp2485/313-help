@@ -34,7 +34,9 @@ export function applyAggregates(rows: BundleRow[], agg: Aggregates): { applied: 
     if (!r) continue;
     r.status = o.status;
     r.archived = o.status === 'archived' ? { at: o.at.slice(0, 10), reason: o.reason_code, ...(o.replacement_id ? { replacement_id: o.replacement_id } : {}) } : null;
-    if (o.status === 'active') { r.facts.last_confirmed_at = o.at; r.facts.last_confirm_method = 'phone'; r.facts.reports = { closed_open: 0, closed_last_at: null, wrong_open: r.facts.reports.wrong_open }; }
+    // A restore clears the closure reports the steward rejected. It is not a check: nobody called, so the badge keeps
+    // whatever dated check the listing already had (review 10b). Older overrides said "confirmed_by_phone" by default.
+    if (o.status === 'active') r.facts.reports = { closed_open: 0, closed_last_at: null, wrong_open: r.facts.reports.wrong_open };
   }
   return { applied, frozen: agg.circuit_breaker };
 }

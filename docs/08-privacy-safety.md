@@ -15,7 +15,7 @@ We can't leak what we never collect. Every design choice below is downstream of 
 | Language choice | Yes (local only) | Never | Until user changes it or clears site data |
 | Reports | Queued until sent | Yes, minus IP, minus device ID | 180 days raw, then aggregate counts only |
 | Photos on condition reports (demo only until legal advice, docs/11) | Re-drawn on the phone without hidden data before sending | Private R2 bucket; only stewards can see them | Deleted 30 days after the report closes, or after 1 day if no report claimed it |
-| Proposals (Add a place) | Queued until sent | Stored in D1: the place's details as typed (name, kind of help, what, address, times, phone, how you know, note). Nothing about the sender | Kept with the steward's decision; no retention limit yet |
+| Proposals (Add a place) | Queued until sent | Stored in D1: the place's details as typed (name, kind of help, what, address, times, phone, how you know, note). Nothing about the sender | Deleted 180 days after a steward settles it (DECISIONS 2026-09-19); an open proposal waits for a steward |
 | `install_secret` | Yes (random) | Never sent; only per-target daily hashes of it (`client_nonce`), which cannot be linked to each other | Resets when the site's data is cleared (a reset button is not built yet) |
 | Provider claim email | No | v1.1, not built; none held today. Plan: for providers only, verification + row ownership | Until provider removes it |
 | Analytics | None | None. No analytics code exists | — |
@@ -26,8 +26,8 @@ No resident-side account, email, phone, name, or persistent identifier ever cros
 ## Anonymous reporting — why it's safe enough
 
 - `client_nonce = sha256(install_secret ‖ target_id ‖ date)` prevents one device from double-counting on a target within a day. Every target and every day gives a different hash, so the server cannot connect one person's reports into a trail of places. It is a dedupe aid for honest devices, not a security control — abuse is limited at Cloudflare's edge, which processes IP addresses in transit; we never read or store them.
-- The Worker never reads the IP header (or the user-agent) at all; a test checks its source for that. It stores submission time at minute granularity.
-- Report text is limited to 280 chars and the UI copy says "Add a note if you want. Don't put your name or number." Before anything is stored, the Worker replaces phone numbers and email addresses with "[removed]" in a report's note and in a proposal's "Anything else we should know" note. (A proposal's other fields are about the place, including its public phone number, and are not masked.)
+- The Worker never reads the IP header (or the user-agent) at all; a test checks its source for that. It stores submission time at minute granularity, and to the hour for condition reports and their photos.
+- Report text is limited to 280 chars and the UI copy says "Add a note if you want. Don't put your name or number." Before anything is stored, the Worker replaces phone numbers and email addresses with "[removed]" in every free-text field: a report's note and its suggested hours and address, and a proposal's "what people get," "days and times," and "Anything else we should know" (DECISIONS 2026-09-19). The fields that hold the place's own public phone number (a proposal's phone, a suggested phone) are kept as typed, as are the place's name and address.
 - Abuse is bounded by design: no single report ever removes a resource (04).
 
 ## Youth

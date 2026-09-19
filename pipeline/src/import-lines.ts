@@ -43,6 +43,9 @@ function parseDays(raw: string): string[] | null {
 
 export interface ParsedWindow { byday: string; opens_at: string; closes_at: string }
 
+/** The whole text says "always open" ("24 hours", "Open 24/7", "24 hours a day, 7 days a week"), and nothing else. */
+const ALWAYS = /^\s*(?:open\s+)?24\s*(?:hours|hrs|\/\s*7)(?:\s*(?:a|per)\s*day)?(?:,?\s*7\s*days(?:\s*(?:a|per)\s*week)?)?\s*\.?\s*$/i;
+
 /** "Mon-Fri 8am-9pm; Sat 9am-5pm" -> windows. Returns null unless EVERY part is understood. */
 export function parseSchedule(text: string): ParsedWindow[] | null {
   if (/24\s*(hours|hrs|\/\s*7)/i.test(text) || /not stated|varies|appointment|call/i.test(text)) return null;
@@ -58,10 +61,11 @@ export function parseSchedule(text: string): ParsedWindow[] | null {
       if (ends.length !== 2) return null;
       let open = parseClock(ends[0]!);
       const close = parseClock(ends[1]!);
-      // "9-5pm": the opening time borrows am/pm only when that gives a sensible window.
+      // "9-5pm", "1-3pm": the opening time borrows am/pm only when that gives a sensible window. The later of the
+      // two sensible readings wins, so "1-3pm" is 1 pm to 3 pm, not a 14-hour window from 1 am.
       if (!open && close && /^\d{1,2}(:\d{2})?$/.test(ends[0]!.trim())) {
         const am = parseClock(ends[0]!.trim() + 'am'), pm = parseClock(ends[0]!.trim() + 'pm');
-        open = am && am < close ? am : pm && pm < close ? pm : null;
+        open = pm && pm < close ? pm : am && am < close ? am : null;
       }
       if (!open || !close || close <= open) return null;
       windows.push({ byday: days.join(','), opens_at: open, closes_at: close });
@@ -81,7 +85,7 @@ export function lineToRows(line: string): { resource: CsvRow; schedules: CsvRow[
   const v = Object.fromEntries(FIELDS.map((k, i) => [k, f[i]!])) as Record<(typeof FIELDS)[number], string>;
   if (!v.name || !v.category || !v.what || !v.source_url || !(v.phone || v.address)) return 'name, category, what, source_url and a phone or address are required';
   const id = `sal_${slug(`${v.org && !v.name.toLowerCase().includes(v.org.toLowerCase().slice(0, 12)) ? v.org.split(/\s+/).slice(0, 2).join(' ') + ' ' : ''}${v.name}`).slice(0, 56)}`;
-  const always = /24\s*(hours|hrs|\/\s*7)/i.test(v.schedule);
+  const always = ALWAYS.test(v.schedule);
   const windows = always ? null : parseSchedule(v.schedule);
   const hoursText = !always && !windows && v.schedule && !/^not stated$/i.test(v.schedule) ? v.schedule.slice(0, 160) : '';
   return {

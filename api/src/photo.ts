@@ -30,7 +30,8 @@ export function checkJpeg(b: Uint8Array): PhotoCheck {
     if (i + 3 >= b.length) return fail('not a well-formed JPEG');
     const len = (b[i + 2]! << 8) | b[i + 3]!;
     if (len < 2 || i + 2 + len > b.length) return fail('not a well-formed JPEG');
-    if (m === 0xe0 && !(b[i + 4] === 0x4a && b[i + 5] === 0x46 && b[i + 6] === 0x49 && b[i + 7] === 0x46)) return fail('photo carries metadata or an unexpected segment');   // APP0 must be "JFIF"
+    // APP0 must be the bare 16-byte "JFIF\0" header: a longer one carries a thumbnail or something tucked in after it.
+    if (m === 0xe0 && !(len === 16 && b[i + 4] === 0x4a && b[i + 5] === 0x46 && b[i + 6] === 0x49 && b[i + 7] === 0x46 && b[i + 8] === 0)) return fail('photo carries metadata or an unexpected segment');
     if (m >= 0xc0 && m <= 0xc2) {
       height = (b[i + 5]! << 8) | b[i + 6]!; width = (b[i + 7]! << 8) | b[i + 8]!;
       if (!width || !height || Math.max(width, height) > MAX_PHOTO_SIDE) return fail('photo is too large');

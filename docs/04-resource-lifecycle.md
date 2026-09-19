@@ -135,7 +135,7 @@ Church food banks: a church that posts its own food-bank distribution on its own
 - Steward archives with reason: `closed_permanently | moved (→ replacement_id) | duplicate (→ canonical_id) | never_existed | program_ended | seasonal_ended (→ suspended instead)`.
 - Archived rows stay in the HSDS dataset with `x_detroit.archived` populated and `status: archived`; the app bundle includes them in a compact `archived.json` so deep links and search-by-name can explain what happened instead of 404ing.
 - A resource archived ≤ 90 days ago still appears in search-by-name, under "Closed places," with "Closed as of {date}". Its link opens a page that says "Closed as of {date}" and "Call 211 for other options." After 90 days it leaves `archived.json`, and a link to it shows "We can't find that listing. It may have been removed." with 211.
-- Un-archive is allowed (pantry reopened). On the steward page, under "Archived by a steward," the button "It's open again: restore it" returns the row to `active` at the next build. Its open closure reports are cleared, and the badge then reads as a phone check on that date.
+- Un-archive is allowed (pantry reopened). On the steward page, under "Archived by a steward," the button "It's open again: restore it" returns the row to `active` at the next build. Its open closure reports are cleared. A restore is recorded with the reason `restored`, never as a phone check: nobody called, so the badge must not say anyone did (DECISIONS 2026-09-19).
 
 ## Expiry of alerts
 

@@ -10,13 +10,18 @@ import { MAX_PHOTO_BYTES, PHOTO_KEY, checkJpeg, type PhotoStore } from './photo.
 import { ARCHIVE_REASONS, CLOSED_KINDS, WRONG_KINDS, isListingId, parseProposal, parseReport } from './validate.js';
 
 export interface Stmt { bind(...args: unknown[]): Stmt; run(): Promise<{ meta: { changes: number } }>; all<T = Record<string, unknown>>(): Promise<{ results: T[] }>; first<T = Record<string, unknown>>(): Promise<T | null> }
-export interface Db { prepare(sql: string): Stmt; batch(stmts: Stmt[]): Promise<unknown> }
+/** A batch is one transaction (D1), answering one result per statement. */
+export interface Db { prepare(sql: string): Stmt; batch(stmts: Stmt[]): Promise<{ meta: { changes: number } }[]> }
 export interface Env { DB: Db; PHOTOS?: PhotoStore; /** "true" turns photo uploads on (docs/11, off by default). */ PHOTOS_ENABLED?: string; ALLOWED_ORIGIN?: string; ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string; DEV_STEWARD?: string }
 interface Deps { now: () => Date; jwks?: JwksFetcher }
 
 const minute = (d: Date) => d.toISOString().slice(0, 16) + 'Z';
+// Anything about a place (a condition report, its photo) keeps only the hour: the person was standing there (docs/11).
+const hour = (d: Date) => d.toISOString().slice(0, 13) + ':00Z';
 const randomId = (prefix: string, bytes = 8) => prefix + [...crypto.getRandomValues(new Uint8Array(bytes))].map((b) => b.toString(16).padStart(2, '0')).join('');
-const REASONS = ['confirmed_by_phone', 'confirmed_in_person', 'confirmed_on_web', 'could_not_confirm', 'not_true', 'duplicate', 'spam', 'about_a_person', 'listed', 'not_a_fit'];
+// `restored` says a steward put a listing back, and nothing more: it is never a phone check (review 10b).
+const REASONS = ['confirmed_by_phone', 'confirmed_in_person', 'confirmed_on_web', 'could_not_confirm', 'not_true', 'duplicate', 'spam', 'about_a_person', 'listed', 'not_a_fit', 'restored'];
+const inList = (kinds: string[]) => kinds.map((k) => `'${k}'`).join(',');
 
 export function createApp(deps: Deps = { now: () => new Date() }) {
   const app = new Hono<{ Bindings: Env; Variables: { who: string } }>();
@@ -46,12 +51,20 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     if (r.photo && !(await c.env.DB.prepare('SELECT key FROM photos WHERE key = ? AND report_id IS NULL').bind(r.photo).first())) return c.json({ error: 'unknown photo' }, 422);
     // OR IGNORE: the same device reporting the same thing about the same target on the same day counts once.
     // The answer is 202 either way, so a repeat looks exactly like a first report.
-    const id = randomId(r.place ? 'cond_' : 'rpt_');
-    const made = await c.env.DB.prepare('INSERT OR IGNORE INTO reports (id, target_id, kind, detail, suggested, observed_at, submitted_at, client_nonce, photo_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(id, r.target_id, r.kind, r.detail, r.suggested, r.observed_at, minute(deps.now()), r.client_nonce, r.photo).run();
-    // A repeat report stores nothing, so its photo stays unclaimed and the daily pass deletes it.
-    if (r.photo && made.meta.changes) await c.env.DB.prepare('UPDATE photos SET report_id = ? WHERE key = ?').bind(id, r.photo).run();
-    return c.json({ accepted: true }, 202);
+    const id = randomId(r.place ? 'cond_' : 'rpt_'), submitted = r.place ? hour(deps.now()) : minute(deps.now());
+    const insert = 'INSERT OR IGNORE INTO reports (id, target_id, kind, detail, suggested, observed_at, submitted_at, client_nonce, photo_key) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?';
+    const args = [id, r.target_id, r.kind, r.detail, r.suggested, r.observed_at, submitted, r.client_nonce, r.photo];
+    if (!r.photo) { await c.env.DB.prepare(insert).bind(...args).run(); return c.json({ accepted: true }, 202); }
+    // With a photo, storing the report and claiming the photo is one transaction: the report is stored only while the
+    // photo is still unclaimed, and the claim only lands on a report that was stored. Two reports can't share a photo.
+    const [, claim] = await c.env.DB.batch([
+      c.env.DB.prepare(`${insert} WHERE EXISTS (SELECT 1 FROM photos WHERE key = ? AND report_id IS NULL)`).bind(...args, r.photo),
+      c.env.DB.prepare('UPDATE photos SET report_id = ? WHERE key = ? AND report_id IS NULL AND EXISTS (SELECT 1 FROM reports WHERE id = ?)').bind(id, r.photo, id)]);
+    if (claim?.meta.changes === 1) return c.json({ accepted: true }, 202);
+    // Nothing was stored. A repeat report answers 202 as always, and its photo stays unclaimed for the daily pass to
+    // delete; otherwise another report took the photo in the meantime, which is refused like the check above.
+    if (await c.env.DB.prepare('SELECT 1 AS ok FROM reports WHERE client_nonce = ? AND kind = ?').bind(r.client_nonce, r.kind).first()) return c.json({ accepted: true }, 202);
+    return c.json({ error: 'unknown photo' }, 422);
   });
 
   // A photo for a condition report (docs/11). The phone has already re-drawn it without metadata; checkJpeg
@@ -65,7 +78,7 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     if (!checked.ok) return c.json({ error: checked.error }, 422);
     const key = randomId('ph_', 16);
     await c.env.PHOTOS.put(key, checked.clean, { httpMetadata: { contentType: 'image/jpeg' } });
-    await c.env.DB.prepare('INSERT INTO photos (key, uploaded_at) VALUES (?, ?)').bind(key, minute(deps.now())).run();
+    await c.env.DB.prepare('INSERT INTO photos (key, uploaded_at) VALUES (?, ?)').bind(key, hour(deps.now())).run();
     return c.json({ photo: key }, 201);
   });
 
@@ -82,10 +95,22 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
   app.use('/v1/steward/*', async (c, next) => {
     // Local development only: `DEV_STEWARD` in api/.dev.vars stands in for Cloudflare Access, and only when the
     // Worker is being reached as localhost. A deployed Worker is never localhost, so this cannot open production.
-    const host = new URL(c.req.url).hostname;
-    const dev = c.env.DEV_STEWARD && (host === 'localhost' || host === '127.0.0.1') ? { who: `dev:${c.env.DEV_STEWARD}` } : null;
+    const url = new URL(c.req.url), local = (h: string) => h === 'localhost' || h === '127.0.0.1';
+    const dev = c.env.DEV_STEWARD && local(url.hostname) ? { who: `dev:${c.env.DEV_STEWARD}` } : null;
     const id = dev ?? (await verifyAccess(c.req.header('Cf-Access-Jwt-Assertion'), c.env, deps.now(), deps.jwks));
     if (!id) return c.json({ error: 'not signed in' }, 401);
+    // Cross-site request forgery: a steward's browser carries the Access cookie to any site that posts here. A form
+    // can't send a JSON content type, and every browser names the page it posts from in Origin. So a write must be JSON
+    // and come from our own origin. The pipeline's Access service token rides in headers no other site can set, and it
+    // sends no Origin, so it needs only the content type. Locally the page may be on another localhost port (Vite).
+    if (c.req.method !== 'GET' && c.req.method !== 'HEAD') {
+      if ((c.req.header('content-type') ?? '').split(';')[0]!.trim().toLowerCase() !== 'application/json') return c.json({ error: 'send JSON' }, 415);
+      const origin = c.req.header('origin');
+      let from: URL | null = null;
+      try { from = origin ? new URL(origin) : null; } catch { from = null; }
+      const same = !!from && (from.origin === url.origin || (!!dev && from.protocol === 'http:' && local(from.hostname)));
+      if (!same && !id.who.startsWith('service:')) return c.json({ error: 'not from the steward page' }, 403);
+    }
     c.set('who', id.who);
     await next();
   });
@@ -129,15 +154,17 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     const id = c.req.param('id');
     const b = (await body(c)) as { status?: string; reason_code?: string; replacement_id?: string; note?: string } | undefined;
     if (!isListingId(id) || !b || !['archived', 'suspended', 'active'].includes(b.status ?? '')) return c.json({ error: 'status must be archived, suspended, or active' }, 400);
-    const reason = b.status === 'archived' ? b.reason_code : b.reason_code ?? (b.status === 'active' ? 'confirmed_by_phone' : 'seasonal');
+    // Restoring records `restored`, never a phone check: nobody called, so the badge must not say anyone did (review 10b).
+    const reason = b.status === 'archived' ? b.reason_code : b.status === 'active' ? 'restored' : b.reason_code ?? 'seasonal';
     if (b.status === 'archived' && !ARCHIVE_REASONS.includes(reason ?? '')) return c.json({ error: `archiving needs a reason: ${ARCHIVE_REASONS.join(', ')}` }, 400);
+    if (b.status === 'active' && b.reason_code != null && b.reason_code !== 'restored') return c.json({ error: 'restoring takes no reason_code' }, 400);
     if (b.replacement_id != null && !isListingId(b.replacement_id)) return c.json({ error: 'bad replacement_id' }, 400);
     if (!(await c.env.DB.prepare('SELECT 1 AS ok FROM targets WHERE id = ?').bind(id).first())) return c.json({ error: 'unknown listing' }, 404);
     const at = minute(deps.now());
     await c.env.DB.prepare('INSERT INTO listing_overrides (target_id, status, reason_code, replacement_id, at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (target_id) DO UPDATE SET status = excluded.status, reason_code = excluded.reason_code, replacement_id = excluded.replacement_id, at = excluded.at')
       .bind(id, b.status, reason, b.replacement_id ?? null, at).run();
     const settle = b.status === 'archived' ? 'accepted' : b.status === 'active' ? 'rejected' : null;
-    if (settle) await c.env.DB.prepare(`UPDATE reports SET status = ?, reason_code = ?, resolved_at = ? WHERE target_id = ? AND status = 'open' AND kind IN (${CLOSED_KINDS.map((k) => `'${k}'`).join(',')})`).bind(settle, reason, at, id).run();
+    if (settle) await c.env.DB.prepare(`UPDATE reports SET status = ?, reason_code = ?, resolved_at = ? WHERE target_id = ? AND status = 'open' AND kind IN (${inList(CLOSED_KINDS)})`).bind(settle, reason, at, id).run();
     await c.env.DB.prepare('INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(at, c.get('who'), `listing.${b.status}`, id, reason, typeof b.note === 'string' ? b.note.slice(0, 500) : null).run();
     return c.json({ ok: true });
@@ -155,13 +182,15 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
 
   // Facts for the bundle build: counts and dates only. No free text leaves through here.
   app.get('/v1/steward/aggregates', async (c) => {
-    const q = (kinds: string[]) => `SUM(CASE WHEN kind IN (${kinds.map((k) => `'${k}'`).join(',')}) THEN 1 ELSE 0 END)`;
-    const open = await c.env.DB.prepare(`SELECT target_id, ${q(CLOSED_KINDS)} AS closed_open, MAX(CASE WHEN kind IN (${CLOSED_KINDS.map((k) => `'${k}'`).join(',')}) THEN submitted_at END) AS closed_last_at, ${q(WRONG_KINDS)} AS wrong_open,
+    const q = (kinds: string[]) => `SUM(CASE WHEN kind IN (${inList(kinds)}) THEN 1 ELSE 0 END)`;
+    // One phone = one report (DECISIONS 2026-09-19): closure reports count distinct per-target daily hashes, so one
+    // phone saying both "closed" and "moved" counts once. (The hash differs every day, so a phone counts once a day.)
+    const open = await c.env.DB.prepare(`SELECT target_id, COUNT(DISTINCT CASE WHEN kind IN (${inList(CLOSED_KINDS)}) THEN client_nonce END) AS closed_open, MAX(CASE WHEN kind IN (${inList(CLOSED_KINDS)}) THEN submitted_at END) AS closed_last_at, ${q(WRONG_KINDS)} AS wrong_open,
         MAX(CASE WHEN kind IN ('confirmed_ok', 'looks_good') THEN submitted_at END) AS last_confirmed_at FROM reports WHERE status = 'open' GROUP BY target_id`).all<{ target_id: string; closed_open: number }>();
     // Circuit breaker (audit A1): closure reports on many listings in one day is an attack or a disaster.
     // Either way a person should look before badges change, so the pipeline ignores closure counts while it is tripped.
     const since = new Date(deps.now().getTime() - 86400000).toISOString().slice(0, 16) + 'Z';
-    const burst = await c.env.DB.prepare(`SELECT COUNT(DISTINCT target_id) AS n FROM reports WHERE status = 'open' AND submitted_at >= ? AND kind IN (${CLOSED_KINDS.map((k) => `'${k}'`).join(',')})`).bind(since).first<{ n: number }>();
+    const burst = await c.env.DB.prepare(`SELECT COUNT(DISTINCT target_id) AS n FROM reports WHERE status = 'open' AND submitted_at >= ? AND kind IN (${inList(CLOSED_KINDS)})`).bind(since).first<{ n: number }>();
     const overrides = await c.env.DB.prepare('SELECT target_id, status, reason_code, replacement_id, at FROM listing_overrides').all();
     return c.json({ circuit_breaker: (burst?.n ?? 0) > 5, targets: open.results, overrides: overrides.results });
   });
@@ -183,15 +212,29 @@ export async function photoRetention(db: Db, photos: PhotoStore | undefined, now
   return due.results.length;
 }
 
-export async function retention(db: Db, now: Date): Promise<number> {
+// A photo goes with its report. Pictures are deleted from the bucket first, then counting, removing the photo rows and
+// removing the reports is one transaction: a crash before it leaves every report in place for the next night (a
+// missing picture is harmless), and a crash inside it changes nothing, so a report is never counted twice or lost.
+// Without the bucket a picture can't be deleted, so a report with a photo waits rather than leave the picture behind.
+// Settled proposals go 180 days after the steward's decision; open ones wait for a steward (DECISIONS 2026-09-19).
+export async function retention(db: Db, now: Date, photos?: PhotoStore): Promise<number> {
   const cutoff = new Date(now.getTime() - 180 * 86400000).toISOString().slice(0, 16) + 'Z';
-  await db.prepare(`INSERT INTO report_counts (target_id, kind, month, n) SELECT target_id, kind, substr(submitted_at, 1, 7), COUNT(*) FROM reports WHERE submitted_at < ? GROUP BY 1, 2, 3
-    ON CONFLICT (target_id, kind, month) DO UPDATE SET n = n + excluded.n`).bind(cutoff).run();
-  return (await db.prepare('DELETE FROM reports WHERE submitted_at < ?').bind(cutoff).run()).meta.changes;
+  const due = `FROM reports WHERE submitted_at < ?${photos ? '' : ' AND id NOT IN (SELECT report_id FROM photos WHERE report_id IS NOT NULL)'}`;
+  if (photos) {
+    const keys = (await db.prepare('SELECT p.key FROM photos p JOIN reports r ON r.id = p.report_id WHERE r.submitted_at < ?').bind(cutoff).all<{ key: string }>()).results.map((p) => p.key);
+    for (let i = 0; i < keys.length; i += 1000) await photos.delete(keys.slice(i, i + 1000));     // R2 takes 1000 keys a call
+  }
+  const [, , , removed] = await db.batch([
+    db.prepare(`INSERT INTO report_counts (target_id, kind, month, n) SELECT target_id, kind, substr(submitted_at, 1, 7), COUNT(*) ${due} GROUP BY 1, 2, 3
+      ON CONFLICT (target_id, kind, month) DO UPDATE SET n = n + excluded.n`).bind(cutoff),
+    db.prepare(`DELETE FROM photos WHERE report_id IN (SELECT id ${due})`).bind(cutoff),
+    db.prepare("DELETE FROM proposals WHERE status != 'open' AND resolved_at < ?").bind(cutoff),
+    db.prepare(`DELETE ${due}`).bind(cutoff)]);
+  return removed?.meta.changes ?? 0;
 }
 
 const app = createApp();
 export default {
   fetch: app.fetch,
-  scheduled: async (_event: unknown, env: Env) => { await photoRetention(env.DB, env.PHOTOS, new Date()); await retention(env.DB, new Date()); },
+  scheduled: async (_event: unknown, env: Env) => { await photoRetention(env.DB, env.PHOTOS, new Date()); await retention(env.DB, new Date(), env.PHOTOS); },
 };

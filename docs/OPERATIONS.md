@@ -27,7 +27,7 @@ In production the pipeline syncs every id at each publish.
 
 ## The demo loop (about two minutes, all local)
 
-1. In the app, open a listing → **Something wrong?** → *Closed for good*. Do it again as *Moved* (one phone counts once per kind per day).
+1. In the app, open a listing → **Something wrong?** → *Closed for good*. Then do the same from a **second phone or a second browser profile** (a private window works too). One phone counts once per listing per day, even if it says both *Closed for good* and *Moved*, so it takes two phones to reach 2.
 2. `REPORTS_API=http://localhost:8787 pnpm build:bundle`, reload: the listing now says **"2 people said this was closed. Call first."** It is still listed. Reports label; they never hide.
 3. Open `/admin/`: the listing is at the top, highlighted, with the note (phone numbers already masked) and the phone script. Press **Archive: closed for good**.
 4. Build again, reload: the listing is gone from results; its link says **"Closed as of {today}. Call 211 for other options."** `data/hsds/services.json` marks the service `defunct`, so a 211 importer won't treat it as live. Nothing was deleted.
@@ -144,11 +144,11 @@ Repository **variables** (not secret): `PUBLISH_ENABLED` (`true` turns the night
 ## What the write API stores, completely
 
 `targets`: every id the published dataset has, and whether it is a listing or a place (`seg_`/`plc_`). The pipeline syncs it at each publish. Reports can only name an id that is here.
-`reports`: listing or place id, kind, optional note (phone numbers and emails masked before storage), optional suggested correction, observed time (to the minute; to the hour for places), submitted time (to the minute), a per-target daily hash, steward outcome, and `photo_key` when a photo came with a place report. After 180 days a report becomes a monthly count and the row is removed.
+`reports`: listing or place id, kind, optional note (phone numbers and emails masked before storage), optional suggested correction (hours and address masked the same way; a suggested phone is kept), observed and submitted time (to the minute; to the hour for places), a per-target daily hash, steward outcome, and `photo_key` when a photo came with a place report. After 180 days a report becomes a monthly count and the row is removed, together with its photo.
 `report_counts`: what is left of old reports: id, kind, month, count.
-`photos`: a random key, the upload minute, and which report it belongs to. The picture itself is in a private R2 bucket and is deleted 30 days after its report closes (one day if no report claimed it).
-`proposals`: the place's name, category, what it offers, address (never for DV), public phone, schedule text, how the submitter knows, masked note.
-`listing_overrides`: a steward's decision about a listing (archived, paused, or active again), the reason, a replacement id if there is one, and the minute. The pipeline applies these at build time.
+`photos`: a random key, the upload hour, and which report it belongs to. The picture itself is in a private R2 bucket and is deleted 30 days after its report closes (one day if no report claimed it), or when its report becomes a monthly count, whichever comes first.
+`proposals`: the place's name, category, what it offers and schedule text (both masked like a note), address (never for DV), public phone, how the submitter knows, masked note. Removed 180 days after a steward settles it; an open proposal waits for a steward.
+`listing_overrides`: a steward's decision about a listing (archived, paused, or active again), the reason (`restored` for active again: a restore is never recorded as a phone check), a replacement id if there is one, and the minute. The pipeline applies these at build time.
 `steward_actions`: steward email, action, reason code, optional note. Never published.
 There is no table of residents, and no column anywhere for an IP address, device, user agent, or location.
 
