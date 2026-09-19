@@ -9578,6 +9578,95 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "2064719e-a41e-5c73-81c8-af135faf2489",
+  "name": "Weekly food pantry",
+  "status": "active",
+  "description": "Free groceries for you and your family.",
+  "url": "https://icdonline.org/",
+  "organization": {
+   "id": "9839c666-f853-5017-8a98-6be8402696a0",
+   "name": "Islamic Center of Detroit",
+   "description": "Islamic Center of Detroit",
+   "x_detroit": {
+    "id": "org_islamic_center_of_detroit"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "8acf6226-c2b5-5da6-8cb4-40a6e96d3ca8",
+    "location": {
+     "id": "a33275cd-190f-508f-b372-f52e3b9f434a",
+     "name": "Weekly food pantry, Islamic Center of Detroit",
+     "location_type": "physical",
+     "latitude": 42.351199,
+     "longitude": -83.183858,
+     "addresses": [
+      {
+       "id": "13b5cc59-0069-5557-a0f3-8bb1e3bdcb47",
+       "address_1": "14350 Tireman",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_islamic_center_weekly_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "e3007ee3-6e35-5d71-8fbc-e8a2c91123ae",
+      "number": "313-584-4143"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "3ec62d12-a220-5d77-bcab-d5084774bc20",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "14:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_islamic_center_weekly_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Islamic Center of Detroit website",
+      "url": "https://icdonline.org/icd-weekly-food-pantry/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_islamic_center_weekly_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "a836a8f8-4f04-568f-9a31-0aeaaa5fde1e",
   "name": "After-school programs in Regent Park",
   "status": "active",
@@ -10924,6 +11013,83 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "82daa4ac-423d-5b78-a410-815ef5b6ebb0",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Free emergency food. Call first to ask when it is open.",
+  "eligibility_description": "For people who live in ZIP codes 48227, 48228 and 48204.",
+  "url": "https://www.scottumc.org/",
+  "organization": {
+   "id": "33f7caaa-8c37-53c9-8f1a-28511e3051b2",
+   "name": "Scott Memorial United Methodist Church",
+   "description": "Scott Memorial United Methodist Church",
+   "x_detroit": {
+    "id": "org_scott_memorial_united_methodist_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "6e13d637-3e0a-5053-82e7-32ddfd5baadc",
+    "location": {
+     "id": "46632a87-6c7c-5eac-812f-72afbf1248d0",
+     "name": "Food pantry, Scott Memorial United Methodist Church",
+     "location_type": "physical",
+     "latitude": 42.372543,
+     "longitude": -83.196007,
+     "addresses": [
+      {
+       "id": "d9e814d5-882c-594d-99cf-a98e5c9624c4",
+       "address_1": "15361 Plymouth Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48227",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_scott_memorial_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "320790e4-2bee-5e76-8432-79c144b8a5ff",
+      "number": "313-836-6301"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_scott_memorial_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Scott Memorial United Methodist Church website",
+      "url": "https://www.scottumc.org/ministries/community-ministries.html"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_scott_memorial_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "b72a4307-c067-5192-9d2c-2d113e45155d",
   "name": "Food pantry at the Activities Building",
   "status": "active",
@@ -11379,6 +11545,96 @@
   ],
   "x_detroit": {
    "id": "svc_st_peter_st_vincent_de_paul_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "f1774ac5-e2cf-5e48-aa56-9ee0a3c85228",
+  "name": "Parish food pantry",
+  "status": "active",
+  "description": "Free food on Tuesday mornings in the Community Center. They also have medical equipment, kids' books, and thrift store items.",
+  "eligibility_description": "Their site says food goes to families in the parish. Call to ask.",
+  "url": "https://straymondolgc.org/",
+  "organization": {
+   "id": "d6d58796-b0a3-5af6-a7ef-d26d91ee05ef",
+   "name": "St. Raymond-Our Lady of Good Counsel Parish",
+   "description": "St. Raymond-Our Lady of Good Counsel Parish",
+   "x_detroit": {
+    "id": "org_st_raymond_our_lady_of_good_counsel_pari"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "c21eb86b-dd8d-55ab-93d7-b42ec0675c37",
+    "location": {
+     "id": "e3aea4ab-2b5c-5927-9e1f-5e25ca86c9e0",
+     "name": "Parish food pantry",
+     "location_type": "physical",
+     "latitude": 42.444395,
+     "longitude": -82.990439,
+     "addresses": [
+      {
+       "id": "1f311bed-be07-5958-a082-358cf832182c",
+       "address_1": "20055 Joann",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48205",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_raymond_our_parish_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "ef618ab3-1668-5b6a-923c-a61a50f2b71e",
+      "number": "313-527-0525"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "69de43d0-be86-5c19-b126-18d94ddd7925",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:30",
+      "closes_at": "11:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_st_raymond_our_parish_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "St. Raymond-Our Lady of Good Counsel Parish website",
+      "url": "https://straymondolgc.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_raymond_our_parish_food_pantry",
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
