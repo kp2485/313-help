@@ -10,17 +10,23 @@ import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
 import { locale } from './i18n.js';
 
 type Count = number | 'lt5';
-export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number }
+export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number; fires?: Count }
+/** Today's numbers, not a year's: rental certificates in force, vacant registrations of the past 12 months, street ratings. */
+export interface NowStats { rental_certs?: Count; vacant_reg?: Count; roads?: { pieces: Count; miles?: number; poor_pct?: number } }
 export interface Hood {
   id: string; name: string; district: number | null; jlg_study_area?: boolean; center: [number, number]; rings: number[][];
   help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; none_listed_yet: string[]; coverage_checked: boolean };
-  places: { parks: number; rec_centers: number; greenway_open: number };
+  places: { parks: number; rec_centers: number; greenway_open: number; snap_stores?: number; bus_stops?: number };
+  nearest_city?: { snap: number | null; grocery: number | null; bus: number | null };
   parcels?: number;
   years: Record<string, YearStats>;
+  now?: NowStats;
 }
 interface Source { name: string; url: string; last_edited: string }
 export interface Indicators {
-  sources: { neighborhoods: Source; sales: Source; permits: Source; blight?: Source; demolitions?: Source; issues?: Source; parcels?: Source }; city_parcels?: number; issue_types?: string[]; stats_fetched_at: string; first_year: number; partial_year: number;
+  sources: { neighborhoods: Source; sales: Source; permits: Source; blight?: Source; demolitions?: Source; issues?: Source; parcels?: Source; snap?: Source; bus_stops?: Source; rentals?: Source; fires?: Source; pavement?: Source; vacant?: Source };
+  city_parcels?: number; issue_types?: string[]; fire_types?: string[]; city_now?: NowStats; roads_years?: [number, number]; vacant_period?: [string, string];
+  stats_fetched_at: string; first_year: number; partial_year: number;
   near_miles: number; origin: [number, number]; city: Record<string, YearStats>; neighborhoods: Hood[]; segments: Record<string, string[]>;
 }
 
@@ -75,6 +81,14 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
   const near = (k: string) => { const mi = h.help.nearest_miles[k]; return `<li><span>${T('hood.nearest.' + k)}</span><span>${mi === null || mi === undefined ? T('hood.nearest_none') : T('miles', { miles: mi.toFixed(1) })}</span></li>`; };
   const cats = Object.entries(h.help.by).filter(([, n]) => n > 0);
   const src = (s: Source) => `<li>${ui.link(s.url, s.name)} <small>${T('hood.updated', { date: ui.date(s.last_edited) })}</small></li>`;
+  const row = (label: string, value: string, city = '') => `<ul class="hours"><li><span>${label}</span><span>${value}${city ? ` <small>${city}</small>` : ''}</span></li></ul>`;
+  const fmtRate = (r: number) => r.toFixed(r < 10 ? 1 : 0);
+  /** A count as of today, with its rate per 1,000 lots when the count can be shown and the base defended (rules 2 and 3). */
+  const per1000 = (c: Count | undefined) => { if (c === undefined) return T('hood.none_recorded'); if (c === 'lt5') return T('hood.lt5'); const r = rate(c, h.parcels); return r === undefined ? String(c) : T('hood.per_1000', { count: c, rate: fmtRate(r) }); };
+  const cityPer1000 = (c: Count | undefined) => { const r = rate(c, d.city_parcels); return r === undefined ? '' : T('hood.city_per_1000', { rate: fmtRate(r) }); };
+  const roads = h.now?.roads, cityRoads = d.city_now?.roads;
+  const roadsValue = !roads ? T('hood.roads_none') : roads.poor_pct === undefined ? T('hood.roads_few') : T('hood.roads_pct', { pct: roads.poor_pct, miles: (roads.miles ?? 0).toFixed(1) });
+  const nc = h.nearest_city, mi = (m: number | null) => (m === null ? T('hood.none_found') : T('miles', { miles: m.toFixed(1) }));
   return `<main><p class="org">${h.district ? T('hood.district', { n: h.district }) : ''}${h.jlg_study_area ? ` · ${T('hood.in_jlg')}` : ''}</p>
     <p class="banner plain">${T('hood.describe')}</p>${ui.map(h)}
 
@@ -84,20 +98,27 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
     ${cats.length ? `<ul class="hours">${cats.map(([c, n]) => `<li><span>${T('add.cat.' + (c === 'shelter' ? 'shelter.emergency' : c))}</span><span>${n}</span></li>`).join('')}</ul>` : ''}
     ${h.help.none_listed_yet.length ? `<p class="foot">${T('hood.none_listed', { kinds: h.help.none_listed_yet.map((c) => ui.t('hood.kind.' + c)).join(', ') })}</p>` : ''}
     <h3 class="sub">${T('hood.nearest_head')}</h3><ul class="hours">${['food', 'clinic', 'narcan', 'indoors'].map(near).join('')}</ul>
-    <h3 class="sub">${T('hood.places_head', { miles: d.near_miles })}</h3><ul class="hours"><li><span>${T('hood.parks')}</span><span>${h.places.parks}</span></li><li><span>${T('hood.rec_centers')}</span><span>${h.places.rec_centers}</span></li><li><span>${T('hood.greenway_open')}</span><span>${h.places.greenway_open}</span></li></ul>
+    <h3 class="sub">${T('hood.places_head', { miles: d.near_miles })}</h3><ul class="hours"><li><span>${T('hood.parks')}</span><span>${h.places.parks}</span></li><li><span>${T('hood.rec_centers')}</span><span>${h.places.rec_centers}</span></li><li><span>${T('hood.greenway_open')}</span><span>${h.places.greenway_open}</span></li>${h.places.snap_stores !== undefined ? `<li><span>${T('hood.snap_stores')}</span><span>${h.places.snap_stores}</span></li>` : ''}${h.places.bus_stops !== undefined ? `<li><span>${T('hood.bus_stops')}</span><span>${h.places.bus_stops}</span></li>` : ''}</ul>
+    ${nc ? `<h3 class="sub">${T('hood.city_near_head')}</h3><ul class="hours"><li><span>${T('hood.near.snap')}</span><span>${mi(nc.snap)}</span></li><li><span>${T('hood.near.grocery')}</span><span>${mi(nc.grocery)}</span></li><li><span>${T('hood.near.bus')}</span><span>${mi(nc.bus)}</span></li></ul>
+    <p class="foot">${T('hood.snap_note')}</p>` : ''}
 
     <h2>${T('hood.money_head')}</h2><div class="panel"><p>${T('hood.money_lede')}</p>
       ${yearsTable(h, d, ui, { value: (y) => y.median_price, count: (y) => y.sales, fmt: money, head: ui.t('hood.median'), countHead: ui.t('hood.sales'), missing: ui.t('hood.too_few'), caption: ui.t('hood.sales_caption') })}
       ${yearsTable(h, d, ui, { value: (y) => y.permit_cost, count: (y) => y.permits, fmt: bigMoney, head: ui.t('hood.permit_cost'), countHead: ui.t('hood.permits'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.permits_caption') })}
-      <p class="foot">${T('hood.money_note')}</p></div>
+      <p class="foot">${T('hood.money_note')}</p>
+      ${d.sources.rentals ? `${row(T('hood.rentals'), per1000(h.now?.rental_certs), cityPer1000(d.city_now?.rental_certs))}<p class="foot">${T('hood.rentals_note')}</p>` : ''}</div>
 
     ${d.sources.blight ? `<h2>${T('hood.cond_head')}</h2><div class="panel"><p>${T('hood.cond_lede')}</p>
       ${yearsTable(h, d, ui, { value: (y) => rate(y.blight, h.parcels), cityValue: (y) => rate(y.blight, d.city_parcels), count: (y) => y.blight, fmt: (n) => n.toFixed(0), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.blight'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.blight_caption') })}
       <p class="foot">${T('hood.blight_note')}</p>
       ${yearsTable(h, d, ui, { value: (y) => (typeof y.demolitions === 'number' ? y.demolitions : undefined), fmt: (n) => String(n), head: ui.t('hood.demolitions'), countHead: '', missing: ui.t('hood.lt5_or_none'), caption: ui.t('hood.demo_caption') })}
       ${yearsTable(h, d, ui, { value: (y) => y.issue_days, count: (y) => y.issues, fmt: (n) => ui.t('hood.days', { n }), head: ui.t('hood.issue_days'), countHead: ui.t('hood.issues'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.issues_caption') })}
-      <p class="foot">${T('hood.issues_note', { types: (d.issue_types ?? []).join(', ') })}</p></div>` : ''}
+      <p class="foot">${T('hood.issues_note', { types: (d.issue_types ?? []).join(', ') })}</p>
+      ${d.sources.fires ? `${yearsTable(h, d, ui, { value: (y) => rate(y.fires, h.parcels), cityValue: (y) => rate(y.fires, d.city_parcels), count: (y) => y.fires, fmt: (n) => n.toFixed(1), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.fires'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.fire_caption') })}
+      <p class="foot">${T('hood.fire_note')}</p><details class="foot"><summary>${T('hood.fire_types')}</summary><p>${ui.esc((d.fire_types ?? []).join('; '))}</p></details>` : ''}
+      ${d.sources.vacant ? `${row(T('hood.vacant', { from: ui.date(d.vacant_period?.[0] ?? ''), to: ui.date(d.vacant_period?.[1] ?? '') }), per1000(h.now?.vacant_reg), cityPer1000(d.city_now?.vacant_reg))}<p class="foot">${T('hood.vacant_note')}</p>` : ''}
+      ${d.sources.pavement ? `${row(T('hood.roads', { from: d.roads_years?.[0] ?? '', to: d.roads_years?.[1] ?? '' }), roadsValue, cityRoads?.poor_pct !== undefined ? T('hood.city_pct', { pct: cityRoads.poor_pct }) : '')}<p class="foot">${T('hood.roads_note')}</p>` : ''}</div>` : ''}
 
-    <h2>${T('hood.sources_head')}</h2><ul class="srcs">${[d.sources.sales, d.sources.permits, d.sources.blight, d.sources.demolitions, d.sources.issues, d.sources.parcels, d.sources.neighborhoods].filter((x): x is Source => !!x).map(src).join('')}<li>${T('hood.source_ours')}</li></ul>
+    <h2>${T('hood.sources_head')}</h2><ul class="srcs">${[d.sources.sales, d.sources.permits, d.sources.rentals, d.sources.blight, d.sources.demolitions, d.sources.issues, d.sources.fires, d.sources.vacant, d.sources.pavement, d.sources.parcels, d.sources.snap, d.sources.bus_stops, d.sources.neighborhoods].filter((x): x is Source => !!x).map(src).join('')}<li>${T('hood.source_ours')}</li></ul>
     <p class="foot">${T('hood.left_out')}</p></main>`;
 }

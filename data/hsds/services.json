@@ -17429,6 +17429,81 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "bc7d5ae2-ad98-533c-8021-eaa47ca361fb",
+  "name": "Food Hub",
+  "status": "active",
+  "description": "Free groceries. You need an appointment.",
+  "organization": {
+   "id": "7e1a7380-022d-5902-9ee3-2af6e099a14e",
+   "name": "St. Cunegunda",
+   "description": "St. Cunegunda",
+   "x_detroit": {
+    "id": "org_st_cunegunda"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "e9819547-05e9-577f-8c06-627cb06fe88f",
+    "location": {
+     "id": "da8e6a78-3696-5251-bb5c-57ce6c19a109",
+     "name": "Food Hub, St. Cunegunda",
+     "location_type": "physical",
+     "latitude": 42.33643,
+     "longitude": -83.147088,
+     "addresses": [
+      {
+       "id": "1f96f6fe-3801-5c8b-a5dc-1e6fc03f8134",
+       "address_1": "5900 St. Lawrence Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_cunegunda_food_hub"
+     }
+    },
+    "phones": [
+     {
+      "id": "2cf0d99d-bfe2-52c8-ad41-a8afd71a1a3e",
+      "number": "313-963-8880"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_st_cunegunda_food_hub",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "By appointment. No days given.",
+     "checked_at_entry": "2026-09-19",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Gleaners PantryNet location data",
+      "url": "https://pantrynet.org/wp-json/pantrynet/v1/locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_cunegunda_food_hub",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-19"
+ },
+ {
   "id": "d87a32e3-1e31-543b-acd9-13856bc1141c",
   "name": "Cabrini Clinic",
   "status": "active",

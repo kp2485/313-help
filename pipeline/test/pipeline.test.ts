@@ -12,8 +12,8 @@ import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
-import { buildIndicators, milesToArea } from '../src/indicators.js';
-import { ISSUE_TYPES, nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
+import { buildIndicators, milesToArea, nearestMiles } from '../src/indicators.js';
+import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
 import { addressOnPage, isChallenge, listingOnPage, pageText, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
@@ -213,6 +213,20 @@ describe('report facts from the write API', () => {
 });
 
 describe('does the page still show this listing (one strict matcher)', () => {
+  it('a data file (like the Gleaners map\'s): phone and address must be in the SAME entry', () => {
+    const file = JSON.stringify([
+      { name: 'A Pantry', address: '100 Main St', city: 'Detroit', phone: '(313) 555-0100' },
+      { name: 'B Pantry', address: '200 Oak Ave', city: 'Detroit', phone: '313-555-0199' },
+    ]);
+    expect(listingOnPage(file, { phone: '313-555-0100', address_1: '100 Main St' }).ok).toBe(true);
+    // the phone of one entry and the address of another: not a match
+    expect(listingOnPage(file, { phone: '313-555-0100', address_1: '200 Oak Ave' }).ok).toBe(false);
+    expect(listingOnPage(JSON.stringify({ locations: JSON.parse(file) }), { phone: '313-555-0199', address_1: '200 Oak Ave' }).ok).toBe(true);
+  });
+  it('a street named for a saint counts: "5900 St. Lawrence"', () => {
+    expect(addressOnPage('<p>5900 St. Lawrence, Detroit</p>', '5900 St. Lawrence St')).toBe(true);
+    expect(addressOnPage('<p>12 Saint Aubin</p>', '12 St Aubin St')).toBe(true);
+  });
   const page = `<html><head><script>var tracking = "3135550100";</script><style>.x{}</style></head><body>
     <h1>St. Moses Pantry</h1><p>Call (313) 555-0100 or 313.555.0199. Toll free 1-800-866-THAW.</p>
     <a href="tel:+18663132520">Shelter line</a><p>2959 Martin Luther King Jr.&nbsp;Blvd, Detroit</p>
@@ -486,6 +500,62 @@ describe('neighborhood indicators (docs/13)', () => {
     expect(st).not.toMatch(/grantor|grantee|parcel_id|"address"/);
     expect(readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8')).not.toMatch(/outFields: '[^']*(grantor|grantee|address)/);
   });
+  it('fires count only fires in buildings: never medical calls, crashes, false alarms, car or outdoor fires', () => {
+    for (const t of ['Building fire', 'Cooking fire, confined to container', 'Cooking fire, no flame damage', 'Fire - Structure Fire - Room and Contents Fire', 'Fire - Structure Fire - Structural Involvement', ' Building fire ']) expect(isBuildingFire(t)).toBe(true);
+    for (const t of ['Automobile', 'unintentional', 'Medical / MANPOWER assist, assist EMS crew', 'Vehicle accident with injuries', 'Alarm system activation, no fire - unintentional', 'Smoke scare, odor of smoke',
+      'Passenger vehicle fire', 'Outside rubbish, trash or waste fire', 'Grass fire', 'Excessive heat, scorch burns with no ignition', 'No incident found on arrival at dispatch address', 'Fire - Transportation Fire - Vehicle Fire  -  Passenger', 'Fire - Outside Fire - Trash / Rubbish Fire'])
+      expect(isBuildingFire(t)).toBe(false);
+    expect(FIRE_TYPES.join(' ')).not.toMatch(/medical|ems|alarm|accident|vehicle|automobile|outside|grass|no fire|false/i);
+    // A fire type the City adds later is flagged at ingest instead of silently dropped.
+    expect(uncountedFireTypes(['Building fire', 'Fire - Structure Fire - Attic Fire', 'Rescue - Structure - Elevator / Escalator Rescue', 'Grass fire', 'Fire - Outside Fire - Utility Infrastructure Fire', 'Structure fire, other'])).toEqual(['Fire - Structure Fire - Attic Fire', 'Structure fire, other']);
+    expect(sqlIn('t', ["Kyle's", 'b'])).toBe("t IN ('Kyle''s', 'b')");
+  });
+  it('street pieces go to the neighborhood around their middle, and "poor" is a share of rated length with small numbers hidden', () => {
+    expect(pathMidpoint([[-83.16, 42.41], [-83.15, 42.41]])).toEqual([-83.155, 42.41]);
+    expect(pathMidpoint([[-83.16, 42.41], [-83.159, 42.41], [-83.15, 42.41]])).toEqual([-83.155, 42.41]);
+    const piece = (cond: number, miles: number, mid: [number, number]) => ({ cond, miles, mid });
+    const inB = [-83.155, 42.415] as [number, number];
+    const r = roadsByHood([piece(3, 1, inB), piece(4, 1, inB), piece(9, 2, inB), piece(2, 5, [-82.95, 42.35])], hoods);
+    expect(r.byHood).toEqual({ nbh_bagley: { pieces: 3, miles: 4, poor_miles: 2 } });
+    expect(r.city).toEqual({ pieces: 4, miles: 9, poor_miles: 7 });
+    expect(roadShare({ pieces: 3, miles: 4, poor_miles: 2 })).toEqual({ pieces: 'lt5' });
+    expect(roadShare({ pieces: 8, miles: 4, poor_miles: 2 })).toEqual({ pieces: 8, miles: 4 });
+    expect(roadShare({ pieces: 12, miles: 4.04, poor_miles: 1.3 })).toEqual({ pieces: 12, miles: 4, poor_pct: 32 });
+    expect(roadShare(undefined)).toBeUndefined();
+  });
+  it('Bridge-card stores and bus stops: nearest in a straight line from the middle, and how many inside or within half a mile', () => {
+    expect(nearestMiles({ lat: 42.415, lon: -83.155 }, [])).toBeNull();
+    expect(nearestMiles({ lat: 42.415, lon: -83.155 }, [[-83.155, 42.4295], [-83.155, 42.30]])).toBe(1);
+    const out = buildIndicators({
+      hoods, parks: [], segments: [], rows: [], stats: { neighborhoods: {}, current: { neighborhoods: { nbh_bagley: { rental_certs: 12, vacant_reg: 'lt5' } } } },
+      snap: [[-83.155, 42.415, 0], [-83.155, 42.4225, 1], [-83.155, 42.44, 1], [-82.9, 42.3, 1]], busStops: [[-83.1551, 42.4151], [-83.2, 42.3]],
+    });
+    const b = out.neighborhoods[0]!;
+    expect(b.places).toMatchObject({ snap_stores: 2, bus_stops: 1 });
+    // The middle of this square outline is [-83.156, 42.414] (the average of its five stored corners).
+    expect(b.nearest_city).toEqual({ snap: 0.1, grocery: 0.6, bus: 0.1 });
+    expect(b.now).toEqual({ rental_certs: 12, vacant_reg: 'lt5' });
+    expect(out.neighborhoods[1]!.now).toBeUndefined();
+  });
+  it('the new City numbers are added up by the City, hold no count under 5, and no owner, address or store name', () => {
+    const src = readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8');
+    expect(src).not.toMatch(/outFields[^\n]*(owner|address|RETAILER_NAME|GRANTEE|location|record_id|parcel)/i);
+    const st = JSON.parse(readFileSync(p('data/ingested/city_stats.json'), 'utf8'));
+    expect(Object.keys(st.sources)).toEqual(expect.arrayContaining(['rentals', 'fires', 'pavement', 'vacant']));
+    expect(st.fire_types).toEqual(FIRE_TYPES);
+    let fires = 0;
+    for (const years of Object.values<any>(st.neighborhoods)) for (const y of Object.values<any>(years)) if (y.fires !== undefined) { fires++; if (y.fires !== 'lt5') expect(y.fires).toBeGreaterThanOrEqual(5); }
+    expect(fires).toBeGreaterThan(500);
+    expect(Object.keys(st.current.neighborhoods).length).toBeGreaterThan(190);
+    for (const n of Object.values<any>(st.current.neighborhoods)) {
+      for (const k of ['rental_certs', 'vacant_reg']) if (n[k] !== undefined && n[k] !== 'lt5') expect(n[k]).toBeGreaterThanOrEqual(5);
+      if (n.roads?.poor_pct !== undefined) { expect(n.roads.pieces).toBeGreaterThanOrEqual(10); expect(n.roads.poor_pct).toBeLessThanOrEqual(100); }
+    }
+    expect(JSON.stringify(st)).not.toMatch(/owner|RETAILER_NAME|grantee/i);
+    const pts = JSON.parse(readFileSync(p('data/ingested/city_points.json'), 'utf8'));
+    expect(pts.snap.length).toBeGreaterThan(800); expect(pts.bus_stops.length).toBeGreaterThan(4000);
+    for (const q of [...pts.snap, ...pts.bus_stops]) for (const x of q) expect(typeof x).toBe('number');
+  });
 });
 
 describe('the real bundle', () => {
@@ -505,6 +575,9 @@ describe('the real bundle', () => {
     expect(Object.keys(index.files)).toContain('indicators/neighborhoods.json');
     const d = JSON.parse(readFileSync(join(out, 'indicators/neighborhoods.json'), 'utf8'));
     expect(d.neighborhoods).toHaveLength(205); expect(d.near_miles).toBe(0.5); expect(d.origin).toHaveLength(2);
+    expect(Object.keys(d.sources)).toEqual(expect.arrayContaining(['snap', 'bus_stops', 'rentals', 'fires', 'pavement', 'vacant']));
+    expect(d.city_now.rental_certs).toBeGreaterThan(5000); expect(d.fire_types.length).toBeGreaterThan(10);
+    expect(d.neighborhoods.filter((n: any) => typeof n.nearest_city?.bus === 'number').length).toBe(205);
   });
   it('is signed, and the signature covers every file through its checksum', () => {
     const bytes = readFileSync(join(out, 'index.json'));

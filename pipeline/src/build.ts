@@ -115,12 +115,16 @@ export async function build(opts: BuildOptions = {}) {
   const hoodsFile = p('data/ingested/neighborhoods.json'), statsFile = p('data/ingested/city_stats.json');
   if (existsSync(hoodsFile) && existsSync(statsFile)) {
     const h = JSON.parse(readFileSync(hoodsFile, 'utf8')), st = JSON.parse(readFileSync(statsFile, 'utf8'));
+    // Stores that take a Bridge card and bus stops (City data): counted near each neighborhood, never shipped as points.
+    const pointsFile = p('data/ingested/city_points.json'), pts = existsSync(pointsFile) ? JSON.parse(readFileSync(pointsFile, 'utf8')) : null;
     const ind = buildIndicators({
       hoods: h.neighborhoods, rows: live, stats: st,
       parks: existsSync(parksFile) ? JSON.parse(readFileSync(parksFile, 'utf8')).parks : [],
       segments: existsSync(jlg) ? JSON.parse(readFileSync(jlg, 'utf8')).segments : [],
+      ...(pts ? { snap: pts.snap, busStops: pts.bus_stops } : {}),
     });
-    const doc = { sources: { neighborhoods: h.source, ...st.sources }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types, ...ind };
+    const doc = { sources: { neighborhoods: h.source, ...st.sources, ...(pts?.sources ?? {}) }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types,
+      ...(st.current ? { city_now: st.current.city, fire_types: st.fire_types, roads_years: st.roads_years, vacant_period: st.vacant_period } : {}), ...ind };
     putCompact('indicators/neighborhoods.json', doc);
     counts.neighborhoods = ind.neighborhoods.length;
     // Committed on publish, without the outlines, so the history of every number is in git (docs/13).

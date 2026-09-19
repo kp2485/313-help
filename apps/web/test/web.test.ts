@@ -188,6 +188,27 @@ describe('neighborhood pages (docs/13 honesty rules)', () => {
     expect(html).toContain('We never count reports about people');
     expect(html).toContain('8 days'); expect(html).toContain('fewer than 5, or none'); expect(html).not.toContain('MISSING:');
   });
+  it('Bridge-card stores, bus stops, rentals, fires, vacant buildings and streets: each with its caveat next to it, and its source', () => {
+    const more: Indicators = { ...d, city_parcels: 377000, issue_types: [], fire_types: ['Building fire'], roads_years: [2023, 2024], vacant_period: ['2025-09-19', '2026-09-16'],
+      sources: { ...d.sources, blight: src, snap: { ...src, name: 'SNAP stores' }, bus_stops: { ...src, name: 'DDOT stops' }, rentals: { ...src, name: 'Rental certificates' }, fires: { ...src, name: 'Fire calls' }, pavement: { ...src, name: 'Street ratings' }, vacant: { ...src, name: 'Vacant registrations' } },
+      city: { 2025: { fires: 2245 } }, city_now: { rental_certs: 12276, vacant_reg: 1493, roads: { pieces: 15000, miles: 826, poor_pct: 31 } },
+      neighborhoods: [{ ...d.neighborhoods[0]!, parcels: 5000, years: { 2025: { fires: 20 } }, places: { parks: 1, rec_centers: 0, greenway_open: 0, snap_stores: 7, bus_stops: 31 },
+        nearest_city: { snap: 0.3, grocery: 1.4, bus: 0.1 }, now: { rental_certs: 150, vacant_reg: 'lt5', roads: { pieces: 60, miles: 5.2, poor_pct: 45 } } }] };
+    const html = hoodPage(more.neighborhoods[0]!, more, ui);
+    expect(html).not.toContain('MISSING:');
+    expect(html).toContain('Stores that take a Bridge card'); expect(html).toContain('>7<'); expect(html).toContain('>31<'); expect(html).toContain('1.4');
+    // Rentals sit in the "can people stay" panel, next to their caveat, and the panel still holds exactly its two tables.
+    const money = html.slice(html.indexOf('Read these two together')); const moneyPanel = money.slice(0, money.indexOf('</div>'));
+    expect(moneyPanel).toContain('150 (30 for every 1,000 lots)'); expect(moneyPanel).toContain('Many rentals never sign up'); expect(moneyPanel.match(/<table/g)).toHaveLength(2);
+    // Fires: a rate per 1,000 lots (20 / 5,000 = 4.0), with what was and was not counted right under the table.
+    expect(html).toContain('4.0'); expect(html).toContain('Not counted: car, trash and grass fires, medical calls');
+    expect(html).toContain('fewer than 5'); expect(html).toContain('It does not count every empty building');
+    expect(html).toContain('45% of 5.2 miles'); expect(html).toContain('Whole city: 31%'); expect(html).toContain('not side streets');
+    for (const s of ['SNAP stores', 'DDOT stops', 'Rental certificates', 'Fire calls', 'Street ratings', 'Vacant registrations']) expect(html.slice(html.indexOf('Where these numbers come from'))).toContain(s);
+    // An older bundle without these numbers still draws a page, without empty rows.
+    const old = hoodPage(d.neighborhoods[0]!, d, ui);
+    expect(old).not.toContain('Bridge card'); expect(old).not.toContain('MISSING:');
+  });
   it('neighborhood numbers are fetched only when asked for, and checked against the signed index', () => {
     const src2 = readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8');
     expect(src2).toContain('fetchVerified(index, FILE)'); expect(src2).not.toContain(' fetch(');

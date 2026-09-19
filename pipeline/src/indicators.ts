@@ -4,7 +4,7 @@
 
 import { milesToLine, miles, type BundleRow, type Segment } from '@detroithelp/query';
 import { encodeLine, GRID } from './ingest-basemap.js';
-import { pointInRing, type Neighborhood, type YearStats } from './ingest-neighborhoods.js';
+import { pointInRing, type Neighborhood, type NowStats, type YearStats } from './ingest-neighborhoods.js';
 
 export const NEAR_MILES = 0.5;                       // "inside or within half a mile" (docs/13)
 export const HELP_TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec'] as const;
@@ -17,9 +17,12 @@ export interface NeighborhoodIndicators {
   center: [number, number];                          // [lat, lon]
   rings: number[][];                                 // outline, same compact encoding as the street map
   help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; none_listed_yet: string[]; coverage_checked: boolean };
-  places: { parks: number; rec_centers: number; greenway_open: number };
+  places: { parks: number; rec_centers: number; greenway_open: number; snap_stores?: number; bus_stops?: number };
+  /** Straight-line miles from the middle to the nearest store that takes a Bridge card, such a grocery store, and bus stop (City data, not our list). */
+  nearest_city?: { snap: number | null; grocery: number | null; bus: number | null };
   parcels?: number;                                  // the City's parcel count here: the base for "per 1,000 parcels"
   years: Record<string, YearStats>;
+  now?: NowStats;
 }
 
 /** 0 when the point is inside; otherwise miles to the nearest edge. */
@@ -28,10 +31,20 @@ export function milesToArea(pt: { lat: number; lon: number }, rings: Pt[][]): nu
   return Math.min(...rings.map((r) => milesToLine(pt, r)));
 }
 
+/** Straight-line miles to the nearest of `pts` ([lon, lat, ...]), to one decimal; null when there are none. */
+export function nearestMiles(from: { lat: number; lon: number }, pts: number[][]): number | null {
+  let best = Infinity;
+  for (const q of pts) best = Math.min(best, miles(from, { lat: q[1]!, lon: q[0]! }));
+  return best === Infinity ? null : Number(best.toFixed(1));
+}
+
 export function buildIndicators(input: {
   hoods: Neighborhood[]; rows: BundleRow[]; parks: { lat: number; lon: number }[]; segments: Segment[];
-  stats: { neighborhoods: Record<string, Record<string, YearStats>>; parcels?: Record<string, number> }; coverageChecked?: Set<string>;
+  stats: { neighborhoods: Record<string, Record<string, YearStats>>; parcels?: Record<string, number>; current?: { neighborhoods: Record<string, NowStats> } }; coverageChecked?: Set<string>;
+  /** City points: SNAP stores as [lon, lat, 1 if a grocery store], bus stops as [lon, lat]. */
+  snap?: number[][]; busStops?: number[][];
 }): { neighborhoods: NeighborhoodIndicators[]; segments: Record<string, string[]> } {
+  const asPt = (q: number[]) => ({ lat: q[1]!, lon: q[0]! });
   const located = input.rows.filter((r) => r.status === 'active' && r.lat !== undefined && r.lon !== undefined);
   const open = input.segments.filter((s) => s.phase === 'open');
   const segHoods: Record<string, string[]> = {};
@@ -63,9 +76,13 @@ export function buildIndicators(input: {
         parks: input.parks.filter(near).length,
         rec_centers: help.filter((r) => r.category === 'rec.center').length,
         greenway_open: open.filter((s) => s.lines.some((l) => l.some(([lon, lat]) => near({ lat, lon })))).length,
+        ...(input.snap ? { snap_stores: input.snap.filter((q) => near(asPt(q))).length } : {}),
+        ...(input.busStops ? { bus_stops: input.busStops.filter((q) => near(asPt(q))).length } : {}),
       },
+      ...(input.snap && input.busStops ? { nearest_city: { snap: nearestMiles(center, input.snap), grocery: nearestMiles(center, input.snap.filter((q) => q[2] === 1)), bus: nearestMiles(center, input.busStops) } } : {}),
       ...(input.stats.parcels?.[n.id] ? { parcels: input.stats.parcels[n.id] } : {}),
       years: input.stats.neighborhoods[n.id] ?? {},
+      ...(input.stats.current?.neighborhoods[n.id] ? { now: input.stats.current.neighborhoods[n.id] } : {}),
     };
   });
   return { neighborhoods, segments: segHoods };
