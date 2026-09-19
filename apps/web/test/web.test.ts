@@ -187,6 +187,19 @@ describe('neighborhood pages (docs/13 honesty rules)', () => {
   });
 });
 
+describe('Spanish', () => {
+  const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
+  const holes = (v: string) => (v.match(/[{]\w+[}]/g) ?? []).sort().join(',');
+  it('has every English key, and no extra ones', () => expect(Object.keys(es)).toEqual(Object.keys(strings)));
+  it('keeps every placeholder, so no number or date goes missing', () => { for (const k of Object.keys(strings)) expect(holes(es[k]!), k).toBe(holes(strings[k]!)); });
+  it('keeps 911, 988 and 211 where the English has them', () => { for (const k of Object.keys(strings)) for (const n of ['911', '988', '211']) if (strings[k]!.includes(n)) expect(es[k], k).toContain(n); });
+  it('the language choice stays on the phone, and a place\'s own words are never machine-translated', () => {
+    const src = readFileSync(join(__dirname, '../src/i18n.ts'), 'utf8');
+    expect(src).not.toMatch(/fetch[(]|localStorage|cookie/); expect(src).toContain("idbSet('lang'");
+    expect(main).toContain('<p lang="en">${esc(r.what)}</p>');
+  });
+});
+
 describe('map', () => {
   const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
   it('reads the pipeline line format: whole 1e-5 degrees from an origin, then steps', () => {

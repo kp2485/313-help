@@ -2,7 +2,7 @@ import {
   badge, bundleAge, effectiveNow, helpAlong, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens,
   type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@detroithelp/query';
-import strings from '../../../strings/en.json';
+import { currentLang, initLang, locale, setLang, t } from './i18n.js';
 import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
@@ -37,8 +37,6 @@ const app = document.getElementById('app')!;
 
 // ---- helpers ----------------------------------------------------------------
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-const t = (key: string, p: Record<string, string | number> = {}) =>
-  ((strings as Record<string, string>)[key] ?? key).replace(/\{(\w+)\}/g, (_, k) => String(p[k] ?? ''));
 const T = (key: string, p?: Record<string, string | number>) => esc(t(key, p));
 const go = (view: View) => `data-go="${esc(JSON.stringify(view))}"`;
 const now = () => effectiveNow(new Date(), bundle?.index.generated_at);
@@ -54,10 +52,10 @@ function dayName(date: string): string {
   const diff = Math.round((Date.parse(date) - Date.parse(detroitDay(now()))) / 86400000);
   if (diff === 0) return t('day.today');
   if (diff === 1) return t('day.tomorrow');
-  return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(date));
+  return new Intl.DateTimeFormat(locale(), { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(date));
 }
 function prettyDate(d: string): string {
-  return d ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(d.slice(0, 10))) : '';
+  return d ? new Intl.DateTimeFormat(locale(), { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(d.slice(0, 10))) : '';
 }
 function openText(o: OpenResult): string {
   switch (o.state) {
@@ -93,6 +91,8 @@ function topBar(title?: string, quickExit = false): string {
   return `<header class="top inner"><button class="iconbtn" data-back aria-label="${T('back')}">${icon('back')}</button><h1 tabindex="-1">${esc(title)}</h1>
     ${quickExit ? `<button class="exit" data-exit>${T('safe.exit')}</button>` : urgentBtn}</header>`;
 }
+// The switch names the other language in that language, so a Spanish speaker can find it on an English screen.
+const langBtn = () => { const other = currentLang() === 'es' ? 'en' : 'es'; return `<p class="langrow"><button class="link" data-lang="${other}" lang="${other}">${T('lang.switch')}</button></p>`; };
 function tabBar(active?: TabId): string {
   return `<nav class="tabs" aria-label="${T('tabs.label')}">${TABS.map((x) => `<button ${go({ v: 'tab', tab: x.id })} ${x.id === active ? 'aria-current="page"' : ''}>${icon(x.icon)}<span>${T('tab.' + x.id)}</span></button>`).join('')}</nav>`;
 }
@@ -160,7 +160,7 @@ function upcoming(limit?: number): CityEvent[] {
 }
 function eventItem(e: CityEvent): string {
   const time = e.starts_at.length > 10 ? clock(e.starts_at.slice(11, 16)) : '';
-  return `<li class="event"><div class="when"><span>${esc(new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' }).format(new Date(e.starts_at.slice(0, 10))))}</span><strong>${Number(e.starts_at.slice(8, 10))}</strong></div>
+  return `<li class="event"><div class="when"><span>${esc(new Intl.DateTimeFormat(locale(), { month: 'short', timeZone: 'UTC' }).format(new Date(e.starts_at.slice(0, 10))))}</span><strong>${Number(e.starts_at.slice(8, 10))}</strong></div>
     <div><h3>${esc(e.title)}</h3><p class="what">${[time, e.location].filter(Boolean).map(esc).join(' · ')}</p>${e.url ? ext(e.url, t('events.details'), 'link') : ''}</div></li>`;
 }
 function homeTab(): string {
@@ -169,9 +169,9 @@ function homeTab(): string {
   const alerts = bundle.alerts.filter((a) => Date.parse(a.ends_at) > now().getTime() && Date.parse(a.starts_at) <= now().getTime());
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const quick = ['food', 'shelter', 'doctor', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
-  return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
+  return `<main>${langBtn()}<section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
     ${alerts.map((a) => `<div class="alert"><strong>${esc(a.title)}</strong>${a.body_plain ? `<p>${esc(a.body_plain)}</p>` : ''}${(a.actions ?? []).filter((x) => x.tel).map((x) => `<a class="btn" href="${telHref(x.tel!)}">${icon('phone', 'sm')}${esc(x.label)}</a>`).join('')}
-      <p class="foot">${T('alert.until', { when: new Intl.DateTimeFormat('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/Detroit' }).format(new Date(a.ends_at)) })}${a.source?.url ? ` · ${ext(a.source.url, t('alert.source'), 'link')}` : ''}</p></div>`).join('')}
+      <p class="foot">${T('alert.until', { when: new Intl.DateTimeFormat(locale(), { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/Detroit' }).format(new Date(a.ends_at)) })}${a.source?.url ? ` · ${ext(a.source.url, t('alert.source'), 'link')}` : ''}</p></div>`).join('')}
     ${sunset ? '' : `<button class="feature" ${go({ v: 'tab', tab: 'help' })}><span class="rowic big">${icon('help')}</span><span class="rowtx"><strong>${T('home.help_title')}</strong><small>${T('home.help_sub')}</small></span>${icon('chevron', 'dim')}</button>
     <ul class="quick">${quick.map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>`).join('')}</ul>`}
     ${ev.length ? `<div class="sechead"><h2>${T('home.events')}</h2><button class="link" ${go({ v: 'tab', tab: 'events' })}>${T('home.see_all')}</button></div><ul class="events">${ev.map(eventItem).join('')}</ul>` : ''}
@@ -267,7 +267,7 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
       <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}" aria-pressed="${savedIds.includes(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button></div>
       ${savedIds.includes(r.id) ? `<p class="foot" role="status">${T('saved.note')}</p>` : ''}</div>
     ${r.category === 'shelter.dv' ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
-    <h2>${T('detail.what')}</h2><p>${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${esc(r.eligibility)}</p>` : ''}
+    ${currentLang() !== 'en' ? `<p class="foot" lang="${currentLang()}">${T('detail.in_english')}</p>` : ''}<h2>${T('detail.what')}</h2><p lang="en">${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${esc(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: r.hours_text })}</p>` : ''}
     ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${esc(clock(n.opens_at))} – ${esc(clock(n.closes_at))}</span></li>`).join('')}</ul>` : ''}
     ${r.address ? `<h2>${T('detail.where')}</h2><address>${esc(r.address.line1)}<br>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</address>${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, quiet: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
@@ -362,7 +362,7 @@ function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string;
 }
 function about(): string {
   const i = bundle?.index;
-  return `<main>${[1, 2, 3, 4].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
+  return `<main>${langBtn()}${[1, 2, 3, 4].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
     ${i ? `<p class="foot">${T('about.data', { version: i.version, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul></main>`;
 }
@@ -427,9 +427,10 @@ function navigate(view: View): void {
 window.addEventListener('popstate', () => { if (stack.length > 1) stack.pop(); else stack[0] = fromHash(location.hash); render(); });
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again]');
   if (!el) return;
   if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
+  else if (el.dataset.lang) { await setLang(el.dataset.lang === 'es' ? 'es' : 'en'); render(false); }
   else if ('listmap' in el.dataset) { listMap = !listMap; render(false); }
   else if (el.dataset.save) { const row = bundle?.rows.find((x) => x.id === el.dataset.save); savedIds = await toggleSaved(savedIds, el.dataset.save, row?.category ?? ''); render(false); }
   else if ('savedClear' in el.dataset) { savedIds = await clearSaved(); render(false); }
@@ -493,6 +494,7 @@ async function checkForUpdate(): Promise<void> {
 }
 async function start(): Promise<void> {
   stack[0] = fromHash(location.hash);
+  await initLang();
   render(false);
   bundle = await cached();
   savedIds = await loadSaved();

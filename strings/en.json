@@ -208,6 +208,8 @@
   "report.photo_label": "Add a photo (if you want)",
   "report.photo_note": "Take a picture of the problem, not of people. Before it leaves your phone we remove the hidden data, like where and when it was taken. Only our helpers see it, and we delete it 30 days after the problem is closed.",
   "report.photo_failed": "The photo could not be sent, but your report was.",
+  "lang.switch": "Español",
+  "detail.in_english": "This place's own words are shown in English, the way they wrote them.",
   "search.title": "Search",
   "search.open": "Search by name or street",
   "search.label": "Name, street, or ZIP code",

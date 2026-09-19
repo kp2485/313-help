@@ -7,6 +7,7 @@
 // are drawn in ONE panel so neither is shown without the other; "none listed yet" describes our list, not the place.
 
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
+import { locale } from './i18n.js';
 
 type Count = number | 'lt5';
 export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number }
@@ -48,8 +49,8 @@ export function outline(h: Hood, origin: [number, number]): { lat: number; lon: 
 export interface Ui { t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; date: (d: string) => string; link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string }
 /** Per 1,000 parcels. No rate without a count we can show and a base we can defend (honesty rules 2 and 3). */
 export const rate = (c: Count | undefined, parcels: number | undefined) => (typeof c === 'number' && parcels && parcels >= 100 ? (c / parcels) * 1000 : undefined);
-const money = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
-const bigMoney = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', compactDisplay: 'long', maximumFractionDigits: 1 }).format(n);
+const money = (n: number) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+const bigMoney = (n: number) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'USD', notation: 'compact', compactDisplay: 'long', maximumFractionDigits: 1 }).format(n);
 
 /** Alphabetical inside each council district. Never sorted by a number: no league tables (rule 1). */
 export function hoodList(d: Indicators, ui: Ui, lens?: string): string {
