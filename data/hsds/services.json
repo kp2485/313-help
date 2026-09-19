@@ -2270,7 +2270,13 @@
     "phones": [
      {
       "id": "c678eb81-e87d-5587-bf18-04122f53e902",
-      "number": "313-386-9727"
+      "number": "313-386-9727",
+      "description": "Wayne Metro water help (WRAP)"
+     },
+     {
+      "id": "bb26080e-4b13-5354-ac29-1306f97b3054",
+      "number": "313-943-2150",
+      "description": "City of Dearborn water office (311)"
      }
     ],
     "schedules": [],
@@ -2532,7 +2538,13 @@
     "phones": [
      {
       "id": "1b3b5561-a7b4-5c60-8f7a-278bd441978f",
-      "number": "313-554-1095"
+      "number": "313-554-1095",
+      "description": "Medical and counseling"
+     },
+     {
+      "id": "fb45ed49-1ab9-51e3-8e33-e272270e0d76",
+      "number": "313-554-3880",
+      "description": "Dental"
      }
     ],
     "schedules": [
@@ -2569,7 +2581,7 @@
      "flags": [
       "sliding_fee"
      ],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -2673,7 +2685,7 @@
    "id": "svc_covenant_community_care_clinic",
    "category": "health.clinic"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "7d737047-66cc-59d7-9b1d-2bd9cd8aaf6c",
@@ -2717,7 +2729,13 @@
     "phones": [
      {
       "id": "4940981c-3462-5355-a88c-b30c563638c6",
-      "number": "313-626-2600"
+      "number": "313-626-2600",
+      "description": "Medical and counseling"
+     },
+     {
+      "id": "f1e41546-e895-5977-b66f-0970d638737e",
+      "number": "313-626-2620",
+      "description": "Dental"
      }
     ],
     "schedules": [
@@ -2752,7 +2770,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -2774,7 +2792,7 @@
    "id": "svc_covenant_community_care_moross",
    "category": "health.clinic"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "f256ca1f-6e5f-5d01-bfaa-49baf5ddf010",
@@ -2818,7 +2836,13 @@
     "phones": [
      {
       "id": "c5af4614-eb9f-5e76-84a6-02c1edf36824",
-      "number": "313-463-2000"
+      "number": "313-305-0311",
+      "description": "Youth in crisis, weekdays 9am-5pm (CAM intake line)"
+     },
+     {
+      "id": "147f2c83-25a5-5cbe-b7f8-71199621dc80",
+      "number": "313-463-2500",
+      "description": "Youth in crisis, nights and weekends"
      }
     ],
     "schedules": [],
@@ -2830,7 +2854,7 @@
      "flags": [
       "youth"
      ],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -2852,7 +2876,7 @@
    "id": "svc_covenant_house_detroit",
    "category": "shelter.emergency"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "7f6ceafa-af72-53af-ae4a-63fd6ef4a059",
@@ -2895,7 +2919,13 @@
     "phones": [
      {
       "id": "296c570d-414a-5f3f-92a6-252327b450e6",
-      "number": "313-831-2787"
+      "number": "313-831-2000",
+      "description": "Help and appointments"
+     },
+     {
+      "id": "85665353-5fe4-5f9c-8add-0e21084c4fb3",
+      "number": "313-831-2787",
+      "description": "Main office"
      }
     ],
     "schedules": [
@@ -2920,7 +2950,7 @@
      "flags": [
       "walk_in"
      ],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -2942,7 +2972,7 @@
    "id": "svc_crossroads_sunday_meal",
    "category": "food.meal"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "39cf864c-fa6c-547b-8186-4aa35caba960",
@@ -3451,7 +3481,8 @@
     "phones": [
      {
       "id": "f332da4b-a548-5abe-bac9-24b1d7364403",
-      "number": "313-943-2150"
+      "number": "313-943-2150",
+      "description": "City of Dearborn main line (311)"
      }
     ],
     "schedules": [],
@@ -3527,7 +3558,8 @@
     "phones": [
      {
       "id": "d388c84b-04c0-560c-a7fd-d1fefd6a0021",
-      "number": "313-943-2150"
+      "number": "313-943-2150",
+      "description": "City of Dearborn main line (311)"
      }
     ],
     "schedules": [],
@@ -3603,7 +3635,8 @@
     "phones": [
      {
       "id": "58f6fbba-a670-59a3-89ee-3bad2b2dbf63",
-      "number": "313-943-2150"
+      "number": "313-943-2150",
+      "description": "City of Dearborn main line (311)"
      }
     ],
     "schedules": [],
@@ -3679,7 +3712,8 @@
     "phones": [
      {
       "id": "fd41d37d-5b71-5211-b90c-2413779d37ec",
-      "number": "313-943-2150"
+      "number": "313-943-2150",
+      "description": "City of Dearborn main line (311)"
      }
     ],
     "schedules": [],
@@ -3960,7 +3994,8 @@
     "phones": [
      {
       "id": "109a64ca-37b5-5f5f-907d-2556b12f08ec",
-      "number": "313-743-0477"
+      "number": "313-743-0477",
+      "description": "Deo Gratias office"
      }
     ],
     "schedules": [
@@ -4049,7 +4084,8 @@
     "phones": [
      {
       "id": "99a49908-21c7-53c1-a3f9-337d29198ead",
-      "number": "313-743-0477"
+      "number": "313-743-0477",
+      "description": "Deo Gratias office"
      }
     ],
     "schedules": [],
@@ -4125,7 +4161,8 @@
     "phones": [
      {
       "id": "18591e19-8287-50a9-83aa-8ffaa0d7c8b1",
-      "number": "313-743-0477"
+      "number": "313-743-0477",
+      "description": "Deo Gratias office"
      }
     ],
     "schedules": [
@@ -4214,7 +4251,13 @@
     "phones": [
      {
       "id": "3b9ba0c2-d54e-5d54-b5dc-91b3d35e3d0f",
-      "number": "313-331-7780"
+      "number": "313-331-7780",
+      "description": "8330 On The River"
+     },
+     {
+      "id": "e8c31927-48ba-5e04-b689-1b610fa8050e",
+      "number": "313-446-4444",
+      "description": "Area Agency on Aging help line"
      }
     ],
     "schedules": [],
@@ -4291,7 +4334,13 @@
     "phones": [
      {
       "id": "c3679cc4-e9ce-5816-9dc3-003f346f7364",
-      "number": "313-494-0217"
+      "number": "313-494-0217",
+      "description": "Bicentennial Towers"
+     },
+     {
+      "id": "3c744255-9124-5e89-b043-78e9e2e3c0fc",
+      "number": "313-446-4444",
+      "description": "Area Agency on Aging help line"
      }
     ],
     "schedules": [],
@@ -4368,7 +4417,13 @@
     "phones": [
      {
       "id": "fd1c7634-9cd2-5aa2-b11f-578495db665c",
-      "number": "313-861-1285"
+      "number": "313-861-1285",
+      "description": "Delray United Action Council"
+     },
+     {
+      "id": "98c37be4-6b0b-5caa-be46-6fc4b3908b5f",
+      "number": "313-446-4444",
+      "description": "Area Agency on Aging help line"
      }
     ],
     "schedules": [],
@@ -4445,7 +4500,13 @@
     "phones": [
      {
       "id": "a56f17e8-bdf2-5f1e-beb0-6c4f0e193753",
-      "number": "313-841-8840"
+      "number": "313-841-8840",
+      "description": "LA SED"
+     },
+     {
+      "id": "fc1a7690-14d5-5494-be45-59d9c814492f",
+      "number": "313-446-4444",
+      "description": "Area Agency on Aging help line"
      }
     ],
     "schedules": [],
@@ -4664,7 +4725,13 @@
     "phones": [
      {
       "id": "e53eaf52-9759-58e8-a858-70be11fb2c09",
-      "number": "313-897-7700"
+      "number": "313-897-7700",
+      "description": "Medical"
+     },
+     {
+      "id": "0086aa69-8ca5-5517-b302-c1a0419180e8",
+      "number": "313-361-3242",
+      "description": "Dental"
      }
     ],
     "schedules": [
@@ -4699,7 +4766,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -4721,7 +4788,7 @@
    "id": "svc_detroit_community_dr_feleta_wilson_health_center",
    "category": "health.clinic"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "bde055da-b3fa-5053-ab3b-3fe5e1db3647",
@@ -4764,7 +4831,13 @@
     "phones": [
      {
       "id": "b4d4088a-8551-548c-a223-a47f63dad820",
-      "number": "313-921-5500"
+      "number": "313-921-5500",
+      "description": "Medical"
+     },
+     {
+      "id": "6c2f05ce-443f-5ea2-ac74-2ddf76ef17e3",
+      "number": "313-579-3242",
+      "description": "Dental"
      }
     ],
     "schedules": [
@@ -4799,7 +4872,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -4821,7 +4894,7 @@
    "id": "svc_detroit_community_dr_sophie_womack_health_center",
    "category": "health.clinic"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "4c2de140-0333-5cb0-9ed6-39cb671c4b0a",
@@ -4964,7 +5037,13 @@
     "phones": [
      {
       "id": "50036fc4-8443-5a64-aaf8-a91a98d0256d",
-      "number": "313-369-2600"
+      "number": "313-369-2600",
+      "description": "Medical"
+     },
+     {
+      "id": "6047d168-899f-5618-8855-b61692438c33",
+      "number": "313-366-5200",
+      "description": "Dental"
      }
     ],
     "schedules": [
@@ -5011,7 +5090,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -5033,7 +5112,7 @@
    "id": "svc_detroit_community_nolan_family_medical_center",
    "category": "health.clinic"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "2f9ea12e-b8a4-5e6e-94c0-549ced21bece",
@@ -10967,7 +11046,13 @@
     "phones": [
      {
       "id": "0210206c-6adb-5c1d-8266-8a0b017cc6fd",
-      "number": "800-241-4949"
+      "number": "800-241-4949",
+      "description": "24-hour crisis line"
+     },
+     {
+      "id": "75cd8dd8-93de-57d1-9b9f-36902aeaeb70",
+      "number": "844-462-7474",
+      "description": "Mobile crisis team (comes to you), 24 hours"
      }
     ],
     "schedules": [],
@@ -10977,7 +11062,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -10999,7 +11084,7 @@
    "id": "svc_dwihn_crisis_line",
    "category": "health.mental"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "f8541670-8fb7-5dd4-becf-8ce78680c161",
@@ -11106,7 +11191,13 @@
     "phones": [
      {
       "id": "875a05f1-52bd-5746-8262-4a6d9a9157ed",
-      "number": "313-635-3355"
+      "number": "313-635-3355",
+      "description": "Center office"
+     },
+     {
+      "id": "a19942db-69ef-57b8-b402-441fd256f06e",
+      "number": "313-933-6943",
+      "description": "Center office, second line"
      }
     ],
     "schedules": [
@@ -11129,7 +11220,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -11151,7 +11242,7 @@
    "id": "svc_ebenezer_community_walk_in_help_with_food_and_basic_need",
    "category": "food.pantry"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "826ee51f-4316-5387-a71d-08505b16c026",
@@ -11422,7 +11513,13 @@
     "phones": [
      {
       "id": "ad2912f6-e6f5-5cde-bf58-5a1c1942a3a1",
-      "number": "313-494-4600"
+      "number": "313-494-4600",
+      "description": "Food program questions"
+     },
+     {
+      "id": "207424bd-a19a-55f3-bb74-f3f882b60649",
+      "number": "313-494-4980",
+      "description": "Home delivery"
      }
     ],
     "schedules": [
@@ -11460,7 +11557,7 @@
       "walk_in",
       "seniors"
      ],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -11503,7 +11600,13 @@
     "phones": [
      {
       "id": "ba4f2abc-f896-530d-9656-b3b4c2ac2531",
-      "number": "313-494-4600"
+      "number": "313-494-4600",
+      "description": "Food program questions"
+     },
+     {
+      "id": "ab6f2165-8a21-5efd-a3f6-1faedab49fa6",
+      "number": "313-494-4980",
+      "description": "Home delivery"
      }
     ],
     "schedules": [
@@ -11541,7 +11644,7 @@
       "walk_in",
       "seniors"
      ],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -11563,7 +11666,7 @@
    "id": "svc_focus_hope_food_for_seniors",
    "category": "food.pantry"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "9ccf3101-48b6-5b9c-ad54-eeb1f048101f",
@@ -12110,7 +12213,13 @@
     "phones": [
      {
       "id": "590e4d1d-b068-5fb1-a016-35b24ae52219",
-      "number": "313-579-1000"
+      "number": "313-579-1000",
+      "description": "Main line"
+     },
+     {
+      "id": "f31ab2bf-aaed-5d47-945c-40e024c072c3",
+      "number": "313-309-1300",
+      "description": "Charlevoix office, where food is given out"
      }
     ],
     "schedules": [],
@@ -12120,7 +12229,7 @@
      "hsds_status": "active",
      "availability": "call_first",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -12142,7 +12251,7 @@
    "id": "svc_franklin_wright_food_and_clothes",
    "category": "food.pantry"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "a89c8d1a-4c48-5cfb-93cd-a8037db2cbe2",
@@ -18184,7 +18293,8 @@
     "phones": [
      {
       "id": "12e4d1ae-6cd2-5ec7-b662-cc207a46af86",
-      "number": "313-493-9129 ext. 1"
+      "number": "313-493-9129 ext. 1",
+      "description": "St. Suzanne front desk (press 1)"
      }
     ],
     "schedules": [
@@ -18273,7 +18383,8 @@
     "phones": [
      {
       "id": "ba8bf82c-ed9c-532e-b566-7c92f8df6217",
-      "number": "313-493-9129"
+      "number": "313-493-9129",
+      "description": "St. Suzanne front desk (press 1)"
      }
     ],
     "schedules": [
@@ -18362,7 +18473,8 @@
     "phones": [
      {
       "id": "ec95dfa7-01c0-51c2-8a74-6975aadf1510",
-      "number": "313-493-9129"
+      "number": "313-493-9129",
+      "description": "St. Suzanne front desk (press 1)"
      }
     ],
     "schedules": [],
@@ -18681,7 +18793,13 @@
     "phones": [
      {
       "id": "55e08627-aaf3-5239-91fd-431a86c52cd3",
-      "number": "313-366-2000"
+      "number": "313-366-2000",
+      "description": "Office"
+     },
+     {
+      "id": "81252a75-6ac0-5c38-9f70-82752dbba916",
+      "number": "313-369-3977",
+      "description": "Pharmacy"
      }
     ],
     "schedules": [
@@ -18704,7 +18822,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -18726,7 +18844,7 @@
    "id": "svc_the_wellness_east_medical_center",
    "category": "health.clinic"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "82e399ee-6b94-5497-aad2-3d4cf063f9fa",
@@ -19110,7 +19228,13 @@
     "phones": [
      {
       "id": "106d253e-6e9f-5990-a456-30a03159eaf5",
-      "number": "313-871-1926"
+      "number": "313-871-1926",
+      "description": "Clinic"
+     },
+     {
+      "id": "2e63144d-3233-5f76-a628-ef3a2c45fc95",
+      "number": "586-358-3455",
+      "description": "After hours (not emergencies)"
      }
     ],
     "schedules": [
@@ -19145,7 +19269,7 @@
      "hsds_status": "active",
      "availability": "scheduled",
      "flags": [],
-     "checked_at_entry": "2026-09-18",
+     "checked_at_entry": "2026-09-19",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
      "last_confirm_method": null,
@@ -19167,7 +19291,7 @@
    "id": "svc_wayne_county_hamtramck_health_center",
    "category": "health.clinic"
   },
-  "assured_date": "2026-09-18"
+  "assured_date": "2026-09-19"
  },
  {
   "id": "940ce8a2-c00e-5b0b-a2c7-9f89a322246f",
@@ -19197,7 +19321,8 @@
     "phones": [
      {
       "id": "35f0e9fa-b16c-5d47-bd2f-22711f04094c",
-      "number": "313-388-9799"
+      "number": "313-388-9799",
+      "description": "Wayne Metro Connect Center"
      }
     ],
     "schedules": [
@@ -19299,7 +19424,8 @@
     "phones": [
      {
       "id": "44957ea9-5034-5cc7-a28b-0bfdc7beeadb",
-      "number": "313-388-9799"
+      "number": "313-388-9799",
+      "description": "Wayne Metro Connect Center"
      }
     ],
     "schedules": [
@@ -19379,7 +19505,8 @@
     "phones": [
      {
       "id": "28b503cc-2637-50ac-8195-21f2172092d5",
-      "number": "313-388-9799"
+      "number": "313-388-9799",
+      "description": "Wayne Metro Connect Center"
      }
     ],
     "schedules": [
@@ -19459,7 +19586,8 @@
     "phones": [
      {
       "id": "b5a53af5-ecfe-5d8b-b310-1e4440e434b9",
-      "number": "313-388-9799"
+      "number": "313-388-9799",
+      "description": "Wayne Metro Connect Center"
      }
     ],
     "schedules": [
@@ -19539,7 +19667,8 @@
     "phones": [
      {
       "id": "77af6045-7c22-5510-add6-fd3f86467867",
-      "number": "313-388-9799"
+      "number": "313-388-9799",
+      "description": "Wayne Metro Connect Center"
      }
     ],
     "schedules": [
