@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@detroithelp/query": "workspace:*",
-    "@noble/ed25519": "^2.1.0"
+    "@noble/ed25519": "^3.2.0"
   },
   "devDependencies": {
-    "typescript": "^5.6.0",
-    "vite": "^5.4.0",
-    "vitest": "^2.1.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.20.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1"
   }
 }

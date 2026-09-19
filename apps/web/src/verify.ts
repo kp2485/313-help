@@ -2,6 +2,7 @@
 // other file. The app pins public keys at build time and refuses anything else, so a tampered
 // CDN, feed, or cache cannot put a wrong phone number on someone's screen.
 // @noble/ed25519 rather than WebCrypto Ed25519: older Android browsers don't have the latter.
+// zip215: false = strict RFC 8032 checking. We make our own signatures with Node, so nothing valid is lost.
 
 import * as ed from '@noble/ed25519';
 
@@ -12,7 +13,7 @@ const rawKey = (spkiB64: string) => b64(spkiB64).slice(-32);
 
 export async function signatureOk(indexBytes: Uint8Array, signatureB64: string, pinnedSpkiB64: string[]): Promise<boolean> {
   for (const key of pinnedSpkiB64) {
-    try { if (await ed.verifyAsync(b64(signatureB64), indexBytes, rawKey(key))) return true; } catch { /* try the next pinned key */ }
+    try { if (await ed.verifyAsync(b64(signatureB64), indexBytes, rawKey(key), { zip215: false })) return true; } catch { /* try the next pinned key */ }
   }
   return false;
 }

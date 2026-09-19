@@ -7,7 +7,8 @@ import {
 // Node resolves rrule's CommonJS build (everything under `default`); bundlers resolve its ESM build
 // (named exports). Take whichever is there.
 type RRuleModule = typeof import('rrule');
-const RRule: RRuleModule['RRule'] = (rrulePkg as unknown as RRuleModule).RRule ?? (rrulePkg as unknown as { default: RRuleModule }).default.RRule;
+// Reflect.get: a bundler sees the ESM build has no default export and warns about a plain `.default`.
+const RRule: RRuleModule['RRule'] = (rrulePkg as unknown as RRuleModule).RRule ?? (Reflect.get(rrulePkg, 'default') as RRuleModule).RRule;
 
 const CLOSES_SOON_MINUTES = 30;
 const LOOKAHEAD_DAYS = 120;
