@@ -237,6 +237,49 @@ describe('map', () => {
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
 });
 
+describe('service worker', () => {
+  // Runs public/sw.js against a fake browser: records what it would cache and which requests it takes over.
+  const load = (net: (url: string) => { ok: boolean; body: string }) => {
+    const handlers: Record<string, (e: unknown) => void> = {};
+    const stored = new Map<string, string>();
+    const cache = {
+      put: async (req: string | { url: string }, res: { body: string }) => { stored.set(typeof req === 'string' ? req : new URL(req.url).pathname, res.body); },
+      addAll: async (urls: string[]) => { for (const u of urls) stored.set(u, 'x'); },
+      match: async (req: string | { url: string }) => { const k = typeof req === 'string' ? req : new URL(req.url).pathname; return stored.has(k) ? { body: stored.get(k)! } : undefined; },
+    };
+    const self = { addEventListener: (n: string, f: (e: unknown) => void) => { handlers[n] = f; }, skipWaiting: () => {}, clients: { claim: () => {} } };
+    const caches = { open: async () => cache, keys: async () => [], delete: async () => true, match: cache.match };
+    const fetchFn = async (req: { url: string }) => { const r = net(req.url); return { ...r, clone: () => ({ ...r }) }; };
+    new Function('self', 'caches', 'fetch', 'location', readFileSync(join(__dirname, '../public/sw.js'), 'utf8'))(self, caches, fetchFn, new URL('https://app.test/'));
+    const request = async (path: string, mode = 'no-cors', method = 'GET') => {
+      let taken: Promise<unknown> | null = null;
+      handlers.fetch!({ request: { url: 'https://app.test' + path, mode, method }, respondWith: (p: Promise<unknown>) => { taken = p; } });
+      const res = taken ? await taken : null;
+      await new Promise((r) => setTimeout(r, 0));
+      return res;
+    };
+    return { stored, request, handlers };
+  };
+  it('never touches the API, the steward page, or the bundle', async () => {
+    const sw = load(() => ({ ok: true, body: 'x' }));
+    for (const p of ['/v1/reports', '/v1/steward/queue', '/admin', '/admin/', '/data/bundle/v1/index.json']) {
+      expect(await sw.request(p, p.startsWith('/admin') ? 'navigate' : 'cors'), p).toBeNull();
+    }
+    expect([...sw.stored.keys()]).toEqual([]);
+  });
+  it('keeps the app page only when it loaded fine', async () => {
+    const sw = load((u) => (u.endsWith('/') ? { ok: false, body: 'error page' } : { ok: true, body: 'x' }));
+    await sw.request('/', 'navigate');
+    expect(sw.stored.has('/')).toBe(false);
+    const ok = load(() => ({ ok: true, body: 'app' }));
+    await ok.request('/', 'navigate');
+    expect(ok.stored.get('/')).toBe('app');
+  });
+  it('a newer shell name, so phones drop the old cache', () => {
+    expect(readFileSync(join(__dirname, '../public/sw.js'), 'utf8')).toMatch(/const SHELL = 'shell-v2'/);
+  });
+});
+
 describe('phone links', () => {
   it('dial the main number, then the extension after a pause (never the digits run together)', () => {
     expect(telHref('313-579-2100 ext. 4217')).toBe('tel:+13135792100,4217');
