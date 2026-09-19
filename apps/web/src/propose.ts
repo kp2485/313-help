@@ -2,7 +2,7 @@
 // name, kind of help, address, times, phone, a note, and how they know. Nothing about the person: no
 // account, no device id, no location. A steward checks every proposal before it can appear (docs/04).
 
-import { idbGet, idbSet } from './data.js';
+import { outbox, retryable, type Sent } from './outbox.js';
 
 export const HOW_KNOWN = ['run_it', 'volunteer', 'went_there', 'heard'] as const;
 /** Kinds of help a person can pick. There is no choice for a domestic-violence shelter: those addresses
@@ -23,27 +23,21 @@ export function buildProposal(form: Record<string, string>): Proposal | null {
   return out;
 }
 
-async function post(p: Proposal): Promise<{ ok: boolean; ref?: string }> {
+async function post(p: Proposal): Promise<Sent<string>> {
   try {
     const res = await fetch('/v1/proposals', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(p), credentials: 'omit', referrerPolicy: 'no-referrer' });
-    if (res.status >= 500) return { ok: false };
+    if (retryable(res.status)) return { sent: false };
     const ref = res.ok ? ((await res.json().catch(() => ({}))) as { ref?: string }).ref : undefined;
-    return { ok: true, ref };           // a 4xx will never succeed later; don't keep it
-  } catch { return { ok: false }; }
+    return { sent: true, result: ref };  // any other 4xx will never succeed later; don't keep it
+  } catch { return { sent: false }; }
 }
+
+const proposals = outbox<Proposal, string>('proposals', 10, post);
 
 /** Sends now if it can; otherwise keeps it on the phone and tries again later (docs/05 "Offline"). */
 export async function submitProposal(p: Proposal): Promise<{ state: 'sent' | 'queued'; ref?: string }> {
-  const r = await post(p);
-  if (r.ok) return { state: 'sent', ref: r.ref };
-  await idbSet('proposals', [...((await idbGet<Proposal[]>('proposals')) ?? []), p].slice(-10));
-  return { state: 'queued' };
+  const r = await proposals.submit(p);
+  return r.sent ? { state: 'sent', ...(r.result ? { ref: r.result } : {}) } : { state: 'queued' };
 }
 
-export async function flushProposals(): Promise<void> {
-  const queue = (await idbGet<Proposal[]>('proposals')) ?? [];
-  if (!queue.length) return;
-  const left: Proposal[] = [];
-  for (const p of queue) if (!(await post(p)).ok) left.push(p);
-  await idbSet('proposals', left);
-}
+export const flushProposals = () => proposals.flush();

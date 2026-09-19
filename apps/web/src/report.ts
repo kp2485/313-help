@@ -2,6 +2,7 @@
 // note, a time, and a one-day hash. Nothing else exists to send: there is no account and no device id.
 
 import { idbGet, idbSet } from './data.js';
+import { outbox, retryable, type Sent } from './outbox.js';
 
 export const LISTING_KINDS = ['closed_permanently', 'moved', 'wrong_hours', 'wrong_phone', 'out_of_stock', 'wrong_info'] as const;
 export const PLACE_KINDS = ['light_out', 'glass_trash', 'flooding_ice', 'path_damaged', 'overgrown', 'broken_fixture', 'restroom', 'dumping'] as const;
@@ -73,24 +74,18 @@ export async function uploadPhoto(photo: Blob): Promise<string | null> {
   } catch { return null; }
 }
 
-async function post(r: Report): Promise<boolean> {
+async function post(r: Report): Promise<Sent<undefined>> {
   try {
     const res = await fetch('/v1/reports', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(r), credentials: 'omit', referrerPolicy: 'no-referrer' });
-    return res.status < 500;   // a 4xx will never succeed later; don't keep it
-  } catch { return false; }
+    return { sent: !retryable(res.status) };   // any other 4xx will never succeed later; don't keep it
+  } catch { return { sent: false }; }
 }
+
+const reports = outbox<Report>('queue', 50, post);
 
 /** Sends now if it can; otherwise keeps it on the phone and tries again later. */
 export async function submit(r: Report): Promise<'sent' | 'queued'> {
-  if (await post(r)) return 'sent';
-  await idbSet('queue', [...((await idbGet<Report[]>('queue')) ?? []), r].slice(-50));
-  return 'queued';
+  return (await reports.submit(r)).sent ? 'sent' : 'queued';
 }
 
-export async function flush(): Promise<void> {
-  const queue = (await idbGet<Report[]>('queue')) ?? [];
-  if (!queue.length) return;
-  const left: Report[] = [];
-  for (const r of queue) if (!(await post(r))) left.push(r);
-  await idbSet('queue', left);
-}
+export const flush = () => reports.flush();

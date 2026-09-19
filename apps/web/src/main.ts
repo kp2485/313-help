@@ -9,6 +9,7 @@ import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators
 import { icon } from './icons.js';
 import { MapView, type MapDot, type MapSpec } from './map.js';
 import { CATEGORIES, HARDCODED, NEEDS, TABS, isSensitive, type Need, type TabId } from './needs.js';
+import { createRouter, type View } from './router.js';
 import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, preparePhoto, submit, uploadPhoto } from './report.js';
 import { TRANSIT } from './transit.js';
 import { FOOD_BENEFITS } from './benefits.js';
@@ -17,11 +18,6 @@ import { canSave, clearSaved, loadSaved, toggleSaved } from './saved.js';
 import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
-type View =
-  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens?: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
-  | { v: 'need'; id: string; refine?: string; all?: boolean }
-  | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
-
 let bundle: Bundle | undefined;
 let loadError = false;
 let here: { lat: number; lon: number } | null = null;   // device location, or a ZIP's center: this variable only, never stored
@@ -33,8 +29,10 @@ let indicators: Indicators | null | undefined;           // neighborhood numbers
 let listMap = false;                                      // "Show these on a map" is open on the current list
 let searchText = '';                                     // memory only: never stored, sent, or put in the URL
 const reported = new Map<string, 'sent' | 'queued' | 'sent_no_photo'>();   // this visit only, so the thank-you stays put
-const stack: View[] = [{ v: 'tab', tab: 'home' }];
 const app = document.getElementById('app')!;
+// The back stack (router.ts): memory only; the browser's history holds a random key per entry and nothing else.
+const router = createRouter(history, { sensitive: (id) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isSensitive(r.category); }, path: () => location.pathname + location.search });
+const stack = router.stack;
 
 // ---- helpers ----------------------------------------------------------------
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
@@ -178,7 +176,7 @@ function alertBox(a: Alert): string {
 function homeTab(): string {
   // No list yet (first visit with no signal, or a load that failed): the numbers that never depend on it, and the
   // overdose steps, are still one tap away.
-  if (!bundle) return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p role="status">${T(loadError ? 'home.no_data' : 'home.loading')}${loadError ? ` <a href="tel:211">211</a>` : ''}</p></section>
+  if (!bundle) return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p role="status">${T(loadError ? 'home.no_data' : 'home.loading')}${loadError ? ` <a href="tel:211">211</a>` : ''}</p>${loadError ? `<button class="btn ghost" data-retry>${T('home.retry')}</button>` : ''}</section>
     <div class="stackbtns">${callButton('emg_911')}${callButton('emg_988')}</div>
     <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}</ul></main>`;
   const sunset = retired();
@@ -385,30 +383,6 @@ function about(): string {
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul></main>`;
 }
 
-// ---- router: in-memory stack. Need screens and sensitive listings never touch the URL (audit A8). ----
-function hashFor(v: View): string | null {
-  if (v.v === 'tab') return v.tab === 'home' ? location.pathname : `#/${v.tab}`;
-  if (v.v === 'detail') { const r = bundle?.rows.find((x) => x.id === v.id); return r && isSensitive(r.category) ? null : `#/r/${v.id}`; }
-  if (v.v === 'list') return `#/c/${v.cat}`;
-  if (v.v === 'greenway') return '#/greenway';
-  if (v.v === 'segment') return `#/greenway/${v.id}`;
-  if (v.v === 'parks') return '#/parks';
-  if (v.v === 'about') return '#/about';
-  if (v.v === 'add') return '#/add';
-  if (v.v === 'hoods') return v.lens ? `#/n/lens-${v.lens}` : '#/n';
-  if (v.v === 'hood') return `#/n/${v.id}`;
-  return null; // the urgent sheet, search, saved places, and every "need" screen: no trace
-}
-function fromHash(h: string): View {
-  const m = /^#\/(r|c|n|greenway|about|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
-  if (!m) return { v: 'tab', tab: 'home' };
-  if (m[1] === 'r' && m[2]) return { v: 'detail', id: m[2] };
-  if (m[1] === 'c' && m[2]) return { v: 'list', cat: m[2] };
-  if (m[1] === 'n') return !m[2] ? { v: 'hoods' } : m[2].startsWith('lens-') ? { v: 'hoods', lens: m[2].slice(5) } : { v: 'hood', id: m[2] };
-  if (m[1] === 'greenway') return m[2] ? { v: 'segment', id: m[2] } : { v: 'greenway' };
-  if (m[1] === 'about' || m[1] === 'parks' || m[1] === 'add') return { v: m[1] };
-  return { v: 'tab', tab: m[1] as TabId };
-}
 const TAB_OF: Partial<Record<View['v'], TabId>> = { search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
 function render(focus = true): void {
   const v = stack[stack.length - 1]!;
@@ -439,19 +413,18 @@ function render(focus = true): void {
   if (focus) { window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true }); }
 }
 function navigate(view: View): void {
-  if (view.v === 'tab') { stack.length = 0; searchText = ''; }   // a tab is a fresh start, not one more screen to back out of
+  if (view.v === 'tab') searchText = '';   // a tab is a fresh start
   if (view.v !== 'detail') listMap = false;   // coming back from a place, the map is still open
   if (view.v === 'add') { proposed = null; proposeError = false; }
-  stack.push(view);
-  history.pushState({ n: stack.length }, '', hashFor(view) ?? location.pathname + location.search);
+  router.navigate(view);
   render();
 }
-window.addEventListener('popstate', () => { if (stack.length > 1) stack.pop(); else stack[0] = fromHash(location.hash); render(); });
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-retry],[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again]');
   if (!el) return;
-  if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
+  if ('retry' in el.dataset) { el.setAttribute('disabled', ''); void checkForUpdate(true); }
+  else if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
   else if (el.dataset.lang) { await setLang(el.dataset.lang === 'es' ? 'es' : 'en'); render(false); }
   else if ('listmap' in el.dataset) { listMap = !listMap; render(false); }
   else if (el.dataset.save) { const row = bundle?.rows.find((x) => x.id === el.dataset.save); savedIds = await toggleSaved(savedIds, el.dataset.save, row?.category ?? ''); render(false); }
@@ -506,29 +479,50 @@ app.addEventListener('submit', (ev) => {
 });
 
 // ---- start ------------------------------------------------------------------
-let lastCheck = 0;
-async function checkForUpdate(): Promise<void> {
-  if (Date.now() - lastCheck < 15 * 60000) return;
+// Looks for a newer list. With a list in hand, at most every 15 minutes. With none yet (a first visit that failed),
+// it tries again on its own, sooner at first and then less often, and at once when the phone comes back online or a
+// person taps "Try again". One check at a time.
+let lastCheck = 0, checking: Promise<void> | null = null, retryIn = 5000, retryTimer: ReturnType<typeof setTimeout> | undefined;
+function checkForUpdate(force = false): Promise<void> {
+  if (checking) return checking;
+  if (bundle && !force && Date.now() - lastCheck < 15 * 60000) return Promise.resolve();
   lastCheck = Date.now();
-  // A new list brings new neighborhood numbers: forget the old ones, and load again when a neighborhood screen asks.
-  try { const next = await refresh(bundle); if (next) { bundle = next; indicators = undefined; render(false); } }
-  catch (e) { console.warn('bundle refresh failed; keeping what we have', e); if (!bundle) { loadError = true; render(false); } }
+  checking = (async () => {
+    // A new list brings new neighborhood numbers: forget the old ones, and load again when a neighborhood screen asks.
+    try {
+      const next = await refresh(bundle);
+      if (next) { bundle = next; indicators = undefined; }
+      if (loadError || next) { loadError = false; render(false); }
+      retryIn = 5000;
+    } catch (e) {
+      console.warn('bundle refresh failed; keeping what we have', e);
+      if (!bundle) {
+        loadError = true; render(false);
+        clearTimeout(retryTimer);
+        retryTimer = setTimeout(() => void checkForUpdate(true), retryIn);
+        retryIn = Math.min(retryIn * 2, 5 * 60000);
+      }
+    } finally { checking = null; }
+  })();
+  return checking;
 }
 async function start(): Promise<void> {
-  stack[0] = fromHash(location.hash);
+  // Listeners first, so nothing that happens while the list loads is missed.
+  window.addEventListener('online', () => { void flush(); void flushProposals(); void checkForUpdate(!bundle); });
+  // An installed app can stay open for days. Look for a newer list whenever it comes back into view
+  // (at most every 15 minutes), so nobody is reading last week's list on a phone that has signal.
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void checkForUpdate(); });
+  // Back and forward (router.ts). A link that changes only the hash also arrives as popstate, then hashchange.
+  window.addEventListener('popstate', (e) => { if (router.popstate(e.state, location.hash)) render(); });
+  window.addEventListener('hashchange', () => { if (router.hashchange(location.hash)) render(); });
+  router.start(location.hash);
   await initLang();
   render(false);
   bundle = await cached();
   savedIds = await loadSaved();
   if (bundle) render(false);
-  await checkForUpdate();
+  await checkForUpdate(true);
   void flush(); void flushProposals();
-  window.addEventListener('online', () => { void flush(); void flushProposals(); void checkForUpdate(); });
-  // An installed app can stay open for days. Look for a newer list whenever it comes back into view
-  // (at most every 15 minutes), so nobody is reading last week's list on a phone that has signal.
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void checkForUpdate(); });
-  // A shared link opened while the app is already open only changes the hash.
-  window.addEventListener('hashchange', () => { const v = fromHash(location.hash); if (JSON.stringify(v) !== JSON.stringify(stack[stack.length - 1])) { stack.length = 0; stack.push(v); render(); } });
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;

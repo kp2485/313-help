@@ -38,6 +38,7 @@
   "home.updated": "List updated {when} · Works offline",
   "home.loading": "Getting the list…",
   "home.no_data": "We can't load the list right now. To find help near you, call",
+  "home.retry": "Try again",
   "need.food": "I need food",
   "need.shelter": "I need a safe place to sleep tonight",
   "need.overdose_now": "Someone is overdosing right now",

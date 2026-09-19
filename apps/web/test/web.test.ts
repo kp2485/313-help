@@ -238,7 +238,7 @@ describe('map', () => {
     for (const c of ['shelter.dv', 'health.mental', 'health.mental.crisis']) expect(isSensitive(c), c).toBe(true);
     for (const c of ['shelter.emergency', 'health.clinic', 'food.pantry']) expect(isSensitive(c), c).toBe(false);
     expect(main).toContain('helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s)');
-    expect(main).toContain('return r && isSensitive(r.category) ? null');
+    expect(main).toContain('sensitive: (id) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isSensitive(r.category); }');   // router.ts: no URL for these
     expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
   });
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
@@ -333,16 +333,19 @@ describe('privacy and copy rules, checked against the source', () => {
     for (const k of used) expect(strings[k], k).toBeTypeOf('string');
   });
   it('never writes to localStorage, sessionStorage, or cookies, and never sends anything', () => {
-    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts', 'hoods.ts', 'saved.ts', 'benefits.ts']) {
+    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts', 'hoods.ts', 'saved.ts', 'benefits.ts', 'outbox.ts', 'phone.ts', 'keys.ts']) {
       const src = readFileSync(join(__dirname, '../src', f), 'utf8');
       expect(src, f).not.toMatch(/localStorage|sessionStorage|document\.cookie|sendBeacon|XMLHttpRequest/);
       expect(src.match(/method:\s*'POST'/), f).toBeNull();
     }
   });
   it('need screens and search never put anything in the URL', () => {
-    expect(main).toMatch(/return null; \/\/ the urgent sheet, search, saved places, and every "need" screen: no trace/);
-    const hashFor = main.slice(main.indexOf('function hashFor'), main.indexOf('function fromHash'));
+    // Behavior: test/router.test.ts. Here: the no-trace rule is in the router, and main.ts never writes history itself.
+    const router = readFileSync(join(__dirname, '../src/router.ts'), 'utf8');
+    const hashFor = router.slice(router.indexOf('export function hashFor'), router.indexOf('export function fromHash'));
+    expect(hashFor).toMatch(/return null; \/\/ the urgent sheet, search, saved places, and every "need" screen: no trace/);
     expect(hashFor).not.toMatch(/'search'|'need'|'urgent'|'saved'/);
+    expect(main).not.toMatch(/history\.(pushState|replaceState)/);
   });
   it('what a person types (search text, ZIP) stays in a variable: never in storage, a request, or the URL', () => {
     // idbSet is the only way this app writes to the phone, and main.ts never calls it.
@@ -352,7 +355,7 @@ describe('privacy and copy rules, checked against the source', () => {
       expect(lines.length, name).toBeGreaterThan(0);
       for (const l of lines) expect(l, name).not.toMatch(/fetch\(|pushState|location\.|href=/);
     }
-    expect(main).toMatch(/if \(view\.v === 'tab'\) \{ stack\.length = 0; searchText = ''; \}/);
+    expect(main).toMatch(/if \(view\.v === 'tab'\) searchText = '';/);
     expect(main).toMatch(/<input id="q"[^>]*autocomplete="off"/);
     expect(main).toMatch(/<input name="zip"[^>]*autocomplete="off"/);
   });
