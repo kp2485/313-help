@@ -6,27 +6,28 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Pinned so a runner image change is a deliberate upgrade, not a surprise on demo day.
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6        # reads the pnpm version from package.json "packageManager"
+      - uses: actions/setup-node@v7
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
-      # Dev build: proves the seed is valid, HSDS-valid, and signable. Release builds run
-      # separately with BUNDLE_SIGNING_KEY and fail until emergency numbers have been phoned.
+      # Dev build: proves the seed is valid, HSDS-valid, and signable. Release builds run in publish.yml with
+      # BUNDLE_SIGNING_KEY, and fail when an emergency number has gone 30 days without matching its owner's page.
       - run: pnpm build:bundle
       # The PWA pins the dev key the bundle step just wrote, then builds with the bundle copied in.
       - run: pnpm --filter @detroithelp/web build
 
   # The iPhone app's copy of the query rules, held to the same fixtures as the web (schema/fixtures).
+  # Runs in the official Swift image, so the compiler version is exact and no third-party setup action is needed.
   ios-query:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container: swift:6.3-noble
     steps:
-      - uses: actions/checkout@v4
-      - uses: swift-actions/setup-swift@v2
-        with: { swift-version: '6.1' }
+      - uses: actions/checkout@v7
       - run: swift test
         working-directory: apps/ios

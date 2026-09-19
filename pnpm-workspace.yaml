@@ -3,3 +3,9 @@ packages:
   - "pipeline"
   - "apps/web"
   - "api"
+
+# pnpm 12 runs no dependency install scripts unless named here. These two only fetch or check their own
+# native binary: esbuild (used by tsx to run the pipeline) and workerd (Cloudflare's local Worker runtime).
+allowBuilds:
+  esbuild: true
+  workerd: true
