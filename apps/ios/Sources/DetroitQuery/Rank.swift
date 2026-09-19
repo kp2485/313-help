@@ -20,6 +20,7 @@ public struct Ranked: Sendable {
     public var badge: Badge
     public var miles: Double?
     public var band: Int
+    public init(row: BundleRow, open: OpenResult, badge: Badge, miles: Double?, band: Int) { self.row = row; self.open = open; self.badge = badge; self.miles = miles; self.band = band }
 }
 
 private let earthMiles = 3958.8
