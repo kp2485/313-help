@@ -89,7 +89,8 @@ export function addressOnPage(html: string, line1: string): boolean {
   const key = streetKey(line1);
   if (!key) return false;
   const [no, word] = key;
-  const between = '(?:[\\s,]+(?:[nsew]|north|south|east|west|\\d+(?:st|nd|rd|th)?)\\.?)*';
+  // Between them only a direction, a numbered street, or a saint ("5900 St. Lawrence", "12 Saint Aubin").
+  const between = '(?:[\\s,]+(?:[nsew]|north|south|east|west|st|saint|mt|mount|\\d+(?:st|nd|rd|th)?)\\.?)*';
   return new RegExp(`(?<![\\w-])${no}${between}[\\s,]+${word}\\b`, 'i').test(pageText(html));
 }
 
@@ -100,6 +101,36 @@ export interface ListingFacts { phone?: string; phone2?: string; address_1?: str
  * street address (house number and street). A listing with an address must show that too.
  */
 export function listingOnPage(html: string, r: ListingFacts): { ok: boolean; missing: string[] } {
+  // A data file (the JSON behind a map, like Gleaners'): the listing's facts must all be in ONE entry, so one
+  // place's phone can't vouch for another place's address.
+  const entries = jsonEntries(html);
+  if (entries) {
+    const tries = entries.map((e) => onPage(`<p>${e}</p>`, r));
+    return tries.find((t) => t.ok) ?? { ok: false, missing: [...tries.reduce((best, t) => (t.missing.length < best.missing.length ? t : best), { ok: false, missing: ['no entry in the data file matches'] }).missing] };
+  }
+  return onPage(html, r);
+}
+
+/** The flat entries of a JSON data file (objects whose values are text or numbers), each as one line of text. */
+export function jsonEntries(text: string): string[] | null {
+  const t = text.trim();
+  if (!/^[[{]/.test(t)) return null;
+  let data: unknown;
+  try { data = JSON.parse(t); } catch { return null; }
+  const out: string[] = [];
+  const walk = (v: unknown) => {
+    if (Array.isArray(v)) { v.forEach(walk); return; }
+    if (!v || typeof v !== 'object') return;
+    const vals = Object.values(v as Record<string, unknown>);
+    const flat = vals.filter((x) => typeof x === 'string' || typeof x === 'number');
+    if (flat.length) out.push(flat.map(String).join(' , '));
+    vals.filter((x) => x && typeof x === 'object').forEach(walk);
+  };
+  walk(data);
+  return out.length ? out : null;
+}
+
+function onPage(html: string, r: ListingFacts): { ok: boolean; missing: string[] } {
   const missing: string[] = [];
   for (const [k, v] of [['phone', r.phone], ['phone2', r.phone2]] as const) if (v && !phoneOnPage(html, v)) missing.push(`${k} ${v}`);
   if (r.address_1 && streetKey(r.address_1) && !addressOnPage(html, r.address_1)) missing.push(`street address "${r.address_1}"`);
