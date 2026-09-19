@@ -2,7 +2,7 @@ import { p, readCsv, writeCsv, type CsvRow } from './util.js';
 
 export const RESOURCE_COLUMNS = [
   'sal_id', 'svc_id', 'org_id', 'org_name', 'service_name', 'location_name', 'category', 'what', 'eligibility',
-  'address_1', 'city', 'zip', 'lat', 'lon', 'phone', 'phone_label', 'phone2', 'phone2_label', 'website',
+  'address_1', 'city', 'zip', 'lat', 'lon', 'phone', 'phone_label', 'phone2', 'phone2_label', 'phone2_source_url', 'website',
   'availability', 'hours_text', 'flags', 'notice', 'status', 'checked_at_entry', 'entry_method',
   'source_type', 'source_name', 'source_url', 'internal_note',
 ];

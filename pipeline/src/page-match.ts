@@ -94,7 +94,9 @@ export function addressOnPage(html: string, line1: string): boolean {
   return new RegExp(`(?<![\\w-])${no}${between}[\\s,]+${word}\\b`, 'i').test(pageText(html));
 }
 
-export interface ListingFacts { phone?: string; phone2?: string; address_1?: string }
+/** `phone2_source_url`: the second number is published on another owner's page (e.g. the food bank's office for a
+ *  truck stop at a church); it is checked there, not on the listing's own page (Kyle, 2026-09-19). */
+export interface ListingFacts { phone?: string; phone2?: string; phone2_source_url?: string; address_1?: string }
 
 /**
  * Does the page show this listing? Every listed phone must be on it; a listing with no phone must show its
@@ -130,9 +132,13 @@ export function jsonEntries(text: string): string[] | null {
   return out.length ? out : null;
 }
 
+/** The second number, on its own page. In a data file it only has to be in some entry (it's an office line, not a place). */
+export const phone2OnItsPage = (html: string, number: string) => phoneOnPage(html, number) || (jsonEntries(html) ?? []).some((e) => phoneOnPage(`<p>${e}</p>`, number));
+
 function onPage(html: string, r: ListingFacts): { ok: boolean; missing: string[] } {
   const missing: string[] = [];
-  for (const [k, v] of [['phone', r.phone], ['phone2', r.phone2]] as const) if (v && !phoneOnPage(html, v)) missing.push(`${k} ${v}`);
+  const phone2Here = r.phone2 && !r.phone2_source_url ? r.phone2 : undefined;
+  for (const [k, v] of [['phone', r.phone], ['phone2', phone2Here]] as const) if (v && !phoneOnPage(html, v)) missing.push(`${k} ${v}`);
   if (r.address_1 && streetKey(r.address_1) && !addressOnPage(html, r.address_1)) missing.push(`street address "${r.address_1}"`);
   if (!r.phone && !r.phone2 && !(r.address_1 && streetKey(r.address_1))) missing.push('a phone or a street address with a house number to look for');
   return { ok: missing.length === 0, missing };

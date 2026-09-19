@@ -11606,7 +11606,8 @@
     "phones": [
      {
       "id": "5afda51b-0c2a-5760-809e-736d60cfa7c9",
-      "number": "248-268-7756"
+      "number": "248-967-1500",
+      "description": "Forgotten Harvest main line"
      }
     ],
     "schedules": [],
@@ -11683,7 +11684,13 @@
     "phones": [
      {
       "id": "2598137f-713c-5854-bf52-9b052d9bef75",
-      "number": "248-219-3488"
+      "number": "248-219-3488",
+      "description": "Equity Alliance of Michigan"
+     },
+     {
+      "id": "f4cae158-9b87-58e7-a7a2-9e099dc1a45a",
+      "number": "248-967-1500",
+      "description": "Forgotten Harvest main line"
      }
     ],
     "schedules": [],
@@ -11759,7 +11766,13 @@
     "phones": [
      {
       "id": "9ddc05e5-102d-5df1-bf65-4b1dcbc8ad06",
-      "number": "313-872-2900"
+      "number": "313-872-2900",
+      "description": "Historic Little Rock church"
+     },
+     {
+      "id": "02aa18f3-7098-5d84-81ed-1c9439808ee6",
+      "number": "248-967-1500",
+      "description": "Forgotten Harvest main line"
      }
     ],
     "schedules": [
@@ -11848,7 +11861,8 @@
     "phones": [
      {
       "id": "395499d8-7880-537a-b83d-b4593c94a582",
-      "number": "248-268-7756"
+      "number": "248-967-1500",
+      "description": "Forgotten Harvest main line"
      }
     ],
     "schedules": [],
@@ -11924,7 +11938,8 @@
     "phones": [
      {
       "id": "50cf83ba-ad45-5c14-9fc4-04e51c3f6c49",
-      "number": "248-268-7756"
+      "number": "248-967-1500",
+      "description": "Forgotten Harvest main line"
      }
     ],
     "schedules": [],
@@ -12000,7 +12015,13 @@
     "phones": [
      {
       "id": "eeed441b-c99c-5f52-958d-65491b41afe2",
-      "number": "313-386-8044"
+      "number": "313-386-8044",
+      "description": "Triumph Church"
+     },
+     {
+      "id": "ea57830b-7829-539f-bba8-15c4d86abb84",
+      "number": "248-967-1500",
+      "description": "Forgotten Harvest main line"
      }
     ],
     "schedules": [

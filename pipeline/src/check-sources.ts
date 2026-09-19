@@ -10,7 +10,7 @@
 
 import { today, writeJson } from './util.js';
 import { readResources, writeResources } from './seed-io.js';
-import { fetchPage, listingOnPage, type PageResult } from './page-match.js';
+import { fetchPage, listingOnPage, phone2OnItsPage, type PageResult } from './page-match.js';
 import { RECHECK, recheckTask, type RecheckTask } from './tasks-sync.js';
 
 const cache = new Map<string, PageResult>();
@@ -37,6 +37,12 @@ for (const r of rows) {
   const got = await page(r.source_url);
   if (!got.ok) { task(r, { why: got.why }); note(r, `source page could not be read (${got.why}); check by eye`); unread++; continue; }
   const m = listingOnPage(got.html, r);
+  // A second number published on another owner's page is checked there.
+  if (r.phone2 && r.phone2_source_url) {
+    const p2 = await page(r.phone2_source_url);
+    if (!p2.ok) { m.ok = false; m.missing.push(`phone2 ${r.phone2} (its page could not be read: ${p2.why})`); }
+    else if (!phone2OnItsPage(p2.html, r.phone2)) { m.ok = false; m.missing.push(`phone2 ${r.phone2} on ${r.phone2_source_url}`); }
+  }
   task(r, { missing: m.missing });
   if (m.ok) {
     if (r.status === 'proposed') { r.status = 'active'; r.checked_at_entry = today(); r.entry_method = 'auto_check'; }

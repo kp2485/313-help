@@ -16,7 +16,7 @@ import { buildIndicators, milesToArea, nearestMiles } from '../src/indicators.js
 import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
-import { addressOnPage, isChallenge, listingOnPage, pageText, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
+import { addressOnPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
 import { GRID, crossings, encodeLine, insideRings, mergeChains, packRoads, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
@@ -222,6 +222,14 @@ describe('does the page still show this listing (one strict matcher)', () => {
     // the phone of one entry and the address of another: not a match
     expect(listingOnPage(file, { phone: '313-555-0100', address_1: '200 Oak Ave' }).ok).toBe(false);
     expect(listingOnPage(JSON.stringify({ locations: JSON.parse(file) }), { phone: '313-555-0199', address_1: '200 Oak Ave' }).ok).toBe(true);
+  });
+  it('a second number from another owner\'s page is checked on that page, not the listing\'s (Kyle, 2026-09-19)', () => {
+    const church = '<p>Truck on 2nd and 4th Fridays. Call 313-872-2900. 9000 Main St</p>';
+    const r = { phone: '313-872-2900', phone2: '248-967-1500', address_1: '9000 Main St' };
+    expect(listingOnPage(church, r).missing).toEqual(['phone2 248-967-1500']);       // without its own page, phone2 must be here
+    expect(listingOnPage(church, { ...r, phone2_source_url: 'https://foodbank.example/' }).ok).toBe(true);
+    expect(phone2OnItsPage('<footer>Office 248-967-1500</footer>', '248-967-1500')).toBe(true);
+    expect(phone2OnItsPage('<footer>Office 248-967-1599</footer>', '248-967-1500')).toBe(false);
   });
   it('a street named for a saint counts: "5900 St. Lawrence"', () => {
     expect(addressOnPage('<p>5900 St. Lawrence, Detroit</p>', '5900 St. Lawrence St')).toBe(true);
