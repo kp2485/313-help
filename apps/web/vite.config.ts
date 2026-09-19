@@ -3,6 +3,7 @@ import { cpSync, createReadStream, existsSync, readFileSync, statSync } from 'no
 import { dirname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
+import { releaseKeyProblems } from './src/keys.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const bundleDir = join(root, 'data/bundle');
@@ -11,8 +12,20 @@ const MIME: Record<string, string> = { '.json': 'application/json', '.html': 'te
 
 // Public keys the app will accept (audit A5). Release: BUNDLE_PUBLIC_KEYS="active,spare" (base64 SPKI).
 // Dev: derived from the throwaway key the pipeline writes to .keys/. Never both.
+// WEB_RELEASE=1 (set by publish.yml) is a release: it stops unless exactly two good keys are given and the list it
+// copies in was signed with the release key. A release can never fall back to the dev key.
+const release = process.env.WEB_RELEASE === '1';
 function pinnedKeys(): string[] {
   const env = process.env.BUNDLE_PUBLIC_KEYS;
+  if (release) {
+    const keys = (env ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+    const problems = releaseKeyProblems(keys);
+    if (problems.length) throw new Error(`Release web build refused: ${problems.join('; ')}. Set BUNDLE_PUBLIC_KEYS (docs/OPERATIONS.md).`);
+    const index = join(bundleDir, 'v1/index.json');
+    const signing = existsSync(index) ? (JSON.parse(readFileSync(index, 'utf8')) as { signing?: string }).signing : undefined;
+    if (signing !== 'release') throw new Error(`Release web build refused: data/bundle is ${signing ? `"${signing}"`: 'missing'}-signed. Run pnpm build:bundle:release first.`);
+    return keys;
+  }
   if (env) return env.split(',').map((s) => s.trim()).filter(Boolean);
   const dev = join(root, '.keys/dev-ed25519.pem');
   if (!existsSync(dev)) { console.warn('No pinned keys: run `pnpm build:bundle` first (dev) or set BUNDLE_PUBLIC_KEYS (release).'); return []; }

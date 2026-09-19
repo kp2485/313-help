@@ -11,6 +11,7 @@ import { FOOD_BENEFITS } from '../src/benefits.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
 import { telHref } from '../src/phone.js';
+import { releaseKeyProblems } from '../src/keys.js';
 import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
 import { build as buildReport, fitWithin, nonce, plainJpeg } from '../src/report.js';
 
@@ -241,6 +242,26 @@ describe('map', () => {
     expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
   });
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
+});
+
+describe('release builds pin two good keys', () => {
+  const key = () => generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'der' }).toString('base64');
+  it('two different Ed25519 keys pass', () => expect(releaseKeyProblems([key(), key()])).toEqual([]));
+  it('one key, three keys, the same key twice, or not a key: refused', () => {
+    const k = key();
+    expect(releaseKeyProblems([k]).join()).toMatch(/exactly two/);
+    expect(releaseKeyProblems([k, key(), key()]).join()).toMatch(/exactly two/);
+    expect(releaseKeyProblems([k, k]).join()).toMatch(/same key/);
+    const rsa = generateKeyPairSync('rsa', { modulusLength: 1024 }).publicKey.export({ type: 'spki', format: 'der' }).toString('base64');
+    expect(releaseKeyProblems([k, rsa]).join()).toMatch(/key 2 is not/);
+    expect(releaseKeyProblems([k, 'not base64!']).join()).toMatch(/key 2 is not/);
+  });
+  it('the build uses the check when WEB_RELEASE=1, and the nightly publish sets it', () => {
+    const cfg = readFileSync(join(__dirname, '../vite.config.ts'), 'utf8');
+    expect(cfg).toMatch(/const release = process\.env\.WEB_RELEASE === '1'/);
+    expect(cfg).toMatch(/releaseKeyProblems\(keys\)/);
+    expect(readFileSync(join(root, '.github/workflows/publish.yml'), 'utf8')).toMatch(/WEB_RELEASE: '1'/);
+  });
 });
 
 describe('service worker', () => {

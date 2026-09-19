@@ -24,6 +24,8 @@ export function validateRows(rows: BundleRow[], todayStr: string): Issues {
     if (seen.has(r.id)) e('duplicate id');
     seen.add(r.id);
     if (!CATEGORY.test(r.category)) e(`unknown category "${r.category}"`);
+    if (!['active', 'suspended', 'archived'].includes(r.status)) e(`unknown status "${r.status}"`);
+    if (!['scheduled', 'always', 'call_first', 'unknown'].includes(r.availability)) e(`unknown availability "${r.availability}"`);
     if (!r.name || !r.what) e('name and what are required');
     if (/�/.test(JSON.stringify(r))) e('contains a broken character (encoding problem in the source)');
 

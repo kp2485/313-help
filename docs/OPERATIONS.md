@@ -121,13 +121,13 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
    2. `pnpm check:emergency`. One bad night doesn't stop the job (`continue-on-error`).
    3. `pnpm test`.
    4. `pnpm build:bundle:release` with `BUNDLE_SIGNING_KEY`, `REPORTS_API`, `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET`.
-   5. Build the web app with `BUNDLE_PUBLIC_KEYS`.
+   5. Build the web app with `BUNDLE_PUBLIC_KEYS` and `WEB_RELEASE=1`: it refuses unless exactly two different keys (active and spare) are pinned and the list it copies in is release-signed.
    6. Deploy to Cloudflare Pages.
    7. Commit `data/hsds/`, the events file and `data/seed/emergency.csv`.
    8. Re-read open data (`ingest:opendata`, `ingest:greenway`, `ingest:city parks`, `ingest:city zips`; on the 1st of the month also `ingest:basemap` and `ingest:neighborhoods`).
    9. If any of that changed, open a pull request. Nothing from step 8 is published that night.
 
-   An emergency number that has gone 30 days without a match stops the release build at step 4. Then nothing is deployed and yesterday's bundle stays up.
+   An emergency number whose own page shows a different number (`mismatch_on`, set by step 2) stops the release build at step 4 until a person fixes `emergency.csv`. Then nothing is deployed and yesterday's bundle stays up. A page that can't be read never stops it (DECISIONS 2026-09-19).
 
 ## Secrets (names only)
 

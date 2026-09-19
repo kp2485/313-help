@@ -43,6 +43,12 @@ describe('row validation', () => {
     expect(errs({ eligibility: 'Email jane@example.org first' })).toMatch(/personal contact/);
   });
   it('rejects an unknown category', () => expect(errs({ category: 'food.pantries' })).toMatch(/unknown category/));
+  it('rejects a status or availability the app doesn\'t know (a typo must not read as open)', () => {
+    expect(errs({ status: 'Active' as never })).toMatch(/unknown status/);
+    expect(errs({ status: 'proposed' as never })).toMatch(/unknown status/);
+    expect(errs({ availability: 'open' as never })).toMatch(/unknown availability/);
+    expect(errs({ availability: 'always' })).toBe('');
+  });
   it('rejects broken characters from a bad source encoding', () => expect(errs({ hours_text: 'Mon � Fri' })).toMatch(/broken character/));
 });
 
