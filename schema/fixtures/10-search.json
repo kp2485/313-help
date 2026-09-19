@@ -40,6 +40,37 @@
       "id": "e_archived",
       "name": "Old Food Pantry",
       "status": "archived"
+    },
+    {
+      "id": "f_marys",
+      "name": "St. Mary’s Soup Kitchen",
+      "org": "St. Mary’s Parish",
+      "what": "Hot meals",
+      "address": {
+        "line1": "646 Monroe St",
+        "city": "Detroit",
+        "zip": "48226"
+      }
+    },
+    {
+      "id": "g_noor",
+      "name": "Al-Noor Center",
+      "what": "مركز النور للطعام",
+      "address": {
+        "line1": "5 Warren Ave",
+        "city": "Detroit",
+        "zip": "48228"
+      }
+    },
+    {
+      "id": "h_ymca",
+      "name": "Y.M.C.A. Pool",
+      "what": "Swim lessons",
+      "address": {
+        "line1": "1401 Broadway St",
+        "city": "Detroit",
+        "zip": "48226"
+      }
     }
   ],
   "cases": [
@@ -170,6 +201,85 @@
         "b_cafe",
         "d_moses_org"
       ]
+    },
+    {
+      "name": "an apostrophe joins: marys finds Mary’s",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "marys",
+      "expect": [
+        "f_marys"
+      ]
+    },
+    {
+      "name": "a typed straight apostrophe matches a curly one",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "mary's",
+      "expect": [
+        "f_marys"
+      ]
+    },
+    {
+      "name": "a curly apostrophe in the query works too",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "Mary’s",
+      "expect": [
+        "f_marys"
+      ]
+    },
+    {
+      "name": "St. with a dot still starts a word",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "st. marys soup",
+      "expect": [
+        "f_marys"
+      ]
+    },
+    {
+      "name": "letters that are not a-z are searchable (Arabic)",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "النور",
+      "expect": [
+        "g_noor"
+      ]
+    },
+    {
+      "name": "a hyphen separates words",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "al noor",
+      "expect": [
+        "g_noor"
+      ]
+    },
+    {
+      "name": "dots between single letters join: ymca finds Y.M.C.A.",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "ymca",
+      "expect": [
+        "h_ymca"
+      ]
+    },
+    {
+      "name": "and the dotted form finds it too",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "y.m.c.a.",
+      "expect": [
+        "h_ymca"
+      ]
+    },
+    {
+      "name": "one letter of any script is too short",
+      "fn": "search",
+      "now": "2026-09-18T17:45:00Z",
+      "text": "ن",
+      "expect": []
     }
   ]
 }

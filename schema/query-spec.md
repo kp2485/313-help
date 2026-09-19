@@ -60,8 +60,8 @@ Distance comes before openness because many users have no car. There is no fresh
 
 Search runs on the device. The typed text is never stored, sent, or put in a URL.
 
-1. **Normalize** both sides: remove accents, lowercase, turn anything that is not a letter or digit into a space.
-2. **Tokens** are the words of the query. A query with fewer than 2 letters or digits in total matches nothing.
+1. **Normalize** both sides: lowercase, decompose (NFD), remove every combining mark (Unicode category M). Letters and digits of any script (categories L and N) are kept. Apostrophes (`'` `’` `‘` `ʼ`) inside a word are removed, joining it ("Mary's" → `marys`). A dot between two single letters is removed, joining them ("U.S.A." → `usa`). Anything else that is not a letter or digit (including any other dot) separates words.
+2. **Tokens** are the words of the query. A query with fewer than 2 letters or digits in total (counted in Unicode code points) matches nothing.
 3. A row **matches** when every token is the start of a word in the searched text. Match tier: 0 = name only; 1 = name + organization; 2 = name, organization, what, who, street, ZIP.
 4. **Order**: match tier, then the one ranking rule above. Only active rows; archived rows (≤ 90 days) are matched by name by the client and shown apart, labeled.
 

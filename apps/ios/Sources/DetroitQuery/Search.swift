@@ -2,21 +2,47 @@
 // Port of packages/query/src/search.ts.
 import Foundation
 
-/// Lowercase, accents removed, anything that is not a letter or digit becomes a space.
-public func normalizeText(_ s: String) -> String {
-    let folded = s.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "en_US_POSIX")).lowercased()
-    var out = "", space = false
-    for ch in folded.unicodeScalars {
-        if (ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9") { out.unicodeScalars.append(ch); space = false }
-        else if !space { out.append(" "); space = true }
+private func isLetter(_ c: Unicode.Scalar) -> Bool {
+    switch c.properties.generalCategory {
+    case .uppercaseLetter, .lowercaseLetter, .titlecaseLetter, .modifierLetter, .otherLetter: return true
+    default: return false
     }
-    return out.trimmingCharacters(in: .whitespaces)
+}
+private func isWordScalar(_ c: Unicode.Scalar) -> Bool {
+    if isLetter(c) { return true }
+    switch c.properties.generalCategory {
+    case .decimalNumber, .letterNumber, .otherNumber: return true
+    default: return false
+    }
+}
+private func isMark(_ c: Unicode.Scalar) -> Bool {
+    switch c.properties.generalCategory {
+    case .nonspacingMark, .spacingMark, .enclosingMark: return true
+    default: return false
+    }
+}
+private let apostrophes: Set<Unicode.Scalar> = ["'", "\u{2019}", "\u{2018}", "\u{02BC}"]
+
+/// Lowercase; accents and other combining marks removed; letters and digits of any script kept. Apostrophes join
+/// ("Mary's" → "marys"); a dot joins single-letter abbreviations ("U.S." → "us") and otherwise separates, like
+/// every other character. Words are separated by one space.
+public func normalizeText(_ s: String) -> String {
+    let cs = Array(s.lowercased().decomposedStringWithCanonicalMapping.unicodeScalars.filter { !isMark($0) })
+    var out = String.UnicodeScalarView(), seg = 0   // seg: letters since the word began or the last joining dot
+    for (i, c) in cs.enumerated() {
+        if isWordScalar(c) { out.append(c); seg += 1; continue }
+        if apostrophes.contains(c), seg > 0 { continue }
+        if c == ".", seg == 1, let last = out.last, isLetter(last), i + 1 < cs.count, isLetter(cs[i + 1]) { seg = 0; continue }
+        if let last = out.last, last != " " { out.append(" ") }
+        seg = 0
+    }
+    return String(out).trimmingCharacters(in: .whitespaces)
 }
 
 /// Words of the query. Fewer than 2 letters or digits in total: no tokens.
 public func searchTokens(_ text: String) -> [String] {
     let words = normalizeText(text).split(separator: " ").map(String.init)
-    return words.joined().count < 2 ? [] : words
+    return words.joined().unicodeScalars.count < 2 ? [] : words
 }
 
 private func hits(_ tokens: [String], _ fields: [String?]) -> Bool {
