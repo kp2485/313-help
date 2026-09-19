@@ -55,7 +55,7 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 |---|---|
 | CAM (see above) | Front door for shelter |
 | 313SafeBeds | Partner. Link/embed public bed status when available. Do not model beds ourselves |
-| THAW, Wayne Metro Community Action Agency (Connect Center 313-388-9799; 734-284-6999 appears only on older flyers), DTE Energy assistance, Detroit Water & Sewerage assistance | Utility shutoff help — these are the "my utilities are being shut off" triage targets. Tier B |
+| THAW, Wayne Metro Community Action Agency (Connect Center 313-388-9799; 734-284-6999 is the Out-Wayne County Continuum of Care's housing-crisis line, our Dearborn shelter line, not a utility number), DTE Energy assistance, Detroit Water & Sewerage assistance | Utility shutoff help — these are the "my utilities are being shut off" triage targets. Tier B |
 | Detroit Housing Commission (313-877-8000) | Low-income housing |
 | Eviction defense (Detroit right-to-counsel, 36th District Court self-help), UCHC | v1.1 |
 
