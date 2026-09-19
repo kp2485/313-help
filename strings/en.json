@@ -303,6 +303,8 @@
   "about.sig_ok": "This list is signed, and the signature checked out.",
   "about.sig_dev": "Test build: this list is signed with a test key.",
   "about.open": "The code and the list are open for anyone to check or reuse.",
+  "about.maker": "Made by Linwood Technologies LLC.",
+  "about.contact": "Questions or corrections:",
   "about.credits_h": "Where our information comes from",
   "about.credits_orgs": "{count} sources: the websites of churches, clinics, food pantries and other groups, and a few public lists. Every listing says which one.",
   "about.credits_foodbanks": "Gleaners Community Food Bank and Forgotten Harvest, for their pantries and mobile food trucks.",

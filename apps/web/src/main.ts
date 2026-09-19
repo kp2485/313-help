@@ -389,7 +389,7 @@ function privacy(): string {
     <h2>${T('privacy.never_h')}</h2><p>${T('privacy.never')}</p>
     <h2>${T('privacy.reset_h')}</h2><p>${T('privacy.reset')}</p>
     ${keyReset ? `<p class="banner ok" role="status">${icon('check', 'sm')} ${T('privacy.reset_done')}</p>` : `<button class="btn ghost" data-reset-key>${T('privacy.reset_btn')}</button>`}
-    <p class="foot">${T('about.p3')}</p></main>`;
+    <p class="foot">${T('about.maker')} ${T('about.p3')}</p>${contactLine()}</main>`;
 }
 function about(): string {
   const i = bundle?.index;
@@ -399,11 +399,15 @@ function about(): string {
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul>
     ${credits()}</main>`;
 }
+// Who makes the app, and how to reach them (Kyle, 2026-09-19). An organization's address, not a resident's.
+const CONTACT = 'kyle@linwoodtechnologies.com';
+const contactLine = () => `<p class="foot">${T('about.contact')} <a href="mailto:${CONTACT}">${CONTACT}</a></p>`;
+
 // Everyone whose information is in the app (NOTICE has the full list). The count comes from the list itself.
 function credits(): string {
   const groups = new Set((bundle?.rows ?? []).map((r) => r.facts.source?.name).filter(Boolean)).size;
   return `<h2>${T('about.credits_h')}</h2><ul class="plain">${groups ? `<li>${T('about.credits_orgs', { count: groups })}</li>` : ''}
-    ${['about.credits_foodbanks', 'about.credits_city', 'about.credits_census'].map((k) => `<li>${T(k)}</li>`).join('')}</ul><p>${T('about.credits_thanks')}</p>`;
+    ${['about.credits_foodbanks', 'about.credits_city', 'about.credits_census'].map((k) => `<li>${T(k)}</li>`).join('')}</ul><p>${T('about.credits_thanks')}</p><p class="foot">${T('about.maker')}</p>${contactLine()}`;
 }
 
 const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };

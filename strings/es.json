@@ -303,6 +303,8 @@
   "about.sig_ok": "Esta lista tiene firma, y la firma es correcta.",
   "about.sig_dev": "Versión de prueba: esta lista está firmada con una clave de prueba.",
   "about.open": "El código y la lista son abiertos para que cualquiera los revise o los use.",
+  "about.maker": "Hecha por Linwood Technologies LLC.",
+  "about.contact": "Preguntas o correcciones:",
   "about.credits_h": "De dónde viene nuestra información",
   "about.credits_orgs": "{count} fuentes: los sitios web de iglesias, clínicas, despensas de comida y otros grupos, y algunas listas públicas. Cada lugar dice de cuál viene.",
   "about.credits_foodbanks": "Gleaners Community Food Bank y Forgotten Harvest, por sus despensas y camiones de comida.",
