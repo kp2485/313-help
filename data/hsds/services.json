@@ -1848,7 +1848,7 @@
   ],
   "x_detroit": {
    "id": "svc_covenant_house_detroit",
-   "category": "youth"
+   "category": "shelter.emergency"
   },
   "assured_date": "2026-09-18"
  },

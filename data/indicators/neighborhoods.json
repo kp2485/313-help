@@ -2555,10 +2555,10 @@
      "food": 1,
      "health": 2,
      "harm": 5,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 1,
      "hygiene": 0,
-     "youth": 1,
+     "youth": 0,
      "rec": 2
     },
     "nearest_miles": {
@@ -2674,10 +2674,10 @@
      "food": 0,
      "health": 2,
      "harm": 2,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 1,
      "hygiene": 0,
-     "youth": 1,
+     "youth": 0,
      "rec": 0
     },
     "nearest_miles": {
@@ -3689,10 +3689,10 @@
      "food": 0,
      "health": 0,
      "harm": 1,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 1,
+     "youth": 0,
      "rec": 0
     },
     "nearest_miles": {
@@ -3800,10 +3800,10 @@
      "food": 2,
      "health": 1,
      "harm": 4,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
-     "youth": 1,
+     "youth": 0,
      "rec": 2
     },
     "nearest_miles": {
@@ -14702,10 +14702,10 @@
      "food": 1,
      "health": 1,
      "harm": 2,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
-     "youth": 1,
+     "youth": 0,
      "rec": 1
     },
     "nearest_miles": {
