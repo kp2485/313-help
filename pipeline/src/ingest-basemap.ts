@@ -15,7 +15,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type { Segment } from '@detroithelp/query';
-import { BBOX, p } from './util.js';
+import { BBOX, p, today } from './util.js';
 
 const ORG = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services';
 const ROADS = `${ORG}/City_of_Detroit_Roads/FeatureServer/0`;
@@ -155,7 +155,7 @@ async function geojson(layer: string, fields: string, page: number): Promise<any
 }
 const lastEdited = async (layer: string) => {
   const m = (await (await fetch(`${layer}?f=json`, { headers: UA })).json()) as any;
-  return new Date(m.editingInfo?.dataLastEditDate ?? m.editingInfo?.lastEditDate).toISOString().slice(0, 10);
+  return today(new Date(m.editingInfo?.dataLastEditDate ?? m.editingInfo?.lastEditDate));
 };
 const linesOf = (g: any): Pt[][] => (!g ? [] : g.type === 'LineString' ? [g.coordinates] : g.type === 'MultiLineString' ? g.coordinates : []);
 const ringsOf = (g: any): Pt[][] => (!g ? [] : g.type === 'Polygon' ? g.coordinates : g.type === 'MultiPolygon' ? g.coordinates.flat() : []);

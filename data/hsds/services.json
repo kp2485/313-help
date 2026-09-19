@@ -483,6 +483,287 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "8f9a836f-c1f2-57ea-8c5c-44f531fe6171",
+  "name": "B'moor Nourished Free Pantry",
+  "status": "active",
+  "description": "Free groceries, and you choose what you take. Bring your own bags and come early, because it closes when the food runs out.",
+  "eligibility_description": "No ID and no sign-up needed. You can pick up for another household if you tell the door volunteer.",
+  "url": "https://brightmoorartisans.org/bmoor-nourished-free-pantry",
+  "organization": {
+   "id": "b6353148-651e-5ca7-b0bb-34746c982bf5",
+   "name": "Brightmoor Artisans Collective",
+   "description": "Brightmoor Artisans Collective",
+   "x_detroit": {
+    "id": "org_brightmoor_artisans_collective"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d6ae0de6-12e6-5630-9959-6f003d656f3a",
+    "location": {
+     "id": "b805c5e9-bffe-5a7c-8897-0f57a7782b35",
+     "name": "B'moor Nourished Free Pantry, Brightmoor Artisans Collective",
+     "location_type": "physical",
+     "latitude": 42.400186,
+     "longitude": -83.265666,
+     "addresses": [
+      {
+       "id": "bb7481e8-6b89-53da-8588-edc1204f0566",
+       "address_1": "22735 Fenkell St.",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_brightmoor_artisans_b_moor_nourished_free_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "c8d6e145-8c1d-54b2-afb1-c0af88757f44",
+      "number": "313-437-1057"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "264d3c30-104e-5fa5-81d5-3a68a552ce63",
+      "freq": "WEEKLY",
+      "byday": "FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "15:00",
+      "closes_at": "16:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_brightmoor_artisans_b_moor_nourished_free_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Brightmoor Artisans Collective website",
+      "url": "https://brightmoorartisans.org/contact-us"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_brightmoor_artisans_b_moor_nourished_free_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "64150a11-f7cf-5831-8172-da9656862564",
+  "name": "Client-choice food pantry",
+  "status": "active",
+  "description": "Pick out your own groceries, by appointment. Closed the first Monday of each month and the last week of each month.",
+  "eligibility_description": "Call to make an appointment.",
+  "url": "https://brightmoorconnection.org/",
+  "organization": {
+   "id": "656ec27b-c8ae-5279-a655-c01f61fa573a",
+   "name": "Brightmoor Connection Food Pantry",
+   "description": "Brightmoor Connection Food Pantry",
+   "x_detroit": {
+    "id": "org_brightmoor_connection_food_pantry"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "88551ed5-ffbb-5e8a-8734-c2c15ab9c688",
+    "location": {
+     "id": "0ed4a0ed-f7e7-5a94-82f9-3785a91c8553",
+     "name": "Client-choice food pantry",
+     "location_type": "physical",
+     "latitude": 42.411827,
+     "longitude": -83.245806,
+     "addresses": [
+      {
+       "id": "66314c9e-bacd-5540-aa4a-5a98cc2745a3",
+       "address_1": "20740 Grand River Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_brightmoor_connection_client_choice_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "ecb2fe6f-2037-5e32-8b3f-bde1374bb50b",
+      "number": "313-740-7688"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "dcce0a7f-b00d-53dd-a4ac-9b1926121f22",
+      "freq": "WEEKLY",
+      "byday": "MO",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "18:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "1ce65e4d-d484-5ac4-a2d5-82c65f9af782",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "14:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "3d0d16e5-8119-53eb-8368-879fa912a4e5",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_brightmoor_connection_client_choice_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Brightmoor Connection Food Pantry website",
+      "url": "https://brightmoorconnection.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_brightmoor_connection_client_choice_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "e35b2caa-374b-55cc-98cb-127165c193e7",
+  "name": "Brilliant Detroit, Brightmoor",
+  "status": "active",
+  "description": "A neighborhood house with free programs for young kids and their families, like reading help, fitness, and community meals. Call for times.",
+  "eligibility_description": "Families do not pay anything.",
+  "url": "https://brilliantcities.org/",
+  "organization": {
+   "id": "1769b9fd-aea6-5154-b6c8-11d93842204f",
+   "name": "Brilliant Detroit",
+   "description": "Brilliant Detroit",
+   "x_detroit": {
+    "id": "org_brilliant_detroit"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "ae7b72f3-2bf0-5dfa-a5ab-c027e5bf5cf2",
+    "location": {
+     "id": "e72b0ef2-ccc9-52ca-af3e-b27b2625690e",
+     "name": "Brilliant Detroit, Brightmoor",
+     "location_type": "physical",
+     "latitude": 42.403117,
+     "longitude": -83.239717,
+     "addresses": [
+      {
+       "id": "39b17267-0f9d-528a-9f58-8112a3e4303f",
+       "address_1": "15509 Heyden Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_brilliant_detroit_brightmoor"
+     }
+    },
+    "phones": [
+     {
+      "id": "98f9be2d-386e-50be-b17b-bdc2a51ee5aa",
+      "number": "313-483-8896"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_brilliant_detroit_brightmoor",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Brilliant Detroit website",
+      "url": "https://brilliantcities.org/hub/brightmoor/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_brilliant_detroit_brightmoor",
+   "category": "youth"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "538199e4-1d55-5014-b107-7f5b12891d04",
   "name": "Brilliant Detroit Cody Rouge hub",
   "status": "active",
@@ -1133,6 +1414,95 @@
   "x_detroit": {
    "id": "svc_chass_southwest",
    "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "3a2430da-01e4-59e6-8e32-9ce1b3654c77",
+  "name": "Hot meals",
+  "status": "active",
+  "description": "Hot meals four days a week.",
+  "url": "https://citycovenantchurch.org/",
+  "organization": {
+   "id": "0b50ef25-c7c7-5671-821f-947c2bc4097f",
+   "name": "City Covenant Church",
+   "description": "City Covenant Church",
+   "x_detroit": {
+    "id": "org_city_covenant_church"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f29c375f-2cca-5a2e-89bc-5ea5e6e140ab",
+    "location": {
+     "id": "a2d3bb74-693c-501b-9250-219e60620bd2",
+     "name": "Hot meals, City Covenant Church",
+     "location_type": "physical",
+     "latitude": 42.385217,
+     "longitude": -83.24091,
+     "addresses": [
+      {
+       "id": "01374cd0-0b91-57cb-8561-42e3c7ebe79f",
+       "address_1": "13624 Stout Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_city_covenant_hot_meals"
+     }
+    },
+    "phones": [
+     {
+      "id": "e571316a-e092-5488-84c4-b66abf4da756",
+      "number": "313-535-1084"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "3cbdbf88-298a-5ac2-9d8b-536a1a84a1d5",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH",
+      "dtstart": "2026-09-14",
+      "opens_at": "16:00",
+      "closes_at": "18:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_city_covenant_hot_meals",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "City Covenant Church website",
+      "url": "https://citycovenantchurch.org/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_city_covenant_hot_meals",
+   "category": "food.meal"
   },
   "assured_date": "2026-09-18"
  },
@@ -2836,6 +3206,196 @@
   ],
   "x_detroit": {
    "id": "svc_detroit_friendship_nutrition_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "16dbbe0a-d334-5180-b57e-20dcbd406208",
+  "name": "Neighborhood Wellness Center at WCCCD Northwest Campus",
+  "status": "active",
+  "description": "Checks for blood pressure, diabetes, and cholesterol at no cost, plus flu and COVID-19 tests. Health workers can help you find other help.",
+  "url": "https://detroitmi.gov/departments/detroit-health-department",
+  "organization": {
+   "id": "25351acd-ca5e-5179-8c06-106adb26c918",
+   "name": "Detroit Health Department",
+   "description": "Detroit Health Department",
+   "x_detroit": {
+    "id": "org_detroit_health_department"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "1f0a721a-7f8a-5249-a410-06587c9bc30b",
+    "location": {
+     "id": "638363d8-8d55-59df-9b94-7f28d0a23fe1",
+     "name": "Neighborhood Wellness Center at WCCCD Northwest Campus, Detroit Health Department",
+     "location_type": "physical",
+     "latitude": 42.419265,
+     "longitude": -83.221564,
+     "addresses": [
+      {
+       "id": "2d0bc214-b553-58e9-bbde-a8f52735f196",
+       "address_1": "8200 West Outer Drive",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_health_neighborhood_wellness_center_at_wcccd_nor"
+     }
+    },
+    "phones": [
+     {
+      "id": "d7433a22-7245-57cd-8986-25808f1c04cb",
+      "number": "313-943-4000"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "d08bb9d5-26aa-5e41-84eb-f91ffbe58547",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "7fec4ddd-9acc-5d67-acc7-60a2236f8115",
+      "freq": "WEEKLY",
+      "byday": "WE",
+      "dtstart": "2026-09-14",
+      "opens_at": "11:00",
+      "closes_at": "19:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "d622e726-6f27-5260-8bf3-3fe2ed55df1c",
+      "freq": "WEEKLY",
+      "byday": "SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "10:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_detroit_health_neighborhood_wellness_center_at_wcccd_nor",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Health Department website",
+      "url": "https://detroitmi.gov/departments/detroit-health-department/detroit-health-department-locations"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_health_neighborhood_wellness_center_at_wcccd_nor",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "45c03ef9-cca1-5520-9c94-95b24d80a737",
+  "name": "Food pantry",
+  "status": "active",
+  "description": "Groceries from the church food pantry once a month.",
+  "url": "https://detroitnorthwestmi.adventistchurch.org/",
+  "organization": {
+   "id": "f291d6c9-6a70-5fca-bf18-5fc4c1d20915",
+   "name": "Detroit Northwest Seventh-day Adventist Church",
+   "description": "Detroit Northwest Seventh-day Adventist Church",
+   "x_detroit": {
+    "id": "org_detroit_northwest_seventh_day_adventist_"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "03be4073-7917-55d1-aaab-171d8253abcc",
+    "location": {
+     "id": "ca03ed7e-8835-5b4d-b755-ce8847cb33d5",
+     "name": "Food pantry, Detroit Northwest Seventh-day Adventist Church",
+     "location_type": "physical",
+     "latitude": 42.390912,
+     "longitude": -83.246853,
+     "addresses": [
+      {
+       "id": "bf345ed5-35ae-523b-a46b-f8a3a41ba4e5",
+       "address_1": "14301 Burt Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_detroit_northwest_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "dfff10d9-4a9b-5775-905e-ee5aff285388",
+      "number": "313-538-5755"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_detroit_northwest_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "hours_text": "Every 4th Thursday at 10am",
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Detroit Northwest Seventh-day Adventist Church website",
+      "url": "https://detroitnorthwestmi.adventistchurch.org/ministries/community-services/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_northwest_food_pantry",
    "category": "food.pantry"
   },
   "assured_date": "2026-09-18"
@@ -9182,6 +9742,83 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "a8c30775-0c2c-50c4-97b1-5489e88bb859",
+  "name": "Health center at Henry Ford High School",
+  "status": "active",
+  "description": "A small doctor's office inside the school, with a nurse practitioner and a therapist. Kids do not have to go to this school to get care there.",
+  "eligibility_description": "For children and teens. No child is turned away for having no insurance, and no one gets a bill. A parent must sign a form first.",
+  "url": "https://www.henryford.com/services/pediatrics/community/school-based",
+  "organization": {
+   "id": "fbd7c664-f391-57d6-8315-132ae7790278",
+   "name": "Henry Ford Health",
+   "description": "Henry Ford Health",
+   "x_detroit": {
+    "id": "org_henry_ford_health"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "59d2ba92-2015-5056-a742-0266c1f8e74c",
+    "location": {
+     "id": "8a63c59f-7fc3-5695-80bb-738e9e8d40a4",
+     "name": "Health center at Henry Ford High School",
+     "location_type": "physical",
+     "latitude": 42.438462,
+     "longitude": -83.239129,
+     "addresses": [
+      {
+       "id": "79c59e49-6ef1-5e58-ab4f-37e87d35a343",
+       "address_1": "20000 Evergreen",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_health_center_at_henry_ford_high_school"
+     }
+    },
+    "phones": [
+     {
+      "id": "b2f82fb6-467e-5366-9b35-ead1179b176a",
+      "number": "313-484-5800"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_health_center_at_henry_ford_high_school",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 180,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Henry Ford Health website",
+      "url": "https://www.henryford.com/services/pediatrics/community/school-based/centers"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_health_center_at_henry_ford_high_school",
+   "category": "health.clinic"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "3994388c-07b1-59b8-88ea-4d1c986e4561",
   "name": "Tindal Recreation Center",
   "status": "active",
@@ -10829,6 +11466,83 @@
   "assured_date": "2026-09-18"
  },
  {
+  "id": "38aad305-50d2-582b-8bc8-392fe6f52773",
+  "name": "Racquet Up Detroit",
+  "status": "active",
+  "description": "A free after-school program with homework help, tutoring, squash, and a meal at each practice. Staff give rides from school to practice.",
+  "eligibility_description": "For students in grades 5 to 10 who apply. Kids come 3 days a week. It is not a drop-in program.",
+  "url": "https://racquetup.org/",
+  "organization": {
+   "id": "bd53cb9f-d1ca-5c97-9103-08275a77f3aa",
+   "name": "Racquet Up Detroit",
+   "description": "Racquet Up Detroit",
+   "x_detroit": {
+    "id": "org_racquet_up_detroit"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "94118041-2a88-592c-86d4-578a4cc96b91",
+    "location": {
+     "id": "62fb123a-0528-5da4-8d44-bf7d4146a993",
+     "name": "Racquet Up Detroit",
+     "location_type": "physical",
+     "latitude": 42.420164,
+     "longitude": -83.190347,
+     "addresses": [
+      {
+       "id": "19b157bd-4479-5111-9bf0-9fbf1db15dca",
+       "address_1": "6530 West Outer Drive",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48235",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_racquet_up_detroit"
+     }
+    },
+    "phones": [
+     {
+      "id": "b8bbb331-4f01-5a0d-952c-bfea74909164",
+      "number": "313-380-2675"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_racquet_up_detroit",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Racquet Up Detroit website",
+      "url": "https://racquetup.org/contact"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_racquet_up_detroit",
+   "category": "youth"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
   "id": "af3e2189-b4b1-510c-a2ea-6efe405122f7",
   "name": "Drop-in center",
   "status": "active",
@@ -11164,6 +11878,185 @@
   "x_detroit": {
    "id": "svc_ss_peter_food_pantry_at_the_activities_building",
    "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "bf3f2f59-e597-5b43-9b7c-3f080cdd0f45",
+  "name": "St. Christine's Food Pantry",
+  "status": "active",
+  "description": "Pick out your own groceries, like bread, vegetables, fruit, meat, eggs, and milk.",
+  "eligibility_description": "Only for people who live in ZIP codes 48223 and 48219. Bring an ID that shows your ZIP code, and bring your own cart or bags. Seniors 70 and older who are in line at 11am go first.",
+  "url": "https://sccsdetroit.org/",
+  "organization": {
+   "id": "fe765958-132f-5d2e-b882-2925672c3715",
+   "name": "St. Christine Christian Services",
+   "description": "St. Christine Christian Services",
+   "x_detroit": {
+    "id": "org_st_christine_christian_services"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "016df49d-e5d5-5c48-9241-11dd7c1825ec",
+    "location": {
+     "id": "d214aa00-927b-5b61-953c-6a4fee89ff36",
+     "name": "St. Christine's Food Pantry",
+     "location_type": "physical",
+     "latitude": 42.400204,
+     "longitude": -83.260621,
+     "addresses": [
+      {
+       "id": "7109d80a-8db3-549a-91fd-0b7b044e252d",
+       "address_1": "22303 Fenkell",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_christine_s_food_pantry"
+     }
+    },
+    "phones": [
+     {
+      "id": "00036231-e039-5155-a8c7-819a471db65f",
+      "number": "313-543-1527"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "64f378a6-8e5a-5df3-83fc-b937c97cbe00",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "14:30",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_st_christine_s_food_pantry",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "St. Christine Christian Services website",
+      "url": "https://sccsdetroit.org/food-pantry"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_christine_s_food_pantry",
+   "category": "food.pantry"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "a9a8efc8-7e7b-5f11-9190-ee4cd1871dc1",
+  "name": "St. Christine Soup Kitchen",
+  "status": "active",
+  "description": "A hot meal every Tuesday, served until the meals are gone. Kids meals and to-go meals too.",
+  "url": "https://sccsdetroit.org/",
+  "organization": {
+   "id": "fe765958-132f-5d2e-b882-2925672c3715",
+   "name": "St. Christine Christian Services",
+   "description": "St. Christine Christian Services",
+   "x_detroit": {
+    "id": "org_st_christine_christian_services"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "3bca2b87-fc69-53f6-9070-9024f40077df",
+    "location": {
+     "id": "451d9ef2-be94-5e1f-9ea9-5d48c1b997c9",
+     "name": "St. Christine Soup Kitchen",
+     "location_type": "physical",
+     "latitude": 42.400207,
+     "longitude": -83.260035,
+     "addresses": [
+      {
+       "id": "8f16892e-cc12-52e8-9ef1-054f11906130",
+       "address_1": "22261 Fenkell",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_st_christine_soup_kitchen"
+     }
+    },
+    "phones": [
+     {
+      "id": "793710a1-16f4-581c-83f7-db0799758d71",
+      "number": "313-255-0312"
+     }
+    ],
+    "schedules": [
+     {
+      "id": "187a7986-ccab-51db-8113-67be66bb559a",
+      "freq": "WEEKLY",
+      "byday": "TU",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "14:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_st_christine_soup_kitchen",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 45,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "St. Christine Christian Services website",
+      "url": "https://sccsdetroit.org/soup-kitchen"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_st_christine_soup_kitchen",
+   "category": "food.meal"
   },
   "assured_date": "2026-09-18"
  },
@@ -12869,6 +13762,83 @@
   "x_detroit": {
    "id": "svc_wayne_metro_walkin",
    "category": "utilities"
+  },
+  "assured_date": "2026-09-18"
+ },
+ {
+  "id": "daeea6aa-d60b-55bd-a232-8fed8c841570",
+  "name": "Wellspring youth program",
+  "status": "active",
+  "description": "Math and reading help, fun activities, field trips, and college prep for young people. It is a Christian program.",
+  "eligibility_description": "Ages 6 to 24.",
+  "url": "https://wellspringdetroit.org/",
+  "organization": {
+   "id": "65e73653-622e-5982-ba57-c41ef83e36dc",
+   "name": "Wellspring",
+   "description": "Wellspring",
+   "x_detroit": {
+    "id": "org_wellspring"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "65237c83-4b0c-52d8-9e4e-3fb7816a8cac",
+    "location": {
+     "id": "0cdcfe2e-c887-568e-8053-24df93028847",
+     "name": "Wellspring youth program",
+     "location_type": "physical",
+     "latitude": 42.412017,
+     "longitude": -83.262184,
+     "addresses": [
+      {
+       "id": "7fbdeb91-3dd5-5f9e-b2a8-fee4a4da41b0",
+       "address_1": "16742 Lamphere",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_wellspring_youth_program"
+     }
+    },
+    "phones": [
+     {
+      "id": "62378e25-efb4-5523-98a2-04c3107550ca",
+      "number": "313-255-9085"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_wellspring_youth_program",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "call_first",
+     "flags": [],
+     "checked_at_entry": "2026-09-18",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "cadence_days": 60,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Wellspring website",
+      "url": "https://wellspringdetroit.org/contact/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_wellspring_youth_program",
+   "category": "youth"
   },
   "assured_date": "2026-09-18"
  },

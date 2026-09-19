@@ -11,7 +11,7 @@
 // We never download a sale or a permit record, so buyer and seller names never reach this repo. Small numbers
 // are dropped here, before anything is written: a count under 5 is stored as "lt5", and a median needs 10 sales.
 
-import { p, slug, writeJson } from './util.js';
+import { p, slug, writeJson, today } from './util.js';
 import { simplify } from './ingest-basemap.js';
 
 const ORG = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services';
@@ -34,7 +34,7 @@ export type Count = number | 'lt5';
 export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number }
 
 const get = async (url: string) => { const j = (await (await fetch(url, { headers: UA })).json()) as any; if (j.error) throw new Error(`${url.slice(0, 120)}: ${JSON.stringify(j.error)}`); return j; };
-const edited = async (layer: string) => { const m = await get(`${layer}?f=json`); return new Date(m.editingInfo?.dataLastEditDate ?? m.editingInfo?.lastEditDate).toISOString().slice(0, 10); };
+const edited = async (layer: string) => { const m = await get(`${layer}?f=json`); return today(new Date(m.editingInfo?.dataLastEditDate ?? m.editingInfo?.lastEditDate)); };
 const q = (layer: string, params: Record<string, string>) => get(`${layer}/query?${new URLSearchParams({ f: 'json', ...params })}`);
 
 /** The same place can be spelled two ways across City datasets ("Mc Dougall-Hunt"). Compare on letters and digits only. */
@@ -135,7 +135,7 @@ async function stats(hoods: Neighborhood[]): Promise<void> {
       blight: { name: 'City of Detroit: blight tickets', url: BLIGHT, last_edited: await edited(BLIGHT) }, demolitions: { name: 'City of Detroit: completed demolitions', url: DEMOS, last_edited: await edited(DEMOS) },
       issues: { name: 'Improve Detroit: issues people reported to the City', url: ISSUES, last_edited: await edited(ISSUES) }, parcels: { name: 'City of Detroit Assessor: parcels', url: PARCELS, last_edited: await edited(PARCELS) } },
     issue_types: ISSUE_TYPES, parcels, city_parcels: cityParcels,
-    fetched_at: new Date().toISOString().slice(0, 10), first_year: FIRST_YEAR, partial_year: thisYear, city, neighborhoods: out,
+    fetched_at: today(), first_year: FIRST_YEAR, partial_year: thisYear, city, neighborhoods: out,
   });
 }
 

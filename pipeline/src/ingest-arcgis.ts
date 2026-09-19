@@ -6,7 +6,7 @@
 
 import { readFileSync } from 'node:fs';
 import YAML from 'yaml';
-import { p, writeCsv, slug, inBbox, type CsvRow } from './util.js';
+import { p, writeCsv, slug, inBbox, type CsvRow, today } from './util.js';
 
 export interface Source {
   id: string; name: string; kind: string; url: string; page?: string; license?: string;
@@ -34,7 +34,7 @@ async function getJson(url: string): Promise<any> {
 export async function fetchLayer(src: Source): Promise<{ lastEdited: string | null; features: any[] }> {
   const meta = await getJson(`${src.url}?f=json`);
   const ms = meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate;
-  const lastEdited = ms ? new Date(ms).toISOString().slice(0, 10) : null;
+  const lastEdited = ms ? today(new Date(ms)) : null;
   const features: any[] = [];
   for (let offset = 0; ; offset += 1000) {
     const page = await getJson(`${src.url}/query?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=1000`);
@@ -76,7 +76,7 @@ export function toRows(src: Source, lastEdited: string | null, features: any[], 
 }
 
 async function main() {
-  const fetchedAt = new Date().toISOString().slice(0, 10);
+  const fetchedAt = today();
   for (const src of loadSources().filter((s) => s.kind === 'arcgis')) {
     const { lastEdited, features } = await fetchLayer(src);
     const { rows, warnings } = toRows(src, lastEdited, features, fetchedAt);

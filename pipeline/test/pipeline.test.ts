@@ -6,7 +6,7 @@ import { badge, openNow, rank, type BundleRow } from '@detroithelp/query';
 import { build } from '../src/build.js';
 import { toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
-import { p, parsePhone, sha256, uuid5 } from '../src/util.js';
+import { p, parsePhone, sha256, today, uuid5 } from '../src/util.js';
 import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { parseCalendar, toZipCenters } from '../src/ingest-city.js';
@@ -150,6 +150,11 @@ describe('hours from research text', () => {
 });
 
 describe('helpers', () => {
+  it('today is the Detroit calendar date, not the UTC one', () => {
+    expect(today(new Date('2026-09-19T00:26:00Z'))).toBe('2026-09-18');   // 8:26pm in Detroit
+    expect(today(new Date('2026-01-15T04:59:00Z'))).toBe('2026-01-14');   // 11:59pm in winter
+    expect(today(new Date('2026-01-15T05:00:00Z'))).toBe('2026-01-15');
+  });
   it('parses the phone formats found in real sources', () => {
     expect(parsePhone('(313) 579-2100 ext. 4217')).toEqual({ number: '3135792100', ext: '4217' });
     expect(parsePhone('1-800-799-7233')).toEqual({ number: '8007997233' });

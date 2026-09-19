@@ -67,4 +67,5 @@ export function uuid5(name: string): string {
   return `${x.slice(0, 8)}-${x.slice(8, 12)}-${x.slice(12, 16)}-${x.slice(16, 20)}-${x.slice(20)}`;
 }
 
-export const today = () => new Date().toISOString().slice(0, 10);
+/** Today's date on a Detroit calendar. Not UTC: after 8pm in summer, UTC is already tomorrow. */
+export const today = (now = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Detroit' }).format(now);

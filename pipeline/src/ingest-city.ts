@@ -7,7 +7,7 @@
 //           does not want to share a location can type a ZIP and still sort by distance (docs/05).
 // Output is committed under data/ingested/ so builds are reproducible and changes are reviewable.
 
-import { inBbox, p, writeJson } from './util.js';
+import { inBbox, p, writeJson, today } from './util.js';
 
 const UA = { 'user-agent': 'detroithelp-pipeline (open-source civic directory; one polite pass per day)' };
 const CAL = 'https://detroitmi.gov/Calendar-and-Events';
@@ -59,13 +59,13 @@ async function events(): Promise<void> {
   }
   if (all.size < 5) throw new Error(`events: only ${all.size} parsed; the page layout may have changed. Not overwriting the last good file.`);
   const list = [...all.values()].sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-  writeJson(p('data/ingested/city_events.json'), { source: { name: 'City of Detroit calendar', page: CAL, fetched_at: new Date().toISOString().slice(0, 10) }, events: list });
+  writeJson(p('data/ingested/city_events.json'), { source: { name: 'City of Detroit calendar', page: CAL, fetched_at: today() }, events: list });
   console.log(`events: ${list.length} upcoming, ${list[0]!.starts_at.slice(0, 10)} to ${list[list.length - 1]!.starts_at.slice(0, 10)}`);
 }
 
 async function parks(): Promise<void> {
   const meta = (await (await fetch(`${PARKS}?f=json`, { headers: UA })).json()) as any;
-  const lastEdited = new Date(meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate).toISOString().slice(0, 10);
+  const lastEdited = today(new Date(meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate));
   const q = `${PARKS}/query?where=1%3D1&outFields=park_name,address,park_type,acreage,latitude,longitude&returnGeometry=false&f=json&resultRecordCount=2000`;
   const feats = ((await (await fetch(q, { headers: UA })).json()) as any).features as { attributes: Record<string, unknown> }[];
   const list = feats.map((f) => f.attributes)
@@ -91,7 +91,7 @@ export function toZipCenters(features: { attributes: { zipcode?: unknown }; cent
 
 async function zips(): Promise<void> {
   const meta = (await (await fetch(`${ZIPS}?f=json`, { headers: UA })).json()) as any;
-  const lastEdited = new Date(meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate).toISOString().slice(0, 10);
+  const lastEdited = today(new Date(meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate));
   const q = `${ZIPS}/query?where=1%3D1&outFields=zipcode&returnGeometry=false&returnCentroid=true&outSR=4326&f=json`;
   const centers = toZipCenters(((await (await fetch(q, { headers: UA })).json()) as any).features ?? []);
   if (Object.keys(centers).length < 20) throw new Error(`zips: only ${Object.keys(centers).length} parsed. Not overwriting the last good file.`);

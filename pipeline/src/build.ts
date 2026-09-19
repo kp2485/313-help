@@ -35,7 +35,7 @@ function gitSha(): string {
 
 export async function build(opts: BuildOptions = {}) {
   const now = opts.now ?? new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const todayStr = today(now);
   const log = (...a: unknown[]) => { if (!opts.quiet) console.log(...a); };
 
   // 1. Load and normalize
@@ -79,7 +79,7 @@ export async function build(opts: BuildOptions = {}) {
     counts[top] = subset.length;
     put(`category/${top}.json`, subset);
   }
-  const cutoff = new Date(now.getTime() - 90 * 86400000).toISOString().slice(0, 10);
+  const cutoff = today(new Date(now.getTime() - 90 * 86400000));
   put('archived.json', rows.filter((r) => r.status === 'archived' && (r.archived?.at ?? '') >= cutoff)
     .map((r) => ({ id: r.id, name: r.name, category: r.category, archived: r.archived })));
   // Greenway segments (docs/11): fetched after the help categories, so a phone that only ever

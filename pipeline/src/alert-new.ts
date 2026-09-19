@@ -10,7 +10,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import type { Alert } from '@detroithelp/query';
-import { p, parsePhone, slug, writeJson } from './util.js';
+import { p, parsePhone, slug, writeJson, today } from './util.js';
 
 export interface AlertArgs { title?: string; body?: string; hours?: number; category?: string; sourceUrl?: string; tel?: string[]; targets?: string[]; demo?: boolean; kind?: Alert['kind'] }
 
@@ -29,7 +29,7 @@ export function makeAlert(a: AlertArgs, now: Date): Alert {
   });
   const minute = (d: Date) => d.toISOString().slice(0, 16) + ':00Z';
   return {
-    id: `alert_${slug(title).slice(0, 40)}_${now.toISOString().slice(0, 10)}`,
+    id: `alert_${slug(title).slice(0, 40)}_${today(now)}`,
     kind: a.kind ?? 'notice', category: a.demo ? 'demo' : (a.category ?? 'notice'),
     title: a.demo ? `Demo: ${title}` : title,
     ...(a.body || a.demo ? { body_plain: a.demo ? `${a.body ? a.body + ' ' : ''}This is a demo. Nothing is happening.` : a.body } : {}),
