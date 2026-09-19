@@ -25,7 +25,7 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 - 178 listings today, each checked once at entry (the DHD stations carry the list's own date instead). No scheduled re-verification (04); emergency numbers are machine-matched against their owners' pages (`pnpm check:emergency`).
 - Steward roster: Kyle + 3 community stewards (CHW, librarian, church coordinator, or outreach worker). Row count is capped by what this roster can verify (doc 10-A6).
 - Spanish UI. **Done 2026-09-18** (needs a native speaker's review).
-- Privacy policy, About/data sources, open dataset published. Repo public: **done 2026-09-18** (`detroit-compass`).
+- Privacy policy, About/data sources, open dataset published. Repo public: **done 2026-09-18** (`detroit-compass`, renamed `313-help` 2026-09-19).
 - First conversation with Forgotten Harvest/Gleaners about a feed.
 
 ## v1.1

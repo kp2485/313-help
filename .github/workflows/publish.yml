@@ -40,7 +40,7 @@ jobs:
         with: { node-version: 22, package-manager-cache: false }
       - run: pnpm install --frozen-lockfile
       - run: |
-          git config user.name "detroit-compass-publish"
+          git config user.name "313-help-publish"
           git config user.email "actions@users.noreply.github.com"
 
       # 2 + 3. Gate, build, deploy. Any failure here stops the job before anything is published.
