@@ -1,6 +1,164 @@
 313 Help
-Copyright 2026 Kyle Peterson / Linwood Technologies
+Copyright 2026 Kyle Peterson / Linwood Technologies LLC
 
-This product includes data from City of Detroit open data layers and from
-the public websites of the organizations listed; each listing names its source.
-The dataset under data/hsds is licensed CC BY 4.0. Source data keeps its own terms.
+The code is licensed under the Apache License, Version 2.0 (LICENSE). The dataset
+under data/hsds is licensed CC BY 4.0. Source data keeps its own terms.
+
+Not an official City of Detroit app. Every listing in the app names its own source
+and the date it was checked; this file credits everyone together. Thank you.
+
+
+WHERE THE LISTINGS COME FROM
+
+Food banks, and the pantries, meal sites and mobile stops they supply:
+  Gleaners Community Food Bank of Southeast Michigan (PantryNet location data)
+  Forgotten Harvest (find-food pages)
+
+Public lists (City of Detroit open data, data.detroitmi.gov):
+  Detroit Health Department: harm reduction stations
+  Detroit Parks and Recreation: recreation centers
+
+Organizations whose own websites supplied their listings:
+  ACCESS
+  Advantage Health Centers
+  American Indian Health and Family Services
+  Auntie Na's Village
+  Bethany Lutheran Church
+  Brightmoor Artisans Collective
+  Brightmoor Connection Food Pantry
+  Brilliant Detroit
+  Capuchin Soup Kitchen
+  Cass Community Social Services
+  Catholic Charities of Southeast Michigan
+  CHASS Center
+  City Covenant Church
+  City of Dearborn
+  City of Detroit Housing and Revitalization Department
+  City of Detroit, Tindal Recreation Center
+  Covenant Community Care
+  Covenant House Michigan
+  Crossroads of Michigan
+  Dearborn Department of Public Health
+  Dearborn First United Methodist Church
+  Dearborn Public Library
+  Deo Gratias Ministries Detroit
+  Detroit Area Agency on Aging
+  Detroit Association of Black Organizations
+  Detroit Community Fridge
+  Detroit Community Health Connection
+  Detroit Friendship House
+  Detroit Health Department
+  Detroit Northwest Seventh-day Adventist Church
+  Detroit Parks and Recreation
+  Detroit Public Library
+  Detroit Rescue Mission Ministries
+  Detroit Water and Sewerage Department
+  Detroit Wayne Integrated Health Network
+  DTE Energy
+  Ebenezer Community and Cultural Center
+  Equity Alliance of Michigan
+  Exodus Food Pantry
+  First Step
+  Focus: HOPE
+  Franklin Wright Settlements
+  Gesu Catholic Church
+  Hamtramck Public Library
+  Henry Ford Health
+  Historic Little Rock Missionary Baptist Church
+  HUDA Clinic
+  Institute for Population Health
+  Iroquois Avenue Christ Lutheran Church
+  Islamic Center of Detroit
+  Leaders Advancing and Helping Communities
+  LifeBUILDERS Detroit
+  Loaves and Fishes Southwest Detroit
+  Matrix Human Services
+  Metropolitan United Methodist Church
+  Most Holy Trinity Parish
+  National Domestic Violence Hotline
+  National Runaway Safeline
+  Nativity of Our Lord Church
+  New Prospect Missionary Baptist Church
+  New Providence Baptist Church
+  NOAH at Central
+  Northwest Church of Christ
+  Peace Lutheran Church
+  Perfecting Community Development Corporation
+  Perry Outreach Center
+  Pilgrim Baptist Church
+  Pope Francis Center
+  Racquet Up Detroit
+  Ruth Ellis Center
+  SAY Detroit
+  Scott Memorial United Methodist Church
+  SS. Peter and Paul Parish, Westside Detroit
+  St. Christine Christian Services
+  St. Frances Cabrini Clinic
+  St. John's Presbyterian Church
+  St. Peter Claver Catholic Community
+  St. Peter's Episcopal Church
+  St. Raymond-Our Lady of Good Counsel Parish
+  St. Suzanne Cody Rouge Community Resource Center
+  Straight Gate International Church
+  The Heat and Warmth Fund (THAW)
+  The Wellness Plan Medical Centers
+  Trinity Health Primary Care - Detroit
+  Triumph Church
+  Twelfth Street Food Pantry
+  Wayne County Healthy Communities
+  Wayne Metropolitan Community Action Agency
+  Wellspring
+  Western Wayne Family Health Centers
+  Westminster Church of Detroit
+  YWCA Metropolitan Detroit
+
+
+URGENT NUMBERS (each from its owner's own page)
+  911 and 988 Suicide & Crisis Lifeline (988lifeline.org)
+  Detroit's shelter intake line: City of Detroit Housing and Revitalization Department,
+    and CAM, the Coordinated Assessment Model (Detroit Continuum of Care)
+  Out-Wayne County Continuum of Care (outwaynehomeless.org), for Dearborn
+  Detroit Wayne Integrated Health Network crisis line (dwihn.org)
+  National Domestic Violence Hotline (thehotline.org)
+  Michigan 2-1-1 (mi211.org)
+
+
+MAPS, ZIP CODES AND NEIGHBORHOOD PAGES
+
+City of Detroit open data (data.detroitmi.gov):
+  Roads, city parks, the city boundary, ZIP code areas, neighborhoods
+  Joe Louis Greenway route segments and study area
+  Assessor: property sales, parcels
+  Buildings, Safety Engineering and Environmental Department (BSEED): building
+    permits, active rental certificates of compliance, vacant property registrations
+  Blight tickets; completed demolitions
+  Improve Detroit: issues people reported to the City
+  Detroit Fire Department: fire incidents
+  Stores that take SNAP (Bridge card)
+  Street pavement ratings
+  Detroit Department of Transportation (DDOT): bus stops
+
+US Census Bureau (TIGER/Line and TIGERweb; public domain):
+  Outlines of Detroit, Hamtramck, Highland Park and Dearborn
+  Streets in Hamtramck, Highland Park and Dearborn
+  ZIP Code Tabulation Areas for Dearborn ZIP codes
+
+
+FORMATS AND STANDARDS
+  Human Services Data Specification (HSDS) 3.2, Open Referral
+
+
+OPEN-SOURCE SOFTWARE THE APP AND ITS TOOLS USE
+  rrule 2.8.1 (BSD-3-Clause), Jakub Roztocil, Lars Schöning and David Golightly
+  @noble/ed25519 3.2.0 (MIT), Paul Miller
+  hono 4.13.8 (MIT), Yusuke Wada
+  ajv 8.20.0 and ajv-formats 3.0.1 (MIT), Evgeny Poberezkin
+  csv-parse 7.0.2 and csv-stringify 6.8.3 (MIT), David Worms / Adaltas
+  yaml 2.9.1 (ISC), Eemeli Aro
+  Built and tested with TypeScript, Vite, Vitest, Wrangler (Cloudflare) and Swift.
+  Each package's own license file ships with it.
+
+
+AND
+  The residents, volunteers, clergy, staff and outreach workers who run these places,
+  and everyone who reports a closed door or confirms an open one.
