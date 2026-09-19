@@ -3,6 +3,7 @@ import {
   type Alert, type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@detroithelp/query';
 import { currentLang, initLang, locale, setLang, t } from './i18n.js';
+import { telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
@@ -40,7 +41,6 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 const T = (key: string, p?: Record<string, string | number>) => esc(t(key, p));
 const go = (view: View) => `data-go="${esc(JSON.stringify(view))}"`;
 const now = () => effectiveNow(new Date(), bundle?.index.generated_at);
-const telHref = (n: string) => `tel:${n.replace(/[^\d+]/g, '').replace(/^(\d{10})$/, '+1$1')}`;
 const ext = (url: string, label: string, cls = 'btn ghost') => `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)} ${icon('out', 'sm')}</a>`;
 
 function clock(hhmm: string): string {
@@ -174,7 +174,11 @@ function alertBox(a: Alert): string {
       <p class="foot">${later ? `${T('alert.from', { when: whenFmt(a.starts_at) })} · ` : ''}${T('alert.until', { when: whenFmt(a.ends_at) })}${a.source?.url ? ` · ${ext(a.source.url, t('alert.source'), 'link')}` : ''}</p></div>`;
 }
 function homeTab(): string {
-  if (!bundle) return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T(loadError ? 'home.no_data' : 'home.loading')}</p></section></main>`;
+  // No list yet (first visit with no signal, or a load that failed): the numbers that never depend on it, and the
+  // overdose steps, are still one tap away.
+  if (!bundle) return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p role="status">${T(loadError ? 'home.no_data' : 'home.loading')}${loadError ? ` <a href="tel:211">211</a>` : ''}</p></section>
+    <div class="stackbtns">${callButton('emg_911')}${callButton('emg_988')}</div>
+    <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}</ul></main>`;
   const sunset = retired();
   const alerts = bundle.alerts.filter((a) => Date.parse(a.ends_at) > now().getTime() && Date.parse(a.starts_at) <= now().getTime());
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
@@ -409,7 +413,9 @@ function render(focus = true): void {
   for (const m of mapViews) m.destroy();
   mapViews = []; mapSpecs = [];
   let title: string | undefined, body: string, exit = false;
-  if (v.v === 'tab' || !bundle) { const tab = v.v === 'tab' ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'rec' ? recTab() : tab === 'transit' ? transitTab() : eventsTab(); }
+  // Without a list, only the screens that don't need one: the urgent numbers and the overdose steps.
+  const standsAlone = v.v === 'urgent' || (v.v === 'need' && !!NEEDS.find((x) => x.id === v.id)?.stepsOnly);
+  if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'rec' ? recTab() : tab === 'transit' ? transitTab() : eventsTab(); }
   else if (v.v === 'urgent') { title = t('strip.more'); body = urgent(); }
   else if (v.v === 'about') { title = t('about.title'); body = about(); }
   else if (v.v === 'search') { title = t('search.title'); body = searchScreen(); }
@@ -421,7 +427,7 @@ function render(focus = true): void {
   else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; body = d.html; }
   else if (v.v === 'greenway') { title = t('gw.title'); body = greenway(); }
   else if (v.v === 'parks') { title = t('rec.parks'); body = parksList(); }
-  else { const s = bundle.greenway?.segments.find((x) => x.id === v.id); title = s?.name ?? t('gw.title'); body = s ? segment(s) : greenway(); }
+  else { const s = bundle!.greenway?.segments.find((x) => x.id === v.id); title = s?.name ?? t('gw.title'); body = s ? segment(s) : greenway(); }
   const fromStack = stack.map((x) => (x.v === 'tab' ? x.tab : undefined)).filter(Boolean).pop();
   const active = v.v === 'tab' ? v.tab : fromStack ?? TAB_OF[v.v];
   // Every list and listing says when this phone last got updates, if that was a while ago. Home has its own spot.

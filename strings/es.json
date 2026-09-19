@@ -37,7 +37,7 @@
   "home.categories": "Buscar por tipo",
   "home.updated": "Lista actualizada {when} · Funciona sin internet",
   "home.loading": "Cargando la lista…",
-  "home.no_data": "No podemos cargar la lista ahora. Si es una emergencia, llame al 911. Para encontrar ayuda, llame al 211.",
+  "home.no_data": "No podemos cargar la lista ahora. Para encontrar ayuda cerca de usted, llame al",
   "need.food": "Necesito comida",
   "need.shelter": "Necesito un lugar seguro para dormir esta noche",
   "need.overdose_now": "Alguien tiene una sobredosis ahora mismo",

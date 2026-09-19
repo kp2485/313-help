@@ -37,7 +37,7 @@
   "home.categories": "Browse by type",
   "home.updated": "List updated {when} · Works offline",
   "home.loading": "Getting the list…",
-  "home.no_data": "We can't load the list right now. If this is an emergency, call 911. For help finding services, call 211.",
+  "home.no_data": "We can't load the list right now. To find help near you, call",
   "need.food": "I need food",
   "need.shelter": "I need a safe place to sleep tonight",
   "need.overdose_now": "Someone is overdosing right now",

@@ -49,10 +49,7 @@ let needs: [Need] = [
     Need(id: "hot_cold", symbol: "sun.max", now: false, query: Query(category: "rec"), intro: "hotcold.intro"),
 ]
 
-func telURL(_ number: String) -> URL? {
-    let digits = number.filter(\.isNumber)
-    return URL(string: "tel:" + (digits.count == 10 ? "+1" + digits : digits))
-}
+func telURL(_ number: String) -> URL? { URL(string: telLink(number)) }
 
 func emergencyNumber(_ id: String, in b: LoadedBundle?) -> (label: String, number: String)? {
     let fromBundle = b?.emergency.first { $0.id == id }

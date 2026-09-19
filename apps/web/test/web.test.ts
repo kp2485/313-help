@@ -10,6 +10,7 @@ import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
 import { FOOD_BENEFITS } from '../src/benefits.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
+import { telHref } from '../src/phone.js';
 import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
 import { build as buildReport, fitWithin, nonce, plainJpeg } from '../src/report.js';
 
@@ -234,6 +235,21 @@ describe('map', () => {
     expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
   });
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
+});
+
+describe('phone links', () => {
+  it('dial the main number, then the extension after a pause (never the digits run together)', () => {
+    expect(telHref('313-579-2100 ext. 4217')).toBe('tel:+13135792100,4217');
+    expect(telHref('313-579-2100 x12')).toBe('tel:+13135792100,12');
+    expect(telHref('(313) 579-2100 Extension 3')).toBe('tel:+13135792100,3');
+  });
+  it('plain, short and toll-free numbers', () => {
+    expect(telHref('313-579-2100')).toBe('tel:+13135792100');
+    expect(telHref('1-866-313-2520')).toBe('tel:+18663132520');
+    expect(telHref('911')).toBe('tel:911');
+    expect(telHref('988')).toBe('tel:988');
+    expect(telHref('211')).toBe('tel:211');
+  });
 });
 
 describe('privacy and copy rules, checked against the source', () => {
