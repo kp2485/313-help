@@ -38,12 +38,21 @@ export function parseDate(s: string): { y: number; m: number; d: number } {
   return { y: Number(m[1]), m: Number(m[2]), d: Number(m[3]) };
 }
 
+/** "HH:MM" on a 24-hour clock, exactly. 24:00 is the end of the day; nothing later. */
 export function parseTime(s: string): { hh: number; mm: number } {
-  const m = /^(\d{1,2}):(\d{2})/.exec(s);
+  const m = /^(\d{2}):(\d{2})$/.exec(s);
   if (!m) throw new Error(`Bad time: ${s}`);
   const hh = Number(m[1]), mm = Number(m[2]);
-  if (hh > 24 || mm > 59) throw new Error(`Bad time: ${s}`);
+  if (hh > 24 || mm > 59 || (hh === 24 && mm !== 0)) throw new Error(`Bad time: ${s}`);
   return { hh, mm };
+}
+
+/** A schedule date: exactly YYYY-MM-DD, and a day that exists (no 2026-02-30). */
+export function parseScheduleDate(s: string): Date {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) throw new Error(`Bad date: ${s}`);
+  const dt = dateToFloating(s);
+  if (floatingToDateString(dt) !== s) throw new Error(`Bad date: ${s}`);
+  return dt;
 }
 
 /** Floating UTC Date at local midnight of a YYYY-MM-DD. */

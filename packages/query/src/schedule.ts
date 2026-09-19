@@ -1,7 +1,7 @@
 import * as rrulePkg from 'rrule';
 import type { Alert, BundleRow, Occurrence, OpenResult, Schedule, WallMinutes } from './types.js';
 import {
-  dateToFloating, floatingToDateString, nowWallMinutes, parseTime, toWall, wallMinutes,
+  dateToFloating, floatingToDateString, nowWallMinutes, parseScheduleDate, parseTime, toWall, wallMinutes,
 } from './time.js';
 
 // Node resolves rrule's CommonJS build (everything under `default`); bundlers resolve its ESM build
@@ -19,23 +19,50 @@ const WEEKDAY = { MO: RRule.MO, TU: RRule.TU, WE: RRule.WE, TH: RRule.TH, FR: RR
 
 function parseByday(byday: string) {
   return byday.split(',').map((raw) => {
-    const m = /^([+-]?\d+)?(MO|TU|WE|TH|FR|SA|SU)$/.exec(raw.trim().toUpperCase());
+    const m = /^([+-]?[1-5])?(MO|TU|WE|TH|FR|SA|SU)$/.exec(raw.trim().toUpperCase());
     if (!m) throw new Error(`Bad BYDAY: ${raw}`);
     const day = WEEKDAY[m[2] as keyof typeof WEEKDAY];
     return m[1] ? day.nth(Number(m[1])) : day;
   });
 }
 
-/** Throws if the schedule cannot be evaluated. The pipeline calls this as a validator. */
+function parseBymonthday(md: string): number[] {
+  return md.split(',').map((raw) => {
+    const t = raw.trim();
+    const n = Number(t);
+    if (!/^-?\d{1,2}$/.test(t) || n === 0 || n < -31 || n > 31) throw new Error(`Bad BYMONTHDAY: ${raw}`);
+    return n;
+  });
+}
+
+/**
+ * Throws if the schedule cannot be evaluated. The pipeline calls this as a validator, and openNow skips a schedule
+ * that fails it, so a bad schedule is never guessed at (a guess could say "open").
+ */
 export function assertScheduleValid(s: Schedule): void {
-  dateToFloating(s.dtstart);
-  if (s.until) dateToFloating(s.until);
-  if (s.valid_from) dateToFloating(s.valid_from);
-  if (s.valid_to) dateToFloating(s.valid_to);
+  parseScheduleDate(s.dtstart);
+  if (s.until) parseScheduleDate(s.until);
+  if (s.valid_from) parseScheduleDate(s.valid_from);
+  if (s.valid_to) parseScheduleDate(s.valid_to);
   parseTime(s.opens_at);
   parseTime(s.closes_at);
-  if (s.byday) parseByday(s.byday);
-  if (s.freq && !(s.freq in FREQ)) throw new Error(`Bad FREQ: ${s.freq}`);
+  if (s.freq != null && !Object.hasOwn(FREQ, s.freq)) throw new Error(`Bad FREQ: ${s.freq}`);
+  if (s.interval != null && !(Number.isInteger(s.interval) && s.interval >= 1)) throw new Error(`Bad INTERVAL: ${s.interval}`);
+  // Only the shapes the spec defines (schema/query-spec.md "Occurrences"), so web and iPhone can't disagree.
+  if (s.byday) {
+    if (s.freq !== 'WEEKLY' && s.freq !== 'MONTHLY') throw new Error(`BYDAY needs FREQ=WEEKLY or MONTHLY: ${s.byday}`);
+    // "2nd Tuesday" only means something within a month.
+    if (s.freq === 'WEEKLY' && parseByday(s.byday).some((d) => d.n)) throw new Error(`A numbered BYDAY needs FREQ=MONTHLY: ${s.byday}`);
+    parseByday(s.byday);
+  }
+  if (s.bymonthday) {
+    if (s.freq !== 'MONTHLY') throw new Error(`BYMONTHDAY needs FREQ=MONTHLY: ${s.bymonthday}`);
+    parseBymonthday(s.bymonthday);
+  }
+}
+
+function isValid(s: Schedule): boolean {
+  try { assertScheduleValid(s); return true; } catch { return false; }
 }
 
 /** Local calendar dates (floating) on which this schedule opens, within [from, to] inclusive. */
@@ -56,7 +83,7 @@ function occurrenceDates(s: Schedule, from: Date, to: Date): Date[] {
     dtstart,
     until: s.until ? dateToFloating(s.until) : null,
     byweekday: s.byday ? parseByday(s.byday) : null,
-    bymonthday: s.bymonthday ? s.bymonthday.split(',').map((n) => Number(n.trim())) : null,
+    bymonthday: s.bymonthday ? parseBymonthday(s.bymonthday) : null,
   });
   return rule.between(lo, hi, true);
 }
@@ -81,8 +108,9 @@ function cancelWindows(rowId: string, alerts: Alert[]): { start: WallMinutes; en
 }
 
 function isCancelled(o: Occurrence, windows: { start: WallMinutes; end: WallMinutes }[]): boolean {
-  // An occurrence is cancelled when it *opens* inside a cancellation window.
-  return windows.some((w) => o.start >= w.start && o.start < w.end);
+  // An occurrence is cancelled when it overlaps a cancellation window at all, so a cancellation posted after a
+  // pantry opened closes it for the rest of that window.
+  return windows.some((w) => o.start < w.end && o.end > w.start);
 }
 
 function allOccurrences(row: BundleRow, nowMin: WallMinutes, days: number): Occurrence[] {
@@ -90,7 +118,7 @@ function allOccurrences(row: BundleRow, nowMin: WallMinutes, days: number): Occu
   const from = new Date(today.getTime() - 86400000); // yesterday, for overnight windows
   const to = new Date(today.getTime() + days * 86400000);
   const out: Occurrence[] = [];
-  for (const s of row.schedules) {
+  for (const s of row.schedules.filter(isValid)) {
     for (const d of occurrenceDates(s, from, to)) out.push(toOccurrence(s, d));
   }
   return out.sort((a, b) => a.start - b.start || a.end - b.end);
@@ -107,10 +135,15 @@ export function nextOccurrences(row: BundleRow, now: Date, n: number, alerts: Al
 
 export function openNow(row: BundleRow, now: Date, alerts: Alert[] = []): OpenResult {
   if (row.status !== 'active') return { state: 'not_listed' };
-  if (row.availability === 'always') return { state: 'open' };
+  if (row.availability === 'always') {
+    // Always open, unless a published cancellation covers right now.
+    const nowMin = nowWallMinutes(now);
+    return cancelWindows(row.id, alerts).some((w) => nowMin >= w.start && nowMin < w.end) ? { state: 'closed', next: null, cancelled_now: true } : { state: 'open' };
+  }
   if (row.availability === 'call_first') return { state: 'call_first' };
   // Unknown is never rendered as open.
-  if (row.availability === 'unknown' || row.schedules.length === 0) return { state: 'unknown' };
+  // So is a schedule that can't be read: it is skipped, and with none left the listing is unknown.
+  if (row.availability === 'unknown' || !row.schedules.some(isValid)) return { state: 'unknown' };
 
   const nowMin = nowWallMinutes(now);
   const windows = cancelWindows(row.id, alerts);

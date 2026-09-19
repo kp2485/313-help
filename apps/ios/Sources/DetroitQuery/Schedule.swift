@@ -18,17 +18,35 @@ func parseByday(_ s: String) -> [DayRule]? {
         let t = raw.trimmingCharacters(in: .whitespaces).uppercased()
         guard t.count >= 2, let wd = codes[String(t.suffix(2))] else { return nil }
         let n = String(t.dropLast(2))
-        if n.isEmpty { out.append(DayRule(nth: nil, weekday: wd)) } else if let k = Int(n), k != 0 { out.append(DayRule(nth: k, weekday: wd)) } else { return nil }
+        if n.isEmpty { out.append(DayRule(nth: nil, weekday: wd)) }
+        else if n.range(of: #"^[+-]?[1-5]$"#, options: .regularExpression) != nil, let k = Int(n) { out.append(DayRule(nth: k, weekday: wd)) }
+        else { return nil }
     }
     return out
 }
 
-/// Throws-equivalent for the pipeline's validator: nil means the schedule can't be evaluated.
+func parseBymonthday(_ s: String) -> [Int]? {
+    var out: [Int] = []
+    for raw in s.split(separator: ",", omittingEmptySubsequences: false) {
+        let t = raw.trimmingCharacters(in: .whitespaces)
+        guard t.range(of: #"^-?\d{1,2}$"#, options: .regularExpression) != nil, let n = Int(t), n != 0, (-31...31).contains(n) else { return nil }
+        out.append(n)
+    }
+    return out
+}
+
+/// The pipeline's validator (assertScheduleValid). A schedule that fails it is skipped, never guessed at.
 public func scheduleIsValid(_ s: Schedule) -> Bool {
-    guard parseDay(s.dtstart) != nil, parseClock(s.opensAt) != nil, parseClock(s.closesAt) != nil else { return false }
-    for d in [s.until, s.validFrom, s.validTo] { if let d, parseDay(d) == nil { return false } }
-    if let b = s.byday, parseByday(b) == nil { return false }
+    guard parseScheduleDay(s.dtstart) != nil, parseClock(s.opensAt) != nil, parseClock(s.closesAt) != nil else { return false }
+    for d in [s.until, s.validFrom, s.validTo] { if let d, parseScheduleDay(d) == nil { return false } }
     if let f = s.freq, !["DAILY", "WEEKLY", "MONTHLY", "YEARLY"].contains(f) { return false }
+    if let i = s.interval, i < 1 { return false }
+    // Only the shapes the spec defines, so web and iPhone can't disagree.
+    if let b = s.byday {
+        guard s.freq == "WEEKLY" || s.freq == "MONTHLY", let rules = parseByday(b) else { return false }
+        if s.freq == "WEEKLY", rules.contains(where: { $0.nth != nil }) { return false }   // "2nd Tuesday" needs a month
+    }
+    if let md = s.bymonthday { guard s.freq == "MONTHLY", parseBymonthday(md) != nil else { return false } }
     return true
 }
 
@@ -54,7 +72,7 @@ func opensOn(_ s: Schedule, _ day: Int) -> Bool {
         guard ((c.y - c0.y) * 12 + (c.m - c0.m)) % every == 0 else { return false }
         let dim = daysInMonth(c.y, c.m)
         if let md = s.bymonthday {
-            return md.split(separator: ",").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }.contains { $0 > 0 ? $0 == c.d : dim + $0 + 1 == c.d }
+            return (parseBymonthday(md) ?? []).contains { $0 > 0 ? $0 == c.d : dim + $0 + 1 == c.d }
         }
         if let rules {
             return rules.contains { r in
@@ -74,7 +92,7 @@ func opensOn(_ s: Schedule, _ day: Int) -> Bool {
 func occurrences(_ row: BundleRow, nowMin: Int, days: Int) -> [Occurrence] {
     let today = Int((Double(nowMin) / 1440).rounded(.down))
     var out: [Occurrence] = []
-    for s in row.schedules {
+    for s in row.schedules where scheduleIsValid(s) {
         guard let o = parseClock(s.opensAt), let c = parseClock(s.closesAt) else { continue }
         var lo = today - 1, hi = today + days            // yesterday too, for windows that run past midnight
         if let v = s.validFrom.flatMap(parseDay) { lo = max(lo, v) }
@@ -98,8 +116,9 @@ func cancelWindows(_ rowId: String, _ alerts: [Alert]) -> [(start: Int, end: Int
             return (nowWallMinutes(s), nowWallMinutes(e))
         }
 }
-/// An occurrence is cancelled when it *opens* inside a cancellation window.
-func isCancelled(_ o: Occurrence, _ w: [(start: Int, end: Int)]) -> Bool { w.contains { o.start >= $0.start && o.start < $0.end } }
+/// An occurrence is cancelled when it overlaps a cancellation window at all, so a cancellation posted after a pantry
+/// opened closes it for the rest of that window.
+func isCancelled(_ o: Occurrence, _ w: [(start: Int, end: Int)]) -> Bool { w.contains { o.start < $0.end && o.end > $0.start } }
 
 public func nextOccurrences(_ row: BundleRow, now: Date, n: Int, alerts: [Alert] = []) -> [Occurrence] {
     guard row.status == "active", row.availability == "scheduled" else { return [] }
@@ -109,10 +128,16 @@ public func nextOccurrences(_ row: BundleRow, now: Date, n: Int, alerts: [Alert]
 
 public func openNow(_ row: BundleRow, now: Date, alerts: [Alert] = []) -> OpenResult {
     guard row.status == "active" else { return OpenResult(state: .not_listed) }
-    if row.availability == "always" { return OpenResult(state: .open) }
+    if row.availability == "always" {
+        // Always open, unless a published cancellation covers right now.
+        let nowMin = nowWallMinutes(now)
+        return cancelWindows(row.id, alerts).contains { nowMin >= $0.start && nowMin < $0.end }
+            ? OpenResult(state: .closed, next: .some(nil), cancelledNow: true) : OpenResult(state: .open)
+    }
     if row.availability == "call_first" { return OpenResult(state: .call_first) }
     // Unknown is never rendered as open.
-    if row.availability == "unknown" || row.schedules.isEmpty { return OpenResult(state: .unknown) }
+    // So is a schedule that can't be read: it is skipped, and with none left the listing is unknown.
+    if row.availability == "unknown" || !row.schedules.contains(where: scheduleIsValid) { return OpenResult(state: .unknown) }
 
     let nowMin = nowWallMinutes(now), w = cancelWindows(row.id, alerts)
     let occ = occurrences(row, nowMin: nowMin, days: lookaheadDays).filter { $0.end > nowMin }

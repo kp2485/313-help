@@ -12,9 +12,10 @@ The web app and pipeline import `packages/query`. iOS (and later Android) re-imp
 
 - A schedule is HSDS RRULE fields: `freq`, `interval`, `byday` (`MO,WE`, `2TU`, `-1FR`), `bymonthday`, `dtstart`, `until`, plus `valid_from` / `valid_to`, `opens_at`, `closes_at`.
 - No `freq` means a single date (`dtstart`).
+- **Valid shapes only.** Dates are exactly `YYYY-MM-DD` and must exist; times are exactly `HH:MM`, with `24:00` the latest; `freq` is one of DAILY, WEEKLY, MONTHLY, YEARLY; `interval` is a whole number of 1 or more; `byday` goes only with WEEKLY or MONTHLY, and a numbered day (`2TU`, `-1FR`, 1 to 5) only with MONTHLY; `bymonthday` (whole numbers, 1 to 31 or -1 to -31) only with MONTHLY. The pipeline refuses anything else. A client that meets one anyway skips that schedule; if none are left, the row is `unknown`. It never guesses.
 - `closes_at <= opens_at` means the window runs past midnight into the next day. The occurrence belongs to the date it **opens**.
 - A row may have several schedules; their occurrences merge in time order.
-- HSDS has no exception dates. A **published cancellation alert** whose `targets` include the row suppresses every occurrence that *opens* inside the alert's window. Draft, expired-by-status, and retracted alerts do nothing.
+- HSDS has no exception dates. A **published cancellation alert** whose `targets` include the row cancels every occurrence whose window **overlaps** the alert's window at all, so a cancellation posted after a pantry opened closes it for the rest of that window. It also closes an `always` row while the alert's window lasts (`closed`, `next: null`, `cancelled_now: true`). Draft, expired-by-status, and retracted alerts do nothing.
 - Look ahead 120 days.
 
 ## Open now
@@ -22,9 +23,9 @@ The web app and pipeline import `packages/query`. iOS (and later Android) re-imp
 | Row | Result |
 |---|---|
 | status is not `active` | `not_listed` |
-| availability `always` | `open` |
+| availability `always` | `open` (unless a cancellation covers now; see above) |
 | availability `call_first` | `call_first` |
-| availability `unknown`, or `scheduled` with no schedules | `unknown` — **never rendered as open** |
+| availability `unknown`, or `scheduled` with no valid schedules | `unknown` — **never rendered as open** |
 | inside a window, 30+ minutes left | `open` + `closes_at`, `minutes_left` |
 | inside a window, under 30 minutes left | `closes_soon` |
 | otherwise | `closed` + `next` (or `next: null`), and `cancelled_now: true` if a cancelled window would have been open |

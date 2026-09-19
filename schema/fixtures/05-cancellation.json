@@ -1,5 +1,5 @@
 {
-  "description": "HSDS schedules have no exception dates. A published cancellation alert suppresses the occurrences that open inside its window. Drafts and retracted alerts do nothing.",
+  "description": "HSDS schedules have no exception dates. A published cancellation alert cancels every time window it overlaps, including one already under way, and it applies to listings that are always open. Drafts and retracted alerts do nothing.",
   "rows": [
     {
       "id": "sal_fri_pantry",
@@ -24,6 +24,35 @@
           "closes_at": "14:30"
         }
       ]
+    },
+    {
+      "id": "sal_sat_pantry",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "SA",
+          "dtstart": "2026-09-05",
+          "opens_at": "09:00",
+          "closes_at": "13:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_sat_early",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "SA",
+          "dtstart": "2026-09-05",
+          "opens_at": "09:00",
+          "closes_at": "13:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_warming",
+      "availability": "always",
+      "schedules": []
     }
   ],
   "alerts": [
@@ -50,6 +79,42 @@
         "sal_other"
       ],
       "status": "draft"
+    },
+    {
+      "id": "alert_sat_midmorning",
+      "kind": "cancellation",
+      "category": "food",
+      "title": "Closed the rest of today",
+      "starts_at": "2026-11-28T10:15:00-05:00",
+      "ends_at": "2026-11-28T16:15:00-05:00",
+      "targets": [
+        "sal_sat_pantry"
+      ],
+      "status": "published"
+    },
+    {
+      "id": "alert_sat_before_open",
+      "kind": "cancellation",
+      "category": "food",
+      "title": "Early delivery cancelled",
+      "starts_at": "2026-11-28T06:00:00-05:00",
+      "ends_at": "2026-11-28T08:00:00-05:00",
+      "targets": [
+        "sal_sat_early"
+      ],
+      "status": "published"
+    },
+    {
+      "id": "alert_warming_closed",
+      "kind": "cancellation",
+      "category": "warming",
+      "title": "Warming center closed tonight",
+      "starts_at": "2026-11-28T18:00:00-05:00",
+      "ends_at": "2026-11-29T08:00:00-05:00",
+      "targets": [
+        "sal_warming"
+      ],
+      "status": "published"
     }
   ],
   "cases": [
@@ -82,6 +147,58 @@
       "fn": "openNow",
       "row": "sal_other",
       "now": "2026-11-27T18:45:00Z",
+      "expect": {
+        "state": "open"
+      }
+    },
+    {
+      "name": "a cancellation posted after opening closes the window already under way",
+      "fn": "openNow",
+      "row": "sal_sat_pantry",
+      "now": "2026-11-28T15:30:00Z",
+      "expect": {
+        "state": "closed",
+        "cancelled_now": true,
+        "next": {
+          "date": "2026-12-05"
+        }
+      }
+    },
+    {
+      "name": "the next times skip the cancelled window",
+      "fn": "nextOccurrences",
+      "row": "sal_sat_pantry",
+      "now": "2026-11-28T15:30:00Z",
+      "n": 1,
+      "expect": [
+        "2026-12-05 09:00-13:00"
+      ]
+    },
+    {
+      "name": "a cancellation that ends before opening cancels nothing",
+      "fn": "openNow",
+      "row": "sal_sat_early",
+      "now": "2026-11-28T14:30:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "13:00"
+      }
+    },
+    {
+      "name": "an always-open listing honors a cancellation",
+      "fn": "openNow",
+      "row": "sal_warming",
+      "now": "2026-11-29T01:00:00Z",
+      "expect": {
+        "state": "closed",
+        "cancelled_now": true
+      }
+    },
+    {
+      "name": "and is open again once it ends",
+      "fn": "openNow",
+      "row": "sal_warming",
+      "now": "2026-11-29T14:00:00Z",
       "expect": {
         "state": "open"
       }

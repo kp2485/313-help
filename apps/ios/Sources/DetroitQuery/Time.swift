@@ -37,9 +37,16 @@ public func parseDay(_ s: String) -> Int? {
     return dayNumber(y, m, d)
 }
 public func dayString(_ day: Int) -> String { let c = civil(day); return String(format: "%04d-%02d-%02d", c.y, c.m, c.d) }
+/// A schedule date: exactly YYYY-MM-DD, and a day that exists (no 2026-02-30).
+public func parseScheduleDay(_ s: String) -> Int? {
+    guard s.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil, let d = parseDay(s), dayString(d) == s else { return nil }
+    return d
+}
+/// "HH:MM" on a 24-hour clock, exactly. 24:00 is the end of the day; nothing later.
 public func parseClock(_ s: String) -> Int? {
+    guard s.range(of: #"^\d{2}:\d{2}$"#, options: .regularExpression) != nil else { return nil }
     let p = s.split(separator: ":")
-    guard p.count >= 2, let h = Int(p[0]), let m = Int(p[1].prefix(2)), h <= 24, m <= 59 else { return nil }
+    guard let h = Int(p[0]), let m = Int(p[1]), h <= 24, m <= 59, h < 24 || m == 0 else { return nil }
     return h * 60 + m
 }
 public func wallDateString(_ w: Wall) -> String { String(format: "%04d-%02d-%02d", w.y, w.m, w.d) }
