@@ -197,10 +197,18 @@ describe('report facts from the write API', () => {
     expect(badge(r, new Date('2026-09-18T18:00:00Z'))).toMatchObject({ level: 'archived', params: { date: '2026-09-18' } });
     expect(validateRows([r], '2026-09-18').errors).toEqual([]);
   });
-  it('a tripped circuit breaker keeps closure reports off the badges', () => {
+  it('a tripped circuit breaker leaves labels as they were: the counts the Worker froze before the burst are applied', () => {
+    // The Worker sends counts as of before the burst while tripped; a real label from before stays up.
     const r = row({ facts: { ...row({}).facts, checked_at_entry: '2026-09-10', entry_method: 'phone' } });
-    applyAggregates([r], agg({ circuit_breaker: true, targets: [{ target_id: 'sal_test', closed_open: 9, closed_last_at: '2026-09-18T10:00Z', wrong_open: 0, last_confirmed_at: null }] }));
-    expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('entry_checked');
+    applyAggregates([r], agg({ circuit_breaker: true, targets: [{ target_id: 'sal_test', closed_open: 2, closed_last_at: '2026-09-15T10:00Z', wrong_open: 0, last_confirmed_at: null }] }));
+    expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
+  });
+  it('the "still open" phone count reaches the badge: one tap does not clear two closed reports', () => {
+    const r = row({});
+    applyAggregates([r], agg({ targets: [{ target_id: 'sal_test', closed_open: 2, closed_last_at: '2026-09-15T10:00Z', wrong_open: 0, last_confirmed_at: '2026-09-17T10:00Z', open_after_closed: 1 }] }));
+    expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
+    applyAggregates([r], agg({ targets: [{ target_id: 'sal_test', closed_open: 2, closed_last_at: '2026-09-15T10:00Z', wrong_open: 0, last_confirmed_at: '2026-09-17T10:00Z', open_after_closed: 2 }] }));
+    expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('confirmed');
   });
 });
 

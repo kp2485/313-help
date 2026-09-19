@@ -37,8 +37,8 @@ A window is open from `opens_at` inclusive to `closes_at` exclusive.
 Computed on the device from dated facts. **No timers** (DECISIONS 2026-09-19): the wording changes only when people report something, never because time passed. Every badge shows its date, so a reader can judge "checked in September" for themselves. First match wins:
 
 1. `archived` — status archived.
-2. `reported_closed` — 2+ open closed/moved reports (counted per phone, not per kind), and no confirm dated **after** the latest one. A report with no date still counts.
-3. `reported_once` — exactly 1 such report. A same-day confirm does not outweigh a report.
+2. `reported_closed` — 2+ open closed/moved reports (counted per phone, not per kind) that still stand. A closed report stands until as many **different phones** say "still open" after the latest closed report (`open_after_closed`) as said closed, or until a person's phone check (`last_confirm_method: phone`) dated a later day. A newer confirm date alone clears nothing: one tap can't undo real reports (review 18, Kyle 2026-09-19). A report with no date still counts.
+3. `reported_once` — exactly 1 such report that still stands. A phone check the same day does not outweigh it.
 4. `confirmed` — a confirm exists (any age). The key carries the method (`badge.confirmed.phone` vs `badge.confirmed.community_confirm`): a tap is not a phone call. Shows how many days ago.
 5. `entry_checked` — checked when added (any age). Shows the date.
 6. `source_listed` — never checked by us, on a publisher's list with a known edit date. Names the list and its date and claims nothing else.

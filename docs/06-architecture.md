@@ -77,7 +77,7 @@ Public endpoints (all anonymous). Rate limiting is a Cloudflare WAF rule in fron
 
 Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a service token for the pipeline):
 - `GET /v1/steward/queue` — open reports (not confirmations: those only feed the badge), proposals, and per target the number of different phones that said closed (`closed_phones`; the hashes never leave D1).
-- `GET /v1/steward/aggregates` — counts and dates per target, steward decisions, and the circuit-breaker flag, for the bundle build. Closure and wrong-info counts are different phones, not reports.
+- `GET /v1/steward/aggregates` — counts and dates per target, steward decisions, and the circuit-breaker flag, for the bundle build. Closure and wrong-info counts are different phones, not reports; `open_after_closed` is the different phones that said "still open" after the latest closed report.
 - `GET /v1/steward/photos/:key` — view one photo.
 - `POST /v1/steward/reports/:id/resolve`, `POST /v1/steward/proposals/:id/resolve` — accept / reject / duplicate, with a reason code.
 - `POST /v1/steward/reports/settle` — settle the reports the steward page showed on one target: only those ids, only on that target, only while still open, never a confirmation. A report that came in after the page loaded stays open.
@@ -95,7 +95,7 @@ Retention: raw reports 180 days, then aggregated to counts per target/kind/month
 ## Admin / steward tool
 
 Boring on purpose. One page, `/admin/`, behind Cloudflare Access. On it, in order:
-- A circuit-breaker banner when more than 5 listings were reported closed in one day (closure reports then change no badges until a person looks).
+- A circuit-breaker banner when more than 5 listings were reported closed in one day (labels then freeze as they were: the aggregates count only reports made before the burst, until a person looks; DECISIONS 2026-09-19).
 - Reported listings and places first, grouped by target, with the phone-call script inline and buttons to archive (closed, moved, program ended), mark it open and clear the reports, or close reports as fixed, can't confirm, spam, or "about a person: discard." A listing is highlighted when 2 or more different phones said closed, the same count that changes its badge. A button settles only the reports the page showed. A photo on a condition report shows here, with "Delete this photo now."
 - Proposed new places: checked and listed, already listed, can't confirm, or not a fit.
 - Pages that changed: the nightly re-check's tasks, with the listing's name and what its page no longer shows, and "Checked: it's fine" or "I'll fix it."

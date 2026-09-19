@@ -168,7 +168,7 @@ describe('steward endpoints', () => {
     for (const [i, kind] of ['closed_permanently', 'moved', 'wrong_hours', 'confirmed_ok'].entries())
       await post('/v1/reports', { target_id: 'sal_b', kind, detail: 'private words', client_nonce: String(i).repeat(64) });
     let agg = (await (await steward('/v1/steward/aggregates')).json()) as { circuit_breaker: boolean; targets: Record<string, unknown>[] };
-    expect(agg.targets[0]).toEqual({ target_id: 'sal_b', closed_open: 2, closed_last_at: '2026-09-18T17:41Z', wrong_open: 1, last_confirmed_at: '2026-09-18T17:41Z' });
+    expect(agg.targets[0]).toEqual({ target_id: 'sal_b', closed_open: 2, closed_last_at: '2026-09-18T17:41Z', wrong_open: 1, last_confirmed_at: '2026-09-18T17:41Z', open_after_closed: 0 });
     expect(JSON.stringify(agg)).not.toContain('private words');
     expect(agg.circuit_breaker).toBe(false);
 
@@ -185,6 +185,34 @@ describe('steward endpoints', () => {
     expect(((await (await steward('/v1/steward/aggregates')).json()) as Agg).targets[0]!.closed_open).toBe(1);
     await post('/v1/reports', { target_id: 'sal_b', kind: 'moved', client_nonce: 'e'.repeat(64) });
     expect(((await (await steward('/v1/steward/aggregates')).json()) as Agg).targets[0]!.closed_open).toBe(2);
+  });
+  // Reports at chosen times (the app's clock is fixed at NOW).
+  const at = (target: string, kind: string, when: string, nonce: string) => db.raw.prepare("INSERT INTO reports (id, target_id, kind, submitted_at, observed_at, client_nonce, status) VALUES (?, ?, ?, ?, ?, ?, 'open')")
+    .run(`rpt_${nonce.slice(0, 6)}${kind.length}${when.slice(8, 10)}`, target, kind, when, when, nonce);
+  type Full = { circuit_breaker: boolean; targets: { target_id: string; closed_open: number; open_after_closed: number; closed_last_at: string | null }[] };
+  const full = async () => (await (await steward('/v1/steward/aggregates')).json()) as Full;
+  it('open_after_closed counts different phones that said "still open" after the latest closed report (review 18)', async () => {
+    at('sal_b', 'closed_permanently', '2026-09-15T10:00Z', 'a'.repeat(64));
+    at('sal_b', 'moved', '2026-09-16T10:00Z', 'b'.repeat(64));
+    at('sal_b', 'confirmed_ok', '2026-09-15T12:00Z', 'c'.repeat(64));   // before the latest closed report: doesn't count
+    at('sal_b', 'confirmed_ok', '2026-09-17T09:00Z', 'd'.repeat(64));
+    at('sal_b', 'looks_good', '2026-09-17T11:00Z', 'd'.repeat(64));     // the same phone again: once
+    expect((await full()).targets.find((t) => t.target_id === 'sal_b')).toMatchObject({ closed_open: 2, open_after_closed: 1, closed_last_at: '2026-09-16T10:00Z' });
+    at('sal_b', 'confirmed_ok', '2026-09-17T15:00Z', 'e'.repeat(64));
+    expect((await full()).targets.find((t) => t.target_id === 'sal_b')!.open_after_closed).toBe(2);
+  });
+  it('while the breaker is tripped, labels stay as they were: counts are taken as of before the burst (Kyle, 2026-09-19)', async () => {
+    at('sal_b', 'closed_permanently', '2026-09-15T10:00Z', 'a'.repeat(64));
+    at('sal_b', 'moved', '2026-09-15T11:00Z', 'b'.repeat(64));
+    const ids = Array.from({ length: 6 }, (_, i) => `sal_burst_${i}`);
+    expect((await steward('/v1/steward/targets', { method: 'PUT', body: JSON.stringify({ listings: ids, places: [] }) })).status).toBe(200);
+    for (const [i, id] of ids.entries()) at(id, 'closed_permanently', '2026-09-18T12:00Z', (i + 4).toString(16).repeat(64));
+    at('sal_b', 'confirmed_ok', '2026-09-18T13:00Z', 'f'.repeat(64));   // a "still open" flood during the burst waits too
+    at('sal_b', 'confirmed_ok', '2026-09-18T13:01Z', 'e'.repeat(64));
+    const agg = await full();
+    expect(agg.circuit_breaker).toBe(true);
+    expect(agg.targets.find((t) => t.target_id === 'sal_b')).toMatchObject({ closed_open: 2, open_after_closed: 0 });   // the real label stays up
+    expect(agg.targets.some((t) => t.target_id.startsWith('sal_burst_'))).toBe(false);                                // the flood adds none
   });
   it('wrong_open counts phones too: one phone saying wrong hours and wrong phone counts once', async () => {
     await post('/v1/reports', { target_id: 'sal_b', kind: 'wrong_hours', client_nonce: NONCE });

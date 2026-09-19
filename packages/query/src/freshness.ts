@@ -29,10 +29,12 @@ export function badge(row: BundleRow, now: Date): Badge {
     return { level: 'archived', key: 'badge.archived', params: { date: row.archived?.at ? detroitDay(row.archived.at) : '' }, tier: TIER.archived };
   }
 
-  // A closed report counts until someone confirms the place is open *after* it.
+  // A closed report stands until as many different phones say "still open" after it as said closed, so one tap
+  // can't undo real reports (review 18, Kyle 2026-09-19), or until a person's phone check on a later day.
   const closedAt = f.reports.closed_last_at ? detroitDay(f.reports.closed_last_at) : null;
   const confirmedAt = f.last_confirmed_at ? detroitDay(f.last_confirmed_at) : null;
-  const closedStands = f.reports.closed_open > 0 && (closedAt === null || confirmedAt === null || confirmedAt <= closedAt);
+  const personChecked = f.last_confirm_method === 'phone' && confirmedAt !== null && closedAt !== null && confirmedAt > closedAt;
+  const closedStands = f.reports.closed_open > 0 && !personChecked && (f.reports.open_after_closed ?? 0) < f.reports.closed_open;
   if (closedStands) {
     return f.reports.closed_open >= 2
       ? { level: 'reported_closed', key: 'badge.reported_closed', params: { count: f.reports.closed_open, date: closedAt ?? '' }, tier: TIER.reported_closed }

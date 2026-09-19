@@ -85,7 +85,8 @@
         "reports": {
           "closed_open": 1,
           "closed_last_at": "2026-10-10",
-          "wrong_open": 0
+          "wrong_open": 0,
+          "open_after_closed": 1
         },
         "source": {
           "type": "seed_list",
@@ -189,6 +190,99 @@
           "name": "test"
         },
         "checked_at_entry": "2026-09-18",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "sal_two_closed_one_open",
+      "facts": {
+        "reports": {
+          "closed_open": 2,
+          "closed_last_at": "2026-10-10",
+          "wrong_open": 0,
+          "open_after_closed": 1
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-15",
+        "last_confirm_method": "community_confirm",
+        "checked_at_entry": "2026-09-01",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "sal_two_closed_two_open",
+      "facts": {
+        "reports": {
+          "closed_open": 2,
+          "closed_last_at": "2026-10-10",
+          "wrong_open": 0,
+          "open_after_closed": 2
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-15",
+        "last_confirm_method": "community_confirm",
+        "checked_at_entry": "2026-09-01",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "sal_confirm_date_only",
+      "facts": {
+        "reports": {
+          "closed_open": 1,
+          "closed_last_at": "2026-10-10",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-15",
+        "last_confirm_method": "community_confirm",
+        "checked_at_entry": "2026-09-01",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "sal_phone_check_after",
+      "facts": {
+        "reports": {
+          "closed_open": 2,
+          "closed_last_at": "2026-10-10",
+          "wrong_open": 0,
+          "open_after_closed": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-12",
+        "last_confirm_method": "phone",
+        "checked_at_entry": "2026-09-01",
+        "entry_method": "web"
+      }
+    },
+    {
+      "id": "sal_phone_check_same_day",
+      "facts": {
+        "reports": {
+          "closed_open": 1,
+          "closed_last_at": "2026-10-12",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "last_confirmed_at": "2026-10-12",
+        "last_confirm_method": "phone",
+        "checked_at_entry": "2026-09-01",
         "entry_method": "web"
       }
     }
@@ -371,6 +465,54 @@
         "params": {
           "count": 3
         }
+      }
+    },
+    {
+      "name": "one \"still open\" tap does not undo two \"closed\" reports (review 18)",
+      "fn": "badge",
+      "row": "sal_two_closed_one_open",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_closed",
+        "params": {
+          "count": 2
+        }
+      }
+    },
+    {
+      "name": "as many different phones saying open (after the last closed report) as said closed: the label clears",
+      "fn": "badge",
+      "row": "sal_two_closed_two_open",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "confirmed"
+      }
+    },
+    {
+      "name": "a newer confirm date alone does not clear a closed label; it takes a count of phones",
+      "fn": "badge",
+      "row": "sal_confirm_date_only",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_once"
+      }
+    },
+    {
+      "name": "a person's phone check dated after the report clears it, whatever the count",
+      "fn": "badge",
+      "row": "sal_phone_check_after",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "confirmed"
+      }
+    },
+    {
+      "name": "a phone check the same day as the report does not outweigh it",
+      "fn": "badge",
+      "row": "sal_phone_check_same_day",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_once"
       }
     }
   ]

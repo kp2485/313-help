@@ -208,14 +208,22 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     // One phone = one report (DECISIONS 2026-09-19): closure and wrong-info reports count distinct per-target daily
     // hashes, so one phone saying both "closed" and "moved" counts once. (The hash differs every day, so a phone
     // counts once a day.)
-    const open = await c.env.DB.prepare(`SELECT target_id, ${phones(CLOSED_KINDS)} AS closed_open, MAX(CASE WHEN kind IN (${inList(CLOSED_KINDS)}) THEN submitted_at END) AS closed_last_at, ${phones(WRONG_KINDS)} AS wrong_open,
-        MAX(CASE WHEN kind IN (${inList(CONFIRM_KINDS)}) THEN submitted_at END) AS last_confirmed_at FROM reports WHERE status = 'open' GROUP BY target_id`).all<{ target_id: string; closed_open: number }>();
-    // Circuit breaker (audit A1): closure reports on many listings in one day is an attack or a disaster.
-    // Either way a person should look before badges change, so the pipeline ignores closure counts while it is tripped.
+    // Circuit breaker (audit A1): closure reports on many listings in one day is an attack or a disaster. Either way a
+    // person should look before labels change. While it is tripped, every count is taken as of the start of that day:
+    // labels stay exactly as they were, and a flood can neither add labels nor hide real ones (Kyle, 2026-09-19).
     const since = new Date(deps.now().getTime() - 86400000).toISOString().slice(0, 16) + 'Z';
     const burst = await c.env.DB.prepare(`SELECT COUNT(DISTINCT target_id) AS n FROM reports WHERE status = 'open' AND submitted_at >= ? AND kind IN (${inList(CLOSED_KINDS)})`).bind(since).first<{ n: number }>();
+    const tripped = (burst?.n ?? 0) > 5;
+    // open_after_closed: different phones that said "still open" after the latest closed report. A closed label clears
+    // only when that reaches the number who said closed, so one tap can't undo real reports (review 18).
+    const open = await c.env.DB.prepare(`WITH r AS (SELECT * FROM reports WHERE status = 'open'${tripped ? ' AND submitted_at < ?' : ''}),
+        c AS (SELECT target_id, MAX(submitted_at) AS last_closed FROM r WHERE kind IN (${inList(CLOSED_KINDS)}) GROUP BY target_id)
+      SELECT r.target_id, ${phones(CLOSED_KINDS)} AS closed_open, c.last_closed AS closed_last_at, ${phones(WRONG_KINDS)} AS wrong_open,
+        MAX(CASE WHEN kind IN (${inList(CONFIRM_KINDS)}) THEN submitted_at END) AS last_confirmed_at,
+        COUNT(DISTINCT CASE WHEN kind IN (${inList(CONFIRM_KINDS)}) AND c.last_closed IS NOT NULL AND r.submitted_at > c.last_closed THEN client_nonce END) AS open_after_closed
+      FROM r LEFT JOIN c ON c.target_id = r.target_id GROUP BY r.target_id`).bind(...(tripped ? [since] : [])).all<{ target_id: string; closed_open: number }>();
     const overrides = await c.env.DB.prepare('SELECT target_id, status, reason_code, replacement_id, at FROM listing_overrides').all();
-    return c.json({ circuit_breaker: (burst?.n ?? 0) > 5, targets: open.results, overrides: overrides.results });
+    return c.json({ circuit_breaker: tripped, targets: open.results, overrides: overrides.results });
   });
 
   // ---- tasks the machine raises for a steward (DECISIONS 2026-09-19) ------------------------------

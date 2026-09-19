@@ -20,7 +20,10 @@ public func badge(_ row: BundleRow, now: Date) -> Badge {
 
     // A closed report counts until someone confirms the place is open *after* it. A report with no date still counts.
     let closedAt = f.reports.closedLastAt.map(detroitDay), confirmedAt = f.lastConfirmedAt.map(detroitDay)
-    if f.reports.closedOpen > 0, closedAt == nil || confirmedAt == nil || confirmedAt! <= closedAt! {
+    // A closed report stands until as many different phones say "still open" after it as said closed (review 18),
+    // or until a person's phone check on a later day.
+    let personChecked = f.lastConfirmMethod == "phone" && confirmedAt != nil && closedAt != nil && confirmedAt! > closedAt!
+    if f.reports.closedOpen > 0, !personChecked, (f.reports.openAfterClosed ?? 0) < f.reports.closedOpen {
         return f.reports.closedOpen >= 2
             ? make("reported_closed", "badge.reported_closed", ["count": String(f.reports.closedOpen), "date": closedAt ?? ""])
             : make("reported_once", "badge.reported_once", ["date": closedAt ?? ""])

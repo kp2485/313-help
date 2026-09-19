@@ -16,7 +16,7 @@ public struct Schedule: Codable, Equatable, Sendable {
 }
 
 public struct Facts: Codable, Equatable, Sendable {
-    public struct Reports: Codable, Equatable, Sendable { public var closedOpen: Int; public var closedLastAt: String?; public var wrongOpen: Int }
+    public struct Reports: Codable, Equatable, Sendable { public var closedOpen: Int; public var closedLastAt: String?; public var wrongOpen: Int; public var openAfterClosed: Int? }
     public struct Source: Codable, Equatable, Sendable { public var type: String; public var name: String; public var url: String?; public var lastEdited: String? }
     public var checkedAtEntry: String?
     public var entryMethod: String?

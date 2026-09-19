@@ -36,6 +36,8 @@ export interface Facts {
     /** Open closed/moved reports (distinct nonces). */
     closed_open: number;
     closed_last_at?: string | null;
+    /** Different phones that said "still open" after the latest closed report (review 18). */
+    open_after_closed?: number;
     /** Open wrong hours/phone/info reports. */
     wrong_open: number;
   };

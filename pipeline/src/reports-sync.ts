@@ -6,7 +6,7 @@ import type { BundleRow } from '@detroithelp/query';
 
 export interface Aggregates {
   circuit_breaker: boolean;
-  targets: { target_id: string; closed_open: number; closed_last_at: string | null; wrong_open: number; last_confirmed_at: string | null }[];
+  targets: { target_id: string; closed_open: number; closed_last_at: string | null; wrong_open: number; last_confirmed_at: string | null; open_after_closed?: number }[];
   /** Steward decisions (admin tool). The seed files are never edited; these are applied at build time. */
   overrides?: { target_id: string; status: 'archived' | 'suspended' | 'active'; reason_code: string; replacement_id: string | null; at: string }[];
 }
@@ -18,9 +18,9 @@ export function applyAggregates(rows: BundleRow[], agg: Aggregates): { applied: 
     const a = by.get(r.id);
     if (!a) continue;
     applied++;
-    // Breaker tripped: closure reports across many listings in a day. Badges wait for a person (audit A1).
-    if (!agg.circuit_breaker) r.facts.reports = { closed_open: a.closed_open, closed_last_at: a.closed_last_at, wrong_open: a.wrong_open };
-    else r.facts.reports.wrong_open = a.wrong_open;
+    // While the breaker is tripped the Worker sends counts as of before the burst, so labels stay as they were
+    // (audit A1; Kyle 2026-09-19). Either way the counts are applied as sent.
+    r.facts.reports = { closed_open: a.closed_open, closed_last_at: a.closed_last_at, wrong_open: a.wrong_open, ...(a.open_after_closed ? { open_after_closed: a.open_after_closed } : {}) };
     // A visitor's confirm never overrides a newer check by a person with a phone.
     if (a.last_confirmed_at && (!r.facts.last_confirmed_at || a.last_confirmed_at > r.facts.last_confirmed_at)) {
       r.facts.last_confirmed_at = a.last_confirmed_at;
