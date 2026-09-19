@@ -124,3 +124,5 @@ address { font-style:normal; font-size:1.0625rem; }
 .kinds { display:grid; gap:.375rem; margin-top:.625rem; } .kinds button { min-height:2.875rem; padding:.5rem .875rem; border-radius:var(--r-sm); background:var(--surface); border:1px solid var(--line); font-weight:550; }
 @media (prefers-reduced-motion:no-preference) { .row,.feature,.tile,.chip,.btn,.tabs button { transition:border-color .15s,background-color .15s,transform .1s; } button:active,.btn:active,.callrow:active { transform:scale(.985); } }
 @media (forced-colors:active) { .row,.card,.chip,.btn,.callrow,.tabs button[aria-current] { border:1px solid CanvasText; } }
+/* Privacy page: a plain bulleted list. */
+ul.plain { list-style: disc; padding-left: 1.25rem; display: grid; gap: .375rem; margin: 0 0 1rem; }

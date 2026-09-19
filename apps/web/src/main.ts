@@ -10,7 +10,7 @@ import { icon } from './icons.js';
 import { MapView, type MapDot, type MapSpec } from './map.js';
 import { CATEGORIES, HARDCODED, NEEDS, TABS, isSensitive, type Need, type TabId } from './needs.js';
 import { createRouter, type View } from './router.js';
-import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, preparePhoto, submit, uploadPhoto } from './report.js';
+import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, preparePhoto, resetInstallSecret, submit, uploadPhoto } from './report.js';
 import { TRANSIT } from './transit.js';
 import { FOOD_BENEFITS } from './benefits.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitProposal } from './propose.js';
@@ -190,7 +190,8 @@ function homeTab(): string {
     ${ev.length ? `<div class="sechead"><h2>${T('home.events')}</h2><button class="link" ${go({ v: 'tab', tab: 'events' })}>${T('home.see_all')}</button></div><ul class="events">${ev.map(eventItem).join('')}</ul>` : ''}
     <div class="duo"><button class="tile" ${go({ v: 'tab', tab: 'rec' })}>${icon('rec')}<strong>${T('tab.rec')}</strong><small>${T('home.rec_sub', { count: openSegs })}</small></button>
       <button class="tile" ${go({ v: 'tab', tab: 'transit' })}>${icon('transit')}<strong>${T('tab.transit')}</strong><small>${T('home.transit_sub')}</small></button></div>
-    <p class="foot">${T('home.updated', { when: prettyDate(bundle.index.generated_at) })} · <button class="link" ${go({ v: 'about' })}>${T('about.title')}</button></p></main>`;
+    <p class="foot">${T('home.updated', { when: prettyDate(bundle.index.generated_at) })} · <button class="link" ${go({ v: 'about' })}>${T('about.title')}</button> · <button class="link" ${go({ v: 'privacy' })}>${T('privacy.title')}</button></p>
+    <p class="foot">${T('about.p3')}</p></main>`;
 }
 function helpTab(): string {
   const group = (g: Need['group']) => `<ul class="rows">${NEEDS.filter((n) => n.group === g).map((n) => rowLink({ v: 'need', id: n.id }, n.icon, t('need.' + n.id))).join('')}</ul>`;
@@ -376,24 +377,40 @@ function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string;
   const h = d.neighborhoods.find((x) => x.id === v.id);
   return h ? { title: h.name, html: hoodPage(h, d, ui) } : { title: t('hood.title'), html: hoodList(d, ui) };
 }
+// What this app keeps and sends, in plain words (docs/08). Everything here is true of the code; tests check the parts
+// that can be checked (no storage writes in main.ts, closed report fields, no IP in the Worker).
+let keyReset = false;
+function privacy(): string {
+  const li = (keys: string[]) => `<ul class="plain">${keys.map((k) => `<li>${T(k)}</li>`).join('')}</ul>`;
+  return `<main><p class="lede">${T('privacy.lede')}</p>
+    <h2>${T('privacy.phone_h')}</h2>${li(['privacy.phone_1', 'privacy.phone_2', 'privacy.phone_3', 'privacy.phone_4', 'privacy.phone_5'])}
+    <h2>${T('privacy.where_h')}</h2><p>${T('privacy.where')}</p>
+    <h2>${T('privacy.sent_h')}</h2>${li(['privacy.sent_1', 'privacy.sent_2'])}
+    <h2>${T('privacy.never_h')}</h2><p>${T('privacy.never')}</p>
+    <h2>${T('privacy.reset_h')}</h2><p>${T('privacy.reset')}</p>
+    ${keyReset ? `<p class="banner ok" role="status">${icon('check', 'sm')} ${T('privacy.reset_done')}</p>` : `<button class="btn ghost" data-reset-key>${T('privacy.reset_btn')}</button>`}
+    <p class="foot">${T('about.p3')}</p></main>`;
+}
 function about(): string {
   const i = bundle?.index;
   return `<main>${langBtn()}${[1, 2, 3, 4].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
     ${i ? `<p class="foot">${T('about.data', { version: i.version, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
+    <ul class="rows">${rowLink({ v: 'privacy' }, 'shield', t('privacy.title'), t('privacy.sub'))}</ul>
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul></main>`;
 }
 
-const TAB_OF: Partial<Record<View['v'], TabId>> = { search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
+const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'rec', segment: 'rec', parks: 'rec' };
 function render(focus = true): void {
   const v = stack[stack.length - 1]!;
   for (const m of mapViews) m.destroy();
   mapViews = []; mapSpecs = [];
   let title: string | undefined, body: string, exit = false;
   // Without a list, only the screens that don't need one: the urgent numbers and the overdose steps.
-  const standsAlone = v.v === 'urgent' || (v.v === 'need' && !!NEEDS.find((x) => x.id === v.id)?.stepsOnly);
+  const standsAlone = v.v === 'urgent' || v.v === 'privacy' || (v.v === 'need' && !!NEEDS.find((x) => x.id === v.id)?.stepsOnly);
   if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' && shownTabs().some((x) => x.id === v.tab) ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'rec' ? recTab() : tab === 'transit' ? transitTab() : eventsTab(); }
   else if (v.v === 'urgent') { title = t('strip.more'); body = urgent(); }
   else if (v.v === 'about') { title = t('about.title'); body = about(); }
+  else if (v.v === 'privacy') { title = t('privacy.title'); body = privacy(); }
   else if (v.v === 'search') { title = t('search.title'); body = searchScreen(); }
   else if (v.v === 'saved') { title = t('saved.title'); body = savedScreen(); }
   else if (v.v === 'add') { title = t('add.title'); body = addScreen(); }
@@ -416,14 +433,16 @@ function navigate(view: View): void {
   if (view.v === 'tab') searchText = '';   // a tab is a fresh start
   if (view.v !== 'detail') listMap = false;   // coming back from a place, the map is still open
   if (view.v === 'add') { proposed = null; proposeError = false; }
+  if (view.v === 'privacy') keyReset = false;
   router.navigate(view);
   render();
 }
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-retry],[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-retry],[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again]');
   if (!el) return;
-  if ('retry' in el.dataset) { el.setAttribute('disabled', ''); void checkForUpdate(true); }
+  if ('resetKey' in el.dataset) { await resetInstallSecret(); keyReset = true; render(false); }
+  else if ('retry' in el.dataset) { el.setAttribute('disabled', ''); void checkForUpdate(true); }
   else if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
   else if (el.dataset.lang) { await setLang(el.dataset.lang === 'es' ? 'es' : 'en'); render(false); }
   else if ('listmap' in el.dataset) { listMap = !listMap; render(false); }

@@ -6,7 +6,7 @@
 import { CATEGORIES, TABS, type TabId } from './needs.js';
 
 export type View =
-  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens?: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
+  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'privacy' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens?: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
   | { v: 'need'; id: string; refine?: string; all?: boolean }
   | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
 
@@ -21,6 +21,7 @@ export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/')
   if (v.v === 'segment') return `#/greenway/${v.id}`;
   if (v.v === 'parks') return '#/parks';
   if (v.v === 'about') return '#/about';
+  if (v.v === 'privacy') return '#/privacy';
   if (v.v === 'add') return '#/add';
   if (v.v === 'hoods') return v.lens ? `#/n/lens-${v.lens}` : '#/n';
   if (v.v === 'hood') return `#/n/${v.id}`;
@@ -29,13 +30,13 @@ export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/')
 
 /** The screen for a URL hash. Anything it doesn't know opens Home, never a half-built screen. */
 export function fromHash(h: string): View {
-  const m = /^#\/(r|c|n|greenway|about|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
+  const m = /^#\/(r|c|n|greenway|about|privacy|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
   if (!m) return HOME;
   if (m[1] === 'r') return m[2] ? { v: 'detail', id: m[2] } : HOME;
   if (m[1] === 'c') return m[2] && CATEGORIES.some((c) => c.id === m[2]) ? { v: 'list', cat: m[2] } : { v: 'tab', tab: 'help' };
   if (m[1] === 'n') return !m[2] ? { v: 'hoods' } : m[2].startsWith('lens-') ? { v: 'hoods', lens: m[2].slice(5) } : { v: 'hood', id: m[2] };
   if (m[1] === 'greenway') return m[2] ? { v: 'segment', id: m[2] } : { v: 'greenway' };
-  if (m[1] === 'about' || m[1] === 'parks' || m[1] === 'add') return m[2] ? HOME : { v: m[1] };
+  if (m[1] === 'about' || m[1] === 'privacy' || m[1] === 'parks' || m[1] === 'add') return m[2] ? HOME : { v: m[1] };
   return !m[2] && TABS.some((x) => x.id === m[1]) ? { v: 'tab', tab: m[1] as TabId } : HOME;
 }
 

@@ -20,6 +20,11 @@ async function installSecret(): Promise<string> {
   return s;
 }
 
+/** A new random key (About → Privacy). Reports made after this can't be matched to earlier ones, even on the same day. */
+export async function resetInstallSecret(): Promise<void> {
+  await idbSet('secret', hex(crypto.getRandomValues(new Uint8Array(32)).buffer));
+}
+
 /** sha256(secret | target | day): the same phone reporting the same target twice in a day counts once;
  *  two targets, or two days, give hashes nobody can connect (audit A4). */
 export async function nonce(targetId: string, when: Date, secret?: string): Promise<string> {
