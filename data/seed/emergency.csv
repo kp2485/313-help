@@ -1,7 +1,7 @@
-id,label,number,sms,hardcoded,sort,verified_by_call_on,verified_published_on,source_url,internal_note
-emg_911,Emergency,911,,yes,1,,,,Hardcoded; listed for completeness. Do not test-call.
-emg_shelter_helpline,Shelter tonight,866-313-2520,,no,2,,2026-09-18,https://detroitmi.gov/departments/housing-and-revitalization-department/homelessness,The City publishes this number for shelter intake. camdetroit.org and some partners still publish 313-305-0311; we follow the City (DECISIONS 2026-09-18).
-emg_988,Suicide and crisis lifeline,988,988,yes,3,,,https://988lifeline.org/,Hardcoded; listed for completeness.
-emg_dwihn_crisis,Local mental health crisis line,800-241-4949,,no,4,,2026-09-19,https://dwihn.org/crisis-help,
-emg_ndvh,Domestic violence hotline,800-799-7233,88788,no,5,,2026-09-19,https://www.thehotline.org/,Text START to 88788.
-emg_211,Help finding services,211,,no,6,,,https://mi211.org/,
+id,label,number,sms,hardcoded,sort,verified_by_call_on,verified_published_on,mismatch_on,source_url,internal_note
+emg_911,Emergency,911,,yes,1,,,,,Hardcoded; listed for completeness. Do not test-call.
+emg_shelter_helpline,Shelter tonight,866-313-2520,,no,2,,2026-09-18,,https://detroitmi.gov/departments/housing-and-revitalization-department/homelessness,The City publishes this number for shelter intake. camdetroit.org and some partners still publish 313-305-0311; we follow the City (DECISIONS 2026-09-18).
+emg_988,Suicide and crisis lifeline,988,988,yes,3,,,,https://988lifeline.org/,Hardcoded; listed for completeness.
+emg_dwihn_crisis,Local mental health crisis line,800-241-4949,,no,4,,2026-09-19,,https://dwihn.org/crisis-help,
+emg_ndvh,Domestic violence hotline,800-799-7233,88788,no,5,,2026-09-19,,https://www.thehotline.org/,Text START to 88788.
+emg_211,Help finding services,211,,no,6,,,,https://mi211.org/,

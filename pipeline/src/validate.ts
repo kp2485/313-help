@@ -65,12 +65,19 @@ export function validateEmergency(rows: CsvRow[], todayStr: string, release: boo
       continue; // 911 and 988 are never test-called
     }
     if (parsePhone(r.number ?? '')?.number.length === 3) continue; // national three-digit codes (211)
-    // Either a logged phone call or a match against the owner's published page counts (check:emergency).
+    // A release fails only on a mismatch (DECISIONS 2026-09-19): the owner's page was read and showed a different
+    // number. A person clears it by fixing the number (and mismatch_on), or by logging a call on or after that day.
+    if (r.mismatch_on && !(r.verified_by_call_on && r.verified_by_call_on >= r.mismatch_on)) {
+      verified = false;
+      (release ? errors : warnings).push(`${r.id} (${r.number}): on ${r.mismatch_on} its page (${r.source_url}) did not show this number. Read the page, fix emergency.csv by hand, and clear mismatch_on`);
+      continue;
+    }
+    // Otherwise age is a note for a person, never a reason to hold a release. A logged call or a page match counts.
     const on = [r.verified_by_call_on, r.verified_published_on].filter(Boolean).sort().pop();
     const age = on ? Math.round((Date.parse(todayStr) - Date.parse(on)) / 86400000) : Infinity;
     if (age > 30) {
       verified = false;
-      (release ? errors : warnings).push(`${r.id} (${r.number}): ${on ? `last checked ${on}, ${age} days ago` : 'never checked against its published source'}; a release needs a check within 30 days (pnpm check:emergency)`);
+      warnings.push(`${r.id} (${r.number}): ${on ? `last checked ${on}, ${age} days ago` : 'never checked against its published source'}; check it (pnpm check:emergency, or in a browser)`);
     }
   }
   for (const id of need.keys()) errors.push(`${id} is missing from emergency.csv`);

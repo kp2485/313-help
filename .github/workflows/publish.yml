@@ -3,10 +3,10 @@
 #
 # What it does, in order:
 #   1. (City events: dropped until a real feed exists, DECISIONS 2026-09-19.)
-#   2. Checks the emergency numbers against their owners' pages and stamps the date of each match. One bad
-#      night (a page that is down) does not stop the publish; the release build does, once any number has gone
-#      30 days without a match. Then yesterday's bundle stays up and a person reads the page. The script never
-#      rewrites a number.
+#   2. Checks the emergency numbers against their owners' pages and stamps the date of each match. A page that
+#      can't be read (down, or bot protection) changes nothing. A page that shows a different number stamps
+#      mismatch_on, and the release build below then fails: yesterday's bundle stays up and a person reads the
+#      page (DECISIONS 2026-09-19). The script never rewrites a number.
 #   3. Builds the signed release bundle from what is committed on main, builds the PWA, deploys to Pages,
 #      and commits data/hsds/ so every publish is in git.
 #   4. Re-reads the other open-data sources. Any change (a station's address, a greenway phase, a street) is
@@ -42,7 +42,7 @@ jobs:
 
       # 2 + 3. Gate, build, deploy. Any failure here stops the job before anything is published.
       - name: Emergency numbers still match their owners' pages
-        continue-on-error: true       # the 30-day rule is enforced by the release build below
+        continue-on-error: true       # a mismatch is enforced by the release build below
         run: pnpm check:emergency
       - run: pnpm test
       - name: Signed release bundle

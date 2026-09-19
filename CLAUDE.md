@@ -9,7 +9,7 @@ You are building **Detroit Compass** (named by Kyle 2026-09-18; internal package
 - Triage answers live in memory only and are cleared on exit.
 - Nothing is deleted from the dataset; rows are archived with reason.
 - Every listing shows freshness **computed on the device** from dated facts in the bundle (never frozen at build time). Badges state facts; never say "verified" for something no person checked. Unknown is never rendered as "open." Reports label rows; they never hide them.
-- 911 and 988 are hardcoded and never overridable. Other emergency numbers come from `data/seed/emergency.csv` via the **signed** bundle. We use the number its owner currently publishes: `pnpm check:emergency` must find each number on its source page (or a person logs a call) within 30 days, or a release build fails. The script never rewrites a number; a mismatch is a person's job. Any phone/address/coordinate change from any source is held for steward approval.
+- 911 and 988 are hardcoded and never overridable. Other emergency numbers come from `data/seed/emergency.csv` via the **signed** bundle. We use the number its owner currently publishes: `pnpm check:emergency` reads each number's source page; if the page is read and shows a different number (a mismatch), a release build fails until a person fixes it (DECISIONS 2026-09-19). A page that can't be read is logged for a person, not a failure. The script never rewrites a number; a mismatch is a person's job. Any phone/address/coordinate change from any source is held for steward approval.
 - Bundles are Ed25519-signed; clients pin two public keys (active + spare) and refuse unsigned or mis-signed bundles.
 - Harm-reduction, DV, and crisis screens follow the ordering rules in docs/05 (911/hotline first).
 

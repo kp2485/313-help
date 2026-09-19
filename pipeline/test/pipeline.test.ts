@@ -14,6 +14,8 @@ import { lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea } from '../src/indicators.js';
 import { ISSUE_TYPES, nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
+import { checkEmergencyRow } from '../src/check-emergency.js';
+import { addressOnPage, isChallenge, listingOnPage, pageText, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
 import { crossings, encodeLine, mergeChains, packRoads, roadName, simplify, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
@@ -49,13 +51,32 @@ describe('emergency numbers', () => {
     { id: 'emg_911', number: '911', hardcoded: 'yes', verified_by_call_on: '' },
     { id: 'emg_988', number: '988', hardcoded: 'yes', verified_by_call_on: '' },
   ];
-  it('a release fails while any number has never been checked', () => {
-    const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '' }], '2026-09-18', true);
-    expect(r.errors.join()).toMatch(/never checked against its published source/);
+  it('a release fails on a mismatch: the owner\'s page was read and showed a different number', () => {
+    const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_published_on: '2026-09-01', mismatch_on: '2026-09-17', source_url: 'https://x' }], '2026-09-18', true);
+    expect(r.errors.join()).toMatch(/did not show this number/);
+    expect(r.verified).toBe(false);
+    // a person called on or after that day: cleared
+    expect(validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', mismatch_on: '2026-09-17', verified_by_call_on: '2026-09-17' }], '2026-09-18', true).errors).toEqual([]);
   });
-  it('a release fails when the last call is older than 30 days', () => {
-    const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '2026-08-01' }], '2026-09-18', true);
-    expect(r.errors.join()).toMatch(/48 days ago/);
+  it('a number not checked lately, or never, is a note for a person, not a failed release (DECISIONS 2026-09-19)', () => {
+    for (const row of [{ verified_by_call_on: '' }, { verified_by_call_on: '2026-08-01' }]) {
+      const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', ...row }], '2026-09-18', true);
+      expect(r.errors).toEqual([]);
+      expect(r.warnings.join()).toMatch(/never checked|48 days ago/);
+      expect(r.verified).toBe(false);
+    }
+  });
+  it('check:emergency: a match stamps the date and clears a mismatch; a changed number is a mismatch; a blocked page is neither', () => {
+    const row = () => ({ id: 'emg_shelter', number: '866-313-2520', source_url: 'https://x', mismatch_on: '2026-09-01', verified_published_on: '' });
+    const a = row();
+    expect(checkEmergencyRow(a, { ok: true, html: '<p>Call 866-313-2520</p>' }, '2026-09-18')).toBe('match');
+    expect(a).toMatchObject({ verified_published_on: '2026-09-18', mismatch_on: '' });
+    const b = row();
+    expect(checkEmergencyRow(b, { ok: true, html: '<p>Call 313-305-0311</p><script>"8663132520"</script>' }, '2026-09-18')).toBe('mismatch');
+    expect(b.mismatch_on).toBe('2026-09-18');
+    const c = row();
+    expect(checkEmergencyRow(c, { ok: false, why: 'bot protection' }, '2026-09-18')).toBe('unreadable');
+    expect(c).toEqual(row());
   });
   it('a recent match against the published page is enough', () => {
     const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '', verified_published_on: '2026-09-15' }, { id: 'emg_211', number: '211', hardcoded: 'no' }], '2026-09-18', true);
@@ -114,6 +135,46 @@ describe('report facts from the write API', () => {
     const r = row({ facts: { ...row({}).facts, checked_at_entry: '2026-09-10', entry_method: 'phone' } });
     applyAggregates([r], agg({ circuit_breaker: true, targets: [{ target_id: 'sal_test', closed_open: 9, closed_last_at: '2026-09-18T10:00Z', wrong_open: 0, last_confirmed_at: null }] }));
     expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('entry_checked');
+  });
+});
+
+describe('does the page still show this listing (one strict matcher)', () => {
+  const page = `<html><head><script>var tracking = "3135550100";</script><style>.x{}</style></head><body>
+    <h1>St. Moses Pantry</h1><p>Call (313) 555-0100 or 313.555.0199. Toll free 1-800-866-THAW.</p>
+    <a href="tel:+18663132520">Shelter line</a><p>2959 Martin Luther King Jr.&nbsp;Blvd, Detroit</p>
+    <p>Zip 48208 20261234 office 55501</p></body></html>`;
+  it('finds whole phone numbers, keypad letters and tel: links, and nothing hidden in a script', () => {
+    expect([...phonesOn(page)].sort()).toEqual(['3135550100', '3135550199', '8008668429', '8663132520']);
+    expect(phoneOnPage('<script>"3135550100"</script><p>nothing</p>', '313-555-0100')).toBe(false);
+  });
+  it('digits that merely run together are not a phone number', () => {
+    expect(phoneOnPage('<p>Order 43135550100999 and 3135 550100</p>', '313-555-0100')).toBe(false);
+    expect(phoneOnPage('<p>313-555-0100</p>', '313-555-0100 ext. 12')).toBe(true);   // the extension is not on the page, the number is
+  });
+  it('the ways real pages write numbers (from the 2026-09-19 re-check)', () => {
+    for (const written of ['Phone: (313)-400-7040', 'P (313) 922 - 0033&nbsp;', 'MI 48221 &nbsp; (313)-447-0165</div>', '313 555 0100', '+1 313 555 0100'])
+      expect(phonesOn(`<p>${written}</p>`).size, written).toBe(1);
+  });
+  it('a street address counts only as its house number followed by its street', () => {
+    expect(addressOnPage(page, '2959 Martin Luther King Jr Blvd')).toBe(true);
+    expect(addressOnPage(page, '2959 W. Grand Blvd')).toBe(false);
+    expect(addressOnPage('<p>Suite 2959, on Martin Luther King</p>', '2959 Martin Luther King Jr Blvd')).toBe(false);   // number after the street
+    expect(streetKey('14 W. 7 Mile Rd')).toEqual(['14', 'mile']);
+    expect(streetKey('Cass Park')).toBeNull();
+  });
+  it('every listed phone must be on the page, phone2 too; a listing with no phone needs its house number', () => {
+    expect(listingOnPage(page, { phone: '313-555-0100', phone2: '313-555-0199', address_1: '2959 Martin Luther King Jr Blvd' })).toEqual({ ok: true, missing: [] });
+    expect(listingOnPage(page, { phone: '313-555-0100', phone2: '313-555-0000' }).missing).toEqual(['phone2 313-555-0000']);
+    expect(listingOnPage(page, { address_1: '2959 Martin Luther King Jr Blvd' }).ok).toBe(true);
+    expect(listingOnPage(page, { address_1: 'Corner of Cass and Warren' }).ok).toBe(false);   // no house number: nothing to check
+    expect(listingOnPage(page, {}).ok).toBe(false);
+  });
+  it('a bot-protection challenge is unreadable, but a real page that loads Cloudflare\'s script is a page', () => {
+    expect(isChallenge('<html><head><title>Just a moment...</title></head><body><script>window._cf_chl_opt={}</script></body></html>')).toBe(true);
+    expect(isChallenge('<title>Domestic Violence Support</title><script src="/cdn-cgi/challenge-platform/scripts/jsd/main.js"></script><p>1-800-799-7233</p>')).toBe(false);
+  });
+  it('reads the page as text: entities decoded, dashes normalized', () => {
+    expect(pageText('<p>313&#8209;555&ndash;0100 &amp; more</p>')).toBe('313-555-0100 & more');
   });
 });
 

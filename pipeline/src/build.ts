@@ -1,7 +1,7 @@
 // data/seed + data/ingested  ->  data/hsds (committed)  +  data/bundle/v1 (never committed)
 //   pnpm build:bundle            dev build: unverified emergency numbers warn, dev signing key
-//   pnpm build:bundle:release    fails unless every emergency number was phoned within 30 days
-//                                and BUNDLE_SIGNING_KEY is set
+//   pnpm build:bundle:release    fails if an emergency number's own page showed a different number
+//                                (mismatch_on, from check:emergency), and unless BUNDLE_SIGNING_KEY is set
 
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
