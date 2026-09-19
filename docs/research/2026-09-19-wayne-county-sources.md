@@ -1,6 +1,6 @@
 # Wayne County and related public sources: research notes
 
-2026-09-19. This answers Kyle's question: "Can we get data from Wayne County too?" It is research only. Nothing here has been built, and no record containing a person's name was downloaded. All script requests used the user-agent `DetroitCompass-research/0.1 (zero-PII civic directory; contact …)`. Where a site refused that request, this doc says so. The built-in browser was used only to read public pages the way a visitor would.
+2026-09-19. This answers Kyle's question: "Can we get data from Wayne County too?" It is research only. Nothing here has been built, and no record containing a person's name was downloaded. All script requests used a user-agent that named this project and said it is a zero-PII civic directory. Where a site refused that request, this doc says so. The built-in browser was used only to read public pages the way a visitor would.
 
 ## Summary and recommendation
 

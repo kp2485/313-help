@@ -56,12 +56,12 @@ jobs:
           ACCESS_CLIENT_ID: ${{ secrets.ACCESS_CLIENT_ID }}
           ACCESS_CLIENT_SECRET: ${{ secrets.ACCESS_CLIENT_SECRET }}
       - name: Build the app with the pinned public keys
-        run: pnpm --filter @detroithelp/web build
+        run: pnpm --filter @313help/web build
         env:
           BUNDLE_PUBLIC_KEYS: ${{ vars.BUNDLE_PUBLIC_KEYS }}
           WEB_RELEASE: '1'     # refuses to build unless two good keys are pinned and the list is release-signed
       - name: Deploy to Cloudflare Pages
-        run: pnpm --filter @detroithelp/api exec wrangler pages deploy ../apps/web/dist --project-name "${{ vars.PAGES_PROJECT }}" --branch main
+        run: pnpm --filter @313help/api exec wrangler pages deploy ../apps/web/dist --project-name "${{ vars.PAGES_PROJECT }}" --branch main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -75,10 +75,10 @@ jobs:
       - name: Re-read open data
         continue-on-error: true
         run: |
-          pnpm --filter @detroithelp/pipeline ingest:opendata
-          pnpm --filter @detroithelp/pipeline ingest:greenway
-          pnpm --filter @detroithelp/pipeline ingest:city parks
-          pnpm --filter @detroithelp/pipeline ingest:city zips
+          pnpm --filter @313help/pipeline ingest:opendata
+          pnpm --filter @313help/pipeline ingest:greenway
+          pnpm --filter @313help/pipeline ingest:city parks
+          pnpm --filter @313help/pipeline ingest:city zips
           if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; fi
       - name: Open a pull request if a source changed
         env:
@@ -98,7 +98,7 @@ jobs:
       - name: Re-check each listing's own page
         if: ${{ !cancelled() }}
         continue-on-error: true
-        run: pnpm --filter @detroithelp/pipeline check:sources --recheck
+        run: pnpm --filter @313help/pipeline check:sources --recheck
       - name: Send pages that changed to the steward queue
         if: ${{ !cancelled() }}
         continue-on-error: true

@@ -33,7 +33,7 @@ export function preflight({ env, file }: Inputs): Check[] {
 
   // The Worker's config.
   const toml = file('api/wrangler.toml') ?? '';
-  check(!/database_id\s*=\s*"0{8}-0{4}-0{4}-0{4}-0{12}"/.test(toml) && /database_id\s*=\s*"[0-9a-f-]{36}"/.test(toml), 'stop', 'api/wrangler.toml has the real D1 database id', 'wrangler d1 create detroithelp, then put its id in api/wrangler.toml (step 3)');
+  check(!/database_id\s*=\s*"0{8}-0{4}-0{4}-0{4}-0{12}"/.test(toml) && /database_id\s*=\s*"[0-9a-f-]{36}"/.test(toml), 'stop', 'api/wrangler.toml has the real D1 database id', 'wrangler d1 create 313-help, then put its id in api/wrangler.toml (step 3)');
   const origin = tomlVar(toml, 'ALLOWED_ORIGIN') ?? '';
   check(/^https:\/\/[^/]+$/.test(origin) && !/localhost|127\.0\.0\.1/.test(origin), 'stop', 'ALLOWED_ORIGIN is the https site, not localhost', 'set ALLOWED_ORIGIN = "https://<domain>" in api/wrangler.toml');
   check(!!tomlVar(toml, 'ACCESS_TEAM_DOMAIN') && !!tomlVar(toml, 'ACCESS_AUD'), 'stop', 'Cloudflare Access team domain and AUD are set (the steward pages fail closed without them)', 'step 5: put ACCESS_TEAM_DOMAIN and ACCESS_AUD in api/wrangler.toml');

@@ -26,7 +26,7 @@ export function loadSources(): Source[] {
 }
 
 async function getJson(url: string): Promise<any> {
-  const res = await fetch(url, { headers: { 'user-agent': 'detroithelp-pipeline (open-source civic directory)' } });
+  const res = await fetch(url, { headers: { 'user-agent': '313help-pipeline (open-source civic directory)' } });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   const body: any = await res.json();
   // ArcGIS answers many failures with HTTP 200 and an error object. That is an error, never an empty layer.

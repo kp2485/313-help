@@ -475,7 +475,7 @@ describe('local development login', () => {
     const at = (url: string, e: Env) => app.request(url, {}, e);
     expect((await at('http://localhost:8787/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(200);
     expect((await at('http://127.0.0.1:8787/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(200);
-    expect((await at('https://detroitcompass.example/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(401);
+    expect((await at('https://313help.example/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(401);
     expect((await at('https://localhost.evil.example/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(401);
     expect((await at('http://localhost:8787/v1/steward/queue', { DB: db })).status).toBe(401);
   });

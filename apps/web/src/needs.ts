@@ -1,7 +1,7 @@
 // The Help tab's "What do you need?" list (docs/05). Runs entirely on the device; nothing chosen
 // here is stored or sent. Need screens never change the URL, so they leave no trace in history.
 
-import type { Query } from '@detroithelp/query';
+import type { Query } from '@313help/query';
 
 export interface Need {
   id: string;

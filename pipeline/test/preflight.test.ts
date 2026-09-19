@@ -8,7 +8,7 @@ const pair = () => {
 };
 const active = pair(), spare = pair();
 const ready: Record<string, string> = {
-  'api/wrangler.toml': 'database_id = "3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b"\n[vars]\nPHOTOS_ENABLED = "false"\nALLOWED_ORIGIN = "https://detroitcompass.org"\nACCESS_TEAM_DOMAIN = "dc.cloudflareaccess.com"\nACCESS_AUD = "abc123"\n',
+  'api/wrangler.toml': 'database_id = "3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b"\n[vars]\nPHOTOS_ENABLED = "false"\nALLOWED_ORIGIN = "https://313help.org"\nACCESS_TEAM_DOMAIN = "dc.cloudflareaccess.com"\nACCESS_AUD = "abc123"\n',
   'data/seed/directory.json': '{"retired": false, "photos": false}',
   'data/seed/emergency.csv': 'id,label,number,sms,hardcoded,sort,verified_by_call_on,verified_published_on,mismatch_on,source_url,internal_note\nemg_911,Emergency,911,,yes,1,,,,,\nemg_x,Shelter,866-313-2520,,no,2,,2026-09-18,,https://x,\n',
   'apps/web/public/_headers': "/admin/*\n  Content-Security-Policy: frame-ancestors 'none'\n  X-Frame-Options: DENY\n",

@@ -50,7 +50,7 @@ Detroit-specific things live in data and config, not code: bbox, time zone, cate
 - Code: **Apache-2.0**. The patent grant matters when a city's vendor forks it. `LICENSE` and `NOTICE` are in the repo.
 - Our dataset: **CC BY 4.0**, with a per-row source license field, since we can only license what is ours (10-B12).
 - Contributions: a DCO sign-off line, not a CLA. Low friction, and enough for a city's lawyers.
-- The name "D Compassion" is DHD's. A gift should not arrive wearing the recipient's trademark without asking. Done: the repo was renamed `detroit-compass` before it went public, and `313-help` with the app on 2026-09-19.
+- The name "D Compassion" is DHD's. A gift should not arrive wearing the recipient's trademark without asking. Done: the repo was renamed before it went public (now `313-help`).
 
 ## What it costs to keep alive
 

@@ -2,7 +2,7 @@
 // Read path: IndexedDB first (instant, offline), then a background refresh.
 // A bundle that fails verification is dropped and the old one stays. Nothing is sent anywhere.
 
-import type { Alert, BundleRow, Segment } from '@detroithelp/query';
+import type { Alert, BundleRow, Segment } from '@313help/query';
 import { sha256Hex, signatureOk } from './verify.js';
 
 export interface BundleIndex {
@@ -31,7 +31,7 @@ declare const __PINNED_KEYS__: string[];
 // ---- IndexedDB, one key ----------------------------------------------------
 function db(): Promise<IDBDatabase> {
   return new Promise((ok, no) => {
-    const r = indexedDB.open('detroithelp', 1);
+    const r = indexedDB.open('313help', 1);
     r.onupgradeneeded = () => r.result.createObjectStore('kv');
     r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error);
   });

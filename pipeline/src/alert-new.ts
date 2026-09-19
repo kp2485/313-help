@@ -11,7 +11,7 @@
 //        (or --from "2026-09-26 13:00" --hours 3; times are Detroit wall time; at most 30 days ahead)
 
 import { existsSync, readFileSync } from 'node:fs';
-import { toWall, type Alert } from '@detroithelp/query';
+import { toWall, type Alert } from '@313help/query';
 import { p, parsePhone, slug, writeJson } from './util.js';
 
 const wallMs = (t: Date) => { const w = toWall(t); return Date.UTC(w.y, w.m - 1, w.d, w.hh, w.mm); };

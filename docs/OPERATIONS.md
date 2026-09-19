@@ -9,9 +9,9 @@ You need Node 22 and pnpm 12 (the version in `package.json` → `packageManager`
 ```
 pnpm install
 pnpm build:bundle                                   # signed data bundle (dev key) into data/bundle/v1
-pnpm --filter @detroithelp/api migrate:local        # local D1 database in api/.wrangler
-pnpm --filter @detroithelp/api dev                  # write API on http://localhost:8787
-pnpm --filter @detroithelp/web dev                  # the app on http://localhost:5173 (proxies /v1 to the API)
+pnpm --filter @313help/api migrate:local        # local D1 database in api/.wrangler
+pnpm --filter @313help/api dev                  # write API on http://localhost:8787
+pnpm --filter @313help/web dev                  # the app on http://localhost:5173 (proxies /v1 to the API)
 ```
 
 `wrangler dev` runs everything on your machine by default: the local D1 database and a fake photo bucket. It touches no Cloudflare account.
@@ -22,7 +22,7 @@ To pull report counts and steward decisions into the bundle, and to tell the API
 `REPORTS_API=http://localhost:8787 pnpm build:bundle`. Do not commit `data/hsds/` from a build that used local test reports; run a plain `pnpm build:bundle` first.
 
 Reports only accept ids the API knows. Locally, add some:
-`pnpm --filter @detroithelp/api exec wrangler d1 execute detroithelp --local --command "INSERT OR IGNORE INTO targets VALUES ('sal_csk_conner_meals','listing')"`.
+`pnpm --filter @313help/api exec wrangler d1 execute 313-help --local --command "INSERT OR IGNORE INTO targets VALUES ('sal_csk_conner_meals','listing')"`.
 In production the pipeline syncs every id at each publish.
 
 ## The demo loop (about two minutes, all local)
@@ -99,7 +99,7 @@ After a build, it counts the help within a 10-minute walk of each open greenway 
 
 ```
 pnpm build:bundle
-pnpm --filter @detroithelp/pipeline exec tsx src/access-report.ts
+pnpm --filter @313help/pipeline exec tsx src/access-report.ts
 ```
 
 It prints a table and writes `data/indicators/greenway_access.json`. On 2026-09-19 every open segment had at least one listing nearby. "None listed yet" describes our directory, not the neighborhood (doc 13).
@@ -110,7 +110,7 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
 
 1. **Accounts that aren't personal.** A Cloudflare account and GitHub organization for the project, so they can be handed over.
 2. **Signing keys.** `pnpm keys:generate` twice. Key 1 → GitHub Actions secret `BUNDLE_SIGNING_KEY`. Key 2 → offline (password manager + paper). Both *public* keys → `BUNDLE_PUBLIC_KEYS="key1,key2"` for the web build. Losing both private keys means shipping a new app build, so keep the spare safe.
-3. **D1.** `wrangler d1 create detroithelp`, put the id in `api/wrangler.toml`, `wrangler d1 migrations apply detroithelp --remote`.
+3. **D1.** `wrangler d1 create 313-help`, put the id in `api/wrangler.toml`, `wrangler d1 migrations apply 313-help --remote`.
 4. **Worker.** `wrangler deploy` from `api/`. Route it at `https://<domain>/v1/*` so the app and API share an origin (no CORS, no third party).
 5. **Cloudflare Access.** One application covering `/v1/steward/*` **and `/admin/*`**. Never set `DEV_STEWARD` in production (it would do nothing anyway: the Worker only honors it on localhost). Policy: allow listed steward emails, plus one **service token** for the pipeline. Put the team domain and the application's AUD tag in `wrangler.toml` (`ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`). The Worker verifies the Access token itself and fails closed if these are empty.
 6. **Rate limiting.** A WAF rate-limiting rule on `POST /v1/*`, per IP, about 10 per minute. This lives in the dashboard on purpose: the Worker code never touches an IP address, and a test keeps it that way.

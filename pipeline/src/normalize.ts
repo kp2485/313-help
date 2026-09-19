@@ -1,6 +1,6 @@
 // Seed + ingested CSV rows -> (a) bundle rows for the apps, (b) nested HSDS 3.2 services for everyone else.
 
-import type { BundleRow, Schedule, SourceType, VerifyMethod, Availability, RowStatus } from '@detroithelp/query';
+import type { BundleRow, Schedule, SourceType, VerifyMethod, Availability, RowStatus } from '@313help/query';
 import { formatPhone, parsePhone, uuid5, type CsvRow } from './util.js';
 import type { Source } from './ingest-arcgis.js';
 

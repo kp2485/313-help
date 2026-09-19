@@ -2,7 +2,7 @@
 // Only counts and dates cross this line; free text never enters the bundle or the dataset.
 // Configured by REPORTS_API plus an Access service token; without them the build uses zeros.
 
-import type { BundleRow } from '@detroithelp/query';
+import type { BundleRow } from '@313help/query';
 
 export interface Aggregates {
   circuit_breaker: boolean;

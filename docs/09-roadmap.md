@@ -25,7 +25,7 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 - 178 listings today, each checked once at entry (the DHD stations carry the list's own date instead). No scheduled re-verification (04); emergency numbers are machine-matched against their owners' pages (`pnpm check:emergency`).
 - Steward roster: Kyle + 3 community stewards (CHW, librarian, church coordinator, or outreach worker). Row count is capped by what this roster can verify (doc 10-A6).
 - Spanish UI. **Done 2026-09-18** (needs a native speaker's review).
-- Privacy policy, About/data sources, open dataset published. Repo public: **done 2026-09-18** (`detroit-compass`, renamed `313-help` 2026-09-19).
+- Privacy policy, About/data sources, open dataset published. Repo public: **done 2026-09-18** (now `313-help`).
 - First conversation with Forgotten Harvest/Gleaners about a feed.
 
 ## v1.1
@@ -47,7 +47,7 @@ Goal: a demo that is *real* — real data, real reporting, real freshness — no
 
 ## Open questions — decisions for Kyle
 
-1. **Name.** **Decided — see DECISIONS 2026-09-19: 313 Help** (was Detroit Compass, 2026-09-18). Original question: needs to be findable, pronounceable in ES/AR, not confusable with a city product, domain available. Candidates to react to: *DetroitHelp*, *313Help*, *NearbyHelp Detroit*, *Detroit Doorway*, *OpenDoor Detroit*. (313SafeBeds already owns the "313" prefix in this space — coordinate with the 313SafeBeds team if you go that way.)
+1. **Name.** **Decided — see DECISIONS 2026-09-19: 313 Help.** Original question: needs to be findable, pronounceable in ES/AR, not confusable with a city product, domain available. Candidates to react to: *313Help*, *NearbyHelp Detroit*, *Detroit Doorway*, *OpenDoor Detroit*. (313SafeBeds already owns the "313" prefix in this space — coordinate with the 313SafeBeds team if you go that way.)
 2. **Android path for the hackathon:** PWA (recommended) vs. attempting Compose. Recommendation: PWA. **Decided in practice (the PWA is the Android app); to be recorded in DECISIONS.**
 3. **Code license:** **Decided — see DECISIONS 2026-09-18: Apache-2.0, dataset CC BY 4.0.** Original question: MIT vs Apache-2.0. Recommendation: Apache-2.0 (patent grant matters if a vendor ever forks it for a city). The app is open source and intended as a gift to the city — see doc 12 for what that requires.
 4. **Analytics on or off at launch?** Recommendation: off for the hackathon; identifier-free aggregate counts at v1 with the About-screen disclosure. **Decided in practice (no analytics are built); to be recorded in DECISIONS.**

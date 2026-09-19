@@ -1,5 +1,5 @@
 {
-  "name": "detroithelp",
+  "name": "313-help",
   "private": true,
   "packageManager": "pnpm@12.4.2",
   "engines": {
@@ -8,18 +8,18 @@
   "scripts": {
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "build:bundle": "pnpm --filter @detroithelp/pipeline build:bundle",
-    "build:bundle:release": "pnpm --filter @detroithelp/pipeline build:bundle -- --release",
-    "ingest:opendata": "pnpm --filter @detroithelp/pipeline ingest:opendata && pnpm --filter @detroithelp/pipeline ingest:greenway && pnpm --filter @detroithelp/pipeline ingest:city",
-    "geocode": "pnpm --filter @detroithelp/pipeline geocode",
-    "keys:generate": "pnpm --filter @detroithelp/pipeline keys:generate",
-    "ingest:neighborhoods": "pnpm --filter @detroithelp/pipeline ingest:neighborhoods",
-    "ingest:basemap": "pnpm --filter @detroithelp/pipeline ingest:basemap",
-    "check:emergency": "pnpm --filter @detroithelp/pipeline check:emergency",
-    "check:sources": "pnpm --filter @detroithelp/pipeline check:sources",
-    "tasks:sync": "pnpm --filter @detroithelp/pipeline tasks:sync",
-    "preflight": "pnpm --filter @detroithelp/pipeline preflight",
-    "alert:new": "pnpm --filter @detroithelp/pipeline alert:new",
-    "import:lines": "pnpm --filter @detroithelp/pipeline import:lines"
+    "build:bundle": "pnpm --filter @313help/pipeline build:bundle",
+    "build:bundle:release": "pnpm --filter @313help/pipeline build:bundle -- --release",
+    "ingest:opendata": "pnpm --filter @313help/pipeline ingest:opendata && pnpm --filter @313help/pipeline ingest:greenway && pnpm --filter @313help/pipeline ingest:city",
+    "geocode": "pnpm --filter @313help/pipeline geocode",
+    "keys:generate": "pnpm --filter @313help/pipeline keys:generate",
+    "ingest:neighborhoods": "pnpm --filter @313help/pipeline ingest:neighborhoods",
+    "ingest:basemap": "pnpm --filter @313help/pipeline ingest:basemap",
+    "check:emergency": "pnpm --filter @313help/pipeline check:emergency",
+    "check:sources": "pnpm --filter @313help/pipeline check:sources",
+    "tasks:sync": "pnpm --filter @313help/pipeline tasks:sync",
+    "preflight": "pnpm --filter @313help/pipeline preflight",
+    "alert:new": "pnpm --filter @313help/pipeline alert:new",
+    "import:lines": "pnpm --filter @313help/pipeline import:lines"
   }
 }

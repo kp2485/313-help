@@ -5,7 +5,7 @@
 // The map is an extra, never the only way to get a fact: every screen that shows one also lists the same
 // places and cross streets as text. If the map files can't be loaded, the greenway and the dots still draw.
 
-import type { Segment } from '@detroithelp/query';
+import type { Segment } from '@313help/query';
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
 
 // ---- world coordinates: flat projection around Detroit; one unit = one degree of latitude ----------------

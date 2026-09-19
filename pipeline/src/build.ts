@@ -5,7 +5,7 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import type { Alert, BundleRow } from '@detroithelp/query';
+import type { Alert, BundleRow } from '@313help/query';
 import { p, readCsv, sha256, today, writeJson, type CsvRow } from './util.js';
 import { loadSources } from './ingest-arcgis.js';
 import { buildIndicators, NEAR_MILES } from './indicators.js';

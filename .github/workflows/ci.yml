@@ -20,7 +20,7 @@ jobs:
       # BUNDLE_SIGNING_KEY, and fail when an emergency number has gone 30 days without matching its owner's page.
       - run: pnpm build:bundle
       # The PWA pins the dev key the bundle step just wrote, then builds with the bundle copied in.
-      - run: pnpm --filter @detroithelp/web build
+      - run: pnpm --filter @313help/web build
 
   # The iPhone app's copy of the query rules, held to the same fixtures as the web (schema/fixtures).
   # Runs in the official Swift image, so the compiler version is exact and no third-party setup action is needed.

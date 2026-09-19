@@ -36,7 +36,7 @@ function pinnedKeys(): string[] {
 // with no build step. Serve both in dev; copy both on build. In production, /admin and /v1/steward sit behind Access.
 function bundleFiles(): Plugin {
   return {
-    name: 'detroithelp-bundle',
+    name: '313help-bundle',
     configureServer(server) {
       const serve = (mount: string, dir: string) => server.middlewares.use(mount, (req, res, next) => {
         let rel = decodeURIComponent((req.url ?? '').split('?')[0]!);
@@ -59,7 +59,7 @@ function bundleFiles(): Plugin {
 export default defineConfig({
   plugins: [bundleFiles()],
   define: { __PINNED_KEYS__: JSON.stringify(pinnedKeys()) },
-  // In dev, /v1 goes to `pnpm --filter @detroithelp/api dev` if it is running. In production the Worker is routed on the same origin.
+  // In dev, /v1 goes to `pnpm --filter @313help/api dev` if it is running. In production the Worker is routed on the same origin.
   server: { fs: { allow: [root] }, proxy: { '/v1': { target: 'http://127.0.0.1:8787', changeOrigin: false } } },
   build: { target: 'es2020', sourcemap: false },
   test: { environment: 'node' },

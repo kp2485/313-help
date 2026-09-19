@@ -6,7 +6,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
-        "@detroithelp/web",
+        "@313help/web",
         "dev"
       ],
       "port": 5173
@@ -16,7 +16,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
-        "@detroithelp/api",
+        "@313help/api",
         "dev"
       ],
       "port": 8787

@@ -7,7 +7,7 @@ import DetroitQuery
 import SwiftUI
 
 @main
-struct DetroitCompassApp: App {
+struct Help313App: App {
     @StateObject private var store = BundleStore()
     @StateObject private var here = Here()
     @Environment(\.scenePhase) private var phase

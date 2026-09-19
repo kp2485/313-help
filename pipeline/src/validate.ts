@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { assertScheduleValid, type Alert, type BundleRow } from '@detroithelp/query';
+import { assertScheduleValid, type Alert, type BundleRow } from '@313help/query';
 import { inBbox, p, parsePhone, type CsvRow } from './util.js';
 
 export interface Issues { errors: string[]; warnings: string[] }

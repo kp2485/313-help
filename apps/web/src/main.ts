@@ -1,7 +1,7 @@
 import {
   badge, bundleAge, effectiveNow, helpAlong, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens,
   type Alert, type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
-} from '@detroithelp/query';
+} from '@313help/query';
 import { currentLang, initLang, locale, setLang, t } from './i18n.js';
 import { telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';

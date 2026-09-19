@@ -4,7 +4,7 @@
 
 import { loadSources, type Source } from './ingest-arcgis.js';
 import { p, slug, writeJson, today } from './util.js';
-import type { Segment, Phase } from '@detroithelp/query';
+import type { Segment, Phase } from '@313help/query';
 
 const PHASE: Record<string, Phase> = { Open: 'open', 'Under Construction': 'under_construction', Funded: 'funded', Unfunded: 'planned' };
 

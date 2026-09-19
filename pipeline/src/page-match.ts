@@ -8,7 +8,7 @@ import { parsePhone } from './util.js';
 
 export type PageResult = { ok: true; html: string } | { ok: false; why: string };
 
-const UA = { 'user-agent': 'Mozilla/5.0 (compatible; detroithelp-sourcecheck; open-source civic directory)' };
+const UA = { 'user-agent': 'Mozilla/5.0 (compatible; 313help-sourcecheck; open-source civic directory)' };
 
 /** Fetch a page once. Bot-protection challenges and error answers come back as unreadable, with the reason. */
 export async function fetchPage(url: string): Promise<PageResult> {

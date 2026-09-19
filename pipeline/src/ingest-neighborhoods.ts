@@ -62,7 +62,7 @@ export const uncountedFireTypes = (seen: string[]) => seen.filter((t) => /\b(str
 const GROCERY = ['Grocery Store', 'Supermarket', 'Super Store'];
 /** Pavement ratings (PASER, 1 to 10) of 1 to 4 are "poor", as Michigan's Transportation Asset Management Council groups them. */
 export const POOR_MAX = 4;
-const UA = { 'user-agent': 'detroithelp-pipeline (open-source civic directory; one polite pass)' };
+const UA = { 'user-agent': '313help-pipeline (open-source civic directory; one polite pass)' };
 export const FIRST_YEAR = 2019;
 
 type Pt = [number, number];

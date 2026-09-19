@@ -8,18 +8,18 @@ The 3-minute script is in docs/09. This page is the checklist that makes it run.
 git pull && pnpm install
 pnpm test                                            # everything green
 pnpm build:bundle                                    # fresh signed bundle (dev key)
-pnpm --filter @detroithelp/api migrate:local
+pnpm --filter @313help/api migrate:local
 ```
 
-- Open the app on a phone on the same Wi-Fi: `pnpm --filter @detroithelp/web dev -- --host`, then visit `http://<laptop-ip>:5173`. On the phone, turn on airplane mode once and reopen the app, to show that it works offline.
+- Open the app on a phone on the same Wi-Fi: `pnpm --filter @313help/web dev -- --host`, then visit `http://<laptop-ip>:5173`. On the phone, turn on airplane mode once and reopen the app, to show that it works offline.
 - The City's site (detroitmi.gov) now blocks scripts, so events and the shelter-line check use the last good data. Nothing to do for the demo.
 - Say in the pitch that the store listing facts about the City's current app are **only what the store listings show** (docs/09).
 
 ## Ten minutes before
 
 ```
-pnpm --filter @detroithelp/api dev                   # tab 1
-pnpm --filter @detroithelp/web dev                   # tab 2
+pnpm --filter @313help/api dev                   # tab 1
+pnpm --filter @313help/web dev                   # tab 2
 pnpm alert:new -- --demo --title "This is what an alert looks like" --hours 1
 pnpm build:bundle
 ```

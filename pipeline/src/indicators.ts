@@ -2,7 +2,7 @@
 // the greenway, and the City's own per-neighborhood sales and permit counts. Public data only. No report, no
 // app usage, nothing a phone sends is read here, and there is no ranking of neighborhoods anywhere in the output.
 
-import { milesToLine, miles, type BundleRow, type Segment } from '@detroithelp/query';
+import { milesToLine, miles, type BundleRow, type Segment } from '@313help/query';
 import { encodeLine, GRID } from './ingest-basemap.js';
 import { pointInRing, type Neighborhood, type NowStats, type YearStats } from './ingest-neighborhoods.js';
 

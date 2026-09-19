@@ -1,5 +1,5 @@
 {
-  "name": "@detroithelp/api",
+  "name": "@313help/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,7 @@
     "test": "vitest run",
     "typecheck": "tsc -p .",
     "dev": "wrangler dev --port 8787",
-    "migrate:local": "wrangler d1 migrations apply detroithelp --local"
+    "migrate:local": "wrangler d1 migrations apply 313-help --local"
   },
   "dependencies": {
     "hono": "^4.13.8"

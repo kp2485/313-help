@@ -8,7 +8,7 @@
 
 import { inBbox, p, writeJson, today } from './util.js';
 
-const UA = { 'user-agent': 'detroithelp-pipeline (open-source civic directory; one polite pass per day)' };
+const UA = { 'user-agent': '313help-pipeline (open-source civic directory; one polite pass per day)' };
 const PARKS = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0';
 const ZIPS = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/City_of_Detroit_Zip_Code_Tabulation_Areas/FeatureServer/0';
 async function parks(): Promise<void> {

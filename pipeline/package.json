@@ -1,5 +1,5 @@
 {
-  "name": "@detroithelp/pipeline",
+  "name": "@313help/pipeline",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -22,7 +22,7 @@
     "import:lines": "tsx src/import-lines.ts"
   },
   "dependencies": {
-    "@detroithelp/query": "workspace:*",
+    "@313help/query": "workspace:*",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "csv-parse": "^7.0.2",

@@ -1,6 +1,6 @@
 # Nothing here has been deployed. Creating the D1 database, the Worker, the Access application,
 # and the rate-limiting rule all need Kyle's go-ahead (CLAUDE.md). See docs/OPERATIONS.md.
-name = "detroithelp-api"
+name = "313-help-api"
 main = "src/index.ts"
 compatibility_date = "2026-09-01"
 
@@ -12,7 +12,7 @@ invocation_logs = false
 
 [[d1_databases]]
 binding = "DB"
-database_name = "detroithelp"
+database_name = "313-help"
 database_id = "00000000-0000-0000-0000-000000000000"   # placeholder until the database exists
 migrations_dir = "migrations"
 
@@ -28,7 +28,7 @@ bucket_name = "313-help-photos"
 [vars]
 PHOTOS_ENABLED = "false"     # photos on condition reports: off until the legal advice in docs/11 (DECISIONS 2026-09-19)
 ALLOWED_ORIGIN = "http://localhost:5173"
-ACCESS_TEAM_DOMAIN = ""      # e.g. detroithelp.cloudflareaccess.com
+ACCESS_TEAM_DOMAIN = ""      # e.g. 313help.cloudflareaccess.com
 ACCESS_AUD = ""              # the Access application's audience tag
 
 [triggers]

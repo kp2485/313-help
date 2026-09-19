@@ -3,7 +3,7 @@
 // and writes data/indicators/greenway_access.json. No resident data is involved anywhere.
 
 import { readdirSync, readFileSync } from 'node:fs';
-import { helpAlong, type BundleRow, type Segment } from '@detroithelp/query';
+import { helpAlong, type BundleRow, type Segment } from '@313help/query';
 import { p, writeJson } from './util.js';
 
 const dir = p('data/bundle/v1');

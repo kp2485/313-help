@@ -1,6 +1,6 @@
 # 313 Help — Design Documents
 
-**313 Help** (renamed 2026-09-19 from "Detroit Compass", which a local organization's name was too close to; older docs and internal package names say "DetroitHelp" or "Detroit Compass"). A standalone app, separate from CommunityChest, that rebuilds the intent of the Detroit Health Department's "D Compassion" app (released by a vendor in 2025 as the "Detroit Compassion App") without collecting anything about the people who use it.
+**313 Help** (named 2026-09-19). A standalone app, separate from CommunityChest, that rebuilds the intent of the Detroit Health Department's "D Compassion" app (released by a vendor in 2025 as the "Detroit Compassion App") without collecting anything about the people who use it.
 
 ## One-sentence pitch
 
@@ -63,10 +63,10 @@ Other scripts, explained in [OPERATIONS.md](OPERATIONS.md): `pnpm ingest:basemap
   - **Alert tool** (`pnpm alert:new`, with a `--demo` mode) and the **nightly publish workflow**, which stays off until `PUBLISH_ENABLED` is set.
   - **iPhone:** `apps/ios` has `DetroitQuery`, a Swift copy of the query rules that passes all 77 fixtures (in CI), and the SwiftUI screens, which still need a first build in Xcode (see `apps/ios/README.md`).
 - 2026-09-18: **Directory grew from 91 to 121 listings**: 16 City recreation centers, 2 libraries, and 12 help listings near greenway segments that had nothing nearby. Open segments with no help within a 10-minute walk: 9 → 3 (→ 0 after the District listings).
-- 2026-09-18: **Build step 4 done** — `admin/` steward queue (plain HTML + JS, no build step): reported listings first, proposals, archive/restore with reasons, circuit-breaker banner. Steward decisions live in D1 and are applied at build time; the full demo loop (report → queue → archive → rebuild → "Closed as of today") runs locally. Repo renamed `detroit-compass` and made public.
+- 2026-09-18: **Build step 4 done** — `admin/` steward queue (plain HTML + JS, no build step): reported listings first, proposals, archive/restore with reasons, circuit-breaker banner. Steward decisions live in D1 and are applied at build time; the full demo loop (report → queue → archive → rebuild → "Closed as of today") runs locally. Repo made public (now `313-help`).
 - 2026-09-18: **Redesign** — five tabs (Home · Help · Recreation · Transit · Events), green design system, Urgent help in the top bar instead of a red strip, City events and 302 parks in the bundle, bus directions on every listing. See 05 and DECISIONS.
 - 2026-09-18: **Build step 3 done** — `api/` Worker (Hono) + D1 schema: anonymous reports and proposals, steward endpoints behind Cloudflare Access, retention, circuit breaker; report buttons and offline queue in the PWA; report facts flow into the bundle build. Runs locally end to end; **nothing is deployed** (see [OPERATIONS.md](OPERATIONS.md)). Next: `admin/` steward queue.
-- 2026-09-18: **Build step 2 done** — `apps/web` PWA: needs list on Home, results, detail, greenway with offline SVG map, signed-bundle verification, IndexedDB offline, 29 KB gzipped. `pnpm --filter @detroithelp/web dev`. Next: `api/` Worker + D1 for reports.
+- 2026-09-18: **Build step 2 done** — `apps/web` PWA: needs list on Home, results, detail, greenway with offline SVG map, signed-bundle verification, IndexedDB offline, 29 KB gzipped. `pnpm --filter @313help/web dev`. Next: `api/` Worker + D1 for reports.
 - 2026-09-18: **Build step 1 done** — seed CSVs, shared query package with fixtures, pipeline, HSDS 3.2-valid export, signed bundle (86 rows). Next: `apps/web` PWA.
 - 2026-09-18: Drafted for review. Nothing built yet. Audited the same day (doc 10); fixes are listed as *Proposed* in DECISIONS.md and are not yet applied to docs 01–09.
 - DHD program staff are aware of this project and informally supportive of reusing the public information from the D Compassion build. DHD has not offered to maintain any data or feed, and there is no written authorization; the design assumes neither (see 02 and 08).

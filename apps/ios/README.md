@@ -3,12 +3,12 @@
 Two parts:
 
 - **`Sources/DetroitQuery`**: the rules for open now, next times, badges, ranking, search and greenway distances. It is a Swift copy of `packages/query`, tested against the same `schema/fixtures` the web app uses. `swift test` runs on macOS, Linux and Windows, and CI runs it on every push.
-- **`DetroitCompassApp/`**: the SwiftUI screens (iOS 17). They need Xcode on a Mac. **They have not been compiled yet**: they were written on a Windows machine against the tested library. Expect small fixes on the first build.
+- **`HelpApp/`**: the SwiftUI screens (iOS 17). They need Xcode on a Mac. **They have not been compiled yet**: they were written on a Windows machine against the tested library. Expect small fixes on the first build.
 
 ## First build on a Mac
 
 1. In Xcode: File → New → Project → iOS App, named "313 Help", with interface SwiftUI and language Swift. Save it in `apps/ios/Xcode/`. The folder is git-ignored until the project settles.
-2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in the four files from `DetroitCompassApp/`, choosing **Create groups** and leaving **Copy items** unticked.
+2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in the four files from `HelpApp/`, choosing **Create groups** and leaving **Copy items** unticked.
 3. File → Add Package Dependencies → Add Local… → select `apps/ios`. Add the **DetroitQuery** library to the app target.
 4. Resources: drag `strings/en.json` and `strings/es.json` from the repo root into the project, without copying. Add a Run Script build phase that copies the latest bundle, so the app works with no signal on first launch:
    ```sh

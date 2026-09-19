@@ -43,7 +43,7 @@ Two halves, deliberately separated:
   api/               Cloudflare Worker (Hono) + D1 migrations
   admin/             steward queue: plain HTML, CSS and JS, no build step; served at /admin/ behind Cloudflare Access
   apps/
-    ios/             SwiftUI, iOS 17+ (Sources/DetroitQuery: the Swift query library, tested; DetroitCompassApp/: SwiftUI screens, not compiled yet)
+    ios/             SwiftUI, iOS 17+ (Sources/DetroitQuery: the Swift query library, tested; HelpApp/: SwiftUI screens, not compiled yet)
     web/             PWA — same bundle, read-only + reporting (also our Android answer)
   strings/           en.json, es.json — every word the app shows
   docs/              these design docs

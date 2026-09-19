@@ -14,14 +14,14 @@
 
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import type { Segment } from '@detroithelp/query';
+import type { Segment } from '@313help/query';
 import { p, today } from './util.js';
 
 const ORG = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services';
 const ROADS = `${ORG}/City_of_Detroit_Roads/FeatureServer/0`;
 const PARKS = `${ORG}/city_parks/FeatureServer/0`;
 const BOUNDARY = `${ORG}/City_of_Detroit_Boundary/FeatureServer/0`;
-const UA = { 'user-agent': 'detroithelp-pipeline (open-source civic directory; one polite pass)' };
+const UA = { 'user-agent': '313help-pipeline (open-source civic directory; one polite pass)' };
 
 // Fixed numbers, not derived from BBOX: every committed map cell (c_X_Y) and encoded outline is measured from this
 // origin, so widening the service area (Dearborn, 2026-09-19) must not move it. Points west of it get negative cells.
