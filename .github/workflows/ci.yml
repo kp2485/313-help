@@ -20,3 +20,13 @@ jobs:
       - run: pnpm build:bundle
       # The PWA pins the dev key the bundle step just wrote, then builds with the bundle copied in.
       - run: pnpm --filter @detroithelp/web build
+
+  # The iPhone app's copy of the query rules, held to the same fixtures as the web (schema/fixtures).
+  ios-query:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: swift-actions/setup-swift@v2
+        with: { swift-version: '6.1' }
+      - run: swift test
+        working-directory: apps/ios
