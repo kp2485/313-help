@@ -155,6 +155,7 @@
   "hood.help_head": "Help people here can reach",
   "hood.thin": "We haven't listed much here yet. A short list means our list is short. It does not mean there is no help here. Tell us what we're missing.",
   "hood.help_count": "{count} places in our list are in this neighborhood or within {miles} mile of it.",
+  "hood.help_count_one": "1 place in our list is in this neighborhood or within {miles} mile of it.",
   "hood.none_listed": "None listed yet: {kinds}. That describes our list, not the neighborhood.",
   "hood.kind.food": "food",
   "hood.kind.health": "health care",

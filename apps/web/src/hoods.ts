@@ -80,7 +80,7 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
 
     <h2>${T('hood.help_head')}</h2>
     ${h.help.coverage_checked ? '' : `<div class="panel"><p>${T('hood.thin')}</p><div class="stackbtns"><button class="btn ghost" ${ui.go({ v: 'add' })}>${T('add.title')}</button></div></div>`}
-    <p>${T('hood.help_count', { count: h.help.total, miles: d.near_miles })}</p>
+    <p>${T(h.help.total === 1 ? 'hood.help_count_one' : 'hood.help_count', { count: h.help.total, miles: d.near_miles })}</p>
     ${cats.length ? `<ul class="hours">${cats.map(([c, n]) => `<li><span>${T('add.cat.' + (c === 'shelter' ? 'shelter.emergency' : c))}</span><span>${n}</span></li>`).join('')}</ul>` : ''}
     ${h.help.none_listed_yet.length ? `<p class="foot">${T('hood.none_listed', { kinds: h.help.none_listed_yet.map((c) => ui.t('hood.kind.' + c)).join(', ') })}</p>` : ''}
     <h3 class="sub">${T('hood.nearest_head')}</h3><ul class="hours">${['food', 'clinic', 'narcan', 'indoors'].map(near).join('')}</ul>

@@ -155,6 +155,7 @@
   "hood.help_head": "Ayuda que la gente de aquí puede alcanzar",
   "hood.thin": "Todavía no tenemos mucho en la lista para esta zona. Una lista corta quiere decir que nuestra lista es corta. No quiere decir que aquí no hay ayuda. Díganos qué nos falta.",
   "hood.help_count": "{count} lugares de nuestra lista están en este vecindario o a menos de {miles} milla de él.",
+  "hood.help_count_one": "1 lugar de nuestra lista está en este vecindario o a menos de {miles} milla de él.",
   "hood.none_listed": "Todavía no hay en la lista: {kinds}. Eso describe nuestra lista, no el vecindario.",
   "hood.kind.food": "comida",
   "hood.kind.health": "atención médica",
