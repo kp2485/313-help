@@ -23,14 +23,18 @@ A **directory + triage + freshness system** for Detroit help resources:
 - Answer 2–4 taps ("I need food this week") and get the two or three resources that fit — computed on the device.
 - See how fresh each listing is and report when it's wrong.
 - Get time-boxed alerts (cold-weather respite activated, cooling centers open, mobile pantry today).
+- Find recreation: the Joe Louis Greenway, City parks, and rec centers.
+- Get transit links (DDOT, SMART, People Mover, QLINE, MoGo) and bus directions to any listing.
+- See City events.
+- Read a page for each of the 205 neighborhoods: help nearby and public-data facts (doc 13).
 - Works offline from a bundled snapshot.
 
 ## What it is NOT
 
 - **Not an intake system.** It never asks who you are. "Someone will contact you" workflows belong to 211/CIE and CAM, where humans answer.
-- **Not a city app.** Shipped by Kyle Peterson / Linwood Technologies. DHD content is used with permission and attributed; the city's name is not on the store listing unless a written agreement says so.
+- **Not a city app.** Shipped by Kyle Peterson / Linwood Technologies. DHD content is public information, attributed; there is no written permission (see 08); the city's name is not on the store listing unless a written agreement says so.
 - **Not a case-management or bed-management tool.** Real-time shelter availability is 313SafeBeds' domain; we link to it or embed its public status when it exists.
-- **Not a general Detroit services app** (permits, taxes, trash pickup). Scope is *help and healthy places*: things that are free, physical, near you, and good for you — a pantry, a clinic, a park restroom, an open stretch of the Joe Louis Greenway (doc 11, approved 2026-09-18). Crisis users pay nothing for the places features: Home order, triage, and the first bundle files are unchanged.
+- **Not a general Detroit services app** (permits, taxes, trash pickup). Scope is *help and healthy places*: things that are free, physical, near you, and good for you — a pantry, a clinic, a park restroom, an open stretch of the Joe Louis Greenway (doc 11, approved 2026-09-18). Crisis paths don't change: Urgent help is one tap from every screen, and the Help tab leads with urgent needs.
 - **Not a scraper that rehosts other directories.** We ingest sources we have rights to, attribute them, and add value through verification and reporting.
 
 ## Design principles (test every decision against these)
@@ -39,7 +43,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 2. **Never lie about freshness.** Every listing shows when it was last verified and by whom (source type). Stale listings are visibly stale. Unknown is shown as unknown, never as "open."
 3. **Three taps to a phone number.** In crisis, the path to "call this" or "go here" must be shorter than the path to anything else. Emergency contacts are always one screen away.
 4. **Works on the worst phone with no signal.** Offline-first, small bundle, no heavy map SDK required for core function, no login walls, no video.
-5. **Plain language, multiple languages.** English first, Spanish and Arabic next, Bengali after. Reading level ≤ 6th grade for all UI copy.
+5. **Plain language, multiple languages.** English first. Spanish is built; Arabic next, then Bengali. Reading level ≤ 6th grade for all UI copy.
 6. **The data outlives the app.** Canonical data is a published, versioned, openly licensed dataset in an HSDS-shaped format. The app is one consumer of it.
 7. **Assume nobody maintains anything.** The directory must stay honest if no institution ever lifts a finger: we watch public sources, the community flags and confirms, stewards verify, and rows nobody has checked decay visibly. An org that *wants* to own its rows (a church, a food bank, someday DHD) can opt in — that's a bonus, never a dependency.
 8. **Never ask what you can't act on.** If the triage asks about safety, the very next screen is a number to call. (This is why the D Compassion intake was harmful, not just useless.)
@@ -48,7 +52,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 ## Success looks like
 
 - A resident finds a real, open food distribution within 60 seconds on first launch, no account, no signal.
-- A church volunteer adds their pantry's schedule in under five minutes and gets a confirmation that it's live.
-- A closed resource reported by two people carries a "reported closed" warning within the hour and is archived at the next weekly steward pass — and if no steward ever comes, the warning stays.
-- DHD changes the Narcan station list on its public web page; our page watcher notices within a day, a steward confirms the diff, and the app reflects it — without anyone at DHD doing anything for us.
+- A church volunteer adds their pantry's schedule in under five minutes and gets an honest confirmation: a person checks it first, which can take a few days.
+- A closed resource reported by two people carries a "reported closed" warning after the next build and is archived at the next weekly steward pass — and if no steward ever comes, the warning stays.
+- DHD edits its station layer; the nightly job opens a pull request with any change; a steward merges it, and the app reflects it — without anyone at DHD doing anything for us.
 - 211/CIE can pull our dataset as HSDS and find nothing they can't parse.

@@ -4,7 +4,7 @@
 
 ## What it is
 
-A static, public page per neighborhood ("How is Bagley doing?") plus a citywide view, rebuilt by the pipeline from open data. No server, no accounts, **no resident data of any kind** — it never touches reports, app usage, or anything a phone sends. It answers three questions:
+A public page per neighborhood ("How is Bagley doing?") plus a citywide view, inside the app, rebuilt by the pipeline from open data. No server, no accounts, **no resident data of any kind** — it never touches reports, app usage, or anything a phone sends. It answers three questions:
 
 1. **What help can people here reach?** (from our own directory — nobody else has this)
 2. **Is the neighborhood getting investment, and is blight going down?** (City open data)
@@ -15,24 +15,24 @@ A static, public page per neighborhood ("How is Bagley doing?") plus a citywide 
 - **Unit: the City's `Current_City_of_Detroit_Neighborhoods` layer — 205 neighborhoods**, with council district and name. *[checked 2026-09-18: public ArcGIS layer, polygons, last edited 2023-12-06.]* These are the names residents use, which matters more than statistical neatness.
 - **Lenses** (saved groupings of neighborhoods, same metrics):
   - *Joe Louis Greenway study area* — the City's own ½-mile planning-study layer, so our numbers line up with theirs (doc 11).
-  - *Council district* (use the 2026 boundaries).
+  - *Council district* (use the 2026 boundaries). (No district lens page yet; the neighborhood list is grouped by district.)
   - Later: Strategic Neighborhood Fund areas, a rec-center or park walkshed.
-- Point data (permits, tickets, sales) is assigned to a neighborhood by point-in-polygon in the pipeline. Tract-based data (Census, CDC PLACES) is shown **at tract level on a map, not re-apportioned** into neighborhoods; splitting modeled tract estimates across neighborhood lines manufactures precision that isn't there.
+- City point data (sales, permits, blight tickets, demolitions, Improve Detroit issues, parcels) is counted by the City's own server: we ask for statistics grouped by each layer's own `neighborhood` field, so no record is downloaded and there is no point-in-polygon step. (Only our own listings, parks and greenway segments are matched to a neighborhood by its outline.) Tract-based data (Census, CDC PLACES) is shown **at tract level on a map, not re-apportioned** into neighborhoods; splitting modeled tract estimates across neighborhood lines manufactures precision that isn't there.
 
 ## Indicators
 
 | Group | Indicator | Source *(all on data.detroitmi.gov unless noted; existence checked 2026-09-18, fields not yet)* | Shown as |
 |---|---|---|---|
-| **Help access** *(ours)* | Verified help listings inside or within ½ mile of the neighborhood, by category; "none listed yet" flags | Our bundle | Counts + list. Labeled as **directory coverage** until the directory is reasonably complete (see "Honesty rules") |
-| | Walk distance from the neighborhood's centre to the nearest open food, clinic, Narcan, cooling site | Our bundle | Miles |
+| **Help access** *(ours)* | Help listings inside or within ½ mile of the neighborhood, by category; "none listed yet" flags | Our bundle | Counts + list. Labeled as **directory coverage** until the directory is reasonably complete (see "Honesty rules") |
+| | Distance from the neighborhood's center to the nearest listed food, clinic, Narcan and indoor place (rec center or library), in a straight line | Our bundle | Miles |
 | | Parks, open greenway segments, rec centers within ½ mile | City parks / JLG / rec layers | Counts |
-| **Conditions** | Blight tickets per 1,000 parcels, 12-month rolling | Blight Tickets | Trend vs. itself, and vs. city median |
+| **Conditions** | Blight tickets per 1,000 parcels, per year | Blight Tickets | Trend vs. itself, and vs. city median |
 | | Demolitions completed | Completed Demolitions | Count per year |
-| | Illegal dumping / park / tree issues reported, and median days to close | Improve Detroit Issues | Trend + days-to-close |
+| | Illegal dumping / park / tree / street light issues reported, and median days to close | Improve Detroit Issues | Trend + days-to-close |
 | **Investment** | Building permits issued (count, and estimated value where the field exists) | Building Permits | Per year |
 | **Staying power** *(lead with these)* | Residential sales: count and median price | Property Sales | Per year, with small-number suppression |
 | | Tax foreclosures, eviction filings | Wayne County Treasurer / court data — **to find; may need a records request** | Per year |
-| **Safe streets** | Crashes involving people walking or biking | Traffic Crashes | 3-year windows |
+| **Safe streets** | Crashes involving people walking or biking | **No current open data:** the City's Traffic Crashes layer holds 2011 only (DECISIONS 2026-09-18) | 3-year windows, once a current source is found |
 | **Health context** | Physical inactivity, poor mental health days, etc. | CDC PLACES (tract) | Map only, labeled "modeled estimate, about two years old — background, not a result" |
 
 **Deliberately left out: crime.** A per-neighborhood crime panel stigmatizes blocks, feeds the people-reporting dynamic doc 11 designs out, and adds nothing the City's own dashboard doesn't already show. If a partner insists, it appears only at council-district scale, never per neighborhood.
@@ -50,10 +50,11 @@ A static, public page per neighborhood ("How is Bagley doing?") plus a citywide 
 
 ## Architecture
 
-- `pipeline/src/indicators/` — one ingester per dataset (ArcGIS REST, paged, incremental by date field), point-in-polygon against the neighborhoods layer, aggregation to `data/indicators/{neighborhood_id}.json` + `citywide.json` + `lenses/*.json`. Committed monthly so history is in git; built in the same GitHub Action.
-- Heavy layers (blight tickets, permits) are aggregated in the pipeline; raw records are never shipped to the browser.
-- Pages are static HTML/JSON on the same host as the bundle. Charts follow one small, accessible chart style (large type, labeled directly, works without color).
-- In the app: neighborhood pages are **not** in the crisis path. They're reachable from About, from a greenway segment ("About this neighborhood"), and by URL for partners. `greenway_access.json` (already built by `pipeline/src/access-report.ts`) is the first indicator file.
+- `pipeline/src/ingest-neighborhoods.ts` (`pnpm ingest:neighborhoods`) reads the neighborhood outlines and asks the City's server for per-neighborhood, per-year statistics, into `data/ingested/neighborhoods.json` and `data/ingested/city_stats.json`. The nightly job re-reads them on the 1st of each month; a change comes as a pull request. `pipeline/src/indicators.ts` joins them with our listings, parks and the greenway at each bundle build.
+- Output: one bundle file, `indicators/neighborhoods.json` (citywide numbers, lenses and all 205 neighborhoods). Each build also commits a copy without the outlines to `data/indicators/neighborhoods.json`, so every number's history is in git.
+- Heavy layers (blight tickets, permits) are added up by the City's server; raw records are never downloaded, let alone shipped to the browser.
+- The pages are screens inside the app, `#/n` and `#/n/nbh_…`, drawn from that one signed file, which is downloaded only when a neighborhood screen opens. Charts follow one small, accessible chart style (large type, labeled directly, works without color).
+- In the app: neighborhood pages are **not** in the crisis path. They're reachable from About, from a greenway segment ("About this neighborhood"), and by URL for partners. `data/indicators/greenway_access.json` comes from `pipeline/src/access-report.ts`: after a bundle build, run `npx tsx src/access-report.ts` from `pipeline/` (there is no pnpm script for it).
 
 ## Order of work
 
@@ -64,9 +65,9 @@ A static, public page per neighborhood ("How is Bagley doing?") plus a citywide 
 5. Crashes; PLACES tract map.
 6. Foreclosure and eviction sources, once found.
 
-Steps 2–3 are the hackathon slice if the PWA is done; the rest is v1.
+Steps 2–4 are done. Steps 5–6 are v1: crashes wait on a current source (see the table above); PLACES and the foreclosure and eviction sources are not started.
 
 ## Open questions for Kyle
 
-- Whose page is this — ours, or offered to the City/Partnership to host? (It's static files; either works.)
+- Whose page is this? Decided 2026-09-18: it lives in the app (DECISIONS). Still open: whether to also offer the data to the City or the Joe Louis Greenway Partnership.
 - Is there a partner who would review the indicator list before it's public? A neighborhood-association umbrella group would be the right critic.

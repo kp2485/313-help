@@ -15,37 +15,40 @@ You are building **Detroit Compass** (named by Kyle 2026-09-18; internal package
 
 ## Build order for the hackathon (docs/09)
 
+Steps 1–4 were done on 2026-09-18. Step 5: `apps/ios` has `DetroitQuery`, the Swift copy of the query rules, passing every fixture in CI; the SwiftUI screens are written but have not been compiled (needs a Mac).
+
+
 1. `data/seed/` CSVs → `pipeline/` → `data/bundle/v1/` (HSDS-valid + `x_detroit`). Fixture tests for open-now / next-occurrence / ranking in `schema/fixtures/` **before** any UI.
 2. `apps/web/` PWA reading the bundle: Home, category list, detail, triage, offline.
 3. `api/` Worker + D1: `POST /v1/reports`, `POST /v1/proposals`, steward endpoints behind Cloudflare Access.
-4. `admin/` minimal steward queue + publish.
+4. `admin/` minimal steward queue. Publishing is `.github/workflows/publish.yml` (off until `PUBLISH_ENABLED` is set) or a local `pnpm build:bundle`.
 5. `apps/ios/` SwiftUI shell if time remains.
 
 ## Conventions
 
-- TypeScript strict for pipeline/api/web; SwiftUI (iOS 17+) for iOS. Node 22. pnpm workspaces.
-- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal, `nbh_` neighborhood). Never reuse.
+- TypeScript strict for pipeline/api/web; SwiftUI (iOS 17+) for iOS. Node 22. pnpm 12 workspaces: dependency install scripts run only when listed under `allowBuilds` in `pnpm-workspace.yaml`, and new package versions must be a day old.
+- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal, `nbh_` neighborhood, `ph_` photo key, `emg_` emergency number). HSDS ids are UUIDv5 of the slug; the slug rides in `x_detroit.id`. Never reuse.
 - Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements against the same fixtures.
 - Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline, used in floating wall-clock mode only — see DECISIONS.md; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
 - Detroit time zone `America/Detroit` everywhere. Bbox sanity: lat 42.25–42.46, lon −83.29 to −82.91.
-- Plain-language UI strings live in one `strings/en.json`; reading level ≤ 6th grade; no jargon ("Free groceries," not "Food pantry services").
+- Plain-language UI strings live in `strings/en.json`, with `strings/es.json` carrying the same keys (tests check keys and placeholders); reading level ≤ 6th grade; no jargon ("Free groceries," not "Food pantry services"). What a place wrote about itself is never machine-translated.
 - Accessibility: every action has a descriptive label; dynamic type must not truncate phone numbers.
 - Commit `data/hsds/` on publish; never commit `data/bundle/`.
 - Tests: fixtures for query semantics; schema validation for every bundle build; a Worker test that proves no IP or install_id reaches D1.
 
 ## Data sources
 
-Registry in `data/sources.yaml` (see docs/02 for tiers and cadences). Do not scrape any Tier C/D source. No institution maintains a feed for us (DHD included): stewards maintain `data/seed/`, page watchers only open steward tasks, and nothing auto-publishes from a watched page. All sources are read-only; never write back.
+Registry in `data/sources.yaml` for the layers that become listings (see docs/02 for tiers and cadences); the City layers behind the map, parks, ZIPs, events and neighborhood numbers are named at the top of their ingest scripts (`pipeline/src/ingest-*.ts`). Do not scrape any Tier C/D source. No institution maintains a feed for us (DHD included): stewards maintain `data/seed/`; a change in an open-data source arrives as a pull request and is published only when a steward merges it. Page watchers are planned, not built, and would only open steward tasks. All sources are read-only; never write back. Identify our requests honestly; if a site blocks them, check by hand rather than disguising the request.
 
 ## Places and condition reports (docs/11, approved)
 
 - Condition reports are about **things, never people**. No category, free-text path, or photo flow for a person, tent, vehicle someone sleeps in, or "suspicious activity." Do not add one, even if asked by a partner; raise it with Kyle.
-- Raw GPS never leaves the device; the client snaps to a `seg_`/`plc_` id. Photos are re-encoded on device (no EXIF), rejected by the server if they carry EXIF, never public, deleted 30 days after the report closes.
-- Neighborhood indicators (docs/13) use public datasets only, never app data. No rankings of neighborhoods, no per-neighborhood crime, small counts suppressed.
+- Raw GPS never leaves the device; a condition report names the segment whose screen the person opened. Photos are re-drawn on device and stripped of every non-picture block, refused by the server if they carry Exif or any other metadata block, never public, and deleted 30 days after the report closes. Photos are demo-only until the legal advice in docs/11 is in hand.
+- Neighborhood indicators (docs/13) use public datasets and our own listings only; never reports, usage, or anything a phone sends. No rankings of neighborhoods, no per-neighborhood crime, small counts suppressed.
 
 ## Things to ask Kyle before doing
 
 - Registering a domain, creating Cloudflare resources, or anything that costs money.
 - Adding a dependency with a non-permissive license.
 - Any deviation from the zero-PII rules, even "temporary for debugging."
-- Changing the app's name. It is **Detroit Compass** and lives in `strings/en.json` (`app.name`), the web manifest, and the page title.
+- Changing the app's name. It is **Detroit Compass** and lives in `app.name` in `strings/en.json` and `strings/es.json`, the web manifest, and the page title.

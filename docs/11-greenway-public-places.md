@@ -1,6 +1,6 @@
 # 11 — Healthy Places: the Joe Louis Greenway, Parks, and Rec Sites
 
-Status: **approved by Kyle 2026-09-18.** Changes scope set in 01. Built so far: segment ingest (52 segments, 20 open), on-device geometry (`packages/query/src/places.ts`), access-shed report. **Layer B below is superseded by [doc 13](13-neighborhood-indicators.md): the public-data indicators now cover every Detroit neighborhood, with the greenway study area as one lens.** Facts marked **[checked]** were verified on the web on this date.
+Status: **approved by Kyle 2026-09-18.** Changes scope set in 01. Built so far: segment ingest (52 segments, 20 open), on-device geometry (`packages/query/src/places.ts`), access-shed report, all 302 City parks, a Recreation tab, condition reports on open segments with an optional photo (photos are demo-only until the private bucket exists and we have legal advice), the app's own street map with the cross streets of each segment, and in-app neighborhood pages with a greenway lens (doc 13). **Layer B below is superseded by [doc 13](13-neighborhood-indicators.md): the public-data indicators now cover every Detroit neighborhood, with the greenway study area as one lens.** Facts marked **[checked]** were verified on the web on this date.
 
 ## Why this belongs in a help app (and the test for what doesn't)
 
@@ -19,9 +19,9 @@ So the feature is not "a parks app bolted on." It is one map where the greenway 
 
 ## Guardrail zero: crisis users pay nothing for this
 
-- Home order doesn't change: emergency strip → alerts → needs → categories. "Parks & Greenway" is **one tile** in the grid, last row.
+- Home order doesn't change: emergency strip → alerts → needs → categories. Recreation (greenway, parks, rec centers) is its **own tab**; Home has one Recreation tile, next to Transit, below the help entry and events.
 - Triage doesn't get a "get outside" entry. Triage is for need.
-- Place data ships as its own bundle file (`places.json.gz` + `greenway.geojson`), fetched after the help categories. A phone that only ever loads food never downloads a trail map.
+- Place data ships as its own bundle file (`places/greenway.json` + `places/parks.json`), fetched after the help categories. A phone that only ever loads food never downloads a trail map.
 - Cut line for the hackathon is stated at the bottom. Help features win every conflict.
 
 ## What the greenway is (for the data model) **[checked]**
@@ -36,12 +36,12 @@ So the feature is not "a parks app bolted on." It is one map where the greenway 
 
 ### 1. Places (browse and find)
 
-**Resident sees:** "Parks & Greenway" → list/map of nearby places with what's there: restroom, water, playground, splash pad, walking loop, shade, lighting, paved/accessible path, bus stop nearby. Each greenway segment shows **Open / Being built / Planned**. Free programs (yoga on the greenway, senior walking club, open gym) show with "Next: Sat 9:00am," using the same schedule machinery as pantries.
+**Resident sees:** the Recreation tab → list/map of nearby places. Each greenway segment shows **Open / Being built / Planned**. *(Not built; no amenity data exists:)* what's there — restroom, water, playground, splash pad, walking loop, shade, lighting, paved/accessible path, bus stop nearby — and free programs (yoga on the greenway, senior walking club, open gym) with "Next: Sat 9:00am," using the same schedule machinery as pantries.
 
 **The bridge feature — "Help along the Greenway":** tap any trailhead or segment → "Within a 10-minute walk or roll": the pantry, the clinic, the Narcan station, the rec center, the library. And the reverse on every help listing near the route: "0.3 mi from the Joe Louis Greenway (Joy Rd entrance)." This is the screen to show a greenway judge: it treats the trail as infrastructure for reaching help, which is what the framework plan says it's for.
 
 **Data model:**
-- A place is an HSDS **Location** with `x_detroit.place`:
+- *(Not built; no amenity data exists. Today segments and parks ship as their own files, `places/greenway.json` and `places/parks.json`, not as HSDS Locations.)* A place is an HSDS **Location** with `x_detroit.place`:
   ```json
   { "kind": "park | greenway_segment | trailhead | rec_center | pool | splash_pad | golf",
     "phase": "open | under_construction | funded | planned",
@@ -50,15 +50,15 @@ So the feature is not "a parks app bolted on." It is one map where the greenway 
     "cost": "free | paid",
     "geometry_ref": "greenway.geojson#seg_warren_joy" }
   ```
-- Programs at places are ordinary HSDS **Services** (org = Detroit Parks & Recreation or the Partnership) joined by ServiceAtLocation. No new machinery.
+- Programs at places are ordinary HSDS **Services** (org = Detroit Parks & Recreation or the Partnership) joined by ServiceAtLocation. No new machinery. *(Not built.)*
 - New ID prefixes `plc_` and `seg_` (DECISIONS.md). Segment IDs key off the City's segment name, and survive phase changes.
-- Greenway geometry: simplified to ≤ ~150 KB GeoJSON. The PMTiles basemap from audit B8 makes this work offline.
+- Greenway geometry: simplified and shipped in `places/greenway.json` (about 23 KB). The app's own street map (docs/06) draws it offline; there is no tile server.
 
 **Sources [checked]:**
 
 | Source | Tier | Notes |
 |---|---|---|
-| JLG Route Segments (data.detroitmi.gov, ArcGIS feature service) | A | Has phase per segment. Modified July 2026. |
+| JLG Route Segments (data.detroitmi.gov, ArcGIS feature service) | A | Has phase per segment. Layer last edited 2026-09-13. |
 | JLG Planning Study Area | A | Impact geography. |
 | City Parks | A | Boundaries, type, acreage — **no amenity fields**. |
 | Recreation Centers | A | Already in 02. |
@@ -72,7 +72,7 @@ Rights: none of those City datasets states a license **[checked]** — "unstated
 
 ### 2. Condition reports ("Tell the greenway team")
 
-**Resident sees:** on any place or segment → **"Something need fixing?"** → one tap:
+**Resident sees:** on any open greenway segment → **"Something need fixing?"** → one tap. (Parks have no report button yet.)
 
 - Light out
 - Broken glass or trash
@@ -84,7 +84,7 @@ Rights: none of those City datasets states a license **[checked]** — "unstated
 - Dumping
 - 👍 Looks good today *(the positive confirm — same role as "Still open")*
 
-Optional photo. Optional 280 characters. Done. Honest confirmation: **"Thanks. We pass this to the greenway team each morning. We can't promise when it gets fixed. If someone is hurt or in danger, call 911."**
+Optional photo. Optional 280 characters. Done. Honest confirmation (`report.sent_place` in `strings/en.json`): **"Thanks. We can't promise when it gets fixed. If someone is hurt or in danger, call 911."** It does not say anyone passes it on, because nobody has agreed to receive it yet (see "The DHD lesson" below).
 
 **The rule that defines this feature: reports are about things, never about people.**
 
@@ -96,15 +96,15 @@ Say this rule out loud to the judge. It's a feature.
 
 | Risk | Design |
 |---|---|
-| GPS reveals where the reporter is standing | **Raw coordinates never leave the phone.** The client snaps to the nearest `seg_`/`plc_` ID plus an optional nearest-cross-street picked from a bundled list. The server only ever sees a public place ID. |
-| Photo EXIF (GPS, device, time) | In-app capture only (no gallery picker). Re-encode through a canvas on the device, which drops all metadata; downscale to 1280px. The server re-encodes again and rejects anything with EXIF — and a Worker test proves it, next to the no-IP test. |
+| GPS reveals where the reporter is standing | **The phone's location is not used at all.** The report names the segment whose screen is open. There is no cross-street picker. The server only ever sees a public segment ID. |
+| Photo EXIF (GPS, device, time) | The file input asks for the camera. The phone re-draws the picture on a canvas (at most 1280 px), which keeps pixels only, then cuts any non-picture blocks the browser added. The server does not re-encode: it refuses any JPEG that still has an Exif, XMP, ICC, IPTC or comment block, and drops any bytes after the end of the image. A Worker test proves it, next to the no-IP test. |
 | Faces, plates, house numbers in frame | Capture screen says "Take a picture of the problem, not of people." On-device face detection (lazy-loaded, only in the photo flow) blocks out faces with **solid boxes, not blur** — blur can be reversed **[checked]**. Detection fails or is unsupported → photo still sends but is tagged for steward review before forwarding. Steward can redact or discard. |
 | Photos of people's homes accumulating into a neighborhood surveillance archive | Photos are **never public**, never in the bundle or the open dataset. Private bucket, steward/partner access only, **deleted 30 days after the report closes**. This is a stated exception to "nothing is deleted": that rule protects resource history, not images. (DECISIONS.md) |
 | Anonymous image upload = abuse magnet (illegal content on our storage) | Nothing uploaded is ever served back to the public. Size/type caps, image re-encode (kills polyglot files), invisible Turnstile / app attestation, edge rate limit. Stewards get a one-click "discard and report" path and written guidance on legal reporting duties. **Get legal advice on this before photos ship publicly**; at the hackathon, photos are demo-only. |
-| Linkable trail of one person's walk | Per-target nonce from audit A4: `sha256(secret ‖ target ‖ day)`. Five reports on five segments are five unlinkable hashes. Time stored to the hour for condition reports. |
+| Linkable trail of one person's walk | Per-target nonce from audit A4: `sha256(secret ‖ target ‖ day)`. Five reports on five segments are five unlinkable hashes. For condition reports the observed time is stored to the hour; the received time is stored to the minute (same as every report, today). |
 | Apple/Play labels | Declare "Photos or Videos — not linked to you" and "User Content" (audit B5). |
 
-**Lifecycle:** `open → forwarded → acknowledged → fixed | wont_fix | duplicate`. ID prefix `cond_`. Two reports of the same kind on the same segment within 7 days merge. Hazards that matter to the next walker (ice, flooding, light out) show on the segment as **"Reported 2 hours ago: ice near Joy Rd"** via `signals.json` (audit B4) after one steward tap or two matching reports — text only, never the photo. They expire (ice: 48h; light out: until fixed or 30 days).
+**Lifecycle (designed, not built):** `open → forwarded → acknowledged → fixed | wont_fix | duplicate`. Today a condition report is `open` until a steward closes it (accepted / rejected / duplicate, like any report). ID prefix `cond_`. *(Designed, not built from here to the end of this paragraph.)* Two reports of the same kind on the same segment within 7 days merge. Hazards that matter to the next walker (ice, flooding, light out) show on the segment as **"Reported 2 hours ago: ice near Joy Rd"** via `signals.json` (audit B4) after one steward tap or two matching reports — text only, never the photo. They expire (ice: 48h; light out: until fixed or 30 days).
 
 **The adversarial questions a greenway judge should ask, answered:**
 
@@ -139,7 +139,7 @@ Honesty rules for Layer B: the route wasn't placed at random, so before/after di
 
 The help directory was first designed around DHD maintaining a spreadsheet. They never signalled they would. Assume the same of GSD and the Partnership until proven otherwise:
 
-- **Places data** comes from the City's open layers plus our own hand-seeded amenities. Nothing waits on the greenway team.
+- **Places data** comes from the City's open layers plus our own hand-seeded amenities (later; none seeded yet). Nothing waits on the greenway team.
 - **Condition reports** must be useful with no recipient. Fallback if nobody agrees to receive a digest: reports (structured fields only — kind, segment, date, status; never photos or free text) publish as an open dataset and a public "open issues on the greenway" page that block clubs, council staff, and reporters can read. The confirmation copy changes to match: "Thanks. This is now on the public list of greenway issues. We can't promise when it gets fixed." That is still an honest promise (Principle 8).
 - **"Fixed" status** then comes from neighbors ("Looks good today" on a segment with an open issue closes it after a steward glance), not from the agency.
 - A named recipient makes all of this better. It is an upgrade, not a dependency.
@@ -156,12 +156,12 @@ The help directory was first designed around DHD maintaining a spreadsheet. They
 ## Hackathon slice (must not displace build steps 1–4 in CLAUDE.md)
 
 In, ~half a day total, all riding on machinery the core already needs:
-1. Ingest JLG Route Segments + Recreation Centers (already planned) + parks within ½ mile of open segments → `places.json` + `greenway.geojson`. Hand-seed amenities for **open segments only**.
-2. "Parks & Greenway" tile → list + segment phase. **"Help along the Greenway"** panel on segment detail and the "near the greenway" line on help listings. (Pure query over data we already have — highest demo value per hour.)
-3. Condition report = the existing report endpoint with new `kind` values and `seg_`/`plc_` targets. On-device snap-to-segment. Shows up in the same steward queue.
-4. Photo: canvas re-encode + EXIF-rejection test; stored privately; visible only in the steward queue. No face detection yet — capture-screen copy + steward review instead, and say so.
-5. One static impact page: access-shed table for open segments + property-sales trend inside the study area, caveats included.
+1. **Done, changed:** ingest JLG Route Segments + Recreation Centers + **all 302 City parks** (not only those near open segments) → `places/greenway.json` + `places/parks.json`. No amenities: no amenity data exists, so none were seeded.
+2. **Done, changed:** a Recreation **tab** (not a tile-only screen) → list + segment phase. **"Help along the Greenway"** panel on segment detail and the "near the greenway" line on help listings.
+3. **Done, changed:** condition report = the existing report endpoint with new `kind` values and `seg_`/`plc_` targets, in the same steward queue. **No snap-to-segment:** the report names the segment whose screen is open.
+4. **Done:** photo — canvas re-draw + metadata-rejection test; stored privately; visible only in the steward queue. No face detection yet — capture-screen copy + steward review instead, and we say so. Demo-only until the bucket exists.
+5. **Done, changed:** the static impact page became in-app neighborhood pages (doc 13) with a Joe Louis Greenway lens, including the property-sales trend, caveats included. The access-shed table is `data/indicators/greenway_access.json`.
 
 Out until after the hackathon: face block-out, Open311 forwarding, hazard signals on segments, trail-counter feed, the full Layer B dashboard, pools/splash-pad seasonal alerts, golf.
 
-**Demo beat (30 seconds, slots in after the steward-archive beat):** "Same app, same zero-PII pipeline, pointed at the greenway. Here's the Joy Road segment: open, restroom status, and everything within a ten-minute walk that can help someone. A neighbor reports a light out — no account, the phone never sent its location, the photo has no metadata — and it lands in the same queue. And there is no button for reporting a person. On purpose."
+**Demo beat (30 seconds, slots in after the steward-archive beat):** "Same app, same zero-PII pipeline, pointed at the greenway. Here's the Joy Road segment: open, its cross streets, and everything within a ten-minute walk that can help someone. A neighbor reports a light out — no account, the phone never sent its location, the photo has no metadata — and it lands in the same queue. And there is no button for reporting a person. On purpose."

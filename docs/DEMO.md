@@ -12,6 +12,7 @@ pnpm --filter @detroithelp/api migrate:local
 ```
 
 - Open the app on a phone on the same Wi-Fi: `pnpm --filter @detroithelp/web dev -- --host`, then visit `http://<laptop-ip>:5173`. On the phone, turn on airplane mode once and reopen the app, to show that it works offline.
+- The City's site (detroitmi.gov) now blocks scripts, so events and the shelter-line check use the last good data. Nothing to do for the demo.
 - Say in the pitch that the store listing facts about the City's current app are **only what the store listings show** (docs/09).
 
 ## Ten minutes before
@@ -33,7 +34,7 @@ The demo alert says "Demo" in its title and body and disappears on its own an ho
 | 2 | "Here's the version that ships." | Home → **Food** → *Food this week*. Three taps, offline. Tap **Show these on a map**. |
 | 3 | "One tap to say it's wrong. No account." | Open a listing → *Something wrong?* → *Closed for good*. |
 | 4 | "A person decides, not an algorithm." | `/admin/` → the listing is at the top → **Archive: closed for good**. `REPORTS_API=http://localhost:8787 pnpm build:bundle` (a plain build does not read steward decisions), reload the phone: "Closed as of today." |
-| 5 | "Nobody at the City had to do anything." | The badge line on any listing ("Matched their website when added…"), and `pnpm check:sources` output. |
+| 5 | "Nobody at the City had to do anything." | The badge line on any listing ("Matched their website when added…"). Don't run `pnpm check:sources` in the demo: it rewrites `data/seed/resources.csv`. |
 | 6 | "Same machinery, pointed at the greenway." | Recreation → a Conrail segment → cross streets and help within a 10-minute walk. Report *Broken glass or trash* with a photo, then show it in `/admin/`: no location, no metadata, and one tap deletes it. "There is no button to report a person." |
 | 7 | "And for every neighborhood, not just the greenway." | About → Neighborhoods → Bagley: home prices next to building permits; "our list is short here," with the add-a-place button. |
 | 8 | "En español también." | Home → **Español**. |

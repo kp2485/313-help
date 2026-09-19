@@ -4,6 +4,8 @@ How to run Detroit Compass. Written so someone other than Kyle could take it ove
 
 ## Run it on your own machine
 
+You need Node 22 and pnpm 12 (the version in `package.json` → `packageManager`). An older pnpm won't install. Get it with `corepack enable` or `npm i -g pnpm@12`.
+
 ```
 pnpm install
 pnpm build:bundle                                   # signed data bundle (dev key) into data/bundle/v1
@@ -11,6 +13,8 @@ pnpm --filter @detroithelp/api migrate:local        # local D1 database in api/.
 pnpm --filter @detroithelp/api dev                  # write API on http://localhost:8787
 pnpm --filter @detroithelp/web dev                  # the app on http://localhost:5173 (proxies /v1 to the API)
 ```
+
+`wrangler dev` runs everything on your machine by default: the local D1 database and a fake photo bucket. It touches no Cloudflare account.
 
 The steward queue is at **http://localhost:5173/admin/**. Locally, `api/.dev.vars` (git-ignored) holds `DEV_STEWARD=local`, which stands in for the Cloudflare Access login and is honored **only when the API is reached as localhost**.
 
@@ -50,13 +54,47 @@ A photo shows up in the steward queue under its report, and nowhere else. Never 
 An alert says something is happening now (warming centers open, a pantry closed today). Write it only from the owner's own announcement.
 
 ```
-pnpm alert:new -- --title "Overnight warming centers are open" --body "Open tonight through Wednesday noon." \n     --hours 60 --category warming --source-url https://detroitmi.gov/news/... --tel "Shelter help line=866-313-2520"
+pnpm alert:new -- --title "Overnight warming centers are open" --body "Open tonight through Wednesday noon." --hours 60 --category warming --source-url https://detroitmi.gov/news/... --tel "Shelter help line=866-313-2520"
 pnpm build:bundle        # or wait for the nightly publish
 ```
 
 The command refuses an alert with no end time, one longer than 7 days, one with no source link, or a phone number that isn't a real number. The app hides the alert by itself at its end time, even offline. To cancel one listing's hours for a day, add `--cancellation --target sal_...`. To take an alert back early, set its `status` to `retracted` in `data/seed/alerts.json`. Ended alerts stay in the file; nothing is deleted.
 
 **For a demo:** `pnpm alert:new -- --demo --title "This is what an alert looks like" --hours 1`. The title and body say it is a demo, it lasts at most 3 hours, and it cannot carry a phone number. Never publish a made-up alert without `--demo`.
+
+## How to add a steward
+
+A steward is anyone who can open `/admin/`. There is no steward account in our code: the Cloudflare Access policy decides.
+
+1. In the Cloudflare dashboard, open the Access application that covers `/admin/*` and `/v1/steward/*` (First deployment, step 5).
+2. Add the person's email to the policy's allow list.
+3. To take access away, remove the email. It takes effect at their next login.
+
+Their email is recorded next to each decision they make (`steward_actions`) and is never published.
+
+**Restoring a listing** someone archived by mistake: `/admin/` → **Archived by a steward** → *It's open again: restore it*. It comes back at the next build. Nothing was deleted.
+
+## How to trigger sunset on purpose
+
+The app goes to sunset mode by itself (doc 12) when **either** the bundle is more than 120 days old **or** the `heartbeat` in `index.json` is more than 120 days old (`packages/query/src/freshness.ts`). The heartbeat is the newest date in the committed CSVs that a person phoned an emergency number (`verified_by_call_on`) or a listing was checked in (`checked_at_entry`). A nightly rebuild does not move it.
+
+To wind the app down on purpose:
+
+- Stop advancing the heartbeat: no new call dates, no new listings checked in. 120 days after the last one, every phone shows sunset mode, even if the nightly job keeps running.
+- Or, faster to reason about: turn the nightly job off (`PUBLISH_ENABLED` to anything but `true`) and let the bundle age. Or publish one final bundle, then turn it off.
+
+To undo it: one new signed bundle with a fresh heartbeat restores everything.
+
+## How to run the greenway access report
+
+After a build, it counts the help within a 10-minute walk of each open greenway segment:
+
+```
+pnpm build:bundle
+pnpm --filter @detroithelp/pipeline exec tsx src/access-report.ts
+```
+
+It prints a table and writes `data/indicators/greenway_access.json`. On 2026-09-19 every open segment had at least one listing nearby. "None listed yet" describes our directory, not the neighborhood (doc 13).
 
 ## First deployment — every step here needs Kyle's go-ahead (accounts, and a few dollars for a domain)
 
@@ -70,7 +108,18 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
 6. **Rate limiting.** A WAF rate-limiting rule on `POST /v1/*`, per IP, about 10 per minute. This lives in the dashboard on purpose: the Worker code never touches an IP address, and a test keeps it that way.
 7. **Logs.** `wrangler.toml` already turns invocation logs off. Leave Logpush off. Never add request logging.
 8. **Pages.** Build `apps/web` with `BUNDLE_PUBLIC_KEYS` set; deploy `apps/web/dist` (it contains the bundle under `/data/bundle/v1/`).
-9. **Nightly publish**: `.github/workflows/publish.yml` (written 2026-09-18, never run). It stays off until the repository variable `PUBLISH_ENABLED` is `true`; it also needs the variables `BUNDLE_PUBLIC_KEYS`, `REPORTS_API`, `PAGES_PROJECT` and the secrets below. City events publish by themselves; any other open-data change (an address, a greenway phase, a street) opens a pull request instead, and merging it is the approval. In short: `ingest:opendata` → `check:emergency` → `build:bundle:release` with `REPORTS_API`, `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET`, `BUNDLE_SIGNING_KEY` → commit `data/hsds/` → deploy. A failed check stops the publish; yesterday's bundle stays up.
+9. **Nightly publish**: `.github/workflows/publish.yml` (written 2026-09-18, never run). It stays off until the repository variable `PUBLISH_ENABLED` is `true`; it also needs the variables `BUNDLE_PUBLIC_KEYS`, `REPORTS_API`, `PAGES_PROJECT` and the secrets below. City events publish by themselves; any other open-data change (an address, a greenway phase, a street) opens a pull request instead, and merging it is the approval. The order, as written in the workflow:
+   1. City events (`ingest:city events`). If the page fails, the last good file stays.
+   2. `pnpm check:emergency`. One bad night doesn't stop the job (`continue-on-error`).
+   3. `pnpm test`.
+   4. `pnpm build:bundle:release` with `BUNDLE_SIGNING_KEY`, `REPORTS_API`, `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET`.
+   5. Build the web app with `BUNDLE_PUBLIC_KEYS`.
+   6. Deploy to Cloudflare Pages.
+   7. Commit `data/hsds/`, the events file and `data/seed/emergency.csv`.
+   8. Re-read open data (`ingest:opendata`, `ingest:greenway`, `ingest:city parks`, `ingest:city zips`; on the 1st of the month also `ingest:basemap` and `ingest:neighborhoods`).
+   9. If any of that changed, open a pull request. Nothing from step 8 is published that night.
+
+   An emergency number that has gone 30 days without a match stops the release build at step 4. Then nothing is deployed and yesterday's bundle stays up.
 
 ## Secrets (names only)
 
@@ -79,12 +128,19 @@ Nothing below has been done. The Cloudflare free tier covers all of it at expect
 | `BUNDLE_SIGNING_KEY` | GitHub Actions | Ed25519 private key that signs `index.json` |
 | spare signing key | offline only | Second pinned key, for rotation |
 | `ACCESS_CLIENT_ID` / `ACCESS_CLIENT_SECRET` | GitHub Actions | Access service token the pipeline uses to read report counts and sync ids |
-| Cloudflare API token | GitHub Actions | Deploys Pages and the Worker |
+| `CLOUDFLARE_API_TOKEN` | GitHub Actions | Deploys Pages (the Worker is deployed by hand with `wrangler deploy`) |
+| `CLOUDFLARE_ACCOUNT_ID` | GitHub Actions | Which Cloudflare account to deploy to |
+
+Repository **variables** (not secret): `PUBLISH_ENABLED` (`true` turns the nightly publish on), `BUNDLE_PUBLIC_KEYS` (the two pinned public keys), `REPORTS_API` (the API's address), `PAGES_PROJECT` (the Cloudflare Pages project name).
 
 ## What the write API stores, completely
 
-`reports`: listing or segment id, kind, optional note (phone numbers and emails masked before storage), optional suggested correction, observed time (to the minute; to the hour for places), submitted time (to the minute), a per-target daily hash, steward outcome. After 180 days a report becomes a monthly count and the row is removed.
+`targets`: every id the published dataset has, and whether it is a listing or a place (`seg_`/`plc_`). The pipeline syncs it at each publish. Reports can only name an id that is here.
+`reports`: listing or place id, kind, optional note (phone numbers and emails masked before storage), optional suggested correction, observed time (to the minute; to the hour for places), submitted time (to the minute), a per-target daily hash, steward outcome, and `photo_key` when a photo came with a place report. After 180 days a report becomes a monthly count and the row is removed.
+`report_counts`: what is left of old reports: id, kind, month, count.
+`photos`: a random key, the upload minute, and which report it belongs to. The picture itself is in a private R2 bucket and is deleted 30 days after its report closes (one day if no report claimed it).
 `proposals`: the place's name, category, what it offers, address (never for DV), public phone, schedule text, how the submitter knows, masked note.
+`listing_overrides`: a steward's decision about a listing (archived, paused, or active again), the reason, a replacement id if there is one, and the minute. The pipeline applies these at build time.
 `steward_actions`: steward email, action, reason code, optional note. Never published.
 There is no table of residents, and no column anywhere for an IP address, device, user agent, or location.
 

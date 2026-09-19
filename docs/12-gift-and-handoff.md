@@ -37,20 +37,20 @@ Sunset mode is reversible: one new signed bundle with a fresh heartbeat restores
 
 ### 3. Transferable in an afternoon
 - **No personal accounts in the path.** Apple/Play under the Linwood Technologies organization (both stores support transferring an app to another organization). Domain, Cloudflare account, and GitHub org are separate from Kyle's personal ones, so ownership can move without a rebuild.
-- **Infrastructure as code.** `wrangler.toml`, D1 migrations, R2 bucket names, Access policy, and GitHub Actions workflows all live in the repo. Nothing is configured only in a dashboard.
+- **Infrastructure as code.** `wrangler.toml`, D1 migrations, R2 bucket names, Access policy, and GitHub Actions workflows all live in the repo. Nothing is configured only in a dashboard, except the WAF rate-limit rule and the Access policy, which `docs/OPERATIONS.md` describes step by step.
 - **Secrets inventory** in `docs/OPERATIONS.md` (names and purposes, never values): bundle signing key, Cloudflare API token, D1 binding. Includes the signing-key rotation procedure — the pinned public key is the one thing that needs an app release to change, so ship the app with **two** pinned keys (active + spare, spare kept offline) from day one.
-- **`docs/OPERATIONS.md`**: the weekly pass, the monthly safety-number calls, how to publish an alert, how to add a steward, how to trigger sunset on purpose, how to hand over.
+- **`docs/OPERATIONS.md`**: the weekly pass, the 30-day emergency-number check (`pnpm check:emergency`), how to publish an alert, how to add a steward, how to trigger sunset on purpose, how to hand over.
 - **A city that adopts it never has to touch resident data,** because there isn't any. Put that sentence at the top of any adoption conversation.
 
 ### 4. Forkable by another city
 Detroit-specific things live in data and config, not code: bbox, time zone, category labels, emergency numbers, source registry, the `x_detroit` extension name (document it as an HSDS Profile). "Grand Rapids forks it in a weekend" is a stronger open-source story for judges than the license alone.
 
-## Licenses (recommendation — Kyle to confirm)
+## Licenses (decided 2026-09-18)
 
-- Code: **Apache-2.0**. The patent grant matters when a city's vendor forks it. Add `LICENSE` and `NOTICE` at the first code commit.
+- Code: **Apache-2.0**. The patent grant matters when a city's vendor forks it. `LICENSE` and `NOTICE` are in the repo.
 - Our dataset: **CC BY 4.0**, with a per-row source license field, since we can only license what is ours (10-B12).
 - Contributions: a DCO sign-off line, not a CLA. Low friction, and enough for a city's lawyers.
-- The name "D Compassion" is DHD's. Before the repo goes public under that name, either get a yes from DHD or rename the repo. A gift should not arrive wearing the recipient's trademark without asking.
+- The name "D Compassion" is DHD's. A gift should not arrive wearing the recipient's trademark without asking. Done: the repo was renamed `detroit-compass` before it went public.
 
 ## What it costs to keep alive
 
