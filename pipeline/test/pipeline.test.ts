@@ -349,6 +349,7 @@ describe('the real bundle', () => {
     expect(typeof index.emergency_verified).toBe('boolean');
     expect(index).not.toHaveProperty('heartbeat');
     expect(index).not.toHaveProperty('retired');
+    expect(index).not.toHaveProperty('photos');   // photos stay off until a person turns them on
     expect(JSON.parse(readFileSync(p('data/seed/directory.json'), 'utf8')).retired).toBe(false);
     for (const r of rows) expect(r.facts).not.toHaveProperty('cadence_days');
   });

@@ -23,6 +23,8 @@ export interface BundleIndex {
   generated_at: string;
   /** Set only when a person retires the directory on purpose (data/seed/directory.json). No timer ever sets it. */
   retired?: true;
+  /** Set only when a person turns photos on (data/seed/directory.json; the Worker has its own PHOTOS_ENABLED). */
+  photos?: true;
   emergency_verified: boolean;
   signing: 'release' | 'dev';
   counts: Record<string, number>;
@@ -132,13 +134,15 @@ export async function build(opts: BuildOptions = {}) {
 
   // Retiring the directory is a person's decision, committed to git (docs/OPERATIONS "How to retire the directory").
   const directoryFile = p('data/seed/directory.json');
-  const retired = existsSync(directoryFile) && JSON.parse(readFileSync(directoryFile, 'utf8')).retired === true;
+  const directory = existsSync(directoryFile) ? JSON.parse(readFileSync(directoryFile, 'utf8')) : {};
+  const retired = directory.retired === true, photos = directory.photos === true;
   const { key, kind } = loadSigningKey(!!opts.release);
   const index: BundleIndex = {
     // The content hash makes every distinct bundle a distinct version, even two builds in the same minute.
     schema: 1, version: `${gitSha()}-${now.toISOString().replace(/[-:]/g, '').slice(0, 13)}-${sha256(JSON.stringify(files)).slice(0, 8)}`,
     generated_at: now.toISOString().slice(0, 16) + 'Z',
     ...(retired ? { retired: true as const } : {}),
+    ...(photos ? { photos: true as const } : {}),
     emergency_verified: emg.verified, signing: kind, counts, files,
   };
   const indexBytes = writeJson(`${out}/index.json`, index);

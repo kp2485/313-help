@@ -42,7 +42,7 @@ const upload = (bytes: Uint8Array, headers: Record<string, string> = {}, e: Env 
 const report = (body: object) => app.request('/v1/reports', { method: 'POST', body: JSON.stringify(body), headers: { 'content-type': 'application/json' } }, env);
 const steward = (path: string, init: RequestInit = {}) => app.request(`http://localhost${path}`, init, { ...env, DEV_STEWARD: 'kyle' });
 beforeEach(() => {
-  db = fakeD1(); bucket = fakeBucket(); env = { DB: db, PHOTOS: bucket };
+  db = fakeD1(); bucket = fakeBucket(); env = { DB: db, PHOTOS: bucket, PHOTOS_ENABLED: 'true' };
   db.raw.exec("INSERT INTO targets VALUES ('sal_b', 'listing'), ('seg_conrail_warren_to_joy', 'place')");
 });
 
@@ -82,6 +82,12 @@ describe('POST /v1/photos', () => {
     expect(bucket.files.size).toBe(0);
     expect((await upload(jpeg(), { 'content-type': 'image/png' })).status).toBe(415);
     expect((await upload(jpeg(), {}, { DB: db })).status).toBe(503);
+  });
+  it('is off unless the switch is on, even with a bucket (DECISIONS 2026-09-19: off by default)', async () => {
+    for (const v of [undefined, '', 'false', 'TRUE', '1']) expect((await upload(jpeg(), {}, { DB: db, PHOTOS: bucket, ...(v === undefined ? {} : { PHOTOS_ENABLED: v }) })).status, String(v)).toBe(503);
+    expect(bucket.files.size).toBe(0);
+    const toml = readFileSync(join(__dirname, '../wrangler.toml'), 'utf8');
+    expect(toml).toMatch(/^PHOTOS_ENABLED = "false"/m);
   });
   it('the source never reads an IP or user agent, and no public route serves a photo back', () => {
     const src = readFileSync(join(__dirname, '../src/index.ts'), 'utf8') + readFileSync(join(__dirname, '../src/photo.ts'), 'utf8');

@@ -11,7 +11,7 @@ import { ARCHIVE_REASONS, CLOSED_KINDS, WRONG_KINDS, isListingId, parseProposal,
 
 export interface Stmt { bind(...args: unknown[]): Stmt; run(): Promise<{ meta: { changes: number } }>; all<T = Record<string, unknown>>(): Promise<{ results: T[] }>; first<T = Record<string, unknown>>(): Promise<T | null> }
 export interface Db { prepare(sql: string): Stmt; batch(stmts: Stmt[]): Promise<unknown> }
-export interface Env { DB: Db; PHOTOS?: PhotoStore; ALLOWED_ORIGIN?: string; ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string; DEV_STEWARD?: string }
+export interface Env { DB: Db; PHOTOS?: PhotoStore; /** "true" turns photo uploads on (docs/11, off by default). */ PHOTOS_ENABLED?: string; ALLOWED_ORIGIN?: string; ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string; DEV_STEWARD?: string }
 interface Deps { now: () => Date; jwks?: JwksFetcher }
 
 const minute = (d: Date) => d.toISOString().slice(0, 16) + 'Z';
@@ -57,7 +57,8 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
   // A photo for a condition report (docs/11). The phone has already re-drawn it without metadata; checkJpeg
   // refuses anything that still carries any. The picture goes to a private bucket and is never served to the public.
   app.post('/v1/photos', async (c) => {
-    if (!c.env.PHOTOS) return c.json({ error: 'photos are off' }, 503);
+    // Off unless switched on (DECISIONS 2026-09-19): the app then sends reports without photos.
+    if (!c.env.PHOTOS || c.env.PHOTOS_ENABLED !== 'true') return c.json({ error: 'photos are off' }, 503);
     if ((c.req.header('content-type') ?? '').split(';')[0]!.trim() !== 'image/jpeg') return c.json({ error: 'send a JPEG' }, 415);
     if (Number(c.req.header('content-length') ?? 0) > MAX_PHOTO_BYTES) return c.json({ error: 'photo is too large' }, 413);
     const checked = checkJpeg(new Uint8Array(await c.req.arrayBuffer()));

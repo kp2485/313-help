@@ -26,6 +26,7 @@ binding = "PHOTOS"
 bucket_name = "detroit-compass-photos"
 
 [vars]
+PHOTOS_ENABLED = "false"     # photos on condition reports: off until the legal advice in docs/11 (DECISIONS 2026-09-19)
 ALLOWED_ORIGIN = "http://localhost:5173"
 ACCESS_TEAM_DOMAIN = ""      # e.g. detroithelp.cloudflareaccess.com
 ACCESS_AUD = ""              # the Access application's audience tag

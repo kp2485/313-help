@@ -106,7 +106,7 @@ describe('reports from the phone', () => {
     const plain = plainJpeg(made)!;
     expect(plain.length).toBe(made.length - 44 - 24 - 13); expect([...plain.slice(-5)]).toEqual([1, 2, 3, 0xff, 0xd9]);
     expect(plainJpeg(new Uint8Array([1, 2, 3, 4]))).toBeNull(); expect(src).toContain("fetch('/v1/photos'");
-    expect(main).toContain('capture="environment" data-photo'); expect(main).toContain("isPlace ? `<label>${T('report.photo_label')}");
+    expect(main).toContain('capture="environment" data-photo'); expect(main).toContain("isPlace && bundle?.index.photos === true ? `<label>${T('report.photo_label')}");   // and only when a person turned photos on
     expect(strings['report.photo_note']).toMatch(/not of people/);
   });
   it('place reports offer no way to report a person', () => {

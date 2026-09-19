@@ -47,6 +47,8 @@ If nobody does any of this, listings keep saying what they said, with their date
 
 ## Photos on condition reports
 
+**Photos are off** (DECISIONS 2026-09-19) until the legal advice in docs/11 is in hand. Two switches, and both must be on: `"photos": true` in `data/seed/directory.json` shows the photo field in the app (after the next publish), and the Worker variable `PHOTOS_ENABLED = "true"` in `api/wrangler.toml` accepts uploads (after the next deploy). While either is off, reports go without photos and `POST /v1/photos` answers 503. To test locally, put `PHOTOS_ENABLED=true` in `api/.dev.vars` and set the directory flag, then build.
+
 A photo shows up in the steward queue under its report, and nowhere else. Never share, post or forward one outside the greenway team. If it shows a person, a face, a license plate or a house number, press **Delete this photo now**: the report stays. Photos delete themselves 30 days after their report is closed. If a photo shows something illegal, delete nothing, close the laptop, and call Kyle: there are legal reporting duties, and written guidance for this is still owed (docs/11).
 
 ## How to publish an alert

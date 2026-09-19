@@ -1,4 +1,5 @@
 {
   "retired": false,
-  "note": "Set retired to true only to shut the directory down on purpose. The app then tells everyone to call 211 and hides report buttons. See docs/OPERATIONS.md."
+  "photos": false,
+  "note": "Set retired to true only to shut the directory down on purpose: the app then tells everyone to call 211 and hides report buttons. Set photos to true only after the legal advice in docs/11, and together with the Worker variable PHOTOS_ENABLED. See docs/OPERATIONS.md."
 }
