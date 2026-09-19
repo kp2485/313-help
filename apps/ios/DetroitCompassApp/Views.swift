@@ -86,7 +86,7 @@ struct UrgentView: View {
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 12) {
             Text(L.t("urgent.lede")).foregroundStyle(.secondary)
-            EmergencyRows(ids: ["emg_911", "emg_988", "emg_shelter_helpline", "emg_dwihn_crisis", "emg_ndvh", "emg_211"])
+            EmergencyRows(ids: ["emg_911", "emg_988", "emg_shelter_helpline", "emg_shelter_outwayne", "emg_dwihn_crisis", "emg_ndvh", "emg_211"])
             NavigationLink(L.t("need.overdose_now")) { OverdoseView() }.buttonStyle(.bordered)
         }.padding() }.navigationTitle(L.t("strip.more"))
     }

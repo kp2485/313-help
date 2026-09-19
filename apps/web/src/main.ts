@@ -234,7 +234,7 @@ function eventsTab(): string {
 
 // ---- pushed screens ---------------------------------------------------------
 function urgent(): string {
-  return `<main><p class="lede">${T('urgent.lede')}</p><div class="stackbtns">${['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_211'].map(callButton).join('')}</div>
+  return `<main><p class="lede">${T('urgent.lede')}</p><div class="stackbtns">${['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_211'].map(callButton).join('')}</div>
     <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}</ul></main>`;
 }
 function need(view: Extract<View, { v: 'need' }>): string {

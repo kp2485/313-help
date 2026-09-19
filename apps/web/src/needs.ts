@@ -24,7 +24,7 @@ export interface Need {
 
 export const NEEDS: Need[] = [
   { id: 'overdose_now', icon: 'pulse', group: 'now', first: ['emg_911'], stepsOnly: true, sensitive: true },
-  { id: 'shelter', icon: 'bed', group: 'now', first: ['emg_shelter_helpline'], refine: [
+  { id: 'shelter', icon: 'bed', group: 'now', first: ['emg_shelter_helpline', 'emg_shelter_outwayne'], refine: [
     { id: 'me', query: { category: 'shelter.emergency' } },
     { id: 'kids', query: { category: 'shelter.emergency' } },
     // Every emergency shelter, with the ones for young people first (DECISIONS 2026-09-19). Not after-school programs.
