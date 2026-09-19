@@ -85,7 +85,7 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
    - `pnpm ingest:basemap`: streets, parks and the city boundary for the app's map.
    Libraries and precincts are not ingested yet.
 3. **Alerts** for activations (warming/cooling/respite) are written by a person with `pnpm alert:new` from the owner's announcement. A press-release watcher is planned (not built yet); it would only draft, and a person always publishes.
-4. **Food listings** — each site was researched on the organization's own site and checked with `pnpm check:sources` (or read by a person in a browser when the site blocks scripts). Nothing is copied from Forgotten Harvest or Gleaners lists. A church that hosts their distribution may be listed when the church's own site says so. In parallel, ask FH and Gleaners for a feed.
+4. **Food listings** — each site was researched on the organization's own site and checked with `pnpm check:sources` (or read by a person in a browser when the site blocks scripts). Forgotten Harvest and Gleaners own the facts about their own distributions, so their own pages count as a source (DECISIONS 2026-09-19); a host's own site counts too. In parallel, ask FH and Gleaners for a feed.
 5. **Community add/report** — see 04.
 
 **Note, 2026-09-19:** detroitmi.gov and the City calendar began answering 403 to scripted requests. Events keep the last good file; listings and the shelter line whose page is on that site need a person's check (DECISIONS).
