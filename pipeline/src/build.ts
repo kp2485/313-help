@@ -104,8 +104,8 @@ export async function build(opts: BuildOptions = {}) {
     putCompact('map/streets.json', { grid: source.grid, cells });
     counts.map_cells = Object.keys(cells).length;
   }
-  // Recreation and Events tabs. Past events are dropped at build time and again on the device.
-  const parksFile = p('data/ingested/city_parks.json'), eventsFile = p('data/ingested/city_events.json');
+  // Recreation tab. City events are not shipped until a real feed exists (DECISIONS 2026-09-19).
+  const parksFile = p('data/ingested/city_parks.json');
   if (existsSync(parksFile)) { const d = JSON.parse(readFileSync(parksFile, 'utf8')); counts.parks = d.parks.length; put('places/parks.json', d); }
   // ZIP center points for "Type a ZIP" (docs/05): about 1 KB, and the typed ZIP never leaves the phone.
   // Neighborhood indicators (docs/13): public City data joined with our own listings. Like the map, the file is
@@ -126,7 +126,6 @@ export async function build(opts: BuildOptions = {}) {
   }
   const zipsFile = p('data/ingested/city_zips.json');
   if (existsSync(zipsFile)) put('places/zips.json', JSON.parse(readFileSync(zipsFile, 'utf8')));
-  if (existsSync(eventsFile)) { const d = JSON.parse(readFileSync(eventsFile, 'utf8')); d.events = d.events.filter((e: { starts_at: string }) => e.starts_at.slice(0, 10) >= todayStr); counts.events = d.events.length; put('events.json', d); }
   put('alerts.json', alerts.filter((a) => a.status === 'published' && Date.parse(a.ends_at) > now.getTime()));
   put('emergency.json', emergency.sort((a, b) => Number(a.sort) - Number(b.sort))
     .map((r) => ({ id: r.id, label: r.label, number: r.number, ...(r.sms ? { sms: r.sms } : {}), hardcoded: r.hardcoded === 'yes' })));

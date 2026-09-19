@@ -13,7 +13,7 @@ Home
 ├─ Active alerts (cards, auto-expire)
 ├─ Find free help                    →  Help tab
 ├─ Quick needs: Food · A place to sleep · A doctor · Free Narcan   →  need screen
-├─ Coming up: next 3 City events     →  Events tab
+├─ (Coming up: City events — hidden while there are none; dropped until a real feed, DECISIONS 2026-09-19)
 ├─ Tiles: Recreation · Transit
 └─ Footer: List updated {date} · Works offline · About this app
      About  →  Español / English switch · list version and signature · Neighborhoods
@@ -36,7 +36,7 @@ Report a problem with the app: not built.
 
 **Revised 2026-09-18 (Kyle): five tabs — Home · Help · Recreation · Transit · Events.** No profile tab; there is no profile.
 
-- **Home**: a calm landing page — the Español/English switch, hero, a search button, active alerts, one "Find free help" card, four quick needs, the next three City events, tiles into Recreation and Transit. No red, no emergency strip.
+- **Home**: a calm landing page — the Español/English switch, hero, a search button, active alerts, one "Find free help" card, four quick needs, tiles into Recreation and Transit. No red, no emergency strip.
 - **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
 - **Recreation**: Joe Louis Greenway (map, segments, help within a 10-minute walk), City parks (302, nearest first with location), recreation centers, MoGo Access Pass.
 - **Transit**: DDOT trip planner and real-time links, fares, free rides (People Mover, QLINE), phone numbers. Every listing with an address gets a **Bus directions** button.
@@ -47,7 +47,7 @@ The earlier "emergency strip" and needs-on-Home layout are superseded by this st
 
 ## Home
 
-- Top to bottom: Español/English switch · "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · four quick needs (Food · A place to sleep · A doctor · Free Narcan), one tap each · "Coming up" (the next 3 City events) · Recreation and Transit tiles · footer.
+- Top to bottom: Español/English switch · "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · four quick needs (Food · A place to sleep · A doctor · Free Narcan), one tap each · Recreation and Transit tiles · footer.
 - **Alerts**: cards with title, plain-language body, a call button for each phone number, when it ends ("Until {when}"), and a link to where it was announced. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
 - **"What do you need?"** now heads the Help tab (see above). Principle 3 path: Help → need (1) → refinement if any (2) → **Call** (3); from Home, a quick need skips the first tap.
 - **Browse by type** (Help tab chips): Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people.

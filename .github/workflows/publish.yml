@@ -2,7 +2,7 @@
 # Kyle creates the Cloudflare resources and sets the repository variable PUBLISH_ENABLED=true.
 #
 # What it does, in order:
-#   1. Refreshes City events (facts only: title, date, link) and commits them. Events carry no phone numbers.
+#   1. (City events: dropped until a real feed exists, DECISIONS 2026-09-19.)
 #   2. Checks the emergency numbers against their owners' pages and stamps the date of each match. One bad
 #      night (a page that is down) does not stop the publish; the release build does, once any number has gone
 #      30 days without a match. Then yesterday's bundle stays up and a person reads the page. The script never
@@ -40,11 +40,6 @@ jobs:
           git config user.name "detroit-compass-publish"
           git config user.email "actions@users.noreply.github.com"
 
-      # 1. Events. If the City's page is down or changed shape, the script keeps the last good file.
-      - name: City events
-        continue-on-error: true
-        run: pnpm --filter @detroithelp/pipeline ingest:city events
-
       # 2 + 3. Gate, build, deploy. Any failure here stops the job before anything is published.
       - name: Emergency numbers still match their owners' pages
         continue-on-error: true       # the 30-day rule is enforced by the release build below
@@ -68,8 +63,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Commit what was published
         run: |
-          git add data/hsds data/ingested/city_events.json data/seed/emergency.csv
-          git diff --cached --quiet || git commit -m "Publish $(date -u +%F): HSDS export, events, emergency check date"
+          git add data/hsds data/seed/emergency.csv
+          git diff --cached --quiet || git commit -m "Publish $(date -u +%F): HSDS export, emergency check date"
           git push
 
       # 4. Everything else from open data is held for a person. The street map changes rarely: monthly.

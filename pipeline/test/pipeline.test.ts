@@ -9,7 +9,7 @@ import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, today, uuid5 } from '../src/util.js';
 import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
-import { parseCalendar, toZipCenters } from '../src/ingest-city.js';
+import { toZipCenters } from '../src/ingest-city.js';
 import { lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea } from '../src/indicators.js';
 import { ISSUE_TYPES, nameKey, suppress, toNeighborhoods } from '../src/ingest-neighborhoods.js';
@@ -114,21 +114,6 @@ describe('report facts from the write API', () => {
     const r = row({ facts: { ...row({}).facts, checked_at_entry: '2026-09-10', entry_method: 'phone' } });
     applyAggregates([r], agg({ circuit_breaker: true, targets: [{ target_id: 'sal_test', closed_open: 9, closed_last_at: '2026-09-18T10:00Z', wrong_open: 0, last_confirmed_at: null }] }));
     expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('entry_checked');
-  });
-});
-
-describe('City calendar reader', () => {
-  const html = `<div><section class="event-preview-top"><div><article class="date"><time datetime="2026-09-19T12:00:00Z">Sep 19</time></article></div>
-    <article class="tag-time"><article class="tags"><a href="/x">Parks &amp; Recreation</a></article><article class="time"> 10:00 am - 2:00 pm </article></article></section>
-    <section class="desc-contacts"><article class="article-title"><h3><a href="/events/gourdys-pumpkin-run" hreflang="en">Gourdy&#039;s Pumpkin Run</a></h3>
-    <article class="article-body"><p>The City's own description, which we do not copy.</p></article></article></section></div>
-    <div><section class="event-preview-top"><time datetime="2026-09-20T12:00:00Z">Sep 20</time><article class="time"></article><h3><a href="/events/board-meeting">Board meeting</a></h3></section></div>`;
-  it('keeps facts only: title, date, time, department, link', () => {
-    const ev = parseCalendar(html);
-    expect(ev).toHaveLength(2);
-    expect(ev[0]).toEqual({ id: 'evt_gourdys_pumpkin_run_2026-09-19', title: "Gourdy's Pumpkin Run", starts_at: '2026-09-19T10:00', time_text: '10:00 am - 2:00 pm', department: 'Parks & Recreation', url: 'https://detroitmi.gov/events/gourdys-pumpkin-run' });
-    expect(ev[1]).toMatchObject({ starts_at: '2026-09-20', title: 'Board meeting' });
-    expect(JSON.stringify(ev)).not.toContain('own description');
   });
 });
 
@@ -366,6 +351,9 @@ describe('the real bundle', () => {
     expect(index).not.toHaveProperty('retired');
     expect(JSON.parse(readFileSync(p('data/seed/directory.json'), 'utf8')).retired).toBe(false);
     for (const r of rows) expect(r.facts).not.toHaveProperty('cadence_days');
+  });
+  it('ships no City events until a real feed exists (DECISIONS 2026-09-19)', () => {
+    expect(Object.keys(index.files)).not.toContain('events.json');
   });
   it('no DV row has a place', () => {
     const dv = rows.filter((r) => r.category === 'shelter.dv');

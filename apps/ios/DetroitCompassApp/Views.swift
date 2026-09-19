@@ -35,12 +35,16 @@ struct DetroitCompassApp: App {
 }
 
 struct RootView: View {
+    @EnvironmentObject var store: BundleStore
     var body: some View {
         TabView {
             NavigationStack { HomeView() }.tabItem { Label(L.t("tab.home"), systemImage: "house") }
             NavigationStack { HelpView() }.tabItem { Label(L.t("tab.help"), systemImage: "heart") }
             NavigationStack { GreenwayView() }.tabItem { Label(L.t("tab.rec"), systemImage: "tree") }
-            NavigationStack { EventsView() }.tabItem { Label(L.t("tab.events"), systemImage: "calendar") }
+            // Only when the list carries events (none today: DECISIONS 2026-09-19).
+            if !(store.bundle?.events.isEmpty ?? true) {
+                NavigationStack { EventsView() }.tabItem { Label(L.t("tab.events"), systemImage: "calendar") }
+            }
         }
         .tint(Color.brand)
     }

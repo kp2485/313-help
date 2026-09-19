@@ -25,7 +25,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 - Get time-boxed alerts (cold-weather respite activated, cooling centers open, mobile pantry today).
 - Find recreation: the Joe Louis Greenway, City parks, and rec centers.
 - Get transit links (DDOT, SMART, People Mover, QLINE, MoGo) and bus directions to any listing.
-- See City events.
+- ~~See City events.~~ Dropped until the City publishes a real events feed (DECISIONS 2026-09-19).
 - Read a page for each of the 205 neighborhoods: help nearby and public-data facts (doc 13).
 - Works offline from a bundled snapshot.
 

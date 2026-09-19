@@ -93,8 +93,10 @@ function topBar(title?: string, quickExit = false): string {
 }
 // The switch names the other language in that language, so a Spanish speaker can find it on an English screen.
 const langBtn = () => { const other = currentLang() === 'es' ? 'en' : 'es'; return `<p class="langrow"><button class="link" data-lang="${other}" lang="${other}">${T('lang.switch')}</button></p>`; };
+// The Events tab shows only when the list carries upcoming events (none today: DECISIONS 2026-09-19).
+const shownTabs = () => TABS.filter((x) => x.id !== 'events' || upcoming(1).length > 0);
 function tabBar(active?: TabId): string {
-  return `<nav class="tabs" aria-label="${T('tabs.label')}">${TABS.map((x) => `<button ${go({ v: 'tab', tab: x.id })} ${x.id === active ? 'aria-current="page"' : ''}>${icon(x.icon)}<span>${T('tab.' + x.id)}</span></button>`).join('')}</nav>`;
+  return `<nav class="tabs" aria-label="${T('tabs.label')}">${shownTabs().map((x) => `<button ${go({ v: 'tab', tab: x.id })} ${x.id === active ? 'aria-current="page"' : ''}>${icon(x.icon)}<span>${T('tab.' + x.id)}</span></button>`).join('')}</nav>`;
 }
 function ageBanner(): string {
   if (!bundle) return '';
@@ -415,7 +417,7 @@ function render(focus = true): void {
   let title: string | undefined, body: string, exit = false;
   // Without a list, only the screens that don't need one: the urgent numbers and the overdose steps.
   const standsAlone = v.v === 'urgent' || (v.v === 'need' && !!NEEDS.find((x) => x.id === v.id)?.stepsOnly);
-  if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'rec' ? recTab() : tab === 'transit' ? transitTab() : eventsTab(); }
+  if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' && shownTabs().some((x) => x.id === v.tab) ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'rec' ? recTab() : tab === 'transit' ? transitTab() : eventsTab(); }
   else if (v.v === 'urgent') { title = t('strip.more'); body = urgent(); }
   else if (v.v === 'about') { title = t('about.title'); body = about(); }
   else if (v.v === 'search') { title = t('search.title'); body = searchScreen(); }

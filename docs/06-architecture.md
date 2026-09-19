@@ -54,9 +54,9 @@ detroit-compass/
 ## Pipeline
 
 - Runs as `.github/workflows/publish.yml`: nightly at 08:00 UTC (04:00 in Detroit, 03:00 in winter) and by hand. It is **off** until the repository variable `PUBLISH_ENABLED` is `true`. In order, it:
-  1. Refreshes City events and keeps the last good file if the page is down.
+  1. (City events: not read, DECISIONS 2026-09-19.)
   2. Checks the emergency numbers against their owners' pages (`pnpm check:emergency`) and stamps each match's date. One bad night does not stop the publish; the release build does, once a number has gone 30 days without a match.
-  3. Runs the tests, builds the signed release bundle (pulling report counts and steward decisions from the Worker), builds the web app with the pinned public keys, deploys to Cloudflare Pages, and commits `data/hsds/`, events and the emergency check dates.
+  3. Runs the tests, builds the signed release bundle (pulling report counts and steward decisions from the Worker), builds the web app with the pinned public keys, deploys to Cloudflare Pages, and commits `data/hsds/` and the emergency check dates.
   4. Re-reads the other open-data sources. Nothing from this step is published: if anything changed, it opens a pull request.
 - Each source has its own ingester file; `normalize.ts` turns seed and ingested rows into bundle rows and HSDS entities with deterministic IDs.
 - **Validate**: HSDS 3.2 JSON Schema + our own checks (Detroit bbox, phone format, known category, schedule parse). A schedule whose `until` is past on an active row is a warning, not an error.
