@@ -58,7 +58,13 @@ pnpm alert:new -- --title "Overnight warming centers are open" --body "Open toni
 pnpm build:bundle        # or wait for the nightly publish
 ```
 
-The command refuses an alert with no end time, one longer than 7 days, one with no source link, or a phone number that isn't a real number. The app hides the alert by itself at its end time, even offline. To cancel one listing's hours for a day, add `--cancellation --target sal_...`. To take an alert back early, set its `status` to `retracted` in `data/seed/alerts.json`. Ended alerts stay in the file; nothing is deleted.
+The command refuses an alert with no end time, one longer than 7 days, one with no source link, or a phone number that isn't a real number. The app hides the alert by itself at its end time, even offline. To cancel one listing's hours, add `--cancellation --target sal_...`; any opening that overlaps the alert's time is cancelled, and the alert shows on that listing's page. An alert starts now unless you say otherwise: `--day 2026-09-26` covers that whole Detroit day, and `--from "2026-09-26 13:00" --hours 3` starts later (Detroit time, at most 30 days ahead). For example:
+
+```
+pnpm alert:new -- --cancellation --target sal_... --day 2026-09-26 --title "Pantry closed Saturday" --source-url https://...
+```
+
+To take an alert back early, set its `status` to `retracted` in `data/seed/alerts.json`. Ended alerts stay in the file; nothing is deleted.
 
 **For a demo:** `pnpm alert:new -- --demo --title "This is what an alert looks like" --hours 1`. The title and body say it is a demo, it lasts at most 3 hours, and it cannot carry a phone number. Never publish a made-up alert without `--demo`.
 

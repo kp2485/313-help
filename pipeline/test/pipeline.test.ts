@@ -229,7 +229,7 @@ describe('writing an alert', () => {
   const now = new Date('2026-09-18T17:45:30Z');
   it('always ends, names its source, and carries a checked phone number', () => {
     const a = makeAlert({ title: 'Overnight warming centers are open', body: 'Open through Wednesday noon.', hours: 60, category: 'warming', sourceUrl: 'https://detroitmi.gov/news/x', tel: ['Shelter help line=866-313-2520'] }, now);
-    expect(a).toMatchObject({ id: 'alert_overnight_warming_centers_are_open_2026-09-18', status: 'published', starts_at: '2026-09-18T17:45:00Z', ends_at: '2026-09-21T05:45:00Z', source: { type: 'press_release', url: 'https://detroitmi.gov/news/x' }, actions: [{ label: 'Shelter help line', tel: '8663132520' }] });
+    expect(a).toMatchObject({ id: 'alert_overnight_warming_centers_are_open_20260918t1345', status: 'published', starts_at: '2026-09-18T17:45:00Z', ends_at: '2026-09-21T05:45:00Z', source: { type: 'press_release', url: 'https://detroitmi.gov/news/x' }, actions: [{ label: 'Shelter help line', tel: '8663132520' }] });
     expect(validateAlerts([a], new Set()).errors).toEqual([]);
   });
   it('refuses an alert with no end, one longer than 7 days, no source, or a bad phone number', () => {
@@ -238,6 +238,26 @@ describe('writing an alert', () => {
     expect(() => makeAlert({ ...ok, hours: 200 }, now)).toThrow(/at most 7 days/);
     expect(() => makeAlert({ ...ok, sourceUrl: undefined }, now)).toThrow(/source-url/);
     expect(() => makeAlert({ ...ok, tel: ['Call=555-0100'] }, now)).toThrow(/--tel/);
+  });
+  it('a cancellation can be posted ahead for a whole Detroit day, and its id carries the start time', () => {
+    const a = makeAlert({ kind: 'cancellation', title: 'Pantry closed Saturday', day: '2026-09-26', targets: ['sal_x'], sourceUrl: 'https://example.org/closed' }, now);
+    // Saturday 00:00 to Sunday 00:00 in Detroit (EDT, UTC-4)
+    expect(a).toMatchObject({ kind: 'cancellation', starts_at: '2026-09-26T04:00:00Z', ends_at: '2026-09-27T04:00:00Z', targets: ['sal_x'], id: 'alert_pantry_closed_saturday_20260926t0000' });
+    // two alerts with the same title on the same day no longer collide
+    const b = makeAlert({ kind: 'cancellation', title: 'Pantry closed Saturday', from: '2026-09-26 13:00', hours: 3, targets: ['sal_x'], sourceUrl: 'https://example.org/closed' }, now);
+    expect(b).toMatchObject({ starts_at: '2026-09-26T17:00:00Z', ends_at: '2026-09-26T20:00:00Z', id: 'alert_pantry_closed_saturday_20260926t1300' });
+    // a winter date uses EST (UTC-5)
+    expect(makeAlert({ title: 'x', from: '2026-12-05 09:30', hours: 1, sourceUrl: 'https://example.org' }, new Date('2026-11-20T12:00:00Z')).starts_at).toBe('2026-12-05T14:30:00Z');
+    // the day clocks fall back is 25 hours long
+    expect(makeAlert({ title: 'x', day: '2026-11-01', sourceUrl: 'https://example.org' }, new Date('2026-10-30T12:00:00Z'))).toMatchObject({ starts_at: '2026-11-01T04:00:00Z', ends_at: '2026-11-02T05:00:00Z' });
+  });
+  it('alert start times are checked', () => {
+    const ok = { title: 'x', sourceUrl: 'https://example.org' };
+    expect(() => makeAlert({ ...ok, from: '9/26 1pm', hours: 1 }, now)).toThrow(/--from/);
+    expect(() => makeAlert({ ...ok, day: '2026-02-30' }, now)).toThrow(/--day/);
+    expect(() => makeAlert({ ...ok, day: '2026-09-26', from: '2026-09-26 10:00', hours: 1 }, now)).toThrow(/not both/);
+    expect(() => makeAlert({ ...ok, day: '2026-09-10' }, now)).toThrow(/already over/);
+    expect(() => makeAlert({ ...ok, day: '2026-12-26' }, now)).toThrow(/30 days/);
   });
   it('a demo alert says so in its title and body, lasts at most 3 hours, and has no phone number', () => {
     const a = makeAlert({ demo: true, title: 'This is what an alert looks like', hours: 1 }, now);

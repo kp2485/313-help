@@ -202,6 +202,7 @@
   "hood.updated": "actualizado {date}",
   "hood.source_ours": "Lugares de ayuda: la lista de Detroit Compass en este teléfono.",
   "hood.left_out": "A propósito no incluimos números de crímenes. Nada de esto viene de las personas que usan esta app.",
+  "alert.from": "Empieza {when}",
   "alert.until": "Hasta {when}",
   "alert.source": "Dónde se anunció esto",
   "report.photo_label": "Agregar una foto (si quiere)",

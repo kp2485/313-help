@@ -1,6 +1,6 @@
 import {
   badge, bundleAge, effectiveNow, helpAlong, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens,
-  type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
+  type Alert, type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@detroithelp/query';
 import { currentLang, initLang, locale, setLang, t } from './i18n.js';
 import { cached, refresh, type Bundle } from './data.js';
@@ -166,6 +166,13 @@ function eventItem(e: CityEvent): string {
   return `<li class="event"><div class="when"><span>${esc(new Intl.DateTimeFormat(locale(), { month: 'short', timeZone: 'UTC' }).format(new Date(e.starts_at.slice(0, 10))))}</span><strong>${Number(e.starts_at.slice(8, 10))}</strong></div>
     <div><h3>${esc(e.title)}</h3><p class="what">${[time, e.location].filter(Boolean).map(esc).join(' · ')}</p>${e.url ? ext(e.url, t('events.details'), 'link') : ''}</div></li>`;
 }
+const whenFmt = (iso: string) => new Intl.DateTimeFormat(locale(), { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/Detroit' }).format(new Date(iso));
+/** One alert card. An alert that hasn't started yet (a cancellation posted ahead) says when it starts. */
+function alertBox(a: Alert): string {
+  const later = Date.parse(a.starts_at) > now().getTime();
+  return `<div class="alert"><strong>${esc(a.title)}</strong>${a.body_plain ? `<p>${esc(a.body_plain)}</p>` : ''}${(a.actions ?? []).filter((x) => x.tel).map((x) => `<a class="btn" href="${telHref(x.tel!)}">${icon('phone', 'sm')}${esc(x.label)}</a>`).join('')}
+      <p class="foot">${later ? `${T('alert.from', { when: whenFmt(a.starts_at) })} · ` : ''}${T('alert.until', { when: whenFmt(a.ends_at) })}${a.source?.url ? ` · ${ext(a.source.url, t('alert.source'), 'link')}` : ''}</p></div>`;
+}
 function homeTab(): string {
   if (!bundle) return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T(loadError ? 'home.no_data' : 'home.loading')}</p></section></main>`;
   const sunset = retired();
@@ -173,8 +180,7 @@ function homeTab(): string {
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const quick = ['food', 'shelter', 'doctor', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
   return `<main>${langBtn()}<section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
-    ${alerts.map((a) => `<div class="alert"><strong>${esc(a.title)}</strong>${a.body_plain ? `<p>${esc(a.body_plain)}</p>` : ''}${(a.actions ?? []).filter((x) => x.tel).map((x) => `<a class="btn" href="${telHref(x.tel!)}">${icon('phone', 'sm')}${esc(x.label)}</a>`).join('')}
-      <p class="foot">${T('alert.until', { when: new Intl.DateTimeFormat(locale(), { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/Detroit' }).format(new Date(a.ends_at)) })}${a.source?.url ? ` · ${ext(a.source.url, t('alert.source'), 'link')}` : ''}</p></div>`).join('')}
+    ${alerts.map(alertBox).join('')}
     ${sunset ? '' : `<button class="feature" ${go({ v: 'tab', tab: 'help' })}><span class="rowic big">${icon('help')}</span><span class="rowtx"><strong>${T('home.help_title')}</strong><small>${T('home.help_sub')}</small></span>${icon('chevron', 'dim')}</button>
     <ul class="quick">${quick.map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>`).join('')}</ul>`}
     ${ev.length ? `<div class="sechead"><h2>${T('home.events')}</h2><button class="link" ${go({ v: 'tab', tab: 'events' })}>${T('home.see_all')}</button></div><ul class="events">${ev.map(eventItem).join('')}</ul>` : ''}
@@ -193,7 +199,7 @@ function recTab(): string {
   const g = bundle?.greenway, parks = bundle?.parks ?? [];
   const openCount = g?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const nearParks = here ? [...parks].map((p) => ({ p, mi: milesBetween(here!, p) })).sort((a, b) => a.mi - b.mi).slice(0, 5) : [];
-  const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now());
+  const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now(), bundle?.alerts ?? []);
   return `<main><h1 class="page" tabindex="-1">${T('tab.rec')}</h1><p class="lede">${T('rec.lede')}</p>
     ${g ? `<button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'dim')}</button>${mapBox({ key: 'rec', label: t('map.label_rec') })}` : ''}
     ${parks.length ? `<h2>${T('rec.parks')}</h2>${locChip()}${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => `<li><div class="row static"><span class="rowic">${icon('rec')}</span><span class="rowtx"><strong>${esc(p.name)}</strong><small>${[p.address, t('miles', { miles: mi.toFixed(1) })].filter(Boolean).map(esc).join(' · ')}</small></span></div></li>`).join('')}</ul>` : ''}
@@ -262,8 +268,11 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
   const b = badgeText(r), o = openNow(r, now(), bundle!.alerts), next = nextOccurrences(r, now(), 3, bundle!.alerts);
   const sensitive = isSensitive(r.category);
   const gw = !sensitive && r.lat !== undefined && bundle!.greenway ? nearestSegment({ lat: r.lat, lon: r.lon! }, bundle!.greenway.segments, { openOnly: true, maxMiles: 0.5 }) : null;
+  // Alerts that name this listing and haven't ended, including ones announced ahead ("closed Saturday").
+  const own = bundle!.alerts.filter((a) => a.status === 'published' && a.targets?.includes(r.id) && Date.parse(a.ends_at) > now().getTime())
+    .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
   return { title: r.name, exit: sensitive, html: `<main class="detail"><p class="org">${esc(r.org)}</p>
-    <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${r.notice ? `<p class="notice">${esc(r.notice)}</p>` : ''}
+    <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${r.notice ? `<p class="notice">${esc(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${esc(ph.label)}` : ''}</span><strong>${esc(ph.number)}</strong></a>`).join('')}
       ${r.address ? `<div class="two"><a class="btn ghost" href="${esc(directionsHref(r))}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
         <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${placeQ(r)}&travelmode=transit" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>` : ''}
