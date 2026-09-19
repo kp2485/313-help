@@ -42,6 +42,15 @@ pnpm geocode             # fill coordinates in data/seed/resources.csv (U.S. Cen
 
 ## Status
 
+- 2026-09-18 (evening): **Everything in the hackathon scope is built** except what needs Kyle's accounts (domain, Cloudflare, signing keys), legal advice (public photos), or a Mac (compiling the iPhone screens). In this pass:
+  - **167 listings.** 46 were researched on each organization's own site in Districts 2, 3, 4 and 7 and published only after `check:sources` matched the phone number and street number on that page; three sites that block scripts were checked by a person in a browser. Neighborhoods with no food listed within half a mile went from 160 to 110. District 1 (far northwest) is still the thinnest.
+  - **Street map** drawn on the phone from City open data: streets, parks, the greenway and cross streets, with no tile server (docs/06).
+  - **Search, Type a ZIP, Saved places, Add a place, help paying for food** (docs/05).
+  - **Neighborhood pages for all 205 neighborhoods** (docs/13 steps 2–4): help nearby, home sales next to building permits, and conditions (blight tickets per 1,000 lots, demolitions, time to close reported problems). No rankings; counts under 5 hidden. Crash data isn't available as current open data (DECISIONS).
+  - **Photos on condition reports** (docs/11 hackathon slice): no metadata can reach storage, only stewards can see them, and they are deleted on time. Demo only until the legal advice is in hand.
+  - **Spanish** for every screen; the words each place wrote about itself stay in English and are marked as such. Needs a native speaker's review.
+  - **Alert tool** (`pnpm alert:new`, with a `--demo` mode) and the **nightly publish workflow**, which stays off until `PUBLISH_ENABLED` is set.
+  - **iPhone:** `apps/ios` has `DetroitQuery`, a Swift copy of the query rules that passes all 77 fixtures (in CI), and the SwiftUI screens, which still need a first build in Xcode (see `apps/ios/README.md`).
 - 2026-09-18: **Directory grew from 91 to 121 listings**: 16 City recreation centers, 2 libraries, and 12 help listings near greenway segments that had nothing nearby. Open segments with no help within a 10-minute walk: 9 → 3.
 - 2026-09-18: **Build step 4 done** — `admin/` steward queue (plain HTML + JS, no build step): reported listings first, proposals, archive/restore with reasons, circuit-breaker banner. Steward decisions live in D1 and are applied at build time; the full demo loop (report → queue → archive → rebuild → "Closed as of today") runs locally. Repo renamed `detroit-compass` and made public.
 - 2026-09-18: **Redesign** — five tabs (Home · Help · Recreation · Transit · Events), green design system, Urgent help in the top bar instead of a red strip, City events and 302 parks in the bundle, bus directions on every listing. See 05 and DECISIONS.
