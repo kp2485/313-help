@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  313 Help collects nothing and tracks nobody (docs/08). This file says so in Apple's own terms.
+
+	  NSPrivacyTracking: false. There is no advertising identifier, no third-party SDK of any kind, and nothing
+	  the app sends could be joined to a person or a device: a report carries a listing id, a kind, an optional
+	  note, a minute-precision time, and sha256(random on-device key ‖ target ‖ day), which differs for every
+	  target and every day.
+
+	  NSPrivacyCollectedDataTypes: empty. Reports and proposals are text a person chooses to send about a place,
+	  not data collected about the person. If the store questionnaire asks, that is "User Content", not linked to
+	  identity and not used for tracking. Location is used on the device to sort a list by distance and is never
+	  written down or sent, so it is not collected either.
+
+	  NSPrivacyAccessedAPITypes: empty. The app uses no required-reason API. It keeps its own state in files it
+	  creates (not UserDefaults), never reads file timestamps, never asks for free disk space, never reads system
+	  boot time, and never looks at the active keyboard list. If any of that changes, add the category and reason
+	  here in the same commit.
+	-->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array/>
+</dict>
+</plist>

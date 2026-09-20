@@ -24,18 +24,25 @@ enum L {
 let hardcoded = ["emg_911": "911", "emg_988": "988"]
 
 struct Need: Identifiable {
-    struct Refine: Identifiable { var id: String; var query: Query }
+    /// One way to narrow a need. `first` is emergency numbers shown above that refinement's own list
+    /// (the emergency room screen leads with 911).
+    struct Refine: Identifiable { var id: String; var query: Query; var first: [String] = [] }
     var id: String
     var symbol: String
     var now: Bool                       // listed first, under "Right now"
     var later = false                   // listed last, under "Work, school, and paperwork"
     var first: [String] = []            // emergency numbers shown BEFORE any list
     var firstLink: (key: String, url: String)? = nil    // a link above even those (313SafeBeds on the shelter screen)
+    var intro: String? = nil
+    /// What an empty list says, when "we don't have anything listed" is not the right answer
+    /// (warming and cooling centres: libraries and recreation centres are the everyday answer).
+    var emptyKey: String? = nil
     var query: Query? = nil
-    var refine: [Refine] = []
     var stepsOnly = false               // overdose: 911 and steps, never a list (audit A7)
     var sensitive = false               // no distance, no map, not saved
-    var intro: String? = nil
+    /// Last, so that every setting of a need is written above its choices, as in apps/web/src/needs.ts.
+    /// AppParityTests reads the two files side by side and relies on that order.
+    var refine: [Refine] = []
 }
 
 let needs: [Need] = [
@@ -43,24 +50,34 @@ let needs: [Need] = [
     Need(id: "shelter", symbol: "bed.double", now: true, first: ["emg_shelter_helpline", "emg_shelter_outwayne"],
          firstLink: ("beds.safebeds", "https://313safebeds.com/"), refine: [
         .init(id: "me", query: Query(category: "shelter.emergency")), .init(id: "kids", query: Query(category: "shelter.emergency")), .init(id: "young", query: Query(category: "shelter.emergency", prefer: ["youth"]))]),   // youth shelters first
-    Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], query: Query(category: "shelter.dv"), sensitive: true, intro: "safe.dv_intro"),
-    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], query: Query(category: "health.mental"), sensitive: true, intro: "talk.intro"),
+    Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], intro: "safe.dv_intro", query: Query(category: "shelter.dv"), sensitive: true),
+    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], intro: "talk.intro", query: Query(category: "health.mental"), sensitive: true),
     // Treatment and sexual assault (DECISIONS 2026-09-19): numbers first. The iPhone app saves nothing and keeps no
     // history, so "private" needs no extra rule here; addresses and distance stay.
-    Need(id: "drugs", symbol: "leaf", now: true, first: ["emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"], refine: [
+    Need(id: "drugs", symbol: "leaf", now: true, first: ["emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"],
+         intro: "drugs.intro", refine: [
         .init(id: "today", query: Query(category: "treatment", prefer: ["walk_in"])), .init(id: "detox", query: Query(category: "treatment.detox")),
         .init(id: "meds", query: Query(category: "treatment.meds")), .init(id: "stay", query: Query(category: "treatment.residential")),
         .init(id: "home", query: Query(category: "treatment.outpatient")), .init(id: "recovery", query: Query(category: "treatment.recovery")),
-        .init(id: "supplies", query: Query(category: "harm.supplies"))], intro: "drugs.intro"),
-    Need(id: "assault", symbol: "shield", now: true, first: ["emg_avalon", "emg_voices4", "emg_911"], query: Query(category: "assault"), intro: "assault.intro"),
-    Need(id: "food", symbol: "fork.knife", now: false, refine: [.init(id: "today", query: Query(category: "food.meal")), .init(id: "week", query: Query(category: "food", mode: "week"))]),
-    Need(id: "doctor", symbol: "cross.case", now: false, refine: [.init(id: "doctor", query: Query(category: "health.clinic")), .init(id: "dentist", query: Query(category: "health.dental")), .init(id: "eyes", query: Query(category: "health.vision"))]),
+        .init(id: "supplies", query: Query(category: "harm.supplies"))]),
+    Need(id: "assault", symbol: "shield", now: true, first: ["emg_avalon", "emg_voices4", "emg_911"], intro: "assault.intro", query: Query(category: "assault")),
+    Need(id: "food", symbol: "fork.knife", now: false, refine: [.init(id: "today", query: Query(category: "food.meal", mode: "now")), .init(id: "week", query: Query(category: "food", mode: "week"))]),
+    // Emergency room first, and that screen leads with 911 (mirrors apps/web/src/needs.ts).
+    Need(id: "doctor", symbol: "cross.case", now: false, refine: [
+        .init(id: "er", query: Query(category: "health.er"), first: ["emg_911"]),
+        .init(id: "urgent", query: Query(category: "health.urgent")),
+        .init(id: "doctor", query: Query(category: "health.clinic")),
+        // Detroit Health Department programs: shots, lead tests, WIC and the wellness centres. Their own
+        // category, because they are city programs rather than a clinic that says it is free (2026-09-20).
+        .init(id: "dhd", query: Query(category: "health.dhd")),
+        .init(id: "dentist", query: Query(category: "health.dental")),
+        .init(id: "eyes", query: Query(category: "health.vision"))]),
     Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner"))]),
     Need(id: "utilities", symbol: "bolt", now: false, query: Query(category: "utilities")),
     Need(id: "day", symbol: "clock", now: false, query: Query(category: "shelter.day")),
     Need(id: "things", symbol: "tshirt", now: false, refine: [.init(id: "clothes", query: Query(category: "goods.clothes")), .init(id: "baby", query: Query(category: "goods.baby"))]),
     Need(id: "narcan", symbol: "shippingbox", now: false, query: Query(category: "harm.narcan")),
-    Need(id: "hot_cold", symbol: "sun.max", now: false, query: Query(category: "rec"), intro: "hotcold.intro"),
+    Need(id: "hot_cold", symbol: "sun.max", now: false, intro: "hotcold.intro", emptyKey: "hotcold.none", query: Query(category: "rec")),
     // The web app also shows link-outs (unemployment, Lifeline, child-care scholarships…) on these screens; the
     // iPhone lists places only until link-outs are built here.
     Need(id: "job", symbol: "briefcase", now: false, later: true, refine: [.init(id: "find", query: Query(category: "jobs.find")), .init(id: "training", query: Query(category: "jobs.training")), .init(id: "record", query: Query(category: "jobs", prefer: ["reentry"]))]),

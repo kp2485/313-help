@@ -6,8 +6,7 @@ import CryptoKit
 import DetroitQuery
 import Foundation
 
-struct BundleIndex: Codable { var version: String; var generatedAt: String; var retired: Bool?; var signing: String; var files: [String: FileMeta]
-    struct FileMeta: Codable { var sha256: String; var bytes: Int } }
+// BundleIndex, BundleError and the checks themselves live in Verify.swift, where the app tests can reach them.
 struct EmergencyNumber: Codable, Identifiable { var id: String; var label: String; var number: String; var hardcoded: Bool }
 struct CityEvent: Codable, Identifiable { var id: String; var title: String; var startsAt: String; var endsAt: String?; var location: String?; var url: String }
 struct ArchivedRow: Codable, Identifiable { var id: String; var name: String; var category: String; var archived: BundleRow.Archived }
@@ -22,17 +21,16 @@ struct LoadedBundle {
     var events: [CityEvent] = []
 }
 
-enum BundleError: Error { case badSignature, badChecksum(String), older, notJSON }
-
 @MainActor
 final class BundleStore: ObservableObject {
     @Published private(set) var bundle: LoadedBundle?
     @Published private(set) var loadFailed = false
 
-    /// Where the published bundle lives, e.g. https://<domain>/data/bundle/v1/ (Info.plist key DCBundleBase).
-    private let base = URL(string: Bundle.main.object(forInfoDictionaryKey: "DCBundleBase") as? String ?? "")
+    /// Where the published bundle lives, e.g. https://<domain>/data/bundle/v1/ (Config, from Info.plist). A build
+    /// still carrying the placeholder origin reaches nothing at all, and lives on the shipped snapshot.
+    private let base = Config.bundleBaseURL
     /// Base64 SPKI Ed25519 public keys, active and spare (Info.plist DCPinnedKeys). Same values as BUNDLE_PUBLIC_KEYS.
-    private let pinned = (Bundle.main.object(forInfoDictionaryKey: "DCPinnedKeys") as? [String]) ?? []
+    private let pinned = Config.pinnedKeys
     private let cacheDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("bundle", isDirectory: true)
 
     func start() async {
@@ -55,8 +53,8 @@ final class BundleStore: ObservableObject {
             }
             let indexData = try await get("index.json")
             let index = try verifiedIndex(indexData, try await get("index.json.sig"))
-            if let cur = bundle?.index { if cur.version == index.version { return }; if index.generatedAt < cur.generatedAt { throw BundleError.older } }
-            for name in index.files.keys where !name.hasPrefix("map/") && !name.hasPrefix("indicators/") { _ = try await get(name) }
+            if let cur = bundle?.index { if cur.version == index.version { return }; if BundleCheck.refusesOlder(current: cur, next: index) { throw BundleError.older } }
+            for name in index.files.keys where BundleCheck.loadedNow(name) { _ = try await get(name) }
             let next = try load(from: { name in guard let d = fetched[name] else { throw URLError(.fileDoesNotExist) }; return d })
             try? FileManager.default.removeItem(at: cacheDir)
             for (name, data) in fetched {
@@ -71,15 +69,7 @@ final class BundleStore: ObservableObject {
     }
 
     private func verifiedIndex(_ indexData: Data, _ sigData: Data) throws -> BundleIndex {
-        struct Sig: Codable { var signature: String }
-        guard let sig = Data(base64Encoded: try JSONDecoder().decode(Sig.self, from: sigData).signature) else { throw BundleError.badSignature }
-        // SPKI DER for Ed25519 is a fixed 12-byte header and the 32-byte key.
-        let ok = pinned.contains { spki in
-            guard let der = Data(base64Encoded: spki), der.count >= 32, let key = try? Curve25519.Signing.PublicKey(rawRepresentation: der.suffix(32)) else { return false }
-            return key.isValidSignature(sig, for: indexData)
-        }
-        guard ok else { throw BundleError.badSignature }
-        return try bundleDecoder().decode(BundleIndex.self, from: indexData)
+        try BundleCheck.verifiedIndex(indexData, sig: sigData, pinned: pinned)
     }
 
     /// Reads and checks every file the index lists (maps and neighborhood numbers load later, when opened).
@@ -87,9 +77,9 @@ final class BundleStore: ObservableObject {
         let index = try verifiedIndex(try read("index.json"), try read("index.json.sig"))
         var b = LoadedBundle(index: index)
         let dec = bundleDecoder()
-        for (name, meta) in index.files where !name.hasPrefix("map/") && !name.hasPrefix("indicators/") {
+        for (name, meta) in index.files where BundleCheck.loadedNow(name) {
             let data = try read(name)
-            guard SHA256.hash(data: data).map({ String(format: "%02x", $0) }).joined() == meta.sha256 else { throw BundleError.badChecksum(name) }
+            guard BundleCheck.sha256Hex(data) == meta.sha256 else { throw BundleError.badChecksum(name) }
             switch name {
             case _ where name.hasPrefix("category/"): b.rows += try dec.decode([BundleRow].self, from: data)
             case "alerts.json": b.alerts = try dec.decode([Alert].self, from: data)

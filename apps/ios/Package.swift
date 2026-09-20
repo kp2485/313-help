@@ -12,5 +12,8 @@ let package = Package(
     targets: [
         .target(name: "DetroitQuery", path: "Sources/DetroitQuery"),
         .testTarget(name: "DetroitQueryTests", dependencies: ["DetroitQuery"], path: "Tests/DetroitQueryTests"),
+        // Reads HelpApp/Help.swift, apps/web/src/needs.ts and strings/*.json as text and fails when the three
+        // disagree. It compiles nothing from HelpApp/, so it runs with `swift test` and needs no Xcode.
+        .testTarget(name: "AppParityTests", path: "Tests/AppParityTests"),
     ]
 )

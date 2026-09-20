@@ -9,12 +9,15 @@ import SwiftUI
 struct Help313App: App {
     @StateObject private var store = BundleStore()
     @StateObject private var here = Here()
+    @StateObject private var saved = Saved.shared
+    @StateObject private var reporter = Reporter.shared
     @Environment(\.scenePhase) private var phase
     var body: some Scene {
         WindowGroup {
-            RootView().environmentObject(store).environmentObject(here)
-                .task { await store.start() }
-                .onChange(of: phase) { _, p in if p == .active { Task { await store.refresh() } } }
+            RootView().environmentObject(store).environmentObject(here).environmentObject(saved).environmentObject(reporter)
+                .task { await store.start(); await reporter.flush() }
+                // Back to the front: look for a newer list, and try anything the outbox is still holding.
+                .onChange(of: phase) { _, p in if p == .active { Task { await store.refresh(); await reporter.flush() } } }
         }
     }
 }
@@ -63,7 +66,9 @@ struct RootView: View {
         TabView {
             NavigationStack { HomeView() }.tabItem { Label(L.t("tab.home"), systemImage: "house") }
             NavigationStack { HelpView() }.tabItem { Label(L.t("tab.help"), systemImage: "heart") }
-            NavigationStack { GreenwayView() }.tabItem { Label(L.t("tab.rec"), systemImage: "tree") }
+            // The web app folded Recreation and Transit into one Map tab (2026-09-20); the iPhone has no map yet,
+            // so the greenway keeps its own tab, named after itself rather than with the retired `tab.rec` key.
+            NavigationStack { GreenwayView() }.tabItem { Label(L.t("gw.title"), systemImage: "tree") }
             // Only when the list carries events (none today: DECISIONS 2026-09-19).
             if !(store.bundle?.events.isEmpty ?? true) {
                 NavigationStack { EventsView() }.tabItem { Label(L.t("tab.events"), systemImage: "calendar") }
@@ -88,15 +93,31 @@ extension View { func urgentHelp() -> some View { modifier(UrgentButton()) } }
 struct CallRow: View {
     let label: String, number: String
     var is911 = false
+    /// A phone number is never allowed to wrap or be cut short. At the biggest text sizes the number will not fit
+    /// beside its label, so it moves onto its own line instead of pushing the screen sideways.
+    @Environment(\.dynamicTypeSize) private var textSize
     var body: some View {
         if let url = telURL(number) {
             Link(destination: url) {
-                HStack(spacing: 12) {
-                    Image(systemName: "phone.fill").font(.body)
-                    Text(label).font(.body.weight(.semibold)).multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
-                    Spacer(minLength: 8)
-                    Text(number).font(.body.weight(.bold)).fixedSize()   // phone numbers never truncate
+                Group {
+                    if textSize.isAccessibilitySize {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "phone.fill").font(.body)
+                                Text(label).font(.body.weight(.semibold)).multilineTextAlignment(.leading)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            Text(number).font(.body.weight(.bold)).minimumScaleFactor(0.6).lineLimit(1)
+                        }
+                    } else {
+                        HStack(spacing: 12) {
+                            Image(systemName: "phone.fill").font(.body)
+                            Text(label).font(.body.weight(.semibold)).multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
+                            Spacer(minLength: 8)
+                            Text(number).font(.body.weight(.bold)).fixedSize()   // phone numbers never truncate
+                        }
+                    }
                 }
                 .foregroundStyle(is911 ? Color.white : Color.brandSoftInk)
                 .padding(.horizontal, 16).padding(.vertical, 14).frame(maxWidth: .infinity, alignment: .leading)
@@ -199,6 +220,16 @@ struct HomeView: View {
                         NavTile(title: L.t("quick." + n.id), symbol: n.symbol) { NeedView(need: n) }
                     }
                 }
+                NavRow(title: L.t("saved.title"), symbol: "bookmark", subtitle: L.t("saved.sub")) { SavedView() }
+                // When this phone last got updates, and the two screens that say what the app keeps and sends.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L.t("home.updated", ["when": prettyDate(b.index.generatedAt)]))
+                        .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 16) {
+                        NavigationLink { AboutView() } label: { Text(L.t("about.title")).font(.footnote.weight(.semibold)).foregroundStyle(Color.brand) }
+                        NavigationLink { PrivacyView() } label: { Text(L.t("privacy.title")).font(.footnote.weight(.semibold)).foregroundStyle(Color.brand) }
+                    }
+                }.padding(.top, 8)
             } else {
                 Text(L.t(store.loadFailed ? "home.no_data" : "home.loading")).foregroundStyle(Color.muted).card()
             }
@@ -259,14 +290,16 @@ struct NeedView: View {
                 if !need.first.isEmpty { EmergencyRows(ids: need.first) }
                 ForEach(need.refine) { r in
                     NavRow(title: L.t("refine.\(need.id).\(r.id)"), symbol: need.symbol) {
-                        ResultsView(query: r.query, sensitive: need.sensitive).navigationTitle(L.t("refine.\(need.id).\(r.id)"))
+                        ResultsView(query: r.query, sensitive: need.sensitive, first: r.first, emptyKey: need.emptyKey)
+                            .navigationTitle(L.t("refine.\(need.id).\(r.id)"))
                     }
                 }
             }.padding(16) }
             .background(Color.appBg.ignoresSafeArea())
             .navigationTitle(L.t("need." + need.id)).navigationBarTitleDisplayMode(.inline).urgentHelp()
         } else {
-            ResultsView(query: need.query ?? Query(), sensitive: need.sensitive, first: need.first, intro: need.intro, firstLink: need.firstLink)
+            ResultsView(query: need.query ?? Query(), sensitive: need.sensitive, first: need.first, intro: need.intro,
+                        firstLink: need.firstLink, emptyKey: need.emptyKey)
                 .navigationTitle(L.t("need." + need.id))
         }
     }
@@ -280,6 +313,8 @@ struct ResultsView: View {
     var first: [String] = []
     var intro: String? = nil
     var firstLink: (key: String, url: String)? = nil
+    /// What to say when nothing is listed, when the plain "we don't have anything yet" is not the right answer.
+    var emptyKey: String? = nil
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt)
         var q = query; if !sensitive { q.near = here.point }
@@ -290,9 +325,9 @@ struct ResultsView: View {
             if !first.isEmpty { EmergencyRows(ids: first) }
             if sensitive { Text(L.t("safe.calls_note")).font(.footnote).foregroundStyle(Color.muted) }
             else { LocationChip() }
-            if ranked.isEmpty { Text(L.t("results.none") + " 211").foregroundStyle(Color.muted).card() }
+            if ranked.isEmpty { Text(L.t(emptyKey ?? "results.none") + " 211").foregroundStyle(Color.muted).card() }
             ForEach(ranked, id: \.row.id) { r in
-                NavigationLink { DetailView(row: r.row) } label: { Card(r: r, showMiles: !sensitive) }.buttonStyle(.plain)
+                CardLink(r: r, showMiles: !sensitive) { DetailView(row: r.row) }
             }
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea()).urgentHelp()
@@ -329,6 +364,51 @@ struct LocationChip: View {
     }
 }
 
+/// One listing on a list: the card leads to the listing, and the Call button under it is its own control, outside
+/// the link. A link inside a link is dead on iOS — "Call" did nothing — and a screen reader reads two controls here,
+/// "Crossroads of Michigan, open until 2 pm…" and "Call Crossroads of Michigan", in that order.
+struct CardLink<Destination: View>: View {
+    let r: Ranked
+    var showMiles = true
+    @Environment(\.dynamicTypeSize) private var textSize
+    @ViewBuilder var destination: () -> Destination
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            NavigationLink(destination: destination) { Card(r: r, showMiles: showMiles) }.buttonStyle(.plain)
+            if let phone = r.row.phones.first, let url = telURL(phone.number) {
+                Link(destination: url) {
+                    // As on CallRow: at the biggest text sizes the number takes its own line rather than
+                    // being cut short or widening the screen.
+                    Group {
+                        if textSize.isAccessibilitySize {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "phone.fill")
+                                    Text(L.t("detail.call")).fontWeight(.semibold)
+                                }
+                                Text(phone.number).fontWeight(.bold).minimumScaleFactor(0.6).lineLimit(1)
+                            }.frame(maxWidth: .infinity, alignment: .leading)
+                        } else {
+                            HStack(spacing: 10) {
+                                Image(systemName: "phone.fill")
+                                Text(L.t("detail.call")).fontWeight(.semibold)
+                                Spacer(minLength: 8)
+                                Text(phone.number).fontWeight(.bold).fixedSize()   // phone numbers never truncate
+                            }
+                        }
+                    }
+                    .font(.subheadline).foregroundStyle(Color.brandSoftInk)
+                    .padding(.horizontal, 14).padding(.vertical, 11).frame(maxWidth: .infinity)
+                    .background(Color.brandSoft, in: RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L.t("detail.call_label", ["name": r.row.name]) + ", " + phone.number)
+            }
+        }.card()
+    }
+}
+
+/// What a card says. It never carries its own background: CardLink puts it on one.
 struct Card: View {
     let r: Ranked
     var showMiles = true
@@ -346,22 +426,7 @@ struct Card: View {
             }
             if let n = r.row.notice { Text(n).font(.footnote).foregroundStyle(Color.warnInk).padding(10).frame(maxWidth: .infinity, alignment: .leading).background(Color.warnBg, in: RoundedRectangle(cornerRadius: 10)) }
             Text(badgeText(r.badge)).font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
-            if let phone = r.row.phones.first, let url = telURL(phone.number) {
-                Link(destination: url) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "phone.fill")
-                        Text(L.t("detail.call")).fontWeight(.semibold)
-                        Spacer(minLength: 8)
-                        Text(phone.number).fontWeight(.bold).fixedSize()
-                    }
-                    .font(.subheadline).foregroundStyle(Color.brandSoftInk)
-                    .padding(.horizontal, 14).padding(.vertical, 11).frame(maxWidth: .infinity)
-                    .background(Color.brandSoft, in: RoundedRectangle(cornerRadius: 12))
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L.t("detail.call_label", ["name": r.row.name]))
-            }
-        }.card()
+        }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -370,7 +435,7 @@ struct DetailView: View {
     let row: BundleRow
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt), alerts = store.bundle?.alerts ?? []
-        let sensitive = row.category == "shelter.dv" || row.category == "health.mental"
+        let sensitive = isSensitive(row.category)
         let open = openNow(row, now: now, alerts: alerts)
         let next = nextOccurrences(row, now: now, n: 3, alerts: alerts)
         return ScrollView { VStack(alignment: .leading, spacing: 10) {
@@ -384,7 +449,10 @@ struct DetailView: View {
                 }
             }.card()
             ForEach(row.phones, id: \.number) { p in CallRow(label: L.t("detail.call") + (p.label.map { " · " + $0 } ?? ""), number: p.number) }
-            if let a = row.address, let q = "\(a.line1), \(a.city), MI \(a.zip ?? "")".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            // Directions to the street address when the place publishes one, and otherwise to its point on the
+            // map (the Wayne County naloxone stations have coordinates and no address). The coordinate is passed
+            // to the maps app as a coordinate; it is never printed as if it were an address.
+            if let dest = mapsDestination(row), let q = dest.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                let url = URL(string: "https://maps.apple.com/?daddr=\(q)") {
                 Link(destination: url) {
                     HStack(spacing: 10) { Image(systemName: "mappin.and.ellipse"); Text(L.t("detail.directions")).fontWeight(.semibold); Spacer() }
@@ -392,9 +460,13 @@ struct DetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
                         .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
-                }.buttonStyle(.plain)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L.t("detail.directions_label", ["name": row.name]))
                 Text(L.t("detail.directions_note")).font(.footnote).foregroundStyle(Color.muted)
             }
+            // Saved places are kept on this phone only, and a private listing has no Save button at all (docs/08).
+            SaveButton(row: row)
             if sensitive { Text(L.t("safe.calls_note")).font(.footnote).foregroundStyle(Color.muted) }
             if L.spanish { Text(L.t("detail.in_english")).font(.footnote).foregroundStyle(Color.muted) }
             DetailSection(title: L.t("detail.what")) { Text(row.what).fixedSize(horizontal: false, vertical: true) }
@@ -409,8 +481,18 @@ struct DetailView: View {
                 }
             }
             if let h = row.hoursText { DetailSection(title: L.t("detail.hours")) { Text(h).fixedSize(horizontal: false, vertical: true) } }
-            if let a = row.address { DetailSection(title: L.t("detail.where")) { Text("\(a.line1)\n\(a.city), MI \(a.zip ?? "")").fixedSize(horizontal: false, vertical: true) } }
+            if let a = row.address {
+                DetailSection(title: L.t("detail.where")) { Text("\(a.line1)\n\(a.city), MI \(a.zip ?? "")").fixedSize(horizontal: false, vertical: true) }
+            } else if showsPointWithoutAddress(row) {
+                // Somewhere real that publishes no street address: say so in the source's own name, and leave
+                // Directions above to open the point. Never invent an address from the coordinate.
+                DetailSection(title: L.t("detail.where")) {
+                    Text(L.t("detail.where_no_address", ["source": row.facts.source.name])).fixedSize(horizontal: false, vertical: true)
+                }
+            }
             DetailSection(title: L.t("detail.source")) { Text(row.facts.source.name).fixedSize(horizontal: false, vertical: true) }
+            // Tell us it's wrong. Nothing about the person goes with it (docs/04): see Reports.swift.
+            ReportBox(targetId: row.id, category: row.category)
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea())
         .navigationTitle(row.name).navigationBarTitleDisplayMode(.inline).urgentHelp()
@@ -439,7 +521,7 @@ struct SearchView: View {
             if searchTokens(text).isEmpty { Text(L.t("search.hint")).font(.body).foregroundStyle(Color.muted).card() }
             else if found.isEmpty { Text(L.t("search.none") + " 211").foregroundStyle(Color.muted).card() }
             ForEach(found.prefix(30), id: \.row.id) { r in
-                NavigationLink { DetailView(row: r.row) } label: { Card(r: r) }.buttonStyle(.plain)
+                CardLink(r: r) { DetailView(row: r.row) }
             }
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea())
@@ -470,7 +552,7 @@ struct SegmentView: View {
     let segment: Segment
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt)
-        let near = helpAlong((store.bundle?.rows ?? []).filter { $0.category != "shelter.dv" }, segment)
+        let near = helpAlong((store.bundle?.rows ?? []).filter { !isSensitive($0.category) }, segment)
         ScrollView { VStack(alignment: .leading, spacing: 10) {
             Pill(text: L.t("gw." + segment.phase), tone: segment.phase == "open" ? .open : .plain)
             if let cross = segment.crossStreets, !cross.isEmpty {
@@ -479,10 +561,11 @@ struct SegmentView: View {
             SectionHead(text: L.t("gw.help_along"))
             if near.isEmpty { Text(L.t("gw.help_none")).foregroundStyle(Color.muted).card() }
             ForEach(near, id: \.row.id) { n in
-                NavigationLink { DetailView(row: n.row) } label: {
-                    Card(r: Ranked(row: n.row, open: openNow(n.row, now: now), badge: DetroitQuery.badge(n.row, now: now), miles: n.miles, band: 0))
-                }.buttonStyle(.plain)
+                CardLink(r: Ranked(row: n.row, open: openNow(n.row, now: now), badge: DetroitQuery.badge(n.row, now: now), miles: n.miles, band: 0)) { DetailView(row: n.row) }
             }
+            // A condition report is about a thing, never a person (docs/11), and it names the segment whose screen
+            // this is: no coordinate, raw or rounded, ever leaves the phone.
+            if segment.phase == "open" { ReportBox(targetId: segment.id, isPlace: true) }
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea()).navigationTitle(segment.name).navigationBarTitleDisplayMode(.inline).urgentHelp()
     }
