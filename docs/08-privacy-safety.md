@@ -47,7 +47,8 @@ This app is separate from CommunityChest specifically so youth-meetup safety que
 
 ## Domestic violence & crisis
 
-- "I'm not safe at home" results show hotline + 911 before any location — a shelter address can be dangerous to display to the wrong person; DV shelters are listed by intake phone only, never by address, unless the shelter explicitly lists its address publicly.
+- "I'm not safe at home" results show hotline + 911 before any location — a shelter address can be dangerous to display to the wrong person; DV shelters are listed by intake phone only, never by address, map dot or distance, even when a shelter publishes its own address (DECISIONS 2026-09-19).
+- **Any other shelter's address is published only if the shelter publishes it itself**, on its own site. An address found anywhere else (a federal roster, a directory, a news story, a partner's page) is never used; the shelter is listed by its intake phone instead (DECISIONS 2026-09-19).
 - Quick-exit: DV and mental-health screens (and their listings) have a visible "Leave this page fast" button in the top bar. It replaces the page with a weather site (`location.replace`), so Back does not return to the app. These screens never change the URL, so history shows nothing about them.
 - 988 and DWIHN crisis line on every mental-health path.
 
@@ -62,7 +63,7 @@ This app is separate from CommunityChest specifically so youth-meetup safety que
 Today's text in About:
 - "This app lists free help from the City of Detroit and community groups. Info can change. If it's an emergency, call 911."
 - "We don't collect your name, number, or location. There are no accounts. What you tap stays on this phone."
-- "Not an official City of Detroit app."
+- ~~"Not an official City of Detroit app."~~ Removed everywhere on 2026-09-20 (Kyle; see DECISIONS). Nothing in the app now says it is not the City's app, so the store listing and any City conversation carry that on their own.
 - "Each listing says where it came from and when someone last checked it. If nobody has checked it, we say so."
 
 ## App Store / Play review notes
