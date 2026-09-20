@@ -28,4 +28,4 @@ If either protection is taken away, changed, or moved to another account, set it
 same commit. Re-sign both when the dashboard changes hands. Preflight asks for a fresh look after 180 days.
 
 access_policy: 2026-09-20 Kyle Peterson — Access app "313 Help stewards" covers /admin/* and /v1/steward/*; 1 email (kdpeters@gmail.com) and 1 service token (313help-pipeline)
-waf_rate_limit: not signed
+waf_rate_limit: 2026-09-20 Kyle Peterson — WAF rule "313 Help write limit": POST /v1/*, block 2 requests per 10 seconds per IP (Free plan's shortest window; ~12/min), block duration 10 seconds
