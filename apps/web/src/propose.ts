@@ -7,7 +7,7 @@ import { outbox, retryable, type Sent } from './outbox.js';
 export const HOW_KNOWN = ['run_it', 'volunteer', 'went_there', 'heard'] as const;
 /** Kinds of help a person can pick. There is no choice for a domestic-violence shelter: those addresses
  *  must never be collected (docs/08), and the API drops them even if sent. */
-export const PROPOSE_CATEGORIES = ['food', 'shelter.emergency', 'health', 'harm', 'utilities', 'hygiene', 'youth', 'rec'] as const;
+export const PROPOSE_CATEGORIES = ['food', 'shelter.emergency', 'health', 'harm', 'utilities', 'hygiene', 'youth', 'rec', 'jobs', 'learn', 'treatment', 'housing', 'legal', 'goods'] as const;
 
 export interface Proposal { name: string; category: string; what: string; address?: string; phone?: string; schedule_text?: string; how_known: string; notes?: string }
 

@@ -1,11 +1,12 @@
 // Saved places (docs/05): listing ids kept on this phone only. Never sent, never synced, cleared with one tap.
-// A phone can be looked through by someone else (audit A8), so listings for domestic violence and
-// mental-health crisis cannot be saved at all, and the screen is named plainly: "Saved places."
+// A phone can be looked through by someone else (audit A8), so listings for domestic violence, mental-health
+// crisis, treatment and help after sexual assault cannot be saved at all (isPrivate), and the screen is named
+// plainly: "Saved places."
 
 import { idbGet, idbSet } from './data.js';
-import { isSensitive } from './needs.js';
+import { isPrivate } from './needs.js';
 
-export const canSave = (category: string) => !isSensitive(category);
+export const canSave = (category: string) => !isPrivate(category);
 
 export async function loadSaved(): Promise<string[]> {
   const ids = await idbGet<unknown>('saved');

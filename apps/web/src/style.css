@@ -9,12 +9,15 @@
   --r-sm:.625rem; --r:1rem; --r-lg:1.375rem; --shadow:0 1px 2px rgb(16 32 26 / .06), 0 6px 20px rgb(16 32 26 / .06);
   --tabs-h:4.25rem; color-scheme: light dark;
   --map-out:#dfe6e1; --map-land:#f7f9f6; --map-park:#c4e3c9; --map-park-ink:#1d5a31; --map-road:#c9d1cb; --map-main:#a9b4ac; --map-fwy:#e0b96a; --map-ink:#2b3a32;
+  /* The greenway is drawn like a transit line: one width, a casing, a colour and a dash per phase. */
+  --gw-open:#0b6b43; --gw-build:#c2701a; --gw-fund:#2f6f9e; --gw-plan:#7d8c84; --gw-case:#ffffff;
 }
 @media (prefers-color-scheme: dark) { :root {
   --bg:#0b1410; --surface:#121e18; --sunken:#0f1a15; --ink:#e9f1ec; --muted:#a3b5aa; --line:#25362d;
   --brand:#4fcf93; --brand-ink:#04140c; --brand-strong:#86e6b6; --brand-soft:#15311f; --brand-soft-ink:#a6ebc8;
   --warn-bg:#33270a; --warn-ink:#ffd98a; --danger:#e26a6a; --danger-ink:#1a0505; --focus:#8ab8ff; --shadow:none;
   --map-out:#0a110e; --map-land:#141f19; --map-park:#1c3b27; --map-park-ink:#9fdcb4; --map-road:#2c3b33; --map-main:#46584d; --map-fwy:#7a6330; --map-ink:#d5e2da;
+  --gw-open:#4fcf93; --gw-build:#e3974a; --gw-fund:#6aa9d6; --gw-plan:#8ea79a; --gw-case:#0a110e;
 } }
 * { box-sizing:border-box; }
 html { -webkit-text-size-adjust:100%; }
@@ -41,7 +44,7 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 .exit { min-height:2.75rem; padding:.4rem 1rem; border-radius:99rem; background:var(--danger); color:var(--danger-ink); font-weight:700; font-size:.9375rem; }
 
 /* Bottom tabs */
-.tabs { position:fixed; inset:auto 0 0 0; z-index:10; display:grid; grid-template-columns:repeat(5,1fr); gap:.125rem; padding:.375rem .5rem calc(.375rem + env(safe-area-inset-bottom)); background:color-mix(in srgb,var(--surface) 92%,transparent); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line); }
+.tabs { position:fixed; inset:auto 0 0 0; z-index:10; display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:.125rem; padding:.375rem .5rem calc(.375rem + env(safe-area-inset-bottom)); background:color-mix(in srgb,var(--surface) 92%,transparent); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line); }
 .tabs button { display:grid; justify-items:center; gap:.125rem; min-height:3.25rem; padding:.375rem .125rem; border-radius:var(--r-sm); color:var(--muted); font-size:.75rem; font-weight:650; line-height:1.2; text-align:center; overflow-wrap:anywhere; }
 .tabs button[aria-current] { color:var(--brand-soft-ink); background:var(--brand-soft); }
 @media (min-width:48rem) { .tabs { inset:auto 50% 1rem auto; transform:translateX(50%); width:min(36rem,92vw); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:var(--shadow); padding:.375rem; } }
@@ -50,8 +53,15 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 .hero { margin:1rem 0 1.25rem; padding:1.5rem 1.375rem; border-radius:var(--r-lg); color:#fff; background:radial-gradient(120% 140% at 0% 0%,#15935d 0%,#0b6b43 45%,#063f29 100%); }
 .hero h1 { font-size:1.875rem; } .hero p { margin-top:.5rem; color:rgb(255 255 255 / .88); }
 .feature { display:flex; align-items:center; gap:.875rem; width:100%; padding:1rem 1.125rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); }
-.quick { display:grid; grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr)); gap:.625rem; margin-top:.75rem; }
-.quick button { display:flex; align-items:center; gap:.625rem; width:100%; min-height:3.5rem; padding:.75rem .875rem; border-radius:var(--r); background:var(--brand-soft); color:var(--brand-soft-ink); font-weight:650; line-height:1.25; }
+.quick { display:grid; grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr)); grid-auto-rows:1fr; gap:.625rem; margin-top:.75rem; }
+.quick > li { display:flex; } .quick button { height:100%; display:flex; align-items:center; gap:.625rem; width:100%; min-height:3.5rem; padding:.75rem .875rem; border-radius:var(--r); background:var(--brand-soft); color:var(--brand-soft-ink); font-weight:650; line-height:1.25; }
+.quick.tiles { margin-top:0; grid-template-columns:repeat(2,1fr); grid-auto-rows:1fr; } .quick.tiles button { min-height:3.75rem; background:var(--surface); border:1px solid var(--line); color:var(--ink); font-weight:600; text-align:start; }
+.quick.tiles button:hover { border-color:var(--brand); } .quick.tiles .ic { flex:none; color:var(--brand); }
+/* "Browse every kind of help": one row until opened (Help tab). */
+.browse { margin-top:1.75rem; } .browse > summary { display:flex; align-items:center; gap:.75rem; min-height:3.25rem; padding:.75rem 1rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); font-weight:650; cursor:pointer; list-style:none; }
+.browse > summary::-webkit-details-marker { display:none; } .browse > summary span { flex:1 1 auto; } .browse > summary .ic:first-child { color:var(--brand); }
+.browse > summary > .ic:last-child { transition:transform .15s; } .browse[open] > summary > .ic:last-child { transform:rotate(90deg); } .browse > .chips { margin-top:.875rem; }
+@media (prefers-reduced-motion: reduce) { .browse > summary > .ic:last-child { transition:none; } }
 .sechead { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; } .sechead .link { font-size:.9375rem; }
 .duo { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.75rem; margin-top:1.75rem; }
 .tile { display:grid; gap:.25rem; align-content:start; padding:1.125rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); } .tile .ic { color:var(--brand); width:1.75rem; height:1.75rem; margin-bottom:.25rem; }
@@ -63,6 +73,13 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 .rowic { flex:none; display:grid; place-items:center; width:2.5rem; height:2.5rem; border-radius:.8rem; background:var(--brand-soft); color:var(--brand-soft-ink); } .rowic.big { width:3rem; height:3rem; border-radius:1rem; background:var(--brand); color:var(--brand-ink); }
 .rowtx { flex:1 1 auto; display:grid; gap:.125rem; min-width:0; } .rowtx strong { font-weight:650; line-height:1.3; }
 .chips { display:flex; flex-wrap:wrap; gap:.5rem; }
+/* Map key: what each kind of greenway line means, in words as well as colour. */
+.gwkey { display:flex; flex-wrap:wrap; gap:.5rem .875rem; margin-top:.75rem; }
+.gwkey li { display:flex; align-items:center; gap:.5rem; font-size:.9375rem; color:var(--muted); }
+.gwkey i { flex:none; width:2rem; height:.375rem; border-radius:99rem; background:var(--gw-open); }
+.gwkey i.build { background:repeating-linear-gradient(90deg,var(--gw-build) 0 .5rem,transparent .5rem .8125rem); }
+.gwkey i.fund { background:repeating-linear-gradient(90deg,var(--gw-fund) 0 .3125rem,transparent .3125rem .625rem); }
+.gwkey i.plan { background:repeating-linear-gradient(90deg,var(--gw-plan) 0 .1875rem,transparent .1875rem .5rem); }
 .chip { display:inline-flex; align-items:center; gap:.4rem; min-height:2.75rem; padding:.4rem .95rem; border-radius:99rem; background:var(--surface); border:1px solid var(--line); font-weight:600; font-size:.9375rem; } .chip.lg { font-size:1rem; padding:.5rem 1.1rem; } .chip .ic { color:var(--brand); }
 .loc { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .625rem; margin:.75rem 0; color:var(--muted); }
 .zipform { display:inline-flex; flex-wrap:wrap; align-items:center; gap:.5rem; } .zipform label { display:inline-flex; align-items:center; gap:.5rem; font-size:.9375rem; }

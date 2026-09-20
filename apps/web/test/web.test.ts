@@ -2,12 +2,12 @@ import { generateKeyPairSync, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { NEEDS, CATEGORIES, HARDCODED, TABS, isSensitive } from '../src/needs.js';
+import { NEEDS, CATEGORIES, HARDCODED, TABS, isPrivate, isSensitive } from '../src/needs.js';
 import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
 import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
-import { FOOD_BENEFITS } from '../src/benefits.js';
+import { LINKS } from '../src/links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
 import { telHref } from '../src/phone.js';
@@ -47,13 +47,24 @@ describe('needs list', () => {
     }
     for (const c of CATEGORIES) expect(strings[`cat.${c.id}`], c.id).toBeTypeOf('string');
     for (const tab of TABS) expect(strings[`tab.${tab.id}`], tab.id).toBeTypeOf('string');
-    for (const id of ['food', 'shelter', 'doctor', 'narcan']) expect(strings[`quick.${id}`], id).toBeTypeOf('string');
+    for (const id of ['food', 'shelter', 'doctor', 'drugs', 'job', 'narcan']) expect(strings[`quick.${id}`], id).toBeTypeOf('string');
+    // "This week" and "Work, school, and paperwork" are short tiles; "Right now" keeps its full sentences.
+    for (const n of NEEDS.filter((x) => x.group !== 'now')) expect(strings[`tile.${n.id}`], n.id).toBeTypeOf('string');
   });
   it('"I\'m under 25" lists emergency shelters, youth shelters first (not after-school programs)', () => {
     const young = NEEDS.find((n) => n.id === 'shelter')!.refine!.find((r) => r.id === 'young')!;
     expect(young.query).toEqual({ category: 'shelter.emergency', prefer: ['youth'] });
     const seed = readFileSync(join(root, 'data/seed/resources.csv'), 'utf8');
     expect(seed).toMatch(/^sal_covenant_house_detroit,(?:[^,]*,){5}shelter\.emergency,/m);
+  });
+  it('"a safe place to sleep tonight" opens with 313SafeBeds, then the shelter lines (Kyle, 2026-09-20)', () => {
+    const shelter = NEEDS.find((n) => n.id === 'shelter')!;
+    expect(shelter.firstLinks).toBe('beds');
+    expect(LINKS.beds!.items.map((i) => i.url)).toEqual(['https://313safebeds.com/']);
+    expect(shelter.first).toEqual(['emg_shelter_helpline', 'emg_shelter_outwayne']);
+    // The link panel is drawn above the call buttons on the screen itself.
+    expect(main).toContain('${topLinks}${first ? `<div class="stackbtns">${first}</div>` : \'\'}');
+    expect(strings['link.beds.safebeds.body']).toMatch(/their site, not ours/);
   });
   it('the overdose-now screen has 911 and steps, and no list of places', () => {
     const od = NEEDS.find((n) => n.id === 'overdose_now')!;
@@ -65,9 +76,17 @@ describe('needs list', () => {
     expect(NEEDS.find((n) => n.id === 'unsafe')!.first).toEqual(['emg_ndvh', 'emg_911']);
     expect(NEEDS.find((n) => n.id === 'talk')!.first![0]).toBe('emg_988');
   });
+  it('treatment: DWIHN\'s 24-hour line first, then SAMHSA; sexual assault: hotlines and 911 first; both have a quick exit', () => {
+    expect(NEEDS.find((n) => n.id === 'drugs')).toMatchObject({ first: ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true });
+    expect(NEEDS.find((n) => n.id === 'assault')).toMatchObject({ first: ['emg_avalon', 'emg_voices4', 'emg_911'], quickExit: true, query: { category: 'assault' } });
+    const emg = readFileSync(join(root, 'data/seed/emergency.csv'), 'utf8');
+    for (const id of ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa', 'emg_avalon', 'emg_voices4']) expect(emg, id).toMatch(new RegExp(`^${id},`, 'm'));
+    for (const wrong of ['800-421-4949', '800-231-1127', '800-841-4949']) expect(emg.split('\n').filter((l) => l.startsWith('emg_')).map((l) => l.split(',').slice(0, 4).join(',')).join('\n')).not.toContain(wrong);
+  });
   it('911 and 988 are hardcoded', () => expect(HARDCODED).toEqual({ emg_911: '911', emg_988: '988' }));
   it('urgent needs come first on the Help tab, and urgent numbers are one tap from every screen', () => {
-    expect(NEEDS.filter((n) => n.group === 'now').map((n) => n.id)).toEqual(['overdose_now', 'shelter', 'unsafe', 'talk']);
+    expect(NEEDS.filter((n) => n.group === 'now').map((n) => n.id)).toEqual(['overdose_now', 'shelter', 'unsafe', 'talk', 'drugs', 'assault']);
+    expect(main).toContain("<h2>${T('help.now')}</h2>${rows('now')}<h2>${T('help.soon')}</h2>${tiles('soon')}<h2>${T('help.later')}</h2>${tiles('later')}");
     expect(main).toMatch(/quickExit \? `<button class="exit" data-exit>[^`]+` : urgentBtn/);
   });
   it('transit links go to official sites only, over a known list of hosts', () => {
@@ -144,9 +163,28 @@ describe('add a place, saved places, help paying for food', () => {
     expect(main).toContain("canSave(r.category) ? `<button");
   });
   it('help paying for food links only to the programs\' own sites, over https', () => {
-    expect(FOOD_BENEFITS.items.map((b) => new URL(b.url).hostname).sort()).toEqual(['doubleupfoodbucks.org', 'newmibridges.michigan.gov', 'www.michigan.gov']);
-    for (const b of FOOD_BENEFITS.items) expect(b.url.startsWith('https://')).toBe(true);
+    expect(LINKS.food!.items.map((b) => new URL(b.url).hostname).sort()).toEqual(['doubleupfoodbucks.org', 'newmibridges.michigan.gov', 'www.michigan.gov']);
     expect(NEEDS.find((n) => n.id === 'food')!.refine!.map((r) => r.id)).toEqual(['today', 'week', 'paying']);
+  });
+  it('every link-out set a need names exists, is https, has a checked date, and has words in both languages', () => {
+    const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
+    const named = NEEDS.flatMap((n) => [n.links, ...(n.refine ?? []).map((r) => r.links)]).filter((x): x is string => !!x);
+    for (const set of named) {
+      const l = LINKS[set];
+      expect(l, set).toBeDefined();
+      expect(l!.checked, set).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(l!.items.length, set).toBeGreaterThan(0);
+      for (const b of l!.items) {
+        expect(b.url.startsWith('https://'), b.url).toBe(true);
+        for (const k of ['title', 'body', 'label']) { expect(strings[`link.${set}.${b.id}.${k}`], `${set}.${b.id}.${k}`).toBeTypeOf('string'); expect(es[`link.${set}.${b.id}.${k}`], `es ${set}.${b.id}.${k}`).toBeTypeOf('string'); }
+      }
+    }
+  });
+  it('treatment and sexual-assault listings are private: never saved, never in the URL, quick exit; they keep a map dot', () => {
+    for (const c of ['treatment.detox', 'treatment.meds', 'assault', 'shelter.dv', 'health.mental']) { expect(isPrivate(c), c).toBe(true); expect(canSave(c), c).toBe(false); }
+    for (const c of ['harm.narcan', 'health.clinic', 'jobs.find', 'treatments']) expect(isPrivate(c), c).toBe(false);
+    for (const c of ['treatment.detox', 'assault']) expect(isSensitive(c), c).toBe(false);   // address, distance and map stay
+    expect(main).toContain('return { title: r.name, exit: priv, html:');
   });
 });
 
@@ -259,10 +297,22 @@ describe('map', () => {
     for (const c of ['shelter.dv', 'health.mental', 'health.mental.crisis']) expect(isSensitive(c), c).toBe(true);
     for (const c of ['shelter.emergency', 'health.clinic', 'food.pantry']) expect(isSensitive(c), c).toBe(false);
     expect(main).toContain('helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s)');
-    expect(main).toContain('sensitive: (id) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isSensitive(r.category); }');   // router.ts: no URL for these
+    expect(main).toContain('sensitive: (id) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isPrivate(r.category); }');   // router.ts: no URL for these (private includes sensitive)
     expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
   });
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
+  it('the greenway is drawn like a transit line, and the key says each phase in words', () => {
+    // One width and a casing under every stretch, so the route reads as one line whatever phase it is in.
+    expect(mapSrc).toContain('for (const g of onScreen) stroke(g, col.gwCase, gwW + 4, []);');
+    for (const phase of ['open', 'under_construction', 'funded', 'planned']) expect(mapSrc, phase).toContain(`${phase}: { color: col.gw`);
+    // Least built first, so an open stretch is never covered by a dotted one.
+    expect(mapSrc).toContain("for (const phase of ['planned', 'funded', 'under_construction', 'open'])");
+    // Colour never carries the meaning alone: the key under the map names every phase.
+    expect(main).toContain("<ul class=\"gwkey\">");
+    for (const phase of ['open', 'under_construction', 'funded', 'planned']) expect(strings[`gw.${phase}`], phase).toBeTypeOf('string');
+    const css = readFileSync(join(__dirname, '../src/style.css'), 'utf8');
+    for (const v of ['--gw-open', '--gw-build', '--gw-fund', '--gw-plan', '--gw-case']) expect(css, v).toContain(`${v}:`);
+  });
 });
 
 describe('release builds pin two good keys', () => {
@@ -353,8 +403,21 @@ describe('privacy and copy rules, checked against the source', () => {
     expect(used.length).toBeGreaterThan(40);
     for (const k of used) expect(strings[k], k).toBeTypeOf('string');
   });
+  it('the tab bar fits however many tabs are shown (Events hides itself when there are none)', () => {
+    const css = readFileSync(join(__dirname, '../src/style.css'), 'utf8');
+    expect(css).toMatch(/\.tabs \{[^}]*grid-auto-flow:column; grid-auto-columns:1fr;/);
+    expect(css).not.toMatch(/\.tabs \{[^}]*grid-template-columns:repeat\(\d/);   // a fixed count left an empty column
+    expect(main).toContain("const shownTabs = () => TABS.filter((x) => x.id !== 'events' || upcoming(1).length > 0);");
+  });
+  it('the About paragraphs the screen asks for all exist, in both languages', () => {
+    // They are built in a loop (about.p1, about.p2, …); a hole would print the key itself on the screen.
+    const n = Number(/\[([\d, ]+)\]\.map\(\(n\) => `<p>\$\{T\('about\.p' \+ n\)\}<\/p>`\)/.exec(main)![1]!.split(',').pop()!.trim());
+    const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
+    for (let i = 1; i <= n; i++) { expect(strings[`about.p${i}`], `en about.p${i}`).toBeTypeOf('string'); expect(es[`about.p${i}`], `es about.p${i}`).toBeTypeOf('string'); }
+    expect(strings[`about.p${n + 1}`], 'a paragraph the screen never shows').toBeUndefined();
+  });
   it('never writes to localStorage, sessionStorage, or cookies, and never sends anything', () => {
-    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts', 'hoods.ts', 'saved.ts', 'benefits.ts', 'outbox.ts', 'phone.ts', 'keys.ts']) {
+    for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts', 'hoods.ts', 'saved.ts', 'links.ts', 'outbox.ts', 'phone.ts', 'keys.ts']) {
       const src = readFileSync(join(__dirname, '../src', f), 'utf8');
       expect(src, f).not.toMatch(/localStorage|sessionStorage|document\.cookie|sendBeacon|XMLHttpRequest/);
       expect(src.match(/method:\s*'POST'/), f).toBeNull();

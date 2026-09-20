@@ -8,11 +8,11 @@ import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
 import { MapView, type MapDot, type MapSpec } from './map.js';
-import { CATEGORIES, HARDCODED, NEEDS, TABS, isSensitive, type Need, type TabId } from './needs.js';
+import { CATEGORIES, HARDCODED, NEEDS, TABS, isPrivate, isSensitive, type Need, type TabId } from './needs.js';
 import { createRouter, type View } from './router.js';
 import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, preparePhoto, resetInstallSecret, submit, uploadPhoto } from './report.js';
 import { TRANSIT } from './transit.js';
-import { FOOD_BENEFITS } from './benefits.js';
+import { LINKS } from './links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitProposal } from './propose.js';
 import { canSave, clearSaved, loadSaved, toggleSaved } from './saved.js';
 import './style.css';
@@ -31,7 +31,7 @@ let searchText = '';                                     // memory only: never s
 const reported = new Map<string, 'sent' | 'queued' | 'sent_no_photo'>();   // this visit only, so the thank-you stays put
 const app = document.getElementById('app')!;
 // The back stack (router.ts): memory only; the browser's history holds a random key per entry and nothing else.
-const router = createRouter(history, { sensitive: (id) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isSensitive(r.category); }, path: () => location.pathname + location.search });
+const router = createRouter(history, { sensitive: (id) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isPrivate(r.category); }, path: () => location.pathname + location.search });
 const stack = router.stack;
 
 // ---- helpers ----------------------------------------------------------------
@@ -127,9 +127,10 @@ function card(r: Ranked, showDistance = true): string {
       ${r.row.notice ? `<p class="notice">${esc(r.row.notice)}</p>` : ''}<p class="fresh ${b.level}">${esc(b.text)}</p></a>
     ${ph ? `<a class="btn" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.row.name })}">${icon('phone', 'sm')}${T('detail.call')} <strong>${esc(ph.number)}</strong></a>` : ''}</li>`;
 }
-function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?: string; noDistance?: boolean }): string {
+function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?: string; noDistance?: boolean; linksBelow?: boolean }): string {
   const ranked = rank(bundle!.rows, { ...query, ...(here && !opts.noDistance ? { near: here } : {}) }, now(), bundle!.alerts);
-  if (!ranked.length) return `<p class="empty">${T(opts.emptyKey ?? 'results.none')} <a href="tel:211">211</a></p>`;
+  // Nothing listed: say so plainly. When the screen has links to programs below, point there instead of to 211.
+  if (!ranked.length) return opts.linksBelow ? `<p class="empty">${T('results.none_links')}</p>` : `<p class="empty">${T(opts.emptyKey ?? 'results.none')} <a href="tel:211">211</a></p>`;
   const shown = opts.limit ? ranked.slice(0, opts.limit) : ranked;
   // The map is closed until asked for, so the first Call button stays near the top. Never on the "not safe at home"
   // screen, and never a dot for a sensitive listing (those carry no coordinates in the first place).
@@ -182,7 +183,7 @@ function homeTab(): string {
   const sunset = retired();
   const alerts = bundle.alerts.filter((a) => Date.parse(a.ends_at) > now().getTime() && Date.parse(a.starts_at) <= now().getTime());
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
-  const quick = ['food', 'shelter', 'doctor', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
+  const quick = ['food', 'shelter', 'doctor', 'drugs', 'job', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
   return `<main>${langBtn()}<section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
     ${alerts.map(alertBox).join('')}
     ${sunset ? '' : `<button class="feature" ${go({ v: 'tab', tab: 'help' })}><span class="rowic big">${icon('help')}</span><span class="rowtx"><strong>${T('home.help_title')}</strong><small>${T('home.help_sub')}</small></span>${icon('chevron', 'dim')}</button>
@@ -191,13 +192,16 @@ function homeTab(): string {
     <div class="duo"><button class="tile" ${go({ v: 'tab', tab: 'rec' })}>${icon('rec')}<strong>${T('tab.rec')}</strong><small>${T('home.rec_sub', { count: openSegs })}</small></button>
       <button class="tile" ${go({ v: 'tab', tab: 'transit' })}>${icon('transit')}<strong>${T('tab.transit')}</strong><small>${T('home.transit_sub')}</small></button></div>
     <p class="foot">${T('home.updated', { when: prettyDate(bundle.index.generated_at) })} · <button class="link" ${go({ v: 'about' })}>${T('about.title')}</button> · <button class="link" ${go({ v: 'privacy' })}>${T('privacy.title')}</button></p>
-    <p class="foot">${T('about.p3')}</p></main>`;
+    </main>`;
 }
 function helpTab(): string {
-  const group = (g: Need['group']) => `<ul class="rows">${NEEDS.filter((n) => n.group === g).map((n) => rowLink({ v: 'need', id: n.id }, n.icon, t('need.' + n.id))).join('')}</ul>`;
+  // "Right now" stays as full sentences, one per row: urgency is carried by order and words. The rest are short tiles,
+  // two to a row, so the whole list fits in about two screens on a small phone. Browsing by type is folded away.
+  const rows = (g: Need['group']) => `<ul class="rows">${NEEDS.filter((n) => n.group === g).map((n) => rowLink({ v: 'need', id: n.id }, n.icon, t('need.' + n.id))).join('')}</ul>`;
+  const tiles = (g: Need['group']) => `<ul class="quick tiles">${NEEDS.filter((n) => n.group === g).map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('tile.' + n.id)}</span></button></li>`).join('')}</ul>`;
   return `<main><h1 class="page" tabindex="-1">${T('home.needs')}</h1><p class="lede">${T('help.lede')}</p>${searchBtn()}
-    <h2>${T('help.now')}</h2>${group('now')}<h2>${T('help.soon')}</h2>${group('soon')}
-    <h2>${T('home.categories')}</h2><ul class="chips">${CATEGORIES.map((c) => `<li><button class="chip lg" ${go({ v: 'list', cat: c.id })}>${icon(c.icon, 'sm')}${T('cat.' + c.id)}</button></li>`).join('')}</ul>
+    <h2>${T('help.now')}</h2>${rows('now')}<h2>${T('help.soon')}</h2>${tiles('soon')}<h2>${T('help.later')}</h2>${tiles('later')}
+    <details class="browse"><summary>${icon('search', 'sm')}<span>${T('home.categories')}</span>${icon('chevron', 'sm dim')}</summary><ul class="chips">${CATEGORIES.map((c) => `<li><button class="chip lg" ${go({ v: 'list', cat: c.id })}>${icon(c.icon, 'sm')}${T('cat.' + c.id)}</button></li>`).join('')}</ul></details>
     <h2>${T('help.more')}</h2><ul class="rows">${rowLink({ v: 'saved' }, 'bookmark', t('saved.title'), t('saved.sub'))}${(retired() ? '' : rowLink({ v: 'add' }, 'plus', t('add.title'), t('add.sub')))}</ul></main>`;
 }
 function recTab(): string {
@@ -234,7 +238,7 @@ function eventsTab(): string {
 
 // ---- pushed screens ---------------------------------------------------------
 function urgent(): string {
-  return `<main><p class="lede">${T('urgent.lede')}</p><div class="stackbtns">${['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_211'].map(callButton).join('')}</div>
+  return `<main><p class="lede">${T('urgent.lede')}</p><div class="stackbtns">${['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_avalon', 'emg_211'].map(callButton).join('')}</div>
     <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}</ul></main>`;
 }
 function need(view: Extract<View, { v: 'need' }>): string {
@@ -244,11 +248,22 @@ function need(view: Extract<View, { v: 'need' }>): string {
   const refine = n.refine && !view.refine ? `<ul class="rows">${n.refine.map((r) => rowLink({ v: 'need', id: n.id, refine: r.id }, n.icon, t(`refine.${n.id}.${r.id}`))).join('')}</ul>` : '';
   const chosen = n.refine?.find((r) => r.id === view.refine);
   const query = n.refine ? chosen?.query : n.query;
-  if (chosen?.benefits) return `<main><p class="lede">${T('benefits.lede')}</p>${FOOD_BENEFITS.items.map((b) => `<h2>${esc(b.title)}</h2><div class="panel"><p>${esc(b.body)}</p><div class="stackbtns">${ext(b.url, b.label)}</div></div>`).join('')}
-    <p class="foot">${T('benefits.note')} <a href="tel:211">211</a></p><p class="foot">${T('transit.checked', { date: prettyDate(FOOD_BENEFITS.checked) })}</p></main>`;
+  const links = n.refine ? chosen?.links : n.links;
+  // Programs that are not places: only the links, with their own lede (docs/05, "Help paying for food").
+  if (links && !query) return `<main><p class="lede">${T(LINKS[links]!.lede ?? 'links.lede')}</p>${linkPanels(links)}</main>`;
   const dv = n.id === 'unsafe';
-  return `<main>${n.intro ? `<p class="lede">${T(n.intro)}</p>` : ''}${first ? `<div class="stackbtns">${first}</div>` : ''}${dv ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
-    ${refine}${query ? results(query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true }, emptyKey: n.emptyKey, noDistance: dv }) : ''}</main>`;
+  // A link that comes before the phone numbers (313SafeBeds on the shelter screen): the same panel, at the top.
+  const topLinks = n.firstLinks && !view.refine ? linkPanels(n.firstLinks, true) : '';
+  return `<main>${n.intro && !view.refine ? `<p class="lede">${T(n.intro)}</p>` : ''}${topLinks}${first ? `<div class="stackbtns">${first}</div>` : ''}${dv ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
+    ${refine}${query ? results(query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true }, emptyKey: n.emptyKey, noDistance: dv, linksBelow: !!links }) : ''}
+    ${links && query ? `<h2>${T('links.more')}</h2>${linkPanels(links)}` : ''}</main>`;
+}
+/** Link-outs to a program's own site. The words are in strings/*.json (link.<set>.<id>.title|body|label).
+ *  `top` is a link shown above a screen's phone numbers (313SafeBeds): just the panel and the date it was read. */
+function linkPanels(set: string, top = false): string {
+  const l = LINKS[set]!, today = detroitDay(now());
+  return `${l.items.filter((b) => !b.until || b.until >= today).map((b) => `<h2>${T(`link.${set}.${b.id}.title`)}</h2><div class="panel"><p>${T(`link.${set}.${b.id}.body`)}</p><div class="stackbtns">${ext(b.url, t(`link.${set}.${b.id}.label`))}</div></div>`).join('')}
+    ${top ? '' : `<p class="foot">${T('benefits.note')} <a href="tel:211">211</a></p>`}<p class="foot">${T(top ? 'links.checked' : 'transit.checked', { date: prettyDate(l.checked) })}</p>`;
 }
 const DAY_ORDER = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 function hoursLine(s: Schedule): string {
@@ -271,12 +286,12 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
     return { title: gone?.name ?? t('app.name'), exit: false, html: `<main><p class="banner warn">${gone ? T('badge.archived', { date: prettyDate(gone.archived.at) }) : T('detail.not_found')} ${T('detail.archived_try_211')} <a href="tel:211">211</a></p></main>` };
   }
   const b = badgeText(r), o = openNow(r, now(), bundle!.alerts), next = nextOccurrences(r, now(), 3, bundle!.alerts);
-  const sensitive = isSensitive(r.category);
+  const sensitive = isSensitive(r.category), priv = isPrivate(r.category);
   const gw = !sensitive && r.lat !== undefined && bundle!.greenway ? nearestSegment({ lat: r.lat, lon: r.lon! }, bundle!.greenway.segments, { openOnly: true, maxMiles: 0.5 }) : null;
   // Alerts that name this listing and haven't ended, including ones announced ahead ("closed Saturday").
   const own = bundle!.alerts.filter((a) => a.status === 'published' && a.targets?.includes(r.id) && Date.parse(a.ends_at) > now().getTime())
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
-  return { title: r.name, exit: sensitive, html: `<main class="detail"><p class="org">${esc(r.org)}</p>
+  return { title: r.name, exit: priv, html: `<main class="detail"><p class="org">${esc(r.org)}</p>
     <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${r.notice ? `<p class="notice">${esc(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${esc(ph.label)}` : ''}</span><strong>${esc(ph.number)}</strong></a>`).join('')}
       ${r.address ? `<div class="two"><a class="btn ghost" href="${esc(directionsHref(r))}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
@@ -317,7 +332,9 @@ function greenway(): string {
   const g = bundle!.greenway;
   if (!g) return `<main><p class="empty">${T('results.none')}</p></main>`;
   const group = (phase: string) => { const s = g.segments.filter((x) => x.phase === phase); return s.length ? `<h2>${T('gw.' + phase)} <span class="count">${s.length}</span></h2><ul class="rows">${s.map((x) => rowLink({ v: 'segment', id: x.id }, 'path', x.name)).join('')}</ul>` : ''; };
-  return `<main><p class="lede">${T('gw.intro')}</p>${mapBox({ key: 'greenway', label: t('gw.map_label') })}${group('open')}${group('under_construction')}${group('funded')}${group('planned')}<p class="foot">${T('gw.source', { date: prettyDate(g.source.last_edited) })}</p></main>`;
+  // The key: what each line on the map means, in words (docs/05: colour never carries meaning alone).
+  const key = `<ul class="gwkey">${[['open', ''], ['under_construction', 'build'], ['funded', 'fund'], ['planned', 'plan']].map(([ph, cls]) => `<li><i class="${cls}"></i>${T('gw.' + ph)}</li>`).join('')}</ul>`;
+  return `<main><p class="lede">${T('gw.intro')}</p>${mapBox({ key: 'greenway', label: t('gw.map_label') })}${key}${group('open')}${group('under_construction')}${group('funded')}${group('planned')}<p class="foot">${T('gw.source', { date: prettyDate(g.source.last_edited) })}</p></main>`;
 }
 function segment(s: Segment): string {
   const near = helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s);
@@ -389,11 +406,11 @@ function privacy(): string {
     <h2>${T('privacy.never_h')}</h2><p>${T('privacy.never')}</p>
     <h2>${T('privacy.reset_h')}</h2><p>${T('privacy.reset')}</p>
     ${keyReset ? `<p class="banner ok" role="status">${icon('check', 'sm')} ${T('privacy.reset_done')}</p>` : `<button class="btn ghost" data-reset-key>${T('privacy.reset_btn')}</button>`}
-    <p class="foot">${T('about.maker')} ${T('about.p3')}</p>${contactLine()}</main>`;
+    <p class="foot">${T('about.maker')}</p>${contactLine()}</main>`;
 }
 function about(): string {
   const i = bundle?.index;
-  return `<main>${langBtn()}${[1, 2, 3, 4].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
+  return `<main>${langBtn()}${[1, 2, 3].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
     ${i ? `<p class="foot">${T('about.data', { version: i.version, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
     <ul class="rows">${rowLink({ v: 'privacy' }, 'shield', t('privacy.title'), t('privacy.sub'))}</ul>
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul>
@@ -455,7 +472,7 @@ app.addEventListener('click', async (ev) => {
   if ('resetKey' in el.dataset) { await resetInstallSecret(); keyReset = true; render(false); }
   else if ('retry' in el.dataset) { el.setAttribute('disabled', ''); void checkForUpdate(true); }
   else if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
-  else if (el.dataset.lang) { await setLang(el.dataset.lang === 'es' ? 'es' : 'en'); render(false); }
+  else if (el.dataset.lang) { if (await setLang(el.dataset.lang === 'es' ? 'es' : 'en')) render(false); }
   else if ('listmap' in el.dataset) { listMap = !listMap; render(false); }
   else if (el.dataset.save) { const row = bundle?.rows.find((x) => x.id === el.dataset.save); savedIds = await toggleSaved(savedIds, el.dataset.save, row?.category ?? ''); render(false); }
   else if ('savedClear' in el.dataset) { savedIds = await clearSaved(); render(false); }
