@@ -4,17 +4,41 @@ import DetroitQuery
 import Foundation
 
 enum L {
+    /// Every language with a strings file. English is the fallback and ships first.
+    /// Arabic and Bengali were drafted by machine on 2026-09-20 and have not been read by a native speaker yet
+    /// (docs/DECISIONS.md). No screen says they were checked.
+    static let languages = ["en", "es", "ar", "bn"]
+
     private static func table(_ lang: String) -> [String: String] {
         guard let url = Bundle.main.url(forResource: lang, withExtension: "json"), let d = try? Data(contentsOf: url),
               let t = try? JSONDecoder().decode([String: String].self, from: d) else { return [:] }
         return t
     }
     private static let en = table("en")
-    private static let es = table("es")
-    /// Spanish when the phone is set to Spanish. A missing string falls back to English, never to blank.
-    static var spanish: Bool { Locale.preferredLanguages.first?.hasPrefix("es") ?? false }
+    private static let tables: [String: [String: String]] = Dictionary(uniqueKeysWithValues: languages.map { ($0, table($0)) })
+
+    /// The phone's own language, if the app has words for it: the first of the phone's preferences that we carry.
+    /// The choice is the phone's, never asked for and never stored.
+    static let current: String = Locale.preferredLanguages
+        .compactMap { code in languages.first { $0 == String(code.prefix(2)).lowercased() } }
+        .first ?? "en"
+    /// True when the app's own words are not English, so a screen can say that a place's words are still English.
+    static var translated: Bool { current != "en" }
+    /// Arabic reads right to left; SwiftUI mirrors every screen from this (Views.swift sets layoutDirection).
+    static var rightToLeft: Bool { current == "ar" }
+    /// For dates, times and numbers. Arabic and Bengali ask for Western digits, so a number reads as it is
+    /// dialled and a time matches the sign on the door (DECISIONS 2026-09-20).
+    static var locale: Locale {
+        switch current {
+        case "es": return Locale(identifier: "es_US")
+        case "ar": return Locale(identifier: "ar@numbers=latn")
+        case "bn": return Locale(identifier: "bn@numbers=latn")
+        default: return Locale(identifier: "en_US")
+        }
+    }
+    /// A missing translation falls back to English, never to a blank or a raw key.
     static func t(_ key: String, _ p: [String: String] = [:]) -> String {
-        var s = (spanish ? es[key] : nil) ?? en[key] ?? key
+        var s = tables[current]?[key] ?? en[key] ?? key
         for (k, v) in p { s = s.replacingOccurrences(of: "{\(k)}", with: v) }
         return s
     }

@@ -34,6 +34,10 @@ html { -webkit-text-size-adjust:100%; }
 /* No web fonts, ever (docs/08, and the page's own CSP). These are the faces the platforms already ship. */
 :lang(ar) { font-family:"Geeza Pro","Noto Naskh Arabic","Droid Arabic Naskh","Segoe UI",system-ui,sans-serif; }
 :lang(bn) { font-family:"Kohinoor Bangla","Noto Sans Bengali","Nirmala UI",system-ui,sans-serif; }
+/* What a place wrote about itself stays in English (docs/05) and is marked `lang="en"`. On an Arabic screen those
+   words also need their own direction, or the full stop at the end of an English sentence jumps to the other end
+   of the line. `isolate` keeps the English run out of the Arabic sentence around it. */
+[dir="rtl"] [lang="en"] { direction:ltr; unicode-bidi:isolate; }
 body { margin:0; background:var(--bg); color:var(--ink); font:1.0625rem/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif; -webkit-font-smoothing:antialiased; }
 #app { min-height:100dvh; padding-bottom:calc(var(--tabs-h) + env(safe-area-inset-bottom)); }
 main { max-width:42rem; margin:0 auto; padding:0 1.125rem 2.5rem; }
@@ -66,10 +70,14 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 .tabs { position:fixed; inset:auto 0 0 0; z-index:10; display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:.125rem; padding:.375rem .5rem calc(.375rem + env(safe-area-inset-bottom)); background:color-mix(in srgb,var(--surface) 92%,transparent); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--edge); }
 .tabs button { display:grid; justify-items:center; gap:.125rem; min-height:3.25rem; padding:.375rem .125rem; border-radius:var(--r-sm); color:var(--muted); font-size:.75rem; font-weight:650; line-height:1.2; text-align:center; overflow-wrap:anywhere; }
 .tabs button[aria-current] { color:var(--brand-soft-ink); background:var(--brand-soft); }
-@media (min-width:48rem) { .tabs { inset:auto 50% 1rem auto; transform:translateX(50%); width:min(36rem,92vw); border:1px solid var(--edge); border-radius:var(--r-lg); box-shadow:var(--shadow); padding:.375rem; } }
+/* Centred with `margin-inline:auto` rather than a physical `translateX(50%)`, so it is centred by the writing
+   direction itself and there is nothing left to flip in Arabic. */
+@media (min-width:48rem) { .tabs { inset-block-end:1rem; inset-inline:0; margin-inline:auto; width:min(36rem,92vw); border:1px solid var(--edge); border-radius:var(--r-lg); box-shadow:var(--shadow); padding:.375rem; } }
 
 /* Home */
+/* The light starts at the top inline-start corner — where the heading begins — in both directions. */
 .hero { margin:1rem 0 1.25rem; padding:1.5rem 1.375rem; border-radius:var(--r-lg); color:#fff; background:radial-gradient(120% 140% at 0% 0%,#0f7d4e 0%,#0b6b43 45%,#063f29 100%); }
+[dir="rtl"] .hero { background:radial-gradient(120% 140% at 100% 0%,#0f7d4e 0%,#0b6b43 45%,#063f29 100%); }
 .hero h1 { font-size:1.875rem; } .hero p { margin-top:.5rem; color:#fff; }
 .feature { display:flex; align-items:center; gap:.875rem; width:100%; padding:1rem 1.125rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); }
 .quick { display:grid; grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr)); grid-auto-rows:1fr; gap:.625rem; margin-top:.75rem; }
@@ -116,7 +124,8 @@ table.years { width:100%; border-collapse:collapse; margin-top:1rem; font-size:.
 .bar { display:block; height:.5rem; border-radius:99rem; background:var(--brand); margin-bottom:.125rem; } h3.sub { margin-top:1.25rem; font-size:1rem; } .srcs { display:grid; gap:.375rem; } .banner.plain { background:var(--sunken); color:var(--ink); }
 .report input[type=file] { font:inherit; font-size:.9375rem; max-width:100%; min-height:2.75rem; color:var(--ink); }
 .report input[type=file]::file-selector-button { font:inherit; min-height:2.75rem; padding:.25rem .875rem; margin-inline-end:.625rem; border-radius:var(--r-sm); border:1.5px solid var(--edge); background:var(--surface); color:var(--ink); }
-.langrow { display:flex; justify-content:flex-end; margin:.5rem 0 -.25rem; } .langrow .link { min-height:2.75rem; padding:0 .25rem; font-weight:650; }
+.langrow { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:.25rem .875rem; margin:.5rem 0 -.25rem; } .langrow .link { min-height:2.75rem; padding:0 .25rem; font-weight:650; }
+.langnow { min-height:2.75rem; display:inline-flex; align-items:center; padding:0 .25rem; font-weight:650; color:var(--muted); }
 .searchbtn { display:flex; align-items:center; gap:.625rem; width:100%; min-height:3rem; margin:.75rem 0; padding:.625rem 1rem; border-radius:99rem; background:var(--surface); border:1.5px solid var(--edge); color:var(--muted); font-size:1rem; text-align:start; } .searchbtn:hover { border-color:var(--brand); } .searchbtn .ic { color:var(--brand); }
 .searchbox { display:grid; gap:.375rem; margin:.75rem 0; font-size:.9375rem; color:var(--muted); } .searchbox input { width:100%; min-height:3rem; font-size:1.0625rem; }
 .cards + .btn { margin-top:.75rem; }
@@ -157,9 +166,11 @@ address { font-style:normal; font-size:1.0625rem; }
 .mapframe canvas:focus-visible { outline:3px solid var(--focus); outline-offset:-3px; }
 .maptools { position:absolute; inset-block-start:.5rem; inset-inline-end:.5rem; display:grid; gap:.375rem; }
 /* Moving the map without dragging (WCAG 2.5.7): four arrows, low on the map so they never cover the zoom keys. */
-.mappan { position:absolute; inset-block-end:.5rem; inset-inline-start:.5rem; display:flex; gap:.25rem; }
+/* The map itself never mirrors: left is west in every language. So the four arrows keep their physical order and
+   their physical glyphs, even in Arabic — `direction:ltr` on the pad, and nothing flipped. */
+.mappan { position:absolute; inset-block-end:.5rem; inset-inline-start:.5rem; display:flex; gap:.25rem; direction:ltr; }
 .mappan button { width:2.25rem; height:2.25rem; border-radius:.6rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1rem; line-height:1; text-align:center; }
-[dir="rtl"] .mappan button[data-map-act="left"],[dir="rtl"] .mappan button[data-map-act="right"] { transform:scaleX(-1); } .maptools button { width:2.75rem; height:2.75rem; border-radius:.75rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1.375rem; font-weight:700; line-height:1; text-align:center; }
+.maptools button { width:2.75rem; height:2.75rem; border-radius:.75rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1.375rem; font-weight:700; line-height:1; text-align:center; }
 .mapnote .foot { margin-top:.5rem; } .mappick { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem .75rem; margin-top:.5rem; padding:.75rem 1rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); }
 .mappick span { display:grid; } .mappick .btn { width:auto; margin:0; }
 .mapbox.big { position:fixed; inset:0; z-index:40; margin:0; padding:.5rem; padding-bottom:calc(.5rem + env(safe-area-inset-bottom)); background:var(--bg); display:flex; flex-direction:column; }

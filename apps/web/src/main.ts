@@ -2,7 +2,7 @@ import {
   badge, bundleAge, effectiveNow, helpAlong, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens,
   type Alert, type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@313help/query';
-import { currentLang, initLang, locale, setLang, t } from './i18n.js';
+import { LANGS, currentLang, initLang, locale, setLang, t, type Lang } from './i18n.js';
 import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
@@ -118,12 +118,18 @@ function topBar(title?: string, quickExit = false): string {
   // On a wide screen Urgent help lives in the side rail (tabBar puts it there), so the top bar does not draw a
   // second copy at all: two buttons with the same name, one of them hidden by CSS, is a trap for a screen reader.
   const urgentBtn = wide.matches ? '' : `<button class="urgent" ${go({ v: 'urgent' })}>${icon('phone', 'sm')}<span>${T('strip.more')}</span></button>`;
-  if (!title) return `<header class="top"><div class="brand">${logo}<span>${T('app.name')}</span></div>${urgentBtn}</header>`;
+  // The name is `<bdi>`: on a right-to-left screen "313 Help" is a number and a word, and without an isolate the
+  // two swap places and the app calls itself "Help 313".
+  if (!title) return `<header class="top"><div class="brand">${logo}<bdi>${T('app.name')}</bdi></div>${urgentBtn}</header>`;
   return `<header class="top inner"><button class="iconbtn" data-back aria-label="${T('back')}">${icon('back', 'turn')}</button><h1 tabindex="-1">${esc(title)}</h1>
     ${quickExit ? `<button class="exit" data-exit>${T('safe.exit')}</button>` : urgentBtn}</header>`;
 }
-// The switch names the other language in that language, so a Spanish speaker can find it on an English screen.
-const langBtn = () => { const other = currentLang() === 'es' ? 'en' : 'es'; return `<p class="langrow"><button class="link" data-lang="${other}" lang="${other}">${T('lang.switch')}</button></p>`; };
+// Every language names itself in its own words and carries its own `lang`, so an Arabic reader can find Arabic on
+// an English screen and a screen reader says each name in the right voice (WCAG 3.1.2). The one in use is not a
+// button: it is marked as the current choice instead, so nobody taps what they already have.
+const langBtn = () => `<nav class="langrow" aria-label="${T('lang.switch')}">${LANGS.map((l) => (l.code === currentLang()
+  ? `<span class="langnow" lang="${l.code}" aria-current="true">${esc(l.name)}</span>`
+  : `<button class="link" data-lang="${l.code}" lang="${l.code}">${esc(l.name)}</button>`)).join('')}</nav>`;
 // The Events tab shows only when the list carries upcoming events (none today: DECISIONS 2026-09-19).
 const shownTabs = () => TABS.filter((x) => x.id !== 'events' || upcoming(1).length > 0);
 // A laptop or a desktop (Kyle, 2026-09-20). On a wide screen the tab bar is a rail down the side, so it is drawn
@@ -557,7 +563,7 @@ function privacy(): string {
 function about(): string {
   const i = bundle?.index;
   return `<main>${langBtn()}${[1, 2, 3].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
-    ${i ? `<p class="foot">${T('about.data', { version: i.version, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
+    ${i ? `<p class="foot">${T('about.data', { version: `⁦${i.version}⁩`, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
     <ul class="rows">${rowLink({ v: 'privacy' }, 'shield', t('privacy.title'), t('privacy.sub'))}</ul>
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul>
     ${credits()}</main>`;
@@ -630,7 +636,7 @@ app.addEventListener('click', async (ev) => {
   else if ('resetKey' in el.dataset) { await resetInstallSecret(); keyReset = true; refocusSel = '.banner.ok'; render(false); announce(t('privacy.reset_done')); }
   else if ('retry' in el.dataset) { el.setAttribute('disabled', ''); void checkForUpdate(true); }
   else if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
-  else if (el.dataset.lang) { if (await setLang(el.dataset.lang === 'es' ? 'es' : 'en')) { refocusSel = '[data-lang]'; render(false); announce(t('lang.changed')); } }
+  else if (el.dataset.lang) { const next = LANGS.find((l) => l.code === el.dataset.lang)?.code ?? ('en' as Lang); if (await setLang(next)) { refocusSel = '[data-lang]'; render(false); announce(t('lang.changed')); } }
   else if ('listmap' in el.dataset) { listMap = !listMap; refocusSel = '[data-listmap]'; render(false); announce(t(listMap ? 'map.shown' : 'map.hidden')); }
   else if (el.dataset.save) {
     const id = el.dataset.save, row = bundle?.rows.find((x) => x.id === id);

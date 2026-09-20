@@ -52,8 +52,8 @@
         android:usesCleartextTraffic="false"
         android:theme="@style/Theme.Help313">
 
-        <!-- More languages are coming, including Arabic, which is written right to left: supportsRtl is on and
-             no layout in this app uses left or right. -->
+        <!-- Arabic is written right to left: supportsRtl is on and no layout in this app uses left or right,
+             so Android mirrors every screen for an Arabic phone. -->
 
         <activity
             android:name=".MainActivity"

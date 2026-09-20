@@ -15,6 +15,10 @@ struct Help313App: App {
     var body: some Scene {
         WindowGroup {
             RootView().environmentObject(store).environmentObject(here).environmentObject(saved).environmentObject(reporter)
+                // The direction follows the words, not the phone's region: Arabic mirrors every screen, and
+                // every layout is already written in leading/trailing terms (docs/ACCESSIBILITY-AUDIT-2026-09-20).
+                .environment(\.layoutDirection, L.rightToLeft ? .rightToLeft : .leftToRight)
+                .environment(\.locale, L.locale)
                 .task { await store.start(); await reporter.flush() }
                 // Back to the front: look for a newer list, and try anything the outbox is still holding.
                 .onChange(of: phase) { _, p in if p == .active { Task { await store.refresh(); await reporter.flush() } } }
@@ -468,7 +472,7 @@ struct DetailView: View {
             // Saved places are kept on this phone only, and a private listing has no Save button at all (docs/08).
             SaveButton(row: row)
             if sensitive { Text(L.t("safe.calls_note")).font(.footnote).foregroundStyle(Color.muted) }
-            if L.spanish { Text(L.t("detail.in_english")).font(.footnote).foregroundStyle(Color.muted) }
+            if L.translated { Text(L.t("detail.in_english")).font(.footnote).foregroundStyle(Color.muted) }
             DetailSection(title: L.t("detail.what")) { Text(row.what).fixedSize(horizontal: false, vertical: true) }
             if let e = row.eligibility { DetailSection(title: L.t("detail.who")) { Text(e).fixedSize(horizontal: false, vertical: true) } }
             if !next.isEmpty {

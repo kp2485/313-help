@@ -175,27 +175,28 @@ dependencies {
 // ---------------------------------------------------------------------------------------------------------------
 
 /**
- * Copies strings/en.json and strings/es.json into the assets (the app reads them at runtime, exactly as the iPhone
- * app does), and generates the handful of values Android itself needs as resources: the launcher label and the
- * accessibility label of the app. Everything else is read from the JSON, so a new key needs no Android change.
+ * Copies every strings/<lang>.json into the assets (the app reads them at runtime, exactly as the iPhone app
+ * does), and generates the handful of values Android itself needs as resources: the launcher label and the
+ * accessibility label of the app. Everything else is read from the JSON, so a new key needs no Android change,
+ * and a new language is one more entry in LANGS here and in L.LANGUAGES.
  */
 val generateStrings by tasks.registering {
-    val enFile = File(repoRoot, "strings/en.json")
-    val esFile = File(repoRoot, "strings/es.json")
+    // English is the fallback and must exist; "values" is English, "values-<lang>" is everything else.
+    val langs = listOf("en", "es", "ar", "bn")
+    val files = langs.associateWith { File(repoRoot, "strings/$it.json") }
     val assetsOut = layout.buildDirectory.dir("generated/assets/app/strings")
     val resOut = layout.buildDirectory.dir("generated/res/strings")
-    inputs.file(enFile)
-    inputs.file(esFile)
+    files.values.forEach { inputs.file(it) }
     outputs.dir(assetsOut)
     outputs.dir(resOut)
     doLast {
-        if (!enFile.isFile || !esFile.isFile) {
-            throw GradleException("strings/en.json and strings/es.json are missing from ${repoRoot.absolutePath}")
+        val absent = files.filterValues { !it.isFile }.keys
+        if (absent.isNotEmpty()) {
+            throw GradleException("strings/${absent.joinToString(".json, strings/")}.json are missing from ${repoRoot.absolutePath}")
         }
         val assets = assetsOut.get().asFile
         assets.mkdirs()
-        enFile.copyTo(File(assets, "en.json"), overwrite = true)
-        esFile.copyTo(File(assets, "es.json"), overwrite = true)
+        for ((lang, file) in files) file.copyTo(File(assets, "$lang.json"), overwrite = true)
 
         // A very small reader: these two keys are all Android's own resource system needs.
         fun value(text: String, key: String): String {
@@ -206,12 +207,14 @@ val generateStrings by tasks.registering {
         fun xmlEscape(s: String) = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             .replace("'", "\\'").replace("\"", "\\\"")
 
-        fun write(dir: String, text: String) {
+        fun write(lang: String) {
+            val dir = if (lang == "en") "values" else "values-$lang"
+            val text = files.getValue(lang).readText(Charsets.UTF_8)
             val d = File(resOut.get().asFile, dir)
             d.mkdirs()
             File(d, "strings.xml").writeText(
                 """<?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from strings/${if (dir == "values") "en" else "es"}.json by :app:generateStrings. Do not edit. -->
+<!-- Generated from strings/$lang.json by :app:generateStrings. Do not edit. -->
 <resources>
     <string name="app_name">${xmlEscape(value(text, "app.name"))}</string>
     <string name="app_tagline">${xmlEscape(value(text, "app.tagline"))}</string>
@@ -220,8 +223,7 @@ val generateStrings by tasks.registering {
                 Charsets.UTF_8,
             )
         }
-        write("values", enFile.readText(Charsets.UTF_8))
-        write("values-es", esFile.readText(Charsets.UTF_8))
+        for (lang in langs) write(lang)
     }
 }
 

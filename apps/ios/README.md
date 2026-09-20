@@ -28,7 +28,7 @@ The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme
 - The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Verify.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Listing.swift`, `Palette.swift`.
 - `HelpApp/Assets.xcassets` (the app icon) and `HelpApp/PrivacyInfo.xcprivacy` are referenced in place too and are copied in by the Resources phase.
 - `DetroitQuery` is a local Swift package reference to `apps/ios` (the `Package.swift` beside this README), linked into both targets.
-- `strings/en.json` and `strings/es.json` are referenced in place from the repo root (`../../../strings/…`) and land flat in the app bundle, which is what `L.table(_:)` expects.
+- `strings/en.json`, `es.json`, `ar.json` and `bn.json` are referenced in place from the repo root (`../../../strings/…`) and land flat in the app bundle, which is what `L.table(_:)` expects. `Info.plist` lists the same four under `CFBundleLocalizations`, so iOS offers them in `Locale.preferredLanguages`.
 - **`Help313Tests`** is a unit-test bundle with no host app. It compiles `Config.swift`, `Reports.swift`, `Saved.swift`, `Listing.swift` and `Verify.swift` directly (no `@testable import`), plus `HelpAppTests/AppTests.swift`. 28 cases, all passing.
 - Build phase "Release preflight" (`Scripts/preflight.sh`, first phase, runs every build): does nothing for Debug; refuses a Release build whose origin or pinned keys are still placeholders. See below.
 - Run Script phase "Copy bundle snapshot" (runs every build, `ENABLE_USER_SCRIPT_SANDBOXING = NO` so it may read outside the project folder):
@@ -64,7 +64,7 @@ It refuses: an empty or non-https origin, the placeholder host, fewer than two k
 1. File → New → Project → iOS App, named "313 Help", interface SwiftUI, language Swift, saved in `apps/ios/Xcode/`.
 2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in the Swift files from `HelpApp/`, choosing **Create groups** and leaving **Copy items** unticked. Drag in `HelpApp/Assets.xcassets` and `HelpApp/PrivacyInfo.xcprivacy` the same way.
 3. File → Add Package Dependencies → Add Local… → select `apps/ios`. Add the **DetroitQuery** library to the app target.
-4. Drag `strings/en.json` and `strings/es.json` in from the repo root, without copying, and add the "Copy bundle snapshot" Run Script phase above, plus a first Run Script phase containing `"$SRCROOT/../Scripts/preflight.sh"`.
+4. Drag `strings/en.json`, `es.json`, `ar.json` and `bn.json` in from the repo root, without copying, and add the "Copy bundle snapshot" Run Script phase above, plus a first Run Script phase containing `"$SRCROOT/../Scripts/preflight.sh"`.
 5. Add a **Unit Testing Bundle** target named `Help313Tests` with **no** host application. Add `HelpAppTests/AppTests.swift` and, from `HelpApp/`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Listing.swift` and `Verify.swift` to its Compile Sources; link **DetroitQuery**. Share the `Help313` scheme and add `Help313Tests` to its Test action.
 6. Set `INFOPLIST_FILE` to `Info.plist` for Debug and `Info-Release.plist` for Release, add the `DC_…` settings from the table above, set `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`, the deployment target to iOS 17, and iPhone only.
 

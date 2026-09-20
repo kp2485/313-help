@@ -13,6 +13,7 @@ import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js'
 import { canSave } from '../src/saved.js';
 import { telHref } from '../src/phone.js';
 import { releaseKeyProblems } from '../src/keys.js';
+import { LANGS, dirFor, pickLang } from '../src/i18n.js';
 import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
 import { build as buildReport, fitWithin, nonce, plainJpeg } from '../src/report.js';
 
@@ -305,16 +306,64 @@ describe('neighborhood pages (docs/13 honesty rules)', () => {
   });
 });
 
-describe('Spanish', () => {
-  const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
+describe('the other languages', () => {
+  // Spanish, Arabic (right to left) and Bengali. Every file carries exactly the English keys, the same
+  // placeholders, and the same emergency numbers; nothing in any of them is a leftover English sentence.
+  const OTHER = ['es', 'ar', 'bn'] as const;
+  const table = (l: string) => JSON.parse(readFileSync(join(root, `strings/${l}.json`), 'utf8')) as Record<string, string>;
+  const es = table('es');
   const holes = (v: string) => (v.match(/[{]\w+[}]/g) ?? []).sort().join(',');
-  it('has every English key, and no extra ones', () => expect(Object.keys(es)).toEqual(Object.keys(strings)));
-  it('keeps every placeholder, so no number or date goes missing', () => { for (const k of Object.keys(strings)) expect(holes(es[k]!), k).toBe(holes(strings[k]!)); });
-  it('keeps 911, 988 and 211 where the English has them', () => { for (const k of Object.keys(strings)) for (const n of ['911', '988', '211']) if (strings[k]!.includes(n)) expect(es[k], k).toContain(n); });
+  // Names, and values that are nothing but a placeholder, are the same in every language on purpose.
+  // `miles` is "{miles} mi": Spanish writes the unit the same way.
+  const SAME_ON_PURPOSE = new Set(['app.name', 'detail.source_line', 'hood.kind.harm', 'miles', 'gw.title', 'layer.place.greenway',
+    'layer.go.people_mover', 'link.food.wic.title', 'link.food.wic.label', 'link.food.double_up.title', 'link.benefits.ser.title']);
+
+  for (const l of OTHER) {
+    const w = table(l);
+    it(`${l} has every English key, and no extra ones`, () => expect(Object.keys(w)).toEqual(Object.keys(strings)));
+    it(`${l} keeps every placeholder, so no number or date goes missing`, () => { for (const k of Object.keys(strings)) expect(holes(w[k]!), k).toBe(holes(strings[k]!)); });
+    it(`${l} keeps 911, 988 and 211 where the English has them`, () => { for (const k of Object.keys(strings)) for (const n of ['911', '988', '211']) if (strings[k]!.includes(n)) expect(w[k], k).toContain(n); });
+    it(`${l} is really translated: no value is still the English one`, () => {
+      for (const k of Object.keys(strings)) if (!SAME_ON_PURPOSE.has(k)) expect(w[k], `${l} ${k} is still English`).not.toBe(strings[k]);
+    });
+  }
+  // A phone number has to match the keypad and a time has to match the sign on the door, so every digit in every
+  // language is a Western one (DECISIONS 2026-09-20). Arabic-Indic and Bengali digits are not allowed anywhere.
+  it('Arabic and Bengali use Western digits, so a number can be dialled as it is read', () => {
+    for (const l of ['ar', 'bn']) {
+      const w = table(l);
+      for (const [k, v] of Object.entries(w)) expect(v, `${l} ${k}`).not.toMatch(/[٠-٩۰-۹০-৯]/);
+      for (const [k, v] of Object.entries(w)) for (const m of v.match(/[\d٠-٩০-৯][\d٠-٩০-৯‑-]{6,}/g) ?? []) expect(m, `${l} ${k}`).toMatch(/^[\d-]+$/);
+    }
+  });
+  it('Arabic reads right to left, the other three read left to right', () => {
+    expect(dirFor('ar')).toBe('rtl');
+    for (const l of ['en', 'es', 'bn']) expect(dirFor(l), l).toBe('ltr');
+    expect(LANGS.map((l) => l.code)).toEqual(['en', 'es', 'ar', 'bn']);
+    // Each language names itself, and the switch marks each name with its own lang (WCAG 3.1.2).
+    expect(LANGS.map((l) => l.name)).toEqual(['English', 'Español', 'العربية', 'বাংলা']);
+    expect(main).toContain('<nav class="langrow" aria-label="${T(\'lang.switch\')}">');
+    expect(main).toContain('lang="${l.code}"');
+  });
+  it('the first language is the phone\'s own, and the choice is remembered on the phone only', () => {
+    expect(pickLang(undefined, ['ar-EG', 'en-US'])).toBe('ar');
+    expect(pickLang(undefined, ['bn-BD'])).toBe('bn');
+    expect(pickLang(undefined, ['es-MX', 'ar'])).toBe('es');       // the phone's order wins, not ours
+    expect(pickLang(undefined, ['fr-FR'])).toBe('en');             // a language we have no words for
+    expect(pickLang('ar', ['en-US'])).toBe('ar');                  // what the person picked beats the phone
+    expect(pickLang('de', ['en-US'])).toBe('en');
+  });
   it('the language choice stays on the phone, and a place\'s own words are never machine-translated', () => {
     const src = readFileSync(join(__dirname, '../src/i18n.ts'), 'utf8');
     expect(src).not.toMatch(/fetch[(]|localStorage|cookie/); expect(src).toContain("idbSet('lang'");
     expect(main).toContain('<p lang="en">${esc(r.what)}</p>');
+    // Each language is its own chunk: an English reader downloads none of them.
+    for (const l of OTHER) expect(src).toContain(`import('../../../strings/${l}.json')`);
+  });
+  it('dates, times and numbers keep Western digits in Arabic and Bengali', () => {
+    const src = readFileSync(join(__dirname, '../src/i18n.ts'), 'utf8');
+    expect(src).toContain("ar: 'ar-u-nu-latn'"); expect(src).toContain("bn: 'bn-u-nu-latn'");
+    expect(new Intl.NumberFormat('ar-u-nu-latn').format(2026)).toBe('2,026');
   });
 });
 

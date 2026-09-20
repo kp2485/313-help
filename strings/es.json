@@ -255,7 +255,7 @@
   "report.photo_label": "Agregar una foto (si quiere)",
   "report.photo_note": "Tome una foto del problema, no de personas. Antes de que salga de su teléfono, le quitamos los datos escondidos, como dónde y cuándo se tomó. Solo nuestros ayudantes la ven, y la borramos 30 días después de que se cierra el problema.",
   "report.photo_failed": "No se pudo enviar la foto, pero su reporte sí se envió.",
-  "lang.switch": "English",
+  "lang.switch": "Idioma",
   "detail.in_english": "La información de este lugar está en inglés, tal como ellos la escribieron.",
   "search.title": "Buscar",
   "search.open": "Buscar por nombre o calle",

@@ -25,6 +25,9 @@ import java.io.File
 
 class ParityTest {
 
+    /** The languages the app registers (L.LANGUAGES), kept here as plain data so this test needs no android.*. */
+    private val LANGS = listOf("en", "es", "ar", "bn")
+
     /** Tests run from `apps/android/app`, so the repository root is three levels up (as in VerifyTest). */
     private val root = File("../../..")
 
@@ -54,11 +57,10 @@ class ParityTest {
         }
     }
 
-    /** Every need and refinement has words in both languages. A screen never shows a raw key. */
+    /** Every need and refinement has words in every language. A screen never shows a raw key. */
     @Test
     fun everyNeedHasItsWords() {
         val en = strings("strings/en.json")
-        val es = strings("strings/es.json")
         val wanted = ArrayList<String>()
         for (n in NEEDS) {
             wanted += "need.${n.id}"
@@ -67,9 +69,38 @@ class ParityTest {
             for (r in n.refine) wanted += "refine.${n.id}.${r.id}"
         }
         for (id in listOf("food", "shelter", "doctor", "narcan")) wanted += "quick.$id"
-        for (key in wanted) {
-            assertNotNull("strings/en.json has no $key", en[key])
-            assertNotNull("strings/es.json has no $key", es[key])
+        for (key in wanted) assertNotNull("strings/en.json has no $key", en[key])
+        for (lang in LANGS - "en") {
+            val other = strings("strings/$lang.json")
+            for (key in wanted) assertNotNull("strings/$lang.json has no $key", other[key])
+        }
+    }
+
+    /**
+     * Every language the app registers has a file with exactly the English keys and the same placeholders, and
+     * the app can read it. Arabic and Bengali carry Western digits only, so a number reads as it is dialled
+     * (DECISIONS 2026-09-20).
+     */
+    @Test
+    fun everyLanguageIsCompleteAndReadable() {
+        val en = strings("strings/en.json")
+        val holes = { s: String -> Regex("\\{(\\w+)}").findAll(s).map { it.value }.sorted().joinToString(",") }
+        // Strings.kt is read as text: this test runs on a plain JVM and never loads a class that names android.*.
+        val declared = File(root, "apps/android/app/src/main/kotlin/org/help313/app/Strings.kt").readText()
+        assertTrue("L.LANGUAGES does not list $LANGS", declared.contains("""val LANGUAGES = listOf("en", "es", "ar", "bn")"""))
+        for (lang in LANGS - "en") {
+            val other = strings("strings/$lang.json")
+            assertEquals("strings/$lang.json has different keys", en.keys.sorted(), other.keys.sorted())
+            for ((key, value) in en) {
+                assertEquals("$lang $key has different placeholders", holes(value), holes(other.getValue(key)))
+                for (n in listOf("911", "988", "211")) {
+                    if (value.contains(n)) assertTrue("$lang $key lost $n", other.getValue(key).contains(n))
+                }
+            }
+            if (lang == "ar" || lang == "bn") {
+                val native = Regex("[\\u0660-\\u0669\\u06F0-\\u06F9\\u09E6-\\u09EF]")
+                for ((key, value) in other) assertFalse("$lang $key uses non-Western digits", native.containsMatchIn(value))
+            }
         }
     }
 

@@ -257,10 +257,28 @@ Done here, so the next agent starts from a clean sheet:
 - **`owner()` already marks every untranslated place-written string as `lang="en"`**, which matters far more in
   Arabic and Bengali than it does in Spanish. Use it for anything new.
 
-Two things left for that agent:
-1. The hero's radial gradient starts at `0% 0%` — a physical top-left. It should start top-inline-start.
-2. `@media (min-width:48rem) .tabs` centres the floating tab bar with `inset:auto 50% 1rem auto` and a physical
-   `translateX(50%)`. It stays centred in RTL, so it is not broken, but it is not logical either.
+Both of the two things left for that agent are done (2026-09-20, Arabic and Bengali pass):
+1. ~~The hero's radial gradient starts at `0% 0%`~~ — `[dir="rtl"] .hero` starts it at `100% 0%`, so the light
+   is at the top inline-start corner, where the heading begins, in both directions.
+2. ~~`@media (min-width:48rem) .tabs` centres the floating tab bar with a physical `translateX(50%)`~~ — it is
+   now `inset-inline:0; margin-inline:auto`, centred by the writing direction with nothing left to flip.
+
+Four more right-to-left defects were found by looking at the running app in Arabic, and fixed:
+
+3. **The pan arrows under the map were mirrored, and the map is not.** `[dir="rtl"] .mappan button[data-map-act=
+   "left"|"right"] { transform:scaleX(-1) }` flipped the glyphs while the flex row also reversed their order, so
+   the leftmost button showed ← and moved the map east. The map never mirrors — left is west in every language —
+   so the pad is now `direction:ltr` and nothing is flipped.
+4. **The app called itself "Help 313".** "313 Help" is a number and a word; in a right-to-left paragraph the
+   space between them takes the paragraph's direction and the two runs swap. The header wraps the name in
+   `<bdi>`, and the seven Arabic strings that name "313 Help", "Section 8" or "Michigan Works!" wrap them in
+   U+2066/U+2069 isolates.
+5. **English sentences lost their full stops to the other end of the line.** Everything a place wrote about
+   itself is `lang="en"` (`owner()`), which says what language it is but not which way it runs:
+   `[dir="rtl"] [lang="en"] { direction:ltr; unicode-bidi:isolate; }` keeps an English run whole inside an
+   Arabic screen.
+6. **The list version on About broke across the line.** `about.data` now receives the version wrapped in
+   isolates, so a hash like `09cca4a-20260920T1906-32a1add44` stays one left-to-right run.
 
 ---
 

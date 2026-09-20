@@ -40,9 +40,12 @@ final class ParityTests: XCTestCase {
         }
     }
 
-    /// Every need and refinement has words in both languages. A screen never shows a raw key.
+    /// The languages the app registers (L.languages in Help.swift). English is the fallback.
+    private static let languages = ["en", "es", "ar", "bn"]
+
+    /// Every need and refinement has words in every language. A screen never shows a raw key.
     func testEveryNeedHasItsWords() throws {
-        let en = try strings("strings/en.json"), es = try strings("strings/es.json")
+        let en = try strings("strings/en.json")
         var wanted: [String] = []
         for n in try swiftNeeds() {
             wanted.append("need.\(n.id)")
@@ -52,9 +55,39 @@ final class ParityTests: XCTestCase {
             for r in n.refine { wanted.append("refine.\(n.id).\(r.id)") }
         }
         wanted += ["food", "shelter", "doctor", "drugs", "job", "narcan"].map { "quick.\($0)" }
-        for key in wanted {
-            XCTAssertNotNil(en[key], "strings/en.json has no \(key)")
-            XCTAssertNotNil(es[key], "strings/es.json has no \(key)")
+        for key in wanted { XCTAssertNotNil(en[key], "strings/en.json has no \(key)") }
+        for lang in Self.languages.dropFirst() {
+            let other = try strings("strings/\(lang).json")
+            for key in wanted { XCTAssertNotNil(other[key], "strings/\(lang).json has no \(key)") }
+        }
+    }
+
+    /// Every language the app registers has a file with exactly the English keys, the same placeholders and the
+    /// same emergency numbers. Arabic and Bengali carry Western digits only, so a number reads as it is dialled
+    /// (DECISIONS 2026-09-20). Help.swift must register the same four.
+    func testEveryLanguageIsCompleteAndReadable() throws {
+        let help = try text("apps/ios/HelpApp/Help.swift")
+        XCTAssertTrue(help.contains("static let languages = [\"en\", \"es\", \"ar\", \"bn\"]"), "L.languages differs")
+        XCTAssertTrue(help.contains("ar@numbers=latn"), "Arabic must keep Western digits")
+        let en = try strings("strings/en.json")
+        let holes = { (s: String) -> String in
+            s.ranges(of: try! Regex("\\{\\w+\\}")).map { String(s[$0]) }.sorted().joined(separator: ",")
+        }
+        let nativeDigits = try Regex("[\\u{0660}-\\u{0669}\\u{06F0}-\\u{06F9}\\u{09E6}-\\u{09EF}]")
+        for lang in Self.languages.dropFirst() {
+            let other = try strings("strings/\(lang).json")
+            XCTAssertEqual(en.keys.sorted(), other.keys.sorted(), "strings/\(lang).json has different keys")
+            for (key, value) in en {
+                guard let mine = other[key] else { continue }
+                XCTAssertEqual(holes(value), holes(mine), "\(lang) \(key) has different placeholders")
+                for n in ["911", "988", "211"] where value.contains(n) {
+                    XCTAssertTrue(mine.contains(n), "\(lang) \(key) lost \(n)")
+                }
+            }
+            guard lang == "ar" || lang == "bn" else { continue }
+            for (key, value) in other {
+                XCTAssertNil(try? nativeDigits.firstMatch(in: value), "\(lang) \(key) uses non-Western digits")
+            }
         }
     }
 
