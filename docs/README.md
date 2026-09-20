@@ -49,7 +49,7 @@ Other scripts, explained in [OPERATIONS.md](OPERATIONS.md): `pnpm ingest:basemap
 
 ## Status
 
-- 2026-09-20 (audit): **[What is active versus only planned](AUDIT-2026-09-20.md).** The app, the data and the Worker are real and tested; nothing is deployed and nothing scheduled has ever run. This checkout has no `.git` and no `.github/`, so the publish workflow and CI the docs describe are not here (that is the one failing test). Six deploy blockers, 56 unfinished hand-checks, 12 open decisions. Two bugs found and fixed during the audit: the About screen would have printed a raw string key, and the tab bar reserved five columns for four tabs.
+- 2026-09-20 (audit): **[What is active versus only planned](AUDIT-2026-09-20.md).** The app, the data and the Worker are real and tested; nothing is deployed and nothing scheduled has ever run. (While the audit ran, this working copy had lost its `.git` and `.github/`, which made the workflows look missing and failed one test; both were restored the same day and everything was merged.) Six deploy blockers, 56 unfinished hand-checks, 12 open decisions. Two bugs found and fixed during the audit: the About screen would have printed a raw string key, and the tab bar reserved five columns for four tabs.
 
 - 2026-09-20 (later): **313SafeBeds first for shelter, a modern iPhone app, and the City disclaimer removed.**
   - "I need a safe place to sleep tonight" now opens with **313SafeBeds** (313safebeds.com), above the shelter lines, in both apps. Its own page was read in a browser on 2026-09-20; we link to it and copy nothing from it (Kyle's call).
