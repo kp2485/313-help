@@ -10,12 +10,13 @@ You are building **313 Help** (named by Kyle 2026-09-19), a zero-PII app that po
 - Nothing is deleted from the dataset; rows are archived with reason.
 - Every listing shows freshness **computed on the device** from dated facts in the bundle (never frozen at build time). Badges state facts; never say "verified" for something no person checked. Unknown is never rendered as "open." Reports label rows; they never hide them.
 - 911 and 988 are hardcoded and never overridable. Other emergency numbers come from `data/seed/emergency.csv` via the **signed** bundle. We use the number its owner currently publishes: `pnpm check:emergency` reads each number's source page; if the page is read and shows a different number (a mismatch), a release build fails until a person fixes it (DECISIONS 2026-09-19). A page that can't be read is logged for a person, not a failure. The script never rewrites a number; a mismatch is a person's job. Any phone/address/coordinate change from any source is held for steward approval.
+- A listing is findable by a phone, a street address, **or** its publisher's own coordinate — one of the three is enough. A coordinate is never reverse-geocoded into an address we then print, and a misprinted phone number is never repaired by guessing the digits.
 - Bundles are Ed25519-signed; clients pin two public keys (active + spare) and refuse unsigned or mis-signed bundles.
 - Harm-reduction, DV, and crisis screens follow the ordering rules in docs/05 (911/hotline first).
 
 ## Build order for the hackathon (docs/09)
 
-Steps 1–4 were done on 2026-09-18. Step 5: `apps/ios` has `DetroitQuery`, the Swift copy of the query rules, passing every fixture in CI; the SwiftUI screens are written but have not been compiled (needs a Mac).
+Steps 1–4 were done on 2026-09-18. Step 5 was done on 2026-09-20: the SwiftUI screens compile and run in the simulator, with reports, saved places, About/privacy, a release gate and 28 app tests beside `DetroitQuery`'s 111 fixture cases. Step 6 (Android) is **written and never compiled**.
 
 
 1. `data/seed/` CSVs → `pipeline/` → `data/bundle/v1/` (HSDS-valid + `x_detroit`). Fixture tests for open-now / next-occurrence / ranking in `schema/fixtures/` **before** any UI.
@@ -23,12 +24,15 @@ Steps 1–4 were done on 2026-09-18. Step 5: `apps/ios` has `DetroitQuery`, the 
 3. `api/` Worker + D1: `POST /v1/reports`, `POST /v1/proposals`, steward endpoints behind Cloudflare Access.
 4. `admin/` minimal steward queue. Publishing is `.github/workflows/publish.yml` (off until `PUBLISH_ENABLED` is set) or a local `pnpm build:bundle`.
 5. `apps/ios/` SwiftUI shell if time remains.
+6. `apps/android/` Kotlin client: platform Views, **no Jetpack Compose, no AndroidX, no dependency of any kind in the APK**, `minSdk` 24. **Nothing in it has ever been compiled** — this Mac has no JDK, Kotlin, Gradle or Android SDK, and installing them is a download Kyle must OK. Never describe it as working; say written and never compiled. The PWA remains the Android answer until it compiles, runs on a real phone and is checked.
+
+The four tabs are **Home · Help · Map · Events** (2026-09-20; Recreation and Transit merged into Map). The iPhone app has no map, so it keeps a greenway tab instead, titled `gw.title`.
 
 ## Conventions
 
-- TypeScript strict for pipeline/api/web; SwiftUI (iOS 17+) for iOS. Node 22. pnpm 12 workspaces: dependency install scripts run only when listed under `allowBuilds` in `pnpm-workspace.yaml`, and new package versions must be a day old.
-- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal, `nbh_` neighborhood, `ph_` photo key, `emg_` emergency number). HSDS ids are UUIDv5 of the slug; the slug rides in `x_detroit.id`. Never reuse.
-- Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements against the same fixtures.
+- TypeScript strict for pipeline/api/web; SwiftUI (iOS 17+) for iOS; Kotlin with platform Android Views (no Compose, no AndroidX, no APK dependencies) for Android. Node 22. pnpm 12 workspaces: dependency install scripts run only when listed under `allowBuilds` in `pnpm-workspace.yaml`, and new package versions must be a day old.
+- IDs are stable slugs (`org_`, `loc_`, `svc_`, `sal_`, `alert_`, `rpt_`, plus `plc_` place, `seg_` greenway segment, `cond_` condition report, `prop_` proposal, `nbh_` neighborhood, `ph_` photo key, `emg_` emergency number). HSDS ids are UUIDv5 of the slug; the slug rides in `x_detroit.id`. Never reuse. An ingested layer's `id_prefix` in `data/sources.yaml` (`hr` for the DHD boxes, `wws` for Wayne County's stations) is **not** a new id prefix: it is part of the slug inside `sal_`, as in `sal_wws_dearborn_…`, so this list does not grow when a layer is added.
+- Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements it in `apps/ios/Sources/DetroitQuery` and **Android re-implements it again in `apps/android/query`** (Kotlin, no dependencies). Three implementations, one spec, the same fixtures: a change to the rules is a change in four places, and the fixtures are what keeps them honest.
 - Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline, used in floating wall-clock mode only — see DECISIONS.md; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
 - Detroit time zone `America/Detroit` everywhere. Service area: Detroit, Hamtramck, Highland Park and Dearborn (Kyle, 2026-09-19). Bbox sanity: lat 42.25–42.46, lon −83.33 to −82.91.
 - Plain-language UI strings live in `strings/en.json`, with `strings/es.json` carrying the same keys (tests check keys and placeholders); reading level ≤ 6th grade; no jargon ("Free groceries," not "Food pantry services"). What a place wrote about itself is never machine-translated.
@@ -49,6 +53,7 @@ Registry in `data/sources.yaml` for the layers that become listings (see docs/02
 ## Things to ask Kyle before doing
 
 - Registering a domain, creating Cloudflare resources, or anything that costs money.
-- Adding a dependency with a non-permissive license.
+- Downloading and installing a toolchain (a JDK, the Android SDK, Gradle, anything of that size), even when it is free.
+- Adding a dependency with a non-permissive license. Open on 2026-09-20: JUnit 4 (EPL-1.0) in `apps/android`, test-only and never distributed.
 - Any deviation from the zero-PII rules, even "temporary for debugging."
 - Changing the app's name. It is **313 Help** and lives in `app.name` in `strings/en.json` and `strings/es.json`, the web manifest, and the page title.

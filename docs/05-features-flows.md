@@ -4,7 +4,7 @@
 
 ```
 Top bar, every screen:  313 Help · [Urgent help]      (on DV and crisis screens: [Leave this page fast] instead)
-Tab bar, every screen:  Home · Help · Recreation · Transit · Events
+Tab bar, every screen:  Home · Help · Map · Events
 
 Home
 ├─ Español / English switch
@@ -14,7 +14,7 @@ Home
 ├─ Find free help                    →  Help tab
 ├─ Quick needs: Food · A place to sleep · A doctor · Free Narcan   →  need screen
 ├─ (Coming up: City events — hidden while there are none; dropped until a real feed, DECISIONS 2026-09-19)
-├─ Tiles: Recreation · Transit
+├─ Tiles: Map · Joe Louis Greenway
 └─ Footer: List updated {date} · Works offline · About this app
      About  →  Español / English switch · list version and signature · Neighborhoods
 
@@ -25,8 +25,11 @@ Help
 ├─ Browse by type: Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people   →  list (+ map on request)
 └─ More: Saved places · Add a place that helps
 
-Recreation:  Joe Louis Greenway (map, segments  →  Neighborhoods) · City parks · Recreation centers and libraries · Bikes
-Transit:     trip planner and real-time links, fares, free rides, phone numbers
+Map          one map with a layer switcher (free help by kind · parks · Joe Louis Greenway · bus routes and
+             stops · streetcar · People Mover · bike lanes and MoGo · stations · park and ride), the same
+             thing as a list under the map, then: the greenway, City parks, recreation centers and libraries,
+             trip planners, fares, free rides, transit phone numbers, MoGo Access Pass
+             Joe Louis Greenway (segments  →  Neighborhoods) and City parks keep their own screens
 Events:      City calendar, grouped by day
 
 Urgent help (top bar): 911 · 988 · shelter · crisis line · DV hotline · 211 · overdose steps
@@ -34,12 +37,11 @@ Resource detail · Neighborhoods (from About and from greenway segments)
 Report a problem with the app: not built.
 ```
 
-**Revised 2026-09-18 (Kyle): five tabs — Home · Help · Recreation · Transit · Events.** No profile tab; there is no profile.
+**Revised 2026-09-20 (Kyle): four tabs — Home · Help · Map · Events.** The Recreation and Transit tabs are one **Map** tab; everything either of them offered is still on it. No profile tab; there is no profile.
 
-- **Home**: a calm landing page — the Español/English switch, hero, a search button, active alerts, one "Find free help" card, four quick needs, tiles into Recreation and Transit. No red, no emergency strip.
+- **Home**: a calm landing page — the Español/English switch, hero, a search button, active alerts, one "Find free help" card, six quick needs, tiles into the Map tab and the greenway. No red, no emergency strip.
 - **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
-- **Recreation**: Joe Louis Greenway (map, segments, help within a 10-minute walk), City parks (302, nearest first with location), recreation centers, MoGo Access Pass. The greenway is drawn like a transit line (DECISIONS 2026-09-20): one width with a casing, a colour and dash for each phase, station dots where stretches join once zoomed in, the chosen stretch bright with the rest dimmed, and a key under the map naming each phase in words.
-- **Transit**: DDOT trip planner and real-time links, fares, free rides (People Mover, QLINE), phone numbers. Every listing with an address gets a **Bus directions** button.
+- **Map** (2026-09-20): one map of the city with a **layer switcher**, then everything Recreation and Transit used to carry. See "Map tab" below. Every listing with an address still gets a **Bus directions** button on its own screen.
 - **Events**: the City calendar, read by the pipeline into the signed bundle, grouped by day; details link out.
 - **Urgent help**: a button in the top bar of every screen (replaced by quick-exit on DV and crisis screens) opens the numbers sheet: 911, 988, shelter, crisis line, DV hotline, 211, plus the overdose steps. One tap from anywhere (Principle 3). 911 is the only red element in the app besides quick exit.
 
@@ -93,6 +95,27 @@ Safety rules baked into the flow:
 - "I want free Narcan to carry" → nearest stations. Not built yet: the line "Narcan is also sold without a prescription at most pharmacies — ask at the counter," and the how-to card.
 - "I'm not safe at home" shows no distance and no map.
 - "I want help with drugs or alcohol" and "Help after sexual assault" (DECISIONS 2026-09-19): numbers first, a quick exit, and **private listings**: never saved, never in the browser history, but with an address, distance and map dot so a person can get there.
+
+## Map tab (2026-09-20)
+
+One tab replaces Recreation and Transit. Top to bottom:
+
+1. **The map**, drawn on the phone from the signed bundle as before — no tile server, no map company, nothing sent.
+2. **"What to show on the map"** — a layer switcher of real `<input type="checkbox">` in labelled `<fieldset>`s, in three groups:
+   - *Free help*: one layer per group of our own listings, **derived from the category taxonomy** (`MAP_GROUPS` in `apps/web/src/needs.ts`): free food · places to sleep · health and Narcan · rec centers and libraries · jobs and school · clothes, showers and things · money, housing and papers. Every top-level category belongs to exactly one group (a test checks it).
+   - *Parks and paths*: the Joe Louis Greenway · City parks.
+   - *Getting around*: DDOT bus routes and stops · SMART bus routes and stops · QLINE · People Mover · MoGo bike stations · bike lanes · train and bus stations · intercity bus stops · park and ride lots.
+   The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. A first visit starts with the greenway, parks and DDOT routes.
+3. **"See this map as a list"** — everything switched on, in words: the help listings as cards, greenway stretches as rows, park names, and each transport layer's route and stop names with a count. Nothing on the map is reachable only by looking at it.
+4. Then the rest of what Recreation and Transit carried: the greenway, City parks, recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass.
+
+Rules that do not change:
+- **Sensitive and private listings are never drawn.** Treatment and help after sexual assault are excluded from every layer (`PRIVATE_TOPS`), and inside a group a DV or mental-health-crisis listing is dropped row by row (`isSensitive`).
+- **Colour never carries the meaning alone.** Each layer is named in the switcher, named again when you tap a route or a stop, and named in the list under the map.
+- **Bus stops wait for the zoom.** There are thousands, so a dense point layer draws only once the map is close enough for stops to be separate things; the list shows them at any zoom, and the switcher says so.
+- Unknown is never rendered as open, and freshness is still computed on the device.
+
+Each transport layer is its own file in the signed bundle under `map/transit/`, **downloaded only when that layer is first switched on** and checked against the signed index, then kept for offline use. The small list of which layers exist travels with the bundle (`places/transit.json`), so the switcher draws offline. Sources, sizes and licence notes: `pipeline/src/ingest-transit.ts` and DECISIONS 2026-09-20.
 
 ## List / Map
 

@@ -23,8 +23,11 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 11 | [Healthy places](11-greenway-public-places.md) | Approved: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
 | 12 | [Gift & handoff](12-gift-and-handoff.md) | What "open-source gift to the city" demands of the design: unattended operation, old-copy notes and retiring on purpose, transfer checklist, costs |
 | 13 | [Neighborhood indicators](13-neighborhood-indicators.md) | Citywide public-data picture for all 205 neighborhoods; honesty rules; the greenway as one lens |
-| — | [research/](research/) | Source research: Wayne County data, and the 2026-09-19 [new kinds of help](research/2026-09-19-new-help/README.md) (jobs, treatment, housing, legal, IDs and more) |
+| — | [research/](research/) | Source research: Wayne County data, the 2026-09-19 [new kinds of help](research/2026-09-19-new-help/README.md) (jobs, treatment, housing, legal, IDs and more), and [2026-09-20](research/2026-09-20/) (the held backlog, the hand checks read in a browser, the empty categories, emergency rooms and urgent care) |
 | — | [AUDIT-2026-09-20.md](AUDIT-2026-09-20.md) | **What is active versus only planned**, checked in the code and data, with four detailed reports in [audit-2026-09-20/](audit-2026-09-20/) |
+| — | [ACCESSIBILITY-AUDIT-2026-09-20.md](ACCESSIBILITY-AUDIT-2026-09-20.md) | Full WCAG 2.2 AA pass over the web app: 44 pass, 21 fixed, 4 open with reasons |
+| — | [DEPLOY-HANDOFF-2026-09-20.md](DEPLOY-HANDOFF-2026-09-20.md) | **For Kyle**: the six deploy blockers, in order, with what each costs and what proves it |
+| — | [CHECKS-2026-09-20.md](CHECKS-2026-09-20.md) | Steward worksheet: the differences found on 2026-09-20, the browser looks and the calls still owed |
 | — | [REVIEW-2026-09-19.md](REVIEW-2026-09-19.md) | SWOT after the build-out, the plan to ship, and the decisions waiting on Kyle |
 | — | [DEMO.md](DEMO.md) | Demo-day checklist: commands, the beats, what to do if something breaks |
 | — | [OPERATIONS.md](OPERATIONS.md) | Running it locally, the regular work, first deployment (needs Kyle), secrets, handover |
@@ -39,15 +42,32 @@ pnpm test                # query fixture cases + pipeline, API and web tests
 pnpm build:bundle        # data/seed + data/ingested -> data/hsds + data/bundle/v1 (signed, dev key)
 pnpm ingest:opendata     # City open-data layers into data/ingested and data/staging, plus the greenway
                          # segments and the City's events, parks and ZIP areas
+pnpm ingest:transit      # the 11 transport layers for the Map tab. By hand, about monthly — on purpose
+                         # it is NOT in the nightly publish (DECISIONS 2026-09-20)
+pnpm ingest:mymap        # Wayne County's Well Wayne Stations map (Google My Maps KML) -> data/ingested/
 pnpm check:sources       # promote proposed rows whose source page matches
 pnpm geocode             # fill coordinates in data/seed/resources.csv (U.S. Census geocoder)
+pnpm smoke -- https://<origin> --i-own-this-origin   # ask a LIVE origin what preflight cannot see
 ```
 
-Other scripts, explained in [OPERATIONS.md](OPERATIONS.md): `pnpm ingest:basemap`, `pnpm ingest:neighborhoods`, `pnpm check:emergency`, `pnpm import:lines`, `pnpm alert:new`, `pnpm keys:generate`, `pnpm build:bundle:release`.
+Other scripts, explained in [OPERATIONS.md](OPERATIONS.md): `pnpm ingest:basemap`, `pnpm ingest:neighborhoods`, `pnpm ingest:treatment`, `pnpm check:emergency`, `pnpm import:lines`, `pnpm alert:new`, `pnpm keys:generate`, `pnpm build:bundle:release`.
+
+`pnpm smoke` only ever sends requests the API must refuse — about thirty of them — so it can never store anything, and it refuses to run without `--i-own-this-origin`. Run it after any change to the Cloudflare Access policy or the WAF rate-limiting rule, and re-sign `api/edge-protections.md` in the same commit if either is removed.
 
 `pnpm build:bundle:release` fails if an emergency number's own page was read and showed a different number (`mismatch_on`, from `pnpm check:emergency`) until a person fixes it, and unless `BUNDLE_SIGNING_KEY` is set. A page that can't be read never blocks it (DECISIONS 2026-09-19). `pnpm preflight` says whether a checkout is ready to deploy.
 
 ## Status
+
+- 2026-09-20 (coordinated build): **528 listings, four tabs with one Map, an accessibility pass, an Android client written, and the deploy blockers cleared down to Kyle's own steps.**
+  - *Data:* **528 listings**, up from 418. Every category in docs/03 now has at least one live listing except warming and cooling centers, which are alert-driven and empty on purpose. Two new kinds of help, `health.er` (emergency room) and `health.urgent` (urgent care) — they cannot be `health.clinic`, which means free or low-cost, and none of these places says it is. 26 Wayne County naloxone and test-strip stations arrive through a new reader for Google My Maps KML (`pnpm ingest:mymap`); they publish a city and a point and **no street address**, which the pipeline, the bundle, the web app and the iPhone app all now handle without inventing one. 23 Health Department programs are live at last.
+  - *Tabs:* **Home · Help · Map · Events.** Recreation and Transit are one Map tab with a layer switcher, and **11 transport layers** (DDOT and SMART routes and stops, QLINE, People Mover, MoGo, bike lanes, Amtrak, intercity buses, park-and-ride) ride in the signed bundle, drawn on the device with no tile server and no runtime request to any of their owners. `pnpm ingest:transit`, run **by hand about monthly** — deliberately not in the nightly job.
+  - *Laptops:* everything new sits inside `@media (min-width:64rem)`, so a phone — and a laptop at 400% zoom — renders exactly as before, pixel for pixel. The tab bar becomes a side rail with Urgent help first in it.
+  - *Accessibility:* a full **WCAG 2.2 AA** pass: **44 pass, 21 failures found and fixed, 4 left open with reasons** ([ACCESSIBILITY-AUDIT-2026-09-20.md](ACCESSIBILITY-AUDIT-2026-09-20.md)). The big one: every live region in the app was being rebuilt by `innerHTML` and therefore never announced, so nothing that happened without a screen change was ever heard.
+  - *iPhone:* reports with an offline outbox, saved places, an About and privacy screen with a key reset, and a release gate that refuses to build without a real origin and two real pinned keys. **28 app tests** beside the 111 shared fixture cases.
+  - *Android:* `apps/android` now holds a Kotlin client — platform Views, no Compose, no AndroidX, no dependency of any kind in the APK, and a **third** implementation of the shared query rules. **It has never been compiled:** this Mac has no JDK, Kotlin, Gradle or Android SDK, and installing them is a download Kyle must OK. The PWA is still the Android answer.
+  - *Deploy:* `api/edge-protections.md` is a signed attestation for the two protections no script can see; `pnpm smoke` proves them from outside against a live origin; `api/test/scheduled.test.ts` holds the first cron run to changing nothing. Kyle committed the real D1 database id.
+  - *Checks:* `pnpm test` is **461** (query 111, api 80, pipeline 161, web 109), plus 111 Swift fixture cases and 28 iOS app tests. Differences for a steward are in **[CHECKS-2026-09-20.md](CHECKS-2026-09-20.md)**.
+  - *Planned, not started:* **Arabic and Bengali.** Kyle asked that they wait until everything else is finished; each will be machine-drafted and each will need a native reviewer before it ships.
 
 - 2026-09-20 (audit): **[What is active versus only planned](AUDIT-2026-09-20.md).** The app, the data and the Worker are real and tested; nothing is deployed and nothing scheduled has ever run. (While the audit ran, this working copy had lost its `.git` and `.github/`, which made the workflows look missing and failed one test; both were restored the same day and everything was merged.) Six deploy blockers, 56 unfinished hand-checks, 12 open decisions. Two bugs found and fixed during the audit: the About screen would have printed a raw string key, and the tab bar reserved five columns for four tabs.
 

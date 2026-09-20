@@ -145,10 +145,11 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 | `hygiene.shower` | Showers / laundry | |
 | `transport` | Bus passes, rides | |
 | `youth` | Young people | |
-| `rec.center` / `rec.library` | Recreation centers and libraries | (Recreation tab, not triage) |
+| `rec.center` / `rec.library` | Recreation centers and libraries | (Map tab, not triage — the Recreation tab was merged into it on 2026-09-20) |
 | `treatment.crisis` / `.detox` / `.residential` / `.outpatient` / `.meds` / `.recovery` | Walk-in crisis and sobering · Detox · Live-in treatment · Treatment while living at home · Medicine for opioid addiction · Recovery support | "I want help with drugs or alcohol" (Right now; DWIHN's 24-hour line and SAMHSA's first) |
 | `assault` | Help after sexual assault | "Help after sexual assault" (Right now; Avalon, VOICES4 and 911 first) |
 | `health.dental` / `health.vision` | Dentist · Eye care and glasses | "I need a doctor, dentist, or eye care" |
+| `health.er` / `health.urgent` | Emergency room · Urgent care | "I need a doctor, dentist, or eye care" → *Emergency room* (911 first on that screen) / *Urgent care*. Separate from `health.clinic`, which means free or low-cost: none of these places say they are, so calling them a free clinic would make the app say something the owner's page does not. An emergency room shows as open all day and night **only** where its own page says so. |
 | `housing.owner` | Help for homeowners (tax exemptions, foreclosure, repairs) | "I'm behind on rent or might lose my home" → *I own my home* |
 | `shelter.day` | Day centers | "I need somewhere to go during the day" |
 | `goods.clothes` / `goods.baby` | Free clothes and coats · Diapers and baby things | "I need clothes, diapers, or baby things" |
@@ -161,6 +162,14 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 | `connect` | Free computers, internet and phones | "I need a phone, internet, or a computer" |
 | `pets` | Pet care and food | "Help with my pet" |
 | `seniors` / `veterans` / `lgbtq` / `youth` / `women` / `men` / `reentry` / `disability` / `immigrants` / `pregnant` / `paid_training` / `referral_only` / language (`spanish`, `arabic`, `bengali`) / access (`walk_in`, `appointment_required`, `no_id_required`, `sliding_fee`, `medicaid`) | Flags, not categories. `reentry` = for people with a record or coming home from prison; "I have a record" lists jobs with it first |
+
+**46 slugs in all; 44 of them had at least one live listing on 2026-09-20.** The two that do not are
+`shelter.warming` and `shelter.cooling`, which are alert-driven and empty on purpose.
+
+*Added 2026-09-20 (DECISIONS):* `health.er` and `health.urgent`. A row may now carry a **city and a point but no
+street address** — Wayne County's naloxone and test-strip stations publish exactly that — and a coordinate is never
+reverse-geocoded into an address we then print as a fact. In the HSDS export a location is `physical` when it has an
+address **or** a point, and `virtual` only when it has neither.
 
 *Added 2026-09-19 (DECISIONS):* the rows from `treatment` down. Treatment and `assault` listings are **private**: never saved and never in the browser history, with a quick exit, but they keep their address, distance and map dot (unlike DV and crisis listings, which are sensitive). Needs whose help is a program you apply for online (unemployment, Lifeline, child-care scholarships, Medicaid rides…) show link-outs to the owner's page (`apps/web/src/links.ts`), not listings.
 
@@ -179,7 +188,8 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
   - `category/*.json` — one file per top-level category (food, harm, health, hygiene, rec, shelter, utilities, youth, and since 2026-09-19 jobs, learn, treatment, housing, legal, ids, assault, money, goods, kids, connect, transport, pets).
   - `alerts.json`, `archived.json`, `emergency.json`, `events.json`.
   - `places/greenway.json`, `places/parks.json`, `places/zips.json`.
-  - `map/base.json`, `map/streets.json` (docs/06).
+  - `map/base.json`, `map/streets.json` (docs/06), and since 2026-09-20 `map/transit/*.json` — the 11 transport
+    layers, one file each, listed in `places/transit.json` and downloaded only when a person switches that layer on.
   - `indicators/neighborhoods.json` (docs/13).
 - The app checks each file against the signed index before using it, swaps to a new bundle in one step, and refuses a bundle older than the one it already holds.
 

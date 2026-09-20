@@ -43,8 +43,9 @@ Two halves, deliberately separated:
   api/               Cloudflare Worker (Hono) + D1 migrations
   admin/             steward queue: plain HTML, CSS and JS, no build step; served at /admin/ behind Cloudflare Access
   apps/
-    ios/             SwiftUI, iOS 17+ (Sources/DetroitQuery: the Swift query library, tested; HelpApp/: SwiftUI screens, not compiled yet)
-    web/             PWA — same bundle, read-only + reporting (also our Android answer)
+    ios/             SwiftUI, iOS 17+ (Sources/DetroitQuery: the Swift query library, tested; HelpApp/: the screens, which compile and run in the simulator since 2026-09-20; HelpAppTests/: 28 app tests)
+    web/             PWA — same bundle, read-only + reporting (still our Android answer)
+    android/         Kotlin, platform Views, no dependencies (query/: a third copy of the shared rules; app/: the screens). Written 2026-09-20 and NEVER COMPILED — no JDK or Android SDK here
   strings/           en.json, es.json — every word the app shows
   docs/              these design docs
   schema/            query-spec.md + fixtures/ (JSON in, expected answer out)
@@ -108,12 +109,14 @@ Not built: a resource editor (stewards edit `data/seed/` in git), an alert compo
 
 ### iOS (SwiftUI, iOS 17+)
 - Kyle's home stack. Bundle loader → plain Codable cache → on-device query layer → views. The query layer is `DetroitQuery` (Swift, `apps/ios/Sources/DetroitQuery`): open-now, next times, badges, ranking, search and greenway distances, tested against the same `schema/fixtures` as the web.
-- No map on iPhone yet; list-first. The SwiftUI screens have not been compiled yet (they need a Mac).
+- No map on iPhone yet; list-first. The SwiftUI screens compile and run in the simulator (first built 2026-09-20; see `apps/ios/README.md`), reading the signed bundle offline. Reports with an offline outbox, saved places and an About/privacy screen with a key reset are built; the street map, neighborhood pages, transit, add-a-place and photos are not. The origin and the two pinned keys are **build settings**, and a Release build refuses to start until they are real.
 - Local notifications only.
 - Ships as Kyle Peterson / Linwood Technologies.
 
-### Android — the web app
-The Android answer is the PWA (`apps/web`): same bundle, installable, reporting works, reaches every Android phone. Missing: reliable background fetch; local notifications are limited. A native app (Kotlin + Jetpack Compose) comes later only if the PWA falls short. KMP / Flutter / React Native are not worth a new stack for two thin read-mostly clients over a static bundle.
+### Android — the web app today, a Kotlin client written but never compiled
+The Android answer **is still the PWA** (`apps/web`): same bundle, installable, reporting works, reaches every Android phone. Missing: reliable background fetch; local notifications are limited.
+
+Since 2026-09-20 `apps/android` also holds a native client, written and **never compiled** — this Mac has no JDK, Kotlin, Gradle or Android SDK, and installing them is a download Kyle must OK. It is deliberately not the Compose app this doc used to imagine: platform Views built in code, **no Jetpack Compose, no AndroidX and no dependency of any kind inside the APK**, `minSdk` 24 / `targetSdk` 35. The reader we design for is a cheap old phone, and Compose alone would cost 2–4 MB and work at every start and every frame. The Detroit wall-clock rule and Ed25519 verification are written out by hand (checked against the JVM's tz database and RFC 8032's vectors) because `java.time` needs API 26 and platform Ed25519 needs API 33. KMP / Flutter / React Native are still not worth a new stack. See `apps/android/README.md` for what is verified and what is not.
 
 ### Web (PWA)
 - Vanilla TypeScript. **Map:** our own street map, drawn on a canvas from the signed bundle (`apps/web/src/map.ts`): no tile server, no map library, works offline. Must work with the map failing: every map screen also lists the same places and cross streets as text.
@@ -125,7 +128,7 @@ The Android answer is the PWA (`apps/web`): same bundle, installable, reporting 
 
 ## Shared query semantics (one spec, two implementations)
 
-Keep a single `schema/query-spec.md` + fixture tests (JSON in, expected ranking out) so the web app (`packages/query`, TypeScript) and the iPhone app (`DetroitQuery`, Swift) agree on: open-now evaluation across DST, "next 3 occurrences," distance banding (0–1 mi, 1–3, 3+), sort by freshness tier, and the rule that reported-closed rows stay listed but go last in their band. The fixtures came first, then the clients.
+Keep a single `schema/query-spec.md` + fixture tests (JSON in, expected ranking out) so the web app (`packages/query`, TypeScript), the iPhone app (`DetroitQuery`, Swift) and, since 2026-09-20, the Android app (`apps/android/query`, Kotlin) — three implementations — agree on: open-now evaluation across DST, "next 3 occurrences," distance banding (0–1 mi, 1–3, 3+), sort by freshness tier, and the rule that reported-closed rows stay listed but go last in their band. The fixtures came first, then the clients.
 
 ## Hosting & cost
 
