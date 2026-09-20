@@ -5,8 +5,8 @@ Contact: kyle@linwoodtechnologies.com
 The code is licensed under the Apache License, Version 2.0 (LICENSE). The dataset
 under data/hsds is licensed CC BY 4.0. Source data keeps its own terms.
 
-Not an official City of Detroit app. Every listing in the app names its own source
-and the date it was checked; this file credits everyone together. Thank you.
+Every listing in the app names its own source and the date it was checked; this file
+credits everyone together. Thank you.
 
 
 WHERE THE LISTINGS COME FROM
@@ -15,26 +15,44 @@ Food banks, and the pantries, meal sites and mobile stops they supply:
   Gleaners Community Food Bank of Southeast Michigan (PantryNet location data)
   Forgotten Harvest (find-food pages)
 
+Drug and alcohol treatment programs were found on:
+  SAMHSA, National Directory of Drug and Alcohol Use Treatment Facilities (public domain)
+  SAMHSA, Opioid Treatment Program Directory (public domain)
+  Detroit Wayne Integrated Health Network, provider directory
+  Each listing's own facts come from the program's own website, named on the listing.
+
 Public lists (City of Detroit open data, data.detroitmi.gov):
   Detroit Health Department: harm reduction stations
   Detroit Parks and Recreation: recreation centers
 
 Organizations whose own websites supplied their listings:
   ACCESS
+  Accounting Aid Society
   Advantage Health Centers
+  All About Animals Rescue
+  All Saints Literacy Center
   American Indian Health and Family Services
   Auntie Na's Village
+  Avalon Healing Center
   Bethany Lutheran Church
   Brightmoor Artisans Collective
   Brightmoor Connection Food Pantry
   Brilliant Detroit
+  Bureau of Services for Blind Persons
   Capuchin Soup Kitchen
   Cass Community Social Services
   Catholic Charities of Southeast Michigan
+  Centers for Family Development
+  Central City Health
+  Changing Lives and Staying Sober (CLASS)
   CHASS Center
   City Covenant Church
   City of Dearborn
+  City of Dearborn Assessing
+  City of Detroit
   City of Detroit Housing and Revitalization Department
+  City of Detroit Office of Eviction Defense
+  City of Detroit Office of the Assessor
   City of Detroit, Tindal Recreation Center
   Covenant Community Care
   Covenant House Michigan
@@ -42,56 +60,103 @@ Organizations whose own websites supplied their listings:
   Dearborn Department of Public Health
   Dearborn First United Methodist Church
   Dearborn Public Library
+  Dearborn Public Schools Adult and Community Education
   Deo Gratias Ministries Detroit
   Detroit Area Agency on Aging
   Detroit Association of Black Organizations
+  Detroit at Work
   Detroit Community Fridge
   Detroit Community Health Connection
   Detroit Friendship House
   Detroit Health Department
+  Detroit Hispanic Development Corporation
+  Detroit Housing Commission
+  Detroit Land Bank Authority
   Detroit Northwest Seventh-day Adventist Church
   Detroit Parks and Recreation
+  Detroit Police Department
   Detroit Public Library
+  Detroit Public Schools Community District
+  Detroit Recovery Project
   Detroit Rescue Mission Ministries
   Detroit Water and Sewerage Department
   Detroit Wayne Integrated Health Network
+  Dominican Literacy Center
   DTE Energy
   Ebenezer Community and Cultural Center
+  Elmhurst Home
+  Enter-Great 313
   Equity Alliance of Michigan
   Exodus Food Pantry
   First Step
+  Focus Program Inc
   Focus: HOPE
   Franklin Wright Settlements
+  Freedom House Detroit
+  Friends for Animals of Metro Detroit
   Gesu Catholic Church
+  Goodwill of Greater Detroit
+  The Greening of Detroit
   Hamtramck Public Library
+  The Heat and Warmth Fund (THAW)
   Henry Ford Health
   Historic Little Rock Missionary Baptist Church
   HUDA Clinic
+  Human-I-T
   Institute for Population Health
+  International Institute of Metropolitan Detroit
   Iroquois Avenue Christ Lutheran Church
   Islamic Center of Detroit
+  Lakeshore Legal Aid
+  Latin Americans for Social and Economic Development (LA SED)
   Leaders Advancing and Helping Communities
   LifeBUILDERS Detroit
   Loaves and Fishes Southwest Detroit
+  Mariners Inn
   Matrix Human Services
+  Mercy Education Project
   Metropolitan United Methodist Church
+  Michigan Anti-Cruelty Society
+  Michigan Department of Health and Human Services
+  Michigan Immigrant Rights Center
+  Michigan Legal Help
+  Michigan Legal Services
+  Michigan Regional Council of Carpenters and Millwrights
+  MiSide
   Most Holy Trinity Parish
+  Nation Outside
+  National Association of Yemeni Americans (NAYA)
   National Domestic Violence Hotline
   National Runaway Safeline
   Nativity of Our Lord Church
+  NCADD Detroit
+  Neighborhood Legal Services Michigan
+  New Light Recovery Center
   New Prospect Missionary Baptist Church
   New Providence Baptist Church
   NOAH at Central
+  NOAH Project
   Northwest Church of Christ
   Peace Lutheran Church
+  Per Scholas
   Perfecting Community Development Corporation
   Perry Outreach Center
   Pilgrim Baptist Church
   Pope Francis Center
+  ProsperUs Detroit
+  Quality Behavioral Health
   Racquet Up Detroit
+  Rainbow Center of Michigan
   Ruth Ellis Center
+  The Salvation Army
   SAY Detroit
   Scott Memorial United Methodist Church
+  Self-Help Addiction Rehabilitation (SHAR)
+  SEMCA Michigan Works!
+  The Senior Alliance
+  Services To Enhance Potential (STEP)
+  Siena Literacy Center
+  Sobriety House
   SS. Peter and Paul Parish, Westside Detroit
   St. Christine Christian Services
   St. Frances Cabrini Clinic
@@ -101,13 +166,18 @@ Organizations whose own websites supplied their listings:
   St. Raymond-Our Lady of Good Counsel Parish
   St. Suzanne Cody Rouge Community Resource Center
   Straight Gate International Church
-  The Heat and Warmth Fund (THAW)
-  The Wellness Plan Medical Centers
+  Team East Clinic
+  Team Wellness Center
   Trinity Health Primary Care - Detroit
   Triumph Church
   Twelfth Street Food Pantry
+  U.S. Department of Veterans Affairs
+  United Children and Family Head Start
+  University of Detroit Mercy School of Dentistry
+  Wayne County Community College District
   Wayne County Healthy Communities
   Wayne Metropolitan Community Action Agency
+  The Wellness Plan Medical Centers
   Wellspring
   Western Wayne Family Health Centers
   Westminster Church of Detroit

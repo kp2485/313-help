@@ -16,7 +16,8 @@ async function geocode(line: string): Promise<{ lat: number; lon: number; zip?: 
 const rows = readResources();
 for (const r of rows) {
   if (!r.address_1 || (r.lat && r.lon) || r.category === 'shelter.dv') continue;
-  const street = r.address_1.replace(/,?\s*(suite|ste|unit|#)\s*[\w-]+$/i, '');
+  // "Suite 100", "Ste. 4-450", "Suite G 7", "#2": the Census geocoder matches the building, not the unit.
+  const street = r.address_1.replace(/,?\s*(suite|ste\.?|unit|#)\s*[\w-]+(\s+\w{1,3})?$/i, '');
   const hit = await geocode(`${street}, ${r.city || 'Detroit'}, MI ${r.zip ?? ''}`);
   if (!hit) { console.warn(`no match: ${r.sal_id} (${r.address_1})`); continue; }
   if (!inBbox(hit.lat, hit.lon)) { console.warn(`outside the service area, ignored: ${r.sal_id}`); continue; }

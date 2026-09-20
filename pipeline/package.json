@@ -19,7 +19,8 @@
     "ingest:neighborhoods": "tsx src/ingest-neighborhoods.ts",
     "ingest:basemap": "tsx src/ingest-basemap.ts",
     "alert:new": "tsx src/alert-new.ts",
-    "import:lines": "tsx src/import-lines.ts"
+    "import:lines": "tsx src/import-lines.ts",
+    "ingest:treatment": "tsx src/ingest-treatment.ts"
   },
   "dependencies": {
     "@313help/query": "workspace:*",

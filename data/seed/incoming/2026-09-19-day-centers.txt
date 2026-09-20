@@ -1,0 +1,6 @@
+# Day centers ("I need somewhere to go during the day"), 2026-09-19. Both places were already listed for meals; these
+# are their day-center services, read on each organization's own page on 2026-09-19 (research:
+# docs/research/2026-09-19-new-help/clothing-dropin-phones.md). Pope Francis Center: "Service Hours: Monday-Saturday,
+# 7am-11am"; "We do not require identification". NOAH: mail and casework; its page prints no hours, so call first.
+Pope Francis Center day center | Pope Francis Center | shelter.day | A place to be in the morning. Showers, laundry, restrooms, mail, phone and internet. No ID needed. | 438 Saint Antoine St | Detroit | 48226 | 313-964-2823 | https://popefranciscenter.org | Mon-Sat 7am-11am | Anyone. No ID, paperwork or screening needed. | https://popefranciscenter.org/our-work/day-center/ | flags=walk_in,no_id_required
+NOAH mail and drop-in help | NOAH Project | shelter.day | Use NOAH as your mailing address. Drop-in help getting an ID or birth certificate, and signing up for SNAP or Medicaid. | 23 E Adams Ave | Detroit | 48226 | 313-965-5422 | https://noahatcentral.org | not stated | For people without housing. | https://noahatcentral.org/what-we-do/casework/ | flags=walk_in
