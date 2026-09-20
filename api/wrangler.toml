@@ -20,7 +20,7 @@ invocation_logs = false
 [[d1_databases]]
 binding = "DB"
 database_name = "313-help"
-database_id = "00000000-0000-0000-0000-000000000000"   # replace with the id from `wrangler d1 create 313-help`
+database_id = "ab7b665d-e4ef-423b-ba77-fcb355cdf222"
 migrations_dir = "migrations"
 
 # Photos on condition reports (docs/11): a PRIVATE bucket. No public access, no custom domain, ever.
