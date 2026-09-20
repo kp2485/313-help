@@ -59,11 +59,54 @@ class BundleStore(context: Context) {
 
     /** Reads what is already on the phone, then refreshes. Never blocks the first screen on the network. */
     fun start() {
+        if (!BuildConfig.IS_RELEASE) {
+            val launched = System.nanoTime()
+            Trace.sink = { label, ms ->
+                android.util.Log.i("Help313Timing", "$label ${ms} ms (at +${(System.nanoTime() - launched) / 1_000_000L} ms)")
+            }
+        }
         worker.execute {
-            val local = runCatching { load { name -> File(cacheDir, name).readBytes() } }.getOrNull()
-            val loaded = local ?: runCatching { load { name -> readAsset("bundle-snapshot/$name") } }.getOrNull()
-            publish(loaded, failed = loaded == null)
+            Trace.time("start.total") {
+                val local = runCatching { Trace.time("start.cached") { load { name -> File(cacheDir, name).readBytes() } } }.getOrNull()
+                val loaded = local
+                    ?: runCatching { Trace.time("start.snapshot") { load { name -> readAsset("bundle-snapshot/$name") } } }.getOrNull()
+                publish(loaded, failed = loaded == null)
+            }
+            if (!BuildConfig.IS_RELEASE) timeBothVerifyPaths()
             refresh()
+        }
+    }
+
+    /**
+     * Debug builds only, and only after the screen already has its list, so it delays nothing: how long one
+     * signature check takes on *this* device, both ways, and which Ed25519 services the device actually has.
+     *
+     * This is the tool for the question that is still open — "is it fast enough on a 2016 handset?". Plug the
+     * phone in, install a debug build (`-PdebugLikeRelease=true`, or the numbers are meaningless: see
+     * app/build.gradle.kts), and read `Help313Timing ed25519.software_path` out of logcat.
+     *
+     * It also prints the providers, because that is how the surprise of 2026-09-20 was found: an API 35 image has
+     * Ed25519 only in AndroidKeyStore and AndroidKeyStoreBCWorkaround, both of which serve hardware-held keys and
+     * neither of which will load a public key from bytes. So `ed25519.platform_available` is 0 even on Android 15,
+     * the software path is what runs, and it is the only thing worth optimising.
+     */
+    private fun timeBothVerifyPaths() {
+        try {
+            val index = readAsset("bundle-snapshot/index.json")
+            val sigJson = Json.parse(String(readAsset("bundle-snapshot/index.json.sig"), Charsets.UTF_8))
+            val signature = BundleCheck.base64(sigJson["signature"]?.str ?: "") ?: return
+            val key = pinned.firstNotNullOfOrNull { pin ->
+                BundleCheck.base64(pin)?.let { Ed25519.rawKeyFromSpkiDer(it) }
+            } ?: return
+            for (p in java.security.Security.getProviders()) {
+                val ed = p.services.filter { it.algorithm.contains("25519", true) }.map { "${it.type}/${it.algorithm}" }
+                if (ed.isNotEmpty()) android.util.Log.i("Help313Timing", "provider ${p.name} has $ed")
+            }
+            val platform = Trace.time("ed25519.platform_path") { Ed25519.platformVerify(key, signature, index) }
+            Trace.say("ed25519.platform_available", if (platform == null) 0 else 1)
+            Trace.time("ed25519.software_path") { Ed25519.softwareVerify(key, signature, index) }
+        } catch (_: Exception) {
+            // A measurement is never allowed to matter.
         }
     }
 
@@ -147,11 +190,20 @@ class BundleStore(context: Context) {
         var segments: List<Segment> = emptyList()
         var events: List<CityEvent> = emptyList()
 
+        var readMs = 0L
+        var shaMs = 0L
+        var parseMs = 0L
         for ((name, meta) in index.files) {
             if (!BundleCheck.loadedNow(name)) continue
+            var t = System.nanoTime()
             val data = read(name)
+            readMs += (System.nanoTime() - t) / 1_000_000L
+            t = System.nanoTime()
             if (BundleCheck.sha256Hex(data) != meta.sha256) throw BundleError.BadChecksum(name)
+            shaMs += (System.nanoTime() - t) / 1_000_000L
+            t = System.nanoTime()
             val j = Json.parse(String(data, Charsets.UTF_8))
+            parseMs += (System.nanoTime() - t) / 1_000_000L
             when {
                 name.startsWith("category/") -> j.arr.forEach { rows.add(BundleRow.fromJson(it)) }
                 name == "alerts.json" -> alerts = j.arr.map { Alert.fromJson(it) }
@@ -176,6 +228,9 @@ class BundleStore(context: Context) {
                 }
             }
         }
+        Trace.say("load.read_files", readMs)
+        Trace.say("load.sha256_files", shaMs)
+        Trace.say("load.json_parse", parseMs)
         return LoadedBundle(index, rows, alerts, emergency, archived, segments, events)
     }
 }

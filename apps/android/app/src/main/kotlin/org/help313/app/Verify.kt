@@ -74,10 +74,12 @@ object BundleCheck {
         if (sigJson["alg"]?.str != null && sigJson["alg"]?.str != "Ed25519") throw BundleError.BadSignature
         val signature = base64(sigJson["signature"]?.str ?: "") ?: throw BundleError.BadSignature
 
-        val ok = pinnedSpkiBase64.any { pin ->
-            val der = base64(pin) ?: return@any false
-            val raw = Ed25519.rawKeyFromSpkiDer(der) ?: return@any false
-            Ed25519.verify(raw, signature, indexBytes)
+        val ok = Trace.time("verify.signature") {
+            pinnedSpkiBase64.any { pin ->
+                val der = base64(pin) ?: return@any false
+                val raw = Ed25519.rawKeyFromSpkiDer(der) ?: return@any false
+                Ed25519.verify(raw, signature, indexBytes)
+            }
         }
         if (!ok) throw BundleError.BadSignature
         return try {

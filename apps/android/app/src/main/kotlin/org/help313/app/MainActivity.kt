@@ -72,7 +72,7 @@ class MainActivity : Activity() {
         store.onChange = { render() }
         store.start()
 
-        go { Screens.home(this) }
+        Trace.time("ui.first_render") { go { Screens.home(this) } }
     }
 
     /**

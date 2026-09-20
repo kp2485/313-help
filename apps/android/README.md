@@ -7,7 +7,7 @@ Three Gradle modules:
   Plain Kotlin/JVM with **no dependencies at all**, so it runs in a unit test on a laptop and compiles unchanged
   into the app. **Compiled and green.**
 - **`core/`** — no sources of its own. It compiles the app's *android-free* files (`Ed25519.kt`, `Verify.kt`,
-  `Listing.kt`, `Needs.kt`, `ReportModel.kt`, `SavedRules.kt`) and runs the app's own unit tests against them on
+  `Trace.kt`, `Listing.kt`, `Needs.kt`, `ReportModel.kt`, `SavedRules.kt`) and runs the app's own unit tests against them on
   a plain JVM, so the signature check, the daily report hash and the needs list are checked on every build
   whether or not anyone has an Android SDK. **Compiled and green.**
 - **`app/`** — the screens, the signed-bundle loader and the report queue. Platform Android views (no Jetpack
@@ -29,7 +29,7 @@ Three Gradle modules:
 > listing detail, Urgent help and Home in Arabic, all screenshotted. Five real errors were found and fixed; they
 > are listed under "What the first compile found", and two of them would have broken the app on every phone
 > below Android 15. Totals now:
-> **8 + 30 + 30 JUnit tests and 111 fixture cases, 0 failures.**
+> **8 + 32 + 32 JUnit tests and 111 fixture cases, 0 failures.**
 
 ## What Kyle has to do next
 
@@ -50,13 +50,13 @@ Everything in this section was run on 2026-09-20 and passed, the `:app` lines in
 ```sh
 ./gradlew :query:test             # 8 tests: every case in schema/fixtures, plus tz, phone and JSON checks
 ./gradlew :query:runFixtures      # the same 111 cases with no test framework on the classpath
-./gradlew :core:test              # 30 tests: Ed25519 vs RFC 8032, the real bundle's signature, the report
+./gradlew :core:test              # 32 tests: Ed25519 vs RFC 8032, the real bundle's signature, the report
                                   # hash and schema, what cannot be saved, and the needs parity test
 ./gradlew test                    # all of the above at once
 ```
 
 `:core:test` checks the real signed bundle when there is one, so build it from the repository root first;
-without one that single assertion prints "no bundle built ... skipping" and the other 29 tests still run:
+without one those two assertions print "no bundle built ... skipping" and the other 30 tests still run:
 
 ```sh
 pnpm build:bundle                 # a store build uses pnpm build:bundle:release
@@ -65,11 +65,21 @@ pnpm build:bundle                 # a store build uses pnpm build:bundle:release
 The `:app` half needs the SDK, and all of these were run on 2026-09-20:
 
 ```sh
-./gradlew :app:testDebugUnitTest  # the same VerifyTest and ParityTest: 30 tests, 0 failures
+./gradlew :app:testDebugUnitTest  # the same VerifyTest and ParityTest: 32 tests, 0 failures
 ./gradlew :app:assembleDebug      # the APK — the app packages a bundle snapshot, so build:bundle first
 ./gradlew :app:lintDebug          # 0 errors, 7 warnings (listed under "What the first compile found")
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
+
+**Never time a start-up on a plain `assembleDebug`.** A debuggable APK is not compiled ahead of time by ART and
+not given the baseline profile, so it can be ten times slower than the thing that ships. Use:
+
+```sh
+./gradlew :app:assembleDebug -PdebugLikeRelease=true   # same code, not debuggable, profile packaged
+adb logcat -s Help313Timing                            # the phases of a cold start, debug builds only
+```
+
+See "Cold start" below for what those numbers were and what they mean.
 
 Without an SDK, `:app` is not in the build at all: `settings.gradle.kts` prints one plain line saying so, and
 `./gradlew :app:anything` fails with "project ':app' not found", which is the truth rather than a confusing
@@ -268,11 +278,116 @@ The app refuses any list not signed by a key it pins.
   These are **public** keys, the same values as the web app's `BUNDLE_PUBLIC_KEYS`. The check is a port of
   `apps/web/src/keys.ts`. No private key is read, written or invented anywhere in `apps/android`.
 
+## Cold start, and where the twenty seconds went
+
+On 2026-09-20 the first run of the app on the emulator waited about twenty seconds before any listing appeared,
+and the suspicion was the hand-written `BigInteger` Ed25519 verification. It was measured before anything was
+changed, with `Trace.kt` and `adb logcat -s Help313Timing`, and the answer was only partly that.
+
+**Where the time went.** One cold start, API 35 arm64 emulator on an Apple-silicon Mac, plain `assembleDebug`:
+
+| phase | ms |
+| --- | --- |
+| first screen drawn (`ui.first_render`) | 33 |
+| **Ed25519 signature on `index.json`** | **3,949** |
+| reading the 20 bundle files from the APK | 12 |
+| SHA-256 of all 742 KB of them | 1 |
+| parsing that JSON | 935 |
+| everything, to the first listing | 5,193 |
+
+So: the signature really was the single biggest item, the checksums cost nothing, and JSON parsing was second.
+Verification already ran off the main thread, once, over `index.json` only — every other file is checked by
+SHA-256 against that signed index, which is right and was left alone.
+
+But the 3,949 ms was not mostly arithmetic. The same code, in the same emulator, took **4,436 ms the first time
+it ran in a process and 94 ms the second time**. A cold start runs each of those methods exactly once, so ART's
+JIT never gets a second chance and the whole verification is interpreted — and **ART never compiles a debuggable
+app ahead of time at all**. `adb shell pm compile -m speed -f` changes nothing, because the debuggable flag is
+the cause. Built non-debuggable, the *unchanged* code fell from 4,436 ms to **332 ms**.
+
+That is the bulk of the twenty seconds: an interpreted signature check and an interpreted JSON reader in a build
+that can never be compiled. No release build is debuggable, so most of what was being measured does not ship.
+
+**What was changed.**
+
+1. **The screen never waits for the signature.** Home used to return early with nothing but a loading line while
+   the bundle was checked. It now shows **Urgent help** first — 911 and 988 are hardcoded and need no bundle —
+   and the loading line under it, and *no listing at all* until the signature has passed. Checked on the
+   emulator: while the check is running the screen reads "313 Help / What do you need today? / Urgent help /
+   Getting the list…", and the listings appear only afterwards.
+2. **A baseline profile** (`app/src/main/baseline-prof.txt`) naming the verification methods and the JSON reader,
+   so ART compiles them at install time instead of interpreting them once. No dependency, no plugin, supported
+   from Android 7.0, and it cannot change behaviour — a line ART does not understand is ignored. AGP packages it
+   into the release APK (and into `-PdebugLikeRelease=true`), never into a debuggable one.
+3. **Faster verification, same checks.** `Ed25519.kt` was rewritten: reduction mod p by hand instead of
+   `BigInteger.mod` (p is 2^255 − 19, so a fold beats a long division), a dedicated doubling formula instead of
+   adding a point to itself with the general one, and Shamir's trick so [s]B − [h]A shares its doublings instead
+   of being two scalar multiplications. The coordinates were already projective with no inversion in the point
+   arithmetic. Measured warm, best of twelve, in one process on the emulator: **38 ms → 24 ms**; on the JVM,
+   5.6 ms → 3.3 ms. About 1.7×, which is what the operation count predicts (roughly 6,800 field multiplications
+   down to 3,700) — a real gain, and much smaller than the interpreter effect above.
+4. **The platform's Ed25519 is used when there is one** — and there is not one. `Ed25519.verify` now asks every
+   installed provider, and on an API 35 image the only Ed25519 services are in `AndroidKeyStore` and
+   `AndroidKeyStoreBCWorkaround`, which serve hardware-held keys and will not load a public key from bytes.
+   `KeyFactory.getInstance("Ed25519")` returns `AndroidKeyStore` and then throws, which is why the first attempt
+   at this silently never ran. So the software path is what runs on every Android, API 33 or not. The platform
+   path stays, because it costs one lookup and will light up by itself on a device whose provider does support
+   it, and because a "yes" from it is the only thing it is allowed to decide: anything else falls through to the
+   software path, so a missing or odd provider can never refuse a good bundle or accept what API 24 would not.
+   `VerifyTest` puts the RFC 8032 vectors, four one-bit signature corruptions, an out-of-range scalar, a key that
+   is not on the curve and a changed message through **both** paths and asserts they never disagree.
+
+**Before and after, same emulator.** Times to the first listing, and the signature check inside them:
+
+| build | signature | to first listing | first paint |
+| --- | --- | --- | --- |
+| before, `assembleDebug` | 3.9–5.2 s | 5.2–7.5 s | 33 ms (loading line only) |
+| after, `assembleDebug` | 4.3–4.9 s | 6.7–7.6 s | 26–46 ms (**Urgent help**) |
+| after, `-PdebugLikeRelease=true` | **0.27–1.06 s** | 2.8–5.8 s | 13–101 ms (**Urgent help**) |
+
+Two honest notes about that table. A debuggable build barely improves, because it is interpreter-bound and the
+arithmetic hardly matters there; the row that resembles what ships is the third. And this emulator is noisy — the
+same build varied from 268 ms to 1,060 ms across five cold starts, and its GPU takes over a second to draw a
+frame — so the cold-start columns are ranges, not measurements, and the clean comparison is the warm, best-of-N
+one in point 3.
+
+**What is now the slowest part: JSON.** With the signature down, reading 742 KB of bundle JSON with the
+hand-written reader in `packages/query`'s Kotlin twin is the largest item left, 0.8–4.0 s on this emulator. That
+is the next thing to look at, and it is not a signature question.
+
+**Verifying once per bundle version was considered and not done.** The idea: after a bundle passes, remember its
+index hash in app-private storage, and on later cold starts re-hash the index and skip the signature check when
+it has not changed. It was rejected on two grounds.
+
+*It would weaken the check.* The argument for it is that anyone who can write app-private storage can already
+replace the app's data — but that is not true of this app as it stands. The copy in `filesDir` is re-verified
+against a pinned key every time it is read, so a forged `index.json` written there is refused today; with a
+remembered hash, the forger writes the hash too and it is accepted. That is a real defence, and CLAUDE.md's rule
+is that a client refuses a mis-signed bundle, not that it refuses one the first time. (The narrower version —
+remembering only the snapshot inside the APK, whose bytes are already covered by the APK signature — would
+weaken nothing, because forging the memo would only skip a check on bytes that are authenticated anyway.)
+
+*And it is not worth it.* Even that safe narrow version now saves a few hundred milliseconds out of a path that
+is dominated by JSON parsing, behind a screen that is usable in 20 ms and already shows 911 and 988. Buying that
+with a cache whose safety every future reader has to re-derive is a bad trade. The measurement pointed at the
+baseline profile and the JSON reader instead, and neither of those touches the signature at all.
+
+**Still open: a real, cheap phone.** Every number here is from an emulator on an Apple-silicon Mac, which is far
+faster than the phones this app is for — a 2016 handset is plausibly five to ten times slower, which would put
+one software verification in the region of a second or two rather than a few hundred milliseconds. That is a
+guess, not a measurement. It is off the main thread and behind a screen that already works, so the guess being
+wrong is survivable, but the number has to come from a real device before a release. `BundleStore` prints
+`ed25519.software_path` on every debug start for exactly that: install `-PdebugLikeRelease=true` on the phone and
+read logcat. `VerifyTest.oneSoftwareVerificationIsWellUnderASecond` holds the JVM to a 1-second budget so that a
+future rewrite of the field arithmetic cannot quietly put this back.
+
 ## What has actually been verified
 
 Compiled and run on 2026-09-20, on JDK 17 (Homebrew `openjdk@17` 17.0.20.1) and Gradle 8.11.1 through the
-committed wrapper, with the Android SDK added later the same day. **68 JUnit test runs (8 in :query, 30 in
-:core, and the same 30 again under :app against the real Android classes) and 111 fixture cases, 0 failures.**
+committed wrapper, with the Android SDK added later the same day. **72 JUnit test runs (8 in :query, 32 in
+:core, and the same 32 again under :app against the real Android classes) and 111 fixture cases, 0 failures.**
+Re-run on 2026-09-20 after the cold-start work, with two tests added: the two verification paths never disagree,
+and one software verification stays inside a one-second budget.
 
 `./gradlew :query:test` — 8 tests:
 
@@ -285,10 +400,15 @@ committed wrapper, with the Android SDK added later the same day. **68 JUnit tes
 - Calendar arithmetic round-tripped at 1,103 dates spread over 40,800 days, `tel:` links with and without
   extensions, and the JSON reader on the shapes the bundle uses.
 
-`./gradlew :core:test` — 30 tests, against `:app`'s own source files:
+`./gradlew :core:test` — 32 tests, against `:app`'s own source files:
 
 - `Ed25519.verify` against the RFC 8032 section 7.1 vectors (**3 of 3**), against tampered signatures, tampered
-  messages and the wrong key (**all refused**), and against malformed input (**false, never a throw**).
+  messages and the wrong key (**all refused**), and against malformed input (**false, never a throw**). Every one
+  of those goes through the software path explicitly as well as through `verify`, and ten cases — the vectors,
+  four one-bit signature corruptions, `s` equal to the group order, a key that is not on the curve and a changed
+  message — through the platform path too, asserting the two **never disagree**.
+- One software verification of the real signature finishes well inside a second (2 ms on the JVM the tests run
+  on; the budget is 1,000 ms, so a slow rewrite of the field arithmetic fails the build).
 - The real `data/bundle/v1/index.json.sig` **verifies**, a changed index is **refused**, a build that pins no
   key **accepts nothing**, and every file the index lists matches its sha256 under the app's own hashing.
 - The one-day report hash: same phone, same listing, same Detroit day gives one hash; another day, another
@@ -416,11 +536,13 @@ Not built:
 6. `MainActivity.onBackPressed` is the deprecated form. It still works at `targetSdk` 35 — it was used on the
    emulator and worked — but it should move to `OnBackInvokedCallback` before a store release. It is the only
    warning the Kotlin compiler emits.
-7. **Cold start is slow.** On the emulator the first screen waited about 20 seconds for the bundle signature:
-   `Ed25519.kt` is `BigInteger` arithmetic and an emulated arm64 is slow, so this number means little on its own,
-   but it has to be measured on a real cheap phone — which is the phone this app is for — before a release. If it
-   is bad there, the fix is to show the packaged snapshot first and verify in the background, not to weaken the
-   check.
+7. **Cold start, mostly fixed, but never measured on an old phone.** The twenty-second wait of 2026-09-20 was
+   found and dealt with — see "Cold start, and where the twenty seconds went" for the measurements, what changed
+   and why the verify-once-per-version cache was rejected. What is *not* done: every number is from an emulator
+   on an Apple-silicon Mac, and a 2016 phone is plausibly five to ten times slower. One software Ed25519
+   verification has to be timed on a real cheap phone before a release (`-PdebugLikeRelease=true`, then
+   `adb logcat -s Help313Timing`). Nothing about the check was weakened, and nothing will be: if the number on a
+   real phone is bad, the answer is the JSON reader, which is now the larger half of the wait.
 8. The "Bus directions in the Transit app" button has never been seen in its visible state, because that needs a
    phone with the Transit app on it. Its rule is unit-tested and its hidden state was checked; the tap itself has
    not been. DECISIONS keeps the question of Transit's linking terms **Open**.

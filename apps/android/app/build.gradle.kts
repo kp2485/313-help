@@ -116,6 +116,20 @@ android {
 
     buildTypes {
         debug {
+            // `-PdebugLikeRelease=true` makes the debug build non-debuggable. That one word changes two things
+            // that make every start-up measurement on a debug build meaningless otherwise:
+            //
+            //  - ART never compiles a debuggable app ahead of time and keeps it in the interpreter, so a method a
+            //    cold start runs exactly once is interpreted from beginning to end. Measured on the emulator on
+            //    2026-09-20: one Ed25519 signature check cost 4,436 ms debuggable and 332 ms not — thirteen times,
+            //    from the same bytecode. `pm compile -m speed -f` does nothing about it; the flag is the cause.
+            //  - AGP leaves the ART baseline profile (src/main/baseline-prof.txt) out of a debuggable APK, so the
+            //    profile that the release build ships and relies on is not even in the file being measured.
+            //
+            // Nothing else changes: same code, same keys, same assets, and BuildConfig.DEBUG follows the flag,
+            // which is why the timing logs are gated on IS_RELEASE instead. Use it to time a cold start, and plain
+            // `assembleDebug` to debug.
+            isDebuggable = !(project.findProperty("debugLikeRelease") == "true")
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             val dev = devKeyFromSnapshot()

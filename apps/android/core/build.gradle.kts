@@ -30,6 +30,7 @@ kotlin.sourceSets["test"].kotlin.setSrcDirs(listOf(appTest))
 
 // The android-free files, named one by one so that adding a screen never silently drags android.* in here.
 kotlin.sourceSets["main"].kotlin.include(
+    "org/help313/app/Trace.kt",          // debug-only timing hook (see Trace.kt)
     "org/help313/app/Ed25519.kt",        // RFC 8032 verification
     "org/help313/app/Verify.kt",         // what makes a bundle acceptable
     "org/help313/app/Listing.kt",        // directions, call buttons, points with no address

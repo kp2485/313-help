@@ -36,6 +36,7 @@ class VerifyTest {
     fun rfc8032Vectors() {
         for ((pub, msg, sig) in vectors) {
             assertTrue("vector $pub", Ed25519.verify(hex(pub), hex(sig), hex(msg)))
+            assertTrue("vector $pub, software path", Ed25519.softwareVerify(hex(pub), hex(sig), hex(msg)))
         }
     }
 
@@ -45,13 +46,16 @@ class VerifyTest {
         val badSig = hex(sig).copyOf()
         badSig[0] = (badSig[0].toInt() xor 1).toByte()
         assertFalse(Ed25519.verify(hex(pub), badSig, hex(msg)))
+        assertFalse(Ed25519.softwareVerify(hex(pub), badSig, hex(msg)))
 
         val badMsg = hex(msg).copyOf()
         badMsg[0] = (badMsg[0].toInt() xor 1).toByte()
         assertFalse(Ed25519.verify(hex(pub), hex(sig), badMsg))
+        assertFalse(Ed25519.softwareVerify(hex(pub), hex(sig), badMsg))
 
         val otherKey = hex(vectors[0].first)
         assertFalse(Ed25519.verify(otherKey, hex(sig), hex(msg)))
+        assertFalse(Ed25519.softwareVerify(otherKey, hex(sig), hex(msg)))
     }
 
     @Test
@@ -59,6 +63,81 @@ class VerifyTest {
         assertFalse(Ed25519.verify(ByteArray(0), ByteArray(64), ByteArray(0)))
         assertFalse(Ed25519.verify(ByteArray(32), ByteArray(0), ByteArray(0)))
         assertFalse(Ed25519.verify(ByteArray(32) { 0xff.toByte() }, ByteArray(64) { 0xff.toByte() }, ByteArray(3)))
+        assertFalse(Ed25519.softwareVerify(ByteArray(0), ByteArray(64), ByteArray(0)))
+        assertFalse(Ed25519.softwareVerify(ByteArray(32), ByteArray(0), ByteArray(0)))
+        assertFalse(Ed25519.softwareVerify(ByteArray(32) { 0xff.toByte() }, ByteArray(64) { 0xff.toByte() }, ByteArray(3)))
+    }
+
+    /**
+     * There are two verification paths — the platform's Ed25519 where a device has one, and the RFC 8032 code in
+     * this repository, which is the only one below API 33 — and a bundle must not be acceptable to one and not the
+     * other. Everything the tests can put in front of them goes through both, including a signature that is one
+     * bit short of valid and one whose scalar is out of range.
+     *
+     * Where the platform has no Ed25519 for a public key held as bytes, `platformVerify` returns null and this
+     * test says so rather than pretending to have checked something. On the JDK the tests run on, it does not.
+     */
+    @Test
+    fun theTwoVerificationPathsNeverDisagree() {
+        val cases = ArrayList<Triple<ByteArray, ByteArray, ByteArray>>()
+        for ((pub, msg, sig) in vectors) cases.add(Triple(hex(pub), hex(sig), hex(msg)))
+
+        val (pub, msg, sig) = vectors[2]
+        for (bit in listOf(0, 31, 32, 63)) {
+            val bad = hex(sig).copyOf()
+            bad[bit] = (bad[bit].toInt() xor 1).toByte()
+            cases.add(Triple(hex(pub), bad, hex(msg)))
+        }
+        // s = L exactly, which RFC 8032 puts out of range.
+        val outOfRange = hex(sig).copyOf()
+        val l = hex("edd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010")
+        l.copyInto(outOfRange, 32)
+        cases.add(Triple(hex(pub), outOfRange, hex(msg)))
+        // A key that is not a point on the curve, and a message changed instead of a signature.
+        cases.add(Triple(ByteArray(32) { 0x7f }, hex(sig), hex(msg)))
+        cases.add(Triple(hex(pub), hex(sig), "not the signed message".toByteArray()))
+
+        var platformAnswered = 0
+        for ((key, signature, message) in cases) {
+            val software = Ed25519.softwareVerify(key, signature, message)
+            val platform = Ed25519.platformVerify(key, signature, message)
+            if (platform != null) {
+                platformAnswered++
+                assertEquals("the two paths disagree", software, platform)
+            }
+            // Whatever `verify` picks, it must come out the same as the software path.
+            assertEquals("verify() and softwareVerify() disagree", software, Ed25519.verify(key, signature, message))
+        }
+        println("platform Ed25519 answered $platformAnswered of ${cases.size} cases on this JVM")
+    }
+
+    /**
+     * A budget, not a benchmark. The point is that a rewrite of the field arithmetic cannot quietly put the
+     * twenty-second cold start of 2026-09-20 back: one software verification of the real signature has to stay
+     * well inside a second on an ordinary machine. The real check is still a cold start on a phone, and the number
+     * on a 2016 handset is an open question (apps/android/README.md).
+     */
+    @Test
+    fun oneSoftwareVerificationIsWellUnderASecond() {
+        val dir = File("../../../data/bundle/v1")
+        val index = File(dir, "index.json")
+        val sigFile = File(dir, "index.json.sig")
+        if (!index.isFile || !sigFile.isFile) {
+            println("no bundle built (run `pnpm build:bundle` from the repository root); skipping")
+            return
+        }
+        val sigText = sigFile.readText()
+        val key = Ed25519.rawKeyFromSpkiDer(
+            BundleCheck.base64(Regex("\"public_key\"\\s*:\\s*\"([^\"]+)\"").find(sigText)!!.groupValues[1])!!,
+        )!!
+        val signature = BundleCheck.base64(Regex("\"signature\"\\s*:\\s*\"([^\"]+)\"").find(sigText)!!.groupValues[1])!!
+        val message = index.readBytes()
+
+        val started = System.nanoTime()
+        assertTrue(Ed25519.softwareVerify(key, signature, message))
+        val millis = (System.nanoTime() - started) / 1_000_000
+        println("software Ed25519 verification of the real index: $millis ms (cold, first call in this JVM)")
+        assertTrue("one software verification took $millis ms; the budget is 1000 ms", millis < 1000)
     }
 
     @Test

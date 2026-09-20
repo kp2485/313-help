@@ -25,6 +25,13 @@ object Screens {
 
         noteBar(a, col)
 
+        // Urgent help is reachable from every screen, and 911 and 988 are always the first two. It is added here,
+        // above the "still checking the list" line and before any listing, because 911 and 988 are hardcoded
+        // (audit A5) and need no bundle at all: making a person in trouble wait on a signature check would be the
+        // one delay in this app that could actually hurt someone. Nothing below this line is shown until the
+        // bundle's signature has passed.
+        col.addView(UI.button(a, L.t("strip.more"), topDp = 16) { a.push { urgent(a) } })
+
         if (a.store.bundle == null) {
             col.addView(UI.text(a, if (a.store.loadFailed) L.t("home.no_data") else L.t("home.loading"), 17f, R.color.muted, topDp = 16))
             if (a.store.loadFailed) {
@@ -32,9 +39,6 @@ object Screens {
             }
             return UI.scroller(a, col)
         }
-
-        // Urgent help is reachable from every screen, and 911 and 988 are always the first two.
-        col.addView(UI.button(a, L.t("strip.more"), topDp = 16) { a.push { urgent(a) } })
 
         col.addView(UI.sectionHead(a, L.t("home.help_title")))
         col.addView(UI.text(a, L.t("home.help_sub"), 16f, R.color.muted))
