@@ -30,7 +30,10 @@ export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/')
 
 /** The screen for a URL hash. Anything it doesn't know opens Home, never a half-built screen. */
 export function fromHash(h: string): View {
-  const m = /^#\/(r|c|n|greenway|about|privacy|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
+  // `map` was missing here while the Map tab's own URL is #/map, so a shared or bookmarked map link opened Home
+  // and going back from the Map tab skipped it (found in the accessibility pass, 2026-09-20). `rec` and `transit`
+  // are the tab ids the Map tab replaced: they still parse, and TABS below sends them to Home.
+  const m = /^#\/(r|c|n|greenway|about|privacy|add|parks|help|map|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
   if (!m) return HOME;
   if (m[1] === 'r') return m[2] ? { v: 'detail', id: m[2] } : HOME;
   if (m[1] === 'c') return m[2] && CATEGORIES.some((c) => c.id === m[2]) ? { v: 'list', cat: m[2] } : { v: 'tab', tab: 'help' };

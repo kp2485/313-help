@@ -14,8 +14,9 @@ export interface Need {
   /** A link set shown above even those numbers: today only 313SafeBeds on the shelter screen (Kyle, 2026-09-20). */
   firstLinks?: string;
   /** A choice leads to a list (`query`), to link-outs for programs that are not places (`links`, a key of LINKS in
-   *  links.ts), or to both: the list first, then the links. */
-  refine?: { id: string; query?: Query; links?: string }[];
+   *  links.ts), or to both: the list first, then the links. `first` lets one choice put emergency numbers above its
+   *  list even when the need itself has none: the emergency-room choice leads with 911 (DECISIONS 2026-09-20). */
+  refine?: { id: string; query?: Query; links?: string; first?: string[] }[];
   query?: Query;
   links?: string;
   /** No list at all: 911 and rescue steps only. A bystander must not be sent on an errand (audit A7). */
@@ -55,8 +56,16 @@ export const NEEDS: Need[] = [
     { id: 'week', query: { category: 'food', mode: 'week' } },
     { id: 'paying', links: 'food' },
   ] },
+  // Emergency rooms and urgent care are their own categories, because neither says it is free or low-cost the way
+  // health.clinic does (DECISIONS 2026-09-20). The emergency room comes first and leads with 911; an emergency room
+  // is only ever shown as open all day and night where its own page says so.
   { id: 'doctor', icon: 'health', group: 'soon', refine: [
+    { id: 'er', query: { category: 'health.er' }, first: ['emg_911'] },
+    { id: 'urgent', query: { category: 'health.urgent' } },
     { id: 'doctor', query: { category: 'health.clinic' } },
+    // Detroit Health Department programs: shots, lead tests, WIC and the wellness centers. Their own category,
+    // because they are city programs rather than a clinic that says it is free (coordinator, 2026-09-20).
+    { id: 'dhd', query: { category: 'health.dhd' } },
     { id: 'dentist', query: { category: 'health.dental' }, links: 'dental' },
     { id: 'eyes', query: { category: 'health.vision' } },
   ] },
@@ -95,7 +104,7 @@ export const NEEDS: Need[] = [
   { id: 'pets', icon: 'paw', group: 'later', query: { category: 'pets' }, links: 'pets' },
 ];
 
-/** Browse-by-type chips on the Help tab. Recreation, transit and events have their own tabs. */
+/** Browse-by-type chips on the Help tab. The map and events have their own tabs. */
 export const CATEGORIES: { id: string; icon: string; query: Query }[] = [
   { id: 'food', icon: 'food', query: { category: 'food' } },
   { id: 'shelter', icon: 'bed', query: { category: 'shelter.emergency' } },
@@ -118,11 +127,28 @@ export const CATEGORIES: { id: string; icon: string; query: Query }[] = [
   { id: 'pets', icon: 'paw', query: { category: 'pets' } },
 ];
 
+// One Map tab instead of the old Recreation and Transit tabs (Kyle, 2026-09-20). Everything both tabs offered is
+// still on it: the greenway, parks, recreation centers, bus and streetcar facts, fares and phone numbers.
 export const TABS = [
-  { id: 'home', icon: 'home' }, { id: 'help', icon: 'help' }, { id: 'rec', icon: 'rec' },
-  { id: 'transit', icon: 'transit' }, { id: 'events', icon: 'events' },
+  { id: 'home', icon: 'home' }, { id: 'help', icon: 'help' }, { id: 'map', icon: 'pin' }, { id: 'events', icon: 'events' },
 ] as const;
 export type TabId = (typeof TABS)[number]['id'];
+
+/** One map layer per group of our own listings, derived from the category taxonomy above.
+ *  `tops` are top-level categories (the part before the first dot). Every top-level category a listing can carry
+ *  belongs to exactly one group, except the private ones, which are never drawn (see PRIVATE_TOPS below). */
+export const MAP_GROUPS: { id: string; icon: string; tops: string[] }[] = [
+  { id: 'food', icon: 'food', tops: ['food'] },
+  { id: 'shelter', icon: 'bed', tops: ['shelter'] },
+  { id: 'health', icon: 'health', tops: ['health', 'harm'] },
+  { id: 'rec', icon: 'rec', tops: ['rec'] },
+  { id: 'work', icon: 'work', tops: ['jobs', 'learn'] },
+  { id: 'things', icon: 'shirt', tops: ['goods', 'hygiene', 'kids', 'youth', 'pets', 'connect'] },
+  { id: 'paperwork', icon: 'card', tops: ['housing', 'utilities', 'money', 'legal', 'ids', 'transport'] },
+];
+/** Never a layer, never a dot: treatment and help after sexual assault are private (PRIVATE), and inside the
+ *  groups above a single listing is still dropped when it is sensitive (shelter.dv, health.mental). */
+export const PRIVATE_TOPS = ['treatment', 'assault'];
 
 /** Domestic violence and mental-health crisis listings: no URL, no map dot, no distance, can't be saved (docs/08, 10-A8). */
 export const SENSITIVE = ['shelter.dv', 'health.mental'];

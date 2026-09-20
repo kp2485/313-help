@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createRouter, fromHash, hashFor, type View } from '../src/router.js';
+import { TABS } from '../src/needs.js';
 
 // A browser's session history, enough to drive the router the way a phone does: push, back, forward, reload,
 // and a link that changes only the hash. Popstate comes first, then hashchange if the hash changed.
@@ -81,5 +82,19 @@ describe('links nobody can trust', () => {
     expect(fromHash('#/c/not_a_category')).toEqual(help);
     expect(fromHash('#/c/food')).toEqual({ v: 'list', cat: 'food' });
     for (const h of ['#/nope', '#/r', '#/r/', '#/about/x', '#/help/x', '#/r/<script>', '', '#']) expect(fromHash(h), h).toEqual({ v: 'tab', tab: 'home' });
+  });
+});
+
+describe('every tab can be reached by its own URL', () => {
+  // The Map tab writes #/map; before 2026-09-20 nothing read it back, so a shared map link opened Home.
+  it('a tab URL round-trips', () => {
+    for (const tab of TABS.map((x) => x.id)) {
+      const h = hashFor({ v: 'tab', tab }, () => false, '/');
+      expect(fromHash(h ?? '/')).toEqual({ v: 'tab', tab });
+    }
+  });
+  it('a tab that no longer exists opens Home, never a half-built screen', () => {
+    expect(fromHash('#/transit')).toEqual({ v: 'tab', tab: 'home' });
+    expect(fromHash('#/nonsense')).toEqual({ v: 'tab', tab: 'home' });
   });
 });

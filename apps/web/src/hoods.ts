@@ -13,6 +13,9 @@ type Count = number | 'lt5';
 export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number; fires?: Count }
 /** Today's numbers, not a year's: rental certificates in force, vacant registrations of the past 12 months, street ratings. */
 export interface NowStats { rental_certs?: Count; vacant_reg?: Count; roads?: { pieces: Count; miles?: number; poor_pct?: number } }
+/** "Safe streets" (docs/13): crashes the police wrote up that involved someone walking or biking, over the
+ *  years the panel names. Plain counts, hidden under 5. Never a rate: docs/13 defines no denominator here. */
+export interface CrashCounts { walk: Count; bike: Count; severe: Count }
 export interface Hood {
   id: string; name: string; district: number | null; jlg_study_area?: boolean; center: [number, number]; rings: number[][];
   help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; none_listed_yet: string[]; coverage_checked: boolean };
@@ -21,11 +24,13 @@ export interface Hood {
   parcels?: number;
   years: Record<string, YearStats>;
   now?: NowStats;
+  crashes?: CrashCounts;
 }
 interface Source { name: string; url: string; last_edited: string }
 export interface Indicators {
-  sources: { neighborhoods: Source; sales: Source; permits: Source; blight?: Source; demolitions?: Source; issues?: Source; parcels?: Source; snap?: Source; bus_stops?: Source; rentals?: Source; fires?: Source; pavement?: Source; vacant?: Source };
+  sources: { neighborhoods: Source; sales: Source; permits: Source; blight?: Source; demolitions?: Source; issues?: Source; parcels?: Source; snap?: Source; bus_stops?: Source; rentals?: Source; fires?: Source; pavement?: Source; vacant?: Source; crashes?: Source };
   city_parcels?: number; issue_types?: string[]; fire_types?: string[]; city_now?: NowStats; roads_years?: [number, number]; vacant_period?: [string, string];
+  crash_years?: [number, number]; city_crashes?: CrashCounts; crash_records_from?: string;
   stats_fetched_at: string; first_year: number; partial_year: number;
   near_miles: number; origin: [number, number]; city: Record<string, YearStats>; neighborhoods: Hood[]; segments: Record<string, string[]>;
 }
@@ -76,6 +81,27 @@ function yearsTable(h: Hood, d: Indicators, ui: Ui, o: { value: (y: YearStats) =
       return `<tr><th scope="row">${Number(y) === d.partial_year ? ui.esc(ui.t('hood.so_far', { year: y })) : y}</th><td>${v === undefined ? `<small>${ui.esc(o.missing)}</small>` : `<span class="bar" aria-hidden="true" style="width:${Math.max(3, Math.round((v / max) * 100))}%"></span><span>${ui.esc(o.fmt(v))}</span>`}</td>${o.count ? `<td>${ui.esc(count(o.count(h.years[y] ?? {})))}</td>` : ''}<td>${cv === undefined ? '' : ui.esc(o.fmt(cv))}</td></tr>`; }).join('')}</tbody></table>`;
 }
 
+/**
+ * "Safe streets" (docs/13). Plain counts of crashes over the years the panel names, with the whole-city number
+ * beside each one. No rate (no denominator we can defend), no ranking, no colour that reads as a score, no
+ * comparison with another neighborhood, and nothing about who was at fault: these are counts of crashes on
+ * streets, not a judgement of the people in them. Drawn only when the bundle carries the numbers.
+ */
+export function crashPanel(h: Hood, d: Indicators, ui: Ui): string {
+  if (!d.sources.crashes || !h.crashes || !d.crash_years) return '';
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const num = (n: number) => new Intl.NumberFormat(locale()).format(n);
+  const show = (c: Count | undefined) => (c === undefined ? T('hood.none_recorded') : c === 'lt5' ? T('hood.lt5') : num(c));
+  const city = (c: Count | undefined) => (typeof c === 'number' ? T('hood.crash_city', { count: num(c) }) : '');
+  const line = (label: string, k: keyof CrashCounts) =>
+    `<li><span>${label}</span><span>${show(h.crashes![k])}${city(d.city_crashes?.[k]) ? ` <small>${city(d.city_crashes?.[k])}</small>` : ''}</span></li>`;
+  const [from, to] = d.crash_years;
+  return `<h2>${T('hood.crash_head')}</h2><div class="panel"><p>${T('hood.crash_lede', { from, to })}</p>
+    <ul class="hours">${line(T('hood.crash_walk'), 'walk')}${line(T('hood.crash_bike'), 'bike')}${line(T('hood.crash_severe'), 'severe')}</ul>
+    <p class="foot">${T('hood.crash_note')}</p>
+    <p class="foot">${T('hood.crash_source', { source: d.sources.crashes.name, records: d.crash_records_from ?? '' })}</p></div>`;
+}
+
 export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
   const near = (k: string) => { const mi = h.help.nearest_miles[k]; return `<li><span>${T('hood.nearest.' + k)}</span><span>${mi === null || mi === undefined ? T('hood.nearest_none') : T('miles', { miles: mi.toFixed(1) })}</span></li>`; };
@@ -119,6 +145,8 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
       ${d.sources.vacant ? `${row(T('hood.vacant', { from: ui.date(d.vacant_period?.[0] ?? ''), to: ui.date(d.vacant_period?.[1] ?? '') }), per1000(h.now?.vacant_reg), cityPer1000(d.city_now?.vacant_reg))}<p class="foot">${T('hood.vacant_note')}</p>` : ''}
       ${d.sources.pavement ? `${row(T('hood.roads', { from: d.roads_years?.[0] ?? '', to: d.roads_years?.[1] ?? '' }), roadsValue, cityRoads?.poor_pct !== undefined ? T('hood.city_pct', { pct: cityRoads.poor_pct }) : '')}<p class="foot">${T('hood.roads_note')}</p>` : ''}</div>` : ''}
 
-    <h2>${T('hood.sources_head')}</h2><ul class="srcs">${[d.sources.sales, d.sources.permits, d.sources.rentals, d.sources.blight, d.sources.demolitions, d.sources.issues, d.sources.fires, d.sources.vacant, d.sources.pavement, d.sources.parcels, d.sources.snap, d.sources.bus_stops, d.sources.neighborhoods].filter((x): x is Source => !!x).map(src).join('')}<li>${T('hood.source_ours')}</li></ul>
+    ${crashPanel(h, d, ui)}
+
+    <h2>${T('hood.sources_head')}</h2><ul class="srcs">${[d.sources.sales, d.sources.permits, d.sources.rentals, d.sources.blight, d.sources.demolitions, d.sources.issues, d.sources.fires, d.sources.vacant, d.sources.pavement, d.sources.parcels, d.sources.snap, d.sources.bus_stops, d.sources.crashes, d.sources.neighborhoods].filter((x): x is Source => !!x).map(src).join('')}<li>${T('hood.source_ours')}</li></ul>
     <p class="foot">${T('hood.left_out')}</p></main>`;
 }

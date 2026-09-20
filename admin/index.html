@@ -13,7 +13,10 @@
     <h1>Steward queue</h1>
     <p id="who">313 Help · boring on purpose</p>
   </header>
-  <main id="app" aria-live="polite"><p>Loading…</p></main>
+  <!-- The queue is redrawn whole after every action, so it is not itself a live region: a screen reader would
+       read the entire queue again each time. One small region, made once, says what just happened. -->
+  <p id="say" class="vh" role="status" aria-live="polite"></p>
+  <main id="app"><p>Loading…</p></main>
   <script type="module" src="admin.js"></script>
 </body>
 </html>

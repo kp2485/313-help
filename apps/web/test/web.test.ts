@@ -2,11 +2,12 @@ import { generateKeyPairSync, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { NEEDS, CATEGORIES, HARDCODED, TABS, isPrivate, isSensitive } from '../src/needs.js';
+import { NEEDS, CATEGORIES, HARDCODED, MAP_GROUPS, PRIVATE_TOPS, TABS, isPrivate, isSensitive } from '../src/needs.js';
 import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
 import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
+import { directionsHref, placeQuery, transitHref } from '../src/directions.js';
 import { LINKS } from '../src/links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
@@ -82,6 +83,25 @@ describe('needs list', () => {
     const emg = readFileSync(join(root, 'data/seed/emergency.csv'), 'utf8');
     for (const id of ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa', 'emg_avalon', 'emg_voices4']) expect(emg, id).toMatch(new RegExp(`^${id},`, 'm'));
     for (const wrong of ['800-421-4949', '800-231-1127', '800-841-4949']) expect(emg.split('\n').filter((l) => l.startsWith('emg_')).map((l) => l.split(',').slice(0, 4).join(',')).join('\n')).not.toContain(wrong);
+  });
+  it('an emergency room and urgent care are their own kinds of help, the emergency room first and led by 911', () => {
+    const doctor = NEEDS.find((n) => n.id === 'doctor')!;
+    expect(doctor.refine!.map((r) => r.id)).toEqual(['er', 'urgent', 'doctor', 'dhd', 'dentist', 'eyes']);
+    expect(doctor.refine![0]!.query).toEqual({ category: 'health.er' });
+    expect(doctor.refine![1]!.query).toEqual({ category: 'health.urgent' });
+    // 911 sits above the emergency-room list, and only there: the plain "a doctor or nurse" screen has no 911 row.
+    expect(doctor.refine![0]!.first).toEqual(['emg_911']);
+    expect(doctor.first).toBeUndefined();
+    expect(doctor.refine!.filter((r) => r.first)).toHaveLength(1);
+    expect(main).toContain("const first = ((chosen?.first ?? n.first) ?? []).map(callButton).join('');");
+    for (const c of ['health.er', 'health.urgent']) {
+      expect(strings[`refine.doctor.${c.split('.')[1]}`], c).toBeTypeOf('string');
+      expect(isSensitive(c), c).toBe(false); expect(isPrivate(c), c).toBe(false);   // an address and a map dot: people have to get there
+      expect(MAP_GROUPS.find((g) => g.tops.includes(c.split('.')[0]!))!.id, c).toBe('health');
+    }
+    // They are not free clinics; nothing in the app may call them that.
+    expect(strings['refine.doctor.er']).not.toMatch(/free|low.cost/i);
+    expect(strings['refine.doctor.urgent']).not.toMatch(/free|low.cost/i);
   });
   it('911 and 988 are hardcoded', () => expect(HARDCODED).toEqual({ emg_911: '911', emg_988: '988' }));
   it('urgent needs come first on the Help tab, and urgent numbers are one tap from every screen', () => {
@@ -247,6 +267,37 @@ describe('neighborhood pages (docs/13 honesty rules)', () => {
     const old = hoodPage(d.neighborhoods[0]!, d, ui);
     expect(old).not.toContain('Bridge card'); expect(old).not.toContain('MISSING:');
   });
+  it('"Safe streets": plain counts with their years, no rate, no rank, no fault, and the records named', () => {
+    const safe: Indicators = { ...d, crash_years: [2020, 2024], city_crashes: { walk: 2024, bike: 664, severe: 630 },
+      crash_records_from: 'Michigan State Police (CJIC) police-reported crashes, published by SEMCOG',
+      sources: { ...d.sources, crashes: { ...src, name: 'SEMCOG — Crash Locations, 2015-2024' } },
+      neighborhoods: [{ ...d.neighborhoods[0]!, crashes: { walk: 49, bike: 'lt5', severe: 22 } }] };
+    const html = hoodPage(safe.neighborhoods[0]!, safe, ui);
+    expect(html).not.toContain('MISSING:');
+    expect(html).toContain('Safe streets');
+    expect(html).toContain('2020 through 2024');
+    expect(html).toContain('Crashes with someone walking');
+    expect(html).toContain('49'); expect(html).toContain('fewer than 5'); expect(html).toContain('Whole city: 2,024');
+    expect(html).toContain('These count crashes, not people');
+    expect(html).toContain('we do not compare one neighborhood with another');
+    expect(html).toContain('Michigan State Police');
+    // The panel names counts and nothing else: no rate per anything, no score, no ranking word.
+    const panel = html.slice(html.indexOf('Safe streets')); const safePanel = panel.slice(0, panel.indexOf('</div>'));
+    expect(safePanel).not.toMatch(/for every 1,000|per 1,000|rank|safest|worst|best/i);
+    expect(safePanel).not.toMatch(/blame|drunk|speeding|driver|caused by/i);
+    // "Fault" appears once, and only to say we do not assign it.
+    expect(safePanel.match(/fault/gi)).toHaveLength(1);
+    expect(safePanel).toContain('We do not say who was at fault');
+    // Its source is listed with the others, and a bundle without crash numbers simply has no panel.
+    expect(html.slice(html.indexOf('Where these numbers come from'))).toContain('SEMCOG');
+    expect(hoodPage(d.neighborhoods[0]!, d, ui)).not.toContain('Safe streets');
+  });
+  it('crashes are a neighborhood-page number only: never a map layer, never a dot per crash', () => {
+    const hoodsSrc = readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8');
+    const panelSrc = hoodsSrc.slice(hoodsSrc.indexOf('export function crashPanel'), hoodsSrc.indexOf('export function hoodPage'));
+    expect(panelSrc).not.toMatch(/ui\.map\(/);
+    expect(readFileSync(join(__dirname, '../src/layers.ts'), 'utf8')).not.toMatch(/crash/i);
+  });
   it('neighborhood numbers are fetched only when asked for, and checked against the signed index', () => {
     const src2 = readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8');
     expect(src2).toContain('fetchVerified(index, FILE)'); expect(src2).not.toContain(' fetch(');
@@ -297,10 +348,29 @@ describe('map', () => {
     for (const c of ['shelter.dv', 'health.mental', 'health.mental.crisis']) expect(isSensitive(c), c).toBe(true);
     for (const c of ['shelter.emergency', 'health.clinic', 'food.pantry']) expect(isSensitive(c), c).toBe(false);
     expect(main).toContain('helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s)');
-    expect(main).toContain('sensitive: (id) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isPrivate(r.category); }');   // router.ts: no URL for these (private includes sensitive)
+    expect(main).toContain('const sensitiveId = (id: string) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isPrivate(r.category); }');   // router.ts: no URL for these (private includes sensitive)
     expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
   });
   it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
+  it('a place with coordinates but no street address still gets directions, and its coordinate is never printed as an address', () => {
+    const spot = { lat: 42.3314, lon: -83.0458 };                       // a naloxone station: no address, no phone
+    const withAddress = { address: { line1: '1 Main St', city: 'Detroit', zip: '48226' }, lat: 42.33, lon: -83.05 };
+    expect(placeQuery(spot)).toBe('42.3314,-83.0458');
+    expect(placeQuery(withAddress)).toBe('1%20Main%20St%2C%20Detroit%2C%20MI%2048226');
+    expect(placeQuery({})).toBeNull();                                   // no address, no coordinate: no button at all
+    expect(directionsHref(spot, 'iPhone')).toBe('https://maps.apple.com/?daddr=42.3314,-83.0458');
+    expect(directionsHref(spot, 'Android')).toBe('geo:42.3314,-83.0458?q=42.3314,-83.0458');
+    expect(directionsHref(spot, 'Windows')).toBe('https://www.google.com/maps/dir/?api=1&destination=42.3314,-83.0458');
+    expect(directionsHref({}, 'Android')).toBeNull();
+    expect(transitHref(spot)).toBe('https://www.google.com/maps/dir/?api=1&destination=42.3314,-83.0458&travelmode=transit');
+    // The screen: the buttons and the "Where" block no longer depend on there being an address, and where there is
+    // none the page says so in words instead of turning the coordinate into one.
+    expect(main).toContain('${goHere(r) ? `<div class="two">');
+    expect(main).toContain("${r.address || (!sensitive && r.lat !== undefined) ? `<h2>${T('detail.where')}</h2>");
+    expect(main).toContain("T('detail.where_no_address', { source: r.facts.source.name })");
+    expect(main).not.toMatch(/r\.address!/);
+    expect(strings['detail.where_no_address']).toContain('{source}');
+  });
   it('the greenway is drawn like a transit line, and the key says each phase in words', () => {
     // One width and a casing under every stretch, so the route reads as one line whatever phase it is in.
     expect(mapSrc).toContain('for (const g of onScreen) stroke(g, col.gwCase, gwW + 4, []);');
@@ -312,6 +382,143 @@ describe('map', () => {
     for (const phase of ['open', 'under_construction', 'funded', 'planned']) expect(strings[`gw.${phase}`], phase).toBeTypeOf('string');
     const css = readFileSync(join(__dirname, '../src/style.css'), 'utf8');
     for (const v of ['--gw-open', '--gw-build', '--gw-fund', '--gw-plan', '--gw-case']) expect(css, v).toContain(`${v}:`);
+  });
+});
+
+describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-20)', () => {
+  const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
+  const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
+  const layersSrc = readFileSync(join(__dirname, '../src/layers.ts'), 'utf8');
+
+  it('four tabs: Home, Help, Map, Events', () => {
+    expect(TABS.map((t) => t.id)).toEqual(['home', 'help', 'map', 'events']);
+    for (const tab of TABS) { expect(strings[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); expect(es[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); }
+    expect(main).toContain("tab === 'map' ? mapTab()");
+    // The greenway, parks and segment screens now sit under Map, so the tab bar highlights Map on them.
+    expect(main).toContain("greenway: 'map', segment: 'map', parks: 'map' };");
+  });
+  it('everything the Recreation and Transit tabs offered is still on it', () => {
+    for (const k of ['gw.title', 'rec.parks', 'rec.all_parks', 'rec.centers', 'rec.bike', 'transit.tip', 'transit.checked']) expect(main, k).toContain(`T('${k}'`);
+    expect(main).toContain('${transitPanels()}');                       // trip planners, fares, free rides, phone numbers
+    expect(main).toContain("TRANSIT.sections.map");
+    expect(main).toContain("${T('detail.bus')}");                        // bus directions still on every listing
+  });
+  it('one layer per group of our own listings, and every top-level kind of help belongs to exactly one group', () => {
+    const tops = MAP_GROUPS.flatMap((g) => g.tops);
+    expect(new Set(tops).size, 'a category in two groups').toBe(tops.length);
+    // Every category a person can browse is either in a group or is one of the private kinds we never draw.
+    for (const c of CATEGORIES) {
+      const top = c.query.category!.split('.')[0]!;
+      expect(tops.includes(top) || PRIVATE_TOPS.includes(top), c.id).toBe(true);
+    }
+    for (const t of PRIVATE_TOPS) expect(tops, t).not.toContain(t);
+    expect(PRIVATE_TOPS.sort()).toEqual(['assault', 'treatment']);
+  });
+  it('treatment, sexual assault, DV and crisis listings are never drawn on it', () => {
+    // The layer rows drop the private kinds outright and the sensitive ones row by row.
+    expect(main).toContain("!isSensitive(r.category)\n    && !PRIVATE_TOPS.includes(r.category.split('.')[0]!) && tops.includes(r.category.split('.')[0]!)");
+    for (const c of ['treatment.detox', 'assault', 'shelter.dv', 'health.mental']) {
+      const top = c.split('.')[0]!;
+      expect(MAP_GROUPS.some((g) => g.tops.includes(top)) && !isSensitive(c) && !isPrivate(c), c).toBe(false);
+    }
+  });
+  it('every layer has plain words in both languages', () => {
+    const ids = [...MAP_GROUPS.map((g) => 'layer.help.' + g.id), 'layer.place.greenway', 'layer.place.parks',
+      ...[...main.matchAll(/'go:(\w+)':/g)].map((m) => 'layer.go.' + m[1])];
+    expect(ids.length).toBeGreaterThan(15);
+    for (const k of ids) { expect(strings[k], k).toBeTypeOf('string'); expect(es[k], `es ${k}`).toBeTypeOf('string'); }
+    for (const k of ['map.lede', 'map.layers', 'map.layers_note', 'map.group_help', 'map.group_places', 'map.group_go',
+      'map.list_title', 'map.list_none', 'map.list_help', 'map.list_more', 'map.list_unnamed', 'map.sources', 'map.label_tab', 'map.layer_zoom']) {
+      expect(strings[k], k).toBeTypeOf('string'); expect(es[k], `es ${k}`).toBeTypeOf('string');
+    }
+  });
+  it('layer switches are real labelled checkboxes, so the keyboard and a screen reader already work', () => {
+    expect(main).toContain('<label class="pick"><input type="checkbox" data-layer=');
+    expect(main).toContain('<fieldset><legend>${T(s.group)}</legend>');
+    // The cursor goes back to the switch that was just used, instead of to the top of the page.
+    expect(main).toContain('refocus = el.dataset.layer;');
+    expect(main).toContain('app.querySelector<HTMLElement>(`[data-layer="${refocus}"]`)?.focus');
+  });
+  it('whatever is on the map is also a list, in words', () => {
+    expect(main).toContain('function layerList(');
+    expect(main).toContain("${layerSwitcher()}${layerList(rows, over)}");
+    expect(main).toContain("T('map.list_title')");
+  });
+  it('the layer choice is kept on this phone and never sent', () => {
+    expect(layersSrc).toContain("idbSet('layers'");
+    expect(layersSrc).not.toMatch(/localStorage|sessionStorage|document\.cookie|fetch\(|method:\s*'POST'/);
+    expect(main).not.toMatch(/idbSet|indexedDB/);                       // main.ts still never writes to the phone itself
+  });
+  it('a transport layer is downloaded only when it is switched on, and checked against the signed index', () => {
+    expect(mapSrc).toContain('export function loadLayer(');
+    expect(mapSrc).toContain("fetchVerified(index, file)");
+    expect(mapSrc).not.toContain(' fetch(');
+    expect(mapSrc).not.toContain('http');                                // still no tile server, no third party
+    // refresh() leaves every map/ file alone, so a first visit downloads none of them.
+    expect(readFileSync(join(__dirname, '../src/data.ts'), 'utf8')).toContain("!name.startsWith('map/')");
+    expect(main).toContain('void loadLayer(bundle!.index, l.file)');
+  });
+  it('colour never carries the meaning alone: each layer is named in the switcher and again when tapped', () => {
+    expect(mapSrc).toContain('stop.name || stop.label');
+    expect(mapSrc).toContain('route.name || route.label');
+    const css = readFileSync(join(__dirname, '../src/style.css'), 'utf8');
+    for (const v of ['--lyr-bus', '--lyr-smart', '--lyr-rail', '--lyr-bike', ...MAP_GROUPS.map((g) => '--grp-' + g.id)]) {
+      expect(css, v).toContain(`${v}:`);
+      expect(css.slice(css.indexOf('prefers-color-scheme: dark')), `${v} in dark`).toContain(`${v}:`);
+    }
+  });
+});
+
+describe('wider screens: laptops and desktops (Kyle, 2026-09-20)', () => {
+  const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
+  const css = readFileSync(join(__dirname, '../src/style.css'), 'utf8');
+  const wideBlock = css.slice(css.indexOf('@media (min-width:64rem)'));
+
+  it('the phone layout is untouched: the bottom tab bar and the page width are still what they were', () => {
+    // Everything for a big screen is inside a min-width query, so a phone — and a laptop at 400% zoom, which
+    // reports a narrow screen — never sees any of it.
+    expect(css).toMatch(/\.tabs \{ position:fixed; inset:auto 0 0 0;/);
+    expect(css).toMatch(/main \{ max-width:42rem;/);
+    expect(css).toContain('@media (min-width:64rem)');
+    for (const rule of ['#app { padding-inline-start:15.5rem', '.tabs { inset-block:0; inset-inline:0 auto', 'main.wide { max-width:74rem', '.maptop { display:grid']) {
+      expect(wideBlock, rule).toContain(rule);
+    }
+    // Nothing added for a big screen uses a physical side: Arabic is next (docs/05).
+    expect(wideBlock).not.toMatch(/[;{ ](margin|padding|border|inset)-(left|right):/);
+    expect(wideBlock).not.toMatch(/[;{ ](left|right):/);
+  });
+  it('the tab bar becomes a rail with Urgent help first, and the top bar drops its copy', () => {
+    expect(main).toContain('const wide = matchMedia(\'(min-width: 64rem)\');');
+    expect(main).toMatch(/const urgentFirst = wide\.matches \? `<button class="urgent" \$\{go\(\{ v: 'urgent' \}\)\}/);
+    expect(wideBlock).toContain('header.top > .urgent { display:none; }');
+    expect(main).toContain("wide.addEventListener('change', () => render(false));");   // and it re-draws when the window crosses the line
+  });
+  it('what the keyboard walks is what the eye reads, at either width, and a skip link comes first', () => {
+    expect(main).toContain('app.innerHTML = skip + (wide.matches ? nav + head + body : head + body + nav);');
+    expect(main).toContain('<button class="skip" data-skip>${T(\'skip.main\')}</button>');
+    expect(main).toContain("if ('skip' in el.dataset) { app.querySelector<HTMLElement>('main')?.focus(); }");
+    expect(main).toContain(`body.replace(/^<main/, '<main tabindex="-1"')`);
+    expect(strings['skip.main']).toBeTypeOf('string'); expect(es['skip.main']).toBeTypeOf('string');
+  });
+  it('the Map tab is one column on a phone and map-beside-list on a laptop', () => {
+    expect(css).toContain('.maptop,.mapside { display:contents; }');            // the phone: the wrappers are not boxes
+    expect(main).toContain('<div class="maptop">');
+    expect(main).toContain('<div class="mapside">${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>');
+    expect(wideBlock).toContain('.maptop > .mapbox { position:sticky;');
+  });
+  it('the map is drawn again when the pixel ratio or the window changes, and Escape leaves the full-screen map', () => {
+    const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
+    expect(mapSrc).toContain("window.addEventListener('resize', this.onWindow);");
+    expect(mapSrc).toContain('if (Math.min(window.devicePixelRatio || 1, 2) !== this.dpr) this.resize();');
+    expect(mapSrc).toMatch(/e\.key === 'Escape' && this\.el\.classList\.contains\('big'\)/);
+    expect(mapSrc).toContain("window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey);");
+  });
+  it('a listing prints (people print at a library): no app furniture, ink on white, link addresses spelled out', () => {
+    const print = css.slice(css.indexOf('@media print'));
+    expect(print).toContain('.tabs,.skip,.maptools,.mappan,.report,.searchbtn,.langrow');
+    expect(print).toContain('a[href^="http"]::after');
+    expect(print).toContain('--ink:#000;');
+    expect(print).not.toMatch(/\.top \{[^}]*display:none/);                     // the listing's name lives in the top bar
   });
 });
 
@@ -441,11 +648,184 @@ describe('privacy and copy rules, checked against the source', () => {
     }
     expect(main).toMatch(/if \(view\.v === 'tab'\) searchText = '';/);
     expect(main).toMatch(/<input id="q"[^>]*autocomplete="off"/);
-    expect(main).toMatch(/<input name="zip"[^>]*autocomplete="off"/);
+    // The ZIP field names its purpose so a browser can fill it in (WCAG 1.3.5); we still never store or send it.
+    expect(main).toMatch(/<input name="zip"[^>]*autocomplete="postal-code"/);
+    expect(main).not.toMatch(/localStorage|sessionStorage/);
   });
   it('no third-party origins in the page shell', () => {
     const html = readFileSync(join(__dirname, '../index.html'), 'utf8');
     expect(html).toMatch(/default-src 'self'/);
     expect(html).not.toMatch(/https?:\/\/(?!www\.w3\.org)/);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// Accessibility (docs/ACCESSIBILITY-AUDIT-2026-09-20.md). These are the parts of WCAG 2.2 AA that a test
+// can hold still: contrast computed from the tokens themselves, a name on every control, a string for
+// every key the code asks for, and the structural fixes the audit made.
+// ---------------------------------------------------------------------------------------------------
+describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
+  const css = readFileSync(join(__dirname, '../src/style.css'), 'utf8');
+  const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
+  const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
+
+  /** The custom properties of one theme, read out of style.css exactly as the browser would see them. */
+  function tokens(theme: 'light' | 'dark'): Record<string, string> {
+    const block = theme === 'light'
+      ? css.slice(css.indexOf(':root {'), css.indexOf('@media (prefers-color-scheme: dark)'))
+      : css.slice(css.indexOf('@media (prefers-color-scheme: dark)'), css.indexOf('* { box-sizing'));
+    const out: Record<string, string> = {};
+    for (const [, k, v] of block.matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-f]{6})\s*;/gi)) out[k!] = v!.toLowerCase();
+    return out;
+  }
+  const lum = (hex: string) => {
+    const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
+  };
+  const ratio = (a: string, b: string) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+
+  // WCAG 1.4.3 (text) and 1.4.11 (everything else). Both themes, every pair a screen actually puts together.
+  const TEXT: [string, string, string][] = [
+    ['body text on the page', '--ink', '--bg'], ['body text on a card', '--ink', '--surface'], ['a pill', '--ink', '--sunken'],
+    ['secondary text on the page', '--muted', '--bg'], ['secondary text on a card', '--muted', '--surface'], ['secondary text in a pill', '--muted', '--sunken'],
+    ['a link on the page', '--brand', '--bg'], ['a link on a card', '--brand', '--surface'],
+    ['a green button', '--brand-ink', '--brand'], ['a green button, hovered', '--brand-ink', '--brand-strong'],
+    ['an "open" pill', '--brand-soft-ink', '--brand-soft'], ['an outline button', '--brand-soft-ink', '--surface'],
+    ['a freshness warning', '--warn-ink', '--warn-bg'], ['the 911 row and quick exit', '--danger-ink', '--danger'],
+    ['a street name on the map', '--map-ink', '--map-land'], ['a park name on the map', '--map-park-ink', '--map-park'],
+  ];
+  const NON_TEXT: [string, string, string][] = [
+    ['the focus ring on the page', '--focus', '--bg'], ['the focus ring on a card', '--focus', '--surface'],
+    ['the outline of a control on a card', '--edge', '--surface'], ['the outline of a control on the page', '--edge', '--bg'],
+    ['a main road', '--map-main', '--map-land'], ['a freeway', '--map-fwy', '--map-land'],
+    ['the greenway, open', '--gw-open', '--map-land'], ['the greenway, being built', '--gw-build', '--map-land'],
+    ['the greenway, funded', '--gw-fund', '--map-land'], ['the greenway, planned', '--gw-plan', '--map-land'],
+    ...['bus', 'smart', 'rail', 'bike'].flatMap((l): [string, string, string][] =>
+      [[`the ${l} layer on land`, `--lyr-${l}`, '--map-land'], [`the ${l} layer over a park`, `--lyr-${l}`, '--map-park']]),
+    ...['food', 'shelter', 'health', 'rec', 'work', 'things', 'paperwork'].flatMap((g): [string, string, string][] =>
+      [[`${g} dots on land`, `--grp-${g}`, '--map-land'], [`${g} dots over a park`, `--grp-${g}`, '--map-park']]),
+  ];
+  for (const theme of ['light', 'dark'] as const) {
+    it(`${theme} theme: every text pair reaches 4.5:1`, () => {
+      const v = tokens(theme);
+      for (const [what, fg, bg] of TEXT) {
+        expect(v[fg], `${fg} is missing in the ${theme} theme`).toBeTypeOf('string');
+        expect(`${what}: ${ratio(v[fg]!, v[bg]!).toFixed(2)}:1`).toBe(`${what}: ${Math.max(4.5, ratio(v[fg]!, v[bg]!)).toFixed(2)}:1`);
+      }
+    });
+    it(`${theme} theme: every outline, ring and map line reaches 3:1`, () => {
+      const v = tokens(theme);
+      for (const [what, fg, bg] of NON_TEXT) {
+        expect(v[fg], `${fg} is missing in the ${theme} theme`).toBeTypeOf('string');
+        expect(`${what}: ${ratio(v[fg]!, v[bg]!).toFixed(2)}:1`).toBe(`${what}: ${Math.max(3, ratio(v[fg]!, v[bg]!)).toFixed(2)}:1`);
+      }
+    });
+  }
+  it('white on the lightest part of the hero reaches 4.5:1 (the words there are normal size)', () => {
+    const stop = /radial-gradient\([^)]*?(#[0-9a-f]{6}) 0%/i.exec(css)![1]!;
+    expect(ratio('#ffffff', stop)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('every string key the app asks for exists in both languages (4.1.2: no control named "cat.x")', () => {
+    const src = [main, mapSrc, readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8')].join('\n');
+    const dynamic = /^(cat|need|tile|quick|refine|link|add|report|gw|day|open|badge|layer|bundle|hood)\./;
+    // Only whole keys: `t('od.s' + i)` is built from a list and is checked by the loops below.
+    const keys = new Set([...src.matchAll(/(?<![\w.])[tT]\('((?:[a-z0-9_]+\.)+[a-z0-9_]+)'\s*[,)]/g)].map((m) => m[1]!));
+    for (const k of keys) {
+      if (dynamic.test(k) && !(k in strings)) continue;        // built from a list; the loops below cover those
+      expect(strings[k], `strings/en.json has no ${k}`).toBeTypeOf('string');
+    }
+    for (const k of Object.keys(strings)) expect(es[k], `strings/es.json has no ${k}`).toBeTypeOf('string');
+    // Same placeholders in both languages, or a screen says "{count} places" out loud.
+    const holes = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!).sort().join(',');
+    for (const k of Object.keys(strings)) expect(`${k}: ${holes(es[k]!)}`).toBe(`${k}: ${holes(strings[k]!)}`);
+  });
+  it('every need, choice, category and map layer has words (no key is ever shown raw)', () => {
+    for (const n of NEEDS) {
+      expect(strings['need.' + n.id], n.id).toBeTypeOf('string');
+      for (const r of n.refine ?? []) expect(strings[`refine.${n.id}.${r.id}`], `refine.${n.id}.${r.id}`).toBeTypeOf('string');
+    }
+    for (const c of CATEGORIES) expect(strings['cat.' + c.id], c.id).toBeTypeOf('string');
+    for (const g of MAP_GROUPS) expect(strings['layer.help.' + g.id], g.id).toBeTypeOf('string');
+    for (const t of TABS) expect(strings['tab.' + t.id], t.id).toBeTypeOf('string');
+  });
+
+  it('2.4.2: a screen that may be named in the browser has a title; one that must leave no trace does not', () => {
+    expect(main).toContain("document.title = docTitle && traceable(v) ? `${docTitle} · ${t('app.name')}` : t('app.name');");
+    expect(main).toContain('const traceable = (v: View) => hashFor(v, sensitiveId, location.pathname) !== null;');
+  });
+  it('2.4.3 and 4.1.3: a redraw that is not a new screen puts the cursor back and says what happened', () => {
+    expect(main).toContain('refocusSel = `[data-save="${id}"]`;');
+    for (const hook of ['data-listmap]', 'data-loc="on"]', 'data-loc="off"]', 'data-lang]']) expect(main).toContain(`refocusSel = '[${hook}'`);
+    expect(main).toContain("if (refocusSel) { app.querySelector<HTMLElement>(refocusSel)?.focus({ preventScroll: true }); refocusSel = ''; }");
+    // One live region, made once, outside the part of the page a redraw replaces.
+    expect(main).toContain("sayEl.setAttribute('aria-live', 'polite'); document.body.append(sayEl);");
+    // Exactly one: the search count, which is the same element on every keystroke. Everything else goes through
+    // announce(), because a live region a redraw has just built is never read out.
+    expect(main.match(/role="status"/g) ?? []).toHaveLength(1);
+    expect(main).toContain('<p class="vh" id="searchsay" role="status" aria-live="polite">');
+  });
+  it('4.1.2: only one "Urgent help" button exists at a time, never one hidden behind the other', () => {
+    expect(main).toContain("const urgentBtn = wide.matches ? '' : `<button class=\"urgent\"");
+  });
+  it('2.5.7 and 2.1.1: the map moves without dragging, and says so to the keyboard', () => {
+    for (const act of ['left', 'right', 'up', 'down']) expect(mapSrc).toContain(`act === '${act}'`);
+    expect(mapSrc).toContain("pad.className = 'mappan'");
+    expect(mapSrc).toContain("this.canvas.setAttribute('aria-describedby', help.id)");
+    expect(strings['map.keys']).toMatch(/arrow/i);
+  });
+  it('2.4.11 and 2.1.2: the full-screen map is a real overlay — nothing behind it is reachable', () => {
+    expect(mapSrc).toContain("this.el.setAttribute('aria-modal', 'true')");
+    expect(mapSrc).toContain('(n as HTMLElement).inert = true');
+    expect(mapSrc).toContain('private release(): void');
+    expect(mapSrc).toContain('(this.opener ?? b).focus();');
+    expect(mapSrc).toContain('destroy(): void { this.release();');
+  });
+  it('3.3.1 and 3.3.3: "Add a place" names the field that is empty and puts the cursor on it', () => {
+    expect(main).toContain("missing = ['name', 'category', 'what', 'how_known'].filter");
+    expect(main).toContain('refocusSel = `.addform [name="${missing[0] ?? \'name\'}"]`;');
+    for (const f of ['name', 'category', 'what', 'how_known']) expect(strings['add.e.' + f], f).toBeTypeOf('string');
+    expect(css).toContain('.addform [aria-invalid="true"] { border-color:var(--danger); border-width:2px; }');
+  });
+  it('3.3.7: "Add a place" gives back everything already typed instead of asking for it again', () => {
+    expect(main).toContain('addValues = values;');
+    expect(main).toContain('const had = (name: string) => addValues[name] ?? \'\';');
+    expect(main).toContain('value="${esc(had(name))}"');
+    expect(main).toContain("${had(name) === id ? ' checked' : ''}");
+    // and it is memory only, cleared the moment the screen is left or the form goes
+    for (const clear of ["missing = []; addValues = {};", "missing = []; addValues = {}; }"]) expect(main).toContain(clear);
+  });
+  it('3.1.2: what a place wrote about itself is marked as English on a screen that is not English', () => {
+    expect(main).toContain("const owner = (s: unknown) => (currentLang() === 'en' ? esc(s) : `<span lang=\"en\">${esc(s)}</span>`);");
+    for (const field of ['r.row.name', 'r.row.what', 'r.org', 'r.eligibility', 'a.title', 'p.name']) expect(main).toContain(`owner(${field})`);
+    expect(main).toContain('<address lang="en">');
+  });
+  it('a phone number stays left to right and never breaks in the middle (CLAUDE.md, and Arabic is next)', () => {
+    expect(main).toContain('const phoneHtml = (n: string) => phoneParts(n).map((p) => `<bdi>${esc(p)}</bdi>`).join(\' \');');
+    expect(main).not.toMatch(/<strong>\$\{esc\((?:e|ph|p)\.number\)\}<\/strong>/);
+    expect(css).toContain('.callrow strong bdi,.btn strong bdi { white-space:nowrap; }');
+  });
+  it('right-to-left is ready: no physical left/right in the stylesheet, and the arrows can turn round', () => {
+    const body = css.replace(/\/\*[^]*?\*\//g, '');
+    expect(body).not.toMatch(/(?:^|[;{\s])(?:margin|padding|border)-(?:left|right)\s*:/);
+    expect(body).not.toMatch(/text-align\s*:\s*(?:left|right)/);
+    expect(body).toContain('[dir="rtl"] .ic.turn { transform:scaleX(-1); }');
+    expect(body).toContain(':lang(ar)'); expect(body).toContain(':lang(bn)');
+    expect(readFileSync(join(__dirname, '../src/i18n.ts'), 'utf8')).toContain("document.documentElement.dir = dirFor(l);");
+  });
+  it('1.4.12: nothing that holds words is a fixed height', () => {
+    expect(css).not.toMatch(/\.when \{[^}]*[^-]height:3\.5rem/);
+    expect(css).toContain('width:3.25rem; min-height:3.5rem;');
+  });
+  it('2.4.11: the skip link steps aside for the rail instead of covering its first button', () => {
+    const wideBlock = css.slice(css.indexOf('@media (min-width:64rem)'));
+    expect(wideBlock).toContain('.skip:focus-visible { inset-inline-start:calc(15.5rem + .75rem); }');
+  });
+  it('1.4.1: every state that has a colour also has words', () => {
+    for (const k of ['open.open', 'open.closed_no_next', 'open.unknown', 'open.call_first', 'gw.open', 'gw.under_construction', 'gw.funded', 'gw.planned']) {
+      expect(strings[k], k).toBeTypeOf('string');
+      expect(strings[k]!.length).toBeGreaterThan(2);
+    }
+    expect(main).toContain('<ul class="gwkey">');                              // the map key, in words as well as dashes
   });
 });

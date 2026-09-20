@@ -33,17 +33,27 @@ export function pickLang(saved: unknown, browserLangs: readonly string[]): Lang 
   return browserLangs.some((l) => l.toLowerCase().startsWith('es')) ? 'es' : 'en';
 }
 
+/** Languages that read right to left. Arabic and Bengali are next (Bengali reads left to right); when a language
+ *  is added here the whole interface mirrors, because style.css uses logical properties throughout. */
+const RTL: readonly string[] = [];
+export const dirFor = (l: string) => (RTL.includes(l) ? 'rtl' : 'ltr');
+function apply(l: Lang): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = l;
+  document.documentElement.dir = dirFor(l);
+}
+
 export async function initLang(): Promise<void> {
   const want = pickLang(await idbGet<string>('lang'), typeof navigator === 'undefined' ? [] : navigator.languages ?? [navigator.language]);
   lang = (await load(want)) ? want : 'en';
-  if (typeof document !== 'undefined') document.documentElement.lang = lang;
+  apply(lang);
 }
 
 /** Switch language. False (and nothing changes) if the words can't be fetched right now. */
 export async function setLang(next: Lang): Promise<boolean> {
   if (!(await load(next))) return false;
   lang = next;
-  if (typeof document !== 'undefined') document.documentElement.lang = lang;
+  apply(lang);
   await idbSet('lang', lang);
   return true;
 }
