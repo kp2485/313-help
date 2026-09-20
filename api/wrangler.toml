@@ -36,7 +36,7 @@ migrations_dir = "migrations"
 
 [vars]
 PHOTOS_ENABLED = "false"     # photos on condition reports: off until the legal advice in docs/11 (DECISIONS 2026-09-19)
-ALLOWED_ORIGIN = "http://localhost:5173"   # the live site origin once it exists: https://<domain>
+ALLOWED_ORIGIN = "https://313help.com"
 ACCESS_TEAM_DOMAIN = ""      # e.g. 313help.cloudflareaccess.com
 ACCESS_AUD = ""              # the Access application's audience tag
 
