@@ -1,0 +1,9 @@
+# The Health Department's Neighborhood Wellness Center at The Open Door Church of God in Christ.
+# The City's locations page (read in Kyle's Chrome, 2026-09-20) prints this site's phone as "(313) 526-34205",
+# which is not a phone number, so that page cannot be the source for it. We do not guess at the digits.
+# The host church's own page, https://www.odcdet.org/ (read 2026-09-20), prints "(313) 526-3460" and
+# "12411 East Seven Mile Rd. Detroit, MI 48205", and says its testing site became a Neighborhood Wellness Center.
+# So: phone and street number from the church's own page (the source_url, which check:sources can match),
+# labelled as the church's number; days and hours as the City's page prints them. A steward should still tell
+# DHD its page has a misprint.
+Neighborhood Wellness Center at The Open Door Church of God in Christ | Detroit Health Department | health.dhd | Free blood pressure, diabetes and cholesterol checks, COVID-19 and flu testing, and a community health worker on site. | 12411 East Seven Mile Road | Detroit | 48205 | 313-526-3460 | https://detroitmi.gov/departments/detroit-health-department | Tue 10am-6pm; Wed 10am-6pm; Thu 10am-6pm | | https://www.odcdet.org/ | phone_label=Church office; flags=walk_in; notice=This is the church's phone number. The City's page prints the wellness center's number wrong.

@@ -13,6 +13,10 @@ export interface Source {
   mode?: 'publish' | 'stage'; enabled?: boolean; max_age_days?: number;
   category?: string; org?: { id: string; name: string };
   fields?: Record<string, string>; extra?: string[]; id_prefix?: string;
+  /** Which plain wording normalize.ts gives this layer's rows. Default: the Narcan boxes' wording. */
+  wording?: 'narcan_box' | 'supplies_station';
+  /** Service-area cities a layer that covers more than the service area is filtered to (ingest-mymap.ts). */
+  cities?: string[];
 }
 
 export const INGESTED_COLUMNS = [

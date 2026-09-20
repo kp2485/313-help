@@ -1,0 +1,27 @@
+# Steward-approved new listings, 2026-09-20.
+#
+# Kyle, the owner and steward, reviewed docs/CHECKS-2026-09-20.md on 2026-09-20 and decided: publish what each
+# organisation's own website says. These are the new listings from section 4 of that worksheet. Every fact comes
+# from the owner's own page, named as source_url on the line, read on 2026-09-20 (the browser read is recorded in
+# docs/research/2026-09-20/dhd-and-hand-checks.md).
+#
+# 1. Capuchin's shower program at Meldrum Community Center. WRITTEN BELOW.
+#    cskdetroit.org refuses scripts (HTTP 403 again today), so `check:sources` can never promote this row. A person
+#    read the shower page in a browser on 2026-09-20; per docs/OPERATIONS.md the row is set status=active and
+#    entry_method=web by hand, which was done on import. It also closes the oldest hold in to-verify.csv: the
+#    Meldrum program is running, not "soon to" re-open.
+#
+# 2. God's Storehouse hot showers. HELD, not written.
+#    Kyle's condition was "only if its own page gives phone+street and enough to be useful". It does not. The
+#    ministries page gives the showers as "Tuesday mornings" with "call 313-867-1234 for location" — no street
+#    address for the showers and no time of day, and the page is explicit that 18301 John R is the ministry's
+#    contact address, not where a service happens. A listing would be a phone number and a guess. The hold in
+#    data/seed/to-verify.csv stands, with today's reason. (godsstorehousedetroit.org also did not resolve in DNS
+#    from here today, with or without www, so nothing new could be read.)
+#
+# 3. SEMCA Michigan Works! Dearborn job center. NOT WRITTEN.
+#    Not in the steward's decision for today. The building and its phone come from ACCESS's own contact page, but
+#    ACCESS is the landlord, not the job centre, and the only Michigan Works! number is from the Michigan Works!
+#    Association rather than the owner. It stays in section 4 of the worksheet for a later decision.
+
+Showers at Meldrum Community Center | Capuchin Soup Kitchen | hygiene.shower | A free shower. | 1264 Meldrum St | Detroit | 48207 | (313) 579-2100 ext. 4217 | https://www.cskdetroit.org | Mon, Wed, Fri 9:00 a.m. - 1:00 p.m. | | https://www.cskdetroit.org/services-offerings/shower-program/ | flags=walk_in

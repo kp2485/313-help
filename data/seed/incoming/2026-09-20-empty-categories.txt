@@ -1,0 +1,82 @@
+# The categories that had no active row and are not alert-driven: rides (`transport`), walk-in treatment
+# (`treatment.crisis`), recovery support (`treatment.recovery`), and safer-use supplies (`harm.supplies`).
+# `health.dhd` is another agent's (the Health Department's own pages). `shelter.warming` and `shelter.cooling`
+# are alert-driven and stay empty on purpose.
+# Pages read 2026-09-20. Every fact below is from the owner's own page named in source_url on that line.
+# Aggregators (findhelp, MyRide2, 211, news stories, search snippets) were used only to find candidates.
+# No staff names, emails or direct lines: ECHO's admissions page prints a named person's mobile number and a
+# second unlabelled line; neither is used. Research note: docs/research/2026-09-20/empty-categories.md.
+#
+# Notes for the steward, in order:
+# - RIDES, no street address. Four of the five ride rows are a phone number, not a door. Two of them (SMART
+#   Connector, the VA hub) have no address at all: their own pages print no street number, because there is
+#   nowhere to walk in. `import:lines` allows a row with a phone and no address, and `check:sources` then only
+#   looks for the phone. That is a judgement, so it is a proposed DECISIONS row in the note.
+# - Dearborn rides: 16901 Michigan Ave is the Dearborn Administrative Center in the page's own contact block,
+#   not a pickup point; the ride itself is curb-to-curb from your home. That is why the row carries a notice.
+#   The page prints two sets of times ("9 a.m. - 1 p.m." for the office, "8:30 a.m. - 3:30 p.m." for the
+#   service) and never says which days, so nothing is parsed as a schedule and the listing says "call first".
+# - Detroit Area Agency on Aging: the transportation page gives the 7-day notice and the trip kinds but no
+#   hours, and the only number on it is the main line. Hours left as "not stated" on purpose.
+# - VA: the phone2 (313-576-4346, Detroit VA's own transportation service) is printed on the same page as the
+#   hub number, so it needs no phone2_source_url. The page gives no street address for the John D. Dingell VA
+#   Medical Center, so the row has none.
+# - SMART Connector: the page says "anywhere within a 10 mile radius of a designated service area" and never
+#   names the communities. Detroit is DDOT territory, not SMART's; Dearborn, Hamtramck and Highland Park are
+#   SMART communities. The row repeats the page's words and names no city. Highland Park's own senior page
+#   (highlandparkmi.gov/services/senior-program/smart-transportation/) describes this same SMART service and
+#   the same 866 number, so it is not listed twice.
+# - WALK-IN TREATMENT. The DWIHN Care Center at 707 W. Milwaukee is already in the seed as
+#   `sal_dwihn_care_center` (health.mental) and as `emg_dwihn_care_center`. It is NOT repeated here. But the
+#   triage step "somewhere I can go today" queries `category: treatment`, so the Care Center does not appear
+#   there. A steward decides: leave it, or add a second row. See the note.
+# - East Detroit Crisis Stabilization Unit: DWIHN's crisis page prints the name, "6309 Mack Ave, Detroit, MI
+#   48207", "(313) 331-3435" and "Open 24/7" together, so DWIHN is the org and that page is the source. Team
+#   Wellness (the operator) prints the same address, phone and "24/7" on teamwellnesscenter.com/services/.
+#   Separately: our existing `sal_team_east_clinic` says "Team East Clinic, 11105 Jefferson Avenue", but Team
+#   Wellness's own page puts Team East Clinic at 6309 Mack Ave and 11105 E Jefferson Ave under "Team
+#   Jefferson". Someone should check that row; it is not touched here.
+# - West Wayne Crisis Stabilization Unit (34290 Ford Rd, Westland) is on the same DWIHN page and is outside
+#   the service area, so it is not listed.
+# - ECHO Detroit Engagement Center: the page says "Admissions and Staffing available 24/7" and not "open
+#   24/7", so it is kept as written and the listing says "call first" rather than claiming always-open. The
+#   page also carries an undated "limited bed space (6 beds)" line; the bed count is left out.
+# - RECOVERY SUPPORT. Nothing here is a sober home: MARR's certified recovery-home list stays a link-out
+#   (docs/05) and we never list homes ourselves. Nothing here is DUI-only, and none of these rows says
+#   treatment is free for the uninsured: the two that say "free" (ECHO, Passenger) say it because their own
+#   page says it about their own peer support, which is not treatment.
+# - Passenger Recovery's own page prints "3901 Christopher Street, Suite D, Detroit/Hamtramck, MI 48211".
+#   48211 is a Detroit ZIP, so the row says Detroit. The page gives days but no times.
+# - Detroit Recovery Project: two rows, for the two offices its services page prints. Peer recovery support is
+#   a different service from the outpatient treatment we already list at 1121 E McNichols
+#   (`sal_detroit_recovery_project_eastside`), so the ids differ. The page also prints a Wellness Space at
+#   2637 Cadillac Blvd with no phone, and a street-outreach line (313-400-3713); neither is listed.
+# - SAFER-USE SUPPLIES. One row only. `data/seed/to-verify.csv` holds six Detroit syringe programs because
+#   their own pages do not name syringe services (CHAG, Detroit Recovery Project, ECHO, Safe Point/Team
+#   Wellness, CHASS, UNIFIED). Read again today, all six still do not. CHAG's page does now name, in its own
+#   words, "Wound care training and supplies" and "Free NARCAN Kits & Training" at its own address and phone,
+#   so that much is listed and nothing more. Calling those supplies `harm.supplies` is a judgement; see the
+#   note. The other fill for this category is Wayne County's station map, which is a data file, not lines:
+#   docs/research/2026-09-20/wayne-county-naloxone.csv.
+# - Dearborn's Wagner Parking Deck box (free Narcan AND fentanyl test strips) is already in the seed as
+#   `sal_dearborn_department_free_narcan_and_test_strips_at_the_w` under harm.narcan. Not repeated.
+
+# --- rides (transport) -------------------------------------------------------
+Rides to medical appointments | Detroit Area Agency on Aging | transport | Rides to appointments you set up yourself: the doctor, dialysis, the pharmacy, radiology. Call 7 days before the appointment. | 1333 Brewery Park, Suite 200 | Detroit | 48207 | 313-446-4444 | https://www.detroitseniorsolution.com | not stated |  | https://www.detroitseniorsolution.com/programs/transportation/ | phone_label=Main line
+Rides for people 60 and over | City of Dearborn | transport | Curb-to-curb rides anywhere in Dearborn, $2 a person for a round trip. Call at least 4 days ahead. | 16901 Michigan Ave | Dearborn | 48126 | 313-943-4083 | https://dearborn.gov | Rides 8:30 a.m. - 3:30 p.m.; office 9 a.m. - 1 p.m.; days not stated | Dearborn residents 60 and over, with limited restrictions. | https://dearborn.gov/residents/services-adults-55/senior-transportation/senior-transportation | phone_label=Book a ride; flags=seniors; notice=The van picks you up at the curb. The address is the city office, not a pickup point.
+Rides to the doctor for older neighbors | Bridging Communities | transport | Medical transportation for older adults, plus extra food, social activities and help with Medicare and Medicaid. | 6900 McGraw Ave | Detroit | 48210 | 313-361-6377 | https://bridgingcommunities.org | Mon-Fri 9am-5pm | Older adults. | https://bridgingcommunities.org/about-us/ | phone_label=Main line; flags=seniors
+SMART Connector door-to-door rides | SMART | transport | Shared door-to-door rides anywhere within 10 miles of a service area. Call 6 business days ahead for a medical trip, 2 business days for anything else. |  |  |  | 866-962-5515 | https://www.smartbus.org | Rides Monday-Friday 6am-6pm; book 7 days a week 8am-5pm; closed major holidays | Seniors and people with disabilities. Riders aged 6 to 64 without a disability must live more than a third of a mile from a bus route. | https://www.smartbus.org/Services/Connector | phone_label=Book a ride; flags=seniors,disability
+Rides to VA medical appointments | John D. Dingell VA Medical Center | transport | Free rides for veterans to VA health care: DAV vans, shuttles and wheelchair-accessible transport. Ask at least 3 business days before your appointment. |  |  |  | 877-838-5438 | https://www.va.gov/detroit-health-care/ | Call the hub Monday - Friday, 7:00 a.m. - 5:00 p.m. | Veterans going to VA health care. | https://www.va.gov/detroit-health-care/dav-vans-transportation-for-veterans/ | phone_label=Transportation Navigation Hub (877-VET-LIFT); phone2=313-576-4346; phone2_label=Detroit VA Veterans Transportation Service; flags=veterans
+
+# --- somewhere to go today (treatment.crisis) --------------------------------
+East Detroit Crisis Stabilization Unit | Detroit Wayne Integrated Health Network | treatment.crisis | Walk in any time you are in crisis. Up to 72 hours of support: a quiet place to settle, a plan for what comes next, and meals. | 6309 Mack Ave | Detroit | 48207 | 313-331-3435 | https://dwihn.org | Open 24/7 | Adults. | https://dwihn.org/programs-services/crisis-services | flags=walk_in
+Engagement Center | ECHO Detroit | treatment.crisis | A safe place to be when you are drunk or high. Up to 23 hours in a monitored bed, with a shower, a meal, a peer recovery coach and help getting to treatment. | 1851 West Grand Blvd. | Detroit | 48208 | 313-556-5222 | https://www.echodetroit.org | Admissions and staffing available 24/7 | People who are intoxicated from alcohol or other drugs. | https://www.echodetroit.org/services/engagement-center/ | phone_label=Main line; flags=walk_in
+
+# --- recovery support (treatment.recovery) -----------------------------------
+Recovery support and groups | ECHO Detroit | treatment.recovery | Free peer recovery coaching, mutual-aid support groups, and computers and wi-fi. Help with housing, work, mental health and physical health too. | 1851 West Grand Blvd. | Detroit | 48208 | 313-556-5222 | https://www.echodetroit.org | not stated | Men and women 18 and older in Wayne County. | https://www.echodetroit.org/services/recovery-community-organization/ | phone_label=Main line
+Recovery Community Center | Passenger Recovery | treatment.recovery | A sober place built around music and art: support groups, recovery coaching, a meeting finder, coffee, wi-fi and studio space. | 3901 Christopher Street, Suite D | Detroit | 48211 | 313-288-0062 | https://passengerrecovery.com | Open Wednesday - Sunday; times not stated | | https://passengerrecovery.com/contact | phone_label=Main line
+Peer recovery support, Eastside | Detroit Recovery Project | treatment.recovery | Recovery coaches who have been there walk with you, for drugs, alcohol or mental health, with case management alongside. Young people have their own peer program. | 1121 East McNichols Rd. | Detroit | 48203 | 313-365-3100 | https://www.recovery4detroit.com | not stated |  | https://www.recovery4detroit.com/services/ | phone_label=Eastside office
+Peer recovery support, Westside | Detroit Recovery Project | treatment.recovery | Recovery coaches who have been there walk with you, for drugs, alcohol or mental health, with case management alongside. Young people have their own peer program. | 1145 West Grand Blvd. | Detroit | 48208 | 313-324-8900 | https://www.recovery4detroit.com | not stated |  | https://www.recovery4detroit.com/services/ | phone_label=Westside office
+
+# --- safer-use supplies (harm.supplies) --------------------------------------
+Life Points outreach | Community Health Awareness Group | harm.supplies | Wound care training and supplies, free Narcan kits and training, rapid HIV testing and screening for hepatitis C and syphilis, and a way into treatment when you are ready. | 1300 W Fort St | Detroit | 48226 | 313-963-3434 | https://www.chagdetroit.org | not stated |  | https://www.chagdetroit.org/our-services | phone_label=Main line; notice=A mobile unit also visits eight Detroit street corners each week. The stops and times are on their page.

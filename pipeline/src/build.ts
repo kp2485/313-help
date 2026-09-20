@@ -15,6 +15,9 @@ import { hsdsSchema, validateAlerts, validateEmergency, validateHsds, validateRo
 import { loadSigningKey, publicKeyB64, signBytes } from './sign.js';
 import { applyAggregates, fetchAggregates, pushTargets, type Aggregates } from './reports-sync.js';
 
+/** One row of data/ingested/transit/source.json (pipeline/src/ingest-transit.ts). */
+interface TransitNote { id: string; kind: 'line' | 'point' | 'both'; lines: number; points: number; bytes: number; name: string; source: { name: string; url: string; page: string; license: string; fetched_at: string } }
+
 export interface BuildOptions { aggregates?: Aggregates | null; release?: boolean; offline?: boolean; outDir?: string; hsdsDir?: string | null; now?: Date; quiet?: boolean }
 
 export interface BundleIndex {
@@ -106,7 +109,23 @@ export async function build(opts: BuildOptions = {}) {
     putCompact('map/streets.json', { grid: source.grid, cells });
     counts.map_cells = Object.keys(cells).length;
   }
-  // Recreation tab. City events are not shipped until a real feed exists (DECISIONS 2026-09-19).
+  // Transport layers for the Map tab (ingest-transit.ts, Kyle 2026-09-20). Like the street map, every layer is
+  // covered by the signature but a phone downloads one only when a person switches that layer on. The small list
+  // of what exists (places/transit.json) travels with the bundle so the switcher can be drawn offline.
+  const transitDir = p('data/ingested/transit');
+  if (existsSync(`${transitDir}/source.json`)) {
+    const read = JSON.parse(readFileSync(`${transitDir}/source.json`, 'utf8')) as { layers: TransitNote[] };
+    const layers = [];
+    for (const l of read.layers) {
+      const from = `${transitDir}/${l.id}.json`;
+      if (!existsSync(from)) continue;
+      const name = `map/transit/${l.id}.json`;
+      putCompact(name, JSON.parse(readFileSync(from, 'utf8')));
+      layers.push({ id: l.id, kind: l.kind, file: name, lines: l.lines, points: l.points, bytes: files[name]!.bytes, name: l.name, source: l.source });
+    }
+    if (layers.length) { put('places/transit.json', { layers }); counts.transit_layers = layers.length; }
+  }
+  // Recreation and transit facts. City events are not shipped until a real feed exists (DECISIONS 2026-09-19).
   const parksFile = p('data/ingested/city_parks.json');
   if (existsSync(parksFile)) { const d = JSON.parse(readFileSync(parksFile, 'utf8')); counts.parks = d.parks.length; put('places/parks.json', d); }
   // ZIP center points for "Type a ZIP" (docs/05): about 1 KB, and the typed ZIP never leaves the phone.
@@ -117,13 +136,18 @@ export async function build(opts: BuildOptions = {}) {
     const h = JSON.parse(readFileSync(hoodsFile, 'utf8')), st = JSON.parse(readFileSync(statsFile, 'utf8'));
     // Stores that take a Bridge card and bus stops (City data): counted near each neighborhood, never shipped as points.
     const pointsFile = p('data/ingested/city_points.json'), pts = existsSync(pointsFile) ? JSON.parse(readFileSync(pointsFile, 'utf8')) : null;
+    // "Safe streets" (docs/13, ingest-crashes.ts): counts of crashes involving people walking or biking, over
+    // the years that file names. Only the multi-year totals go in the bundle; the yearly history stays in git.
+    const crashFile = p('data/ingested/crashes.json'), cr = existsSync(crashFile) ? JSON.parse(readFileSync(crashFile, 'utf8')) : null;
     const ind = buildIndicators({
       hoods: h.neighborhoods, rows: live, stats: st,
       parks: existsSync(parksFile) ? JSON.parse(readFileSync(parksFile, 'utf8')).parks : [],
       segments: existsSync(jlg) ? JSON.parse(readFileSync(jlg, 'utf8')).segments : [],
       ...(pts ? { snap: pts.snap, busStops: pts.bus_stops } : {}),
+      ...(cr ? { crashes: cr.neighborhoods } : {}),
     });
-    const doc = { sources: { neighborhoods: h.source, ...st.sources, ...(pts?.sources ?? {}) }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types,
+    const doc = { sources: { neighborhoods: h.source, ...st.sources, ...(pts?.sources ?? {}), ...(cr ? { crashes: { name: cr.source.name, url: cr.source.page, last_edited: cr.source.last_edited } } : {}) }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types,
+      ...(cr ? { crash_years: cr.years, city_crashes: cr.city.window, crash_records_from: cr.source.records_from } : {}),
       ...(st.current ? { city_now: st.current.city, fire_types: st.fire_types, roads_years: st.roads_years, vacant_period: st.vacant_period } : {}), ...ind };
     putCompact('indicators/neighborhoods.json', doc);
     counts.neighborhoods = ind.neighborhoods.length;

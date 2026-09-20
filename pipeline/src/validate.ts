@@ -9,7 +9,7 @@ import { inBbox, p, parsePhone, type CsvRow } from './util.js';
 export interface Issues { errors: string[]; warnings: string[] }
 
 const ID = /^sal_[a-z0-9_]+$/;
-const CATEGORY = /^(food\.(pantry|meal|mobile|benefits)|shelter\.(emergency|warming|cooling|dv|day)|harm\.(narcan|supplies)|health\.(clinic|mental|dhd|dental|vision)|utilities|housing\.(rent|owner)|hygiene\.shower|transport|youth|rec\.(center|library)|jobs\.(find|training)|learn\.(school|english)|treatment\.(crisis|detox|residential|outpatient|meds|recovery)|legal|ids|assault|money\.(tax|benefits)|goods\.(clothes|baby)|kids\.care|connect|pets)$/;
+const CATEGORY = /^(food\.(pantry|meal|mobile|benefits)|shelter\.(emergency|warming|cooling|dv|day)|harm\.(narcan|supplies)|health\.(clinic|mental|dhd|dental|vision|er|urgent)|utilities|housing\.(rent|owner)|hygiene\.shower|transport|youth|rec\.(center|library)|jobs\.(find|training)|learn\.(school|english)|treatment\.(crisis|detox|residential|outpatient|meds|recovery)|legal|ids|assault|money\.(tax|benefits)|goods\.(clothes|baby)|kids\.care|connect|pets)$/;
 // Patterns that suggest a person's contact details leaked into public text.
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]+/;
 // Case-sensitive on purpose: the name part must be Capitalized Words, or "ask for help today" would match.
@@ -42,7 +42,9 @@ export function validateRows(rows: BundleRow[], todayStr: string): Issues {
     if (r.lat !== undefined && !inBbox(r.lat, r.lon!)) e(`coordinates ${r.lat},${r.lon} are outside the service area (Detroit, Hamtramck, Highland Park, Dearborn)`);
     if (r.address && r.lat === undefined && r.status === 'active') w('has an address but no coordinates; it will not sort by distance');
 
-    if (r.phones.length === 0 && !r.address) e('needs a phone number or an address');
+    // A person has to be able to find it: a number to call, a street address, or a coordinate its publisher
+    // states (Wayne County's station map gives a site name and a point and no address; DECISIONS 2026-09-20).
+    if (r.phones.length === 0 && !r.address && r.lat === undefined) e('needs a phone number, an address, or coordinates');
     for (const ph of r.phones) if (!parsePhone(ph.number)) e(`phone "${ph.number}" is not a valid number`);
 
     if (r.availability === 'scheduled' && r.schedules.length === 0) e('availability is "scheduled" but there are no schedule rows');

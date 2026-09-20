@@ -59,20 +59,56 @@ export function fromSeed(resources: CsvRow[], schedules: CsvRow[]): Normalized {
 const ALWAYS = /^(open\s*)?24\s*(hrs?|hours)\.?$/i;
 const DEVICE: Record<string, string> = { 'Vending Machine': 'vending machine', Newsstand: 'newsstand box', Countertop: 'countertop box', 'Wall Mount': 'wall box' };
 
+/** What the layer calls its device, in our words. A layer that names several devices at one site just says "box". */
+const deviceWord = (type: string) => DEVICE[Object.keys(DEVICE).find((k) => k.toLowerCase() === type.trim().toLowerCase()) ?? ''] ?? 'box';
+const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+
+/**
+ * The plain wording a layer's rows carry. Every sentence states a fact the source states:
+ *  - narcan_box: the Detroit Health Department's list, which names Narcan and nothing else.
+ *  - supplies_station: Wayne County's Well Wayne Stations, which name naloxone (Narcan) *and* fentanyl and
+ *    xylazine test strips, and whose own map adds that supplies can run out ("*Supplies are subject to change
+ *    based on availability and may not always be available"). That is why they are harm.supplies, not harm.narcan.
+ */
+const WORDING = {
+  narcan_box: {
+    service_name: 'Free Narcan and harm reduction supplies',
+    what: (extra: Record<string, string>) => {
+      const where = extra.Box_Location ? ` The box is ${extra.Box_Location.toLowerCase()}.` : '';
+      return `Free Narcan from a ${deviceWord(extra.Distribution_Device_Type ?? '')}. No ID, no cost, no questions.${where}`;
+    },
+  },
+  supplies_station: {
+    service_name: 'Free naloxone and test strips',
+    what: (extra: Record<string, string>) => {
+      const spots = Object.keys(extra).filter((k) => /^Box_Location\d*$/.test(k)).sort().map((k) => lowerFirst(extra[k]!.replace(/\.$/, '')));
+      const where = spots.length === 1 ? ` The station is ${spots[0]}.`
+        : spots.length > 1 ? ` There are ${spots.length} stations here: ${spots.join('; ')}.` : '';
+      return `Free naloxone (Narcan), fentanyl test strips and xylazine test strips from a ${deviceWord(extra.Station_Type ?? '')}. No cost, no ID, no questions.${where} What is in stock can change, so supplies may not always be there.`;
+    },
+  },
+} as const;
+
 export function fromIngested(src: Source, ingested: CsvRow[]): Normalized {
   const orgs = new Map([[src.org!.id, src.org!.name]]), svcOf: Normalized['svcOf'] = new Map();
+  const wording = WORDING[src.wording ?? 'narcan_box'];
   const rows = ingested.map((r): BundleRow => {
-    const extra = Object.fromEntries((r.extra ?? '').split('; ').filter(Boolean).map((kv) => kv.split('=') as [string, string]));
-    const device = DEVICE[extra.Distribution_Device_Type ?? ''] ?? 'box';
-    const where = extra.Box_Location ? ` The box is ${extra.Box_Location.toLowerCase()}.` : '';
-    svcOf.set(r.sal_id!, { svc_id: `svc_${src.id}`, service_name: 'Free Narcan and harm reduction supplies', org_id: src.org!.id });
+    const extra = Object.fromEntries((r.extra ?? '').split('; ').filter(Boolean).map((kv) => {
+      const at = kv.indexOf('=');
+      return [kv.slice(0, at), kv.slice(at + 1)] as [string, string];
+    }));
+    svcOf.set(r.sal_id!, { svc_id: `svc_${src.id}`, service_name: wording.service_name, org_id: src.org!.id });
     const ph = parsePhone(r.phone ?? '');
     const always = ALWAYS.test((r.hours_text ?? '').trim());
+    const hasCoords = r.lat !== undefined && r.lat !== '' && r.lon !== undefined && r.lon !== '';
     return {
       id: r.sal_id!, name: r.name!, org: src.org!.name, category: src.category!,
-      what: `Free Narcan from a ${device}. No ID, no cost, no questions.${where}`,
-      address: { line1: r.address_1!, city: 'Detroit', ...(r.zip ? { zip: r.zip } : {}) },
-      lat: Number(r.lat), lon: Number(r.lon),
+      what: wording.what(extra),
+      // A layer may publish a city of its own (this one spans four) and may have no street address at all.
+      // A coordinate is never turned into an address: the row simply has none, and the map dot comes from the
+      // publisher's own coordinate (DECISIONS 2026-09-20). validateRows checks every coordinate against the bbox.
+      ...(r.address_1 ? { address: { line1: r.address_1, city: r.city || 'Detroit', ...(r.zip ? { zip: r.zip } : {}) } } : {}),
+      ...(hasCoords ? { lat: Number(r.lat), lon: Number(r.lon) } : {}),
       // This is the host's number (the store, the center), not a Narcan line. Label it so.
       phones: ph ? [{ number: formatPhone(ph.number), label: 'Host site' }] : [],
       ...(r.website ? { website: r.website } : {}),
@@ -136,7 +172,9 @@ export function toHsds(all: Normalized[]) {
       svc.service_at_locations.push({
         id: uuid5(row.id),
         location: {
-          id: uuid5(locSlug), name: row.name, location_type: row.address ? 'physical' : 'virtual',
+          // A place someone walks to is physical even when its publisher gives a point and no street address
+          // (Wayne County's stations). Only a row with neither an address nor a point is virtual (a hotline, a DV row).
+          id: uuid5(locSlug), name: row.name, location_type: row.address || row.lat !== undefined ? 'physical' : 'virtual',
           ...(row.lat !== undefined ? { latitude: row.lat, longitude: row.lon } : {}),
           ...(row.address ? { addresses: [{ id: uuid5(`${locSlug}#address`), address_1: row.address.line1, city: row.address.city, state_province: 'MI', postal_code: row.address.zip ?? '', country: 'US', address_type: 'physical' }] } : {}),
           x_detroit: { id: locSlug },

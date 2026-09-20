@@ -56,6 +56,12 @@ describe('row validation', () => {
     expect(errs({ eligibility: 'Email jane@example.org first' })).toMatch(/personal contact/);
   });
   it('rejects an unknown category', () => expect(errs({ category: 'food.pantries' })).toMatch(/unknown category/));
+  // Emergency rooms and urgent care are their own kinds (DECISIONS 2026-09-20): neither says it is free or
+  // low-cost, which is what health.clinic means.
+  it('takes an emergency room and an urgent care as their own kinds of help', () => {
+    for (const c of ['health.er', 'health.urgent']) expect(errs({ category: c }), c).toBe('');
+    expect(errs({ category: 'health.emergency' })).toMatch(/unknown category/);
+  });
   it('rejects a status or availability the app doesn\'t know (a typo must not read as open)', () => {
     expect(errs({ status: 'Active' as never })).toMatch(/unknown status/);
     expect(errs({ status: 'proposed' as never })).toMatch(/unknown status/);
