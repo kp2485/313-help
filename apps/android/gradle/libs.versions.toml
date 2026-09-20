@@ -1,0 +1,21 @@
+# One place for every version. Nothing here is a runtime dependency of the app: the only library that ships in
+# the APK is the Kotlin standard library. JUnit is test-only and never reaches a phone.
+#
+# Licences: Android Gradle Plugin Apache-2.0, Kotlin Apache-2.0, JUnit 4 Eclipse Public Licence 1.0 (test only,
+# not distributed). No analytics, no crash reporting, no Google Play Services, no Firebase, no HTTP library.
+#
+# Versions were chosen on 2026-09-20 without a network. Check for newer stable releases before the first build
+# (see apps/android/README.md, "Before the first build"); the repository rule is that a version must be a day old.
+
+[versions]
+agp = "8.7.3"
+kotlin = "2.0.21"
+junit = "4.13.2"
+
+[libraries]
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

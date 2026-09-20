@@ -1,0 +1,162 @@
+// "What do you need?" (docs/05), mirroring apps/web/src/needs.ts and apps/ios/HelpApp/Help.swift.
+// Everything here runs on the device; nothing chosen on these screens is stored or sent.
+package org.help313.app
+
+import org.help313.query.Query
+
+/**
+ * One way to narrow a need. `first` is emergency numbers shown above that choice's own list: the emergency-room
+ * choice leads with 911, even though "I need a doctor" has no numbers of its own (DECISIONS 2026-09-20).
+ */
+class Refine(val id: String, val query: Query, val first: List<String> = emptyList())
+
+class Need(
+    val id: String,
+    /** "now" needs come first, under "Right now", then "This week", then "Work, school, and paperwork".
+     *  The same calm styling throughout: urgency is carried by order and wording, not by colour. */
+    val group: String,
+    /** Emergency numbers (by id in emergency.json) shown BEFORE any list. Principle 8: never ask what you
+     *  cannot act on. */
+    val first: List<String> = emptyList(),
+    /** A link shown above even those numbers: today only 313SafeBeds on the shelter screen (Kyle, 2026-09-20).
+     *  The first half is a key into the strings files (`link.<key>.title|body|label`), so the words about someone
+     *  else's site are translated like the rest of the app; the second is its address. */
+    val firstLink: Pair<String, String>? = null,
+    val query: Query? = null,
+    val refine: List<Refine> = emptyList(),
+    /** No list at all: 911 and rescue steps only. A bystander must not be sent on an errand (audit A7). */
+    val stepsOnly: Boolean = false,
+    val sensitive: Boolean = false,
+    val intro: String? = null,
+    val emptyKey: String? = null,
+)
+
+val NEEDS: List<Need> = listOf(
+    Need("overdose_now", "now", first = listOf("emg_911"), stepsOnly = true, sensitive = true),
+    Need(
+        "shelter", "now",
+        first = listOf("emg_shelter_helpline", "emg_shelter_outwayne"),
+        firstLink = "beds.safebeds" to "https://313safebeds.com/",
+        refine = listOf(
+            Refine("me", Query(category = "shelter.emergency")),
+            Refine("kids", Query(category = "shelter.emergency")),
+            // Every emergency shelter, with the ones for young people first (DECISIONS 2026-09-19).
+            Refine("young", Query(category = "shelter.emergency", prefer = listOf("youth"))),
+        ),
+    ),
+    // DV: hotline and 911 before anything else; rows have no address and never show a distance.
+    Need("unsafe", "now", first = listOf("emg_ndvh", "emg_911"), query = Query(category = "shelter.dv"),
+        sensitive = true, intro = "safe.dv_intro"),
+    Need("talk", "now", first = listOf("emg_988", "emg_dwihn_crisis"), query = Query(category = "health.mental"),
+        sensitive = true, intro = "talk.intro"),
+    // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door for all four cities, then SAMHSA's.
+    Need(
+        "drugs", "now",
+        first = listOf("emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"),
+        intro = "drugs.intro",
+        refine = listOf(
+            Refine("today", Query(category = "treatment", prefer = listOf("walk_in"))),
+            Refine("detox", Query(category = "treatment.detox")),
+            Refine("meds", Query(category = "treatment.meds")),
+            Refine("stay", Query(category = "treatment.residential")),
+            Refine("home", Query(category = "treatment.outpatient")),
+            Refine("recovery", Query(category = "treatment.recovery")),
+            Refine("supplies", Query(category = "harm.supplies")),
+        ),
+    ),
+    Need("assault", "now", first = listOf("emg_avalon", "emg_voices4", "emg_911"),
+        query = Query(category = "assault"), intro = "assault.intro"),
+    Need("food", "soon", refine = listOf(
+        Refine("today", Query(category = "food.meal", mode = "now")),
+        Refine("week", Query(category = "food", mode = "week")),
+    )),
+    // Emergency rooms and urgent care are their own categories, because neither says it is free or low-cost the
+    // way health.clinic does (DECISIONS 2026-09-20). The emergency room comes first and leads with 911; an
+    // emergency room is only ever shown as open all day and night where its own page says so.
+    Need("doctor", "soon", refine = listOf(
+        Refine("er", Query(category = "health.er"), first = listOf("emg_911")),
+        Refine("urgent", Query(category = "health.urgent")),
+        Refine("doctor", Query(category = "health.clinic")),
+        // Detroit Health Department programmes: shots, lead tests, WIC and the wellness centres. Their own
+        // category, because they are city programmes rather than a clinic that says it is free (2026-09-20).
+        Refine("dhd", Query(category = "health.dhd")),
+        Refine("dentist", Query(category = "health.dental")),
+        Refine("eyes", Query(category = "health.vision")),
+    )),
+    Need("home", "soon", refine = listOf(
+        Refine("rent", Query(category = "housing.rent")),
+        Refine("own", Query(category = "housing.owner")),
+    )),
+    Need("utilities", "soon", query = Query(category = "utilities")),
+    Need("day", "soon", query = Query(category = "shelter.day")),
+    Need("things", "soon", refine = listOf(
+        Refine("clothes", Query(category = "goods.clothes")),
+        Refine("baby", Query(category = "goods.baby")),
+    )),
+    Need("narcan", "soon", query = Query(category = "harm.narcan")),
+    // Warming and cooling centres are announced as alerts. Day to day, libraries and recreation centres are the
+    // free indoor places.
+    Need("hot_cold", "soon", query = Query(category = "rec"), intro = "hotcold.intro", emptyKey = "hotcold.none"),
+    // The web app also shows link-outs (unemployment, Lifeline, child-care scholarships) on these screens.
+    // Android lists places only, until link-outs are ported. See README.md, "What it does not do yet".
+    Need("job", "later", refine = listOf(
+        Refine("find", Query(category = "jobs.find")),
+        Refine("training", Query(category = "jobs.training")),
+        Refine("record", Query(category = "jobs", prefer = listOf("reentry"))),
+    )),
+    Need("school", "later", refine = listOf(
+        Refine("ged", Query(category = "learn.school")),
+        Refine("english", Query(category = "learn.english")),
+    )),
+    Need("legal", "later", query = Query(category = "legal")),
+    Need("id", "later", query = Query(category = "ids")),
+    Need("money", "later", refine = listOf(
+        Refine("taxes", Query(category = "money.tax")),
+        Refine("benefits", Query(category = "money.benefits")),
+    )),
+    Need("childcare", "later", query = Query(category = "kids.care")),
+    Need("phone", "later", query = Query(category = "connect")),
+    Need("rides", "later", query = Query(category = "transport")),
+    Need("pets", "later", query = Query(category = "pets")),
+)
+
+/** Browse-by-type chips on the Help screen. */
+val CATEGORIES: List<Pair<String, Query>> = listOf(
+    "food" to Query(category = "food"),
+    "shelter" to Query(category = "shelter.emergency"),
+    "health" to Query(category = "health"),
+    "harm" to Query(category = "harm"),
+    "utilities" to Query(category = "utilities"),
+    "hygiene" to Query(category = "hygiene"),
+    "youth" to Query(category = "youth"),
+    "jobs" to Query(category = "jobs"),
+    "learn" to Query(category = "learn"),
+    "treatment" to Query(category = "treatment"),
+    "housing" to Query(category = "housing"),
+    "legal" to Query(category = "legal"),
+    "ids" to Query(category = "ids"),
+    "money" to Query(category = "money"),
+    "goods" to Query(category = "goods"),
+    "kids" to Query(category = "kids"),
+    "connect" to Query(category = "connect"),
+    "transport" to Query(category = "transport"),
+    "pets" to Query(category = "pets"),
+)
+
+/** Domestic violence and mental-health crisis listings: no distance, no map dot, cannot be saved (docs/08, 10-A8). */
+private val SENSITIVE = listOf("shelter.dv", "health.mental")
+
+fun isSensitive(category: String): Boolean =
+    SENSITIVE.any { category == it || category.startsWith("$it.") }
+
+/**
+ * Treatment and help after sexual assault (DECISIONS 2026-09-19): never saved and never in history. Unlike the
+ * sensitive listings they keep an address and a distance, because people have to get there.
+ */
+private val PRIVATE = listOf("treatment", "assault")
+
+fun isPrivate(category: String): Boolean =
+    isSensitive(category) || PRIVATE.any { category == it || category.startsWith("$it.") }
+
+/** 911 and 988 are hardcoded. No bundle, feed, or server can change them (audit A5). */
+val HARDCODED = mapOf("emg_911" to "911", "emg_988" to "988")

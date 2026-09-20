@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Two permissions and no more.
+
+  INTERNET is for one thing: fetching the signed list over HTTPS. The app sends nothing.
+
+  ACCESS_COARSE_LOCATION is strictly optional and is asked for only when a person taps "Use my location". It
+  sorts the list by distance and is held in memory for as long as the screen is open. It is never written to
+  disk and never leaves the phone (docs/08). Fine location is deliberately not requested: the list is sorted in
+  miles, and a neighbourhood is precise enough.
+
+  There is no advertising id, no ACCESS_NETWORK_STATE, no READ_PHONE_STATE, no CALL_PHONE (a call opens the
+  phone's own dialler with the number in it and the person presses the button), no storage permission, and no
+  analytics, crash reporting or Play Services library that could ask for one.
+
+  allowBackup is false: the only secret on the phone is the random install secret behind the daily report hash,
+  and it must not be copied off the device by a cloud backup. There is nothing else worth restoring: the list
+  itself is re-fetched and is public.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+    <!-- A tablet or a phone with no dialler is fine; the number is shown as text either way. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
+        android:theme="@style/Theme.Help313">
+
+        <!-- More languages are coming, including Arabic, which is written right to left: supportsRtl is on and
+             no layout in this app uses left or right. -->
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
