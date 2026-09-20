@@ -2,6 +2,9 @@
 # Kyle creates the Cloudflare resources and sets the repository variable PUBLISH_ENABLED=true.
 #
 # What it does, in order:
+#   0. Runs `pnpm preflight`: the keys, the Worker's config, and the dated lines in api/edge-protections.md where a
+#      person signed that the Cloudflare Access policy and the WAF rate-limiting rule exist. Any "stop" ends the job
+#      before anything is built (audit 2026-09-20). Prove the two from outside with `pnpm smoke -- https://<domain>`.
 #   1. (City events: dropped until a real feed exists, DECISIONS 2026-09-19.)
 #   2. Checks the emergency numbers against their owners' pages and stamps the date of each match. A page that
 #      can't be read (down, or bot protection) changes nothing. A page that shows a different number stamps
@@ -48,6 +51,14 @@ jobs:
         continue-on-error: true       # a mismatch is enforced by the release build below
         run: pnpm check:emergency
       - run: pnpm test
+      # Is this checkout allowed to publish at all? The keys, the Worker's config, and the two protections that live
+      # in the Cloudflare dashboard and that a person has signed for in api/edge-protections.md (audit 2026-09-20).
+      # An unsigned line stops the publish here, before anything is built or deployed.
+      - name: Ready to publish?
+        run: pnpm preflight
+        env:
+          BUNDLE_SIGNING_KEY: ${{ secrets.BUNDLE_SIGNING_KEY }}
+          BUNDLE_PUBLIC_KEYS: ${{ vars.BUNDLE_PUBLIC_KEYS }}
       - name: Signed release bundle
         run: pnpm build:bundle:release
         env:
@@ -87,10 +98,13 @@ jobs:
           git add data/ingested data/staging
           if git diff --cached --quiet; then echo "No source changed."; exit 0; fi
           branch="ingest/$(date -u +%F)"
-          git checkout -b "$branch"
+          # -B and --force-with-lease so a second run on the same day updates that day's branch instead of failing on
+          # a name that already exists; the branch is only ever written by this job.
+          git checkout -B "$branch"
           git commit -m "Open data changed on $(date -u +%F): review before it is published"
-          git push -u origin "$branch"
-          gh pr create --title "Open data changed $(date -u +%F)" --body "A City source changed. Read the diff: a changed phone number, address or coordinate is published only when this is merged. Nothing here was published tonight." --base main --head "$branch"
+          git push -u --force-with-lease origin "$branch"
+          gh pr create --title "Open data changed $(date -u +%F)" --body "A City source changed. Read the diff: a changed phone number, address or coordinate is published only when this is merged. Nothing here was published tonight." --base main --head "$branch" \
+            || echo "A pull request for $branch is already open; it now has tonight's changes too."
 
       # 5. The nightly re-check. It runs even if a step above failed, and never fails the job: a flaky page must
       #    not block a publish. Nothing here is committed: the resources.csv notes stay on this runner, and
