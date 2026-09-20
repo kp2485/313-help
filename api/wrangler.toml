@@ -1,5 +1,12 @@
-# Nothing here has been deployed. Creating the D1 database, the Worker, the Access application,
-# and the rate-limiting rule all need Kyle's go-ahead (CLAUDE.md). See docs/OPERATIONS.md.
+# Creating the D1 database, the Worker, the Access application and the rate-limiting rule all need Kyle's
+# go-ahead (CLAUDE.md). See docs/OPERATIONS.md, "First deployment".
+#
+# The Worker deploys from Git (Kyle, 2026-09-20): in the Cloudflare project, set
+#   Root directory:  api
+#   Deploy command:  npx wrangler deploy
+# The repository root has no Worker config on purpose - it is a pnpm workspace, and the site is built and
+# deployed by .github/workflows/publish.yml, not by Cloudflare. Pointing a Cloudflare build at the root fails
+# with "application detection logic has been run in the root of a workspace".
 name = "313-help-api"
 main = "src/index.ts"
 compatibility_date = "2026-09-01"
@@ -13,21 +20,23 @@ invocation_logs = false
 [[d1_databases]]
 binding = "DB"
 database_name = "313-help"
-database_id = "00000000-0000-0000-0000-000000000000"   # placeholder until the database exists
+database_id = "00000000-0000-0000-0000-000000000000"   # replace with the id from `wrangler d1 create 313-help`
 migrations_dir = "migrations"
 
 # Photos on condition reports (docs/11): a PRIVATE bucket. No public access, no custom domain, ever.
-# `wrangler dev` fakes it locally. For production the bucket has to be created first (needs Kyle's go-ahead):
+# The binding is commented out because the bucket does not exist yet and a deploy would fail on it. With no
+# binding the Worker answers 503 to photo uploads and the app sends the report without the photo, which is what
+# PHOTOS_ENABLED = "false" does anyway. `wrangler dev` fakes the bucket locally.
+# To turn photos on later (needs Kyle's go-ahead and the legal advice in docs/11):
 #   wrangler r2 bucket create 313-help-photos
-# Until it exists, delete this block before `wrangler deploy`; the Worker then answers 503 to photo uploads and
-# the app sends the report without the photo.
-[[r2_buckets]]
-binding = "PHOTOS"
-bucket_name = "313-help-photos"
+# then uncomment the three lines below and set PHOTOS_ENABLED = "true".
+# [[r2_buckets]]
+# binding = "PHOTOS"
+# bucket_name = "313-help-photos"
 
 [vars]
 PHOTOS_ENABLED = "false"     # photos on condition reports: off until the legal advice in docs/11 (DECISIONS 2026-09-19)
-ALLOWED_ORIGIN = "http://localhost:5173"
+ALLOWED_ORIGIN = "http://localhost:5173"   # the live site origin once it exists: https://<domain>
 ACCESS_TEAM_DOMAIN = ""      # e.g. 313help.cloudflareaccess.com
 ACCESS_AUD = ""              # the Access application's audience tag
 
