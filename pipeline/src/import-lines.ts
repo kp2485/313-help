@@ -1,5 +1,6 @@
 // Adds researched listings to the seed as `proposed` rows. Input: data/seed/incoming/*.txt, one
-// pipe-delimited line per listing (12 fields, see FIELDS). Nothing imported here is visible until
+// pipe-delimited line per listing (12 fields, see FIELDS, and an optional 13th: `key=value` pairs separated
+// by `;` for the columns a person used to fill in by hand, see EXTRAS). Nothing imported here is visible until
 // `pnpm check:sources` finds the phone and street number on the listing's own source page.
 //
 // Hours become a schedule ONLY when every part parses cleanly. Anything else is kept as written
@@ -10,6 +11,8 @@ import { p, readCsv, slug, writeCsv, type CsvRow } from './util.js';
 import { readResources, writeResources } from './seed-io.js';
 
 const FIELDS = ['name', 'org', 'category', 'what', 'address', 'city', 'zip', 'phone', 'website', 'schedule', 'eligibility', 'source_url'] as const;
+/** Optional 13th field: `flags=reentry,walk_in; phone_label=Intake; phone2=313-555-0100; phone2_label=Main line`. */
+const EXTRAS = ['flags', 'phone_label', 'phone2', 'phone2_label', 'phone2_source_url', 'notice'] as const;
 const DAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 const DAY_WORD: Record<string, string> = { m: 'MO', mon: 'MO', monday: 'MO', mondays: 'MO', t: 'TU', tu: 'TU', tue: 'TU', tues: 'TU', tuesday: 'TU', tuesdays: 'TU', w: 'WE', wed: 'WE', wednesday: 'WE', wednesdays: 'WE',
   th: 'TH', thu: 'TH', thur: 'TH', thurs: 'TH', thursday: 'TH', thursdays: 'TH', f: 'FR', fri: 'FR', friday: 'FR', fridays: 'FR', sat: 'SA', saturday: 'SA', saturdays: 'SA', sun: 'SU', sunday: 'SU', sundays: 'SU' };
@@ -81,8 +84,15 @@ export function titleFor(name: string, org: string): string {
 
 export function lineToRows(line: string): { resource: CsvRow; schedules: CsvRow[] } | string {
   const f = line.split('|').map((x) => x.trim());
-  if (f.length !== FIELDS.length) return `expected ${FIELDS.length} fields, got ${f.length}`;
+  if (f.length !== FIELDS.length && f.length !== FIELDS.length + 1) return `expected ${FIELDS.length} fields (or ${FIELDS.length + 1} with extras), got ${f.length}`;
   const v = Object.fromEntries(FIELDS.map((k, i) => [k, f[i]!])) as Record<(typeof FIELDS)[number], string>;
+  const extra: Partial<Record<(typeof EXTRAS)[number], string>> = {};
+  for (const pair of (f[FIELDS.length] ?? '').split(';').map((x) => x.trim()).filter(Boolean)) {
+    const eq = pair.indexOf('='), k = pair.slice(0, eq).trim(), val = pair.slice(eq + 1).trim();
+    if (eq < 1 || !(EXTRAS as readonly string[]).includes(k)) return `unknown extra "${pair}" (allowed: ${EXTRAS.join(', ')})`;
+    extra[k as (typeof EXTRAS)[number]] = k === 'flags' ? val.split(',').map((x) => x.trim()).filter(Boolean).join(',') : val;
+  }
+  if (extra.phone2 && !extra.phone2_label) return 'phone2 needs a phone2_label that says what the line is for';
   if (!v.name || !v.category || !v.what || !v.source_url || !(v.phone || v.address)) return 'name, category, what, source_url and a phone or address are required';
   const id = `sal_${slug(`${v.org && !v.name.toLowerCase().includes(v.org.toLowerCase().slice(0, 12)) ? v.org.split(/\s+/).slice(0, 2).join(' ') + ' ' : ''}${v.name}`).slice(0, 56)}`;
   const always = ALWAYS.test(v.schedule);
@@ -93,8 +103,8 @@ export function lineToRows(line: string): { resource: CsvRow; schedules: CsvRow[
       // "Food give-away" alone doesn't say whose it is; a title names the place unless the name already does.
       sal_id: id, svc_id: '', org_id: `org_${slug(v.org || v.name).slice(0, 40)}`, org_name: v.org || v.name, service_name: v.name, location_name: titleFor(v.name, v.org),
       category: v.category, what: v.what, eligibility: v.eligibility, address_1: v.address, city: v.address ? v.city || 'Detroit' : '', zip: v.zip, lat: '', lon: '',
-      phone: v.phone, phone_label: '', phone2: '', phone2_label: '', website: v.website, availability: always ? 'always' : windows ? 'scheduled' : 'call_first',
-      hours_text: hoursText, flags: '', notice: '', status: 'proposed', checked_at_entry: '', entry_method: '', source_type: 'seed_list',
+      phone: v.phone, phone_label: extra.phone_label ?? '', phone2: extra.phone2 ?? '', phone2_label: extra.phone2_label ?? '', phone2_source_url: extra.phone2_source_url ?? '', website: v.website, availability: always ? 'always' : windows ? 'scheduled' : 'call_first',
+      hours_text: hoursText, flags: extra.flags ?? '', notice: extra.notice ?? '', status: 'proposed', checked_at_entry: '', entry_method: '', source_type: 'seed_list',
       source_name: `${v.org || v.name} website`, source_url: v.source_url, internal_note: '',
     },
     schedules: (windows ?? []).map((w) => ({ sal_id: id, freq: 'WEEKLY', interval: '', byday: w.byday, bymonthday: '', dtstart: '2026-09-14', until: '', valid_from: '', valid_to: '', opens_at: w.opens_at, closes_at: w.closes_at, description: '' })),

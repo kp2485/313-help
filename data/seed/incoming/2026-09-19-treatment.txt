@@ -1,0 +1,49 @@
+# Drug and alcohol treatment places in Detroit and Highland Park: detox, live-in treatment, outpatient treatment and
+# medicine for opioid use disorder. (No harm.supplies or treatment.crisis lines: see notes below.)
+# Research notes: docs/research/2026-09-19-new-help/treatment-1-places.md and treatment-2-system-and-data.md.
+# Pages read 2026-09-19 with a plain request that says who we are. Every fact on a line comes from that provider's
+# own page (the source_url column). Aggregators were used only to find names. SAMHSA's OTP list and DWIHN's
+# provider directory CSV ("Last Updated 04/06/2026") were used only as cross-checks that a place is still running,
+# never as the source of a fact on a line.
+# Notes for a steward:
+# - Wording: no line says treatment is free. DWIHN's rule for uninsured callers needs one call to confirm
+#   (treatment-2 notes, section 1). Elmhurst's own page says no one is turned away for inability to pay, so its two
+#   lines say that.
+# - Never copy a DWIHN number from a provider page. Several print a wrong one (listed in the convert notes). Lines
+#   that say "call DWIHN's access line" rely on the DWIHN number the app already shows (emg_dwihn_crisis).
+# - Salvation Army Harbor Light: the source page's path says "monroe" but it is the whole Harbor Light system page and
+#   lists the Detroit campus first. Its history text still sends women outside Detroit to "SEMCA"; that is stale, do
+#   not copy it. Cost is not stated on the page.
+# - QBH East Grand Blvd and Medbury: the page prints two unlabeled numbers for each site (313-922-2222 and
+#   313-922-3333). The line uses 313-922-2222, which DWIHN's list also shows; phone2 is QBH's "24/7 central intake".
+#   Medbury is listed under medicine because SAMHSA's OTP list and DWIHN's list show it as a methadone clinic; QBH's
+#   page lists it under detox and live-in treatment. Cost is not stated on QBH's pages.
+# - Sobriety House: its own site was last changed in 2024. DWIHN's April 2026 list still shows the same address and
+#   phone. A person should call before first publish. Its footer prints a wrong DWIHN number; never copy it.
+# - Mariners Inn: site footer is (c) 2024; DWIHN's April 2026 list still shows 445 Ledyard with the same phone. Call
+#   before first publish.
+# - CLASS Agency: footer (c) 2022. The Detroit Health Department's 2026 Behavioral Health page lists it as a partner,
+#   and DWIHN's 2026 list shows it (as prevention). A person should confirm outpatient treatment is still offered.
+# - New Light: hours are clinic and dosing hours. New-patient intake hours are not published, so the line says to
+#   call first.
+# - Detroit Recovery Project Eastside: hours are not on the owner page (only the outreach desk's hours are).
+# - No harm.supplies lines: no syringe service program's own page names syringe services in text we could read
+#   (CHAG, DRP, ECHO, Safe Point, CHASS, UNIFIED are held). The Wayne County "Well Wayne" naloxone station map is a
+#   data-source question for Kyle, not lines.
+# - No treatment.crisis lines: the DWIHN Care Center is already listed (sal_dwihn_care_center); Team Wellness East
+#   and the ECHO Engagement Center are held.
+# - Recovery homes are link-out only (MARR's certified list), never lines.
+Salvation Army Harbor Light, Detroit | The Salvation Army | treatment.detox | A safe place to stop using, with nurses, for 3 to 5 days. Then live-in or outpatient treatment. Suboxone and Vivitrol offered. | 3737 Lawton Street | Detroit | 48208 | 313-556-5555 | https://www.salvationarmyusa.org/usa-central-territory/great-lakes/metro-detroit/detroit-harbor-light/ | 24/7 | Adults. | https://www.salvationarmyusa.org/mi/monroe/n-monroe-street/harbor-light/ | flags=walk_in; phone_label=Treatment team, 24/7
+Quality Behavioral Health, East Grand Blvd | Quality Behavioral Health | treatment.detox | Detox with staff there day and night, then live-in treatment. | 751 East Grand Blvd | Detroit | 48207 | 313-922-2222 | https://www.qbhrecovery.org/ | not stated |  | https://www.qbhrecovery.org/locations/ | phone2=855-838-4222; phone2_label=24/7 central intake (toll free)
+Quality Behavioral Health, Medbury | Quality Behavioral Health | treatment.meds | Methadone clinic. Detox and live-in treatment are at this site too. | 6821 Medbury St | Detroit | 48211 | 313-922-2222 | https://www.qbhrecovery.org/ | not stated |  | https://www.qbhrecovery.org/locations/ | phone2=855-838-4222; phone2_label=24/7 central intake (toll free)
+Quality Behavioral Health central intake, Gratiot | Quality Behavioral Health | treatment.outpatient | Outpatient treatment and medicine for opioid use disorder. This is also the central intake for all QBH programs. | 7220 Gratiot | Detroit | 48213 | 855-838-4222 | https://www.qbhrecovery.org/ | not stated |  | https://www.qbhrecovery.org/locations/ | phone_label=24/7 central intake (toll free)
+Sobriety House | Sobriety House | treatment.residential | Live-in treatment for men, up to 30 days, plus outpatient visits. | 2081 W. Grand Blvd. | Detroit | 48208 | (313) 895-0500 | https://www.sobrietyhouse.net/ | Walk-ins 24/7; office Mon-Fri 8:30am-4:30pm | Adult men. | https://www.sobrietyhouse.net/ | flags=men,walk_in
+Mariners Inn | Mariners Inn | treatment.residential | Live-in treatment for men, then outpatient groups. Start by calling DWIHN's access line. The front desk can help you call. | 445 Ledyard St. | Detroit | 48201 | (313) 962-9446 | https://www.marinersinn.org/ | not stated | Men 18 and older. | https://www.marinersinn.org/residential-treatment-programs | flags=men; phone_label=Main line
+SHAR Main | Self-Help Addiction Rehabilitation (SHAR) | treatment.residential | Live-in treatment for up to 120 days, with a unit for women. Vivitrol shots offered. DWIHN must approve your stay first. | 1852 W. Grand Blvd. | Detroit | 48208 | (313) 894-8444 | https://sharinc.org/ | 24/7; DWIHN approval needed first |  | https://sharinc.org/
+Elmhurst Home, James Oden Center | Elmhurst Home | treatment.residential | Live-in treatment for men, 14 to 90 days. Needs a referral, such as from DWIHN. No one is turned away for not being able to pay. | 12007 Linwood | Detroit | 48206 | (313) 867-1090 | https://ehinc.org/ | Residential intake 24 hours/7 days | Men. | https://ehinc.org/ | flags=men,sliding_fee,referral_only
+Elmhurst Home, Naomi's Nest | Elmhurst Home | treatment.residential | Live-in treatment for women, 14 to 90 days. Needs a referral, such as from DWIHN. You do not need insurance or money. | 245 Pitkin | Highland Park | 48203 | (313) 865-1500 | https://ehinc.org/ | Residential intake 24 hours/7 days | Women. | https://ehinc.org/ | flags=women,sliding_fee,referral_only
+New Light Recovery Center | New Light Recovery Center | treatment.meds | Methadone clinic with counseling. Suboxone and Vivitrol too. New-patient hours are not posted, so call first. | 300 W. McNichols | Detroit | 48203 | (313) 867-8015 | https://www.nlrc.net/ | Mon-Fri 6am-3pm; Sat 8am-10am |  | https://www.nlrc.net/
+Rainbow Center of Michigan | Rainbow Center of Michigan | treatment.meds | Methadone clinic with counseling. | 12501 Hamilton Ave. | Highland Park | 48203 | 313-865-1580 | https://rainbowcm.com/ | not stated | Ages 21 and older. | https://rainbowcm.com/ | phone_label=Main line; phone2=1-800-965-7754; phone2_label=24-hour access line
+Detroit Recovery Project, Eastside | Detroit Recovery Project | treatment.outpatient | Outpatient treatment, medicine for opioid use disorder, recovery coaches, and help after jail or prison. | 1121 East McNichols Rd. | Detroit | 48203 | (313) 365-3100 | https://www.recovery4detroit.com/ | not stated |  | https://www.recovery4detroit.com/services/ | flags=reentry
+CLASS Agency | Changing Lives and Staying Sober (CLASS) | treatment.outpatient | Outpatient counseling for drug and alcohol use, for adults, teens and children. | 22000 Grand River Ave | Detroit | 48219 | 313-412-2160 | https://www.class-agency.org/ | Mon-Fri 9am-5pm |  | https://www.class-agency.org/contacts | flags=youth
+Centers for Family Development | Centers for Family Development | treatment.outpatient | Outpatient treatment for teens and adults with drug or alcohol problems, and help for their families. | 2995 E. Grand Blvd | Detroit | 48202 | 313-758-0150 | https://centersforfamilydevelopment.org/ | not stated | Wayne County teens and adults who have Medicaid. | https://centersforfamilydevelopment.org/index.php/programs/mentalhealth/substance.html | flags=medicaid,youth; phone_label=Intake

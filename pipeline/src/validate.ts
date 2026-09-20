@@ -9,11 +9,14 @@ import { inBbox, p, parsePhone, type CsvRow } from './util.js';
 export interface Issues { errors: string[]; warnings: string[] }
 
 const ID = /^sal_[a-z0-9_]+$/;
-const CATEGORY = /^(food\.(pantry|meal|mobile|benefits)|shelter\.(emergency|warming|cooling|dv)|harm\.(narcan|supplies)|health\.(clinic|mental|dhd)|utilities|housing\.rent|hygiene\.shower|transport|youth|rec\.(center|library))$/;
+const CATEGORY = /^(food\.(pantry|meal|mobile|benefits)|shelter\.(emergency|warming|cooling|dv|day)|harm\.(narcan|supplies)|health\.(clinic|mental|dhd|dental|vision)|utilities|housing\.(rent|owner)|hygiene\.shower|transport|youth|rec\.(center|library)|jobs\.(find|training)|learn\.(school|english)|treatment\.(crisis|detox|residential|outpatient|meds|recovery)|legal|ids|assault|money\.(tax|benefits)|goods\.(clothes|baby)|kids\.care|connect|pets)$/;
 // Patterns that suggest a person's contact details leaked into public text.
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]+/;
 // Case-sensitive on purpose: the name part must be Capitalized Words, or "ask for help today" would match.
 const CONTACT_NAME = /\b(?:[Cc]ontact|[Aa]sk for)\s+(?:(?:Mr|Ms|Mrs|Dr|Sister|Pastor|Rev)\.?\s+)?[A-Z][a-z]+\s+[A-Z][a-z]+\b/;
+
+const host = (u?: string) => { try { return u ? new URL(u).hostname.replace(/^www\./, '') : null; } catch { return null; } };
+const sameSite = (a?: string, b?: string) => { const x = host(a), y = host(b); return !!x && x === y; };
 
 export function validateRows(rows: BundleRow[], todayStr: string): Issues {
   const errors: string[] = [], warnings: string[] = [];
@@ -31,6 +34,9 @@ export function validateRows(rows: BundleRow[], todayStr: string): Issues {
 
     // DV rows never carry a place. A schema rule, not an editorial habit (docs/08, audit A8).
     if (r.category === 'shelter.dv' && (r.address || r.lat !== undefined || r.lon !== undefined)) e('domestic violence rows must not have an address or coordinates');
+    // Any other shelter shows an address only if the shelter publishes it on its own site (DECISIONS 2026-09-19).
+    // Warming and cooling centers are public buildings the City announces, not shelters people live in.
+    if (/^shelter\.(?!warming|cooling)/.test(r.category) && r.address && !sameSite(r.website, r.facts.source?.url)) e("a shelter's address must come from the shelter's own website: source url and website must be on the same site");
 
     if ((r.lat === undefined) !== (r.lon === undefined)) e('lat and lon must come together');
     if (r.lat !== undefined && !inBbox(r.lat, r.lon!)) e(`coordinates ${r.lat},${r.lon} are outside the service area (Detroit, Hamtramck, Highland Park, Dearborn)`);
@@ -66,7 +72,7 @@ export function validateEmergency(rows: CsvRow[], todayStr: string, release: boo
       need.delete(r.id!);
       continue; // 911 and 988 are never test-called
     }
-    if (parsePhone(r.number ?? '')?.number.length === 3) continue; // national three-digit codes (211)
+    // 911 and 988 are hardcoded (handled above). Any other number, including 211, follows the same rule as the rest.
     // A release fails only on a mismatch (DECISIONS 2026-09-19): the owner's page was read and showed a different
     // number. A person clears it by fixing the number (and mismatch_on), or by logging a call on or after that day.
     if (r.mismatch_on && !(r.verified_by_call_on && r.verified_by_call_on >= r.mismatch_on)) {

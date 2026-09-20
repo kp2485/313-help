@@ -5,12 +5,19 @@
 // The choice is a preference, not a fact about a person: it is kept on the phone only and never sent.
 
 import en from '../../../strings/en.json';
-import es from '../../../strings/es.json';
 import { idbGet, idbSet } from './data.js';
 
 export type Lang = 'en' | 'es';
-const TABLES: Record<Lang, Record<string, string>> = { en, es };
+// English ships with the app. Spanish is its own small file, fetched only when it is chosen (or is the phone's
+// language), so an English reader never downloads it. Once fetched, the service worker keeps it for offline use.
+const TABLES: Partial<Record<Lang, Record<string, string>>> = { en };
 let lang: Lang = 'en';
+
+/** Load a language's words. False if they can't be fetched (no signal and never loaded): the app stays in English. */
+async function load(l: Lang): Promise<boolean> {
+  if (TABLES[l]) return true;
+  try { TABLES[l] = (await import('../../../strings/es.json')).default; return true; } catch { return false; }
+}
 
 export const currentLang = () => lang;
 /** For dates and times. Spanish as used in the United States: same calendar, same 12-hour clock. */
@@ -18,7 +25,7 @@ export const locale = () => (lang === 'es' ? 'es-US' : 'en-US');
 
 /** A missing Spanish string falls back to English, never to a blank or a raw key. */
 export function t(key: string, p: Record<string, string | number> = {}): string {
-  return (TABLES[lang][key] ?? en[key as keyof typeof en] ?? key).replace(/\{(\w+)\}/g, (_, k) => String(p[k] ?? ''));
+  return (TABLES[lang]?.[key] ?? en[key as keyof typeof en] ?? key).replace(/\{(\w+)\}/g, (_, k) => String(p[k] ?? ''));
 }
 
 export function pickLang(saved: unknown, browserLangs: readonly string[]): Lang {
@@ -27,12 +34,16 @@ export function pickLang(saved: unknown, browserLangs: readonly string[]): Lang 
 }
 
 export async function initLang(): Promise<void> {
-  lang = pickLang(await idbGet<string>('lang'), typeof navigator === 'undefined' ? [] : navigator.languages ?? [navigator.language]);
+  const want = pickLang(await idbGet<string>('lang'), typeof navigator === 'undefined' ? [] : navigator.languages ?? [navigator.language]);
+  lang = (await load(want)) ? want : 'en';
   if (typeof document !== 'undefined') document.documentElement.lang = lang;
 }
 
-export async function setLang(next: Lang): Promise<void> {
+/** Switch language. False (and nothing changes) if the words can't be fetched right now. */
+export async function setLang(next: Lang): Promise<boolean> {
+  if (!(await load(next))) return false;
   lang = next;
   if (typeof document !== 'undefined') document.documentElement.lang = lang;
   await idbSet('lang', lang);
+  return true;
 }

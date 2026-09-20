@@ -1,0 +1,22 @@
+# Clothing and baby things, a daytime place, and free computers (research lane I: clothing, day centers, phones).
+# Pages read 2026-09-19. Every fact below comes only from the owner's own page (source_url on each line). Aggregators
+# (findhelp, 211, Idealist, news, the Wayne County prosecutor's guide) were used only to find candidates. No staff names,
+# emails or direct lines. Research notes: docs/research/2026-09-19-new-help/clothing-dropin-phones.md.
+# Notes for the steward:
+# - Most Holy Trinity clothing room is a new service at the same place as sal_most_holy_food_pantry (1050 Porter). The page
+#   says it is "generally" open Thursdays 11-1 when the pantry is open, so it is entered as written and says "call first".
+# - The three Crossroads lines are new services at the same place as sal_crossroads_sunday_meal (2424 W Grand Blvd). The
+#   resource list (/clients) names clothing, diapers, formula, baby clothing and the computer lab, and shows the phone and
+#   street number. Hours come from the weekly page https://www.crossroadsofmichigan.org/thisweek (week of Sep 14-20, 2026),
+#   which changes every week, so they are kept as text (call first) rather than a schedule. Neither page says the items are
+#   free, so the lines do not say "free".
+# - Human-I-T sells devices ("starting at $73"); classes and internet setup are free. Listed as low cost, not free.
+# - Detroit Public Library Main: the page does not print a ZIP (Connect 313 gives 48202; a person should confirm before
+#   filling it in). DPL pages disagree on the computer guest-pass fee ($1 vs no charge), so the line does not say computers
+#   are free for everyone. The heat/cold respite wording is from https://detroitpubliclibrary.org/cooling-centers.
+Clothing room | Most Holy Trinity Parish | goods.clothes | Clothes for people in the community who are in need. Open while the Thursday food pantry is open. | 1050 Porter Street | Detroit | 48226 | 313-965-4450 | https://mhtdetroit.org/ | Generally Thursdays 11am-1pm, when the food pantry is open | People in need. | https://mhtdetroit.org/outreach/clothes-closet/ | phone_label=Parish office
+Clothes and hygiene items | Crossroads of Michigan | goods.clothes | Clothes and hygiene items. Call for an appointment, or walk in on a Monday or Friday. | 2424 West Grand Boulevard | Detroit | 48208 | 313-831-2000 | https://crossroadsofmichigan.org | Appointments Mon-Fri 10am-3:30pm; walk-ins on Mondays and Fridays (weekly page, week of Sep 14-20, 2026) | | https://crossroadsofmichigan.org/clients | phone_label=Appointments; phone2=313-831-2787; phone2_label=All other business
+Diapers, formula and baby clothes | Crossroads of Michigan | goods.baby | Diapers, formula and baby clothes. Call for an appointment, or walk in on a Monday or Friday. | 2424 West Grand Boulevard | Detroit | 48208 | 313-831-2000 | https://crossroadsofmichigan.org | Appointments Mon-Fri 10am-3:30pm; walk-ins on Mondays and Fridays (weekly page, week of Sep 14-20, 2026) | | https://crossroadsofmichigan.org/clients | phone_label=Appointments; phone2=313-831-2787; phone2_label=All other business
+Computer lab | Crossroads of Michigan | connect | Computers for email, job searches and more. Volunteers answer tech questions. No appointment needed. | 2424 West Grand Boulevard | Detroit | 48208 | 313-831-2000 | https://crossroadsofmichigan.org | Open lab 11am-2pm on Mon, Tue, Thu and Fri (weekly page, week of Sep 14-20, 2026); changes week to week | | https://crossroadsofmichigan.org/clients | phone_label=Appointments and questions; phone2=313-831-2787; phone2_label=All other business; flags=walk_in
+Digital Empowerment Center, W. 7 Mile | Human-I-T | connect | Low-cost laptops, tablets and hotspots. Free help setting up internet, free computer classes and an open computer lab. | 6375 W. 7 Mile Road, Suite 101 | Detroit | 48221 | 313-612-9990 | https://www.human-i-t.org/ | Mon-Sat 10am-7pm | | https://www.human-i-t.org/7-mile/ | phone_label=Call or walk in; flags=walk_in
+Main Library | Detroit Public Library | connect | Public computers and free job and résumé help. Anyone can come in to get out of the heat or cold while it is open. | 5201 Woodward Ave. | Detroit | | 313-481-1400 | https://detroitpubliclibrary.org/ | Mon 10am-6pm; Tue-Wed 12pm-8pm; Thu-Sat 10am-6pm; Sun 1pm-5pm | | https://detroitpubliclibrary.org/locations/main | phone_label=Main Library; flags=walk_in

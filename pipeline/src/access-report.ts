@@ -10,7 +10,7 @@ const dir = p('data/bundle/v1');
 const rows: BundleRow[] = readdirSync(`${dir}/category`).flatMap((f) => JSON.parse(readFileSync(`${dir}/category/${f}`, 'utf8')));
 const { segments, source } = JSON.parse(readFileSync(`${dir}/places/greenway.json`, 'utf8')) as { segments: Segment[]; source: unknown };
 
-const TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec'];
+const TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec', 'jobs', 'learn', 'treatment', 'housing', 'legal', 'ids', 'money', 'goods', 'kids', 'connect', 'transport', 'pets'];
 const out = segments.filter((s) => s.phase === 'open').map((s) => {
   const near = helpAlong(rows, s);
   const by = Object.fromEntries(TOPS.map((t) => [t, near.filter((x) => x.row.category.startsWith(t)).length]));

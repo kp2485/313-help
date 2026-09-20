@@ -7,7 +7,7 @@ import { encodeLine, GRID } from './ingest-basemap.js';
 import { pointInRing, type Neighborhood, type NowStats, type YearStats } from './ingest-neighborhoods.js';
 
 export const NEAR_MILES = 0.5;                       // "inside or within half a mile" (docs/13)
-export const HELP_TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec'] as const;
+export const HELP_TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec', 'jobs', 'learn', 'treatment', 'housing', 'legal', 'ids', 'money', 'goods', 'kids', 'connect', 'transport', 'pets'] as const;
 /** Walk distance from the middle of the neighborhood to the nearest listing of each kind. */
 const NEAREST: Record<string, string> = { food: 'food', clinic: 'health.clinic', narcan: 'harm.narcan', indoors: 'rec' };
 

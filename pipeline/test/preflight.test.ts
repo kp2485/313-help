@@ -12,7 +12,7 @@ const ready: Record<string, string> = {
   'data/seed/directory.json': '{"retired": false, "photos": false}',
   'data/seed/emergency.csv': 'id,label,number,sms,hardcoded,sort,verified_by_call_on,verified_published_on,mismatch_on,source_url,internal_note\nemg_911,Emergency,911,,yes,1,,,,,\nemg_x,Shelter,866-313-2520,,no,2,,2026-09-18,,https://x,\n',
   'apps/web/public/_headers': "/admin/*\n  Content-Security-Policy: frame-ancestors 'none'\n  X-Frame-Options: DENY\n",
-  'strings/en.json': '{"app.name": "313 Help", "about.p3": "Not an official City of Detroit app."}',
+  'strings/en.json': '{"app.name": "313 Help"}',
   'apps/web/public/manifest.webmanifest': '{"name": "313 Help"}',
   'apps/web/index.html': '<title>313 Help</title>',
   'docs/CHECKS-2026-09-19.md': '| a | b | ok |\n',
@@ -33,6 +33,10 @@ describe('preflight', () => {
     expect(stops(run({}, { ...env, BUNDLE_PUBLIC_KEYS: `${active.pub},${active.pub}` })).join()).toMatch(/pins two different/);
     expect(stops(run({}, { ...env, BUNDLE_SIGNING_KEY: pair().priv })).join()).toMatch(/signing key is one of the two pinned/);
     expect(stops(run({}, { ...env, BUNDLE_SIGNING_KEY: undefined })).join()).toMatch(/BUNDLE_SIGNING_KEY is set/);
+  });
+  it('a label with a comma in it is not a mismatch (it once stopped a deploy for no reason)', () => {
+    const csv = ready['data/seed/emergency.csv']! + 'emg_avalon,"Sexual assault help, 24 hours (Avalon Healing Center)",313-474-7233,,no,5.5,,2026-09-20,,https://avalonhealing.org/,"Printed as 313-474-SAFE, a vanity number"\n';
+    expect(stops(run({ 'data/seed/emergency.csv': csv })).join()).not.toMatch(/emergency number/);
   });
   it('an emergency mismatch, a missing _headers, or a renamed app stop it', () => {
     const csv = ready['data/seed/emergency.csv']!.replace('2026-09-18,,https', '2026-09-18,2026-09-19,https');

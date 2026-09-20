@@ -33,6 +33,15 @@ describe('row validation', () => {
     expect(errs({ category: 'shelter.dv', address: { line1: '1 Main St', city: 'Detroit' } })).toMatch(/must not have an address/));
   it('rejects a DV row that carries coordinates', () =>
     expect(errs({ category: 'shelter.dv', lat: 42.35, lon: -83.05 })).toMatch(/must not have an address or coordinates/));
+  it("shows a shelter's address only when it came from the shelter's own site (Kyle, 2026-09-19)", () => {
+    const addr = { line1: '1 Main St', city: 'Detroit' };
+    const src = (url: string) => ({ reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list' as const, name: 'test', url } });
+    expect(errs({ category: 'shelter.emergency', address: addr, website: 'https://www.shelter.org', facts: src('https://shelter.org/locations/') })).toBe('');
+    expect(errs({ category: 'shelter.emergency', address: addr, website: 'https://shelter.org', facts: src('https://www.justice.gov/eoir/roster') })).toMatch(/shelter's own website/);
+    expect(errs({ category: 'shelter.emergency', address: addr, facts: src('https://shelter.org/') })).toMatch(/shelter's own website/);
+    expect(errs({ category: 'shelter.emergency', website: 'https://shelter.org', facts: src('https://example.org/') })).toBe('');   // intake phone only
+    expect(errs({ category: 'shelter.cooling', address: addr })).toBe('');   // a public building, not a shelter
+  });
   it('rejects coordinates outside the service area', () => expect(errs({ lat: 42.6, lon: -83.05 })).toMatch(/outside the service area/));
   it('accepts places in Dearborn, Hamtramck and Highland Park (Kyle, 2026-09-19)', () => {
     for (const [lat, lon] of [[42.322, -83.176], [42.33, -83.312], [42.395, -83.049], [42.405, -83.097]]) expect(errs({ lat, lon }), `${lat},${lon}`).toBe('');
@@ -88,10 +97,27 @@ describe('emergency numbers', () => {
     expect(checkEmergencyRow(c, { ok: false, why: 'bot protection' }, '2026-09-18')).toBe('unreadable');
     expect(c).toEqual(row());
   });
+  it('211 is checked against its own page ("211" or "2-1-1"); 911 and 988 never are (REVIEW 30a)', () => {
+    const row = (over = {}) => ({ id: 'emg_211', number: '211', source_url: 'https://mi211.org/', hardcoded: '', mismatch_on: '', verified_published_on: '', ...over });
+    const a = row();
+    expect(checkEmergencyRow(a, { ok: true, html: '<p>Call 2-1-1 any time</p>' }, '2026-09-20')).toBe('match');
+    expect(a.verified_published_on).toBe('2026-09-20');
+    expect(checkEmergencyRow(row(), { ok: true, html: '<p>Dial 311 for city services</p>' }, '2026-09-20')).toBe('mismatch');
+    expect(checkEmergencyRow(row(), { ok: true, html: '<p>Call 313-211-0000</p>' }, '2026-09-20')).toBe('mismatch');   // not inside a longer number
+    for (const id of ['emg_911', 'emg_988']) expect(checkEmergencyRow(row({ id, number: id.slice(4), hardcoded: 'yes' }), { ok: true, html: '' }, '2026-09-20'), id).toBe('skipped');
+  });
   it('a recent match against the published page is enough', () => {
-    const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '', verified_published_on: '2026-09-15' }, { id: 'emg_211', number: '211', hardcoded: 'no' }], '2026-09-18', true);
+    const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '', verified_published_on: '2026-09-15' }, { id: 'emg_211', number: '211', hardcoded: 'no', verified_published_on: '2026-09-15' }], '2026-09-18', true);
     expect(r.errors).toEqual([]);
     expect(r.verified).toBe(true);
+  });
+  it('211 follows the same rule as every other number: never checked is a warning, not a failed release (REVIEW 30a)', () => {
+    const r = validateEmergency([...base, { id: 'emg_211', number: '211', hardcoded: 'no' }], '2026-09-18', true);
+    expect(r.errors).toEqual([]);
+    expect(r.warnings.join(' ')).toMatch(/emg_211 \(211\): never checked/);
+    expect(r.verified).toBe(false);
+    const bad = validateEmergency([...base, { id: 'emg_211', number: '211', hardcoded: 'no', mismatch_on: '2026-09-17' }], '2026-09-18', true);
+    expect(bad.errors.join(' ')).toMatch(/emg_211/);   // a release stops if 211's own page stopped showing it
   });
   it('passes with a recent call, and never asks anyone to test-call 911 or 988', () => {
     const r = validateEmergency([...base, { id: 'emg_shelter', number: '866-313-2520', hardcoded: 'no', verified_by_call_on: '2026-09-10' }], '2026-09-18', true);
@@ -300,6 +326,14 @@ describe('hours from research text', () => {
   it('a line with unclear hours is imported as call-first with the hours kept as written', () => {
     const out = lineToRows('Hope Pantry | Hope Church | food.pantry | Free groceries. | 1 Main St | Detroit | 48204 | 313-555-0100 | https://x.org | 2nd Saturday 10am-noon | | https://x.org/pantry');
     expect(out).toMatchObject({ resource: { sal_id: 'sal_hope_church_hope_pantry', status: 'proposed', availability: 'call_first', hours_text: '2nd Saturday 10am-noon' }, schedules: [] });
+  });
+  it('an optional 13th field carries flags, phone labels, a second phone and a notice', () => {
+    const base = 'Career center | Detroit at Work | jobs.find | Help finding a job. | 1 Main St | Detroit | 48204 | 313-555-0100 | https://x.org | Mon-Fri 8am-5pm | | https://x.org/locations';
+    expect(lineToRows(`${base} | flags=walk_in, reentry; phone_label=Job line; phone2=313-555-0101; phone2_label=Unemployment help; notice=Closed Nov 26.`)).toMatchObject({ resource: {
+      flags: 'walk_in,reentry', phone_label: 'Job line', phone2: '313-555-0101', phone2_label: 'Unemployment help', notice: 'Closed Nov 26.', availability: 'scheduled' } });
+    expect(lineToRows(`${base} | `)).toMatchObject({ resource: { flags: '', phone2: '' } });
+    expect(lineToRows(`${base} | color=green`)).toMatch(/unknown extra/);
+    expect(lineToRows(`${base} | phone2=313-555-0101`)).toMatch(/phone2_label/);
   });
 });
 

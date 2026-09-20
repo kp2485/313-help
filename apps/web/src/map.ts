@@ -210,7 +210,7 @@ export class MapView {
   private draw(): void {
     const c = this.ctx, { w, h } = this, mpp = M_PER_UNIT / this.s;                        // meters per pixel
     const view: Box = [this.cx - w / 2 / this.s, this.cy - h / 2 / this.s, this.cx + w / 2 / this.s, this.cy + h / 2 / this.s];
-    const col = { out: css('--map-out'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus') };
+    const col = { out: css('--map-out'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus'), gwOpen: css('--gw-open'), gwBuild: css('--gw-build'), gwFund: css('--gw-fund'), gwPlan: css('--gw-plan'), gwCase: css('--gw-case') };
     c.lineCap = 'round'; c.lineJoin = 'round'; c.setLineDash([]);
     c.fillStyle = this.map ? col.out : col.land; c.fillRect(0, 0, w, h);
     const labels: { name: string; pts: Float32Array; cls: number }[] = [];
@@ -239,14 +239,46 @@ export class MapView {
       c.beginPath(); for (const ring of this.spec.outline) { ring.forEach((q, i) => (i ? c.lineTo(this.X(wx(q.lon)), this.Y(wy(q.lat))) : c.moveTo(this.X(wx(q.lon)), this.Y(wy(q.lat))))); c.closePath(); }
       c.globalAlpha = 0.12; c.fillStyle = col.brand; c.fill(); c.globalAlpha = 1; c.strokeStyle = col.strong; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.stroke(); c.setLineDash([]);
     }
-    // Greenway: open stretches are a solid green line; the rest is dashed and says so when tapped.
+    // Greenway, drawn like a transit line: one width the whole way, a casing so it reads over the streets, and a
+    // colour and dash for each phase. Colour never carries the meaning alone: the key under the map says it in words,
+    // and tapping a stretch names its phase. Where stretches meet, a station dot marks the join once you zoom in.
     const stroke = (g: { lines: Float32Array[] }, color: string, lw: number, dash: number[]) => { c.strokeStyle = color; c.lineWidth = lw; c.setLineDash(dash); c.beginPath(); for (const l of g.lines) this.trace(l); c.stroke(); };
-    const gwW = Math.max(3, Math.min(7, 14 / mpp));
-    for (const g of this.segs) if (g.seg.phase !== 'open' && touches(g.box, view)) stroke(g, col.muted, Math.max(2, gwW - 2), [2, 7]);
-    for (const g of this.segs) if (g.seg.phase === 'open' && touches(g.box, view)) { stroke(g, col.surface, gwW + 3, []); stroke(g, col.brand, gwW, []); }
-    const f = this.segs.find((g) => g.seg.id === this.spec.focus);
-    if (f) { stroke(f, col.strong, gwW + 5, []); stroke(f, f.seg.phase === 'open' ? col.brand : col.surface, gwW, f.seg.phase === 'open' ? [] : [2, 9]); }
+    const gwW = Math.max(4.5, Math.min(9, 18 / mpp));
+    const gwStyle: Record<string, { color: string; dash: number[] }> = {
+      open: { color: col.gwOpen, dash: [] },
+      under_construction: { color: col.gwBuild, dash: [gwW * 2.4, gwW * 1.5] },
+      funded: { color: col.gwFund, dash: [gwW * 1.4, gwW * 1.3] },
+      planned: { color: col.gwPlan, dash: [0.1, gwW * 1.9] },                    // round caps turn this into dots
+    };
+    const onScreen = this.segs.filter((g) => touches(g.box, view));
+    const focused = this.spec.focus ? onScreen.filter((g) => g.seg.id === this.spec.focus) : [];
+    // One casing pass under everything, so the route looks continuous even where phases change.
+    for (const g of onScreen) stroke(g, col.gwCase, gwW + 4, []);
+    // Then each phase, least built first, so an open stretch is never hidden by a dotted one.
+    for (const phase of ['planned', 'funded', 'under_construction', 'open']) {
+      const st = gwStyle[phase]!;
+      for (const g of onScreen) if (g.seg.phase === phase) {
+        c.globalAlpha = this.spec.focus && g.seg.id !== this.spec.focus ? 0.45 : 1;   // the chosen stretch stands out
+        stroke(g, st.color, gwW, st.dash);
+      }
+    }
+    c.globalAlpha = 1;
+    for (const f of focused) { stroke(f, col.strong, gwW + 6, []); stroke(f, col.gwCase, gwW + 3, []); stroke(f, gwStyle[f.seg.phase]!.color, gwW, gwStyle[f.seg.phase]!.dash); }
     c.setLineDash([]);
+    // Stations: where a stretch begins and ends. Only once they are far enough apart to be worth drawing.
+    if (mpp < 14 && onScreen.length) {
+      const r = Math.max(3, Math.min(6, gwW * 0.75)), seen: [number, number][] = [];
+      c.fillStyle = col.gwCase; c.strokeStyle = col.ink; c.lineWidth = Math.max(1.5, r * 0.45);
+      for (const g of onScreen) for (const l of g.lines) {
+        for (const [ux, uy] of [[l[0]!, l[1]!], [l[l.length - 2]!, l[l.length - 1]!]] as [number, number][]) {
+          const x = this.X(ux), y = this.Y(uy);
+          if (x < -10 || y < -10 || x > w + 10 || y > h + 10) continue;
+          if (seen.some(([sx, sy]) => Math.hypot(sx - x, sy - y) < r * 2.5)) continue;
+          seen.push([x, y]);
+          c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fill(); c.stroke();
+        }
+      }
+    }
 
     // Names. Bigger roads first, so they win when two names would overlap.
     // A name is a row of small circles along its text, so a slanted name only blocks the space it really covers.

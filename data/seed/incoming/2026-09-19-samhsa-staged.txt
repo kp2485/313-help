@@ -1,0 +1,19 @@
+# Drug and alcohol treatment programs from SAMHSA's lists that DWIHN's list gave no website for
+# (data/staging/samhsa_treatment.csv, decision=staged, 22 rows). Only 2 of the 22 had their own current page
+# with the phone and street number together; the other 20 are held (scratchpad convert-samhsa-staged.md).
+# Pages read 2026-09-19 with a plain request that says who we are. category, what and flags come from the staged
+# row (SAMHSA's codes); the phone and address are as each program's own page prints them. Aggregators were used
+# only to find the program's own site, never as the source of a fact.
+# Notes for a steward:
+# - NCADD Detroit, Vantage Point West: the own page prints the treatment center line as (313) 341-9891, which is
+#   SAMHSA's intake line. SAMHSA's main line, 313-342-3606, is not on the own page, so it is not used. The page
+#   prints a second number with no label, (313) 861-0413. That number is not used. The page says "not a 24-hour
+#   facility". DWIHN's April 2026 list says "accepting new: No"; one call before first publish.
+# - Focus Program, Hamtramck: the own site gives one phone for all four sites, (248) 726-0127. SAMHSA gives
+#   248-914-3211, which is not on the own site. The line uses the own site's number. The hours (Mon-Fri 9am-5pm,
+#   Saturday by appointment) are on the contact page for the whole organization, not for this site. Because they
+#   say "appointment", the listing will say "call first". The home page says "We Speak Spanish too!", so the line
+#   adds `spanish` to SAMHSA's `medicaid`. The page names Suboxone. It does not name Vivitrol, but it doesn't say
+#   Vivitrol isn't offered, so `what` is SAMHSA's wording. Its insurance list is only in images. Medicaid comes from SAMHSA.
+NCADD Detroit, Vantage Point West | NCADD Detroit | treatment.outpatient | Treatment for drug or alcohol use while you live at home. Takes Medicaid. | 16647 Wyoming Street | Detroit | 48221 | (313) 341-9891 | https://ncadd-detroit.org | not stated | Adults and young adults. | https://ncadd-detroit.org/contact-us/ | flags=medicaid; phone_label=Treatment center
+Focus Program, Hamtramck | Focus Program Inc | treatment.outpatient | Treatment for drug or alcohol use while you live at home. Offers buprenorphine (Suboxone) and naltrexone (Vivitrol). Takes Medicaid. | 9740 Conant St., Suite 5 | Hamtramck | 48212 | (248) 726-0127 | https://focusprograminc.com | Mon-Fri 9am-5pm; Sat by appointment only |  | https://focusprograminc.com/contact-us/ | flags=medicaid,spanish; phone_label=Main line for all Focus Program sites

@@ -66,6 +66,10 @@ export function phonesOn(html: string): Set<string> {
   return out;
 }
 
+/** A three-digit code (211, 988) as a page writes it: "211" or "2-1-1", never inside a longer number. */
+export const shortCodeOnPage = (html: string, code: string): boolean =>
+  new RegExp(String.raw`(?<![\d-])${code.split('').join('-?')}(?![\d-])`).test(pageText(html));
+
 export const phoneOnPage = (html: string, number: string): boolean => {
   const ph = parsePhone(number);
   return !!ph && ph.number.length === 10 && phonesOn(html).has(ph.number);

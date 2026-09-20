@@ -38,7 +38,7 @@ Report a problem with the app: not built.
 
 - **Home**: a calm landing page — the Español/English switch, hero, a search button, active alerts, one "Find free help" card, four quick needs, tiles into Recreation and Transit. No red, no emergency strip.
 - **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
-- **Recreation**: Joe Louis Greenway (map, segments, help within a 10-minute walk), City parks (302, nearest first with location), recreation centers, MoGo Access Pass.
+- **Recreation**: Joe Louis Greenway (map, segments, help within a 10-minute walk), City parks (302, nearest first with location), recreation centers, MoGo Access Pass. The greenway is drawn like a transit line (DECISIONS 2026-09-20): one width with a casing, a colour and dash for each phase, station dots where stretches join once zoomed in, the chosen stretch bright with the rest dimmed, and a key under the map naming each phase in words.
 - **Transit**: DDOT trip planner and real-time links, fares, free rides (People Mover, QLINE), phone numbers. Every listing with an address gets a **Bus directions** button.
 - **Events**: the City calendar, read by the pipeline into the signed bundle, grouped by day; details link out.
 - **Urgent help**: a button in the top bar of every screen (replaced by quick-exit on DV and crisis screens) opens the numbers sheet: 911, 988, shelter, crisis line, DV hotline, 211, plus the overdose steps. One tap from anywhere (Principle 3). 911 is the only red element in the app besides quick exit.
@@ -63,16 +63,10 @@ The earlier "emergency strip" and needs-on-Home layout are superseded by this st
 
 Runs entirely on the device against the cached bundle. No answer is stored, transmitted, or remembered after the flow ends (the back stack is cleared on exit).
 
-Step 1 — **What's going on?** (pick one)
-- I need food
-- I need a safe place to sleep tonight
-- **Someone is overdosing right now**
-- I want free Narcan to carry
-- My lights, heat, or water are being shut off
-- I need to see a doctor or nurse
-- I need to talk to someone right now
-- I'm not safe at home
-- It's too hot / too cold where I am
+Step 1 — **What's going on?** (pick one; three groups since 2026-09-19. *Right now* is full-sentence rows; the other two groups are two-column tiles with short labels, and "Browse every kind of help" opens to the category list. Home's six shortcuts: food, a place to sleep, a doctor, help with drugs or alcohol, a job, free Narcan.)
+- *Right now:* **Someone is overdosing right now** · I need a safe place to sleep tonight · I'm not safe at home · I need to talk to someone right now · **I want help with drugs or alcohol** · **Help after sexual assault**
+- *This week:* I need food · I need a doctor, dentist, or eye care · I'm behind on rent or might lose my home · My lights, heat, or water are being shut off · I need somewhere to go during the day · I need clothes, diapers, or baby things · I want free Narcan to carry · It's too hot / too cold where I am
+- *Work, school, and paperwork:* I want a job or job training · I want my GED or to learn English · I need free legal help · I need an ID or birth certificate · Help with taxes or signing up for benefits · Help paying for child care or preschool · I need a phone, internet, or a computer · Rides to the doctor or cheaper bus fare · Help with my pet
 
 Step 2 — one refinement, only if it changes the result:
 - Food → *Food today* (hot meals, `food.meal`; places open now or later today sort first) vs *Food this week* (every food listing; places with a time in the next 7 days sort first) vs *Help paying for food* (link-outs to MI Bridges for SNAP, Michigan WIC, and Double Up Food Bucks; no phone numbers, no eligibility rules copied)
@@ -80,7 +74,13 @@ Step 2 — one refinement, only if it changes the result:
 - Overdosing right now → no refinement, no list, no map: **Call 911**, then the rescue steps (check, call, give naloxone if you have it, rescue breaths, recovery position, stay). Nothing else on the screen.
 - Narcan to carry → straight to results (the stations list)
 - Utilities → no refinement today: one list. (Later, if it changes the result: *Electric/gas (DTE)* vs *Water (DWSD)*.)
-- Doctor → no refinement today: one list of clinics. (Later, if it changes the result: *Today / urgent* vs *Regular care*.)
+- Doctor → *A doctor or nurse* (clinics) vs *A dentist* vs *Eye care or glasses*.
+- Drugs or alcohol → DWIHN's 24-hour line (the front door to publicly funded treatment in all of Wayne County) and SAMHSA's national helpline first, then: *Somewhere I can go today* (walk-in places first) · *Detox* · *Medicine for opioid addiction* · *Live-in treatment* · *Treatment while I live at home* · *Recovery support and meetings* (with a link to MARR's certified recovery homes; we never list homes ourselves) · *Safer-use supplies*. Quick exit. Listings are private (see below).
+- Sexual assault → Avalon Healing Center's 24-hour line, the VOICES4 hotline (call or text) and 911 first, then the list. "The medical exam is free. You do not have to talk to the police to get one." Quick exit; private listings; no address for a program that doesn't publish one.
+- Rent or home → *I rent* (free eviction lawyers and court help first: no general rent money is open today) vs *I own my home* (tax exemptions, foreclosure help, repairs).
+- Job → *Help finding a job* · *Free job training* · *I have a record* (every job listing, the ones for people with a record first) · *I lost my job* (link-outs: unemployment, the State's job board, Michigan Works!).
+- School → *GED, diploma, or reading* vs *English classes*.
+- The other "Work, school, and paperwork" needs go straight to a list, followed by link-outs where the help is a program you apply for online (free state ID rules, the child-care scholarship and free PreK, Lifeline phones and low-cost internet, Medicaid rides and reduced fares, the IRS and Michigan free-filing pages).
 
 Step 3 — **never a gate.** Results show immediately, citywide. An inline chip offers "Use my location" (permission asked only on that tap, never on launch) or "Type a ZIP code" (not stored); choosing either re-sorts in place.
 
@@ -92,6 +92,7 @@ Safety rules baked into the flow:
 - "Someone is overdosing right now" → 911 and rescue steps only (static text, works offline; illustrations not built yet). Never a station list: a bystander must not be sent on an errand (10-A7).
 - "I want free Narcan to carry" → nearest stations. Not built yet: the line "Narcan is also sold without a prescription at most pharmacies — ask at the counter," and the how-to card.
 - "I'm not safe at home" shows no distance and no map.
+- "I want help with drugs or alcohol" and "Help after sexual assault" (DECISIONS 2026-09-19): numbers first, a quick exit, and **private listings**: never saved, never in the browser history, but with an address, distance and map dot so a person can get there.
 
 ## List / Map
 
@@ -134,7 +135,7 @@ See 04. One screen, under Help → More. The address is typed. Days and times ar
 
 ## Language
 
-English and Spanish are built. The app picks Spanish when the phone's language is Spanish, and an "Español / English" switch on Home and About changes it; the choice stays on the phone. Arabic is next (RTL layout — test early, it breaks tab bars). What a place wrote about itself stays in English, marked as English, with the line "This place's own words are shown in English, the way they wrote them." We never machine-translate safety-critical text. Later: the bundle may carry an owner's own translation of a description.
+English and Spanish are built. The app picks Spanish when the phone's language is Spanish, and an "Español / English" switch on Home and About changes it; the choice stays on the phone. **Spanish is a separate file, fetched only when it is chosen** (DECISIONS 2026-09-19), so an English reader never downloads it; once fetched it is kept for offline use. With no signal and no saved copy the switch does nothing and the app stays in English. Arabic is next (RTL layout — test early, it breaks tab bars). What a place wrote about itself stays in English, marked as English, with the line "This place's own words are shown in English, the way they wrote them." We never machine-translate safety-critical text. Later: the bundle may carry an owner's own translation of a description.
 
 ## Accessibility
 

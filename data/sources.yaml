@@ -42,3 +42,32 @@ sources:
     license: unstated
     # docs/11 approved 2026-09-18. PHASE_DESCRIPTION (Open / Under Construction / Funded / Unfunded)
     # is the truth for "can I walk here today".
+
+  # Drug and alcohol treatment (DECISIONS 2026-09-19, "use SAMHSA's lists"). Read by pipeline/src/ingest-treatment.ts
+  # (pnpm ingest:treatment), which stages every program in the four cities in data/staging/samhsa_treatment.csv and
+  # writes import lines only for programs whose own website DWIHN names; check:sources decides from there.
+  - id: samhsa_treatment_directory
+    name: SAMHSA National Directory of Drug and Alcohol Use Treatment Facilities (2025 edition, 2024 survey)
+    tier: A
+    kind: samhsa_directory
+    url: https://www.samhsa.gov/data/sites/default/files/reports/rpt57009/2025_SU_Facilities_for_All_City_All.xlsx
+    page: https://www.samhsa.gov/data/data-we-collect/n-sumhss-national-substance-use-and-mental-health-services-survey/national-directories
+    license: public domain   # "This publication is in the public domain ... may not be reproduced or distributed for a fee"
+    mode: stage
+
+  - id: samhsa_otp_directory
+    name: SAMHSA Opioid Treatment Program Directory
+    tier: A
+    kind: samhsa_otp
+    url: https://www.samhsa.gov/find-help/locators/opioid-treatment-program-directory/export?page&_format=csv
+    page: https://www.samhsa.gov/find-help/locators/opioid-treatment-program-directory
+    license: public domain (federal government work)
+    mode: stage
+
+  - id: dwihn_provider_directory
+    name: Detroit Wayne Integrated Health Network provider directory
+    tier: A
+    kind: dwihn_providers
+    url: https://dwihn.org/sites/default/files/providers-practitioners/provider-directory.csv
+    license: unstated   # public provider directory; used only to match programs and find their own websites
+    mode: stage

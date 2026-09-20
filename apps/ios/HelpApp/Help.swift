@@ -28,7 +28,9 @@ struct Need: Identifiable {
     var id: String
     var symbol: String
     var now: Bool                       // listed first, under "Right now"
+    var later = false                   // listed last, under "Work, school, and paperwork"
     var first: [String] = []            // emergency numbers shown BEFORE any list
+    var firstLink: (key: String, url: String)? = nil    // a link above even those (313SafeBeds on the shelter screen)
     var query: Query? = nil
     var refine: [Refine] = []
     var stepsOnly = false               // overdose: 911 and steps, never a list (audit A7)
@@ -38,15 +40,38 @@ struct Need: Identifiable {
 
 let needs: [Need] = [
     Need(id: "overdose_now", symbol: "waveform.path.ecg", now: true, first: ["emg_911"], stepsOnly: true, sensitive: true),
-    Need(id: "shelter", symbol: "bed.double", now: true, first: ["emg_shelter_helpline", "emg_shelter_outwayne"], refine: [
+    Need(id: "shelter", symbol: "bed.double", now: true, first: ["emg_shelter_helpline", "emg_shelter_outwayne"],
+         firstLink: ("beds.safebeds", "https://313safebeds.com/"), refine: [
         .init(id: "me", query: Query(category: "shelter.emergency")), .init(id: "kids", query: Query(category: "shelter.emergency")), .init(id: "young", query: Query(category: "shelter.emergency", prefer: ["youth"]))]),   // youth shelters first
     Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], query: Query(category: "shelter.dv"), sensitive: true, intro: "safe.dv_intro"),
     Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], query: Query(category: "health.mental"), sensitive: true, intro: "talk.intro"),
+    // Treatment and sexual assault (DECISIONS 2026-09-19): numbers first. The iPhone app saves nothing and keeps no
+    // history, so "private" needs no extra rule here; addresses and distance stay.
+    Need(id: "drugs", symbol: "leaf", now: true, first: ["emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"], refine: [
+        .init(id: "today", query: Query(category: "treatment", prefer: ["walk_in"])), .init(id: "detox", query: Query(category: "treatment.detox")),
+        .init(id: "meds", query: Query(category: "treatment.meds")), .init(id: "stay", query: Query(category: "treatment.residential")),
+        .init(id: "home", query: Query(category: "treatment.outpatient")), .init(id: "recovery", query: Query(category: "treatment.recovery")),
+        .init(id: "supplies", query: Query(category: "harm.supplies"))], intro: "drugs.intro"),
+    Need(id: "assault", symbol: "shield", now: true, first: ["emg_avalon", "emg_voices4", "emg_911"], query: Query(category: "assault"), intro: "assault.intro"),
     Need(id: "food", symbol: "fork.knife", now: false, refine: [.init(id: "today", query: Query(category: "food.meal")), .init(id: "week", query: Query(category: "food", mode: "week"))]),
-    Need(id: "doctor", symbol: "cross.case", now: false, query: Query(category: "health.clinic")),
+    Need(id: "doctor", symbol: "cross.case", now: false, refine: [.init(id: "doctor", query: Query(category: "health.clinic")), .init(id: "dentist", query: Query(category: "health.dental")), .init(id: "eyes", query: Query(category: "health.vision"))]),
+    Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner"))]),
     Need(id: "utilities", symbol: "bolt", now: false, query: Query(category: "utilities")),
+    Need(id: "day", symbol: "clock", now: false, query: Query(category: "shelter.day")),
+    Need(id: "things", symbol: "tshirt", now: false, refine: [.init(id: "clothes", query: Query(category: "goods.clothes")), .init(id: "baby", query: Query(category: "goods.baby"))]),
     Need(id: "narcan", symbol: "shippingbox", now: false, query: Query(category: "harm.narcan")),
     Need(id: "hot_cold", symbol: "sun.max", now: false, query: Query(category: "rec"), intro: "hotcold.intro"),
+    // The web app also shows link-outs (unemployment, Lifeline, child-care scholarships…) on these screens; the
+    // iPhone lists places only until link-outs are built here.
+    Need(id: "job", symbol: "briefcase", now: false, later: true, refine: [.init(id: "find", query: Query(category: "jobs.find")), .init(id: "training", query: Query(category: "jobs.training")), .init(id: "record", query: Query(category: "jobs", prefer: ["reentry"]))]),
+    Need(id: "school", symbol: "book", now: false, later: true, refine: [.init(id: "ged", query: Query(category: "learn.school")), .init(id: "english", query: Query(category: "learn.english"))]),
+    Need(id: "legal", symbol: "building.columns", now: false, later: true, query: Query(category: "legal")),
+    Need(id: "id", symbol: "person.text.rectangle", now: false, later: true, query: Query(category: "ids")),
+    Need(id: "money", symbol: "dollarsign.circle", now: false, later: true, refine: [.init(id: "taxes", query: Query(category: "money.tax")), .init(id: "benefits", query: Query(category: "money.benefits"))]),
+    Need(id: "childcare", symbol: "figure.2.and.child.holdinghands", now: false, later: true, query: Query(category: "kids.care")),
+    Need(id: "phone", symbol: "wifi", now: false, later: true, query: Query(category: "connect")),
+    Need(id: "rides", symbol: "bus", now: false, later: true, query: Query(category: "transport")),
+    Need(id: "pets", symbol: "pawprint", now: false, later: true, query: Query(category: "pets")),
 ]
 
 func telURL(_ number: String) -> URL? { URL(string: telLink(number)) }

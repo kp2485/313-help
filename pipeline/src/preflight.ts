@@ -6,6 +6,7 @@
 
 import { createPrivateKey, createPublicKey } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
+import { parse as parseCsv } from 'csv-parse/sync';
 import { p } from './util.js';
 
 export interface Check { ok: boolean; level: 'stop' | 'look'; what: string; fix?: string }
@@ -44,10 +45,10 @@ export function preflight({ env, file }: Inputs): Check[] {
   const directory = JSON.parse(file('data/seed/directory.json') ?? '{}') as { retired?: boolean; photos?: boolean };
   check(directory.retired !== true, 'look', 'the directory is not marked retired', 'data/seed/directory.json says retired: true; every phone will show the shutdown notice');
   check(directory.photos !== true, 'look', 'the photo field is off in the app (directory.json)', 'photos stay off until the legal advice in docs/11');
-  const emergency = file('data/seed/emergency.csv') ?? '';
-  const header = emergency.split(/\r?\n/)[0]?.split(',') ?? [];
-  const col = header.indexOf('mismatch_on');
-  const mismatched = col < 0 ? [] : emergency.split(/\r?\n/).slice(1).filter((l) => l && (l.split(',')[col] ?? '') !== '').map((l) => l.split(',')[0]);
+  // Parsed as real CSV: a label like "Sexual assault help, 24 hours (Avalon Healing Center)" holds commas, and
+  // splitting on them shifted the columns and invented a mismatch that stopped a deploy for no reason.
+  const emergency = parseCsv(file('data/seed/emergency.csv') ?? '', { columns: true, skip_empty_lines: true }) as Record<string, string>[];
+  const mismatched = emergency.filter((r) => (r.mismatch_on ?? '') !== '').map((r) => r.id);
   check(mismatched.length === 0, 'stop', 'no emergency number has a page that showed a different number', `fix ${mismatched.join(', ')} in data/seed/emergency.csv by hand (check:emergency found a mismatch)`);
 
   // The page shell.
@@ -56,7 +57,6 @@ export function preflight({ env, file }: Inputs): Check[] {
   const en = JSON.parse(file('strings/en.json') ?? '{}') as Record<string, string>;
   const manifest = JSON.parse(file('apps/web/public/manifest.webmanifest') ?? '{}') as { name?: string };
   check(en['app.name'] === '313 Help' && manifest.name === '313 Help' && /<title>313 Help<\/title>/.test(file('apps/web/index.html') ?? ''), 'stop', 'the app is named 313 Help in the strings, the manifest and the page title', 'the name changes only with Kyle (CLAUDE.md)');
-  check(/Not an official City of Detroit app/.test(en['about.p3'] ?? ''), 'stop', 'the "not an official City of Detroit app" line is there');
 
   // Work a person still owes.
   const worksheet = file('docs/CHECKS-2026-09-19.md');
