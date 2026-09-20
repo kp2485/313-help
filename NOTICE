@@ -25,6 +25,12 @@ Public lists (City of Detroit open data, data.detroitmi.gov):
   Detroit Health Department: harm reduction stations
   Detroit Parks and Recreation: recreation centers
 
+Naloxone and test-strip stations outside Detroit:
+  Wayne County Healthy Communities, "Well Wayne Stations" location map
+    (endoverdosewayne.org). The map states no terms of use; we publish the
+    County's own facts, name the County on every row, and carry the map's own
+    "Map updated" date. Asking the County about reuse is still owed.
+
 Organizations whose own websites supplied their listings:
   ACCESS
   Accounting Aid Society
@@ -214,9 +220,55 @@ US Census Bureau (TIGER/Line and TIGERweb; public domain):
   Streets in Hamtramck, Highland Park and Dearborn
   ZIP Code Tabulation Areas for Dearborn ZIP codes
 
+Pedestrian and bicycle crash counts ("Safe streets"):
+  Southeast Michigan Council of Governments (SEMCOG), "Crash Locations,
+    2015-2024". The underlying police reports are the Michigan State Police's
+    (CJIC). SEMCOG publishes no terms for this layer, so it is recorded as
+    unstated, read by hand about once a year, kept as counts only, and both
+    bodies are named on the panel. Questions to SEMCOG and MSP are owed; if
+    either objects the layer is deleted and the panel disappears.
+
+
+THE ELEVEN TRANSPORT LAYERS ON THE MAP
+
+Each layer names its owner and its licence text on the Map tab and in
+data/ingested/transit/source.json. Nothing is drawn from a tile server and no
+layer owner is contacted while the map is open.
+
+  City of Detroit open data (data.detroitmi.gov) — the portal publishes a
+    disclaimer and no licence grant:
+      DDOT Bus Routes; DDOT Bus Stops; QLine Stops (M-1 RAIL); MoGo Stations;
+      Bike Lanes (Department of Public Works)
+    DDOT also publishes a GTFS feed its portal marks CC0. We cannot read it:
+    detroitmi.gov answers 403 to scripts and we do not disguise a request.
+  SMART, published GTFS feed (routes and stops) — no terms published
+  Detroit People Mover, published GTFS feed (stations) — no terms published
+  Michigan Department of Transportation, Carpool Lots (park and ride) —
+    a disclaimer, no redistribution limit stated
+  US DOT Bureau of Transportation Statistics, NTAD Amtrak Stations —
+    a work of the United States government, unrestricted public use
+  US DOT Bureau of Transportation Statistics, NTAD Intercity Bus Atlas Stops —
+    CC BY-NC 4.0 (attribution, non-commercial)
+
+
+PLACES WE LINK TO, AND TAKE NOTHING FROM
+
+  313SafeBeds (313safebeds.com) — real-time shelter status. Its page was read
+    in a browser; the shelter screen opens with a link to it and copies nothing.
+  Transit (transitapp.com) — the "Bus directions in the Transit app" button uses
+    Transit's own documented URL scheme and passes only a destination. Their
+    developer page states no terms and no branding rule, so we use the plain
+    word "Transit" in text, no logo, no asset of theirs, and fetch nothing from
+    their servers. Asking them what they want is still owed.
+  DDOT and SMART trip planners, and the public application sites behind the
+    link-outs on several need screens. Named as theirs; never an endorsement of
+    ours, and none of them endorses us.
+
 
 FORMATS AND STANDARDS
   Human Services Data Specification (HSDS) 3.2, Open Referral
+  General Transit Feed Specification (GTFS), read for the SMART, People Mover
+    and (by hand) DDOT layers
 
 
 OPEN-SOURCE SOFTWARE THE APP AND ITS TOOLS USE
@@ -226,8 +278,14 @@ OPEN-SOURCE SOFTWARE THE APP AND ITS TOOLS USE
   ajv 8.20.0 and ajv-formats 3.0.1 (MIT), Evgeny Poberezkin
   csv-parse 7.0.2 and csv-stringify 6.8.3 (MIT), David Worms / Adaltas
   yaml 2.9.1 (ISC), Eemeli Aro
-  Built and tested with TypeScript, Vite, Vitest, Wrangler (Cloudflare) and Swift.
+  Built and tested with TypeScript, Vite, Vitest, Wrangler (Cloudflare), Swift,
+  and Kotlin with Gradle and the Android Gradle Plugin.
   Each package's own license file ships with it.
+
+  The iPhone and Android apps ship with no third-party code at all: the Android
+  APK contains no AndroidX, no Jetpack Compose, no Play Services and no HTTP or
+  JSON library. JUnit 4 (Eclipse Public License 1.0) is used only to run the
+  Android tests on a laptop and is never distributed.
 
 
 AND

@@ -45,8 +45,8 @@ Two halves, deliberately separated:
   apps/
     ios/             SwiftUI, iOS 17+ (Sources/DetroitQuery: the Swift query library, tested; HelpApp/: the screens, which compile and run in the simulator since 2026-09-20; HelpAppTests/: 28 app tests)
     web/             PWA — same bundle, read-only + reporting (still our Android answer)
-    android/         Kotlin, platform Views, no dependencies (query/: a third copy of the shared rules; app/: the screens). Written 2026-09-20 and NEVER COMPILED — no JDK or Android SDK here
-  strings/           en.json, es.json — every word the app shows
+    android/         Kotlin, platform Views, no dependencies (query/: a third copy of the shared rules; core/: the android-free files on a plain JVM; app/: the screens). Compiled, tested and run on 2026-09-20 — on an API 35 emulator only, never a phone
+  strings/           en.json, es.json, ar.json, bn.json — every word the app shows, the same keys in all four
   docs/              these design docs
   schema/            query-spec.md + fixtures/ (JSON in, expected answer out)
   .github/workflows/ ci.yml (tests), publish.yml (nightly publish)
@@ -73,7 +73,7 @@ Public endpoints (all anonymous). Rate limiting is a Cloudflare WAF rule in fron
 - `POST /v1/reports` — body per 03. The target must be in the `targets` list the pipeline syncs at each publish (422 if not). The same device, target, kind and day counts once. Returns 202.
 - `POST /v1/proposals` — add-a-place. Stored as an open proposal. Returns 202 and a display-only reference code.
 - `POST /v1/photos` — one JPEG for a condition report (docs/11). Refused if it carries any metadata. Returns a `ph_…` key. Answers 503 while the photo bucket is not set up.
-- `GET /v1/health` — for the app's "reporting available" indicator.
+- `GET /v1/health` — answers `{ok:true}`. **No client calls it** (corrected 2026-09-20: this line used to describe a "reporting available" indicator, which was never built; the app simply queues a report it cannot send).
 - `POST /v1/provider/claim` — provider requests ownership; sends a verification email (the only email we would ever hold; see 08). **(later, v1.1; not built)**
 
 Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a service token for the pipeline):
@@ -109,14 +109,14 @@ Not built: a resource editor (stewards edit `data/seed/` in git), an alert compo
 
 ### iOS (SwiftUI, iOS 17+)
 - Kyle's home stack. Bundle loader → plain Codable cache → on-device query layer → views. The query layer is `DetroitQuery` (Swift, `apps/ios/Sources/DetroitQuery`): open-now, next times, badges, ranking, search and greenway distances, tested against the same `schema/fixtures` as the web.
-- No map on iPhone yet; list-first. The SwiftUI screens compile and run in the simulator (first built 2026-09-20; see `apps/ios/README.md`), reading the signed bundle offline. Reports with an offline outbox, saved places and an About/privacy screen with a key reset are built; the street map, neighborhood pages, transit, add-a-place and photos are not. The origin and the two pinned keys are **build settings**, and a Release build refuses to start until they are real.
+- No map on iPhone yet; list-first. The SwiftUI screens compile and run in the simulator (first built 2026-09-20; see `apps/ios/README.md`), reading the signed bundle offline. Reports with an offline outbox, saved places, an About/privacy screen with a key reset and the "Bus directions in the Transit app" link-out are built; the street map, neighborhood pages, transit screens, add-a-place and photos are not. The origin and the two pinned keys are **build settings**, and a Release build refuses to start until they are real.
 - Local notifications only.
 - Ships as Kyle Peterson / Linwood Technologies.
 
-### Android — the web app today, a Kotlin client written but never compiled
+### Android — the web app today, a Kotlin client that has run on an emulator
 The Android answer **is still the PWA** (`apps/web`): same bundle, installable, reporting works, reaches every Android phone. Missing: reliable background fetch; local notifications are limited.
 
-Since 2026-09-20 `apps/android` also holds a native client, written and **never compiled** — this Mac has no JDK, Kotlin, Gradle or Android SDK, and installing them is a download Kyle must OK. It is deliberately not the Compose app this doc used to imagine: platform Views built in code, **no Jetpack Compose, no AndroidX and no dependency of any kind inside the APK**, `minSdk` 24 / `targetSdk` 35. The reader we design for is a cheap old phone, and Compose alone would cost 2–4 MB and work at every start and every frame. The Detroit wall-clock rule and Ed25519 verification are written out by hand (checked against the JVM's tz database and RFC 8032's vectors) because `java.time` needs API 26 and platform Ed25519 needs API 33. KMP / Flutter / React Native are still not worth a new stack. See `apps/android/README.md` for what is verified and what is not.
+Since 2026-09-20 `apps/android` also holds a native client. Kyle OK'd the Android SDK that day (one licence, `android-sdk-license`, for `platform-tools`, `platforms;android-35` and `build-tools;35.0.0`), and since then it compiles, its tests pass, `assembleDebug` produces a **1.13 MiB APK with two permissions and no third-party code at all**, and it has **run on an AOSP API 35 emulator — never on a phone, and never below Android 15**. CI builds `:query` and `:core` only and sets `HELP313_NO_ANDROID=1` on purpose: a workflow should not accept Google's SDK licence for this repository. It is deliberately not the Compose app this doc used to imagine: platform Views built in code, **no Jetpack Compose, no AndroidX and no dependency of any kind inside the APK**, `minSdk` 24 / `targetSdk` 35. The reader we design for is a cheap old phone, and Compose alone would cost 2–4 MB and work at every start and every frame. The Detroit wall-clock rule and Ed25519 verification are written out by hand (checked against the JVM's tz database and RFC 8032's vectors) because `java.time` needs API 26 and platform Ed25519 needs API 33. KMP / Flutter / React Native are still not worth a new stack. See `apps/android/README.md` for what is verified and what is not.
 
 ### Web (PWA)
 - Vanilla TypeScript. **Map:** our own street map, drawn on a canvas from the signed bundle (`apps/web/src/map.ts`): no tile server, no map library, works offline. Must work with the map failing: every map screen also lists the same places and cross streets as text.
@@ -126,7 +126,7 @@ Since 2026-09-20 `apps/android` also holds a native client, written and **never 
 - The service worker caches the app shell only (never `/data/`). Listings live in IndexedDB, stored only after the signature and checksum checks pass. IndexedDB also queues reports made with no signal.
 - Also serves as the shareable deep-link target (`https://<domain>/#/r/sal_…`) that resolves for people without the app.
 
-## Shared query semantics (one spec, two implementations)
+## Shared query semantics (one spec, three implementations)
 
 Keep a single `schema/query-spec.md` + fixture tests (JSON in, expected ranking out) so the web app (`packages/query`, TypeScript), the iPhone app (`DetroitQuery`, Swift) and, since 2026-09-20, the Android app (`apps/android/query`, Kotlin) — three implementations — agree on: open-now evaluation across DST, "next 3 occurrences," distance banding (0–1 mi, 1–3, 3+), sort by freshness tier, and the rule that reported-closed rows stay listed but go last in their band. The fixtures came first, then the clients.
 

@@ -16,7 +16,7 @@ We can't leak what we never collect. Every design choice below is downstream of 
 | Reports | Queued until sent | Yes, minus IP, minus device ID | 180 days raw, then aggregate counts only |
 | Photos on condition reports (demo only until legal advice, docs/11) | Re-drawn on the phone without hidden data before sending | Private R2 bucket; only stewards can see them | Deleted 30 days after the report closes, or after 1 day if no report claimed it |
 | Proposals (Add a place) | Queued until sent | Stored in D1: the place's details as typed (name, kind of help, what, address, times, phone, how you know, note). Nothing about the sender | Deleted 180 days after a steward settles it (DECISIONS 2026-09-19); an open proposal waits for a steward |
-| `install_secret` | Yes (random) | Never sent; only per-target daily hashes of it (`client_nonce`), which cannot be linked to each other | Resets when the site's data is cleared (a reset button is not built yet) |
+| `install_secret` | Yes (random) | Never sent; only per-target daily hashes of it (`client_nonce`), which cannot be linked to each other | Resets when the site's data is cleared, or with **"Make a new key"** on the Your privacy screen — built on both the web app and iPhone (corrected 2026-09-20; this row used to say the button did not exist) |
 | Provider claim email | No | v1.1, not built; none held today. Plan: for providers only, verification + row ownership | Until provider removes it |
 | Analytics | None | None. No analytics code exists | — |
 | Steward identities | — | Cloudflare Access allowlist + action log | Operational |
@@ -54,7 +54,7 @@ This app is separate from CommunityChest specifically so youth-meetup safety que
 
 ## Authorization & branding (city relationship)
 
-- **Plan of record: no letter.** The app lists only information DHD already publishes, attributed as "Source: Detroit Health Department public listings," with no DHD name in the title, no logo, and "Not an official City of Detroit app." in About (a first-launch screen is not built yet). A one-page letter (permission to use the name/logo, confirmation it's not a city product) would be welcome and is worth one ask — but DHD has not signalled it will take on any role, so nothing depends on it, and we never imply endorsement.
+- **Plan of record: no letter.** The app lists only information DHD already publishes, attributed as "Source: Detroit Health Department public listings," with no DHD name in the title and no logo. (It also said "Not an official City of Detroit app." in About until 2026-09-20, when Kyle had the line removed everywhere; see the Disclaimers section below and DECISIONS. The distinction now rests on the store listing, on what we tell the City, and on the repository's own `README.md`. A first-launch screen is not built yet.) A one-page letter (permission to use the name/logo, confirmation it's not a city product) would be welcome and is worth one ask — but DHD has not signalled it will take on any role, so nothing depends on it, and we never imply endorsement.
 - Store listing is under Kyle Peterson / Linwood Technologies. "City of Detroit" does not appear in the app name.
 - Partner data (Forgotten Harvest, Gleaners) only with written permission or a feed they hand us; otherwise link out.
 

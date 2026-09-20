@@ -4,10 +4,11 @@ How to run 313 Help. Written so someone other than Kyle could take it over in an
 
 ## Run it on your own machine
 
-You need Node 22 and pnpm 12 (the version in `package.json` → `packageManager`). An older pnpm won't install. Get it with `corepack enable` or `npm i -g pnpm@12`.
+You need Node 22 and pnpm 12 (the version in `package.json` → `packageManager`). An older pnpm won't install. Get it with `corepack enable` or `npm i -g pnpm@12`. `/README.md` has the same steps in shorter form for a first-time contributor.
 
 ```
 pnpm install
+pnpm test                                           # 503 tests (query 111, api 80, pipeline 179, web 133)
 pnpm build:bundle                                   # signed data bundle (dev key) into data/bundle/v1
 pnpm --filter @313help/api migrate:local        # local D1 database in api/.wrangler
 pnpm --filter @313help/api dev                  # write API on http://localhost:8787
@@ -44,8 +45,8 @@ In production the pipeline syncs every id at each publish.
 | When Wayne County updates its map | `pnpm ingest:mymap` — the Well Wayne naloxone and test-strip stations, read from the map's own KML. The map prints its own "Map updated" date and that becomes `source_last_edited`; past `max_age_days` (90) the rows lose the `source_listed` badge. Read the diff of `data/ingested/wayne_well_wayne_stations.csv` and merge it | 5 minutes |
 | Every month or so | `pnpm check:emergency` — reads each emergency number's own page. A mismatch means a published number changed: read the page, edit `data/seed/emergency.csv` by hand. A page that can't be fetched (the City's site blocks scripts) is checked in a normal browser and the date recorded | 5 minutes |
 | Every year, and when SAMHSA posts a new directory | `pnpm ingest:treatment` re-reads SAMHSA's treatment directory and OTP list and DWIHN's provider list. Read the diff of `data/staging/samhsa_treatment.csv` and the warnings: a treatment listing on none of the lists may have closed (check it); new programs whose own site DWIHN names arrive in `data/seed/incoming/samhsa-treatment.txt` and go through the steps below. Update `SAMHSA_DIRECTORY` in `pipeline/src/ingest-treatment.ts` when SAMHSA publishes a new edition | 30 min |
-| When adding listings | Put one pipe-delimited line per listing in `data/seed/incoming/*.txt` (format at the top of `pipeline/src/import-lines.ts`), then `pnpm import:lines` → `pnpm check:sources` → `pnpm geocode` → `pnpm build:bundle`. Imported rows are `proposed` and invisible until their own source page matches. Hours become a schedule only if every part parses; otherwise they're shown as written with "call first." Rows whose site blocks scripts: read the page in a browser, then set `status=active`, `entry_method=web` | — |
-| When a listing can't be finished | Add a row to `data/seed/to-verify.csv` saying what is missing and on which page. **Nothing is ever deleted from that file.** When a hold is settled, leave the row and its original `why_held` where they are and fill in the fourth column, `resolved` (added 2026-09-20), with the date, the outcome, and the `sal_id` if it became a listing. 288 rows on 2026-09-19; 326 on 2026-09-20, of which 67 carry a resolution | — |
+| When adding listings | Put one pipe-delimited line per listing in `data/seed/incoming/*.txt` (format at the top of `pipeline/src/import-lines.ts`), then `pnpm import:lines` → `pnpm check:sources` → `pnpm geocode` → `pnpm build:bundle`. Imported rows are `proposed` and invisible until their own source page matches. Hours become a schedule only if every part parses; otherwise they're shown as written with "call first." Rows whose site blocks scripts: read the page in a browser, then set `status=active`, `entry_method=web`. **Read the importer's summary, not just its exit code:** a line whose `sal_id` already exists is skipped and says so (`skipped: id collision with <sal_id>`), counted in the summary — it used to be dropped in silence, which is how one line of a 25-line file went missing on 2026-09-20. A line that corrects an address for the same organisation and phone prints an informational note instead. Either way the fix is to give the new listing a name that distinguishes it, or to edit the existing row | — |
+| When a listing can't be finished | Add a row to `data/seed/to-verify.csv` saying what is missing and on which page. **Nothing is ever deleted from that file.** When a hold is settled, leave the row and its original `why_held` where they are and fill in the fourth column, `resolved` (added 2026-09-20), with the date, the outcome, and the `sal_id` if it became a listing. 288 rows on 2026-09-19; 326 on 2026-09-20, of which 71 carry a resolution | — |
 | Monthly or so | `pnpm ingest:opendata`, then read the git diff of `data/ingested/`. A changed phone number or address is approved by committing it | 10 minutes |
 
 If nobody does any of this, listings keep saying what they said, with their dates, and people's reports keep labeling them. Phones that haven't updated in a while say so. Nothing shuts down on its own; retiring the directory is a person's decision (below).
@@ -107,7 +108,7 @@ pnpm build:bundle
 pnpm --filter @313help/pipeline exec tsx src/access-report.ts
 ```
 
-It prints a table and writes `data/indicators/greenway_access.json`. On 2026-09-19 every open segment had at least one listing nearby. "None listed yet" describes our directory, not the neighborhood (doc 13).
+It prints a table and writes `data/indicators/greenway_access.json`. On 2026-09-19 every open segment had at least one listing nearby. "None listed yet" describes our directory, not the neighborhood (doc 13). **The committed file is from an older bundle** (49 listings, 18 segments flagged) and understates today's coverage, so re-run it before quoting it.
 
 ## First deployment — every step here needs Kyle's go-ahead (accounts, and a few dollars for a domain)
 

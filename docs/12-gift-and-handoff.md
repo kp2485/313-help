@@ -37,9 +37,9 @@ What the phone does know is how old its own copy of the list is. That is a fact 
 
 ### 3. Transferable in an afternoon
 - **No personal accounts in the path.** Apple/Play under the Linwood Technologies organization (both stores support transferring an app to another organization). Domain, Cloudflare account, and GitHub org are separate from Kyle's personal ones, so ownership can move without a rebuild.
-- **Infrastructure as code.** `wrangler.toml`, D1 migrations, R2 bucket names, Access policy, and GitHub Actions workflows all live in the repo. Nothing is configured only in a dashboard, except the WAF rate-limit rule and the Access policy, which `docs/OPERATIONS.md` describes step by step.
+- **Infrastructure as code.** `wrangler.toml`, D1 migrations, R2 bucket names, Access policy, and GitHub Actions workflows all live in the repo. Nothing is configured only in a dashboard, except the WAF rate-limit rule and the Access policy, which `docs/OPERATIONS.md` describes step by step. Since 2026-09-20 those two also carry a **signed attestation** in `api/edge-protections.md` — a dated line with a person's name — which `pnpm preflight` requires and `pnpm smoke` proves from outside a live origin. An operator taking this over inherits both the instructions and the proof.
 - **Secrets inventory** in `docs/OPERATIONS.md` (names and purposes, never values): bundle signing key, Cloudflare API token, D1 binding. Includes the signing-key rotation procedure — the pinned public key is the one thing that needs an app release to change, so ship the app with **two** pinned keys (active + spare, spare kept offline) from day one.
-- **`docs/OPERATIONS.md`**: the weekly pass, the emergency-number check (`pnpm check:emergency`), how to publish an alert, how to add a steward, how to retire the directory on purpose, how to hand over.
+- **`docs/OPERATIONS.md`**: the weekly pass, the emergency-number check (`pnpm check:emergency`), how to publish an alert, how to add a steward, how to retire the directory on purpose, how to hand over. `/README.md` is the front door for anyone deciding whether to take it on, and `docs/09` is the roadmap they would inherit.
 - **A city that adopts it never has to touch resident data,** because there isn't any. Put that sentence at the top of any adoption conversation.
 
 ### 4. Forkable by another city

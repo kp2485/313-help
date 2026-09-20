@@ -26,7 +26,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 - See how fresh each listing is and report when it's wrong.
 - Get time-boxed alerts (cold-weather respite activated, cooling centers open, mobile pantry today).
 - Find recreation: the Joe Louis Greenway, City parks, and rec centers.
-- Get transit links (DDOT, SMART, People Mover, QLINE, MoGo) and bus directions to any listing.
+- Get transit links (DDOT, SMART, People Mover, QLINE, MoGo), see 11 transport layers on the map, and get bus directions to any listing — in the browser, or in the Transit app on a phone that has it.
 - ~~See City events.~~ Dropped until the City publishes a real events feed (DECISIONS 2026-09-19).
 - Read a page for each of the 205 neighborhoods: help nearby and public-data facts (doc 13).
 - Works offline from a bundled snapshot.
@@ -45,7 +45,7 @@ A **directory + triage + freshness system** for Detroit help resources:
 2. **Never lie about freshness.** Every listing shows when it was last checked and how (source type), and what people have reported. Listings change only when people report something, never because time passed (DECISIONS 2026-09-19). Unknown is shown as unknown, never as "open."
 3. **Three taps to a phone number.** In crisis, the path to "call this" or "go here" must be shorter than the path to anything else. Emergency contacts are always one screen away.
 4. **Works on the worst phone with no signal.** Offline-first, small bundle, no heavy map SDK required for core function, no login walls, no video.
-5. **Plain language, multiple languages.** English first. Spanish is built; Arabic next, then Bengali. Reading level ≤ 6th grade for all UI copy.
+5. **Plain language, multiple languages.** English first. Spanish, Arabic and Bengali are all built (2026-09-20), Arabic right to left; **none of the three has been read by a native speaker yet**, and no screen says otherwise. Reading level ≤ 6th grade for all UI copy.
 6. **The data outlives the app.** Canonical data is a published, versioned, openly licensed dataset in an HSDS-shaped format. The app is one consumer of it.
 7. **Assume nobody maintains anything.** The directory must stay honest if no institution ever lifts a finger: we watch public sources, the community flags and confirms, stewards verify, and rows nobody has checked decay visibly. An org that *wants* to own its rows (a church, a food bank, someday DHD) can opt in — that's a bonus, never a dependency.
 8. **Never ask what you can't act on.** If the triage asks about safety, the very next screen is a number to call. (This is why the D Compassion intake was harmful, not just useless.)

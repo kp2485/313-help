@@ -186,8 +186,8 @@ address **or** a point, and `virtual` only when it has neither.
 - `data/bundle/v1/` — the app bundle, plain JSON (the web server compresses it in transit). Not committed.
   - `index.json` + `index.json.sig` — version, `generated_at`, `retired` (only when a person retires the directory), `emergency_verified`, counts, and a SHA-256 and byte size for every file below. The signature covers the exact bytes of `index.json`.
   - `category/*.json` — one file per top-level category (food, harm, health, hygiene, rec, shelter, utilities, youth, and since 2026-09-19 jobs, learn, treatment, housing, legal, ids, assault, money, goods, kids, connect, transport, pets).
-  - `alerts.json`, `archived.json`, `emergency.json`, `events.json`.
-  - `places/greenway.json`, `places/parks.json`, `places/zips.json`.
+  - `alerts.json`, `archived.json`, `emergency.json`. (~~`events.json`~~ — City events were dropped on 2026-09-19, so the build never writes this file and the Events tab hides itself. Corrected 2026-09-20.)
+  - `places/greenway.json`, `places/parks.json`, `places/zips.json`, and since 2026-09-20 `places/transit.json` (the index of the transport layers, with each one's owner and licence text).
   - `map/base.json`, `map/streets.json` (docs/06), and since 2026-09-20 `map/transit/*.json` — the 11 transport
     layers, one file each, listed in `places/transit.json` and downloaded only when a person switches that layer on.
   - `indicators/neighborhoods.json` (docs/13).

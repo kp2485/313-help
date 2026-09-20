@@ -1,6 +1,6 @@
 # CLAUDE.md — handoff for Claude Code
 
-You are building **313 Help** (named by Kyle 2026-09-19), a zero-PII app that points Detroit residents to free help, recreation, transit, and City events. Read `docs/README.md` first, then `docs/04-resource-lifecycle.md` and `docs/06-architecture.md`. Every design decision is in `docs/`; if a task conflicts with a doc, stop and ask rather than silently diverging. If you make a decision the docs don't cover, add it to `docs/DECISIONS.md` with a date and one-line rationale.
+You are building **313 Help** (named by Kyle 2026-09-19), a zero-PII app that points residents of Detroit, Hamtramck, Highland Park and Dearborn to free help, healthy places, parks and transit. (City events are dropped until the City publishes a real feed, and the Events tab hides itself.) Read `docs/README.md` first, then `docs/04-resource-lifecycle.md` and `docs/06-architecture.md`. `/README.md` is the public front page — keep it true when you change what the app does. Every design decision is in `docs/`; if a task conflicts with a doc, stop and ask rather than silently diverging. If you make a decision the docs don't cover, add it to `docs/DECISIONS.md` with a date and one-line rationale.
 
 ## Non-negotiables (from docs/01 and docs/08)
 
@@ -11,12 +11,13 @@ You are building **313 Help** (named by Kyle 2026-09-19), a zero-PII app that po
 - Every listing shows freshness **computed on the device** from dated facts in the bundle (never frozen at build time). Badges state facts; never say "verified" for something no person checked. Unknown is never rendered as "open." Reports label rows; they never hide them.
 - 911 and 988 are hardcoded and never overridable. Other emergency numbers come from `data/seed/emergency.csv` via the **signed** bundle. We use the number its owner currently publishes: `pnpm check:emergency` reads each number's source page; if the page is read and shows a different number (a mismatch), a release build fails until a person fixes it (DECISIONS 2026-09-19). A page that can't be read is logged for a person, not a failure. The script never rewrites a number; a mismatch is a person's job. Any phone/address/coordinate change from any source is held for steward approval.
 - A listing is findable by a phone, a street address, **or** its publisher's own coordinate — one of the three is enough. A coordinate is never reverse-geocoded into an address we then print, and a misprinted phone number is never repaired by guessing the digits.
+- **Link-outs hand over the destination and nothing else.** The three buttons that open something outside the app — Directions, Bus directions, and Bus directions in the Transit app (`transit://directions?to=…`, no `from`) — pass the address the place publishes or its coordinate. **Never an origin, never the person's location, never an identifier, never what they were searching for.** Nothing is contacted until the tap: no SDK, no script, no preconnect, no font or icon from anyone's servers; CSP stays `default-src 'self'` and the service worker ignores every origin but ours. Where directions are withheld — DV and mental-health-crisis listings, which carry no address and no coordinate — all three buttons are absent, the Transit one included.
 - Bundles are Ed25519-signed; clients pin two public keys (active + spare) and refuse unsigned or mis-signed bundles.
 - Harm-reduction, DV, and crisis screens follow the ordering rules in docs/05 (911/hotline first).
 
 ## Build order for the hackathon (docs/09)
 
-Steps 1–4 were done on 2026-09-18. Step 5 was done on 2026-09-20: the SwiftUI screens compile and run in the simulator, with reports, saved places, About/privacy, a release gate and 28 app tests beside `DetroitQuery`'s 111 fixture cases. Step 6 (Android) is **written and never compiled**.
+Steps 1–4 were done on 2026-09-18. Step 5 was done on 2026-09-20: the SwiftUI screens compile and run in the simulator, with reports, saved places, About/privacy, a release gate and 28 app tests beside `DetroitQuery`'s 111 fixture cases. Step 6 (Android) was compiled the same day and **has run only on an API 35 emulator**.
 
 
 1. `data/seed/` CSVs → `pipeline/` → `data/bundle/v1/` (HSDS-valid + `x_detroit`). Fixture tests for open-now / next-occurrence / ranking in `schema/fixtures/` **before** any UI.
@@ -24,7 +25,7 @@ Steps 1–4 were done on 2026-09-18. Step 5 was done on 2026-09-20: the SwiftUI 
 3. `api/` Worker + D1: `POST /v1/reports`, `POST /v1/proposals`, steward endpoints behind Cloudflare Access.
 4. `admin/` minimal steward queue. Publishing is `.github/workflows/publish.yml` (off until `PUBLISH_ENABLED` is set) or a local `pnpm build:bundle`.
 5. `apps/ios/` SwiftUI shell if time remains.
-6. `apps/android/` Kotlin client: platform Views, **no Jetpack Compose, no AndroidX, no dependency of any kind in the APK**, `minSdk` 24. **Nothing in it has ever been compiled** — this Mac has no JDK, Kotlin, Gradle or Android SDK, and installing them is a download Kyle must OK. Never describe it as working; say written and never compiled. The PWA remains the Android answer until it compiles, runs on a real phone and is checked.
+6. `apps/android/` Kotlin client: platform Views, **no Jetpack Compose, no AndroidX, no dependency of any kind in the APK**, `minSdk` 24. Kyle OK'd the Android SDK on 2026-09-20 (`android-sdk-license` only, for `platform-tools`, `platforms;android-35` and `build-tools;35.0.0`); since then `:app` compiles, its tests pass, `assembleDebug` produces a 1.13 MiB APK, and the app **has run on an AOSP API 35 emulator and nowhere else**. Never describe it as shipped or as tested on a phone: it has never run on hardware and nothing below Android 15 has run it at all. The PWA remains the Android answer until it has. CI builds `:query` and `:core` only and sets **`HELP313_NO_ANDROID=1`** to keep `:app` out on purpose — an ubuntu runner ships a licensed SDK in `ANDROID_HOME` and quietly pulled `:app` in before that flag existed, and a workflow must not accept Google's SDK licence on this repository's behalf.
 
 The four tabs are **Home · Help · Map · Events** (2026-09-20; Recreation and Transit merged into Map). The iPhone app has no map, so it keeps a greenway tab instead, titled `gw.title`.
 
@@ -35,7 +36,7 @@ The four tabs are **Home · Help · Map · Events** (2026-09-20; Recreation and 
 - Shared query semantics (open-now, next occurrences, badge, ranking) live in `packages/query` with the spec in `schema/query-spec.md` and fixtures in `schema/fixtures/`; web and pipeline import it, iOS re-implements it in `apps/ios/Sources/DetroitQuery` and **Android re-implements it again in `apps/android/query`** (Kotlin, no dependencies). Three implementations, one spec, the same fixtures: a change to the rules is a change in four places, and the fixtures are what keeps them honest.
 - Schedules are HSDS/iCal RRULE fields; compute occurrences with a tested library (`rrule` on web/pipeline, used in floating wall-clock mode only — see DECISIONS.md; a small tested Swift implementation or `EventKit`-free custom evaluator on iOS). DST tests are required.
 - Detroit time zone `America/Detroit` everywhere. Service area: Detroit, Hamtramck, Highland Park and Dearborn (Kyle, 2026-09-19). Bbox sanity: lat 42.25–42.46, lon −83.33 to −82.91.
-- Plain-language UI strings live in `strings/en.json`, with `strings/es.json` carrying the same keys (tests check keys and placeholders); reading level ≤ 6th grade; no jargon ("Free groceries," not "Food pantry services"). What a place wrote about itself is never machine-translated.
+- Plain-language UI strings live in `strings/en.json`, with `strings/es.json`, `strings/ar.json` and `strings/bn.json` carrying **the same keys** (tests check keys and placeholders in all four); reading level ≤ 6th grade; no jargon ("Free groceries," not "Food pantry services"). What a place wrote about itself is never machine-translated, in any language. Arabic mirrors the interface right to left; Arabic and Bengali use Western digits so a number reads as it is dialled. **Arabic and Bengali were machine-drafted on 2026-09-20 and no native speaker has read either one** — Spanish has not been reviewed either. Never let a screen, a doc or a store listing imply any of the three was checked by a speaker.
 - Accessibility: every action has a descriptive label; dynamic type must not truncate phone numbers.
 - Commit `data/hsds/` on publish; never commit `data/bundle/`.
 - Tests: fixtures for query semantics; schema validation for every bundle build; a Worker test that proves no IP or install_id reaches D1.
@@ -56,4 +57,4 @@ Registry in `data/sources.yaml` for the layers that become listings (see docs/02
 - Downloading and installing a toolchain (a JDK, the Android SDK, Gradle, anything of that size), even when it is free.
 - Adding a dependency with a non-permissive license. Open on 2026-09-20: JUnit 4 (EPL-1.0) in `apps/android`, test-only and never distributed.
 - Any deviation from the zero-PII rules, even "temporary for debugging."
-- Changing the app's name. It is **313 Help** and lives in `app.name` in `strings/en.json` and `strings/es.json`, the web manifest, and the page title.
+- Changing the app's name. It is **313 Help** and lives in `app.name` in all four strings files, the web manifest, and the page title (`pnpm preflight` checks this).

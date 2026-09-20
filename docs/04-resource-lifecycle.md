@@ -74,7 +74,7 @@ A listing never changes because time passed. There is no check-by date, no "stal
 
 Alerts are different: they end at the time their owner announced (`ends_at`, 7 days at most).
 
-**The exception: safety-critical rows** (the Urgent help numbers: 911, 988, shelter, the local crisis line, the DV hotline, and 211. That is 6 rows in `data/seed/emergency.csv`). `pnpm check:emergency` reads each number's own page. A release build fails only when a page is read and shows a different number (a mismatch); a page that can't be fetched is logged for a person but doesn't stop a release (DECISIONS 2026-09-19). The three-digit national numbers (911, 988, 211) are not checked this way. The script never rewrites a number. If one stops matching, a person reads the page and decides.
+**The exception: safety-critical rows** (the Urgent help numbers. **11 rows in `data/seed/emergency.csv`** as of 2026-09-20: 911, 988, Detroit's shelter line, Out-Wayne's shelter line for Dearborn, the DWIHN crisis line and its walk-in Care Center, the National Domestic Violence Hotline, 211, SAMHSA's helpline, Avalon, and Michigan's VOICES4 sexual-assault line). `pnpm check:emergency` reads each number's own page. A release build fails only when a page is read and shows a different number (a mismatch); a page that can't be fetched is logged for a person but doesn't stop a release (DECISIONS 2026-09-19). **Only 911 and 988 are never checked this way** — 211 is matched against mi211.org like every other number (corrected 2026-09-20; this line used to say 6 rows and exempt 211). The script never rewrites a number. If one stops matching, a person reads the page and decides.
 
 ## Verification methods (cheapest first)
 

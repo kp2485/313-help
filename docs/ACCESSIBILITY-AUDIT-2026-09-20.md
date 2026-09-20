@@ -268,7 +268,10 @@ Four more right-to-left defects were found by looking at the running app in Arab
 3. **The pan arrows under the map were mirrored, and the map is not.** `[dir="rtl"] .mappan button[data-map-act=
    "left"|"right"] { transform:scaleX(-1) }` flipped the glyphs while the flex row also reversed their order, so
    the leftmost button showed ← and moved the map east. The map never mirrors — left is west in every language —
-   so the pad is now `direction:ltr` and nothing is flipped.
+   so the pad no longer flips any glyph. *(Correction, 2026-09-20 evening, from the Arabic and Bengali
+   walk-through: the fix written here was `direction:ltr` on the pad; in the code today it is
+   `[dir="rtl"] .mappan { flex-direction:row-reverse; }`, which keeps west on the left without overriding the
+   pad's own text direction. The outcome described above is what ships.)*
 4. **The app called itself "Help 313".** "313 Help" is a number and a word; in a right-to-left paragraph the
    space between them takes the paragraph's direction and the two runs swap. The header wraps the name in
    `<bdi>`, and the seven Arabic strings that name "313 Help", "Section 8" or "Michigan Works!" wrap them in
@@ -279,6 +282,33 @@ Four more right-to-left defects were found by looking at the running app in Arab
    Arabic screen.
 6. **The list version on About broke across the line.** `about.data` now receives the version wrapped in
    isolates, so a hash like `09cca4a-20260920T1906-32a1add44` stays one left-to-right run.
+
+**Added the same evening (2026-09-20), from a second walk-through of every screen in Arabic and Bengali.** These
+are additions to the done list above, not revisions of it:
+
+7. **The owner-written heading in the top bar** is now marked `lang="en"`, like every other string a place wrote
+   about itself, so it keeps its own direction inside a right-to-left bar.
+8. **A phone extension stayed with its number.** The number and its extension are wrapped in **one** outer
+   `<bdi class="tel">` rather than two siblings, so "…-2100 ext. 4217" cannot be reordered into something a
+   person would misdial.
+9. **The next-times row and the emergency-number labels** were walked in both languages and read in order.
+10. **Uppercase and letter-spaced section headings apply only under `:lang(en)` and `:lang(es)`.** Letter-spacing
+    breaks Arabic joining and Bengali conjuncts, so the same heading keeps its own letterforms and only loses the
+    styling.
+11. **"am"/"pm" are translated strings** (`clock.am`, `clock.pm`) while digits stay Western, and the list
+    separator is a string (`list.sep`). All three are new keys and join the native-review queue; the Bengali
+    "এএম/পিএম" is a transliteration a reviewer may well change.
+12. **Dollar amounts are written the way the record writes them** (`$85,000`), falling back to `en-US` where a
+    language's own `Intl` rules do not lead with the sign.
+
+**Still open from that walk-through**, and listed in [CHECKS-2026-09-20.md](CHECKS-2026-09-20.md) §6:
+
+- **Searching in Arabic or Bengali always returns nothing**, because every listing is written in English. That is
+  not a bug in the search; it needs a one-line hint on the empty state, worded with the native reviewer rather
+  than guessed at.
+- **Print in Arabic** puts a bare left-to-right URL in parentheses inside right-to-left text. Cosmetic.
+- **The iPhone and Android apps still hard-code "am"/"pm"** (`HelpApp/Help.swift`, `Format.kt`). A roadmap item,
+  not a web defect.
 
 ---
 
