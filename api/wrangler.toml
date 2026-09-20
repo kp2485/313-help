@@ -37,8 +37,8 @@ migrations_dir = "migrations"
 [vars]
 PHOTOS_ENABLED = "false"     # photos on condition reports: off until the legal advice in docs/11 (DECISIONS 2026-09-19)
 ALLOWED_ORIGIN = "https://313help.com"
-ACCESS_TEAM_DOMAIN = ""      # e.g. 313help.cloudflareaccess.com
-ACCESS_AUD = ""              # the Access application's audience tag
+ACCESS_TEAM_DOMAIN = "313help.cloudflareaccess.com"
+ACCESS_AUD = "00df5d305b6e52fce68686ad9dc4f9a17d54145d588bc9f2d5d9bf72787df3a5"
 
 [triggers]
 crons = ["17 8 * * *"]       # daily retention pass: raw reports older than 180 days become monthly counts
