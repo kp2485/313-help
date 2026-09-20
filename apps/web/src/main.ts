@@ -16,7 +16,7 @@ import { TRANSIT } from './transit.js';
 import { LINKS } from './links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitProposal } from './propose.js';
 import { canSave, clearSaved, loadSaved, toggleSaved } from './saved.js';
-import { directionsHref, transitHref } from './directions.js';
+import { directionsHref, transitAppHref, transitHref } from './directions.js';
 import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
@@ -417,6 +417,10 @@ function hoursLine(s: Schedule): string {
 // Directions live in directions.ts, so a row with coordinates but no street address (the naloxone and
 // test-strip spots) still gets them. A coordinate is never printed as an address.
 const goHere = (r: BundleRow) => directionsHref(r, navigator.userAgent);
+// The same trip in the Transit app, when this phone could have it (directions.ts: Transit documents no web
+// fallback, so a laptop is not offered a link that could only fail). An addition: "Bus directions" above needs
+// no app and stays first. A link-out like any other, marked as leaving the app.
+const busApp = (r: BundleRow) => transitAppHref(r, navigator.userAgent);
 function detail(id: string): { title: string; html: string; exit: boolean } {
   const r = bundle!.rows.find((x) => x.id === id);
   if (!r) {
@@ -433,7 +437,8 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
     <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${r.notice ? `<p class="notice">${owner(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${owner(ph.label)}` : ''}</span><strong>${phoneHtml(ph.number)}</strong></a>`).join('')}
       ${goHere(r) ? `<div class="two"><a class="btn ghost" href="${esc(goHere(r)!)}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
-        <a class="btn ghost" href="${esc(transitHref(r)!)}" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>` : ''}
+        <a class="btn ghost" href="${esc(transitHref(r)!)}" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>
+        ${busApp(r) ? `<a class="btn ghost" href="${esc(busApp(r)!)}" aria-label="${T('detail.bus_app_label', { name: r.name })}">${icon('transit', 'sm')}${T('detail.bus_app')} ${icon('out', 'sm')}</a>` : ''}` : ''}
       <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button></div>
       ${savedIds.includes(r.id) ? `<p class="foot">${T('saved.note')}</p>` : ''}</div>
     ${sensitive ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}

@@ -79,3 +79,26 @@ Publishing the dataset (CC BY 4.0) and code (Apache-2.0, decided 2026-09-18) is 
 ## Maps
 
 The street map is part of the signed bundle and is drawn on the phone (docs/06). No map company, tile server, or third party is contacted, so nobody learns where a person is looking. The map files are downloaded whole, the same two files for everyone, the first time a person opens a map. The map does not move to the person's location on its own; the location dot is drawn on the phone only after "Use my location," and a typed ZIP is never drawn as a location. **Directions** and **Bus directions** still hand the destination address to the maps app the person chooses; the screen says so.
+
+## Handing a place to another app (maps, and the Transit app)
+
+Three buttons on a listing open something outside this app: **Directions** (the phone's maps app), **Bus
+directions** (a trip plan in the browser) and, on a phone, **Bus directions in the Transit app**
+(`transit://directions?to=…`, Transit's own documented link — `docs/research/2026-09-20/transit-app.md`). What a
+third party learns is the same in all three, and it is the smallest thing that can work:
+
+- **Only when the person taps.** Nothing is contacted until then: a plain `<a href>` on the web, one `openURL` on
+  iOS. No SDK, no script, no preconnect, no icon or font from their servers, nothing loaded from transitapp.com
+  while the screen is open. The CSP stays `default-src 'self'` and the service worker still ignores every origin
+  but ours (a test checks all of this).
+- **Only the destination.** The address the place publishes, or its coordinate. **Never an origin, never the
+  person's location, never an identifier** — Transit's link takes a `from` parameter and we leave it out, which is
+  their documented way of letting the app ask for the person's own location itself, on their phone.
+- **Nothing about what the person was looking for.** The link says where a place is; it does not say it was found
+  under Narcan, treatment, or a shelter search.
+- **Never where directions are withheld.** DV and mental-health-crisis listings carry no address and no
+  coordinate, so all three buttons are absent, the Transit one included. Treatment and sexual-assault listings
+  keep their directions, because people have to get there, and so keep the Transit link.
+- **Not an endorsement.** Transit is a company's app, linked like any other link-out and named as theirs. iOS asks
+  the system whether the app is installed (`LSApplicationQueriesSchemes`) so it can hide a link that would do
+  nothing; that question is local and sends nothing.

@@ -107,7 +107,7 @@ One tab replaces Recreation and Transit. Top to bottom:
    - *Getting around*: DDOT bus routes and stops · SMART bus routes and stops · QLINE · People Mover · MoGo bike stations · bike lanes · train and bus stations · intercity bus stops · park and ride lots.
    The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. A first visit starts with the greenway, parks and DDOT routes.
 3. **"See this map as a list"** — everything switched on, in words: the help listings as cards, greenway stretches as rows, park names, and each transport layer's route and stop names with a count. Nothing on the map is reachable only by looking at it.
-4. Then the rest of what Recreation and Transit carried: the greenway, City parks, recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass.
+4. Then the rest of what Recreation and Transit carried: the greenway, City parks, recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass. The trip-planner list names the **Transit app** ("live DDOT and SMART buses on your phone") beside DDOT's own planner, as a link-out to transitapp.com like every other; the same link appears in the **"Rides to the doctor or cheaper bus fare"** link-outs, where it leads, because it is the free thing that answers "when is my bus coming?". Neither says DDOT or SMART recommends it: SMART's own page lists Transit among third-party apps that receive SMART data, DDOT's pages could not be read (`docs/research/2026-09-20/transit-app.md`), and we state only what an owner page states.
 
 Rules that do not change:
 - **Sensitive and private listings are never drawn.** Treatment and help after sexual assault are excluded from every layer (`PRIVATE_TOPS`), and inside a group a DV or mental-health-crisis listing is dropped row by row (`isSensitive`).
@@ -128,10 +128,21 @@ Each transport layer is its own file in the signed bundle under `map/transit/`, 
 
 Top → bottom:
 1. Name (in the top bar) · organization · open now or next time, computed from RRULE ("Open now until {time}" / "Closed now. Next: {day} {time}") · freshness badge, which states a fact and never says "verified" ("Matched their website when added, {date}" / "Nobody has confirmed this since {date}. Call first.") · a notice, if the listing has one.
-2. Big buttons: **Call** (one per phone number) · **Directions** · **Bus directions** · **Save** · **Share** (share a deep link — no personal data in the link). DV and crisis listings have no Save button.
+2. Big buttons: **Call** (one per phone number) · **Directions** · **Bus directions** · **Bus directions in the Transit app** (phones only, see below) · **Save** · **Share** (share a deep link — no personal data in the link). DV and crisis listings have no Save button.
+   - **Bus directions** is first and needs no app: it opens a trip plan in the browser, wherever the person is.
+   - **Bus directions in the Transit app** is an addition under it, for the app DDOT and SMART riders use for
+     real-time buses. It is Transit's own documented link (`transit://directions?to=…`, `apps/web/src/directions.ts`
+     and `apps/ios/HelpApp/Listing.swift`; sources in `docs/research/2026-09-20/transit-app.md`) and carries the
+     **destination only** — no origin, ever; Transit asks the person for their location itself, on their phone.
+     The destination is the publisher's coordinate when there is one, otherwise the written address.
+     **Exactly the same gate as Bus directions:** an address or a coordinate. DV and crisis listings have
+     neither, so they show no Directions, no Bus directions and no Transit link.
+     **Phones only.** Transit documents no https link and no behaviour when the app is missing, and ships for iOS
+     and Android only, so the web hides the link off a phone user-agent and iOS hides it unless the app is
+     installed. We never guess a URL, never load anything of theirs, and never claim a partnership.
 3. What you get (plain language), who it's for and what to bring ("No ID needed" / "Bring proof of Detroit address"). Languages: later.
 4. Hours table, or "Hours as listed: {text}" when a list gave hours as text. "Next times": the next 3 dates.
-5. Where: address, a small map (never for a sensitive listing), and "Directions open in a maps app, which will see the address."
+5. Where: address, a small map (never for a sensitive listing), and "Directions open in another app, which will see where this place is." — worded for any app the person picks, maps or Transit, and true on a laptop too.
 6. "{miles} mi from the Joe Louis Greenway ({segment})" when an open segment is within half a mile. Tapping it opens the segment.
 7. Website.
 8. Where this came from: the name of the list or site the row came from.

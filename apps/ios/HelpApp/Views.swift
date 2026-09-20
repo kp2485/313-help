@@ -4,6 +4,7 @@
 import CoreLocation
 import DetroitQuery
 import SwiftUI
+import UIKit
 
 @main
 struct Help313App: App {
@@ -436,6 +437,7 @@ struct Card: View {
 
 struct DetailView: View {
     @EnvironmentObject var store: BundleStore
+    @Environment(\.openURL) private var openURL
     let row: BundleRow
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt), alerts = store.bundle?.alerts ?? []
@@ -467,6 +469,25 @@ struct DetailView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(L.t("detail.directions_label", ["name": row.name]))
+                // The same trip in the Transit app, when this phone has it: Transit's own documented scheme, the
+                // destination and nothing else (Listing.swift). An addition — "Directions" above needs no other
+                // app and stays first — and not an endorsement or a partnership.
+                if let turl = transitAppURL(row, canOpen: { UIApplication.shared.canOpenURL($0) }) {
+                    Button { openURL(turl) } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "bus")
+                            Text(L.t("detail.bus_app")).fontWeight(.semibold).multilineTextAlignment(.leading)
+                            Spacer()
+                            Image(systemName: "arrow.up.forward.square")
+                        }
+                        .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
+                        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(L.t("detail.bus_app_label", ["name": row.name]))
+                }
                 Text(L.t("detail.directions_note")).font(.footnote).foregroundStyle(Color.muted)
             }
             // Saved places are kept on this phone only, and a private listing has no Save button at all (docs/08).

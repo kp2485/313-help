@@ -7,7 +7,7 @@ import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
 import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
-import { directionsHref, placeQuery, transitHref } from '../src/directions.js';
+import { directionsHref, placeQuery, transitAppHref, transitAppQuery, transitHref } from '../src/directions.js';
 import { LINKS } from '../src/links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
@@ -419,6 +419,39 @@ describe('map', () => {
     expect(main).toContain("T('detail.where_no_address', { source: r.facts.source.name })");
     expect(main).not.toMatch(/r\.address!/);
     expect(strings['detail.where_no_address']).toContain('{source}');
+  });
+  it('the Transit app is an extra way to open the same trip: their documented scheme, the destination and nothing else', () => {
+    const spot = { lat: 42.3314, lon: -83.0458 };                        // a naloxone station: a point, no address
+    const withAddress = { address: { line1: '1 Main St', city: 'Detroit', zip: '48226' }, lat: 42.33, lon: -83.05 };
+    const addressOnly = { address: { line1: '1 Main St', city: 'Detroit', zip: '48226' } };
+    // transitapp.com/developers: `transit://directions` with from/to. We send only `to`, so Transit asks the
+    // person for their own location itself. The coordinate wins when there is one (their address geocoding is
+    // loose); it is passed through, never printed as an address.
+    expect(transitAppQuery(spot)).toBe('42.3314,-83.0458');
+    expect(transitAppQuery(withAddress)).toBe('42.33,-83.05');
+    expect(transitAppQuery(addressOnly)).toBe('1%20Main%20St%2C%20Detroit%2C%20MI%2048226');
+    expect(transitAppQuery({})).toBeNull();
+    expect(transitAppHref(spot, 'iPhone')).toBe('transit://directions?to=42.3314,-83.0458');
+    expect(transitAppHref(addressOnly, 'Android')).toBe('transit://directions?to=1%20Main%20St%2C%20Detroit%2C%20MI%2048226');
+    for (const ua of ['iPhone', 'iPad', 'Android']) expect(transitAppHref(spot, ua), ua).not.toContain('from');
+    // No app on a laptop, and Transit documents no web link, so no link there: "Bus directions" needs no app.
+    for (const ua of ['Windows', 'Macintosh', 'X11; Linux x86_64']) expect(transitAppHref(spot, ua), ua).toBeNull();
+    expect(transitAppHref({}, 'iPhone')).toBeNull();                     // nothing to point at, no link
+    // The screen: inside the same gate as Directions and Bus directions, so a row whose directions are withheld
+    // (DV and crisis rows carry neither an address nor a coordinate) never shows it. Bus directions stays first.
+    expect(main).toContain("${goHere(r) ? `<div class=\"two\">");
+    expect(main).toContain("${busApp(r) ? `<a class=\"btn ghost\" href=\"${esc(busApp(r)!)}\"");
+    expect(main).toMatch(/transitHref\(r\)![\s\S]{0,200}busApp\(r\)/);
+    expect(main).toContain("const busApp = (r: BundleRow) => transitAppHref(r, navigator.userAgent);");
+    expect(strings['detail.bus_app_label']).toContain('{name}');
+    // A plain link and nothing else: no SDK, no script, no image or font from their servers, no preconnect.
+    const src = (p: string) => readFileSync(join(__dirname, '..', p), 'utf8');
+    const web = ['src/directions.ts', 'src/links.ts', 'src/transit.ts'].map(src).concat(main).join('\n');
+    expect(web).not.toMatch(/preconnect|dns-prefetch|<script|transitapp\.com\/[^'"\s)]*\.(js|css|png|svg|woff2?)/);
+    // Nothing from transitapp.com is fetched, cached, or allowed by the CSP: the page still says default-src 'self'.
+    for (const p of ['index.html', 'public/sw.js']) expect(src(p), p).not.toContain('transitapp.com');
+    expect(src('index.html')).toContain("default-src 'self'");
+    expect(src('public/sw.js')).toContain("url.origin !== location.origin");
   });
   it('the greenway is drawn like a transit line, and the key says each phase in words', () => {
     // One width and a casing under every stretch, so the route reads as one line whatever phase it is in.

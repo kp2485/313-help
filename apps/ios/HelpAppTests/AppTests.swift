@@ -234,6 +234,52 @@ final class ListingTests: XCTestCase {
         XCTAssertFalse(showsPointWithoutAddress(row()))
     }
 
+    // ---- the Transit app link (transitapp.com's own documented scheme) -------------------------------------
+    // Always a destination and nothing else: no `from`, no origin, no identifier. And `canOpen` stands in for
+    // iOS: when no app can open `transit://`, the screen offers no row rather than a row that does nothing.
+    private let canOpenAnything: (URL) -> Bool = { _ in true }
+
+    func testTransitAppGetsTheCoordinateWhenThePublisherGivesOne() {
+        // A place with both: Transit gets the point, because it geocodes an address string loosely (its own docs).
+        let pantry = row(address: "2424 W Grand Blvd", point: (42.3378412, -83.1770116), category: "food.pantry")
+        XCTAssertEqual(transitAppDestination(pantry), "42.3378412,-83.1770116")
+        XCTAssertEqual(transitAppURL(pantry, canOpen: canOpenAnything)?.absoluteString,
+                       "transit://directions?to=42.3378412,-83.1770116")
+    }
+
+    func testTransitAppFallsBackToTheWrittenAddress() {
+        let clinic = row(address: "2424 W Grand Blvd", category: "health.clinic")
+        XCTAssertEqual(transitAppDestination(clinic), "2424 W Grand Blvd, Detroit, MI 48208")
+        let url = transitAppURL(clinic, canOpen: canOpenAnything)
+        XCTAssertEqual(url?.scheme, "transit")
+        XCTAssertEqual(url?.absoluteString, "transit://directions?to=2424%20W%20Grand%20Blvd,%20Detroit,%20MI%2048208")
+    }
+
+    /// The same gate as Directions: a listing whose directions are withheld gets no Transit link either.
+    func testTransitAppIsNeverOfferedForASensitiveListing() {
+        for category in ["shelter.dv", "health.mental", "health.mental.crisis"] {
+            XCTAssertNil(transitAppDestination(row(address: "1 Main St", point: (42.3, -83.1), category: category)))
+            XCTAssertNil(transitAppURL(row(point: (42.3, -83.1), category: category), canOpen: canOpenAnything))
+        }
+    }
+
+    /// Treatment keeps its directions (people have to get there), so it keeps the Transit link too.
+    func testTransitAppIsOfferedForTreatment() {
+        XCTAssertNotNil(transitAppURL(row(address: "1 Main St", category: "treatment.detox"), canOpen: canOpenAnything))
+    }
+
+    func testNoAddressAndNoPointMeansNoTransitLink() {
+        XCTAssertNil(transitAppDestination(row()))
+        XCTAssertNil(transitAppURL(row(), canOpen: canOpenAnything))
+    }
+
+    /// No Transit app on the phone, no row. Nothing about the person is part of the question or the link.
+    func testNoTransitAppInstalledMeansNoRow() {
+        let pantry = row(address: "2424 W Grand Blvd", point: (42.3, -83.1), category: "food.pantry")
+        XCTAssertNil(transitAppURL(pantry, canOpen: { _ in false }))
+        XCTAssertFalse(transitAppURL(pantry, canOpen: canOpenAnything)!.absoluteString.contains("from"))
+    }
+
     /// No published number, no Call button: the screens render one row per phone, and there are none.
     func testAListingWithNoPhoneOffersNoCall() {
         XCTAssertFalse(hasPhone(row(point: (42.3, -83.1))))
