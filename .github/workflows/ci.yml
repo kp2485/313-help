@@ -43,6 +43,15 @@ jobs:
   # These are exactly the two commands that were run on a laptop on 2026-09-20, on the same JDK 17.
   android-query:
     runs-on: ubuntu-24.04
+    # A GitHub ubuntu runner ships an Android SDK in ANDROID_HOME, so this job was not the JDK-only build it was
+    # written to be: settings.gradle.kts found that SDK, pulled :app in, and the job went red on 2026-09-20. The
+    # override says out loud what this job builds instead of leaving it to whatever a runner image happens to
+    # contain. :app is deliberately NOT built here: it needs platform and build-tools packages under Google's SDK
+    # licence, and accepting a licence on this repository's behalf in CI is not something a workflow should do
+    # quietly. The screens are compiled on a laptop with the SDK (apps/android/README.md); everything CI runs
+    # needs a JDK and nothing else.
+    env:
+      HELP313_NO_ANDROID: "1"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v5

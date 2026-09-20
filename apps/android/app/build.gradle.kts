@@ -1,4 +1,8 @@
 import java.io.File
+// Imported rather than written out: inside a Kotlin DSL build script `java` is the Java plugin's own extension, so
+// `java.util.Base64` does not resolve ("Unresolved reference: util" — found on the first build with :app in it,
+// 2026-09-20).
+import java.util.Base64
 
 plugins {
     alias(libs.plugins.android.application)
@@ -22,7 +26,7 @@ val spkiEd25519 = "302a300506032b6570032100"
 
 fun hexOfBase64(b64: String): String? = try {
     if (!Regex("^[A-Za-z0-9+/]+={0,2}$").matches(b64)) null
-    else java.util.Base64.getDecoder().decode(b64).joinToString("") { "%02x".format(it) }
+    else Base64.getDecoder().decode(b64).joinToString("") { "%02x".format(it) }
 } catch (_: Exception) {
     null
 }

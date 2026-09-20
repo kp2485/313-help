@@ -23,6 +23,29 @@ fun mapsDestination(row: BundleRow): String? {
     return null
 }
 
+/**
+ * The destination handed to the Transit app (transitapp.com), or null when we would be offering a link that
+ * cannot work. The Kotlin copy of `transitAppDestination` in apps/ios/HelpApp/Listing.swift and
+ * `transitAppQuery` in apps/web/src/directions.ts.
+ *
+ * The coordinate comes **first** here, which is the reverse of `mapsDestination` and is deliberate: Transit's own
+ * documentation says "User's current location is taken into account when geocoding address strings"
+ * (docs/research/2026-09-20/transit-app.md), so a point lands where the publisher put the place and an address
+ * string does not. A coordinate is still never printed as if it were an address; it is only ever passed through.
+ *
+ * Sensitive listings are gated exactly as they are for Directions: a domestic-violence or mental-health-crisis
+ * row is never handed to another app, so it gets no Transit link either. Treatment keeps its directions, because
+ * people have to get there, so it keeps this too.
+ */
+fun transitAppDestination(row: BundleRow): String? {
+    if (isSensitive(row.category)) return null
+    val lat = row.lat
+    val lon = row.lon
+    if (lat != null && lon != null) return "$lat,$lon"
+    row.address?.let { return "${it.line1}, ${it.city}, MI ${it.zip ?: ""}" }
+    return null
+}
+
 /** A listing with no published phone number shows no Call button at all, rather than one that does nothing. */
 fun hasPhone(row: BundleRow): Boolean = row.phones.isNotEmpty()
 

@@ -58,9 +58,17 @@ fun androidSdkDir(): File? {
     return candidates.map(::File).firstOrNull { File(it, "platforms").isDirectory }
 }
 
-val sdk = androidSdkDir()
+// HELP313_NO_ANDROID=1 leaves :app out even when an SDK is sitting right there. This is not a convenience: a
+// GitHub ubuntu runner ships a licensed Android SDK in ANDROID_HOME, so the android-query job, which is meant to
+// be the JDK-only half, silently started configuring :app and went red (2026-09-20). The job now sets this, so
+// what CI builds is a decision written down rather than a guess about what happens to be installed on a runner.
+// It is also how the no-SDK path is tested on a laptop that has one.
+val sdkOff = System.getenv("HELP313_NO_ANDROID") == "1"
+val sdk = if (sdkOff) null else androidSdkDir()
 if (sdk != null) {
     include(":app")
+} else if (sdkOff) {
+    println("313 Help: HELP313_NO_ANDROID=1, so :app is left out and only :query and :core are built.")
 } else {
     println(
         "313 Help: no Android SDK found, so only :query is in this build. " +

@@ -40,6 +40,17 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="geo" />
         </intent>
+        <!--
+          The Transit app's own scheme (transitapp.com). This entry only lets the app ask Android, on this phone,
+          whether anything can open a transit:// link, so the "Bus directions in the Transit app" button can be
+          left out when nothing can. Asking is entirely local: no network request, nothing sent anywhere, and no
+          list of installed apps is read, stored or transmitted — the answer is one yes or no about one scheme.
+          Without this entry Android 11 and up would always answer no and the button would never appear.
+        -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="transit" />
+        </intent>
     </queries>
 
     <application

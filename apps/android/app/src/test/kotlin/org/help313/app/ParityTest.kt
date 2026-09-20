@@ -194,6 +194,62 @@ class ParityTest {
         assertTrue(hasPhone(station(phones = listOf(Phone("313-555-0101")))))
     }
 
+    // ---- the Transit app link (docs/research/2026-09-20/transit-app.md) --------------------------------------
+    //
+    // The same six cases as apps/ios/HelpAppTests ListingTests and the web app's own tests, so the three apps
+    // cannot drift on which listings get a bus link and what is in it.
+
+    /** A place with both a point and an address: Transit gets the point, because it geocodes address strings
+     *  loosely by its own documentation. This is the reverse of what the maps link does, on purpose. */
+    @Test
+    fun theTransitAppGetsTheCoordinateWhenThePublisherGivesOne() {
+        val pantry = BundleRow(id = "sal_p", name = "A pantry", category = "food.pantry",
+            address = Address("2424 W Grand Blvd", "Detroit", "48208"), lat = 42.3378412, lon = -83.1770116)
+        assertEquals("42.3378412,-83.1770116", transitAppDestination(pantry))
+        assertEquals("1234 Woodward Ave, Detroit, MI 48226", mapsDestination(
+            BundleRow(id = "sal_p2", name = "x", category = "food.pantry",
+                address = Address("1234 Woodward Ave", "Detroit", "48226"), lat = 42.33, lon = -83.05)))
+    }
+
+    @Test
+    fun theTransitAppFallsBackToTheWrittenAddress() {
+        val clinic = BundleRow(id = "sal_c", name = "A clinic", category = "health.clinic",
+            address = Address("2424 W Grand Blvd", "Detroit", "48208"))
+        assertEquals("2424 W Grand Blvd, Detroit, MI 48208", transitAppDestination(clinic))
+    }
+
+    /** The same gate as Directions: a listing whose directions are withheld gets no Transit link either. */
+    @Test
+    fun theTransitAppIsNeverOfferedForASensitiveListing() {
+        for (category in listOf("shelter.dv", "health.mental", "health.mental.crisis")) {
+            assertNull(transitAppDestination(BundleRow(id = "sal_s", name = "x", category = category,
+                address = Address("1 Main St", "Detroit", "48226"), lat = 42.3, lon = -83.1)))
+        }
+    }
+
+    /** Treatment keeps its directions, because people have to get there, so it keeps the Transit link too. */
+    @Test
+    fun theTransitAppIsOfferedForTreatment() {
+        assertNotNull(transitAppDestination(BundleRow(id = "sal_t", name = "Detox", category = "treatment.detox",
+            address = Address("1 Main St", "Detroit", "48226"))))
+    }
+
+    @Test
+    fun noAddressAndNoPointMeansNoTransitLink() {
+        assertNull(transitAppDestination(station(lat = null, lon = null)))
+    }
+
+    /** The link carries the destination and nothing else. No `from`, ever: Transit's own note says leaving it
+     *  out uses the person's own location, which Transit asks for itself. We pass no origin and read none. */
+    @Test
+    fun theTransitLinkCarriesNoOrigin() {
+        val pantry = BundleRow(id = "sal_p", name = "A pantry", category = "food.pantry",
+            address = Address("2424 W Grand Blvd", "Detroit", "48208"), lat = 42.3, lon = -83.1)
+        val link = "transit://directions?to=" + transitAppDestination(pantry)
+        assertEquals("transit://directions?to=42.3,-83.1", link)
+        assertFalse("the Transit link must never carry an origin", link.contains("from"))
+    }
+
     // ---- reading the two files -----------------------------------------------------------------------------
 
     /** id, the one-line summary of the need, and its choices as (id, one-line summary) pairs. */

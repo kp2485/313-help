@@ -11,10 +11,12 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -62,12 +64,59 @@ class MainActivity : Activity() {
         tabs = buildTabs()
         root.addView(tabs)
         setContentView(root)
+        // After setContentView, never before: window.insetsController is backed by the decor view, which does not
+        // exist until the content is set, and asking for it early threw a NullPointerException on first run.
+        keepClearOfSystemBars(root)
 
         store = BundleStore(this)
         store.onChange = { render() }
         store.start()
 
         go { Screens.home(this) }
+    }
+
+    /**
+     * Pads the whole screen clear of the status bar, the navigation bar and any display cutout, and asks for dark
+     * status-bar icons because the app's background is light.
+     *
+     * This is not decoration. At targetSdk 35 on Android 15 the system draws every app edge to edge and ignores
+     * `android:statusBarColor`, which is what the theme was relying on. Run for the first time on 2026-09-20, the
+     * app drew its title under the clock and put the tab bar underneath the navigation bar — and the navigation
+     * bar took the taps, so the bottom half of "Home", "Help", "Search" and "Saved places" did nothing at all.
+     *
+     * No AndroidX here, so the insets are read from the platform: the typed API on Android 11 and up, and the old
+     * systemWindowInset* getters on 7.0 to 10, which is what minSdk 24 still has to work on.
+     */
+    private fun keepClearOfSystemBars(root: View) {
+        root.setOnApplyWindowInsetsListener { v, insets ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val bars = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+            } else {
+                @Suppress("DEPRECATION")
+                v.setPadding(
+                    insets.systemWindowInsetLeft,
+                    insets.systemWindowInsetTop,
+                    insets.systemWindowInsetRight,
+                    insets.systemWindowInsetBottom,
+                )
+            }
+            insets
+        }
+        // Dark icons in the status bar: the background behind them is @color/app_bg, which is nearly white, and
+        // the default light icons were all but invisible on it.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(
+                android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
+                    android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
+                android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
+                    android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
     }
 
     override fun onResume() {
@@ -103,7 +152,14 @@ class MainActivity : Activity() {
     fun render() {
         if (stack.isEmpty()) return
         content.removeAllViews()
-        val v = stack.last()()
+        // Indexed on purpose, not `stack.last()`. At compileSdk 35 java.util.List has getLast() (SequencedCollection,
+        // new in API 35), which Kotlin reads as a synthetic property `stack.last`; because the elements are
+        // functions, `stack.last()` then means `getLast().invoke()` and is already a View. That is two things wrong:
+        // it made `stack.last()()` fail to compile (the first error the first :app compile found, 2026-09-20), and
+        // had it compiled it would have called a method that does not exist below API 35, so every phone from
+        // minSdk 24 up to Android 14 would have thrown NoSuchMethodError on the first screen. Indexing binds to
+        // List.get, which has always been there.
+        val v = stack[stack.size - 1]()
         content.addView(v, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
     }
 
@@ -186,6 +242,31 @@ class MainActivity : Activity() {
         val point = if (lat != null && lon != null) "$lat,$lon" else "0,0"
         openIntent(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$point?q=" + Uri.encode(destination))))
     }
+
+    /**
+     * Opens the trip in the Transit app, using Transit's own documented URL scheme,
+     * `transit://directions?to=<destination>` (docs/research/2026-09-20/transit-app.md).
+     *
+     * **Only `to`, never `from`.** Transit's note says leaving a parameter out uses the person's own location,
+     * which Transit asks for itself, on their phone. This app passes no origin and reads none: nothing about the
+     * person is in the link, and nothing reaches transitapp.com until the person taps. No SDK, no key, no logo,
+     * nothing fetched from their servers.
+     */
+    fun transitApp(destination: String) {
+        openIntent(Intent(Intent.ACTION_VIEW, Uri.parse("transit://directions?to=" + Uri.encode(destination))))
+    }
+
+    /**
+     * Whether anything on this phone can open a `transit://` link. Transit documents no https fallback and no
+     * behaviour when the app is missing, so a link offered to a phone without it could only fail: the screen
+     * leaves the button out instead. "Directions" needs no other app and is always there.
+     *
+     * The question is answered locally by the package manager and sends nothing. It needs the `<queries>` entry
+     * in AndroidManifest.xml, without which Android 11 and up would always answer no.
+     */
+    fun canOpenTransitApp(): Boolean =
+        Intent(Intent.ACTION_VIEW, Uri.parse("transit://directions?to=0,0"))
+            .resolveActivity(packageManager) != null
 
     private fun openIntent(intent: Intent) {
         try {

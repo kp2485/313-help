@@ -277,6 +277,18 @@ object Screens {
                     backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
                     a.directions(row.lat, row.lon, destination)
                 })
+                // Bus directions in the Transit app, and only when the phone actually has it: Transit documents
+                // no fallback for a phone without it, so the button is left out rather than offered and broken.
+                // Never a replacement for Directions above, and never an endorsement — the word "Transit" in
+                // text, no logo, nothing loaded from their servers (docs/research/2026-09-20/transit-app.md).
+                transitAppDestination(row)?.let { busDestination ->
+                    if (a.canOpenTransitApp()) {
+                        col.addView(UI.button(a, L.t("detail.bus_app"), description = L.t("detail.bus_app_label", "name" to row.name),
+                            backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                            a.transitApp(busDestination)
+                        })
+                    }
+                }
                 col.addView(UI.text(a, L.t("detail.directions_note"), 14f, R.color.muted, topDp = 4))
             }
         }
