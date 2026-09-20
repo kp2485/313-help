@@ -6,12 +6,12 @@ import { badge, openNow, rank, type BundleRow } from '@313help/query';
 import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
-import { p, parsePhone, sha256, today, uuid5 } from '../src/util.js';
+import { p, parsePhone, sha256, today, uuid5, type CsvRow } from '../src/util.js';
 import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
-import { lineToRows, parseSchedule } from '../src/import-lines.js';
+import { importInto, lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea, nearestMiles } from '../src/indicators.js';
 import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
@@ -340,6 +340,74 @@ describe('hours from research text', () => {
     expect(lineToRows(`${base} | `)).toMatchObject({ resource: { flags: '', phone2: '' } });
     expect(lineToRows(`${base} | color=green`)).toMatch(/unknown extra/);
     expect(lineToRows(`${base} | phone2=313-555-0101`)).toMatch(/phone2_label/);
+  });
+});
+
+describe('importing lines into the seed', () => {
+  // Two cities' assessors, one service name: both slugs are "sal_city_of_help_with_a_property_tax_bill..."
+  const hamtramck = 'Help with a property tax bill you cannot pay | City of Hamtramck Assessor | money.tax | Ask the Board of Review to lower it. | 3401 Evaline St | Hamtramck | 48212 | 313-800-5233 | https://hamtramckcity.gov | Mon-Fri 8am-4pm | Homeowners. | https://hamtramckcity.gov/departments/assessor/';
+  const highlandPark = 'Help with a property tax bill you cannot pay | City of Highland Park Assessor | money.tax | Ask the Board of Review to lower it. | 12050 Woodward Ave | Highland Park | 48203 | 313-252-0050 | https://highlandparkmi.gov | Mon-Fri 8:30am-5pm | Homeowners. | https://highlandparkmi.gov/government/assessor/';
+
+  function run(files: { file: string; text: string }[], resources: CsvRow[] = []) {
+    const logs: string[] = [], warns: string[] = [], schedules: CsvRow[] = [];
+    const summary = importInto(files, resources, schedules, (m) => logs.push(m), (m) => warns.push(m));
+    return { ...summary, logs, warns, resources, schedules };
+  }
+
+  it('a second line whose id is taken by a different organisation is reported, counted and not silently dropped', () => {
+    const out = run([{ file: 'a.txt', text: `# note\n${hamtramck}\n${highlandPark}\n` }]);
+    expect(out.added).toBe(1);
+    expect(out.collisions).toBe(1);
+    expect(out.resources).toHaveLength(1);
+    expect(out.warns).toEqual(['a.txt:3 skipped: id collision with sal_city_of_help_with_a_property_tax_bill_you_cannot_pay (a different organisation or address already has this id); change the service name so the id is unique']);
+  });
+
+  it('a collision against a row already in the seed is reported too', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    const out = run([{ file: 'b.txt', text: `\n${highlandPark}` }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 1 });
+    expect(out.warns[0]).toMatch(/^b\.txt:2 skipped: id collision with sal_city_of_/);
+  });
+
+  it('a same-organisation, same-address re-import is silent and changes nothing', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    const before = JSON.stringify(seeded);
+    const out = run([{ file: 'a.txt', text: hamtramck }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 0 });
+    expect(out.warns).toEqual([]);
+    expect(out.logs).toEqual([]);
+    expect(JSON.stringify(out.resources)).toBe(before);
+  });
+
+  it('an address corrected in the seed after the import is a note, not a collision', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    seeded[0]!.address_1 = '3401 Evaline Street, 1st Floor';
+    const out = run([{ file: 'a.txt', text: hamtramck }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 0 });
+    expect(out.warns).toEqual([]);
+    expect(out.logs[0]).toMatch(/already imported as sal_city_of_.*address reads "3401 Evaline Street, 1st Floor"/);
+  });
+
+  it('same organisation, different address and different phone is a collision', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    const branch = hamtramck.replace('3401 Evaline St', '9000 Jos Campau').replace('313-800-5233', '313-800-9999');
+    const out = run([{ file: 'b.txt', text: branch }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 1 });
+    expect(out.warns[0]).toMatch(/^b\.txt:1 skipped: id collision with sal_city_of_/);
+  });
+
+  it('the same organisation with a different service is imported, not called a collision', () => {
+    const other = hamtramck.replace('Help with a property tax bill you cannot pay', 'Pay your water bill in person');
+    const out = run([{ file: 'a.txt', text: `${hamtramck}\n${other}` }]);
+    expect(out).toMatchObject({ added: 2, collisions: 0 });
+    expect(new Set(out.resources.map((r) => r.sal_id)).size).toBe(2);
+    expect(out.warns).toEqual([]);
+  });
+
+  it('a malformed line is still a plain skip, with no collision count', () => {
+    const out = run([{ file: 'a.txt', text: 'one | two | three' }]);
+    expect(out).toMatchObject({ added: 0, collisions: 0 });
+    expect(out.warns[0]).toMatch(/^a\.txt:1 skipped: expected 12 fields/);
   });
 });
 
