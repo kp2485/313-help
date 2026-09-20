@@ -60,8 +60,10 @@ const ext = (url: string, label: string, cls = 'btn ghost') => `<a class="${cls}
 // words must still be marked as English, so a screen reader switches voice instead of reading English with Spanish
 // rules (WCAG 3.1.2). `owner()` is for anything a place, a city dataset or an alert wrote; `T()` is for our words.
 const owner = (s: unknown) => (currentLang() === 'en' ? esc(s) : `<span lang="en">${esc(s)}</span>`);
-/** A phone number, ready to show: unbreakable pieces, each one left-to-right even inside right-to-left text. */
-const phoneHtml = (n: string) => phoneParts(n).map((p) => `<bdi>${esc(p)}</bdi>`).join(' ');
+/** A phone number, ready to show: unbreakable pieces inside ONE left-to-right run. The outer `<bdi class="tel">`
+ *  is what keeps "313-579-2100" before "ext. 4217" on an Arabic screen — as two loose pieces they took the
+ *  paragraph's direction and the extension came first, which is a number nobody can dial. */
+const phoneHtml = (n: string) => `<bdi class="tel">${phoneParts(n).map((p) => `<bdi>${esc(p)}</bdi>`).join(' ')}</bdi>`;
 // One live region for the whole app, outside #app so a redraw never destroys it: a screen reader only announces a
 // change inside a region that was already there. Everything the app does without moving the screen (a report sent,
 // a place saved, a ZIP that isn't ours, a layer switched on) says so here.
@@ -72,10 +74,15 @@ function announce(message: string): void {
   setTimeout(() => { if (sayEl) sayEl.textContent = message; }, 60);
 }
 
+/** A clock time. The digits stay Western in every language (DECISIONS 2026-09-20), but "am" and "pm" are our own
+ *  two words and are translated like any other: Arabic writes ص and م, and `Intl` already says so in the alert
+ *  lines, so leaving English here made one screen say both. */
 function clock(hhmm: string): string {
   const [h, m] = hhmm.split(':').map(Number) as [number, number];
-  return `${((h + 11) % 12) + 1}${m ? ':' + String(m).padStart(2, '0') : ''} ${h < 12 || h === 24 ? 'am' : 'pm'}`;
+  return `${((h + 11) % 12) + 1}${m ? ':' + String(m).padStart(2, '0') : ''} ${t(h < 12 || h === 24 ? 'clock.am' : 'clock.pm')}`;
 }
+/** A clock time (or a range of them) ready to sit inside a right-to-left sentence as one left-to-right run. */
+const clockHtml = (...parts: string[]) => `<bdi>${parts.map(esc).join(' – ')}</bdi>`;
 const detroitDay = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Detroit' }).format(d);
 function dayName(date: string): string {
   const diff = Math.round((Date.parse(date) - Date.parse(detroitDay(now()))) / 86400000);
@@ -109,19 +116,23 @@ function emergency(id: string): { number: string; label: string } | null {
 function callButton(id: string): string {
   const e = emergency(id);
   if (!e) return '';
-  return `<a class="callrow ${id === 'emg_911' ? 'is911' : ''}" href="${telHref(e.number)}" aria-label="${T('strip.call_label', { label: e.label, number: e.number })}">${icon('phone')}<span>${esc(e.label)}</span><strong>${phoneHtml(e.number)}</strong></a>`;
+  return `<a class="callrow ${id === 'emg_911' ? 'is911' : ''}" href="${telHref(e.number)}" aria-label="${T('strip.call_label', { label: e.label, number: e.number })}">${icon('phone')}<span>${owner(e.label)}</span><strong>${phoneHtml(e.number)}</strong></a>`;
 }
 
 // ---- chrome -----------------------------------------------------------------
 const logo = `<svg class="logo" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="currentColor"/><path d="M16 7l2.6 6.4L25 16l-6.4 2.6L16 25l-2.6-6.4L7 16l6.4-2.6z" fill="var(--bg)"/></svg>`;
-function topBar(title?: string, quickExit = false): string {
+/** `ownTitle` says the heading is a name its owner wrote (a listing, a greenway stretch, a neighborhood), not one
+ *  of our words. Those are never translated, so on an Arabic or Bengali screen they carry `lang="en"` like every
+ *  other owner-written run (WCAG 3.1.2) — and in Arabic that also keeps the name's own commas and parentheses at
+ *  the end of the name instead of at the end of the line. */
+function topBar(title?: string, quickExit = false, ownTitle = false): string {
   // On a wide screen Urgent help lives in the side rail (tabBar puts it there), so the top bar does not draw a
   // second copy at all: two buttons with the same name, one of them hidden by CSS, is a trap for a screen reader.
   const urgentBtn = wide.matches ? '' : `<button class="urgent" ${go({ v: 'urgent' })}>${icon('phone', 'sm')}<span>${T('strip.more')}</span></button>`;
   // The name is `<bdi>`: on a right-to-left screen "313 Help" is a number and a word, and without an isolate the
   // two swap places and the app calls itself "Help 313".
   if (!title) return `<header class="top"><div class="brand">${logo}<bdi>${T('app.name')}</bdi></div>${urgentBtn}</header>`;
-  return `<header class="top inner"><button class="iconbtn" data-back aria-label="${T('back')}">${icon('back', 'turn')}</button><h1 tabindex="-1">${esc(title)}</h1>
+  return `<header class="top inner"><button class="iconbtn" data-back aria-label="${T('back')}">${icon('back', 'turn')}</button><h1 tabindex="-1">${ownTitle ? owner(title) : esc(title)}</h1>
     ${quickExit ? `<button class="exit" data-exit>${T('safe.exit')}</button>` : urgentBtn}</header>`;
 }
 // Every language names itself in its own words and carries its own `lang`, so an Arabic reader can find Arabic on
@@ -319,7 +330,9 @@ function layerSwitcher(): string {
 function layerList(rows: Ranked[], over: Overlay[]): string {
   const parks = layerOn('place:parks') ? [...(bundle?.parks ?? [])].sort((a, b) => (here ? milesBetween(here, a) - milesBetween(here, b) : a.name.localeCompare(b.name))) : [];
   const segs = layerOn('place:greenway') ? bundle?.greenway?.segments ?? [] : [];
-  const names = (list: string[], limit = 40) => `<p>${esc([...new Set(list)].filter(Boolean).slice(0, limit).join(' · '))}</p>${new Set(list).size > limit ? `<p class="foot">${T('map.list_more', { count: new Set(list).size - limit })}</p>` : ''}`;
+  // Route, stop and park names are written by the City, never by us: one English run, marked as one (WCAG 3.1.2),
+  // so an Arabic screen keeps the whole list left to right instead of reordering it around every "·".
+  const names = (list: string[], limit = 40) => `<p>${owner([...new Set(list)].filter(Boolean).slice(0, limit).join(' · '))}</p>${new Set(list).size > limit ? `<p class="foot">${T('map.list_more', { count: new Set(list).size - limit })}</p>` : ''}`;
   const parts = [
     rows.length ? `<h3>${T('map.list_help', { count: rows.length })}</h3><ul class="cards">${rows.slice(0, 20).map((r) => card(r)).join('')}</ul>${rows.length > 20 ? `<p class="foot">${T('map.list_more', { count: rows.length - 20 })}</p>` : ''}` : '',
     segs.length ? `<h3>${T('gw.title')}</h3><ul class="rows">${segs.map((s) => rowLink({ v: 'segment', id: s.id }, 'path', s.name, t('gw.' + s.phase), true)).join('')}</ul>` : '',
@@ -347,7 +360,7 @@ function mapTab(): string {
   return `<main class="wide"><h1 class="page" tabindex="-1">${T('tab.map')}</h1><p class="lede">${T('map.lede')}</p>
     <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, segments: layerOn('place:greenway'), fit: CITY, cover: true })}
     <div class="mapside">${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
-    ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map((l) => esc(`${l.source.name} (${l.source.license}, ${prettyDate(l.source.fetched_at)})`)).join(' · ')}</p>` : ''}
+    ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map((l) => `${owner(l.source.name)} (${owner(l.source.license)}, ${esc(prettyDate(l.source.fetched_at))})`).join(' · ')}</p>` : ''}
     ${g ? `<h2>${T('gw.title')}</h2><button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'turn dim')}</button>` : ''}
     ${parks.length ? `<h2>${T('rec.parks')}</h2>${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => `<li><div class="row static"><span class="rowic">${icon('rec')}</span><span class="rowtx"><strong>${owner(p.name)}</strong><small>${[p.address ? owner(p.address) : '', T('miles', { miles: mi.toFixed(1) })].filter(Boolean).join(' · ')}</small></span></div></li>`).join('')}</ul>` : ''}
       <button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.all_parks', { count: parks.length })}</button>` : ''}
@@ -411,8 +424,9 @@ function hoursLine(s: Schedule): string {
   const codes = (s.byday ?? '').split(',').filter(Boolean);
   const days = codes.map((d) => { const m = /^([+-]?\d+)?(\w\w)$/.exec(d)!; return (m[1] ? `#${m[1]} ` : '') + t('day.' + m[2]); });
   const run = days.length > 2 && codes.every((d, i) => i === 0 || DAY_ORDER.indexOf(d) === DAY_ORDER.indexOf(codes[i - 1]!) + 1);
-  const label = !s.freq ? prettyDate(s.dtstart) : run ? `${days[0]} – ${days[days.length - 1]}` : days.join(', ');
-  return `<li><span>${esc(label)}</span><span><bdi>${esc(clock(s.opens_at))} – ${esc(clock(s.closes_at))}</bdi>${s.description ? ` · ${owner(s.description)}` : ''}</span></li>`;
+  // "Mon, Wed, Fri": the comma is the list separator of the language reading it, not always a Latin one.
+  const label = !s.freq ? prettyDate(s.dtstart) : run ? `${days[0]} – ${days[days.length - 1]}` : days.join(t('list.sep'));
+  return `<li><span>${esc(label)}</span><span>${clockHtml(clock(s.opens_at), clock(s.closes_at))}${s.description ? ` · ${owner(s.description)}` : ''}</span></li>`;
 }
 // Directions live in directions.ts, so a row with coordinates but no street address (the naloxone and
 // test-strip spots) still gets them. A coordinate is never printed as an address.
@@ -421,11 +435,11 @@ const goHere = (r: BundleRow) => directionsHref(r, navigator.userAgent);
 // fallback, so a laptop is not offered a link that could only fail). An addition: "Bus directions" above needs
 // no app and stays first. A link-out like any other, marked as leaving the app.
 const busApp = (r: BundleRow) => transitAppHref(r, navigator.userAgent);
-function detail(id: string): { title: string; html: string; exit: boolean } {
+function detail(id: string): { title: string; html: string; exit: boolean; ownTitle: true } {
   const r = bundle!.rows.find((x) => x.id === id);
   if (!r) {
     const gone = bundle!.archived.find((x) => x.id === id);
-    return { title: gone?.name ?? t('app.name'), exit: false, html: `<main><p class="banner warn">${gone ? T('badge.archived', { date: prettyDate(gone.archived.at) }) : T('detail.not_found')} ${T('detail.archived_try_211')} <a href="tel:211">211</a></p></main>` };
+    return { title: gone?.name ?? t('app.name'), exit: false, ownTitle: true, html: `<main><p class="banner warn">${gone ? T('badge.archived', { date: prettyDate(gone.archived.at) }) : T('detail.not_found')} ${T('detail.archived_try_211')} <a href="tel:211">211</a></p></main>` };
   }
   const b = badgeText(r), o = openNow(r, now(), bundle!.alerts), next = nextOccurrences(r, now(), 3, bundle!.alerts);
   const sensitive = isSensitive(r.category), priv = isPrivate(r.category);
@@ -433,7 +447,7 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
   // Alerts that name this listing and haven't ended, including ones announced ahead ("closed Saturday").
   const own = bundle!.alerts.filter((a) => a.status === 'published' && a.targets?.includes(r.id) && Date.parse(a.ends_at) > now().getTime())
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
-  return { title: r.name, exit: priv, html: `<main class="detail"><p class="org">${owner(r.org)}</p>
+  return { title: r.name, exit: priv, ownTitle: true, html: `<main class="detail"><p class="org">${owner(r.org)}</p>
     <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${r.notice ? `<p class="notice">${owner(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${owner(ph.label)}` : ''}</span><strong>${phoneHtml(ph.number)}</strong></a>`).join('')}
       ${goHere(r) ? `<div class="two"><a class="btn ghost" href="${esc(goHere(r)!)}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
@@ -444,7 +458,7 @@ function detail(id: string): { title: string; html: string; exit: boolean } {
     ${sensitive ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
     ${currentLang() !== 'en' ? `<p class="foot">${T('detail.in_english')}</p>` : ''}<h2>${T('detail.what')}</h2><p lang="en">${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${owner(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: '' })}<span lang="en">${esc(r.hours_text)}</span></p>` : ''}
-    ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${esc(clock(n.opens_at))} – ${esc(clock(n.closes_at))}</span></li>`).join('')}</ul>` : ''}
+    ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${clockHtml(clock(n.opens_at), clock(n.closes_at))}</span></li>`).join('')}</ul>` : ''}
     ${r.address || (!sensitive && r.lat !== undefined) ? `<h2>${T('detail.where')}</h2>${r.address ? `<address lang="en"><bdi>${esc(r.address.line1)}</bdi><br><bdi>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</bdi></address>` : `<p>${T('detail.where_no_address', { source: r.facts.source.name })}</p>`}${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, quiet: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
     ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
     ${r.website ? `<p>${ext(r.website, t('detail.website'), 'link')}</p>` : ''}
@@ -487,7 +501,7 @@ function segment(s: Segment): string {
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `<main><p class="meta"><span class="pill ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}</span></p>${s.phase === 'open' ? '' : `<p class="lede">${T('gw.not_open')}</p>`}
     ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
-    ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${esc(s.cross_streets.join(' · '))}</p>` : ''}
+    ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${owner(s.cross_streets.join(' · '))}</p>` : ''}
     <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
     ${s.phase === 'open' ? reportBox(s.id, true) : ''}
     ${bundle!.index.files['indicators/neighborhoods.json'] ? `<h2>${T('hood.about_area')}</h2><ul class="rows">${indicators ? (indicators.segments[s.id] ?? []).map((id) => indicators!.neighborhoods.find((n) => n.id === id)).filter((n): n is Hood => !!n).map((n) => rowLink({ v: 'hood', id: n.id }, 'info', n.name, '', true)).join('') : ''}${rowLink({ v: 'hoods', lens: 'jlg' }, 'path', t('hood.lens_jlg'))}</ul>` : ''}</main>`;
@@ -540,16 +554,16 @@ function addScreen(): string {
       <button class="btn" type="submit">${T('add.send')}</button><p class="foot">${T('add.privacy')}</p></form></main>`;
 }
 // Neighborhood pages (docs/13, hoods.ts). Not in the crisis path; the numbers load only when one of these screens opens.
-function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string; html: string } {
+function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string; html: string; ownTitle: boolean } {
   if (indicators === undefined) { void loadIndicators(bundle!.index).then((d) => { indicators = d; render(false); }); }
-  if (!indicators) return { title: t('hood.title'), html: `<main><p class="empty">${T(indicators === null ? 'hood.unavailable' : 'home.loading')}</p></main>` };
+  if (!indicators) return { title: t('hood.title'), ownTitle: false, html: `<main><p class="empty">${T(indicators === null ? 'hood.unavailable' : 'home.loading')}</p></main>` };
   const d = indicators, ui = {
-    t, esc, date: prettyDate, link: (url: string, label: string) => ext(url, label, 'link'), go: (view: object) => go(view as View),
+    t, esc, own: owner, date: prettyDate, link: (url: string, label: string) => ext(url, label, 'link'), go: (view: object) => go(view as View),
     map: (h: Hood) => mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), quiet: false, outline: outline(h, d.origin), fit: outline(h, d.origin).flat(), minMeters: 900 }),
   };
-  if (v.v === 'hoods') return { title: t(v.lens === 'jlg' ? 'hood.lens_jlg' : 'hood.title'), html: hoodList(d, ui, v.lens) };
+  if (v.v === 'hoods') return { title: t(v.lens === 'jlg' ? 'hood.lens_jlg' : 'hood.title'), ownTitle: false, html: hoodList(d, ui, v.lens) };
   const h = d.neighborhoods.find((x) => x.id === v.id);
-  return h ? { title: h.name, html: hoodPage(h, d, ui) } : { title: t('hood.title'), html: hoodList(d, ui) };
+  return h ? { title: h.name, ownTitle: true, html: hoodPage(h, d, ui) } : { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
 }
 // What this app keeps and sends, in plain words (docs/08). Everything here is true of the code; tests check the parts
 // that can be checked (no storage writes in main.ts, closed report fields, no IP in the Worker).
@@ -589,7 +603,8 @@ function render(focus = true): void {
   const v = stack[stack.length - 1]!;
   for (const m of mapViews) m.destroy();
   mapViews = []; mapSpecs = [];
-  let title: string | undefined, body: string, exit = false;
+  // `ownTitle`: the heading is a name its owner wrote, so it is marked English on a screen that is not English.
+  let title: string | undefined, body: string, exit = false, ownTitle = false;
   // Without a list, only the screens that don't need one: the urgent numbers and the overdose steps.
   const standsAlone = v.v === 'urgent' || v.v === 'privacy' || (v.v === 'need' && !!NEEDS.find((x) => x.id === v.id)?.stepsOnly);
   if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' && shownTabs().some((x) => x.id === v.tab) ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'map' ? mapTab() : eventsTab(); }
@@ -599,19 +614,19 @@ function render(focus = true): void {
   else if (v.v === 'search') { title = t('search.title'); body = searchScreen(); }
   else if (v.v === 'saved') { title = t('saved.title'); body = savedScreen(); }
   else if (v.v === 'add') { title = t('add.title'); body = addScreen(); }
-  else if (v.v === 'hoods' || v.v === 'hood') { const hs = hoodScreen(v); title = hs.title; body = hs.html; }
+  else if (v.v === 'hoods' || v.v === 'hood') { const hs = hoodScreen(v); title = hs.title; ownTitle = hs.ownTitle; body = hs.html; }
   else if (v.v === 'need') { const n = NEEDS.find((x) => x.id === v.id)!; title = t(n.stepsOnly ? 'od.title' : 'need.' + n.id); exit = !!n.quickExit; body = need(v); }
   else if (v.v === 'list') { title = t('cat.' + v.cat); body = `<main>${results(CATEGORIES.find((c) => c.id === v.cat)?.query ?? {}, {})}</main>`; }
-  else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; body = d.html; }
+  else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; ownTitle = d.ownTitle; body = d.html; }
   else if (v.v === 'greenway') { title = t('gw.title'); body = greenway(); }
   else if (v.v === 'parks') { title = t('rec.parks'); body = parksList(); }
-  else { const s = bundle!.greenway?.segments.find((x) => x.id === v.id); title = s?.name ?? t('gw.title'); body = s ? segment(s) : greenway(); }
+  else { const s = bundle!.greenway?.segments.find((x) => x.id === v.id); title = s?.name ?? t('gw.title'); ownTitle = !!s; body = s ? segment(s) : greenway(); }
   const fromStack = stack.map((x) => (x.v === 'tab' ? x.tab : undefined)).filter(Boolean).pop();
   const active = v.v === 'tab' ? v.tab : fromStack ?? TAB_OF[v.v];
   // Every list and listing says when this phone last got updates, if that was a while ago. Home has its own spot.
   if (['need', 'list', 'detail', 'segment', 'search', 'saved'].includes(v.v) || (v.v === 'tab' && v.tab === 'map')) body = body.replace(/^<main([^>]*)>/, (m) => m + ageBanner());
   body = body.replace(/^<main/, '<main tabindex="-1"');                    // where the skip link lands
-  const nav = tabBar(active), head = topBar(title, exit), skip = `<button class="skip" data-skip>${T('skip.main')}</button>`;
+  const nav = tabBar(active), head = topBar(title, exit, ownTitle), skip = `<button class="skip" data-skip>${T('skip.main')}</button>`;
   // Wide: the rail (leftmost), then the bar above the page, then the page. Narrow: the bar, the page, and the tab
   // bar along the bottom. Either way the order the keyboard walks is the order the eye reads.
   app.innerHTML = skip + (wide.matches ? nav + head + body : head + body + nav);

@@ -57,16 +57,41 @@ export function outline(h: Hood, origin: [number, number]): { lat: number; lon: 
   return h.rings.map((enc) => { const out: { lat: number; lon: number }[] = []; let x = 0, y = 0; for (let i = 0; i + 1 < enc.length; i += 2) { x += enc[i]!; y += enc[i + 1]!; out.push({ lon: origin[0] + x / 1e5, lat: origin[1] + y / 1e5 }); } return out; });
 }
 
-export interface Ui { t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; date: (d: string) => string; link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string }
+export interface Ui { t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; own: (s: unknown) => string; date: (d: string) => string; link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string }
 /** Per 1,000 parcels. No rate without a count we can show and a base we can defend (honesty rules 2 and 3). */
+/**
+ * One of our sentences with a run the City wrote dropped into it: the sentence is escaped, the run is marked
+ * English (WCAG 3.1.2), and in Arabic the run stays one left-to-right piece inside the Arabic sentence, so its
+ * own commas and slashes do not end up at the end of the line.
+ */
+export function slot(ui: Ui, key: string, name: string, value: string, p: Record<string, string | number> = {}): string {
+  return ui.esc(ui.t(key, { ...p, [name]: '\u0000' })).replace('\u0000', ui.own(value));
+}
 export const rate = (c: Count | undefined, parcels: number | undefined) => (typeof c === 'number' && parcels && parcels >= 100 ? (c / parcels) * 1000 : undefined);
-const money = (n: number) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
-const bigMoney = (n: number) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'USD', notation: 'compact', compactDisplay: 'long', maximumFractionDigits: 1 }).format(n);
+/**
+ * Dollars are written the way the sale record and the permit write them: "$85,000", "$1.2 million". This is the
+ * same rule that keeps every digit Western (DECISIONS 2026-09-20) — and it is also the only formatting that is
+ * right in all four languages here: `Intl` renders USD in Arabic as "85,000 US$" with the sign at the far end,
+ * and in Bengali it cuts the compact word short ("85 হা$"). Counts, which carry no unit, still follow the
+ * language: `num()` below uses `locale()`.
+ */
+const MONEY_LOCALE = 'en-US';
+/** The dollar sign leads the amount, or we fall back to the language that writes it that way. Nothing changes for
+ *  a language whose own rules already put it there, so English and Spanish are untouched. */
+const dollars = (n: number, o: Intl.NumberFormatOptions) => {
+  const opts = { style: 'currency', currency: 'USD', ...o } as const;
+  const mine = new Intl.NumberFormat(locale(), opts).format(n);
+  return mine.startsWith('$') ? mine : new Intl.NumberFormat(MONEY_LOCALE, opts).format(n);
+};
+const money = (n: number) => dollars(n, { maximumFractionDigits: 0 });
+const bigMoney = (n: number) => dollars(n, { notation: 'compact', compactDisplay: 'long', maximumFractionDigits: 1 });
 
 /** Alphabetical inside each council district. Never sorted by a number: no league tables (rule 1). */
 export function hoodList(d: Indicators, ui: Ui, lens?: string): string {
   const list = d.neighborhoods.filter((n) => lens !== 'jlg' || n.jlg_study_area).sort((a, b) => a.name.localeCompare(b.name));
-  const row = (n: Hood) => `<li><button class="row" ${ui.go({ v: 'hood', id: n.id })}><span class="rowtx"><strong>${ui.esc(n.name)}</strong></span></button></li>`;
+  // A neighborhood's name is the City's, never ours: marked English so it is read in the right voice and, in
+  // Arabic, so a name like "Crary/St Marys" or "Evergreen Lahser 7/8" stays in one piece.
+  const row = (n: Hood) => `<li><button class="row" ${ui.go({ v: 'hood', id: n.id })}><span class="rowtx"><strong>${ui.own(n.name)}</strong></span></button></li>`;
   const groups = [1, 2, 3, 4, 5, 6, 7, null].map((dist) => ({ dist, items: list.filter((n) => n.district === dist) })).filter((g) => g.items.length);
   return `<main><p class="lede">${ui.esc(ui.t('hood.list_lede'))}</p><p class="foot">${ui.esc(ui.t('hood.describe'))}</p>
     ${lens === 'jlg' ? `<p class="foot">${ui.esc(ui.t('hood.lens_jlg_note', { count: list.length }))}</p>` : `<ul class="rows"><li><button class="row" ${ui.go({ v: 'hoods', lens: 'jlg' })}><span class="rowtx"><strong>${ui.esc(ui.t('hood.lens_jlg'))}</strong><small>${ui.esc(ui.t('hood.lens_jlg_sub'))}</small></span></button></li></ul>`}
@@ -99,7 +124,7 @@ export function crashPanel(h: Hood, d: Indicators, ui: Ui): string {
   return `<h2>${T('hood.crash_head')}</h2><div class="panel"><p>${T('hood.crash_lede', { from, to })}</p>
     <ul class="hours">${line(T('hood.crash_walk'), 'walk')}${line(T('hood.crash_bike'), 'bike')}${line(T('hood.crash_severe'), 'severe')}</ul>
     <p class="foot">${T('hood.crash_note')}</p>
-    <p class="foot">${T('hood.crash_source', { source: d.sources.crashes.name, records: d.crash_records_from ?? '' })}</p></div>`;
+    <p class="foot">${slot(ui, 'hood.crash_source', 'source', d.sources.crashes.name, { records: d.crash_records_from ?? '' })}</p></div>`;
 }
 
 export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
@@ -139,9 +164,9 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
       <p class="foot">${T('hood.blight_note')}</p>
       ${yearsTable(h, d, ui, { value: (y) => (typeof y.demolitions === 'number' ? y.demolitions : undefined), fmt: (n) => String(n), head: ui.t('hood.demolitions'), countHead: '', missing: ui.t('hood.lt5_or_none'), caption: ui.t('hood.demo_caption') })}
       ${yearsTable(h, d, ui, { value: (y) => y.issue_days, count: (y) => y.issues, fmt: (n) => ui.t('hood.days', { n }), head: ui.t('hood.issue_days'), countHead: ui.t('hood.issues'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.issues_caption') })}
-      <p class="foot">${T('hood.issues_note', { types: (d.issue_types ?? []).join(', ') })}</p>
+      <p class="foot">${slot(ui, 'hood.issues_note', 'types', (d.issue_types ?? []).join(', '))}</p>
       ${d.sources.fires ? `${yearsTable(h, d, ui, { value: (y) => rate(y.fires, h.parcels), cityValue: (y) => rate(y.fires, d.city_parcels), count: (y) => y.fires, fmt: (n) => n.toFixed(1), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.fires'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.fire_caption') })}
-      <p class="foot">${T('hood.fire_note')}</p><details class="foot"><summary>${T('hood.fire_types')}</summary><p>${ui.esc((d.fire_types ?? []).join('; '))}</p></details>` : ''}
+      <p class="foot">${T('hood.fire_note')}</p><details class="foot"><summary>${T('hood.fire_types')}</summary><p>${ui.own((d.fire_types ?? []).join('; '))}</p></details>` : ''}
       ${d.sources.vacant ? `${row(T('hood.vacant', { from: ui.date(d.vacant_period?.[0] ?? ''), to: ui.date(d.vacant_period?.[1] ?? '') }), per1000(h.now?.vacant_reg), cityPer1000(d.city_now?.vacant_reg))}<p class="foot">${T('hood.vacant_note')}</p>` : ''}
       ${d.sources.pavement ? `${row(T('hood.roads', { from: d.roads_years?.[0] ?? '', to: d.roads_years?.[1] ?? '' }), roadsValue, cityRoads?.poor_pct !== undefined ? T('hood.city_pct', { pct: cityRoads.poor_pct }) : '')}<p class="foot">${T('hood.roads_note')}</p>` : ''}</div>` : ''}
 

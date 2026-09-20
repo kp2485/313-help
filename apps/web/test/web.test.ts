@@ -205,12 +205,12 @@ describe('add a place, saved places, help paying for food', () => {
     for (const c of ['treatment.detox', 'treatment.meds', 'assault', 'shelter.dv', 'health.mental']) { expect(isPrivate(c), c).toBe(true); expect(canSave(c), c).toBe(false); }
     for (const c of ['harm.narcan', 'health.clinic', 'jobs.find', 'treatments']) expect(isPrivate(c), c).toBe(false);
     for (const c of ['treatment.detox', 'assault']) expect(isSensitive(c), c).toBe(false);   // address, distance and map stay
-    expect(main).toContain('return { title: r.name, exit: priv, html:');
+    expect(main).toContain('return { title: r.name, exit: priv, ownTitle: true, html:');
   });
 });
 
 describe('neighborhood pages (docs/13 honesty rules)', () => {
-  const ui = { t: (k: string, p: Record<string, string | number> = {}) => (strings[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '<div class="mapbox"></div>' };
+  const ui = { t: (k: string, p: Record<string, string | number> = {}) => (strings[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), own: (x: unknown) => '<span lang="en">' + String(x) + '</span>', date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '<div class="mapbox"></div>' };
   const hood = (name: string, district: number | null, total: number): Hood => ({ id: 'nbh_' + name.toLowerCase(), name, district, center: [42.4, -83.1], rings: [], years: { 2024: { sales: 'lt5', permits: 12, permit_cost: 500000 }, 2025: { sales: 40, median_price: 90000 } },
     help: { total, by: { food: 0, harm: total }, nearest_miles: { food: 2.3, clinic: null, narcan: 0.5, indoors: 0.8 }, none_listed_yet: ['food', 'health'], coverage_checked: false }, places: { parks: 3, rec_centers: 1, greenway_open: 0 } });
   const src = { name: 'City data', url: 'https://example.org/x', last_edited: '2026-09-17' };
@@ -315,8 +315,11 @@ describe('the other languages', () => {
   const holes = (v: string) => (v.match(/[{]\w+[}]/g) ?? []).sort().join(',');
   // Names, and values that are nothing but a placeholder, are the same in every language on purpose.
   // `miles` is "{miles} mi": Spanish writes the unit the same way.
+  // `clock.am`/`clock.pm` and `list.sep` are a clock abbreviation and a comma: Spanish as written in the United
+  // States uses the English ones, and Bengali writes the same comma. Arabic writes its own (ص, م, ،).
   const SAME_ON_PURPOSE = new Set(['app.name', 'detail.source_line', 'hood.kind.harm', 'miles', 'gw.title', 'layer.place.greenway',
-    'layer.go.people_mover', 'link.food.wic.title', 'link.food.wic.label', 'link.food.double_up.title', 'link.benefits.ser.title']);
+    'layer.go.people_mover', 'link.food.wic.title', 'link.food.wic.label', 'link.food.double_up.title', 'link.benefits.ser.title',
+    'clock.am', 'clock.pm', 'list.sep']);
 
   for (const l of OTHER) {
     const w = table(l);
@@ -364,6 +367,79 @@ describe('the other languages', () => {
     const src = readFileSync(join(__dirname, '../src/i18n.ts'), 'utf8');
     expect(src).toContain("ar: 'ar-u-nu-latn'"); expect(src).toContain("bn: 'bn-u-nu-latn'");
     expect(new Intl.NumberFormat('ar-u-nu-latn').format(2026)).toBe('2,026');
+  });
+
+  // Everything below was found by walking every screen in Arabic and in Bengali on 2026-09-20.
+  const cssBody = readFileSync(join(__dirname, '../src/style.css'), 'utf8').replace(/\/\*[^]*?\*\//g, '');
+  const hoodsSrc = readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8');
+  /** Every rule in the stylesheet, as { selector, body }. */
+  const RULES = [...cssBody.matchAll(/([^{}@]+)\{([^{}]*)\}/g)].map((m) => ({ sel: m[1]!.trim(), body: m[2]! }));
+
+  it('nothing is upper-cased or letter-spaced except in the two languages that were drawn for it', () => {
+    // `text-transform:uppercase` says nothing in Arabic or Bengali, and letter-spacing breaks Arabic's joins and
+    // pulls a Bengali conjunct off its vowel sign. Both are allowed only inside a `:lang(en)`/`:lang(es)` rule.
+    const scoped = (sel: string) => /:lang\((?:en|es)\)/.test(sel);
+    for (const r of RULES) {
+      if (/text-transform\s*:\s*uppercase/.test(r.body)) expect(scoped(r.sel), `uppercase in "${r.sel}"`).toBe(true);
+      const ls = /letter-spacing\s*:\s*([^;}]+)/.exec(r.body)?.[1]?.trim();
+      // `normal`, `0`, and the two runs that are Latin in every language — the brand's "313 Help" and a phone
+      // number — are the only unscoped tracking left.
+      if (ls && !['normal', '0'].includes(ls) && !scoped(r.sel)) expect(['.brand', '.callrow strong'], `letter-spacing in "${r.sel}"`).toContain(r.sel);
+    }
+    expect(cssBody).toContain('h2:lang(en),h2:lang(es) { letter-spacing:.04em; text-transform:uppercase; }');
+  });
+  it('Bengali gets room for its vowel signs: every tight line-height opens up, and only for Bengali', () => {
+    for (const sel of [':lang(bn) h1,:lang(bn) .brand', ':lang(bn) .when']) expect(cssBody).toContain(sel);
+    expect(cssBody).toMatch(/:lang\(bn\)[^{]*\.tabs button[^{]*\{[^}]*line-height:1\.4/);
+    // and nothing Bengali-only touches the phone layout English and Spanish already have
+    for (const r of RULES) if (/:lang\(bn\)/.test(r.sel)) expect(r.body).toMatch(/^[^:]*line-height|font-family/);
+  });
+  it('"am" and "pm" are words we translate, not letters left in English', () => {
+    expect(main).toContain("${t(h < 12 || h === 24 ? 'clock.am' : 'clock.pm')}");
+    expect(main).not.toMatch(/'am' : 'pm'/);
+    for (const l of ['en', 'es', 'ar', 'bn']) for (const k of ['clock.am', 'clock.pm', 'list.sep']) expect(table(l)[k], `${l} ${k}`).toBeTruthy();
+    expect(table('ar')['clock.am']).toBe('ص');
+    // and the day of the week comes from the same files, never from the browser's idea of a weekday
+    for (const l of ['en', 'es', 'ar', 'bn']) for (const d of ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']) expect(table(l)['day.' + d], `${l} ${d}`).toBeTruthy();
+    expect(main).toContain("t('day.' + m[2])");
+    expect(main).toContain("days.join(t('list.sep'))");
+  });
+  it('a clock time reads left to right wherever it is printed, not only in the hours table', () => {
+    expect(main).toContain("const clockHtml = (...parts: string[]) => `<bdi>${parts.map(esc).join(' – ')}</bdi>`;");
+    // no bare "9 am – 1 pm" left anywhere: every pair of clock times goes through clockHtml
+    expect(main).not.toMatch(/\$\{esc\(clock\([^)]*\)\)\} – /);
+  });
+  it('3.1.2: a name its owner wrote is marked English in the heading too, not only in the page', () => {
+    expect(main).toContain('function topBar(title?: string, quickExit = false, ownTitle = false)');
+    expect(main).toContain('${ownTitle ? owner(title) : esc(title)}');
+    expect(main).toContain('head = topBar(title, exit, ownTitle)');
+    // and the screens whose heading is a name say so
+    for (const k of ['ownTitle: true, html:', 'ownTitle = hs.ownTitle', 'ownTitle = d.ownTitle', "ownTitle = !!s;"]) expect(main).toContain(k);
+  });
+  it('the map never mirrors, but the pad of arrows under it still moves to the other corner', () => {
+    // `direction:ltr` on the pad kept the glyphs physical AND stopped `inset-inline-start` mirroring, so in Arabic
+    // the arrows sat in the same corner as the zoom keys. `row-reverse` does the first without the second.
+    expect(cssBody).toContain('[dir="rtl"] .mappan { flex-direction:row-reverse; }');
+    expect(cssBody).toMatch(/\.mappan \{[^}]*inset-inline-start:\.5rem/);
+    expect(cssBody).not.toMatch(/\.mappan \{[^}]*direction:ltr/);
+    expect(cssBody).toMatch(/\.maptools \{[^}]*inset-inline-end:\.5rem/);
+  });
+  it('a run of English inside our sentence is marked, so Arabic keeps it in one piece', () => {
+    for (const call of ['owner(e.label)', 'owner(s.cross_streets.join', 'owner(l.source.name)']) expect(main).toContain(call);
+    expect(hoodsSrc).toContain('ui.own(n.name)');
+    expect(hoodsSrc).toContain('export function slot(');
+  });
+  it('dollars are written the way the record writes them, in every language', () => {
+    // Intl renders USD in Arabic as "85,000 US$" and cuts the Bengali compact word short ("85 হা$").
+    expect(hoodsSrc).toContain("const MONEY_LOCALE = 'en-US';");
+    expect(hoodsSrc).toContain("return mine.startsWith('$') ? mine : new Intl.NumberFormat(MONEY_LOCALE, opts).format(n);");
+    const usd = (l: string, o: Intl.NumberFormatOptions = {}) => new Intl.NumberFormat(l, { style: 'currency', currency: 'USD', maximumFractionDigits: 0, ...o }).format(85000);
+    // English and Spanish already lead with the sign, so nothing about them changes; Arabic and Bengali do not.
+    for (const l of ['en-US', 'es-US']) expect(usd(l).startsWith('$'), l).toBe(true);
+    for (const l of ['ar-u-nu-latn', 'bn-u-nu-latn']) expect(usd(l).startsWith('$'), l).toBe(false);
+    expect(usd('en-US')).toBe('$85,000');
+    // counts, which carry no unit, still follow the language
+    expect(hoodsSrc).toContain('new Intl.NumberFormat(locale()).format(n)');
   });
 });
 
@@ -883,9 +959,11 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
     expect(main).toContain('<address lang="en">');
   });
   it('a phone number stays left to right and never breaks in the middle (CLAUDE.md, and Arabic is next)', () => {
-    expect(main).toContain('const phoneHtml = (n: string) => phoneParts(n).map((p) => `<bdi>${esc(p)}</bdi>`).join(\' \');');
+    expect(main).toContain('const phoneHtml = (n: string) => `<bdi class="tel">${phoneParts(n).map((p) => `<bdi>${esc(p)}</bdi>`).join(\' \')}</bdi>`;');
     expect(main).not.toMatch(/<strong>\$\{esc\((?:e|ph|p)\.number\)\}<\/strong>/);
-    expect(css).toContain('.callrow strong bdi,.btn strong bdi { white-space:nowrap; }');
+    expect(css).toContain('.callrow strong .tel > bdi,.btn strong .tel > bdi { white-space:nowrap; }');
+    // and the number and its extension stay in that order in Arabic: one left-to-right run around the two pieces
+    expect(css).toContain('.tel { direction:ltr; unicode-bidi:isolate; }');
   });
   it('right-to-left is ready: no physical left/right in the stylesheet, and the arrows can turn round', () => {
     const body = css.replace(/\/\*[^]*?\*\//g, '');

@@ -34,6 +34,12 @@ html { -webkit-text-size-adjust:100%; }
 /* No web fonts, ever (docs/08, and the page's own CSP). These are the faces the platforms already ship. */
 :lang(ar) { font-family:"Geeza Pro","Noto Naskh Arabic","Droid Arabic Naskh","Segoe UI",system-ui,sans-serif; }
 :lang(bn) { font-family:"Kohinoor Bangla","Noto Sans Bengali","Nirmala UI",system-ui,sans-serif; }
+/* Bengali sets taller than the Latin alphabet: vowel signs ride above the headline and conjuncts hang below the
+   baseline, so leading drawn for English crowds them (and, in a button, can cut the top of a matra off). Every
+   tight line-height in this file opens up for Bengali only; English and Spanish are untouched. */
+:lang(bn) h1,:lang(bn) .brand { line-height:1.3; }
+:lang(bn) h3,:lang(bn) .rowtx strong,:lang(bn) .quick button,:lang(bn) .tabs button { line-height:1.4; }
+:lang(bn) .when { line-height:1.3; } :lang(bn) ol.steps li { line-height:1.6; }
 /* What a place wrote about itself stays in English (docs/05) and is marked `lang="en"`. On an Arabic screen those
    words also need their own direction, or the full stop at the end of an English sentence jumps to the other end
    of the line. `isolate` keeps the English run out of the Arabic sentence around it. */
@@ -42,13 +48,21 @@ body { margin:0; background:var(--bg); color:var(--ink); font:1.0625rem/1.55 sys
 #app { min-height:100dvh; padding-bottom:calc(var(--tabs-h) + env(safe-area-inset-bottom)); }
 main { max-width:42rem; margin:0 auto; padding:0 1.125rem 2.5rem; }
 h1,h2,h3,p,ul,ol { margin:0; padding:0; } ul,ol { list-style:none; }
-h1 { font-size:1.75rem; line-height:1.15; letter-spacing:-.02em; font-weight:750; } h1:focus { outline:none; }
-h1.page { margin-top:1.25rem; } h2 { font-size:.9375rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin:1.75rem 0 .625rem; }
+h1 { font-size:1.75rem; line-height:1.15; font-weight:750; } h1:focus { outline:none; }
+h1.page { margin-top:1.25rem; } h2 { font-size:.9375rem; font-weight:700; color:var(--muted); margin:1.75rem 0 .625rem; }
+/* Tracking is a Latin-alphabet effect. In Arabic, letter-spacing pulls apart letters that are joined to each other
+   and the word stops being a word; in Bengali it separates a conjunct from its vowel sign. `uppercase` means
+   nothing in either script. So every tracked or upper-cased run — the section labels, the layer groups, the month
+   on an event chip, the tight headline tracking — is scoped to the two languages it was drawn for. */
+h1:lang(en),h1:lang(es) { letter-spacing:-.02em; }
+h2:lang(en),h2:lang(es) { letter-spacing:.04em; text-transform:uppercase; }
 h3 { font-size:1.0625rem; line-height:1.3; font-weight:700; } p + p { margin-top:.5rem; }
 a { color:var(--brand); text-underline-offset:.15em; } strong { font-weight:700; }
 /* A phone number never breaks in the middle. Each piece (the number, then "ext. 4217") is unbreakable on its own,
-   so at the biggest text sizes a long number wraps BETWEEN the pieces instead of running off the screen. */
-.callrow strong bdi,.btn strong bdi { white-space:nowrap; }
+   so at the biggest text sizes a long number wraps BETWEEN the pieces instead of running off the screen. The
+   pieces sit inside one left-to-right run, or an Arabic screen puts the extension first. */
+.tel { direction:ltr; unicode-bidi:isolate; }
+.callrow strong .tel > bdi,.btn strong .tel > bdi { white-space:nowrap; }
 button { font:inherit; color:inherit; cursor:pointer; border:0; background:none; text-align:inherit; }
 small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); font-size:1.0625rem; margin:.5rem 0 0; }
 .foot { color:var(--muted); font-size:.9375rem; margin-top:1.25rem; } .dim { color:var(--muted); opacity:.8; }
@@ -60,7 +74,9 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 
 /* Top bar */
 .top { position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; padding:.625rem 1.125rem; padding-top:calc(.625rem + env(safe-area-inset-top)); background:color-mix(in srgb,var(--bg) 88%,transparent); backdrop-filter:saturate(1.4) blur(12px); -webkit-backdrop-filter:saturate(1.4) blur(12px); border-bottom:1px solid transparent; }
-.top.inner { border-bottom-color:var(--line); } .top h1 { flex:1 1 10rem; font-size:1.1875rem; letter-spacing:-.01em; }
+.top.inner { border-bottom-color:var(--line); } .top h1 { flex:1 1 10rem; font-size:1.1875rem; }
+.top h1:lang(en),.top h1:lang(es) { letter-spacing:-.01em; }
+/* The brand is the Latin string "313 Help" in every language, so its tracking is not scoped. */
 .brand { flex:1 1 0; min-width:0; line-height:1.15; display:flex; align-items:center; gap:.625rem; font-weight:750; font-size:1.125rem; letter-spacing:-.01em; } .logo { color:var(--brand); border-radius:.6rem; }
 .urgent { flex:none; display:inline-flex; align-items:center; gap:.4rem; min-height:2.75rem; padding:.4rem .95rem; border-radius:99rem; background:var(--surface); border:1.5px solid var(--edge); font-weight:650; font-size:.9375rem; box-shadow:var(--shadow); }
 .urgent .ic { color:var(--brand); } .iconbtn { display:grid; place-items:center; width:2.75rem; height:2.75rem; border-radius:99rem; background:var(--surface); border:1px solid var(--edge); }
@@ -158,7 +174,8 @@ ol.steps li::before { content:counter(s); flex:none; display:grid; place-items:c
 .hours li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.125rem 1rem; padding:.625rem 1rem; } .hours li + li { border-top:1px solid var(--line); } .hours li span:first-child { font-weight:600; }
 address { font-style:normal; font-size:1.0625rem; }
 .events { display:grid; gap:.625rem; } .event { display:flex; gap:.875rem; padding:.875rem 1rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); }
-.when { flex:none; display:grid; place-content:center; justify-items:center; width:3.25rem; min-height:3.5rem; padding:.25rem; border-radius:.875rem; background:var(--brand-soft); color:var(--brand-soft-ink); line-height:1.1; } .when span { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; } .when strong { font-size:1.375rem; }
+.when { flex:none; display:grid; place-content:center; justify-items:center; width:3.25rem; min-height:3.5rem; padding:.25rem; border-radius:.875rem; background:var(--brand-soft); color:var(--brand-soft-ink); line-height:1.1; } .when span { font-size:.75rem; font-weight:700; } .when strong { font-size:1.375rem; }
+.when span:lang(en),.when span:lang(es) { text-transform:uppercase; letter-spacing:.06em; }
 /* Map (map.ts): one canvas. It takes drags and pinches itself, so it never fills the whole screen unless asked:
    there is always page left to scroll with. */
 .mapbox { margin-top:.75rem; } .mapframe { position:relative; height:min(58vh,24rem); border-radius:var(--r); overflow:hidden; border:1px solid var(--line); background:var(--map-land); }
@@ -167,8 +184,11 @@ address { font-style:normal; font-size:1.0625rem; }
 .maptools { position:absolute; inset-block-start:.5rem; inset-inline-end:.5rem; display:grid; gap:.375rem; }
 /* Moving the map without dragging (WCAG 2.5.7): four arrows, low on the map so they never cover the zoom keys. */
 /* The map itself never mirrors: left is west in every language. So the four arrows keep their physical order and
-   their physical glyphs, even in Arabic — `direction:ltr` on the pad, and nothing flipped. */
-.mappan { position:absolute; inset-block-end:.5rem; inset-inline-start:.5rem; display:flex; gap:.25rem; direction:ltr; }
+   their physical glyphs, even in Arabic. That is `row-reverse` in a right-to-left page, not `direction:ltr` on the
+   pad: `direction` also decides which corner `inset-inline-start` means, and with it set here the pad stopped
+   mirroring and piled up under the zoom keys on the same side of the map (found in the Arabic pass). */
+.mappan { position:absolute; inset-block-end:.5rem; inset-inline-start:.5rem; display:flex; gap:.25rem; }
+[dir="rtl"] .mappan { flex-direction:row-reverse; }
 .mappan button { width:2.25rem; height:2.25rem; border-radius:.6rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1rem; line-height:1; text-align:center; }
 .maptools button { width:2.75rem; height:2.75rem; border-radius:.75rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1.375rem; font-weight:700; line-height:1; text-align:center; }
 .mapnote .foot { margin-top:.5rem; } .mappick { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem .75rem; margin-top:.5rem; padding:.75rem 1rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); }
@@ -190,7 +210,8 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
 /* Map tab: the layer switcher and the list that says the same thing in words. Real checkboxes, so the
    keyboard and screen readers already work; .pick gives each one a big, obvious target. */
 .layers { margin-top:1.5rem; } .layers h2 { margin-bottom:.25rem; } .layers .foot { margin-top:0; margin-bottom:.75rem; }
-.layers fieldset { border:0; margin:0 0 1rem; padding:0; } .layers legend { font-weight:700; font-size:.9375rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:.5rem; padding:0; }
+.layers fieldset { border:0; margin:0 0 1rem; padding:0; } .layers legend { font-weight:700; font-size:.9375rem; color:var(--muted); margin-bottom:.5rem; padding:0; }
+.layers legend:lang(en),.layers legend:lang(es) { text-transform:uppercase; letter-spacing:.06em; }
 .layers .kinds { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:0; }
 .layers .pick span { display:inline-flex; flex-wrap:wrap; align-items:baseline; gap:.375rem; }
 .maplist { margin-top:.25rem; } .maplistbody { margin-top:.875rem; } .maplistbody h3 { margin-top:1.25rem; } .maplistbody h3:first-child { margin-top:0; }
