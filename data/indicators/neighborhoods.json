@@ -218,16 +218,28 @@
     -83.02288
    ],
    "help": {
-    "total": 7,
+    "total": 14,
     "by": {
-     "food": 5,
+     "food": 7,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 1,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1,
@@ -371,7 +383,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -482,7 +506,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -610,19 +646,31 @@
     -83.15373
    ],
    "help": {
-    "total": 9,
+    "total": 13,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 1,
-     "rec": 2
+     "rec": 2,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.9,
+     "food": 0.8,
      "clinic": 2.2,
      "narcan": 0.5,
      "indoors": 0.8
@@ -750,7 +798,7 @@
     -83.15691
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 4,
      "health": 0,
@@ -759,7 +807,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0,
@@ -903,7 +963,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.2,
@@ -982,7 +1054,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -1123,7 +1207,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -1254,7 +1350,7 @@
     -83.16983
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 3,
      "health": 0,
@@ -1263,7 +1359,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -1398,16 +1506,28 @@
     -83.17723
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -1533,7 +1653,7 @@
     -83.09284
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 4,
      "health": 0,
@@ -1542,7 +1662,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -1678,7 +1810,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -1813,16 +1957,28 @@
     -83.04895
    ],
    "help": {
-    "total": 2,
+    "total": 9,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 1,
+     "ids": 1,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -1830,9 +1986,7 @@
      "narcan": 0.4,
      "indoors": 1.3
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -1892,16 +2046,28 @@
     -83.26215
    ],
    "help": {
-    "total": 13,
+    "total": 18,
     "by": {
-     "food": 8,
+     "food": 11,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -2036,16 +2202,28 @@
     -83.05184
    ],
    "help": {
-    "total": 6,
+    "total": 17,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 4,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 3,
+     "housing": 0,
+     "legal": 2,
+     "ids": 1,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -2053,9 +2231,7 @@
      "narcan": 0.4,
      "indoors": 1.4
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -2160,7 +2336,7 @@
     -83.04764
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
      "food": 3,
      "health": 0,
@@ -2169,7 +2345,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.5,
@@ -2311,7 +2499,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -2450,7 +2650,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -2571,7 +2783,7 @@
     -83.07701
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
      "food": 5,
      "health": 0,
@@ -2580,7 +2792,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.3,
@@ -2714,7 +2938,7 @@
     -83.07147
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 0,
@@ -2723,7 +2947,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.4,
@@ -2857,25 +3093,36 @@
     -83.12895
    ],
    "help": {
-    "total": 0,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.5,
+     "food": 1.1,
      "clinic": 2.2,
      "narcan": 1.1,
      "indoors": 1.4
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -2993,7 +3240,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.2,
@@ -3123,19 +3382,31 @@
     -83.09804
    ],
    "help": {
-    "total": 17,
+    "total": 39,
     "by": {
-     "food": 6,
-     "health": 2,
+     "food": 11,
+     "health": 6,
      "harm": 5,
      "shelter": 1,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 2
+     "rec": 2,
+     "jobs": 3,
+     "learn": 6,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 1,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 1
     },
     "nearest_miles": {
-     "food": 0.6,
+     "food": 0.3,
      "clinic": 0.7,
      "narcan": 0.1,
      "indoors": 0.6
@@ -3266,16 +3537,28 @@
     -83.10325
    ],
    "help": {
-    "total": 13,
+    "total": 23,
     "by": {
-     "food": 7,
-     "health": 2,
+     "food": 9,
+     "health": 6,
      "harm": 2,
      "shelter": 1,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 1,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -3416,7 +3699,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -3549,19 +3844,31 @@
     -82.97745
    ],
    "help": {
-    "total": 10,
+    "total": 18,
     "by": {
-     "food": 2,
+     "food": 4,
      "health": 1,
      "harm": 4,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 3,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.8,
+     "food": 0.5,
      "clinic": 0.3,
      "narcan": 0.4,
      "indoors": 0.1
@@ -3690,16 +3997,28 @@
     -82.95913
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 2,
+     "food": 4,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -3825,16 +4144,28 @@
     -83.13992
    ],
    "help": {
-    "total": 12,
+    "total": 17,
     "by": {
-     "food": 7,
-     "health": 3,
+     "food": 8,
+     "health": 4,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 1,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -3967,19 +4298,31 @@
     -83.21232
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.9,
+     "food": 0.7,
      "clinic": 0.5,
      "narcan": 1,
      "indoors": 2.1
@@ -4118,7 +4461,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.1,
@@ -4250,7 +4605,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -4383,16 +4750,28 @@
     -82.96555
    ],
    "help": {
-    "total": 10,
+    "total": 18,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 4,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 3,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -4490,16 +4869,28 @@
     -83.09121
    ],
    "help": {
-    "total": 3,
+    "total": 9,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 3,
      "harm": 1,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -4507,9 +4898,7 @@
      "narcan": 0.5,
      "indoors": 1.4
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -4624,16 +5013,28 @@
     -83.07415
    ],
    "help": {
-    "total": 12,
+    "total": 25,
     "by": {
-     "food": 3,
-     "health": 1,
+     "food": 4,
+     "health": 4,
      "harm": 4,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 2
+     "rec": 2,
+     "jobs": 2,
+     "learn": 4,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 1,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -4751,16 +5152,28 @@
     -82.92028
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 1,
-     "health": 1,
+     "health": 2,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -4893,7 +5306,7 @@
     -83.21277
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
      "food": 0,
      "health": 2,
@@ -4902,7 +5315,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.3,
@@ -5034,19 +5459,31 @@
     -83.06197
    ],
    "help": {
-    "total": 4,
+    "total": 16,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 3,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.8,
+     "food": 0.7,
      "clinic": 2.1,
      "narcan": 0.2,
      "indoors": 1.8
@@ -5156,7 +5593,7 @@
     -83.05039
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 5,
      "health": 0,
@@ -5165,7 +5602,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.7,
@@ -5309,7 +5758,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -5445,19 +5906,31 @@
     -83.11023
    ],
    "help": {
-    "total": 5,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 5,
      "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.1,
+     "food": 1,
      "clinic": 1.2,
      "narcan": 1.2,
      "indoors": 1.6
@@ -5586,7 +6059,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -5719,7 +6204,7 @@
     -83.12632
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 1,
      "health": 0,
@@ -5728,7 +6213,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -5835,7 +6332,7 @@
     -83.12912
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 6,
      "health": 1,
@@ -5844,7 +6341,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -5965,7 +6474,7 @@
     -83.10866
    ],
    "help": {
-    "total": 15,
+    "total": 19,
     "by": {
      "food": 9,
      "health": 2,
@@ -5974,7 +6483,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -6107,16 +6628,28 @@
     -83.04737
    ],
    "help": {
-    "total": 4,
+    "total": 14,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 3,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 1,
+     "legal": 1,
+     "ids": 1,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -6124,9 +6657,7 @@
      "narcan": 0.5,
      "indoors": 1.2
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -6185,16 +6716,28 @@
     -83.04659
    ],
    "help": {
-    "total": 17,
+    "total": 36,
     "by": {
      "food": 6,
      "health": 1,
      "harm": 8,
-     "shelter": 0,
+     "shelter": 2,
      "utilities": 0,
      "hygiene": 2,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 4,
+     "learn": 2,
+     "treatment": 3,
+     "housing": 4,
+     "legal": 1,
+     "ids": 0,
+     "money": 1,
+     "goods": 1,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -6312,7 +6855,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1,
@@ -6441,7 +6996,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -6568,7 +7135,7 @@
     -82.98566
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 2,
      "health": 1,
@@ -6577,7 +7144,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -6711,16 +7290,28 @@
     -83.04137
    ],
    "help": {
-    "total": 4,
+    "total": 14,
     "by": {
-     "food": 2,
+     "food": 5,
      "health": 0,
      "harm": 2,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 1,
+     "legal": 1,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -6821,19 +7412,31 @@
     -82.98695
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1,
+     "food": 0.8,
      "clinic": 1.5,
      "narcan": 0.9,
      "indoors": 1.3
@@ -6965,7 +7568,7 @@
     -83.08471
    ],
    "help": {
-    "total": 4,
+    "total": 12,
     "by": {
      "food": 2,
      "health": 1,
@@ -6974,7 +7577,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 0,
+     "goods": 2,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -7108,7 +7723,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -7229,16 +7856,28 @@
     -83.02726
    ],
    "help": {
-    "total": 7,
+    "total": 16,
     "by": {
-     "food": 4,
+     "food": 6,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 3,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -7363,7 +8002,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -7497,16 +8148,28 @@
     -83.227
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -7647,7 +8310,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.6,
@@ -7786,7 +8461,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -7922,7 +8609,7 @@
     -83.19313
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 2,
      "health": 0,
@@ -7931,7 +8618,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -8061,16 +8760,28 @@
     -83.15704
    ],
    "help": {
-    "total": 11,
+    "total": 15,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 6,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -8214,7 +8925,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1,
@@ -8348,25 +9071,36 @@
     -83.04712
    ],
    "help": {
-    "total": 3,
+    "total": 7,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.9,
+     "food": 0.1,
      "clinic": 2.2,
      "narcan": 0.7,
      "indoors": 1.5
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -8463,19 +9197,31 @@
     -82.96086
    ],
    "help": {
-    "total": 10,
+    "total": 15,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 1,
      "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.5,
+     "food": 0.4,
      "clinic": 1,
      "narcan": 0.5,
      "indoors": 0.9
@@ -8601,16 +9347,28 @@
     -82.98547
    ],
    "help": {
-    "total": 9,
+    "total": 11,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 0,
      "harm": 3,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -8745,16 +9503,28 @@
     -83.23889
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 5,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -8896,7 +9666,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -9028,19 +9810,31 @@
     -83.2106
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
      "food": 0,
-     "health": 1,
+     "health": 2,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.1,
+     "food": 0.8,
      "clinic": 0.3,
      "narcan": 1.3,
      "indoors": 2.9
@@ -9124,16 +9918,28 @@
     -83.09077
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -9278,7 +10084,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -9379,7 +10197,7 @@
     -83.17258
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 3,
      "health": 0,
@@ -9388,7 +10206,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.1,
@@ -9522,7 +10352,7 @@
     -83.20636
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
      "health": 0,
@@ -9531,7 +10361,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.2,
@@ -9664,7 +10506,7 @@
     -83.21552
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -9673,7 +10515,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.3,
@@ -9812,7 +10666,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -9936,16 +10802,28 @@
     -83.03306
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 1,
+     "food": 3,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -10078,7 +10956,7 @@
     -82.99213
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
@@ -10087,7 +10965,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -10221,16 +11111,28 @@
     -83.00956
    ],
    "help": {
-    "total": 1,
+    "total": 5,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -10365,7 +11267,7 @@
     -83.02417
    ],
    "help": {
-    "total": 2,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 0,
@@ -10374,7 +11276,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 1,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -10503,7 +11417,7 @@
     -83.00117
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 1,
      "health": 0,
@@ -10512,7 +11426,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 1,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -10646,16 +11572,28 @@
     -83.04073
    ],
    "help": {
-    "total": 11,
+    "total": 21,
     "by": {
      "food": 4,
      "health": 0,
      "harm": 6,
-     "shelter": 0,
+     "shelter": 2,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 3,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 3,
+     "legal": 1,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -10755,7 +11693,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -10881,19 +11831,31 @@
     -83.20892
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
-     "food": 1,
+     "food": 3,
      "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.1,
+     "food": 0.6,
      "clinic": 0.8,
      "narcan": 1.5,
      "indoors": 2.3
@@ -11025,7 +11987,7 @@
     -83.20466
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -11034,7 +11996,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -11169,7 +12143,7 @@
     -83.0966
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 2,
      "health": 1,
@@ -11178,7 +12152,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -11295,16 +12281,28 @@
     -83.17473
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
-     "food": 1,
+     "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -11431,7 +12429,7 @@
     -83.106
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 0,
      "health": 1,
@@ -11440,7 +12438,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1,
@@ -11584,7 +12594,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -11703,16 +12725,28 @@
     -83.1736
    ],
    "help": {
-    "total": 7,
+    "total": 11,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -11844,7 +12878,7 @@
     -83.09136
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 2,
      "health": 1,
@@ -11853,7 +12887,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -11986,7 +13032,7 @@
     -83.0972
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 1,
      "health": 0,
@@ -11995,7 +13041,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -12111,7 +13169,7 @@
     -83.24891
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
      "food": 2,
      "health": 0,
@@ -12120,7 +13178,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -12255,19 +13325,31 @@
     -83.08922
    ],
    "help": {
-    "total": 6,
+    "total": 16,
     "by": {
-     "food": 2,
+     "food": 4,
      "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 5,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.2,
+     "food": 0.1,
      "clinic": 0.7,
      "narcan": 0.4,
      "indoors": 0.4
@@ -12380,16 +13462,28 @@
     -83.07385
    ],
    "help": {
-    "total": 8,
+    "total": 14,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 2
+     "rec": 2,
+     "jobs": 1,
+     "learn": 4,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -12512,7 +13606,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -12656,7 +13762,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -12796,7 +13914,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -12914,16 +14044,28 @@
     -83.00244
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
-     "food": 4,
+     "food": 5,
      "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -13064,7 +14206,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -13207,7 +14361,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1,
@@ -13341,7 +14507,7 @@
     -83.07276
    ],
    "help": {
-    "total": 0,
+    "total": 2,
     "by": {
      "food": 0,
      "health": 0,
@@ -13350,7 +14516,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -13454,7 +14632,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -13554,19 +14744,31 @@
     -83.20375
    ],
    "help": {
-    "total": 4,
+    "total": 8,
     "by": {
-     "food": 3,
-     "health": 1,
+     "food": 5,
+     "health": 2,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.4,
+     "food": 0.1,
      "clinic": 0.8,
      "narcan": 1.4,
      "indoors": 2.9
@@ -13707,7 +14909,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -13841,7 +15055,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -13977,16 +15203,28 @@
     -83.03515
    ],
    "help": {
-    "total": 7,
+    "total": 14,
     "by": {
      "food": 3,
      "health": 0,
      "harm": 2,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 1,
+     "legal": 1,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -14097,25 +15335,36 @@
     -83.0032
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1,
+     "food": 0.7,
      "clinic": 1.8,
      "narcan": 1.1,
      "indoors": 2.1
     },
     "none_listed_yet": [
-     "food",
      "health",
      "harm"
     ],
@@ -14242,7 +15491,7 @@
     -83.09537
    ],
    "help": {
-    "total": 5,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 0,
@@ -14251,7 +15500,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 2,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -14381,7 +15642,7 @@
     -83.15179
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 1,
      "health": 0,
@@ -14390,7 +15651,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -14523,16 +15796,28 @@
     -82.96388
    ],
    "help": {
-    "total": 8,
+    "total": 11,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -14667,7 +15952,7 @@
     -82.9702
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -14676,7 +15961,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.1,
@@ -14781,7 +16078,7 @@
     -83.13324
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 0,
@@ -14790,7 +16087,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -14924,19 +16233,31 @@
     -83.02998
    ],
    "help": {
-    "total": 4,
+    "total": 11,
     "by": {
-     "food": 1,
+     "food": 4,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 1,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.3,
+     "food": 0.1,
      "clinic": 1.5,
      "narcan": 0.2,
      "indoors": 0.7
@@ -15061,16 +16382,28 @@
     -83.16441
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -15201,7 +16534,7 @@
     -83.24181
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
      "food": 2,
      "health": 0,
@@ -15210,7 +16543,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -15332,7 +16677,7 @@
     -83.06466
    ],
    "help": {
-    "total": 4,
+    "total": 16,
     "by": {
      "food": 1,
      "health": 1,
@@ -15341,7 +16686,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 5,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -15437,16 +16794,28 @@
     -83.05548
    ],
    "help": {
-    "total": 3,
+    "total": 16,
     "by": {
-     "food": 1,
-     "health": 0,
+     "food": 2,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 1,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 2,
+     "ids": 1,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -15454,9 +16823,7 @@
      "narcan": 0.4,
      "indoors": 1.7
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -15549,7 +16916,7 @@
     -83.26368
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -15558,7 +16925,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.1,
@@ -15661,16 +17040,28 @@
     -83.08474
    ],
    "help": {
-    "total": 6,
+    "total": 15,
     "by": {
-     "food": 2,
+     "food": 4,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 2
+     "rec": 2,
+     "jobs": 2,
+     "learn": 5,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -15772,16 +17163,28 @@
     -83.11984
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 2,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 1,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -15905,16 +17308,28 @@
     -83.06043
    ],
    "help": {
-    "total": 12,
+    "total": 30,
     "by": {
      "food": 4,
-     "health": 1,
+     "health": 2,
      "harm": 6,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 4,
+     "learn": 1,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 3,
+     "ids": 1,
+     "money": 1,
+     "goods": 1,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -16035,16 +17450,28 @@
     -83.1262
    ],
    "help": {
-    "total": 11,
+    "total": 16,
     "by": {
-     "food": 9,
+     "food": 10,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -16177,7 +17604,7 @@
     -83.25005
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
      "food": 2,
      "health": 0,
@@ -16186,7 +17613,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -16314,7 +17753,7 @@
     -83.05688
    ],
    "help": {
-    "total": 5,
+    "total": 14,
     "by": {
      "food": 3,
      "health": 1,
@@ -16323,7 +17762,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 4,
+     "learn": 1,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 3,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -16431,16 +17882,28 @@
     -83.23433
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -16562,19 +18025,31 @@
     -82.97604
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 1,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.7,
+     "food": 0.4,
      "clinic": 2.2,
      "narcan": 0.3,
      "indoors": 0.7
@@ -16703,16 +18178,28 @@
     -82.94469
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.1,
@@ -16847,16 +18334,28 @@
     -82.94105
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
      "food": 3,
-     "health": 1,
+     "health": 2,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -16989,19 +18488,31 @@
     -83.01834
    ],
    "help": {
-    "total": 4,
+    "total": 7,
     "by": {
-     "food": 1,
+     "food": 4,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.6,
+     "food": 0.4,
      "clinic": 1.1,
      "narcan": 0.8,
      "indoors": 1.9
@@ -17131,7 +18642,7 @@
     -83.13072
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 5,
      "health": 0,
@@ -17140,7 +18651,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.1,
@@ -17275,7 +18798,7 @@
     -83.07818
    ],
    "help": {
-    "total": 3,
+    "total": 8,
     "by": {
      "food": 1,
      "health": 1,
@@ -17284,7 +18807,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -17383,7 +18918,7 @@
     -83.08069
    ],
    "help": {
-    "total": 5,
+    "total": 10,
     "by": {
      "food": 2,
      "health": 1,
@@ -17392,7 +18927,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -17515,7 +19062,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -17649,7 +19208,7 @@
     -83.07461
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 3,
      "health": 0,
@@ -17658,7 +19217,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.6,
@@ -17783,16 +19354,28 @@
     -83.08025
    ],
    "help": {
-    "total": 9,
+    "total": 17,
     "by": {
      "food": 3,
-     "health": 1,
+     "health": 4,
      "harm": 2,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 1,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -17915,7 +19498,7 @@
     -83.07155
    ],
    "help": {
-    "total": 9,
+    "total": 16,
     "by": {
      "food": 5,
      "health": 1,
@@ -17924,7 +19507,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 3,
+     "learn": 1,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -18057,7 +19652,7 @@
     -83.2255
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
      "food": 2,
      "health": 1,
@@ -18066,7 +19661,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -18202,7 +19809,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -18348,7 +19967,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -18486,10 +20117,22 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.1,
+     "food": 0.8,
      "clinic": 0.2,
      "narcan": 0.4,
      "indoors": 1.9
@@ -18621,7 +20264,7 @@
     -83.10077
    ],
    "help": {
-    "total": 3,
+    "total": 9,
     "by": {
      "food": 2,
      "health": 0,
@@ -18630,7 +20273,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 1,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 2,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -18756,16 +20411,28 @@
     -83.23033
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -18898,7 +20565,7 @@
     -83.26411
    ],
    "help": {
-    "total": 4,
+    "total": 7,
     "by": {
      "food": 1,
      "health": 0,
@@ -18907,7 +20574,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1,
@@ -19025,7 +20704,7 @@
     -83.15338
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 2,
      "health": 0,
@@ -19034,7 +20713,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -19158,7 +20849,7 @@
     -83.13869
    ],
    "help": {
-    "total": 18,
+    "total": 20,
     "by": {
      "food": 11,
      "health": 2,
@@ -19167,7 +20858,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 3,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -19300,7 +21003,7 @@
     -83.15402
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
@@ -19309,7 +21012,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.3,
@@ -19406,7 +21121,7 @@
     -83.26131
    ],
    "help": {
-    "total": 3,
+    "total": 6,
     "by": {
      "food": 0,
      "health": 0,
@@ -19415,7 +21130,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.1,
@@ -19533,19 +21260,31 @@
     -82.96213
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 2,
+     "food": 4,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.4,
+     "food": 0.2,
      "clinic": 1.7,
      "narcan": 1.2,
      "indoors": 1.4
@@ -19678,7 +21417,7 @@
     -83.11821
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 0,
      "health": 0,
@@ -19687,7 +21426,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.1,
@@ -19807,7 +21558,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -19933,7 +21696,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -20062,7 +21837,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -20199,7 +21986,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.5,
@@ -20326,7 +22125,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -20459,7 +22270,7 @@
     -83.11696
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 3,
      "health": 0,
@@ -20468,7 +22279,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -20602,7 +22425,7 @@
     -83.08522
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
      "food": 3,
      "health": 0,
@@ -20611,7 +22434,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -20737,7 +22572,7 @@
     -83.12024
    ],
    "help": {
-    "total": 13,
+    "total": 15,
     "by": {
      "food": 6,
      "health": 2,
@@ -20746,7 +22581,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -20879,7 +22726,7 @@
     -83.00622
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 1,
      "health": 0,
@@ -20888,7 +22735,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.9,
@@ -21021,16 +22880,28 @@
     -83.18534
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
-     "food": 6,
+     "food": 8,
      "health": 0,
      "harm": 1,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -21165,19 +23036,31 @@
     -83.20317
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
-     "food": 3,
+     "food": 5,
      "health": 0,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.5,
+     "food": 0.3,
      "clinic": 1.5,
      "narcan": 0.9,
      "indoors": 2.4
@@ -21308,16 +23191,28 @@
     -83.04603
    ],
    "help": {
-    "total": 3,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 1,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -21454,7 +23349,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -21581,16 +23488,28 @@
     -83.00023
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -21723,7 +23642,7 @@
     -82.98469
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
      "food": 1,
      "health": 0,
@@ -21732,10 +23651,22 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.1,
+     "food": 1,
      "clinic": 0.6,
      "narcan": 0.2,
      "indoors": 0.5
@@ -21849,16 +23780,28 @@
     -82.95465
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -21993,7 +23936,7 @@
     -82.9498
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 1,
@@ -22002,7 +23945,19 @@
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.1,
@@ -22133,7 +24088,7 @@
     -83.26692
    ],
    "help": {
-    "total": 3,
+    "total": 6,
     "by": {
      "food": 0,
      "health": 0,
@@ -22142,7 +24097,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -22278,16 +24245,28 @@
     -83.01792
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
      "food": 4,
      "health": 0,
      "harm": 0,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 2,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -22396,19 +24375,31 @@
     -83.23026
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
-     "food": 2,
+     "food": 4,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.8,
+     "food": 0.5,
      "clinic": 1.5,
      "narcan": 0.7,
      "indoors": 1.6
@@ -22541,7 +24532,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.1,
@@ -22641,7 +24644,7 @@
     -83.06338
    ],
    "help": {
-    "total": 5,
+    "total": 8,
     "by": {
      "food": 3,
      "health": 1,
@@ -22650,7 +24653,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -22737,7 +24752,7 @@
     -83.13366
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 0,
@@ -22746,7 +24761,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -22878,25 +24905,36 @@
     -83.19645
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.2,
+     "food": 0.4,
      "clinic": 0.2,
      "narcan": 0.9,
      "indoors": 1.7
     },
     "none_listed_yet": [
-     "food",
      "harm"
     ],
     "coverage_checked": false
@@ -23012,26 +25050,36 @@
     -83.18815
    ],
    "help": {
-    "total": 2,
+    "total": 5,
     "by": {
-     "food": 0,
+     "food": 3,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.9,
+     "food": 0.3,
      "clinic": 0.3,
      "narcan": 0.8,
      "indoors": 1.4
     },
-    "none_listed_yet": [
-     "food"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -23150,19 +25198,31 @@
     -83.2082
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
-     "food": 4,
+     "food": 5,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.8,
+     "food": 0.7,
      "clinic": 1.7,
      "narcan": 0.8,
      "indoors": 2.5
@@ -23294,19 +25354,31 @@
     -83.17015
    ],
    "help": {
-    "total": 8,
+    "total": 14,
     "by": {
-     "food": 2,
+     "food": 5,
      "health": 0,
      "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 2
+     "rec": 2,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.7,
+     "food": 0.3,
      "clinic": 1.4,
      "narcan": 0.6,
      "indoors": 0.3
@@ -23433,26 +25505,36 @@
     -83.19366
    ],
    "help": {
-    "total": 2,
+    "total": 5,
     "by": {
-     "food": 0,
+     "food": 3,
      "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1,
+     "food": 0.5,
      "clinic": 0.2,
      "narcan": 0.7,
      "indoors": 1.5
     },
-    "none_listed_yet": [
-     "food"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -23565,7 +25647,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -23707,10 +25801,22 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 1.2,
+     "food": 1,
      "clinic": 0.8,
      "narcan": 0.6,
      "indoors": 1.3
@@ -23836,7 +25942,7 @@
     -83.13556
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 1,
      "health": 0,
@@ -23845,7 +25951,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -23977,7 +26095,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.2,
@@ -24117,7 +26247,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -24245,16 +26387,28 @@
     -83.13552
    ],
    "help": {
-    "total": 7,
+    "total": 17,
     "by": {
-     "food": 3,
+     "food": 5,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 3,
+     "learn": 2,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 1,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.4,
@@ -24397,7 +26551,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.4,
@@ -24491,7 +26657,7 @@
     -83.07512
    ],
    "help": {
-    "total": 3,
+    "total": 14,
     "by": {
      "food": 1,
      "health": 1,
@@ -24500,7 +26666,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 4,
+     "learn": 1,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 3,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -24604,7 +26782,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.5,
@@ -24735,25 +26925,36 @@
     -83.18162
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
-     "food": 0,
+     "food": 2,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.6,
+     "food": 0.1,
      "clinic": 0.9,
      "narcan": 0.2,
      "indoors": 0.7
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -24844,7 +27045,7 @@
     -83.1339
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 1,
      "health": 0,
@@ -24853,7 +27054,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -24980,7 +27193,7 @@
     -83.08272
    ],
    "help": {
-    "total": 4,
+    "total": 9,
     "by": {
      "food": 2,
      "health": 0,
@@ -24989,7 +27202,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
@@ -25079,7 +27304,7 @@
     -83.09267
    ],
    "help": {
-    "total": 9,
+    "total": 16,
     "by": {
      "food": 5,
      "health": 1,
@@ -25088,7 +27313,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 0,
+     "goods": 2,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -25221,16 +27458,28 @@
     -82.9953
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -25365,16 +27614,28 @@
     -82.98685
    ],
    "help": {
-    "total": 2,
+    "total": 5,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.1,
@@ -25509,16 +27770,28 @@
     -83.20881
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
      "food": 0,
-     "health": 1,
+     "health": 2,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.2,
@@ -25654,16 +27927,28 @@
     -83.23183
    ],
    "help": {
-    "total": 8,
+    "total": 11,
     "by": {
      "food": 3,
-     "health": 1,
+     "health": 2,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 2,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 2,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -25796,7 +28081,7 @@
     -82.97911
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -25805,7 +28090,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 1,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
@@ -25870,7 +28167,7 @@
     -83.07338
    ],
    "help": {
-    "total": 3,
+    "total": 13,
     "by": {
      "food": 1,
      "health": 1,
@@ -25879,7 +28176,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 3,
+     "learn": 2,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 2,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
@@ -25967,16 +28276,28 @@
     -83.18982
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 4,
+     "food": 5,
      "health": 0,
      "harm": 2,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 1,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -26119,7 +28440,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
@@ -26252,7 +28585,7 @@
     -82.99356
    ],
    "help": {
-    "total": 4,
+    "total": 9,
     "by": {
      "food": 1,
      "health": 1,
@@ -26261,7 +28594,19 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 3,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 1,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.6,
@@ -26402,7 +28747,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1.1,
@@ -26530,16 +28887,28 @@
     -83.07609
    ],
    "help": {
-    "total": 16,
+    "total": 30,
     "by": {
-     "food": 5,
+     "food": 7,
      "health": 2,
      "harm": 6,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
-     "rec": 2
+     "rec": 2,
+     "jobs": 2,
+     "learn": 5,
+     "treatment": 0,
+     "housing": 3,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 1,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.2,
@@ -26657,7 +29026,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 1
+     "rec": 1,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -26775,19 +29156,31 @@
     -83.23423
    ],
    "help": {
-    "total": 3,
+    "total": 6,
     "by": {
-     "food": 1,
+     "food": 4,
      "health": 0,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
-     "food": 0.7,
+     "food": 0.6,
      "clinic": 1.9,
      "narcan": 0.5,
      "indoors": 1.7
@@ -26912,7 +29305,7 @@
     -83.10633
    ],
    "help": {
-    "total": 4,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 0,
@@ -26921,7 +29314,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 2,
+     "kids": 0,
+     "connect": 1,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
@@ -27055,16 +29460,28 @@
     -83.19156
    ],
    "help": {
-    "total": 10,
+    "total": 15,
     "by": {
-     "food": 1,
+     "food": 4,
      "health": 2,
      "harm": 4,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 1,
-     "rec": 1
+     "rec": 1,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.1,
@@ -27190,7 +29607,7 @@
     -83.07955
    ],
    "help": {
-    "total": 0,
+    "total": 2,
     "by": {
      "food": 0,
      "health": 0,
@@ -27199,7 +29616,19 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 1,
+     "learn": 1,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 1,
@@ -27325,16 +29754,28 @@
     -82.94313
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 1,
-     "health": 1,
+     "health": 2,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,

@@ -20,6 +20,7 @@
     "tasks:sync": "pnpm --filter @313help/pipeline tasks:sync",
     "preflight": "pnpm --filter @313help/pipeline preflight",
     "alert:new": "pnpm --filter @313help/pipeline alert:new",
-    "import:lines": "pnpm --filter @313help/pipeline import:lines"
+    "import:lines": "pnpm --filter @313help/pipeline import:lines",
+    "ingest:treatment": "pnpm --filter @313help/pipeline ingest:treatment"
   }
 }
