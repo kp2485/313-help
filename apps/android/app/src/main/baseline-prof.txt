@@ -51,6 +51,7 @@ Lorg/help313/query/Json$Str;
 Lorg/help313/query/Json$Num;
 Lorg/help313/query/Json$Bool;
 HSPLorg/help313/query/Json$Companion;->parse(Ljava/lang/String;)Lorg/help313/query/Json;
+HSPLorg/help313/query/Json$Companion;->parse([B)Lorg/help313/query/Json;
 HSPLorg/help313/query/Json;->get(Ljava/lang/String;)Lorg/help313/query/Json;
 HSPLorg/help313/query/Json;->getStr()Ljava/lang/String;
 HSPLorg/help313/query/Json;->getArr()Ljava/util/List;
@@ -59,7 +60,14 @@ Lorg/help313/query/Parser;
 HSPLorg/help313/query/Parser;->value()Lorg/help313/query/Json;
 HSPLorg/help313/query/Parser;->obj()Lorg/help313/query/Json;
 HSPLorg/help313/query/Parser;->arr()Lorg/help313/query/Json;
+HSPLorg/help313/query/Parser;->key()Ljava/lang/String;
+HSPLorg/help313/query/Parser;->sameAscii(Ljava/lang/String;I)Z
 HSPLorg/help313/query/Parser;->string()Ljava/lang/String;
+HSPLorg/help313/query/Parser;->escaped(I)Ljava/lang/String;
+HSPLorg/help313/query/Parser;->push(Ljava/lang/Object;)V
+HSPLorg/help313/query/Parser;->literal(Ljava/lang/String;Lorg/help313/query/Json;)Lorg/help313/query/Json;
+HSPLorg/help313/query/Parser;->digit(I)Z
+HSPLorg/help313/query/Parser;->numberByte(I)Z
 HSPLorg/help313/query/Parser;->number()Lorg/help313/query/Json;
 HSPLorg/help313/query/Parser;->skipWhitespace()V
 HSPLorg/help313/query/Parser;->expect(C)V

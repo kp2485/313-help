@@ -58,9 +58,25 @@ sealed class Json {
          */
         const val MAX_CHARS = 16 * 1024 * 1024
 
+        /** The same ceiling for a file read as bytes. A character is never less than a byte, so it is no looser. */
+        const val MAX_BYTES = MAX_CHARS
+
+        internal val TRUE = Bool(true)
+        internal val FALSE = Bool(false)
+
         fun parse(text: String): Json {
             if (text.length > MAX_CHARS) throw JsonException("JSON is ${text.length} characters; the limit is $MAX_CHARS")
-            val p = Parser(text)
+            return parse(text.toByteArray(Charsets.UTF_8))
+        }
+
+        /**
+         * Reads UTF-8 bytes as they came off the disk or the network, which is how the bundle is read: the 742 KB
+         * is never turned into one big String first, and a string with no escape in it is decoded once, straight
+         * from its bytes (apps/android/README.md, "JSON, measured").
+         */
+        fun parse(bytes: ByteArray): Json {
+            if (bytes.size > MAX_BYTES) throw JsonException("JSON is ${bytes.size} bytes; the limit is $MAX_BYTES")
+            val p = Parser(bytes)
             val v = p.value()
             p.skipWhitespace()
             if (!p.atEnd()) throw JsonException("trailing text at ${p.pos}")
@@ -71,36 +87,55 @@ sealed class Json {
 
 class JsonException(message: String) : RuntimeException(message)
 
-private class Parser(private val s: String) {
+// Works on the UTF-8 bytes, not on a String. Every character JSON's grammar cares about is ASCII, and an ASCII
+// byte never occurs inside a longer UTF-8 sequence, so the structure can be found byte by byte and only the text
+// between two quotes is ever decoded. `pos`, and every position in a message, is therefore a byte offset.
+private class Parser(private val b: ByteArray) {
     var pos = 0
+    private val n = b.size
 
     /** How many objects and arrays are open at this point. One frame of `value()` per level, so it is the cap. */
     private var depth = 0
 
-    fun atEnd() = pos >= s.length
+    /**
+     * The members of every object and array still open, innermost last. A container is built once, at its closing
+     * bracket, at exactly the size it turned out to be — so no map is rehashed and no list regrown on the way.
+     */
+    private var stack = arrayOfNulls<Any>(64)
+    private var top = 0
+
+    /**
+     * Object keys seen so far in this document. A category file says "id", "name", "facts" five hundred times; each
+     * is decoded once and the same String reused, which also means its hash is computed once. ASCII keys of up to
+     * [KEY_MAX] bytes only, and never more than half of [KEY_SLOTS], so a hostile file cannot make it grow.
+     */
+    private val keys = arrayOfNulls<String>(KEY_SLOTS)
+    private var keyCount = 0
+
+    fun atEnd() = pos >= n
 
     fun skipWhitespace() {
-        while (pos < s.length) {
-            val c = s[pos]
-            if (c == ' ' || c == '\t' || c == '\n' || c == '\r') pos++ else break
+        while (pos < n) {
+            val c = b[pos].toInt()
+            if (c == ' '.code || c == '\n'.code || c == '\r'.code || c == '\t'.code) pos++ else break
         }
     }
 
     private fun expect(c: Char) {
-        if (pos >= s.length || s[pos] != c) throw JsonException("expected '$c' at $pos")
+        if (pos >= n || b[pos].toInt() != c.code) throw JsonException("expected '$c' at $pos")
         pos++
     }
 
     fun value(): Json {
         skipWhitespace()
         if (atEnd()) throw JsonException("unexpected end of JSON")
-        return when (s[pos]) {
-            '{' -> nested { obj() }
-            '[' -> nested { arr() }
-            '"' -> Json.Str(string())
-            't' -> literal("true", Json.Bool(true))
-            'f' -> literal("false", Json.Bool(false))
-            'n' -> literal("null", Json.Null)
+        return when (b[pos].toInt()) {
+            '{'.code -> nested { obj() }
+            '['.code -> nested { arr() }
+            '"'.code -> Json.Str(string())
+            't'.code -> literal("true", Json.TRUE)
+            'f'.code -> literal("false", Json.FALSE)
+            'n'.code -> literal("null", Json.Null)
             else -> number()
         }
     }
@@ -119,27 +154,46 @@ private class Parser(private val s: String) {
     }
 
     private fun literal(word: String, v: Json): Json {
-        if (!s.startsWith(word, pos)) throw JsonException("bad literal at $pos")
+        if (pos + word.length > n) throw JsonException("bad literal at $pos")
+        for (i in word.indices) if (b[pos + i].toInt() != word[i].code) throw JsonException("bad literal at $pos")
         pos += word.length
         return v
     }
 
+    private fun push(x: Any) {
+        if (top == stack.size) stack = stack.copyOf(top * 2)
+        stack[top++] = x
+    }
+
     private fun obj(): Json {
         expect('{')
-        val out = LinkedHashMap<String, Json>()
         skipWhitespace()
-        if (pos < s.length && s[pos] == '}') { pos++; return Json.Obj(out) }
+        if (pos < n && b[pos].toInt() == '}'.code) { pos++; return Json.Obj(LinkedHashMap(0)) }
+        val base = top
         while (true) {
             skipWhitespace()
-            val k = string()
+            push(key())
             skipWhitespace()
             expect(':')
-            out[k] = value()
+            push(value())
             skipWhitespace()
-            if (pos >= s.length) throw JsonException("unterminated object")
-            when (s[pos]) {
-                ',' -> pos++
-                '}' -> { pos++; return Json.Obj(out) }
+            if (pos >= n) throw JsonException("unterminated object")
+            when (b[pos].toInt()) {
+                ','.code -> pos++
+                '}'.code -> {
+                    pos++
+                    val count = (top - base) / 2
+                    // Room for `count` entries under the default load factor of 0.75, so it never rehashes.
+                    val out = LinkedHashMap<String, Json>(count + count / 3 + 1)
+                    var i = base
+                    while (i < top) {
+                        out[stack[i] as String] = stack[i + 1] as Json   // a repeated key: the last one wins, as before
+                        i += 2
+                    }
+                    java.util.Arrays.fill(stack, base, top, null)
+                    top = base
+                    return Json.Obj(out)
+                }
                 else -> throw JsonException("expected ',' or '}' at $pos")
             }
         }
@@ -147,62 +201,163 @@ private class Parser(private val s: String) {
 
     private fun arr(): Json {
         expect('[')
-        val out = ArrayList<Json>()
         skipWhitespace()
-        if (pos < s.length && s[pos] == ']') { pos++; return Json.Arr(out) }
+        if (pos < n && b[pos].toInt() == ']'.code) { pos++; return Json.Arr(ArrayList(0)) }
+        val base = top
         while (true) {
-            out.add(value())
+            push(value())
             skipWhitespace()
-            if (pos >= s.length) throw JsonException("unterminated array")
-            when (s[pos]) {
-                ',' -> pos++
-                ']' -> { pos++; return Json.Arr(out) }
+            if (pos >= n) throw JsonException("unterminated array")
+            when (b[pos].toInt()) {
+                ','.code -> pos++
+                ']'.code -> {
+                    pos++
+                    val out = ArrayList<Json>(top - base)
+                    for (i in base until top) out.add(stack[i] as Json)
+                    java.util.Arrays.fill(stack, base, top, null)
+                    top = base
+                    return Json.Arr(out)
+                }
                 else -> throw JsonException("expected ',' or ']' at $pos")
             }
         }
     }
 
+    /** An object key: the same text `string()` would give, but a short plain one is looked up before it is decoded. */
+    private fun key(): String {
+        if (pos >= n || b[pos].toInt() != '"'.code) throw JsonException("expected '\"' at $pos")
+        val start = pos + 1
+        var i = start
+        var h = 0
+        while (i < n) {
+            val c = b[i].toInt()
+            if (c == '"'.code) break
+            if (c < 0 || c == '\\'.code || i - start >= KEY_MAX) return string()
+            h = h * 31 + c
+            i++
+        }
+        if (i >= n) return string()   // unterminated, and string() is what says so
+        val len = i - start
+        var slot = (h xor (h ushr 16)) and (KEY_SLOTS - 1)
+        while (true) {
+            val k = keys[slot] ?: break
+            if (k.length == len && sameAscii(k, start)) { pos = i + 1; return k }
+            slot = (slot + 1) and (KEY_SLOTS - 1)
+        }
+        val k = string()
+        if (keyCount < KEY_SLOTS / 2) { keys[slot] = k; keyCount++ }
+        return k
+    }
+
+    private fun sameAscii(k: String, start: Int): Boolean {
+        for (j in k.indices) if (k[j].code != b[start + j].toInt()) return false
+        return true
+    }
+
     private fun string(): String {
         expect('"')
-        val sb = StringBuilder()
+        val start = pos
+        while (pos < n) {
+            val c = b[pos].toInt()
+            if (c == '"'.code) return String(b, start, pos++ - start, Charsets.UTF_8)   // the usual case: no escapes
+            if (c == '\\'.code) return escaped(start)
+            pos++
+        }
+        throw JsonException("unterminated string")
+    }
+
+    /** The rest of a string that has a backslash in it. `pos` is at the first one; `start` is where the text began. */
+    private fun escaped(start: Int): String {
+        val sb = StringBuilder(pos - start + 16)
+        var run = start   // the bytes from `run` up to `pos` are plain text not yet copied
         while (true) {
-            if (pos >= s.length) throw JsonException("unterminated string")
-            when (val c = s[pos++]) {
-                '"' -> return sb.toString()
-                '\\' -> {
-                    if (pos >= s.length) throw JsonException("unterminated escape")
-                    when (val e = s[pos++]) {
-                        '"' -> sb.append('"')
-                        '\\' -> sb.append('\\')
-                        '/' -> sb.append('/')
-                        'b' -> sb.append('\b')
-                        'f' -> sb.append('')
-                        'n' -> sb.append('\n')
-                        'r' -> sb.append('\r')
-                        't' -> sb.append('\t')
-                        'u' -> {
-                            if (pos + 4 > s.length) throw JsonException("short \\u escape at $pos")
-                            val code = s.substring(pos, pos + 4).toIntOrNull(16)
-                                ?: throw JsonException("bad \\u escape at $pos")
-                            pos += 4
-                            sb.append(code.toChar())
-                        }
-                        else -> throw JsonException("bad escape '\\$e' at ${pos - 1}")
+            if (pos >= n) throw JsonException("unterminated string")
+            val c = b[pos].toInt()
+            if (c != '"'.code && c != '\\'.code) { pos++; continue }
+            if (pos > run) sb.append(String(b, run, pos - run, Charsets.UTF_8))
+            pos++
+            if (c == '"'.code) return sb.toString()
+            if (pos >= n) throw JsonException("unterminated escape")
+            when (val e = b[pos++].toInt()) {
+                '"'.code -> sb.append('"')
+                '\\'.code -> sb.append('\\')
+                '/'.code -> sb.append('/')
+                'b'.code -> sb.append('\b')
+                'f'.code -> sb.append('')
+                'n'.code -> sb.append('\n')
+                'r'.code -> sb.append('\r')
+                't'.code -> sb.append('\t')
+                'u'.code -> {
+                    if (pos + 4 > n) throw JsonException("short \\u escape at $pos")
+                    var code = 0
+                    for (i in 0 until 4) {
+                        val d = hex(b[pos + i].toInt())
+                        if (d < 0) throw JsonException("bad \\u escape at $pos")
+                        code = code * 16 + d
                     }
+                    pos += 4
+                    sb.append(code.toChar())
                 }
-                else -> sb.append(c)
+                else -> throw JsonException("bad escape '\\${e.toChar()}' at ${pos - 1}")
             }
+            run = pos
         }
     }
 
+    private fun hex(c: Int): Int = when {
+        c >= '0'.code && c <= '9'.code -> c - '0'.code
+        c >= 'a'.code && c <= 'f'.code -> c - 'a'.code + 10
+        c >= 'A'.code && c <= 'F'.code -> c - 'A'.code + 10
+        else -> -1
+    }
+
+    private fun digit(i: Int): Boolean = i < n && b[i] >= ZERO && b[i] <= NINE
+
     private fun number(): Json {
         val start = pos
-        if (pos < s.length && (s[pos] == '-' || s[pos] == '+')) pos++
-        while (pos < s.length && (s[pos].isDigit() || s[pos] == '.' || s[pos] == 'e' || s[pos] == 'E' ||
-                ((s[pos] == '-' || s[pos] == '+') && (s[pos - 1] == 'e' || s[pos - 1] == 'E')))
-        ) pos++
-        val text = s.substring(start, pos)
+        // Plain decimals — every number the bundle has: "3", "-83.0458", "42.331427" — are read in place. Up to 15
+        // digits fit a Double exactly and so does the power of ten under them, so the one division below is
+        // correctly rounded: bit for bit what Double.parseDouble gives. Anything else takes the path it always took.
+        var i = pos
+        val negative = i < n && b[i].toInt() == '-'.code
+        if (negative) i++
+        var mantissa = 0L
+        var digits = 0
+        while (digit(i) && digits <= 15) { mantissa = mantissa * 10 + (b[i] - ZERO); digits++; i++ }
+        var plain = digits in 1..15
+        var fraction = 0
+        if (plain && i < n && b[i].toInt() == '.'.code) {
+            i++
+            while (digit(i) && digits <= 15) { mantissa = mantissa * 10 + (b[i] - ZERO); digits++; fraction++; i++ }
+            plain = fraction > 0 && digits <= 15
+        }
+        if (plain && (i >= n || !numberByte(i))) {
+            pos = i
+            val d = mantissa.toDouble() / POW10[fraction]
+            return Json.Num(if (negative) -d else d)
+        }
+
+        if (pos < n && (b[pos].toInt() == '-'.code || b[pos].toInt() == '+'.code)) pos++
+        while (pos < n && numberByte(pos)) pos++
+        val text = String(b, start, pos - start, Charsets.ISO_8859_1)
         val d = text.toDoubleOrNull() ?: throw JsonException("bad number '$text' at $start")
         return Json.Num(d)
+    }
+
+    /** Whether the byte at `i`, which is never a number's first, can continue one. */
+    private fun numberByte(i: Int): Boolean {
+        val c = b[i].toInt()
+        if (c >= '0'.code && c <= '9'.code) return true
+        if (c == '.'.code || c == 'e'.code || c == 'E'.code) return true
+        if (c == '-'.code || c == '+'.code) { val p = b[i - 1].toInt(); return p == 'e'.code || p == 'E'.code }
+        return false
+    }
+
+    private companion object {
+        const val KEY_SLOTS = 256
+        const val KEY_MAX = 32
+        const val ZERO = '0'.code.toByte()
+        const val NINE = '9'.code.toByte()
+        val POW10 = DoubleArray(16).also { it[0] = 1.0; for (i in 1 until 16) it[i] = it[i - 1] * 10.0 }
     }
 }

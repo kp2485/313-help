@@ -50,6 +50,10 @@ class BundleStore private constructor(context: Context) {
     companion object {
         private var instance: BundleStore? = null
 
+        /** Besides `category/`, the files `load` has a use for. Anything else is checksummed and not parsed. */
+        private val PARSED_AT_START =
+            setOf("alerts.json", "emergency.json", "archived.json", "places/greenway.json", "events.json")
+
         /**
          * The one store this process has. An activity asks for it in `onCreate` and gets the same object across a
          * configuration change, a recreation or a second launch — so a font-scale change or a rotation does not
@@ -249,6 +253,7 @@ class BundleStore private constructor(context: Context) {
         var readMs = 0L
         var shaMs = 0L
         var parseMs = 0L
+        var parseCpuMs = 0L
         for ((name, meta) in index.files) {
             if (!BundleCheck.loadedNow(name)) continue
             // Belt and braces: verifiedIndex has already refused an index that names anything but a plain relative
@@ -260,9 +265,15 @@ class BundleStore private constructor(context: Context) {
             t = System.nanoTime()
             if (BundleCheck.sha256Hex(data) != meta.sha256) throw BundleError.BadChecksum(name)
             shaMs += (System.nanoTime() - t) / 1_000_000L
+            // Checked, like every file, and then left alone: no screen in this app reads the parks, the transit
+            // stops or the ZIP codes yet, and parsing them cost a tenth of the whole load to throw the result away.
+            // Whoever adds a reader adds a branch below, and this line sends the file to it.
+            if (!name.startsWith("category/") && name !in PARSED_AT_START) continue
             t = System.nanoTime()
-            val j = Json.parse(String(data, Charsets.UTF_8))
+            val cpu = android.os.SystemClock.currentThreadTimeMillis()
+            val j = Json.parse(data)
             parseMs += (System.nanoTime() - t) / 1_000_000L
+            parseCpuMs += android.os.SystemClock.currentThreadTimeMillis() - cpu
             when {
                 name.startsWith("category/") -> j.arr.forEach { rows.add(BundleRow.fromJson(it)) }
                 name == "alerts.json" -> alerts = j.arr.map { Alert.fromJson(it) }
@@ -290,6 +301,7 @@ class BundleStore private constructor(context: Context) {
         Trace.say("load.read_files", readMs)
         Trace.say("load.sha256_files", shaMs)
         Trace.say("load.json_parse", parseMs)
+        Trace.say("load.json_parse_cpu", parseCpuMs)
         return LoadedBundle(index, rows, alerts, emergency, archived, segments, events)
     }
 }

@@ -57,7 +57,7 @@ Three Gradle modules:
 Everything in this section was run on 2026-09-20 and passed, the `:app` lines included. From `apps/android`:
 
 ```sh
-./gradlew :query:test             # 11 tests: every case in schema/fixtures, plus tz (and the pre-1987 clamp),
+./gradlew :query:test             # 16 tests: every case in schema/fixtures, plus tz (and the pre-1987 clamp),
                                   # phone, and the JSON reader including its depth and length caps
 ./gradlew :query:runFixtures      # the same 181 cases with no test framework on the classpath
 ./gradlew :core:test              # 61 tests: Ed25519 vs RFC 8032, small-order keys, the real bundle's signature,
@@ -607,9 +607,9 @@ same build varied from 268 ms to 1,060 ms across five cold starts, and its GPU t
 frame — so the cold-start columns are ranges, not measurements, and the clean comparison is the warm, best-of-N
 one in point 3.
 
-**What is now the slowest part: JSON.** With the signature down, reading 742 KB of bundle JSON with the
-hand-written reader in `packages/query`'s Kotlin twin is the largest item left, 0.8–4.0 s on this emulator. That
-is the next thing to look at, and it is not a signature question.
+**What was the slowest part after that: JSON.** With the signature down, reading 742 KB of bundle JSON with the
+hand-written reader in `packages/query`'s Kotlin twin was the largest item left, 0.8–4.0 s on this emulator. It
+was measured and dealt with later the same day: see "JSON, measured" below.
 
 **Verifying once per bundle version was considered and not done.** The idea: after a bundle passes, remember its
 index hash in app-private storage, and on later cold starts re-hash the index and skip the signature check when
@@ -637,15 +637,117 @@ wrong is survivable, but the number has to come from a real device before a rele
 read logcat. `VerifyTest.oneSoftwareVerificationIsWellUnderASecond` holds the JVM to a 1-second budget so that a
 future rewrite of the field arithmetic cannot quietly put this back.
 
+## JSON, measured
+
+`load.json_parse` was 0.8–4.0 s on the API 35 arm64 emulator, for about 742 KB in 20 files. Measured on
+2026-09-20 before anything was changed, and the first thing the measurement said was that **most of that number
+was not parsing.**
+
+**What the 0.8–4.0 s was made of.** `BundleStore.load` now prints `load.json_parse_cpu` beside
+`load.json_parse`: the first is the time the loader thread actually ran
+(`SystemClock.currentThreadTimeMillis`), the second is the clock on the wall. Same build, same emulator, six
+cold starts: **wall 700–2,860 ms, CPU 380–650 ms.** The rest is the thread waiting for a core. This AVD has
+`hw.gpu.enabled=no`, so the guest draws the first frame in software on the same four cores the loader wants —
+logcat shows `Davey! duration=5023ms` for that frame — and in the same starts `load.read_files`, which is 12 ms
+of work, took anything from 33 to 690 ms. A phone with a GPU does not have that particular fight, so **the wall
+numbers from this emulator overstate the wait and the CPU numbers are the ones to compare.**
+
+To get the emulator's scheduling out of the way, the reader was also timed alone: `:query` dexed with `d8` and
+run with `dalvikvm64` on the same emulator, parsing the same files the app loads at start, plus
+`BundleRow.fromJson` for the 531 rows. "Fresh process" is one parse in a new ART process with the JIT on and
+nothing compiled ahead — what a cold start sees. "Warm" is the best of 40 in one process — what compiled code
+costs.
+
+| reader, alone | ART, fresh process (7 runs) | ART, warm | JVM, warm |
+| --- | --- | --- | --- |
+| before: `String`, a character at a time | 104–211 ms, median 147 | 58.7 ms | 4.2 ms |
+| after: UTF-8 bytes | 45–101 ms, median 55 | 9.4 ms | 2.2 ms |
+| `BundleRow.fromJson`, unchanged | 15–56 ms, median 25 | 1.3–2.0 ms | 0.5 ms |
+
+**What was changed**, all of it in `query/.../Json.kt`, with no new dependency and the same `Json` tree out:
+
+1. **It reads the bytes.** `Json.parse(ByteArray)` walks the UTF-8 as it came off the disk. Every character the
+   grammar cares about is ASCII, and an ASCII byte never occurs inside a longer UTF-8 sequence, so only the text
+   between two quotes is ever decoded. The 742 KB is no longer copied into one big `String` first, and a byte
+   read is one instruction where `String.charAt` was a call — which matters most exactly when the code is being
+   interpreted. `Json.parse(String)` is still there for the small files and the tests; it encodes and calls the
+   same reader, so there is one reader, not two.
+2. **A string with no escape in it is decoded once**, straight from its bytes, with no `StringBuilder`. That is
+   nearly every string in the bundle. One with a backslash takes the builder, a run at a time.
+3. **Object keys are decoded once per file.** A category file says `"id"`, `"name"`, `"facts"` five hundred
+   times; a 256-slot table hands back the same `String`, whose hash is then already computed. ASCII keys of up
+   to 32 bytes, at most 128 of them, so a hostile file cannot make it grow.
+4. **Maps and lists are built at their final size**, at the closing bracket, from one stack the parser keeps —
+   no `LinkedHashMap` rehash, no `ArrayList` regrowth.
+5. **Plain decimals are read in place.** Up to 15 digits and the power of ten under them are both exact in a
+   `Double`, so one division is correctly rounded: bit for bit what `Double.parseDouble` gives. Exponents, long
+   mantissas and everything odd still go through `toDoubleOrNull` as before.
+
+And one thing in `BundleStore.load`: **`places/parks.json`, `places/transit.json` and `places/zips.json` are
+checksummed and not parsed.** No Android screen reads them; they were being parsed — about a tenth of the
+bytes — and the result dropped. Whoever adds a reader adds the name to `PARSED_AT_START`. (One consequence, said
+out loud: a malformed `parks.json` whose checksum matches the signed index no longer refuses the whole bundle on
+Android. Only the publisher can produce that file, and the pipeline's schema validation is where it is caught.)
+
+The depth cap, the size ceiling and "anything it cannot read throws `JsonException`" are as they were. Positions
+in messages are byte offsets now. Two places are *stricter* than before and none is looser: a `\u` escape must
+be four hex digits (`toIntOrNull(16)` used to let a sign through), and a number may only contain ASCII digits.
+
+**Held to the old reader.** The reader it replaced is kept word for word in
+`query/src/test/.../ReferenceJson.kt`, and `JsonParityTest` requires the same tree or the same refusal from
+both: every file in `schema/fixtures`, every file of the bundle when `data/bundle/v1` exists (43 files on
+2026-09-20), about a hundred awkward inputs (escapes at either end, surrogates, repeated keys, more keys than
+the table holds, every object size from 0 to 40, malformed everything), and 200,000 random decimals compared
+with `toDouble()` by their raw bits. All 181 fixture cases still pass; TypeScript/Kotlin/Swift parity is
+untouched, because nothing downstream of the `Json` tree changed.
+
+**Before and after, in the app.** Same emulator, `-PdebugLikeRelease=true`, six to eight cold starts each,
+`load.json_parse` / `load.json_parse_cpu`:
+
+| build on the emulator | before, wall | before, CPU | after, wall | after, CPU |
+| --- | --- | --- | --- | --- |
+| as `adb install` leaves it (`status=verify`: interpreted, then JIT) | 700–2,860 ms, median ~1,200 | 380–650 ms, median ~510 | 210–1,050 ms, median ~550 | 80–430 ms, median ~170 |
+| after `pm compile -m speed -f` (everything compiled ahead) | 780–3,390 ms, median ~1,180 | 370–1,060 ms, median ~480 | 140–605 ms, median ~320 | 45–113 ms, median ~80 |
+
+Roughly a third of the CPU interpreted and a sixth compiled; the wall time follows it down but stays two to five
+times the CPU for the reason above. `start.snapshot` — signature, read, checksum, parse, rows — went from
+1.1–5.4 s to 0.7–3.0 s, and its floor is now the signature (about 250 ms) and the wait for a core.
+
+**Something the measurement turned up about the baseline profile.** After `adb install`,
+`dumpsys package` says `status=verify` for this app: nothing was compiled ahead, profile or no profile. The
+profile is packaged (`assets/dexopt/baseline.prof` is in the APK), but what *applies* one on a sideloaded
+install is `androidx.profileinstaller`, which this app does not have; without it the profile is used when the
+Play Store installs the app, and not by `adb install` or a shared APK. So the second row above is what a Play
+install should resemble and the first is what a sideloaded APK gets — and the first is where reading bytes
+helps most. Adding `profileinstaller` would be this app's first runtime dependency; that is Kyle's call and has
+not been made. `baseline-prof.txt` was updated for the reader's new methods either way.
+
+**Considered, measured against, and not done.**
+
+- *Parsing a category only when its screen opens.* Home needs no rows at all, so this would take nearly all of
+  the parse off the cold start. But search, saved places and a listing opened by id all read every row, so
+  `LoadedBundle.rows` would have to become something that loads on demand, holding checksummed bytes (or
+  re-reading and re-checking them) until asked, and every reader of it would need a "not yet" state. That is a
+  lot of new states to buy back what is now 50–100 ms of compiled work behind a screen that already shows 911
+  and 988. If a real cheap phone says otherwise, this is the next lever, and `load.json_parse_cpu` is the label
+  that will say so.
+- *Parsing categories in parallel.* The whole parse is about 55 ms alone in a fresh process; the most a second
+  thread could return is some tens of milliseconds, on the cores the first frame is already short of, and
+  "one store, one background thread" is a property this file leans on elsewhere. Not worth it.
+
+**Still open** is the same thing as above: a real, cheap phone. `load.json_parse` and `load.json_parse_cpu`
+are printed on every debug start for that.
+
 ## What has actually been verified
 
 Compiled and run on 2026-09-20, on JDK 17 (Homebrew `openjdk@17` 17.0.20.1) and Gradle 8.11.1 through the
-committed wrapper, with the Android SDK added later the same day. **133 JUnit test runs (11 in :query, 61 in
+committed wrapper, with the Android SDK added later the same day. **138 JUnit test runs (16 in :query, 61 in
 :core, and the same 61 again under :app against the real Android classes) and 181 fixture cases, 0 failures.**
 Re-run on 2026-09-20 after the cold-start work, with two tests added: the two verification paths never disagree,
 and one software verification stays inside a one-second budget.
 
-`./gradlew :query:test` — 11 tests:
+`./gradlew :query:test` — 16 tests (11 until the JSON reader was rewritten on 2026-09-20; the other five are
+`JsonParityTest`, see "JSON, measured"):
 
 - Every case in `schema/fixtures/*.json`: **181 of 181**, the same files and the same expectations
   `packages/query` and `apps/ios` are held to. Open-now, next occurrences, badges, ranking, search, bundle age,
@@ -857,7 +959,8 @@ Not built:
    on an Apple-silicon Mac, and a 2016 phone is plausibly five to ten times slower. One software Ed25519
    verification has to be timed on a real cheap phone before a release (`-PdebugLikeRelease=true`, then
    `adb logcat -s Help313Timing`). Nothing about the check was weakened, and nothing will be: if the number on a
-   real phone is bad, the answer is the JSON reader, which is now the larger half of the wait.
+   real phone is bad, the next lever is reading each category when it is first opened (see "JSON, measured",
+   which is also where the JSON reader, once the larger half of the wait, was measured and rewritten).
 8. The "Bus directions in the Transit app" button has never been seen in its visible state, because that needs a
    phone with the Transit app on it. Its rule is unit-tested and its hidden state was checked; the tap itself has
    not been. DECISIONS keeps the question of Transit's linking terms **Open**.
