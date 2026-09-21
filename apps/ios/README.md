@@ -7,6 +7,32 @@ Four parts:
 - **`HelpApp/`**: the SwiftUI screens (iOS 17). They compile and run in the iOS Simulator (first built 2026-09-20 on Xcode 27; re-verified the same day on iPhone 16 Pro / iOS 18.0). They have not been run on a real iPhone and have never been signed for a device.
 - **`Tests/`**: `HelpCoreTests` (the app's own rules), `DetroitQueryTests` (the shared fixtures) and `AppParityTests` — the needs list held to the web app's. Parity reads `HelpApp/Help.swift`, `apps/web/src/needs.ts` and `strings/*.json` as text and fails when the three disagree: a different need, a missing choice, a different category, a screen that gained or lost its **quick exit**, or a string key the app asks for and `strings/en.json` does not have. It compiles nothing from `HelpApp/`, so it runs with `swift test` and needs no Xcode. Because it reads both files as text, both write a need's own settings (`first`, `intro`, `emptyKey`, `quickExit`, `query`) **above** its `refine` list; keep it that way.
 
+## The Neighborhoods tab (2026-09-21)
+
+Public numbers about each of Detroit's 205 neighborhoods (docs/13), in a tab of its own — Kyle asked for one, "not just on the web, in the apps too". The tab bar is **Home · Help · Map · Neighborhoods**, with Events still hiding itself; the bar's label is the short word (`tab.hoods`, "Areas") because "Neighborhoods" does not fit a fifth of a phone bar at the accessibility text sizes, while the screen, its title and VoiceOver all say the whole word (`tab.hoods_wide`).
+
+- **`Sources/HelpCore/Hoods.swift`** is the whole of the rules, so `swift test` runs them on Linux too: decoding `indicators/neighborhoods.json` (its bytes held to the checksum in the **signed** index before anything in it is believed), which neighborhood a point is in (ray casting, on the phone, against outlines that came with the bundle), the A–Z and by-district order, the search box, and how every number is written — a count under five as the words "fewer than 5", dollars with the sign in front in every language, a rate per 1,000 lots only when there is a count to show and at least a hundred lots to divide by.
+- **`HelpApp/HoodsScreen.swift`** is the screens: a searchable index with an A–Z / by-district control and "Your neighborhood", and a neighborhood page carrying the web's panels in the web's order — help nearby, building and whether people can stay, conditions, Safe streets with SEMCOG's notice in SEMCOG's English, sources with dates. The outline is drawn with the Map tab's own `Canvas`; tapping it opens the Map tab centred there. Year tables become stacked blocks at the accessibility text sizes, and every cell reads as "2023, 14 Homes sold".
+- The numbers file is fetched and decoded the way a map file is (`MapLoader.indicators`): lazily, off the main actor, checksum first, and kept for one bundle at a time.
+- **Location** reuses the existing on-device flow (`Here`, `LocationChip`) and its refusal handling. The point stays in memory, is never written down and is never sent; a point outside Detroit's 205 — Dearborn, Hamtramck, Highland Park, the river — is answered in words with the Map tab offered, never by naming the nearest neighborhood.
+- **Held to the web**: `Tests/HelpCoreTests/HoodTests.swift` runs the shared coordinates in `schema/neighborhoods/points.json` case for case, and `AppParityTests` fails when the panels of `apps/web/src/hoods.ts` and of this screen fall out of order, when the SEMCOG notice differs by a byte, or when the kinds of help drift from the pipeline's `HELP_TOPS`.
+- **"Your neighborhood" from a typed ZIP** as well as from a location (`hood.mine_zip`): the bundle carries one point per ZIP, so the screen says which ZIP it looked in rather than calling the answer "yours". The shared `zip_cases` run in `ZipProposalTests`.
+- **The nearest food, clinic, Narcan and indoor place open their listing** when the bundle says which one it is (`help.nearest_id`, 2026-09-21). The id has to be in the list this phone holds and the listing must not be private or sensitive, or the row stays a plain distance — the numbers and the listings are two files under one signature, so the category is checked again here (`HoodHelp.nearestListing`, HelpCore).
+- **"Tell us what we're missing"** on the thin-coverage note opens the add-a-place form below.
+
+## Add a place that helps (2026-09-21)
+
+The Swift half of the web's add form and `apps/web/src/propose.ts`, reached from the Help tab's "More" and from a thin neighborhood page.
+
+- **`Sources/HelpCore/Proposals.swift`**: the proposal, its closed JSON encoding, the four required answers, the size caps, and the two closed lists — the kinds of help offered (no domestic-violence shelter: that address must never be collected, docs/08) and the four ways of knowing. `swift test` holds the encoded body to exactly the eight names `parseProposal` accepts in api/src/validate.ts, and proves nothing about the person can be in it.
+- **`HelpApp/AddPlace.swift`**: the form, and `Proposer` — the same outbox actor the reports use, in a file of its own, so a proposal made with no signal is kept and sent later. A proposal carries **no dedupe hash**: it is not deduplicated, so there is nothing to work out again when it goes, and the reports' re-nonce-at-flush rule does not apply.
+- A missing required answer is marked on the field itself, announced, and the cursor goes to the first one — everything already typed stays.
+- Checked against a stub Worker on localhost (2026-09-21): the body was `{name, category, what, how_known}` and nothing else, no cookie header, `User-Agent: 313Help-iOS/0.1`.
+
+## Typing a ZIP instead of sharing a location (2026-09-21)
+
+`LocationChip` now offers "Type a ZIP code" beside "Use my location", wherever the chip appears — the same pair the web has always had. `Sources/HelpCore/Zips.swift` decodes `places/zips.json` (checksum first), validates five digits, and answers `found` / `unknown` / `notAZip`; the ZIP and the point it stands for live in memory only, like a location, and go nowhere. The field deliberately sets **no** `textContentType`: postal-code autofill would have iOS offer this person's own home ZIP above the keyboard, which is their address appearing on a screen they did not put it on.
+
 All of `Tests/` runs with `swift test` from `apps/ios`, which is what the `ios-query` job in CI runs. Two small groups are compiled out where they cannot run: the Ed25519 signature maths (CryptoKit is Apple-only, and this package takes no third-party dependency to get Ed25519 on Linux) and the backup flag (an Apple file attribute). Everything around both — the shape a pinned key may take, the eight small-order points, an all-zero signature, the downgrade floor, the dedupe hash, the report schema, the outbox, the saved rules — runs on Linux as well. **Run `swift test` on a Mac before shipping**; CI on its own does not exercise the signature maths.
 
 ## Building it
@@ -25,7 +51,7 @@ The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme
 
 ### How the project is wired
 
-- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
+- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, `AddPlace.swift`, and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
 - `HelpApp/Assets.xcassets` (the app icon) and `HelpApp/PrivacyInfo.xcprivacy` are referenced in place too and are copied in by the Resources phase.
 - `DetroitQuery` and `HelpCore` are local Swift package products from `apps/ios` (the `Package.swift` beside this README), linked into the app target.
 - `strings/en.json`, `es.json`, `ar.json` and `bn.json` are referenced in place from the repo root (`../../../strings/…`) and land flat in the app bundle, which is what `L.table(_:)` expects. `Info.plist` lists the same four under `CFBundleLocalizations`, so iOS offers them in `Locale.preferredLanguages`.
@@ -119,7 +145,7 @@ It does:
 - **About and Your privacy** (2026-09-20), reachable from the bottom of Home. About shows the list version, its date and whether it was signed with the release key or a test key; Your privacy has the plain-language table from docs/08, **how many reports are still waiting** with a control to delete them unsent, and **"Make a new key"**, which throws the install key away and makes a new random one.
 - English, Spanish, Arabic and Bengali, following the phone's language. am/pm come from `clock.am` / `clock.pm` and list separators from `list.sep`, so an Arabic time reads "2 م" rather than "2 pm".
 
-Not yet: add-a-place (proposals), neighborhood pages, link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, a typed ZIP, a parks list screen, photos on condition reports. The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
+Not yet: link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, a parks list screen, photos on condition reports. (Neighborhood pages, add-a-place and a typed ZIP arrived on 2026-09-21 and have sections of their own below.) The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
 
 ## The Map tab
 
