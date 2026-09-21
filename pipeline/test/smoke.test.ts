@@ -14,7 +14,10 @@ function fakeOrigin(open: Partial<{ steward: boolean; admin: boolean; schema: bo
     const headers = Object.fromEntries(Object.entries((init.headers ?? {}) as Record<string, string>).map(([k, v]) => [k.toLowerCase(), v]));
     sent.push({ url, method, headers, body: typeof init.body === 'string' ? init.body : '' });
     const path = url.slice(SITE.length);
-    const res = (status: number, h: Record<string, string> = {}) => new Response(null, { status, headers: h });
+    // Like the real fetch: a redirect is followed to Access's login page, which answers 200, unless the caller asked
+    // to see the redirect itself.
+    const res = (status: number, h: Record<string, string> = {}) =>
+      status >= 300 && status < 400 && init.redirect !== 'manual' ? new Response(null, { status: 200 }) : new Response(null, { status, headers: h });
     if (path === '/v1/health') return res(200, { 'cache-control': 'no-store' });
     if (path.startsWith('/v1/steward/')) return open.steward ? res(200) : res(302, { location: 'https://313help.cloudflareaccess.com/login' });
     if (path === '/admin/') return open.admin ? res(200) : res(302, { location: 'https://313help.cloudflareaccess.com/login' });

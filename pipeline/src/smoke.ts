@@ -49,7 +49,10 @@ export function parseArgs(argv: string[]): { ok: boolean; why?: string; origin: 
 }
 
 /** Asks a live origin the questions preflight can't. Sends nothing that could be stored. */
-export async function smoke(origin: string, fetcher: Fetcher = fetch, burst = 25, pause: (ms: number) => Promise<void> = sleep): Promise<Probe[]> {
+export async function smoke(origin: string, ask: Fetcher = fetch, burst = 25, pause: (ms: number) => Promise<void> = sleep): Promise<Probe[]> {
+  // Read the origin's first answer. fetch follows redirects by default, and Access's login page answers 200: followed,
+  // a protected path looks open.
+  const fetcher: Fetcher = (url, init) => ask(url, { ...init, redirect: 'manual' });
   const out: Probe[] = [];
   const add = (ok: boolean, level: Probe['level'], what: string, saw: string) => out.push({ ok, level, what, saw });
   const head = (extra: Record<string, string> = {}) => ({ 'user-agent': USER_AGENT, ...extra });
