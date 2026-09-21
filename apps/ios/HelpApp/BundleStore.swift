@@ -45,6 +45,10 @@ struct LoadedBundle {
     /// and the "Map style" control is then not offered at all.
     var netFiles: [String: String] = [:]
     var hubs: [TransitHub] = []
+    /// The middle of each ZIP area the bundle carries, for a person who types one instead of handing over where
+    /// they are (HelpCore/Zips.swift). Empty in a bundle built before the file existed, and the ZIP control is
+    /// then not offered at all.
+    var zips = ZipCenters(points: [:])
 }
 
 /// Where one big map file may be read from, and the checksum the **signed** index gives it. Handed to `MapLoader`
@@ -157,6 +161,9 @@ final class BundleStore: ObservableObject {
                 b.netFiles = extras.netFiles.filter { index.files[$0.value] != nil }
                 b.hubs = extras.hubs
             case "events.json": struct E: Codable { var events: [CityEvent] }; b.events = try dec.decode(E.self, from: data).events
+            // Small enough to travel with the rest; the checksum has just been checked, and HelpCore checks it
+            // again rather than take a caller's word for it.
+            case ZipsFile.name: b.zips = try ZipsFile.decode(data, sha256: meta.sha256)
             default: break
             }
         }

@@ -113,6 +113,29 @@ final class ParityTests: XCTestCase {
             XCTAssertFalse(kinds.isEmpty, "could not read ReportKinds.\(name) from Reports.swift")
             built += kinds.map { "report.kind.\($0)" }
         }
+        // The Neighborhoods tab finishes three prefixes from lists in HelpCore/Hoods.swift: the kinds of help
+        // counted for a neighborhood, the four "nearest listed" rows, and the kinds we may have nothing listed
+        // for. `shelter` is spelled `shelter.emergency` in the category words, as it is on the web.
+        let hoods = try text("apps/ios/Sources/HelpCore/Hoods.swift")
+        let helpKinds = quoted(bracketed(hoods, after: "public let hoodHelpKinds = "))
+        XCTAssertFalse(helpKinds.isEmpty, "could not read hoodHelpKinds from Hoods.swift")
+        built += helpKinds.map { "add.cat.\($0 == "shelter" ? "shelter.emergency" : $0)" }
+        let nearest = quoted(bracketed(hoods, after: "public let hoodNearestKinds = "))
+        XCTAssertFalse(nearest.isEmpty, "could not read hoodNearestKinds from Hoods.swift")
+        built += nearest.map { "hood.nearest.\($0)" }
+        built += ["food", "health", "harm"].map { "hood.kind.\($0)" }
+        // "Add a place that helps": the kinds of help offered, the ways of knowing, and every field's own label,
+        // error and hint (the hints are passed to the field as a key, so they are built rather than written out).
+        let proposals = try text("apps/ios/Sources/HelpCore/Proposals.swift")
+        let categories = quoted(bracketed(proposals, after: "public let proposalCategories = "))
+        XCTAssertFalse(categories.isEmpty, "could not read proposalCategories from Proposals.swift")
+        built += categories.map { "add.cat.\($0)" }
+        let how = quoted(bracketed(proposals, after: "public let proposalHowKnown = "))
+        XCTAssertFalse(how.isEmpty, "could not read proposalHowKnown from Proposals.swift")
+        built += how.map { "add.how.\($0)" }
+        built += ["name", "category", "what", "address", "schedule_text", "phone", "how_known", "notes"].map { "add.f.\($0)" }
+        built += quoted(bracketed(proposals, after: "public let proposalRequired = ")).map { "add.e.\($0)" }
+        built += ["add.h.what", "add.h.address", "add.h.schedule", "add.h.phone", "add.h.notes"]
         for key in built where en[key] == nil { missing.append("built: \(key)") }
         XCTAssertEqual(missing, [], "string keys the app asks for that strings/en.json does not have")
     }
@@ -158,6 +181,156 @@ final class ParityTests: XCTestCase {
         // And the sensitive pair did not change while a new health kind was added (HelpCore owns the rule).
         XCTAssertTrue(try text("apps/ios/Sources/HelpCore/Saved.swift")
             .contains("public let sensitiveCategories = [\"shelter.dv\", \"health.mental\"]"))
+    }
+
+    // MARK: - the Neighborhoods tab (docs/13)
+
+    /**
+     A neighborhood page says the same things in the same order on the iPhone as on the web.
+
+     `hoodPage` in apps/web/src/hoods.ts is the source of truth for the panels: help, then building and staying,
+     then conditions, then safe streets, then the sources. The order is not decoration — the money panel draws
+     home prices and building permits together on purpose, and the crash panel carries SEMCOG's notice — so a
+     panel that moved or went missing on one client and not the other is a bug worth a failing test.
+     */
+    func testTheNeighborhoodPagePanelsMatchTheWebApp() throws {
+        let web = try text("apps/web/src/hoods.ts")
+        guard let start = web.range(of: "export function hoodPage(") else { return XCTFail("hoodPage moved") }
+        let webBody = String(web[start.upperBound...])
+        var webPanels = headKeys(in: webBody)
+        // The crash panel is drawn by a function of its own, called from inside `hoodPage`.
+        if let at = webBody.range(of: "crashPanel(h, d, ui)") {
+            let before = headKeys(in: String(webBody[..<at.lowerBound])).count
+            webPanels.insert("hood.crash_head", at: before)
+        }
+        XCTAssertEqual(webPanels, ["hood.help_head", "hood.nearest_head", "hood.places_head", "hood.city_near_head",
+                                   "hood.money_head", "hood.cond_head", "hood.crash_head", "hood.sources_head"],
+                       "the web page's headings changed; the iPhone's have to change with them")
+
+        let ios = try text("apps/ios/HelpApp/HoodsScreen.swift")
+        guard let panelStart = ios.range(of: "// MARK: - the panels, in the web page's order"),
+              let panelEnd = ios.range(of: "// MARK: - the pieces a panel is built from")
+        else { return XCTFail("the panel section of HoodsScreen.swift moved") }
+        XCTAssertEqual(headKeys(in: String(ios[panelStart.upperBound..<panelEnd.lowerBound])), webPanels,
+                       "the iPhone's panels are in a different order from the web page's")
+
+        // And the one sentence that is not ours to translate is byte for byte the web's.
+        let notice = "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited."
+        XCTAssertTrue(web.contains("export const SEMCOG_NOTICE = '\(notice)'"), "the web's SEMCOG notice changed")
+        XCTAssertTrue(try text("apps/ios/Sources/HelpCore/Hoods.swift").contains("\"\(notice)\""),
+                      "the iPhone's SEMCOG notice differs from the web's, or is no longer written out in full")
+    }
+
+    /**
+     No number a person reads is laid out by the platform.
+
+     `NumberFormatter`, `formatted()` and `String(format:)` do not agree across the two systems this repository
+     builds on: swift-corelibs-foundation ignored the fraction-digit settings that Darwin honours, so a rate came
+     out "9.4" on a Mac and "9.44" on the Linux runner (PR #10, 2026-09-21). The rules in HelpCore must give the
+     same answer everywhere, so they do their own arithmetic — and this is the guard that keeps a convenient
+     one-liner from creeping back in.
+     */
+    func testHelpCoreNeverLetsThePlatformFormatANumber() throws {
+        for file in try FileManager.default.contentsOfDirectory(atPath: Self.root.appendingPathComponent("apps/ios/Sources/HelpCore").path)
+        where file.hasSuffix(".swift") {
+            let code = withoutComments(try text("apps/ios/Sources/HelpCore/\(file)"))
+            for needle in ["NumberFormatter", ".formatted("] {
+                XCTAssertFalse(code.contains(needle),
+                               "\(file) formats a number with \(needle), which rounds differently on Linux")
+            }
+            // `String(format:)` is allowed for whole numbers — a hex byte, a two-digit hour — and never for a
+            // fractional one, which is where the two platforms part company.
+            for line in code.split(separator: "\n") where line.contains("String(format:") {
+                for spec in ["%f", "%g", "%e", "%.'"] where line.contains(spec) {
+                    XCTFail("\(file) formats a fractional number with \(spec): \(line)")
+                }
+                XCTAssertFalse(line.contains("%."), "\(file) formats a fractional number: \(line)")
+            }
+        }
+    }
+
+    /// A Swift file with its comments taken out, so a test that looks for a forbidden call does not trip over a
+    /// comment that names it in order to explain why it is forbidden.
+    private func withoutComments(_ source: String) -> String {
+        var out = "", inBlock = false, i = source.startIndex
+        while i < source.endIndex {
+            let rest = source[i...]
+            if inBlock {
+                if rest.hasPrefix("*/") { inBlock = false; i = source.index(i, offsetBy: 2) } else { i = source.index(after: i) }
+                continue
+            }
+            if rest.hasPrefix("/*") { inBlock = true; i = source.index(i, offsetBy: 2); continue }
+            if rest.hasPrefix("//") {
+                while i < source.endIndex, source[i] != "\n" { i = source.index(after: i) }
+                continue
+            }
+            out.append(source[i])
+            i = source.index(after: i)
+        }
+        return out
+    }
+
+    /**
+     A proposal carries exactly the field names the Worker's closed schema accepts.
+
+     `parseProposal` in api/src/validate.ts calls `closed(body, [...])`: a name that is not in that list is a 400,
+     not something stored. The iPhone builds its own body, so the two lists have to be the same list — and the
+     failure mode if they are not is a person filling in a form, tapping Send, and being told nothing happened.
+     */
+    func testAProposalsFieldsAreTheOnesTheWorkerAccepts() throws {
+        let api = try text("api/src/validate.ts")
+        guard let r = api.range(of: "export function parseProposal("),
+              let call = api.range(of: "closed(body, [", range: r.upperBound..<api.endIndex),
+              let end = api[call.upperBound...].firstIndex(of: "]")
+        else { return XCTFail("parseProposal's closed() list moved") }
+        let worker = quoted(String(api[call.upperBound..<end]))
+        XCTAssertEqual(worker.sorted(), ["address", "category", "how_known", "name", "notes", "phone", "schedule_text", "what"])
+        // The Swift side names them in its CodingKeys, which is what the encoder writes.
+        let keys = try text("apps/ios/Sources/HelpCore/Proposals.swift")
+        guard let start = keys.range(of: "public enum CodingKeys: String, CodingKey {"),
+              let stop = keys[start.upperBound...].firstIndex(of: "}")
+        else { return XCTFail("Proposal.CodingKeys moved") }
+        let block = String(keys[start.upperBound..<stop])
+        for name in worker {
+            XCTAssertTrue(block.contains(name) || block.contains(camel(name)),
+                          "a proposal from the iPhone has no \(name), which the Worker expects")
+        }
+        // And nothing about the person can be sent with it: a proposal is not deduplicated, so unlike a report it
+        // carries no per-day hash, and there is nothing else it could carry either.
+        for forbidden in ["client_nonce", "observed_at", "install", "lat", "lon"] {
+            XCTAssertFalse(worker.contains(forbidden), "the Worker would accept \(forbidden) on a proposal")
+            XCTAssertFalse(block.contains(forbidden), "the iPhone's proposal carries \(forbidden)")
+        }
+    }
+
+    /// "schedule_text" as Swift spells it in a property name.
+    private func camel(_ snake: String) -> String {
+        let parts = snake.split(separator: "_")
+        return (parts.first.map(String.init) ?? "") + parts.dropFirst().map { $0.capitalized }.joined()
+    }
+
+    /// The kinds of help counted for a neighborhood are the pipeline's `HELP_TOPS`, in its order. A JSON object's
+    /// order does not survive being decoded into a Swift dictionary, so the iPhone keeps its own copy of the list
+    /// — and a copy drifts unless something holds it (HelpCore/Hoods.swift says as much).
+    func testTheNeighborhoodHelpKindsMatchThePipeline() throws {
+        let pipeline = quoted(bracketed(try text("pipeline/src/indicators.ts"), after: "export const HELP_TOPS = "))
+        XCTAssertFalse(pipeline.isEmpty, "could not read HELP_TOPS from pipeline/src/indicators.ts")
+        let swift = quoted(bracketed(try text("apps/ios/Sources/HelpCore/Hoods.swift"), after: "public let hoodHelpKinds = "))
+        XCTAssertEqual(swift, pipeline, "HelpCore.hoodHelpKinds and the pipeline's HELP_TOPS disagree")
+    }
+
+    /// The `hood.*_head` keys a body asks for, in the order it asks for them.
+    private func headKeys(in body: String) -> [String] {
+        var out: [String] = [], rest = Substring(body)
+        while let r = rest.range(of: "'hood.") ?? rest.range(of: "\"hood.") {
+            let quote = rest[r.lowerBound]
+            rest = rest[rest.index(after: r.lowerBound)...]
+            guard let end = rest.firstIndex(of: quote) else { break }
+            let key = String(rest[..<end])
+            if key.hasSuffix("_head") { out.append(key) }
+            rest = rest[end...]
+        }
+        return out
     }
 
     /// Keys retired on 2026-09-20, when the web app folded Recreation and Transit into one Map tab.

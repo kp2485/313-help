@@ -58,9 +58,9 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   segments, 302 parks, and **11 transport layers**, with two styles on all three apps: **Standard** and **Subway**
   ([MAP-STYLE](docs/MAP-STYLE.md)). Keyboard: arrows pan, N and P walk the features, Enter opens one.
 - **205 neighborhood pages** from public datasets: no rankings, no per-neighborhood crime, small counts suppressed
-  ([docs/13](docs/13-neighborhood-indicators.md)). On the web they have their own tab (2026-09-22), which finds
+  ([docs/13](docs/13-neighborhood-indicators.md)). On the web and on iPhone they have their own tab, which finds
   the neighborhood you are standing in on the device and lists all 205 A–Z or by council district — never by a
-  number.
+  number. Both clients answer the same shared point cases (`schema/neighborhoods/points.json`).
 - **Four languages** — English, Español, العربية, বাংলা — each loaded only when chosen. The native apps follow
   the phone's language list. What a place wrote about itself is never machine-translated.
 - **WCAG 2.2 AA audit: 44 pass, 27 found and fixed, 0 open** ([audit](docs/ACCESSIBILITY-AUDIT-2026-09-20.md),
@@ -146,7 +146,7 @@ More: [iPhone](apps/ios/README.md) · [Android](apps/android/README.md) · [desi
   today," warming centers open — in a small signed signals file.
 - Partner feeds: Gleaners and Forgotten Harvest schedules, and an HSDS exchange with 211.
 - Richer transit: stops in travel order, GTFS-based trip hints — still no tracking.
-- Client parity: neighborhood pages and add-a-place in both native apps.
+- Client parity: the last differences between the three apps, such as the greenway lens on Android's Neighborhoods tab.
 - A steward mobile mode for outreach workers, and coverage passes for thin neighborhoods.
 
 **Later** — photos on condition reports after legal review; local notifications for saved places and alerts;
