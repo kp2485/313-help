@@ -68,7 +68,9 @@ Dashboard → **Zero Trust → Access → Applications → Add an application �
 - Copy the application's **Application Audience (AUD) tag** and your **team domain**
   (`<something>.cloudflareaccess.com`) into `api/wrangler.toml` as `ACCESS_AUD` and `ACCESS_TEAM_DOMAIN`,
   and commit. The Worker verifies the token itself and fails closed while these are empty.
-- Never set `DEV_STEWARD` in production. (It would do nothing: the Worker only honors it on localhost.)
+- Never set `DEV_STEWARD` in production. (It would do nothing: the Worker honours it only when its value is
+  exactly `local` **and** neither `ACCESS_TEAM_DOMAIN` nor `ACCESS_AUD` is set — so filling the two fields above
+  switches it off by itself. The request's `Host` is not part of the decision.)
 
 ### 5. The WAF rate-limiting rule
 
@@ -105,6 +107,19 @@ refuse, so it can never store anything. Only ever run it against this project's 
 Re-run it after any change to the Access policy or the WAF rule. If either is ever removed, set its line in
 `api/edge-protections.md` back to `not signed` in the same commit.
 
+### 6b. Check the logs are off, in the dashboard
+
+`api/wrangler.toml` already sets `[observability.logs] enabled = false` and `invocation_logs = false`, and the
+Worker's error handlers log nothing (Cloudflare's own docs say invocation logs capture "request metadata, and
+headers"). Two things a config file cannot prove, so look at them once after the first deploy:
+
+- Worker → **Observability → Logs**: off. If the dashboard has turned it on, turn it back off.
+- Account → **Logpush**: no job for **Workers Trace Events**. An account-level job collects what the Worker's own
+  setting cannot prevent.
+
+And a standing rule for whoever debugs this later: **never paste `wrangler tail` output into an issue, a chat or a
+document.** Tail streams live requests, URLs and headers past whoever is looking at the screen.
+
 ### 7. Turn the publish on, last
 
 GitHub → *Settings → Secrets and variables → Actions*.
@@ -139,6 +154,12 @@ The cron (`17 8 * * *`, daily) runs the 180-day report purge and the 30-day phot
 both find nothing and change nothing; without the R2 binding the photo pass does nothing at all and a report
 that carries a photo waits rather than leave a picture behind. `api/test/scheduled.test.ts` holds the first run
 to that. The one thing that will break it is skipping the `--remote` migrations in step 2.
+
+The two passes are now independent: each runs in its own `try`/`catch`, so a photo pass that fails cannot stop
+the retention pass, and neither can stop the other from being tried again tomorrow. A failure prints one of two
+fixed sentences and nothing else — no ids, no error text — because that is the only thing the Worker is allowed
+to print (`api/src/log.ts`). Which means **a failed pass is silent from outside**: the way you find out is that
+counts stop moving, not a log line. With Workers Logs off there is deliberately nowhere else to look.
 
 The nightly publish's last two steps (the page re-check and the steward tasks it raises) never fail the job and
 never change the app: a flaky page must not block a publish.

@@ -27,6 +27,8 @@ Organization ─┬─< Service ─────< ServiceAtLocation >────
 - **Location** — a physical place with lat/lon and address. A church is one Location hosting possibly several Services.
 - **ServiceAtLocation** — the join: *this* service at *this* place, with its own schedule and phone. This is the row users actually see. Most app logic keys on `service_at_location.id`.
 - **Schedule** — HSDS uses iCal RRULE fields (`freq`, `byday`, `dtstart`, `until`, `opens_at`, `closes_at`). A Forgotten Harvest mobile pantry "every Friday 1:30–2:30pm" is `FREQ=WEEKLY;BYDAY=FR` with open/close times. One-off events get `dtstart` = `until`. This is how we compute "next distribution" and "open now" correctly.
+
+**What the phone computes from a schedule** is one of seven states — `open`, `closes_soon`, `closed`, `call_first`, `unknown`, `not_listed`, and, since 2026-09-20, **`holiday`**. They are defined once, in `schema/query-spec.md` ("Open now"), and typed once, as `OpenState` in `packages/query/src/types.ts`; nothing in these docs is the normative list. `holiday` is what a schedule-derived "open" becomes on one of the eleven US federal holidays (or the observed day when one falls at a weekend): it carries the schedule's own times as **usual** hours, never `closes_at` or `minutes_left`, ranks exactly where `call_first` ranks, and is never coloured as a kind of open. The holidays are a date rule computed on the device, so a phone with a three-month-old copy still knows what Christmas is; no list of dates is in the bundle. `always` rows (an emergency room, a crisis line) are untouched.
 - **Phone, Address, Contact, Accessibility, Language, Eligibility** — per HSDS.
 
 ## Extension: `x_detroit` (per ServiceAtLocation, also allowed on Service/Location)
@@ -70,7 +72,8 @@ Optional keys, when they apply:
 - `hours_text` — hours exactly as the source states them, when they could not be turned into a schedule. Shown as written; never used for "open now."
 - `notice` — a short heads-up, e.g. "Enrollment is full. You can join the waitlist."
 - `languages`, `eligibility`.
-- `archived` — `{ "at", "reason", "replacement_id" }` on an archived row; `null` otherwise.
+- `archived` — `{ "at", "reason", "replacement_id" }` on an archived row; `null` otherwise. It is never written in the seed CSV — an `archived` row with no archive record fails the build. A steward archives through the queue and the pipeline applies the D1 record at build time (docs/04, OPERATIONS).
+- `flags` — plain string flags. Most describe a row (`walk_in`, `no_id_required`, `youth`, `reentry`, `immigrants`, `referral_only`, …) and are used for eligibility and for "prefer" in ranking. One changes a rule: **`open_holidays`**, set by a steward only when the owner's own page says the place is open on holidays, makes that row skip the holiday rule entirely. Nothing validates the spelling of a flag, so a typo does nothing rather than failing.
 - `source.last_edited` — for open-data rows, the date the source layer was last edited.
 
 `reports.closed_open` counts open "closed" / "moved" reports; `wrong_open` counts open wrong hours / phone / info reports.

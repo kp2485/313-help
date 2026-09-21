@@ -7,7 +7,7 @@ Nothing here is deployed or costs money. The commands below were run in this che
 
 ```
 git pull && pnpm install
-pnpm test                                        # 503 tests, all green
+pnpm test                                        # 644 tests, all green
 pnpm build:bundle                                # fresh signed bundle (dev key)
 pnpm --filter @313help/api migrate:local         # local D1 in api/.wrangler
 ```

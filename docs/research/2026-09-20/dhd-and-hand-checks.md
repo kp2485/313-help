@@ -1,5 +1,21 @@
 # The hand checks, done in a browser (2026-09-20)
 
+> **Read this first — the summary table below is out of date, and the later sections of this same file supersede
+> it (2026-09-20, later the same day).** This write-up was begun while `detroitmi.gov` was still blocking every
+> attempt, and its "The short version" table and section 1 record that state: 38 rows blocked, 0 DHD import lines
+> written, `health.dhd` empty, the shelter line unread. **All four of those are now wrong.** What actually
+> happened, later the same day: **Kyle passed the bot challenge himself, in his own Chrome**, and asked for that
+> session to be used one page at a time; **all 38 blocked rows were read** and set `status: active`,
+> `entry_method: web`; that produced **24 live `health.dhd` listings** and one `transport` listing; and the
+> shelter line **866-313-2520 matched** its own page. The rest of this file — every "read, page by page" section
+> below — is the record of that work and is current. The stale table is left in place rather than rewritten,
+> because a research note that gets quietly edited stops being evidence. See DECISIONS 2026-09-20, "Rows whose
+> own site refuses scripts were read in a browser".
+>
+> One more thing to know about who did the reading: the browser reads were done by **an AI agent driving a
+> browser, with Kyle approving the results as steward**, except the `detroitmi.gov` pages, whose human check was
+> Kyle's own. No machine clicked a challenge, submitted a form or accepted a banner.
+
 What this was: the worksheet `docs/CHECKS-2026-09-19.md` asks for "a person with a browser" to read pages
 our scripts cannot. On 2026-09-20 those pages were opened in the built-in browser and read as text. Only the
 organisation's own page counted. No form was submitted, no cookie banner was accepted, no bot challenge was
@@ -478,8 +494,16 @@ programmes with a phone and a day for each, at one address (5555 Conner St., Sui
 (313) 876-4554). It is where **Ceasefire Detroit** finally has a number (313-224-1257, call for an
 appointment) and where Children's Special Health Care Services, iDecide Detroit, Infant Safe Sleep, the
 961-BABY line, the Fatherhood Program and the Safe Routes Ambassadors Program are all written down. Most of
-its clinics run monthly ("Every 2nd Tuesday", "Every 3rd Monday"), which our schedule parser cannot express,
-so those listings say "call first" and carry the printed words. That is the honest result, not a gap.
+its clinics run monthly ("Every 2nd Tuesday", "Every 3rd Monday"), so those listings say "call first" and carry
+the printed words.
+
+> **Correction, 2026-09-20 (later the same day).** "Which our schedule parser cannot express" was wrong. A
+> numbered monthly BYDAY **is** supported: `packages/query/src/schedule.ts` accepts `FREQ=MONTHLY` with
+> `BYDAY=2TU` or `BYDAY=1WE,3WE` (and rejects a numbered BYDAY only with `FREQ=WEEKLY`), which is exactly the
+> rule DECISIONS 2026-09-19 records — "Monthly days may be entered as MONTHLY schedules by hand". So "Every 2nd
+> Tuesday" can be entered as a real schedule and computed as open-now. These rows are call-first because the
+> **line importer** reads weekly hours only and nobody has entered them by hand yet, not because the rules cannot
+> hold them. Entering them is steward work, and until then call-first with the printed words is still honest.
 
 ### Two DHD pages that disagree with each other
 

@@ -301,7 +301,7 @@ are additions to the done list above, not revisions of it:
 12. **Dollar amounts are written the way the record writes them** (`$85,000`), falling back to `en-US` where a
     language's own `Intl` rules do not lead with the sign.
 
-**Still open from that walk-through**, and listed in [CHECKS-2026-09-20.md](CHECKS-2026-09-20.md) §6:
+**Still open from that walk-through**, and listed in [CHECKS-2026-09-20.md](CHECKS-2026-09-20.md) §7:
 
 - **Searching in Arabic or Bengali always returns nothing**, because every listing is written in English. That is
   not a bug in the search; it needs a one-line hint on the empty state, worded with the native reviewer rather

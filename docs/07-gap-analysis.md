@@ -2,7 +2,7 @@
 
 > **Correction, 2026-09-18.** Earlier drafts said D Compassion never shipped and was Android-only. That is wrong. It is live as the **"Detroit Compassion App"** on Google Play (package `com.detroithealthdepartment.dcompassion`, "Initial Release," updated 2025-05-16, 10+ downloads) and the Apple App Store (id6743035244; 115 MB; iOS 15+), published by a vendor, **Command Data Solutions, Inc**, not by the City. Its store privacy labels declare name, phone number, and device ID collected and linked to identity, and personal info shared with third parties. What follows describes the December 2024 build we examined; the comparison that matters now is with the shipped app: it asks who you are, weighs 115 MB, and has about ten installs.
 
-Source: reverse-engineering of `com.detroithealthdepartment.dcompassion` v1.0 (built 2024-12-10, .NET MAUI Blazor Hybrid, Radzen UI, Android only). The directory content is public program information; DHD staff are informally supportive; no written authorization exists and none is assumed (see 08).
+Source: reverse-engineering of `com.detroithealthdepartment.dcompassion` v1.0 (built 2024-12-10, .NET MAUI Blazor Hybrid, Radzen UI, Android only). The directory content is public program information; DHD staff are informally supportive **(Kyle's account; no written record in this repository — DECISIONS 2026-09-20)**; no written authorization exists and none is assumed (see 08).
 
 ## What D Compassion had
 

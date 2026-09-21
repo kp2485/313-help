@@ -95,8 +95,8 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 
 | Source | What | Tier | Notes |
 |---|---|---|---|
-| Wayne County Healthy Communities, "Well Wayne Stations" map | 26 naloxone and test-strip stations in Dearborn, Hamtramck and Highland Park | A (a Google My Maps KML) | `pnpm ingest:mymap`. **No terms stated**, the same footing as the DHD layer; the County is named on every row and the map's own "Map updated" date drives the badge. They publish a point and a city and **no street address**, which we never invent. Asking the County is owed |
-| SEMCOG, "Crash Locations, 2015-2024" | Pedestrian and bicycle crash counts for the "Safe streets" panel; the records are the **Michigan State Police's** | A | `pnpm ingest:crashes`, by hand about once a year. **Licence unstated.** Counts only; nothing about a crash beyond the year survives the read. If SEMCOG or MSP objects, one file is deleted and the panel disappears (DECISIONS 2026-09-20) |
+| Wayne County Healthy Communities, "Well Wayne Stations" map | 26 naloxone and test-strip stations in Dearborn, Hamtramck and Highland Park | A (a Google My Maps KML) | `pnpm ingest:mymap`. **No terms stated**, the same footing as the DHD layer; the County is named on every row and the map's own "Map updated" date drives the badge. They publish a point and a city and **no street address**, which we never invent. Asking the County is owed — and so is asking for the file directly: the content is the County's, but the delivery is Google's undocumented My Maps KML endpoint (DECISIONS 2026-09-20) |
+| SEMCOG, "Crash Locations, 2015-2024" | Pedestrian and bicycle crash counts for the "Safe streets" panel; the records are the **Michigan State Police's** (CJIC) | A | `pnpm ingest:crashes`, by hand about once a year. **Licence stated, and not yet accepted knowingly.** SEMCOG's portal carries a [Copyright License Agreement](https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement) covering everything it publishes: a perpetual, royalty-free licence to reproduce, modify and publish; a **required** notice, "Copyright © \<year\> SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.", which NOTICE carries and which is owed on the Safe streets panel, where it is not printed yet; a **one-way indemnification clause**; and no third-party rights, which is why MSP's position matters. Counts only; nothing about a crash beyond the year survives the read. **Open for Kyle:** accept the agreement including the indemnification clause, or remove the layer. If SEMCOG or MSP objects, one file is deleted and the panel disappears (DECISIONS 2026-09-20) |
 | Transit (transitapp.com) | Nothing — a **link-out only**, using their documented URL scheme | — | We take no data at all and fetch nothing from their servers. Their page states no terms and no branding rule; asking them is owed |
 
 ## Ingestion strategy summary
@@ -118,7 +118,7 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 
 ## What to ask DHD for (optional — nothing blocks on a reply)
 
-DHD has been informally supportive but has not signalled it will maintain anything. Send this once; build as if the answer is silence.
+DHD has been informally supportive but has not signalled it will maintain anything **(Kyle's account; no written record in this repository — DECISIONS 2026-09-20)**. Send this once; build as if the answer is silence.
 
 - Is the council-district food-access ArcGIS map a DHD product, and is its layer public?
 - The current DHD program list with a named contact per program.

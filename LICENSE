@@ -200,3 +200,32 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+-------------------------------------------------------------------------------
+NOT PART OF THE APACHE LICENSE, VERSION 2.0.
+The text above ends the Apache License. The notice below is added by the
+copyright holder and does not modify, qualify or reinterpret that licence.
+-------------------------------------------------------------------------------
+
+DATA CARVE-OUT
+
+The Apache License, Version 2.0 above covers the SOURCE CODE in this repository.
+
+It does not cover the third-party data files under data/ingested/ and
+data/seed/. Those files are not licensed under Apache-2.0 and are not ours to
+license: each keeps its publisher's own terms, as recorded in
+data/sources.yaml, data/ingested/transit/source.json and NOTICE. In particular:
+
+  * data/ingested/transit/intercity_bus.json (US DOT BTS, NTAD Intercity Bus
+    Atlas Stops) is licensed CC BY-NC 4.0 — attribution required, NOT for
+    commercial use. It is not licensed under Apache-2.0.
+  * data/ingested/crashes.json (counts derived from SEMCOG's "Crash Locations,
+    2015-2024"; the underlying police reports are the Michigan State Police's)
+    is used under SEMCOG's portal-wide Copyright License Agreement, whose
+    required copyright notice is reproduced in NOTICE.
+
+The dataset this project publishes itself, under data/hsds/, is licensed
+CC BY 4.0, with a per-row source licence field, because we can only license
+what is ours.
+
+The full carve-out, file by file, is data/LICENSE-DATA.md.

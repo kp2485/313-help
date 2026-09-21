@@ -5,6 +5,14 @@ Contact: kyle@linwoodtechnologies.com
 The code is licensed under the Apache License, Version 2.0 (LICENSE). The dataset
 under data/hsds is licensed CC BY 4.0. Source data keeps its own terms.
 
+Apache-2.0 covers the source code only. The third-party data files under
+data/ingested/ and data/seed/ are NOT licensed under Apache-2.0: each keeps its
+publisher's terms, as recorded in data/sources.yaml, data/ingested/transit/source.json
+and this file. In particular data/ingested/transit/intercity_bus.json is
+CC BY-NC 4.0 (attribution, non-commercial), and the SEMCOG crash aggregate in
+data/ingested/crashes.json is used under SEMCOG's Copyright License Agreement.
+The carve-out is spelled out in data/LICENSE-DATA.md.
+
 Every listing in the app names its own source and the date it was checked; this file
 credits everyone together. Thank you.
 
@@ -16,8 +24,11 @@ Food banks, and the pantries, meal sites and mobile stops they supply:
   Forgotten Harvest (find-food pages)
 
 Drug and alcohol treatment programs were found on:
-  SAMHSA, National Directory of Drug and Alcohol Use Treatment Facilities (public domain)
-  SAMHSA, Opioid Treatment Program Directory (public domain)
+  SAMHSA, National Directory of Drug and Alcohol Use Treatment Facilities.
+    In the public domain, with the publication's own stated condition: it "may
+    not be reproduced or distributed for a fee." We accept that condition; the
+    app is free and nothing here is sold. Recorded in data/sources.yaml.
+  SAMHSA, Opioid Treatment Program Directory (a federal government work)
   Detroit Wayne Integrated Health Network, provider directory
   Each listing's own facts come from the program's own website, named on the listing.
 
@@ -29,7 +40,16 @@ Naloxone and test-strip stations outside Detroit:
   Wayne County Healthy Communities, "Well Wayne Stations" location map
     (endoverdosewayne.org). The map states no terms of use; we publish the
     County's own facts, name the County on every row, and carry the map's own
-    "Map updated" date. Asking the County about reuse is still owed.
+    "Map updated" date. Asking the County about reuse is still owed. The
+    content is the County's; the delivery is Google's — the map is a published
+    Google My Map and we read its own KML endpoint
+    (google.com/maps/d/kml?mid=...&forcekml=1), which Google documents nowhere.
+    Asking the County for the file directly is owed too.
+
+NARCAN is a registered trademark of Emergent BioSolutions Inc. We use the word
+  because it is the word Detroit residents, outreach workers and the City's own
+  pages use for naloxone; naloxone is the drug. There is no affiliation with,
+  sponsorship by, or endorsement from Emergent BioSolutions.
 
 Organizations whose own websites supplied their listings:
   ACCESS
@@ -221,12 +241,23 @@ US Census Bureau (TIGER/Line and TIGERweb; public domain):
   ZIP Code Tabulation Areas for Dearborn ZIP codes
 
 Pedestrian and bicycle crash counts ("Safe streets"):
+  Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without
+    Permission is Prohibited.
   Southeast Michigan Council of Governments (SEMCOG), "Crash Locations,
     2015-2024". The underlying police reports are the Michigan State Police's
-    (CJIC). SEMCOG publishes no terms for this layer, so it is recorded as
-    unstated, read by hand about once a year, kept as counts only, and both
-    bodies are named on the panel. Questions to SEMCOG and MSP are owed; if
-    either objects the layer is deleted and the panel disappears.
+    (CJIC), and MSP has not been asked about them. SEMCOG's open-data portal
+    carries a Copyright License Agreement covering everything it publishes
+    (https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement):
+    a perpetual, royalty-free licence to reproduce, modify and publish; the
+    REQUIRED copyright notice reproduced above, which since 2026-09-20 is
+    printed on the Safe streets panel itself as well as here (the panel also
+    names SEMCOG and the State Police); a one-way clause under which the user indemnifies
+    SEMCOG; and a clause granting no third-party rights, which is why MSP's
+    position matters. The layer is read by hand about once a year and kept as
+    counts only, and both bodies are named on the panel. Open for Kyle: accept
+    the agreement including its indemnification clause knowingly, or remove the
+    layer. If SEMCOG or MSP objects the layer is deleted and the panel
+    disappears.
 
 
 THE ELEVEN TRANSPORT LAYERS ON THE MAP
@@ -248,7 +279,12 @@ layer owner is contacted while the map is open.
   US DOT Bureau of Transportation Statistics, NTAD Amtrak Stations —
     a work of the United States government, unrestricted public use
   US DOT Bureau of Transportation Statistics, NTAD Intercity Bus Atlas Stops —
-    CC BY-NC 4.0 (attribution, non-commercial)
+    CC BY-NC 4.0 (attribution, non-commercial).
+    Licence: https://creativecommons.org/licenses/by-nc/4.0/
+    Modified: filtered to Detroit, Hamtramck, Highland Park and Dearborn plus a
+    surrounding margin, and reduced to the fields the app draws. 9 stops of the
+    national file. data/ingested/transit/intercity_bus.json is NOT covered by
+    this repository's Apache-2.0 licence (data/LICENSE-DATA.md).
 
 
 PLACES WE LINK TO, AND TAKE NOTHING FROM

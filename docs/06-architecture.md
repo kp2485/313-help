@@ -43,7 +43,7 @@ Two halves, deliberately separated:
   api/               Cloudflare Worker (Hono) + D1 migrations
   admin/             steward queue: plain HTML, CSS and JS, no build step; served at /admin/ behind Cloudflare Access
   apps/
-    ios/             SwiftUI, iOS 17+ (Sources/DetroitQuery: the Swift query library, tested; HelpApp/: the screens, which compile and run in the simulator since 2026-09-20; HelpAppTests/: 28 app tests)
+    ios/             SwiftUI, iOS 17+. Two SwiftPM libraries CI can run without Xcode: Sources/DetroitQuery (the Swift copy of the query rules, held to schema/fixtures) and Sources/HelpCore (the app's own non-screen logic — install key, outbox, saved rules, session, signature check, release rules). HelpApp/ holds the screens and needs Xcode. Tests/: DetroitQueryTests, HelpCoreTests, AppParityTests — 73 tests
     web/             PWA — same bundle, read-only + reporting (still our Android answer)
     android/         Kotlin, platform Views, no dependencies (query/: a third copy of the shared rules; core/: the android-free files on a plain JVM; app/: the screens). Compiled, tested and run on 2026-09-20 — on an API 35 emulator only, never a phone
   strings/           en.json, es.json, ar.json, bn.json — every word the app shows, the same keys in all four
@@ -76,7 +76,7 @@ Public endpoints (all anonymous). Rate limiting is a Cloudflare WAF rule in fron
 - `GET /v1/health` — answers `{ok:true}`. **No client calls it** (corrected 2026-09-20: this line used to describe a "reporting available" indicator, which was never built; the app simply queues a report it cannot send).
 - `POST /v1/provider/claim` — provider requests ownership; sends a verification email (the only email we would ever hold; see 08). **(later, v1.1; not built)**
 
-Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a service token for the pipeline):
+Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a service token for the pipeline). **Their bodies are closed schemas with size caps too, since 2026-09-20** — being behind a login is not a reason to accept a field nobody designed. An unknown field is a 400; a steward `note` is capped at 500 characters and `report_ids` at 500 ids; the request body itself is capped at 4 KB on the two resolve routes, 32 KB on the listing-status route, and 1 MB with a 20,000-id limit on `PUT /v1/steward/targets`, which used to read the body raw and uncapped. A bad listing id answers `{"error":"bad listing id"}`.
 - `GET /v1/steward/queue` — open reports (not confirmations: those only feed the badge), proposals, and per target the number of different phones that said closed (`closed_phones`; the hashes never leave D1).
 - `GET /v1/steward/aggregates` — counts and dates per target, steward decisions, and the circuit-breaker flag, for the bundle build. Closure and wrong-info counts are different phones, not reports; `open_after_closed` is the different phones that said "still open" after the latest closed report.
 - `GET /v1/steward/photos/:key` — view one photo.
@@ -136,7 +136,7 @@ Cloudflare Pages + R2 (photos only) + Workers + D1 + Access: within free/near-fr
 
 ## Observability
 
-Worker logs (the Worker logs no requests and reads no IPs), a public status line on the About screen ("Data last updated …"). Not built: pipeline run summaries in the admin tool (for now, read the GitHub Actions log), and an uptime check on `index.json`.
+**There are no Worker logs.** Workers Logs are off by configuration (`[observability.logs] enabled = false`, `invocation_logs = false`); the error and not-found handlers log nothing at all, not even the route pattern; and the only permitted `console` call is `api/src/log.ts`, whose message type is an allow-list of two fixed sentences about the nightly cron. Tests enforce both. So the only thing to watch is the public status line on the About screen ("Data last updated …") and the GitHub Actions log. Not built: pipeline run summaries in the admin tool (for now, read the GitHub Actions log), and an uptime check on `index.json`.
 
 ## Licensing
 
