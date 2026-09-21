@@ -11,7 +11,8 @@ import { loadSources } from './ingest-arcgis.js';
 import { buildIndicators, NEAR_MILES } from './indicators.js';
 import { GRID } from './ingest-basemap.js';
 import { fromIngested, fromSeed, toHsds, type Normalized } from './normalize.js';
-import { hsdsSchema, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsds, validateHsdsPrivacy, validateRows } from './validate.js';
+import { retiredPath } from './ingest-ids.js';
+import { hsdsSchema, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsds, validateHsdsPrivacy, validateIngestedIds, validateRows, type Issues } from './validate.js';
 import { readScriptRefusingHosts } from './seed-io.js';
 import { loadSigningKey, publicKeyB64, signBytes } from './sign.js';
 import { applyAggregates, fetchAggregates, pushTargets, type Aggregates } from './reports-sync.js';
@@ -46,8 +47,13 @@ export async function build(opts: BuildOptions = {}) {
 
   // 1. Load and normalize
   const parts: Normalized[] = [fromSeed(readCsv(p('data/seed/resources.csv')), readCsv(p('data/seed/schedules.csv')))];
+  // An ingested id belongs to one record of the publisher's, for good (DECISIONS 2026-09-22). Checked here, on
+  // what is committed, so an id that has moved or been reused can never reach a bundle or a pull request.
+  const idIssues: Issues[] = [];
   for (const src of loadSources().filter((s) => s.mode === 'publish')) {
-    parts.push(fromIngested(src, readCsv(p('data/ingested', `${src.id}.csv`))));
+    const ingested = readCsv(p('data/ingested', `${src.id}.csv`));
+    idIssues.push(validateIngestedIds(src.id, ingested, readCsv(retiredPath('data/ingested', src.id))));
+    parts.push(fromIngested(src, ingested));
   }
   const rows: BundleRow[] = parts.flatMap((x) => x.rows).sort((a, b) => a.id.localeCompare(b.id));
   // Report counts and visitor confirms from the write API (none until it is deployed and configured).
@@ -57,7 +63,7 @@ export async function build(opts: BuildOptions = {}) {
   const alerts = JSON.parse(readFileSync(p('data/seed/alerts.json'), 'utf8')) as Alert[];
 
   // 2. Validate
-  const issues = [validateRows(rows, todayStr, scriptRefusingHosts(readScriptRefusingHosts())), validateAlerts(alerts, new Set(rows.map((r) => r.id)))];
+  const issues = [...idIssues, validateRows(rows, todayStr, scriptRefusingHosts(readScriptRefusingHosts())), validateAlerts(alerts, new Set(rows.map((r) => r.id)))];
   const emg = validateEmergency(emergency, todayStr, !!opts.release);
   issues.push(emg);
   const services = toHsds(parts);
