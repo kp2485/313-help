@@ -56,8 +56,9 @@ And two that are plain work: the **iPhone and Android apps still hard-code "am"/
 `Format.kt`) instead of reading `clock.am`/`clock.pm` from the strings files, and **printing an Arabic screen**
 puts a bare left-to-right URL in parentheses inside right-to-left text (cosmetic).
 
-The overdose steps themselves still need a review by **DHD, MDHHS or counsel** before a public release, and the
-copy must never promise legal protection (docs/08, 10-A7).
+The six overdose steps are the ones **the City had approved** (Kyle, 2026-09-20; DECISIONS), and the screen says so:
+"Call 911 first. The Detroit Health Department approved these steps." What is still owed is the record — who approved them, when, in what document —
+which is not in this repository. The copy must never promise legal protection (docs/08, 10-A7).
 
 ### The steward backlog ([CHECKS-2026-09-20.md](CHECKS-2026-09-20.md))
 

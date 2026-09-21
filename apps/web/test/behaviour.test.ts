@@ -252,19 +252,31 @@ describe('the whole app is served with the policy the page claims, not only the 
   });
 });
 
-describe('the overdose steps claim nothing nobody has done', () => {
-  it('no review, no source, no promise — and 911 first, in all four languages', () => {
+describe('the line under the overdose steps says only what Kyle has told us', () => {
+  // Kyle, 2026-09-20: the City had these six steps approved (DECISIONS). The line names the Detroit Health
+  // Department and nobody else, keeps 911 first, and never promises anything about the law.
+  it('911 first, the Health Department and no other source, no promise, in all four languages', () => {
+    const dept: Record<string, RegExp> = { en: /Detroit Health Department approved these steps/, es: /Departamento de Salud de Detroit aprobó estos pasos/, ar: /دائرة الصحة في ديترويت/, bn: /ডেট্রয়েট স্বাস্থ্য বিভাগ/ };
     for (const l of LANGS) {
       const v = table(l)['od.review_note']!;
-      expect(v, l).toContain('911');
-      // No provenance: no guidance, no agency, no "follows", no one who checked.
-      expect(v, `${l} names a source nobody gave us`).not.toMatch(/guidance|guideline|CDC|MDHHS|DHD|SAMHSA|WHO\b|health department|salud pública|الصحة العامة|জনস্বাস্থ্য/i);
-      expect(v, `${l} claims a review that has not happened`).not.toMatch(/\b(verified|approved|verificado|aprobado)\b/i);
-      // and never a promise about the law
+      expect(v.indexOf('911'), l).toBeGreaterThanOrEqual(0);
+      expect(v.indexOf('911'), `${l}: 911 comes before anything else`).toBeLessThan(v.search(dept[l]!));
+      expect(v, l).toMatch(dept[l]!);
+      expect(v, `${l} names a source nobody gave us`).not.toMatch(/guidance|guideline|CDC|MDHHS|SAMHSA|WHO\b|doctor|médico|طبيب|ডাক্তার/i);
       expect(v, `${l} promises protection`).not.toMatch(/\blaw\b|\blegal\b|arrest|police|\bley\b|policía|قانون|আইন/i);
     }
-    // The English says plainly that nobody has checked it yet.
-    expect(table('en')['od.review_note']).toMatch(/No doctor has checked these steps yet/);
+  });
+
+  it('the six steps are the ones that were approved: not one word has changed', () => {
+    const en = table('en');
+    expect([1, 2, 3, 4, 5, 6].map((i) => en['od.s' + i])).toEqual([
+      'Call 911. Say someone is not breathing.',
+      'Try to wake them. Shout their name. Rub the middle of their chest hard.',
+      'If you have Narcan, spray it into one nostril.',
+      'If they are not breathing, give one breath every 5 seconds if you know how.',
+      'No change after 2 to 3 minutes? Give a second dose in the other nostril.',
+      'Lay them on their side. Stay with them until help comes.',
+    ]);
   });
 });
 
