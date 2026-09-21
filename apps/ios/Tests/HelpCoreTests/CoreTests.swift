@@ -13,6 +13,9 @@ import CryptoKit
 #endif
 import DetroitQuery
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking  // URLSession on Linux
+#endif
 import XCTest
 
 @testable import HelpCore
