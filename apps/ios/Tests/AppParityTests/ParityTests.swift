@@ -209,6 +209,55 @@ final class ParityTests: XCTestCase {
                       "the iPhone's SEMCOG notice differs from the web's, or is no longer written out in full")
     }
 
+    /**
+     No number a person reads is laid out by the platform.
+
+     `NumberFormatter`, `formatted()` and `String(format:)` do not agree across the two systems this repository
+     builds on: swift-corelibs-foundation ignored the fraction-digit settings that Darwin honours, so a rate came
+     out "9.4" on a Mac and "9.44" on the Linux runner (PR #10, 2026-09-21). The rules in HelpCore must give the
+     same answer everywhere, so they do their own arithmetic — and this is the guard that keeps a convenient
+     one-liner from creeping back in.
+     */
+    func testHelpCoreNeverLetsThePlatformFormatANumber() throws {
+        for file in try FileManager.default.contentsOfDirectory(atPath: Self.root.appendingPathComponent("apps/ios/Sources/HelpCore").path)
+        where file.hasSuffix(".swift") {
+            let code = withoutComments(try text("apps/ios/Sources/HelpCore/\(file)"))
+            for needle in ["NumberFormatter", ".formatted("] {
+                XCTAssertFalse(code.contains(needle),
+                               "\(file) formats a number with \(needle), which rounds differently on Linux")
+            }
+            // `String(format:)` is allowed for whole numbers — a hex byte, a two-digit hour — and never for a
+            // fractional one, which is where the two platforms part company.
+            for line in code.split(separator: "\n") where line.contains("String(format:") {
+                for spec in ["%f", "%g", "%e", "%.'"] where line.contains(spec) {
+                    XCTFail("\(file) formats a fractional number with \(spec): \(line)")
+                }
+                XCTAssertFalse(line.contains("%."), "\(file) formats a fractional number: \(line)")
+            }
+        }
+    }
+
+    /// A Swift file with its comments taken out, so a test that looks for a forbidden call does not trip over a
+    /// comment that names it in order to explain why it is forbidden.
+    private func withoutComments(_ source: String) -> String {
+        var out = "", inBlock = false, i = source.startIndex
+        while i < source.endIndex {
+            let rest = source[i...]
+            if inBlock {
+                if rest.hasPrefix("*/") { inBlock = false; i = source.index(i, offsetBy: 2) } else { i = source.index(after: i) }
+                continue
+            }
+            if rest.hasPrefix("/*") { inBlock = true; i = source.index(i, offsetBy: 2); continue }
+            if rest.hasPrefix("//") {
+                while i < source.endIndex, source[i] != "\n" { i = source.index(after: i) }
+                continue
+            }
+            out.append(source[i])
+            i = source.index(after: i)
+        }
+        return out
+    }
+
     /// The kinds of help counted for a neighborhood are the pipeline's `HELP_TOPS`, in its order. A JSON object's
     /// order does not survive being decoded into a Swift dictionary, so the iPhone keeps its own copy of the list
     /// — and a copy drifts unless something holds it (HelpCore/Hoods.swift says as much).

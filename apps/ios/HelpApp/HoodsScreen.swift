@@ -262,12 +262,12 @@ private struct HoodHelpPanel: View {
                     .fixedSize(horizontal: false, vertical: true).card()
             }
             Text(L.t(hood.help.total == 1 ? "hood.help_count_one" : "hood.help_count",
-                     ["count": String(hood.help.total), "miles": HoodFormat.number(d.nearMiles, decimals: 1, locale: L.locale)]))
+                     ["count": String(hood.help.total), "miles": HoodFormat.loose(d.nearMiles)]))
                 .font(.body).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
             let kinds = hood.help.kindsWithSomething
             if !kinds.isEmpty {
                 HoodRows(kinds.map { (L.t("add.cat." + ($0.kind == "shelter" ? "shelter.emergency" : $0.kind)),
-                                      HoodFormat.number(Double($0.count), decimals: 0, locale: L.locale), "") })
+                                      String($0.count), "") })
             }
             if !hood.help.noneListedYet.isEmpty {
                 Text(L.t("hood.none_listed", ["kinds": hood.help.noneListedYet.map { L.t("hood.kind." + $0) }.joined(separator: L.t("list.sep"))]))
@@ -277,10 +277,10 @@ private struct HoodHelpPanel: View {
             HoodRows(hoodNearestKinds.map { k in
                 let mi = hood.help.nearestMiles[k] ?? nil
                 return (L.t("hood.nearest." + k),
-                        mi.map { L.t("miles", ["miles": HoodFormat.number($0, decimals: 1, locale: L.locale)]) } ?? L.t("hood.nearest_none"),
+                        mi.map { L.t("miles", ["miles": HoodFormat.number($0, decimals: 1)]) } ?? L.t("hood.nearest_none"),
                         "")
             })
-            HoodSubHead(L.t("hood.places_head", ["miles": HoodFormat.number(d.nearMiles, decimals: 1, locale: L.locale)]))
+            HoodSubHead(L.t("hood.places_head", ["miles": HoodFormat.loose(d.nearMiles)]))
             HoodRows([(L.t("hood.parks"), plain(hood.places.parks), ""),
                       (L.t("hood.rec_centers"), plain(hood.places.recCenters), ""),
                       (L.t("hood.greenway_open"), plain(hood.places.greenwayOpen), "")]
@@ -295,9 +295,9 @@ private struct HoodHelpPanel: View {
             }
         }
     }
-    private func plain(_ n: Int) -> String { HoodFormat.number(Double(n), decimals: 0, locale: L.locale) }
+    private func plain(_ n: Int) -> String { String(n) }
     private func miles(_ m: Double?) -> String {
-        m.map { L.t("miles", ["miles": HoodFormat.number($0, decimals: 1, locale: L.locale)]) } ?? L.t("hood.none_found")
+        m.map { L.t("miles", ["miles": HoodFormat.number($0, decimals: 1)]) } ?? L.t("hood.none_found")
     }
 }
 
@@ -314,11 +314,11 @@ private struct HoodMoneyPanel: View {
                 HoodYearsTable(caption: L.t("hood.sales_caption"), d: d, hood: hood,
                                head: L.t("hood.median"), countHead: L.t("hood.sales"), missing: L.t("hood.too_few"),
                                value: { $0.medianPrice }, count: { $0.sales },
-                               fmt: { HoodFormat.money($0, locale: L.locale) })
+                               fmt: { HoodFormat.money($0) })
                 HoodYearsTable(caption: L.t("hood.permits_caption"), d: d, hood: hood,
                                head: L.t("hood.permit_cost"), countHead: L.t("hood.permits"), missing: L.t("hood.too_few_permits"),
                                value: { $0.permitCost }, count: { $0.permits },
-                               fmt: { HoodFormat.bigMoney($0, language: L.current, locale: L.locale) })
+                               fmt: { HoodFormat.bigMoney($0, language: L.current) })
                 HoodFoot(L.t("hood.money_note"))
                 if d.sources.rentals != nil {
                     HoodRows([(L.t("hood.rentals"), per1000(hood.now?.rentalCerts), cityPer1000(d.cityNow?.rentalCerts))])
@@ -329,7 +329,7 @@ private struct HoodMoneyPanel: View {
     }
     private func per1000(_ c: HoodCount?) -> String { hoodPer1000(c, parcels: hood.parcels) }
     private func cityPer1000(_ c: HoodCount?) -> String {
-        HoodFormat.rate(c, parcels: d.cityParcels).map { L.t("hood.city_per_1000", ["rate": HoodFormat.rateText($0, locale: L.locale)]) } ?? ""
+        HoodFormat.rate(c, parcels: d.cityParcels).map { L.t("hood.city_per_1000", ["rate": HoodFormat.rateText($0)]) } ?? ""
     }
 }
 
@@ -350,16 +350,16 @@ private struct HoodConditionsPanel: View {
                                    value: { HoodFormat.rate($0.blight, parcels: hood.parcels) },
                                    cityValue: { HoodFormat.rate($0.blight, parcels: d.cityParcels) },
                                    count: { $0.blight },
-                                   fmt: { HoodFormat.number($0, decimals: 0, locale: L.locale) })
+                                   fmt: { HoodFormat.number($0, decimals: 0) })
                     HoodFoot(L.t("hood.blight_note"))
                     HoodYearsTable(caption: L.t("hood.demo_caption"), d: d, hood: hood,
                                    head: L.t("hood.demolitions"), countHead: nil, missing: L.t("hood.lt5_or_none"),
                                    value: { $0.demolitions?.shown.map(Double.init) }, count: nil,
-                                   fmt: { HoodFormat.number($0, decimals: 0, locale: L.locale) })
+                                   fmt: { HoodFormat.number($0, decimals: 0) })
                     HoodYearsTable(caption: L.t("hood.issues_caption"), d: d, hood: hood,
                                    head: L.t("hood.issue_days"), countHead: L.t("hood.issues"), missing: L.t("hood.too_few_permits"),
                                    value: { $0.issueDays }, count: { $0.issues },
-                                   fmt: { L.t("hood.days", ["n": HoodFormat.number($0, decimals: 0, locale: L.locale)]) })
+                                   fmt: { L.t("hood.days", ["n": HoodFormat.number($0, decimals: 0)]) })
                     // The City's own names for the kinds of problem it counts: one English run inside our sentence.
                     HoodFoot(L.t("hood.issues_note", ["types": ltr((d.issueTypes ?? []).joined(separator: L.t("list.sep")))]))
                     if d.sources.fires != nil {
@@ -368,7 +368,7 @@ private struct HoodConditionsPanel: View {
                                        value: { HoodFormat.rate($0.fires, parcels: hood.parcels) },
                                        cityValue: { HoodFormat.rate($0.fires, parcels: d.cityParcels) },
                                        count: { $0.fires },
-                                       fmt: { HoodFormat.number($0, decimals: 1, locale: L.locale) })
+                                       fmt: { HoodFormat.number($0, decimals: 1) })
                         HoodFoot(L.t("hood.fire_note"))
                         DisclosureGroup(L.t("hood.fire_types")) {
                             Text(ltr((d.fireTypes ?? []).joined(separator: "; "))).font(.footnote).foregroundStyle(Color.muted)
@@ -379,13 +379,13 @@ private struct HoodConditionsPanel: View {
                     if d.sources.vacant != nil {
                         HoodRows([(L.t("hood.vacant", ["from": prettyDate(d.vacantPeriod?.first ?? ""), "to": prettyDate(d.vacantPeriod?.last ?? "")]),
                                    hoodPer1000(hood.now?.vacantReg, parcels: hood.parcels),
-                                   HoodFormat.rate(d.cityNow?.vacantReg, parcels: d.cityParcels).map { L.t("hood.city_per_1000", ["rate": HoodFormat.rateText($0, locale: L.locale)]) } ?? "")])
+                                   HoodFormat.rate(d.cityNow?.vacantReg, parcels: d.cityParcels).map { L.t("hood.city_per_1000", ["rate": HoodFormat.rateText($0)]) } ?? "")])
                         HoodFoot(L.t("hood.vacant_note"))
                     }
                     if d.sources.pavement != nil {
                         HoodRows([(L.t("hood.roads", ["from": String(d.roadsYears?.first ?? 0), "to": String(d.roadsYears?.last ?? 0)]),
                                    roadsValue,
-                                   d.cityNow?.roads?.poorPct.map { L.t("hood.city_pct", ["pct": HoodFormat.number($0, decimals: 0, locale: L.locale)]) } ?? "")])
+                                   d.cityNow?.roads?.poorPct.map { L.t("hood.city_pct", ["pct": HoodFormat.number($0, decimals: 0)]) } ?? "")])
                         HoodFoot(L.t("hood.roads_note"))
                     }
                 }.card()
@@ -395,8 +395,8 @@ private struct HoodConditionsPanel: View {
     private var roadsValue: String {
         guard let r = hood.now?.roads else { return L.t("hood.roads_none") }
         guard let pct = r.poorPct else { return L.t("hood.roads_few") }
-        return L.t("hood.roads_pct", ["pct": HoodFormat.number(pct, decimals: 0, locale: L.locale),
-                                      "miles": HoodFormat.number(r.miles ?? 0, decimals: 1, locale: L.locale)])
+        return L.t("hood.roads_pct", ["pct": HoodFormat.loose(pct),
+                                      "miles": HoodFormat.number(r.miles ?? 0, decimals: 1)])
     }
 }
 
@@ -432,10 +432,10 @@ private struct HoodCrashPanel: View {
         }
     }
     private func show(_ c: HoodCount) -> String {
-        HoodFormat.count(c, locale: L.locale, none: L.t("hood.none_recorded"), fewerThanFive: L.t("hood.lt5"))
+        HoodFormat.count(c, none: L.t("hood.none_recorded"), fewerThanFive: L.t("hood.lt5"), grouped: true)
     }
     private func city(_ c: HoodCount?) -> String {
-        c?.shown.map { L.t("hood.crash_city", ["count": HoodFormat.number(Double($0), decimals: 0, locale: L.locale)]) } ?? ""
+        c?.shown.map { L.t("hood.crash_city", ["count": HoodFormat.grouped(Double($0))]) } ?? ""
     }
 }
 
@@ -555,10 +555,10 @@ private func hoodPer1000(_ c: HoodCount?, parcels: Int?) -> String {
     if c == .suppressed { return L.t("hood.lt5") }
     let n = c.shown ?? 0
     guard let r = HoodFormat.rate(c, parcels: parcels) else {
-        return HoodFormat.number(Double(n), decimals: 0, locale: L.locale)
+        return String(n)
     }
-    return L.t("hood.per_1000", ["count": HoodFormat.number(Double(n), decimals: 0, locale: L.locale),
-                                 "rate": HoodFormat.rateText(r, locale: L.locale)])
+    return L.t("hood.per_1000", ["count": String(n),
+                                 "rate": HoodFormat.rateText(r)])
 }
 
 /**
@@ -589,7 +589,7 @@ private struct HoodYearsTable: View {
         let v = value(mine), cv = (cityValue ?? value)(theirs)
         return (year: Int(year) == d.partialYear ? L.t("hood.so_far", ["year": year]) : year,
                 value: v.map(fmt) ?? missing,
-                count: count.map { HoodFormat.count($0(mine), locale: L.locale, none: L.t("hood.none_recorded"), fewerThanFive: L.t("hood.lt5")) },
+                count: count.map { HoodFormat.count($0(mine), none: L.t("hood.none_recorded"), fewerThanFive: L.t("hood.lt5")) },
                 city: cv.map(fmt) ?? "")
     }
 

@@ -151,35 +151,91 @@ final class HoodTests: XCTestCase {
     // MARK: - the numbers, as they are written
 
     func testACountUnderFiveIsWordsAndNeverADigit() {
-        let words = HoodFormat.count(.suppressed, locale: en, none: "none recorded", fewerThanFive: "fewer than 5")
+        let words = HoodFormat.count(.suppressed, none: "none recorded", fewerThanFive: "fewer than 5")
         XCTAssertEqual(words, "fewer than 5")
         XCTAssertNil(HoodCount.suppressed.shown, "a hidden count has no number to print")
-        XCTAssertEqual(HoodFormat.count(nil, locale: en, none: "none recorded", fewerThanFive: "fewer than 5"), "none recorded")
-        XCTAssertEqual(HoodFormat.count(.number(1078), locale: en, none: "x", fewerThanFive: "y"), "1,078")
+        XCTAssertEqual(HoodFormat.count(nil, none: "none recorded", fewerThanFive: "fewer than 5"), "none recorded")
+        // A year table writes a count plainly, as the web's `String(c)` does; the crash panel groups it, as the
+        // web's `Intl.NumberFormat` does.
+        XCTAssertEqual(HoodFormat.count(.number(1078), none: "x", fewerThanFive: "y"), "1078")
+        XCTAssertEqual(HoodFormat.count(.number(2024), none: "x", fewerThanFive: "y", grouped: true), "2,024")
+    }
+
+    /**
+     Every number is laid out by this package's own arithmetic, never by `NumberFormatter` — which rounds
+     differently on Linux from Darwin and cost this branch a red CI run (2026-09-21). These are the boundaries,
+     and each expectation is the string a browser's `toFixed` / `Intl` produces for the same input.
+     */
+    func testEveryNumberIsRoundedTheSameWayOnEveryPlatform() {
+        // `toFixed(1)`: half away from zero — on the binary double, which is why 0.95 and 9.95 go DOWN.
+        XCTAssertEqual(HoodFormat.number(0.95, decimals: 1), "0.9")
+        XCTAssertEqual(HoodFormat.number(9.94, decimals: 1), "9.9")
+        XCTAssertEqual(HoodFormat.number(9.95, decimals: 1), "9.9")
+        XCTAssertEqual(HoodFormat.number(9.99, decimals: 1), "10.0", "trailing zeros are kept")
+        XCTAssertEqual(HoodFormat.number(10.04, decimals: 1), "10.0")
+        XCTAssertEqual(HoodFormat.number(9.44, decimals: 1), "9.4", "the case that failed on Linux")
+        // `toFixed(0)`
+        XCTAssertEqual(HoodFormat.number(0.5), "1")
+        XCTAssertEqual(HoodFormat.number(999.5), "1000", "away from zero, and ungrouped")
+        XCTAssertEqual(HoodFormat.number(1000), "1000")
+        XCTAssertEqual(HoodFormat.number(1_234_567), "1234567")
+        XCTAssertEqual(HoodFormat.number(-1234.5), "-1235")
+        XCTAssertEqual(HoodFormat.number(-9.95, decimals: 1), "-9.9")
+        XCTAssertEqual(HoodFormat.number(0), "0")
+        XCTAssertEqual(HoodFormat.number(-0.4), "0", "a rounded-away minus is not printed")
+        // Grouped, the way the crash panel writes a count.
+        XCTAssertEqual(HoodFormat.grouped(1_234_567), "1,234,567")
+        XCTAssertEqual(HoodFormat.grouped(999), "999")
+        XCTAssertEqual(HoodFormat.grouped(1000), "1,000")
+        XCTAssertEqual(HoodFormat.grouped(-1_234_567), "-1,234,567")
+        // What a JavaScript template writes when the web hands a raw number to a sentence.
+        XCTAssertEqual(HoodFormat.loose(0.5), "0.5")
+        XCTAssertEqual(HoodFormat.loose(2), "2")
+        XCTAssertEqual(HoodFormat.loose(45), "45")
+        // Nothing here ever produces a digit that is not Latin.
+        let native = CharacterSet(charactersIn: "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹০১২৩৪৫৬৭৮৯")
+        for s in [HoodFormat.number(1_234_567), HoodFormat.grouped(1_234_567), HoodFormat.money(85_000),
+                  HoodFormat.bigMoney(107_838_606, language: "ar"), HoodFormat.rateText(9.44)] {
+            XCTAssertNil(s.rangeOfCharacter(from: native), s)
+        }
     }
 
     func testDollarsLeadWithTheSignInEveryLanguage() {
-        for lang in ["en_US", "es_US", "ar@numbers=latn", "bn@numbers=latn"] {
-            let s = HoodFormat.money(85_000, locale: Locale(identifier: lang))
-            XCTAssertTrue(s.hasPrefix("$"), "\(lang) wrote \(s)")
-            XCTAssertTrue(s.contains("85"), "\(lang) wrote \(s)")
-            XCTAssertFalse(s.contains("."), "no cents on a house price: \(s)")
-            // Western digits, always (DECISIONS 2026-09-20).
-            XCTAssertNil(s.rangeOfCharacter(from: CharacterSet(charactersIn: "٠١٢٣٤٥٦٧٨٩০১২৩৪৫৬৭৮৯")), "\(lang) wrote \(s)")
-        }
-        XCTAssertEqual(HoodFormat.money(85_000, locale: en), "$85,000")
+        XCTAssertEqual(HoodFormat.money(85_000), "$85,000")
+        XCTAssertEqual(HoodFormat.money(1_234_567), "$1,234,567")
+        XCTAssertEqual(HoodFormat.money(999.5), "$1,000", "whole dollars, rounded away from zero")
+        XCTAssertEqual(HoodFormat.money(0.5), "$1")
+        XCTAssertEqual(HoodFormat.money(0), "$0")
+        XCTAssertEqual(HoodFormat.money(-85_000), "-$85,000", "the minus goes in front of the sign")
+        // The amount does not depend on the language: dollars are written the way the sale record writes them.
+        XCTAssertFalse(HoodFormat.money(85_000).contains("."), "no cents on a house price")
     }
 
-    func testABigCostIsWrittenInWords() {
-        XCTAssertEqual(HoodFormat.bigMoney(107_838_606, language: "en", locale: en), "$107.8 million")
-        XCTAssertEqual(HoodFormat.bigMoney(20_486_576, language: "en", locale: en), "$20.5 million")
-        XCTAssertEqual(HoodFormat.bigMoney(2_000_000, language: "en", locale: en), "$2 million")
-        XCTAssertEqual(HoodFormat.bigMoney(1_500, language: "en", locale: en), "$1.5 thousand")
-        XCTAssertEqual(HoodFormat.bigMoney(1_200_000_000, language: "en", locale: en), "$1.2 billion")
-        XCTAssertEqual(HoodFormat.bigMoney(850, language: "en", locale: en), "$850", "under a thousand is a plain price")
-        XCTAssertEqual(HoodFormat.bigMoney(2_000_000, language: "es", locale: Locale(identifier: "es_US")), "$2 millones")
-        // A language with no words of its own here falls back to English, with the sign still in front.
-        XCTAssertEqual(HoodFormat.bigMoney(2_000_000, language: "ar", locale: Locale(identifier: "ar@numbers=latn")), "$2 million")
+    /// `Intl` has no long words for a currency in compact notation, whatever `compactDisplay` asks for — a
+    /// browser writes "$107.8M" — so this does too. Spanish keeps a space and has no "B" under a million million.
+    func testABigCostIsWrittenShort() {
+        XCTAssertEqual(HoodFormat.bigMoney(107_838_606, language: "en"), "$107.8M")
+        XCTAssertEqual(HoodFormat.bigMoney(20_486_576, language: "en"), "$20.5M")
+        XCTAssertEqual(HoodFormat.bigMoney(2_000_000, language: "en"), "$2M", "no pointless .0")
+        XCTAssertEqual(HoodFormat.bigMoney(95_989_218, language: "en"), "$96M")
+        XCTAssertEqual(HoodFormat.bigMoney(1_500, language: "en"), "$1.5K")
+        XCTAssertEqual(HoodFormat.bigMoney(12_345, language: "en"), "$12.3K")
+        XCTAssertEqual(HoodFormat.bigMoney(99_950, language: "en"), "$100K")
+        XCTAssertEqual(HoodFormat.bigMoney(999_999, language: "en"), "$1M", "rounding carries it up a step")
+        XCTAssertEqual(HoodFormat.bigMoney(1_200_000_000, language: "en"), "$1.2B")
+        XCTAssertEqual(HoodFormat.bigMoney(1_250_000_000_000, language: "en"), "$1.3T")
+        XCTAssertEqual(HoodFormat.bigMoney(850, language: "en"), "$850", "under a thousand is a plain price")
+        XCTAssertEqual(HoodFormat.bigMoney(0, language: "en"), "$0")
+        XCTAssertEqual(HoodFormat.bigMoney(-2_000_000, language: "en"), "-$2M")
+        // Spanish, as `es-US` writes it.
+        XCTAssertEqual(HoodFormat.bigMoney(107_838_606, language: "es"), "$107.8 M")
+        XCTAssertEqual(HoodFormat.bigMoney(999_999, language: "es"), "$1 M")
+        XCTAssertEqual(HoodFormat.bigMoney(1_200_000_000, language: "es"), "$1200 M", "es-US has no short thousand-million")
+        XCTAssertEqual(HoodFormat.bigMoney(1_250_000_000_000, language: "es"), "$1.3 B")
+        // A language whose own rules would move the sign to the end of the line falls back to English, as the web's
+        // `dollars()` does.
+        XCTAssertEqual(HoodFormat.bigMoney(2_000_000, language: "ar"), "$2M")
+        XCTAssertEqual(HoodFormat.bigMoney(2_000_000, language: "bn"), "$2M")
     }
 
     func testARateNeedsACountWeCanShowAndABaseWeCanDefend() {
@@ -188,8 +244,12 @@ final class HoodTests: XCTestCase {
         XCTAssertNil(HoodFormat.rate(.number(3), parcels: 99), "fewer than a hundred lots is not a base")
         XCTAssertNil(HoodFormat.rate(.number(3), parcels: nil))
         XCTAssertNil(HoodFormat.rate(nil, parcels: 10_244))
-        XCTAssertEqual(HoodFormat.rateText(105.23, locale: en), "105")
-        XCTAssertEqual(HoodFormat.rateText(9.44, locale: en), "9.4", "one decimal under ten")
+        XCTAssertEqual(HoodFormat.rateText(105.23), "105")
+        XCTAssertEqual(HoodFormat.rateText(9.44), "9.4", "one decimal under ten")
+        XCTAssertEqual(HoodFormat.rateText(0.95), "0.9")
+        XCTAssertEqual(HoodFormat.rateText(9.99), "10.0", "still under ten when it is measured")
+        XCTAssertEqual(HoodFormat.rateText(10.04), "10")
+        XCTAssertEqual(HoodFormat.rateText(999.5), "1000")
     }
 
     // MARK: - the real file

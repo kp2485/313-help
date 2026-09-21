@@ -424,50 +424,158 @@ extension HoodHelp {
 // MARK: - the formatting rules
 
 /**
- How a number is written on a neighborhood screen, as pure functions — the Swift half of the money, count and
- rate rules in apps/web/src/hoods.ts.
+ How a number is written on a neighborhood screen, as pure arithmetic and string building — the Swift half of the
+ money, count and rate rules in apps/web/src/hoods.ts.
 
- Dollars are written the way the sale record and the permit write them: "$85,000", "$1.2 million", with the sign
- in front and Western digits, in every one of the app's languages (DECISIONS 2026-09-20, and the same rule the
- web applies by falling back to `en-US` whenever a language would move the sign to the far end). Counts, which
- carry no unit, follow the language.
+ **Nothing here goes through `NumberFormatter`, `formatted()` or `String(format:)`.** Those belong to the
+ platform, and the platform is not the same on both sides of CI: swift-corelibs-foundation on Linux does not
+ honour the fraction-digit settings Darwin does, so `9.44` came out "9.4" on a Mac and "9.44" on the Linux runner
+ (PR #10, 2026-09-21). What a person reads must not depend on which machine built the app, so the rounding is
+ done with `.rounded()` — half away from zero, which is what JavaScript's `toFixed` and `Intl` do — and the
+ digits are laid out by hand. Western digits, always (DECISIONS 2026-09-20).
+
+ Dollars are written the way the sale record and the permit write them: "$85,000", "$107.8M", with the sign in
+ front, in every one of the app's languages. That is not our invention — it is what `Intl` gives for `en-US`, and
+ the web falls back to `en-US` whenever a language would move the currency sign to the far end of the line, which
+ Arabic and Bengali both do. Spanish keeps the sign in front and so keeps its own spacing: "$107.8 M".
  */
 public enum HoodFormat {
-    /// The scale words, for the one language that keeps the sign in front and so keeps its own words. Every other
-    /// language falls back to English here for the same reason the web's `dollars()` does: with the amount in
-    /// Arabic or Bengali the currency sign lands at the end of the line, and the whole point of this rule is that
-    /// it does not. Spanish writes "$1.2 millones", which is what `es-US` gives on the web.
-    static let scaleWords: [String: [String]] = [
-        "en": ["thousand", "million", "billion", "trillion"],
-        "es": ["mil", "millones", "mil millones", "billones"],
-    ]
 
-    /// "$85,000". Western digits and a leading sign, whatever the language (see the note above).
-    public static func money(_ n: Double, locale: Locale) -> String {
-        let f = NumberFormatter()
-        f.numberStyle = .currency
-        f.currencyCode = "USD"
-        f.locale = locale
-        f.maximumFractionDigits = 0
-        f.minimumFractionDigits = 0
-        let mine = f.string(from: NSNumber(value: n)) ?? ""
-        if mine.hasPrefix("$") { return mine }
-        f.locale = Locale(identifier: "en_US")
-        return f.string(from: NSNumber(value: n)) ?? "$\(Int(n.rounded()))"
+    // MARK: laying out the digits
+
+    /// Thousands separators, by hand: "1234567" becomes "1,234,567". The comma is `en-US`'s, which is what the
+    /// web shows in English, Spanish and Arabic alike; Bengali groups by lakh above 99,999, and the only grouped
+    /// numbers on this screen are crash counts in the hundreds, which are written the same either way.
+    static func grouping(_ digits: String) -> String {
+        guard digits.count > 3 else { return digits }
+        var out = "", n = 0
+        for ch in digits.reversed() {
+            if n > 0 && n % 3 == 0 { out.append(",") }
+            out.append(ch)
+            n += 1
+        }
+        return String(out.reversed())
     }
 
-    /// "$1.2 million": the permit cost of a whole year, where the exact dollar is noise and the size is the fact.
-    /// Under a thousand it is simply `money`.
-    public static func bigMoney(_ n: Double, language: String, locale: Locale) -> String {
-        let words = scaleWords[language] ?? scaleWords["en"]!
+    /**
+     `|x|` multiplied by `10^places` and rounded to a whole number, **exactly** — the integer JavaScript's
+     `toFixed` picks: the one closest to the true value of the double, and the larger of the two when it is
+     caught exactly between them.
+
+     It has to be exact, because `x * 10` is not. The double nearest to 0.95 is a hair BELOW it
+     (0.94999999999999995559…), so `toFixed(1)` writes "0.9" — but `0.95 * 10` in floating point rounds to
+     exactly 9.5, which then rounds up to "1.0". One digit, two answers, from the same number. So the value is
+     taken apart into the integer and the power of two it really is (`x = significand × 2^exponent`) and the
+     scaling is done in whole numbers, where nothing can drift.
+
+     `nil` when the number is too large or too small for that arithmetic to fit in 64 bits — far outside
+     anything a neighborhood screen shows, and the caller then falls back to plain floating point.
+     */
+    static func scaledDigits(_ x: Double, places: Int) -> UInt64? {
+        guard x.isFinite, x >= 0 else { return nil }
+        guard (0...3).contains(places) else { return nil }
+        // Zero, and anything too small to have a leading bit of its own, round to nothing at three places or fewer.
+        guard x.isNormal else { return 0 }
+        let pow10: UInt64 = [1, 10, 100, 1000][places]
+        let significand = x.significandBitPattern | (1 << 52)      // the implicit leading bit, restored
+        let exponent = x.exponent - 52                             // x == significand × 2^exponent, exactly
+        let (numerator, overflowed) = significand.multipliedReportingOverflow(by: pow10)
+        guard !overflowed else { return nil }
+        if exponent >= 0 {
+            guard exponent < 64 else { return nil }
+            let (whole, over) = numerator.multipliedReportingOverflow(by: 1 << UInt64(exponent))
+            return over ? nil : whole                              // a whole number already: nothing to round
+        }
+        let shift = -exponent
+        // A shift this big means the number is under 2^-11 — smaller than half of the last place three decimals
+        // can hold — so it rounds to nothing, and there is nothing to divide.
+        guard shift < 64 else { return 0 }
+        let denominator: UInt64 = 1 << UInt64(shift)
+        let quotient = numerator / denominator, remainder = numerator % denominator
+        // Half away from zero, which for a magnitude is `toFixed`'s "pick the larger n".
+        let (twice, over) = remainder.multipliedReportingOverflow(by: 2)
+        return (over || twice >= denominator) ? quotient + 1 : quotient
+    }
+
+    /**
+     `n` to exactly `decimals` places, the way JavaScript's `toFixed` writes it: rounded half away from zero,
+     trailing zeros kept ("10.0"), grouped only when asked.
+     */
+    static func fixed(_ n: Double, decimals: Int, grouped: Bool) -> String {
+        guard n.isFinite else { return "0" }
+        let places = max(0, min(3, decimals))
+        let unit: UInt64 = [1, 10, 100, 1000][places]
+        guard let whole = scaledDigits(abs(n), places: places) else {
+            // Nothing this screen shows reaches here; a number that does is printed rather than dropped.
+            return String(n)
+        }
+        let sign = n < 0 && whole > 0 ? "-" : ""
+        var text = String(whole / unit)
+        if grouped { text = grouping(text) }
+        guard places > 0 else { return sign + text }
+        let frac = String(whole % unit)
+        return sign + text + "." + String(repeating: "0", count: places - frac.count) + frac
+    }
+
+    /// A number to a fixed number of places, ungrouped: `toFixed` on the web, which is how every number in a year
+    /// table, every distance and every percentage is written there.
+    public static func number(_ n: Double, decimals: Int = 0) -> String { fixed(n, decimals: decimals, grouped: false) }
+
+    /// A number with thousands separators — what `Intl.NumberFormat` gives, and what the web uses for the crash
+    /// counts and the whole-city figure beside them.
+    public static func grouped(_ n: Double, decimals: Int = 0) -> String { fixed(n, decimals: decimals, grouped: true) }
+
+    /// A number written the way a JavaScript template writes one — `${0.5}` is "0.5" and `${2}` is "2" — for the
+    /// few values the web drops straight into a sentence without rounding them first: how far "nearby" reaches,
+    /// the share of main streets rated poor, the days a reported problem took to close.
+    public static func loose(_ n: Double) -> String {
+        n == n.rounded() && abs(n) < 9e15 ? fixed(n, decimals: 0, grouped: false) : fixed(n, decimals: 1, grouped: false)
+    }
+
+    // MARK: money
+
+    /// "$85,000": whole dollars, grouped, with the sign in front of the amount and the minus in front of that.
+    public static func money(_ n: Double) -> String {
+        let digits = fixed(abs(n), decimals: 0, grouped: true)
+        return (n < 0 && digits != "0" ? "-" : "") + "$" + digits
+    }
+
+    /// The scale suffixes. `Intl` has no long words for a **currency** in compact notation — ask it for
+    /// `compactDisplay: 'long'` with `style: 'currency'` and CLDR hands back the short form anyway — so the web
+    /// renders "$107.8M", and so do we. Spanish puts a space before the suffix and has no short form for a
+    /// thousand million: `es-US` writes $1.2 billion as "$1200 M", keeping "B" for a million million.
+    static func scaleSteps(_ language: String) -> [(value: Double, suffix: String)] {
+        language == "es"
+            ? [(1e12, "B"), (1e6, "M"), (1e3, "K")]
+            : [(1e12, "T"), (1e9, "B"), (1e6, "M"), (1e3, "K")]
+    }
+
+    /// "$107.8M": a whole year's permit cost, where the exact dollar is noise and the size is the fact. Under a
+    /// thousand it is a plain price. One decimal at most, and never a pointless ".0".
+    public static func bigMoney(_ n: Double, language: String) -> String {
         let magnitude = abs(n)
-        let steps: [(Double, String)] = [(1e12, words[3]), (1e9, words[2]), (1e6, words[1]), (1e3, words[0])]
-        guard let step = steps.first(where: { magnitude >= $0.0 }) else { return money(n, locale: locale) }
-        let scaled = (n / step.0 * 10).rounded() / 10
-        // One decimal at most, and never a pointless ".0".
-        let digits = scaled == scaled.rounded() ? String(Int(scaled)) : String(format: "%.1f", scaled)
-        return "$" + digits + " " + step.1
+        let sign = n < 0 ? "-" : ""
+        let steps = scaleSteps(language)
+        let space = language == "es" ? " " : ""
+        guard var step = steps.first(where: { magnitude >= $0.value }) else {
+            return sign + "$" + trimmed(magnitude, decimals: 1)      // "$850", "$999.5"
+        }
+        // Rounding can carry a number over its own step — 999,999 rounds to "1000K", which nobody writes — so it
+        // moves up, but only to a step exactly a thousand times this one. Spanish has no such step between a
+        // million and a million million, and writes "$1200 M" there, exactly as `es-US` does.
+        if (scaledDigits(magnitude / step.value, places: 1) ?? 0) >= 10_000,
+           let next = steps.first(where: { $0.value == step.value * 1000 }) { step = next }
+        return sign + "$" + trimmed(magnitude / step.value, decimals: 1) + space + step.suffix
     }
+
+    /// One decimal at most, with a bare ".0" dropped: "107.8", "2", "1200".
+    static func trimmed(_ n: Double, decimals: Int) -> String {
+        let text = fixed(n, decimals: decimals, grouped: false)
+        guard text.hasSuffix(".0") else { return text }
+        return String(text.dropLast(2))
+    }
+
+    // MARK: rates and counts
 
     /// Per 1,000 lots. No rate without a count we can show AND a base we can defend: a hidden count has no rate,
     /// and neither has a neighborhood with fewer than a hundred lots in it (honesty rules 2 and 3).
@@ -476,20 +584,8 @@ public enum HoodFormat {
         return Double(n) / Double(p) * 1000
     }
 
-    /// A rate as it is printed: one decimal under ten, none above it.
-    public static func rateText(_ r: Double, locale: Locale) -> String {
-        number(r, decimals: r < 10 ? 1 : 0, locale: locale)
-    }
-
-    /// A plain number in the phone's language (Western digits everywhere: `L.locale`).
-    public static func number(_ n: Double, decimals: Int, locale: Locale) -> String {
-        let f = NumberFormatter()
-        f.numberStyle = .decimal
-        f.locale = locale
-        f.maximumFractionDigits = decimals
-        f.minimumFractionDigits = decimals
-        return f.string(from: NSNumber(value: n)) ?? String(n)
-    }
+    /// A rate as it is printed: one decimal under ten, none above it. The web's `fmtRate`, ungrouped as there.
+    public static func rateText(_ r: Double) -> String { number(r, decimals: r < 10 ? 1 : 0) }
 
     /**
      A count as a person reads it: the number, "fewer than 5" when the pipeline hid it, or "none recorded" when
@@ -498,11 +594,11 @@ public enum HoodFormat {
 
      There is no branch that turns a hidden count into a digit. That is the point of it.
      */
-    public static func count(_ c: HoodCount?, locale: Locale, none: String, fewerThanFive: String) -> String {
+    public static func count(_ c: HoodCount?, none: String, fewerThanFive: String, grouped useGrouping: Bool = false) -> String {
         switch c {
         case .none: return none
         case .suppressed: return fewerThanFive
-        case .number(let n): return number(Double(n), decimals: 0, locale: locale)
+        case .number(let n): return fixed(Double(n), decimals: 0, grouped: useGrouping)
         }
     }
 }
