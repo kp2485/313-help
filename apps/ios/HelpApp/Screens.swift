@@ -159,8 +159,9 @@ struct AboutView: View {
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 10) {
-                ForEach([1, 2, 3], id: \.self) { n in
-                    Text(L.t("about.p\(n)")).font(.body).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+                // Who this is not from comes second, straight after what the app is (Kyle, 2026-09-20).
+                ForEach(["about.p1", "about.independent", "about.p2", "about.p3"], id: \.self) { key in
+                    Text(L.t(key)).font(.body).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
                 }
             }.card()
             if let i = store.bundle?.index {

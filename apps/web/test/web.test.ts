@@ -836,12 +836,16 @@ describe('privacy and copy rules, checked against the source', () => {
     expect(css).not.toMatch(/\.tabs \{[^}]*grid-template-columns:repeat\(\d/);   // a fixed count left an empty column
     expect(main).toContain("const shownTabs = () => TABS.filter((x) => x.id !== 'events' || upcoming(1).length > 0);");
   });
-  it('the About paragraphs the screen asks for all exist, in both languages', () => {
-    // They are built in a loop (about.p1, about.p2, …); a hole would print the key itself on the screen.
-    const n = Number(/\[([\d, ]+)\]\.map\(\(n\) => `<p>\$\{T\('about\.p' \+ n\)\}<\/p>`\)/.exec(main)![1]!.split(',').pop()!.trim());
-    const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
-    for (let i = 1; i <= n; i++) { expect(strings[`about.p${i}`], `en about.p${i}`).toBeTypeOf('string'); expect(es[`about.p${i}`], `es about.p${i}`).toBeTypeOf('string'); }
-    expect(strings[`about.p${n + 1}`], 'a paragraph the screen never shows').toBeUndefined();
+  it('the About paragraphs the screen asks for all exist, in every language, and say whose app this is not', () => {
+    // A hole would print the key itself on the screen. The second paragraph is the independence line (Kyle, 2026-09-20).
+    const keys = /\[((?:'about\.[\w.]+',? ?)+)\]\.map\(\(k\) => `<p>\$\{T\(k\)\}<\/p>`\)/.exec(main)![1]!.split(',').map((k) => k.trim().replace(/'/g, ''));
+    expect(keys).toEqual(['about.p1', 'about.independent', 'about.p2', 'about.p3']);
+    for (const l of ['en', 'es', 'ar', 'bn']) {
+      const tbl = JSON.parse(readFileSync(join(root, `strings/${l}.json`), 'utf8')) as Record<string, string>;
+      for (const k of keys) expect(tbl[k], `${l} ${k}`).toBeTypeOf('string');
+      for (const name of ['DDOT', 'SMART']) expect(tbl['about.independent'], l).toContain(name);
+    }
+    expect(strings['about.independent']).toBe('This is an independent project. It is not from the City of Detroit, DDOT, SMART or the Health Department.');
   });
   it('never writes to localStorage, sessionStorage, or cookies, and never sends anything', () => {
     for (const f of ['main.ts', 'data.ts', 'needs.ts', 'verify.ts', 'map.ts', 'hoods.ts', 'saved.ts', 'links.ts', 'outbox.ts', 'phone.ts', 'keys.ts']) {

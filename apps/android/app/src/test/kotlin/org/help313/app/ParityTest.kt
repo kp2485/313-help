@@ -115,7 +115,7 @@ class ParityTest {
         // The keys the app builds rather than writes out.
         val built = ArrayList<String>()
         for (i in 1..6) built += "od.s$i"
-        for (k in listOf("about.p1", "about.p2", "about.data")) built += k
+        for (k in listOf("about.p1", "about.independent", "about.p2", "about.p3", "about.data")) built += k
         for (i in 1..5) built += "privacy.phone_$i"
         for (part in listOf("title", "body", "label")) built += "link.beds.safebeds.$part"
         for (id in CATEGORIES.map { it.first }) built += "cat.$id"

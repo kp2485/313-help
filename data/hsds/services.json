@@ -14253,7 +14253,13 @@
       "id": "loc_detroit_medical_children_s_hospital_of_michigan_emergenc"
      }
     },
-    "phones": [],
+    "phones": [
+     {
+      "id": "5f7e9449-bd3d-559a-a615-87d7b9f845ea",
+      "number": "313-745-5437",
+      "description": "Hospital main line, 745-KIDS"
+     }
+    ],
     "schedules": [],
     "x_detroit": {
      "id": "sal_detroit_medical_children_s_hospital_of_michigan_emergenc",
@@ -14263,7 +14269,7 @@
      "flags": [
       "walk_in"
      ],
-     "notice": "In an emergency call 911. The hospital's own page prints its number only as (313) 745-KIDS, so no number is listed here yet.",
+     "notice": "In an emergency call 911. The hospital prints its number as (313) 745-KIDS. On a phone keypad that is 313-745-5437.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "web",
      "last_confirmed_at": null,

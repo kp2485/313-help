@@ -675,7 +675,7 @@ function privacy(): string {
 }
 function about(): string {
   const i = bundle?.index;
-  return `<main>${langBtn()}${[1, 2, 3].map((n) => `<p>${T('about.p' + n)}</p>`).join('')}
+  return `<main>${langBtn()}${['about.p1', 'about.independent', 'about.p2', 'about.p3'].map((k) => `<p>${T(k)}</p>`).join('')}
     ${i ? `<p class="foot">${T('about.data', { version: `⁦${i.version}⁩`, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
     <ul class="rows">${rowLink({ v: 'privacy' }, 'shield', t('privacy.title'), t('privacy.sub'))}</ul>
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul>

@@ -330,6 +330,7 @@
   "gw.map_label": "Map of the Joe Louis Greenway. Solid lines are open. Dashed lines are being built or planned.",
   "about.title": "About this app",
   "about.p1": "This app lists free help from the City of Detroit and community groups. Info can change. If it's an emergency, call 911.",
+  "about.independent": "This is an independent project. It is not from the City of Detroit, DDOT, SMART or the Health Department.",
   "about.p2": "We don't collect your name, number, or location. There are no accounts. What you tap stays on this phone.",
   "about.data": "List version {version}, made {date}.",
   "about.sig_ok": "This list is signed, and the signature checked out.",

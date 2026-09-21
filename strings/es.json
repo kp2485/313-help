@@ -330,6 +330,7 @@
   "gw.map_label": "Mapa del Joe Louis Greenway. Las líneas enteras están abiertas. Las líneas cortadas están en construcción o planeadas.",
   "about.title": "Sobre esta app",
   "about.p1": "Esta app tiene una lista de ayuda gratis de la Ciudad de Detroit y de grupos de la comunidad. La información puede cambiar. Si es una emergencia, llame al 911.",
+  "about.independent": "Este es un proyecto independiente. No es de la Ciudad de Detroit, DDOT, SMART ni del Departamento de Salud.",
   "about.p2": "No guardamos su nombre, su número ni su ubicación. No hay cuentas. Lo que toca se queda en este teléfono.",
   "about.data": "Versión de la lista {version}, hecha el {date}.",
   "about.sig_ok": "Esta lista tiene firma, y la firma es correcta.",

@@ -61,11 +61,11 @@ then read one at a time. No machine ever clicked a challenge. The remaining 86 l
 agencies' own data layers — 60 Detroit Health Department stations and 26 Wayne County ones — and have had **no
 per-row check at all**: they carry their layer's own date and a badge that names only the list they came from.
 
-Not every row carries every fact, and the app never pretends otherwise. **43 of the 531 have no phone number**,
+Not every row carries every fact, and the app never pretends otherwise. **42 of the 531 have no phone number**,
 because their owner publishes none: 26 Wayne County stations and 3 Health Department boxes (you cannot call a box),
-12 Gleaners, Loaves and Fishes and Community Fridge food stops, one court self-help center, and Children's Hospital
-of Michigan's emergency room, whose owner prints its number nowhere as digits — only as "(313) 745-KIDS", which we
-will not do the arithmetic on ourselves. **44 have no street address**: 26 County stations that publish a
+12 Gleaners, Loaves and Fishes and Community Fridge food stops, and one court self-help center. (Children's Hospital
+of Michigan's emergency room prints its number only in letters, "(313) 745-KIDS"; the listing carries 313-745-5437,
+those letters on a keypad, entered on the steward's instruction and saying so on screen.) **44 have no street address**: 26 County stations that publish a
 coordinate and nothing else, and 18 phone-only rows — hotlines, legal helplines and two door-to-door ride programs
 with no door to walk into. A listing is publishable with a phone, a street address, **or** its publisher's own
 coordinate; one of the three is enough, and a coordinate is never printed as if it were an address.
@@ -280,10 +280,7 @@ By horizon, not by date. Every item says what it waits on: **Kyle** (an account,
 | A native speaker's review of Spanish, Arabic and Bengali — crisis, overdose and domestic-violence screens first, then the three newest keys (`clock.am`, `clock.pm`, `list.sep`) | **Kyle** to find reviewers, then outside parties |
 | Write the empty-search line for Arabic and Bengali. **Searching in either language returns nothing today**, because every listing is written in English; the screen should say so and offer the categories, in wording the native reviewer supplies rather than one we guess | **outside party**, then work |
 | Make the iPhone and Android apps read "am"/"pm" from the strings files; both still hard-code them (`HelpApp/Help.swift`, `Format.kt`) | **work** |
-| One line on the About screen saying this is an independent project — "An independent project. Not from the City of Detroit, DDOT, SMART or the Health Department." The app now shows layers named after all four of those agencies and says nowhere in itself that it is not theirs | **Kyle** (he removed the old line on 2026-09-20; this is a recommendation, not a reversal) |
 | Serve the headers in `apps/web/public/_headers`. The `/*` block is written — CSP with `frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `X-Content-Type-Options`, `X-Frame-Options`, a `Permissions-Policy` — but **Cloudflare Pages is what applies that file and no Pages site exists**, so it has never been served to anybody. Create the site, then check from outside with `pnpm smoke` | **Kyle** (the Pages site), then work |
-| Settle SEMCOG's indemnification clause: accept the Copyright License Agreement knowingly, or remove the crash layer | **Kyle** |
-| Write down the date and substance of the DHD conversation, or leave the claim of DHD's informal support off public pages. There is no record of it anywhere in this repository, and everything else here is held to "name the page and date it" | **Kyle** |
 | Decide whether a personal email address belongs in a public repository. `api/edge-protections.md` carries Kyle's own (`kdpeters@gmail.com`) as the steward on the Cloudflare Access allow list. It is his to publish or not — the zero-PII rules are about residents — but it is the only personal address in the repo | **Kyle** |
 | Work the steward worksheet: five SER rows to confirm in a browser, 15 calls owed, the DHD phone misprint to report, the VA emergency-room number to confirm by voice ([CHECKS-2026-09-20](docs/CHECKS-2026-09-20.md)) | **steward** |
 | Import the one Highland Park tax-help line that never made it in. (The cause is fixed: `pnpm import:lines` now reports an id collision instead of dropping the line.) | **steward** |
@@ -441,10 +438,9 @@ page, and date it. More than 150 organizations; they are all named in [NOTICE](N
   *"Copyright © \<year\> SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited."* — and
   a one-way clause under which the user indemnifies SEMCOG, plus a clause granting no third-party rights, which
   matters because the reports underneath are the State Police's and neither body has been asked. The required
-  notice is reproduced in [NOTICE](NOTICE); **it is not yet on the Safe streets panel**, which today names SEMCOG
-  and the State Police but does not carry the notice itself — a roadmap item below. **Two more things are open for
-  Kyle, not settled:** whether to accept the indemnification clause knowingly, and MSP's position on records that
-  are theirs. Either way the layer is counts only, read by hand about once a year, and deleting one file makes the
+  notice is reproduced in [NOTICE](NOTICE) and printed on the Safe streets panel, beside the source line. **Kyle
+  accepted the agreement, indemnification clause included, for now (2026-09-20)**, knowing its terms; what stays
+  open is MSP's position on records that are theirs, to be asked after the hackathon submission. Either way the layer is counts only, read by hand about once a year, and deleting one file makes the
   panel disappear (DECISIONS 2026-09-20).
 
 **No stated terms — flagged, and questions owed.** These are published by public bodies as their own open data,
@@ -487,10 +483,11 @@ who reports a closed door or confirms an open one.
 **This app rebuilds the intent of the Detroit Health Department's D Compassion app from public program
 information.** DHD has not authorized it, has not offered to maintain any data or feed, and there is no written
 authorization; the design assumes none. **Nothing here is endorsed by the City of Detroit**, the Health
-Department, DDOT or SMART, and the City's name is not on the app. ("Not an official City of Detroit app" was
-removed from the app itself on 2026-09-20 by the owner's decision — see [DECISIONS.md](docs/DECISIONS.md) — and
-no store listing exists yet, so right now that distinction rests on pages like this one and not on anything a
-resident sees. Putting one line back on the About screen is a roadmap item waiting on Kyle.)
+Department, DDOT or SMART. The About screen says so in all four languages: "This is an independent project. It is
+not from the City of Detroit, DDOT, SMART or the Health Department." The one place the app names a City department
+as a source is the line under the overdose steps, which says the Detroit Health Department approved those six
+steps (the owner's account; the written record of that approval is still owed — see
+[DECISIONS.md](docs/DECISIONS.md)).
 
 Also: 313SafeBeds, whose work on shelter availability is where "where can I sleep tonight" belongs, and which the
 shelter screen opens with — we link to them and copy nothing from them; and the food banks, public agencies and

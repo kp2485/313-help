@@ -101,7 +101,7 @@ final class ParityTests: XCTestCase {
             }
         }
         // The keys the app builds rather than writes out: a number, a fixed list, or a list read from the source.
-        var built = (1...6).map { "od.s\($0)" } + (1...3).map { "about.p\($0)" } + (1...5).map { "privacy.phone_\($0)" }
+        var built = (1...6).map { "od.s\($0)" } + ["about.p1", "about.independent", "about.p2", "about.p3"] + (1...5).map { "privacy.phone_\($0)" }
         built += ["title", "body", "label"].map { "link.beds.safebeds.\($0)" }
         built += ["open", "under_construction", "funded", "planned"].map { "gw.\($0)" }
         // ReportKinds moved into the HelpCore library on 2026-09-20, so that `swift test` covers it.

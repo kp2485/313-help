@@ -538,7 +538,12 @@ object Screens {
     fun about(a: MainActivity): View {
         val col = UI.column(a, 16)
         col.addView(UI.text(a, L.t("about.title"), 24f, R.color.ink, bold = true))
-        for (k in listOf("about.p1", "about.p2", "about.data")) col.addView(UI.text(a, L.t(k), 16f, R.color.ink, topDp = 8))
+        // Who this is not from comes second, straight after what the app is (Kyle, 2026-09-20).
+        for (k in listOf("about.p1", "about.independent", "about.p2", "about.p3")) col.addView(UI.text(a, L.t(k), 16f, R.color.ink, topDp = 8))
+        // The list this phone is holding. It used to print the sentence with its {version} and {date} still in it.
+        a.store.bundle?.index?.let { i ->
+            col.addView(UI.text(a, L.t("about.data", "version" to i.version, "date" to i.generatedAt.take(10)), 15f, R.color.muted, topDp = 8))
+        }
         val signing = a.store.bundle?.index?.signing
         col.addView(UI.text(a, L.t(if (signing == "dev") "about.sig_dev" else "about.sig_ok"), 15f, R.color.muted, topDp = 12))
 
