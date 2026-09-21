@@ -13,16 +13,25 @@ class ZipTest {
 
     private val root = File("../../..")
 
-    private fun shipped(): Map<String, LatLon> {
+    /**
+     * The ZIP centres out of the bundle, or **null when there is no bundle**: CI builds none (the android job is
+     * JDK-only), so a test that needs the file returns early and prints the sentence GuardsTest prints, exactly as
+     * HoodsTest does. Everything that does not need it — what counts as a ZIP, and what an empty list answers —
+     * runs everywhere.
+     */
+    private fun shipped(): Map<String, LatLon>? {
         val f = File(root, "data/bundle/v1/$ZIP_FILE")
-        assertTrue("run `pnpm build:bundle` first: no ${f.path}", f.isFile)
+        if (!f.isFile) {
+            println("no bundle built (run `pnpm build:bundle` from the repository root); skipping")
+            return null
+        }
         return decodeZips(f.readBytes())
     }
 
     /** The real file the app ships, not a fixture. */
     @Test
     fun theShippedZipFileDecodes() {
-        val zips = shipped()
+        val zips = shipped() ?: return
         assertTrue("only ${zips.size} ZIPs", zips.size >= 30)
         assertTrue("48226 is downtown Detroit", zips.containsKey("48226"))
         for ((zip, point) in zips) {
@@ -50,20 +59,20 @@ class ZipTest {
 
     @Test
     fun aZipBecomesAPointOrAPlainRefusal() {
-        val zips = shipped()
+        // An empty list is an older bundle or a file that could not be read: every ZIP is unknown, and no point is
+        // ever guessed at. This half needs no bundle and runs everywhere.
+        assertTrue(lookupZip(emptyMap(), "48226") is ZipAnswer.Unknown)
+        assertTrue("letters are not a ZIP", lookupZip(emptyMap(), "hello") is ZipAnswer.NotAZip)
+        // A ZIP a list carries whose middle is outside the four cities is refused rather than used.
+        assertTrue(lookupZip(mapOf("99999" to LatLon(45.0, -90.0)), "99999") is ZipAnswer.Outside)
+
+        val zips = shipped() ?: return
         val found = lookupZip(zips, "48226")
         assertTrue("48226 should be a point", found is ZipAnswer.Found)
         assertEquals("48226", (found as ZipAnswer.Found).zip)
         assertTrue("48226 is in the service area", inServiceArea(found.point))
 
-        assertTrue("letters are not a ZIP", lookupZip(zips, "hello") is ZipAnswer.NotAZip)
         assertTrue("a ZIP the bundle has never heard of", lookupZip(zips, "90210") is ZipAnswer.Unknown)
-        // An empty list is an older bundle or a file that could not be read: every ZIP is unknown, and no point is
-        // ever guessed at.
-        assertTrue(lookupZip(emptyMap(), "48226") is ZipAnswer.Unknown)
-        // A ZIP the bundle carries whose middle is outside the four cities is refused rather than used.
-        val far = mapOf("99999" to LatLon(45.0, -90.0))
-        assertTrue(lookupZip(far, "99999") is ZipAnswer.Outside)
     }
 
     /**
@@ -72,7 +81,7 @@ class ZipTest {
      */
     @Test
     fun theSharedZipCasesLandWhereTheySay() {
-        val zips = shipped()
+        val zips = shipped() ?: return
         val d = decodeIndicators(File(root, "data/bundle/v1/$HOOD_FILE").readBytes())
         val cases = org.help313.query.Json.parse(File(root, "schema/neighborhoods/points.json").readBytes())
         val list = cases["zip_cases"]!!.arr
