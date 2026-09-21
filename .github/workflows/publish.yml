@@ -102,6 +102,10 @@ jobs:
           # a name that already exists; the branch is only ever written by this job.
           git checkout -B "$branch"
           git commit -m "Open data changed on $(date -u +%F): review before it is published"
+          # A fresh checkout knows nothing about that day's branch on the server, and --force-with-lease with nothing
+          # to compare against refuses the push ("stale info") — which is what failed the second run on 2026-09-21.
+          # Fetch it first when it exists, so the lease has the server's real state to hold the push to.
+          git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" 2>/dev/null || true
           git push -u --force-with-lease origin "$branch"
           gh pr create --title "Open data changed $(date -u +%F)" --body "A City source changed. Read the diff: a changed phone number, address or coordinate is published only when this is merged. Nothing here was published tonight." --base main --head "$branch" \
             || echo "A pull request for $branch is already open; it now has tonight's changes too."
