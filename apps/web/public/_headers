@@ -1,6 +1,22 @@
 # Cloudflare Pages response headers. Vite copies public/ to the root of dist/, where Pages reads this file.
-# The steward page must never be shown inside another site's frame (clickjacking). frame-ancestors can't be set
-# from a <meta> tag, so it is sent here. An api/ test checks these lines.
+# An api/ test checks these lines.
+#
+# The whole app, not only the steward page. index.html carries the same policy in a <meta> tag, which is what a
+# `file://` copy or a stale service-worker shell falls back to; a real header is what a browser applies first, and
+# it is the only place `frame-ancestors` counts at all. Keep the two in step.
+#
+# connect-src is 'self' and nothing else: the bundle is served from our own origin (/data/bundle/v1/) and the API
+# is the Worker routed on the same origin (/v1/…, apps/web/vite.config.ts proxies it in dev). There is no second
+# origin to allow — no analytics, no map tiles, no fonts (docs/08).
+/*
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), midi=(), serial=(), bluetooth=(), display-capture=(), idle-detection=(), browsing-topics=(), interest-cohort=()
+
+# The steward page must never be shown inside another site's frame (clickjacking). It keeps its own block so the
+# rule is stated where a reader looks for it; Pages applies the most specific match.
 /admin
   Content-Security-Policy: frame-ancestors 'none'
   X-Frame-Options: DENY

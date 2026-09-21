@@ -23,6 +23,11 @@ export function outbox<T, R = undefined>(key: string, max: number, send: (item: 
       if (!r.sent) await locked(async () => idbSet(key, [...((await idbGet<T[]>(key)) ?? []), item].slice(-max)));
       return r;
     },
+    /** How many are waiting. Shown on the Your privacy screen, so nothing is queued out of sight. */
+    count: () => locked(async () => ((await idbGet<T[]>(key)) ?? []).length),
+    /** Throw away everything waiting, without sending it. Nothing waiting is worth keeping against a person's
+     *  wishes: this is their phone and their report. */
+    clear: () => locked(async () => { await idbSet(key, []); }),
     /** Tries everything waiting; keeps what still didn't go. */
     flush: () => locked(async () => {
       const queue = (await idbGet<T[]>(key)) ?? [];

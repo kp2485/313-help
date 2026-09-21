@@ -106,6 +106,12 @@ function yearsTable(h: Hood, d: Indicators, ui: Ui, o: { value: (y: YearStats) =
       return `<tr><th scope="row">${Number(y) === d.partial_year ? ui.esc(ui.t('hood.so_far', { year: y })) : y}</th><td>${v === undefined ? `<small>${ui.esc(o.missing)}</small>` : `<span class="bar" aria-hidden="true" style="width:${Math.max(3, Math.round((v / max) * 100))}%"></span><span>${ui.esc(o.fmt(v))}</span>`}</td>${o.count ? `<td>${ui.esc(count(o.count(h.years[y] ?? {})))}</td>` : ''}<td>${cv === undefined ? '' : ui.esc(o.fmt(cv))}</td></tr>`; }).join('')}</tbody></table>`;
 }
 
+/** SEMCOG asks for this sentence wherever their data is reproduced, and it is theirs, so it stays in their
+ *  words: the same English on an Arabic, Bengali or Spanish screen, marked `lang="en"` so a screen reader says
+ *  it in an English voice (WCAG 3.1.2), never machine-translated. The year is the year of the crash layer we
+ *  ship (data/ingested/crashes.json, `source.last_edited` 2025-10-08). */
+export const SEMCOG_NOTICE = 'Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.';
+
 /**
  * "Safe streets" (docs/13). Plain counts of crashes over the years the panel names, with the whole-city number
  * beside each one. No rate (no denominator we can defend), no ranking, no colour that reads as a score, no
@@ -124,7 +130,8 @@ export function crashPanel(h: Hood, d: Indicators, ui: Ui): string {
   return `<h2>${T('hood.crash_head')}</h2><div class="panel"><p>${T('hood.crash_lede', { from, to })}</p>
     <ul class="hours">${line(T('hood.crash_walk'), 'walk')}${line(T('hood.crash_bike'), 'bike')}${line(T('hood.crash_severe'), 'severe')}</ul>
     <p class="foot">${T('hood.crash_note')}</p>
-    <p class="foot">${slot(ui, 'hood.crash_source', 'source', d.sources.crashes.name, { records: d.crash_records_from ?? '' })}</p></div>`;
+    <p class="foot">${slot(ui, 'hood.crash_source', 'source', d.sources.crashes.name, { records: d.crash_records_from ?? '' })}</p>
+    <p class="foot" lang="en">${SEMCOG_NOTICE}</p></div>`;
 }
 
 export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {

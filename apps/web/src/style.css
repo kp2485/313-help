@@ -151,6 +151,8 @@ table.years { width:100%; border-collapse:collapse; margin-top:1rem; font-size:.
 .meta { display:flex; flex-wrap:wrap; gap:.375rem; margin-top:.25rem; }
 .pill { display:inline-flex; align-items:center; padding:.2rem .7rem; border-radius:99rem; font-size:.9375rem; font-weight:650; background:var(--sunken); color:var(--ink); }
 .pill.open,.pill.closes_soon { background:var(--brand-soft); color:var(--brand-soft-ink); } .pill.plain { font-weight:500; color:var(--muted); }
+/* A holiday is never the open colour: the words say "Call first" and the colour agrees with them (query-spec "Holidays"). */
+.pill.holiday { background:var(--warn-bg); color:var(--warn-ink); }
 .fresh { font-size:.9375rem; color:var(--muted); } .fresh.unconfirmed,.fresh.never_checked,.fresh.reported_once,.fresh.reported_closed,.fresh.archived { color:var(--warn-ink); background:var(--warn-bg); padding:.3rem .625rem; border-radius:var(--r-sm); font-weight:600; justify-self:start; }
 .notice,.banner { margin-top:.75rem; padding:.625rem .875rem; border-radius:var(--r-sm); background:var(--warn-bg); color:var(--warn-ink); font-weight:600; }
 .banner.ok { display:flex; gap:.5rem; align-items:flex-start; background:var(--brand-soft); color:var(--brand-soft-ink); } .banner.stop { background:var(--danger); color:var(--danger-ink); } .banner.stop a { color:inherit; }
@@ -193,8 +195,17 @@ address { font-style:normal; font-size:1.0625rem; }
 .maptools button { width:2.75rem; height:2.75rem; border-radius:.75rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1.375rem; font-weight:700; line-height:1; text-align:center; }
 .mapnote .foot { margin-top:.5rem; } .mappick { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem .75rem; margin-top:.5rem; padding:.75rem 1rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); }
 .mappick span { display:grid; } .mappick .btn { width:auto; margin:0; }
-.mapbox.big { position:fixed; inset:0; z-index:40; margin:0; padding:.5rem; padding-bottom:calc(.5rem + env(safe-area-inset-bottom)); background:var(--bg); display:flex; flex-direction:column; }
-.mapbox.big .mapframe { flex:1; height:auto; } body.mapbig { overflow:hidden; }
+/* Full screen really is full screen: fixed to the whole viewport, over the rail and the top bar, never inside the
+   grid column it came out of. `inset:0` and `position:fixed` are on one class, so the wide-screen rule that makes
+   the Map tab's box sticky has to exclude the full-screen state by name — same specificity, and it comes later in
+   the file, so it used to win and the "bigger" button produced a map that was neither big nor usable, with the
+   page behind it inert (web review, 2026-09-20). */
+.mapbox.big { position:fixed; inset:0; z-index:40; margin:0; padding:.5rem; padding-top:calc(.5rem + env(safe-area-inset-top)); padding-bottom:calc(.5rem + env(safe-area-inset-bottom)); background:var(--bg); display:flex; flex-direction:column; }
+.mapbox.big .mapframe { flex:1; height:auto; min-height:0; } body.mapbig { overflow:hidden; }
+/* The map covers the page, so the buttons that must always be one tap away come inside it: "Urgent help", and the
+   quick exit on a screen that has one (map.ts clones the page's own, words and all). */
+.mapbar { flex:none; display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:.5rem; margin-bottom:.5rem; }
+.mapbar .urgent,.mapbar .exit { flex:none; }
 .report { display:grid; gap:.5rem; margin-top:1.75rem; padding-top:1.25rem; border-top:1px solid var(--line); } .report summary { min-height:2.75rem; padding:.625rem 0; font-weight:650; cursor:pointer; }
 .report label { display:grid; gap:.375rem; font-size:.9375rem; color:var(--muted); } .report textarea { width:100%; font:inherit; color:var(--ink); padding:.625rem .75rem; border-radius:var(--r-sm); border:1.5px solid var(--edge); background:var(--surface); }
 .kinds { display:grid; gap:.375rem; margin-top:.625rem; } .kinds button { min-height:2.875rem; padding:.5rem .875rem; border-radius:var(--r-sm); background:var(--surface); border:1px solid var(--edge); font-weight:550; }
@@ -241,7 +252,6 @@ main:focus { outline:none; }
   header.top > .urgent { display:none; }
   header.top,main { padding-inline:2rem; }
   main { padding-bottom:4rem; }
-  .mapbox.big { inset-inline-start:15.5rem; }
   /* The rail is the first thing on screen, so the skip link stands beside it, never over its first button. */
   .skip:focus-visible { inset-inline-start:calc(15.5rem + .75rem); }
   /* More columns where the content is tiles and cards; prose keeps its one comfortable column. */
@@ -256,13 +266,15 @@ main:focus { outline:none; }
   main.wide > * { max-width:42rem; }
   main.wide > .maptop { max-width:none; }
   .maptop { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:1.5rem; align-items:start; margin-top:.75rem; }
-  .maptop > .mapbox { position:sticky; top:5rem; margin-top:0; }
-  .maptop .mapframe { height:min(74vh,40rem); }
+  /* `:not(.big)`: the full-screen map leaves this column entirely, so it must not be given a sticky position
+     that would beat its own `position:fixed` (same specificity, later in the file). */
+  .maptop > .mapbox:not(.big) { position:sticky; top:5rem; margin-top:0; }
+  .maptop .mapbox:not(.big) .mapframe { height:min(74vh,40rem); }
   .mapside { display:block; min-width:0; }
   .mapside .layers,.mapside .loc { margin-top:0; }
   .mapside .maplist { margin-top:.75rem; }
 }
-@media (min-width:100rem) { #app { padding-inline-start:17rem; } .tabs { width:17rem; } .mapbox.big { inset-inline-start:17rem; } .skip:focus-visible { inset-inline-start:calc(17rem + .75rem); } }
+@media (min-width:100rem) { #app { padding-inline-start:17rem; } .tabs { width:17rem; } .skip:focus-visible { inset-inline-start:calc(17rem + .75rem); } }
 
 /* A mouse or trackpad: say so when something is a target. Never on a phone (hover:none), so nothing changes there. */
 @media (hover:hover) and (pointer:fine) {
@@ -279,7 +291,7 @@ main:focus { outline:none; }
 /* Printing (people print at a library). Ink on white, no app furniture, and every link's address spelled out. */
 @media print {
   :root { --bg:#fff; --surface:#fff; --sunken:#fff; --ink:#000; --muted:#333; --line:#999; --brand:#000; --brand-soft:#fff; --brand-soft-ink:#000; --warn-bg:#fff; --warn-ink:#000; --shadow:none; color-scheme:light; }
-  .tabs,.skip,.maptools,.mappan,.report,.searchbtn,.langrow,.browse>summary,.top>.urgent,.top>.iconbtn,.top>.exit,.stackbtns .btn.ghost { display:none !important; }
+  .tabs,.skip,.maptools,.mappan,.mapbar,.report,.searchbtn,.langrow,.browse>summary,.top>.urgent,.top>.iconbtn,.top>.exit,.stackbtns .btn.ghost { display:none !important; }
   #app { padding:0; } main,main.wide { max-width:none; padding:0 1rem 1rem; }
   .top { position:static; background:none; backdrop-filter:none; border:0; padding-inline:1rem; }
   .btn,.callrow { background:none !important; color:#000 !important; border:1px solid #999; }

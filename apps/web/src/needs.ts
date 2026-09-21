@@ -159,5 +159,20 @@ export const isSensitive = (category: string) => SENSITIVE.some((c) => category 
 export const PRIVATE = ['treatment', 'assault'];
 export const isPrivate = (category: string) => isSensitive(category) || PRIVATE.some((c) => category === c || category.startsWith(c + '.'));
 
+/** The listings a set of switched-on help layers may put on the map. Two rules, and both have to hold: the
+ *  private kinds (treatment, help after sexual assault) are dropped as whole top-level kinds, and inside any
+ *  other group a single sensitive listing (a DV shelter, a mental-health crisis line) is dropped row by row.
+ *  A row also needs a coordinate, because a dot is what this is for.
+ *
+ *  It lives here, beside the rules it enforces, so it can be held to a fixture of the exact rows it must never
+ *  draw rather than to the shape of the line that used to do it inside main.ts. */
+export function mapDrawable<T extends { category: string; lat?: number }>(rows: readonly T[], tops: readonly string[]): T[] {
+  return rows.filter((r) => {
+    if (r.lat === undefined) return false;
+    const top = r.category.split('.')[0]!;
+    return !isSensitive(r.category) && !PRIVATE_TOPS.includes(top) && tops.includes(top);
+  });
+}
+
 // 911 and 988 are hardcoded. No bundle, feed, or server can change them (audit A5).
 export const HARDCODED = { emg_911: '911', emg_988: '988' } as const;

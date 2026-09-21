@@ -58,7 +58,7 @@ export async function idbSet(key: string, val: unknown): Promise<void> {
 export const cached = () => idbGet<Bundle>('bundle');
 
 async function bytes(path: string): Promise<Uint8Array> {
-  const res = await fetch(BASE + path, { cache: 'no-store' });
+  const res = await fetch(BASE + path, { cache: 'no-store', credentials: 'omit' });
   if (!res.ok) throw new Error(`${res.status} ${path}`);
   return new Uint8Array(await res.arrayBuffer());
 }

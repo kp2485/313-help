@@ -8,14 +8,16 @@ import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
 import { MapView, loadLayer, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
-import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, PRIVATE_TOPS, TABS, isPrivate, isSensitive, type Need, type TabId } from './needs.js';
+import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
 import { loadLayers, toggleLayer } from './layers.js';
 import { createRouter, hashFor, type View } from './router.js';
-import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, flush, preparePhoto, resetInstallSecret, submit, uploadPhoto } from './report.js';
+import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, clearQueue, flush, preparePhoto, queuedCount, queuedTargets, resetInstallSecret, submit, uploadPhoto } from './report.js';
 import { TRANSIT } from './transit.js';
 import { LINKS } from './links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitProposal } from './propose.js';
-import { canSave, clearSaved, loadSaved, toggleSaved } from './saved.js';
+import { canSave, canShare, clearSaved, loadSaved, toggleSaved } from './saved.js';
+import { safeUrl } from './url.js';
+import { focusSelector, type FocusEl } from './focus.js';
 import { directionsHref, transitAppHref, transitHref } from './directions.js';
 import './style.css';
 
@@ -33,18 +35,29 @@ let missing: string[] = [];                              // which "Add a place" 
 let addValues: Record<string, string> = {};
 let indicators: Indicators | null | undefined;           // neighborhood numbers (docs/13): fetched the first time a neighborhood screen opens
 let listMap = false;                                      // "Show these on a map" is open on the current list
+let langOffline = false;                                 // the last language tapped could not be fetched
 let searchText = '';                                     // memory only: never stored, sent, or put in the URL
 let searchCount = '';                                    // "12 places found": what the live region says after a keystroke
 let layersOn: string[] = [];                             // map layers switched on (layers.ts): this phone only
-const layerFiles = new Map<string, LayerData | null>();  // layer shapes already loaded, this visit only
+// Layer shapes already loaded, this visit only, keyed by file AND the checksum the signed index gives it.
+// 'loading' is a request in flight; 'failed' is a try that did not come back and can be made again.
+const layerFiles = new Map<string, LayerData | 'loading' | 'failed'>();
 let refocusSel = '';
 let refocus = '';                                        // a layer switch to put the cursor back on after redrawing
 // Where the cursor goes after a redraw that is not a new screen (a report sent, a place saved, the map opened on a
 // list). Without this the whole page is replaced under the person's feet and the keyboard starts again at the top.
-const reported = new Map<string, 'sent' | 'queued' | 'sent_no_photo'>();   // this visit only, so the thank-you stays put
+type ReportOutcome = 'sent' | 'queued' | 'sent_no_photo' | 'failed';
+const reported = new Map<string, ReportOutcome>();   // what this phone has already said about a target
+// A note being typed, and whether "Something wrong?" is open, per target. Memory only, and never sent unless a
+// person presses one of the buttons — exactly like the search box and the "Add a place" fields.
+const notes = new Map<string, string>();
+const openDetails = new Set<string>();
 const app = document.getElementById('app')!;
 // The back stack (router.ts): memory only; the browser's history holds a random key per entry and nothing else.
-const sensitiveId = (id: string) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isPrivate(r.category); };
+// Fails closed: until the list has loaded, nobody knows whether an id is a private listing, so it is treated as
+// one. A link to a DV or crisis listing that arrives on a cold load leaves the address bar at once; a public
+// listing gets its address back from router.retrace() the moment the list says it is public (review, 2026-09-20).
+const sensitiveId = (id: string) => { if (!bundle) return true; const r = bundle.rows.find((x) => x.id === id); return !!r && isPrivate(r.category); };
 const router = createRouter(history, { sensitive: sensitiveId, path: () => location.pathname + location.search });
 /** True when a screen may be named in the browser's own window title and history list. */
 const traceable = (v: View) => hashFor(v, sensitiveId, location.pathname) !== null;
@@ -55,7 +68,16 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 const T = (key: string, p?: Record<string, string | number>) => esc(t(key, p));
 const go = (view: View) => `data-go="${esc(JSON.stringify(view))}"`;
 const now = () => effectiveNow(new Date(), bundle?.index.generated_at);
-const ext = (url: string, label: string, cls = 'btn ghost') => `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)} ${icon('out', 'sm')}</a>`;
+// A link-out. The address is checked against the scheme allow-list first (url.ts): everything printed here comes
+// from the signed bundle or from links.ts, but an href is the one place a string becomes something the browser
+// runs, so a `javascript:` value is printed as plain words instead of being made into a link (web review,
+// 2026-09-20). `rel="noopener noreferrer"` on every one: the other site gets no handle on our window and no
+// referrer (the page also sends `referrer: no-referrer`, and so does the _headers file).
+const ext = (url: string, label: string, cls = 'btn ghost') => {
+  const safe = safeUrl(url);
+  if (!safe) return `<span class="${cls === 'link' ? 'foot' : ''}">${esc(label)}</span>`;
+  return `<a class="${cls}" href="${esc(safe)}" target="_blank" rel="noopener noreferrer">${esc(label)} ${icon('out', 'sm')}</a>`;
+};
 // What a place wrote about itself is never translated (docs/05). On a Spanish (or Arabic, or Bengali) screen those
 // words must still be marked as English, so a screen reader switches voice instead of reading English with Spanish
 // rules (WCAG 3.1.2). `owner()` is for anything a place, a city dataset or an alert wrote; `T()` is for our words.
@@ -99,8 +121,17 @@ function openText(o: OpenResult): string {
     case 'closes_soon': return t('open.closes_soon', { time: clock(o.closes_at!) });
     case 'closed': return o.cancelled_now ? t('open.cancelled') : o.next ? t('open.closed_next', { day: dayName(o.next.date), time: clock(o.next.opens_at) }) : t('open.closed_no_next');
     case 'call_first': return t('open.call_first');
+    // A holiday: the schedule's hours are the usual ones and say nothing about today (query-spec "Holidays").
+    // `.pill.holiday` gets no colour of its own, so it can never read as open.
+    case 'holiday': return t('open.holiday');
     default: return t('open.unknown');
   }
+}
+/** The detail screen's holiday line: the usual hours, printed as one left-to-right run inside our sentence. */
+function holidayNote(o: OpenResult): string {
+  if (o.state !== 'holiday' || !o.usual_hours) return '';
+  const [before, after] = t('detail.holiday', { hours: '' }).split('');
+  return `<p class="banner warn" role="note">${esc(before)}${clockHtml(clock(o.usual_hours.opens_at), clock(o.usual_hours.closes_at))}${esc(after ?? '')}</p>`;
 }
 function badgeText(row: BundleRow): { text: string; level: string } {
   const b = badge(row, now());
@@ -108,15 +139,22 @@ function badgeText(row: BundleRow): { text: string; level: string } {
   for (const k of ['date', 'source_date'] as const) if (p[k]) p[k] = prettyDate(String(p[k]));
   return { text: t(b.key, p), level: b.level };
 }
-function emergency(id: string): { number: string; label: string } | null {
+function emergency(id: string): { number: string; label: string; ownLabel: boolean } | null {
   const fromBundle = bundle?.emergency.find((e) => e.id === id);
   const number = (HARDCODED as Record<string, string>)[id] ?? fromBundle?.number;   // hardcoded always wins
-  return number ? { number, label: fromBundle?.label ?? (id === 'emg_911' ? 'Emergency' : id === 'emg_988' ? 'Suicide and crisis lifeline' : number) } : null;
+  if (!number) return null;
+  // 911 and 988 are ours to name, because the numbers themselves are hardcoded and answer before any list has
+  // loaded — so their words live in strings/*.json like every other word of ours, in all four languages. They
+  // used to be English literals here, which put "Emergency" on an Arabic screen (web review, 2026-09-20).
+  const ours = t('emergency.' + id, {});
+  if (ours !== 'emergency.' + id) return { number, label: ours, ownLabel: false };
+  return { number, label: fromBundle?.label ?? number, ownLabel: true };
 }
 function callButton(id: string): string {
   const e = emergency(id);
   if (!e) return '';
-  return `<a class="callrow ${id === 'emg_911' ? 'is911' : ''}" href="${telHref(e.number)}" aria-label="${T('strip.call_label', { label: e.label, number: e.number })}">${icon('phone')}<span>${owner(e.label)}</span><strong>${phoneHtml(e.number)}</strong></a>`;
+  // A label from the bundle is what that service calls itself, in English (`owner`); one of ours is translated.
+  return `<a class="callrow ${id === 'emg_911' ? 'is911' : ''}" href="${telHref(e.number)}" aria-label="${T('strip.call_label', { label: e.label, number: e.number })}">${icon('phone')}<span>${e.ownLabel ? owner(e.label) : esc(e.label)}</span><strong>${phoneHtml(e.number)}</strong></a>`;
 }
 
 // ---- chrome -----------------------------------------------------------------
@@ -140,7 +178,7 @@ function topBar(title?: string, quickExit = false, ownTitle = false): string {
 // button: it is marked as the current choice instead, so nobody taps what they already have.
 const langBtn = () => `<nav class="langrow" aria-label="${T('lang.switch')}">${LANGS.map((l) => (l.code === currentLang()
   ? `<span class="langnow" lang="${l.code}" aria-current="true">${esc(l.name)}</span>`
-  : `<button class="link" data-lang="${l.code}" lang="${l.code}">${esc(l.name)}</button>`)).join('')}</nav>`;
+  : `<button class="link" data-lang="${l.code}" lang="${l.code}">${esc(l.name)}</button>`)).join('')}</nav>${langOffline ? `<p class="banner warn" role="note">${T('lang.needs_net')}</p>` : ''}`;
 // The Events tab shows only when the list carries upcoming events (none today: DECISIONS 2026-09-19).
 const shownTabs = () => TABS.filter((x) => x.id !== 'events' || upcoming(1).length > 0);
 // A laptop or a desktop (Kyle, 2026-09-20). On a wide screen the tab bar is a rail down the side, so it is drawn
@@ -207,12 +245,17 @@ function reportBox(targetId: string, isPlace: boolean, category = ''): string {
   if (retired()) return '';
   const done = reported.get(targetId);
   // The thank-you replaces the buttons, so it is where the cursor goes; the live region says the same thing.
+  // A phone that could not even write the report to its own queue says so, and says nothing was sent: the same
+  // sentence the iPhone shows (strings `report.failed`). Silence there looked like "sent".
+  if (done === 'failed') return `<section class="report" data-target="${esc(targetId)}"><p class="banner warn" tabindex="-1">${T('report.failed')}</p></section>`;
   if (done) return `<section class="report" data-target="${esc(targetId)}"><p class="banner ok" tabindex="-1">${icon('check', 'sm')} ${T(done === 'queued' ? 'report.queued' : isPlace ? 'report.sent_place' : 'report.sent')}${done === 'sent_no_photo' ? ` ${T('report.photo_failed')}` : ''}</p></section>`;
   const kinds = isPlace ? PLACE_KINDS : LISTING_KINDS.filter((k) => k !== 'out_of_stock' || /^(food|harm)/.test(category));
+  // A note half-typed, and an opened "Something wrong?", survive every redraw that is not a new screen — a layer
+  // arriving, a new list, a window crossing the laptop line. They used to be wiped by all three (web review).
   return `<section class="report" data-target="${esc(targetId)}">
     <button class="btn ghost" data-report="${isPlace ? CONFIRM.place : CONFIRM.listing}">${icon('check', 'sm')}${T(isPlace ? 'report.confirm.place' : 'report.confirm.listing')}</button>
-    <details><summary>${T(isPlace ? 'report.fix' : 'report.wrong')}</summary>${isPlace ? `<p class="foot">${T('report.things_only')}</p>` : ''}
-      <label>${T('report.note_label')}<textarea maxlength="280" rows="2"></textarea></label>
+    <details${openDetails.has(targetId) ? ' open' : ''}><summary>${T(isPlace ? 'report.fix' : 'report.wrong')}</summary>${isPlace ? `<p class="foot">${T('report.things_only')}</p>` : ''}
+      <label>${T('report.note_label')}<textarea maxlength="280" rows="2">${esc(notes.get(targetId) ?? '')}</textarea></label>
       ${isPlace && bundle?.index.photos === true ? `<label>${T('report.photo_label')}<input type="file" accept="image/*" capture="environment" data-photo></label><p class="foot">${T('report.photo_note')}</p>` : ''}
       <div class="kinds">${kinds.map((k) => `<button data-report="${k}">${T('report.kind.' + k)}</button>`).join('')}</div></details></section>`;
 }
@@ -282,6 +325,19 @@ const LAYER_STYLE: Record<string, { css: string; width?: number; dash?: number[]
   'go:bike_lanes': { css: '--lyr-bike', width: 2.4 },
   'go:stations': { css: '--lyr-rail', ring: true },
   'go:park_ride': { css: '--lyr-smart', ring: true },
+  // Intercity coaches (Greyhound and the rest): a few stops, not a network. It had no entry at all, so it was
+  // drawn exactly like the DDOT routes and nothing on the map told the two apart (web review, 2026-09-20).
+  'go:intercity_bus': { css: '--lyr-rail', width: 2.6, dash: [5, 3], ring: true },
+};
+/** Licence links. The manifest carries a licence NAME but no URL (pipeline/src/ingest-transit.ts, another
+ *  agent's file), so the address for each name we actually ship is kept here and matched by name. A licence we
+ *  have no address for is still printed, just without a link — never guessed at. */
+const LICENSE_URL: Record<string, string> = {
+  'CC BY-NC 4.0': 'https://creativecommons.org/licenses/by-nc/4.0/',
+  'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/',
+  'CC BY-SA 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/',
+  'CC0 1.0': 'https://creativecommons.org/publicdomain/zero/1.0/',
+  'ODbL 1.0': 'https://opendatacommons.org/licenses/odbl/1-0/',
 };
 const layerName = (id: string, fallback = '') => { const k = 'layer.' + id.replace(':', '.'); const s = t(k); return s === k ? fallback || id : s; };
 /** The layers on offer today: our own listing groups, the places we already ship, then the transport layers. */
@@ -300,30 +356,53 @@ const layerOn = (id: string) => layersOn.includes(id);
 function layerRows(): Ranked[] {
   const tops = MAP_GROUPS.filter((g) => layerOn('help:' + g.id)).flatMap((g) => g.tops);
   if (!tops.length) return [];
-  const rows = (bundle?.rows ?? []).filter((r) => r.lat !== undefined && !isSensitive(r.category)
-    && !PRIVATE_TOPS.includes(r.category.split('.')[0]!) && tops.includes(r.category.split('.')[0]!));
-  return rank(rows, here ? { near: here } : {}, now(), bundle?.alerts ?? []);
+  return rank(mapDrawable(bundle?.rows ?? [], tops), here ? { near: here } : {}, now(), bundle?.alerts ?? []);
 }
 const groupOf = (category: string) => MAP_GROUPS.find((g) => g.tops.includes(category.split('.')[0]!))?.id ?? '';
-/** The transport layers that are on, with their shapes if those have arrived. Missing ones are asked for once. */
+/** The key a layer's shapes are held under: the file AND the checksum the signed index gives it, exactly as
+ *  map.ts keys its own cache. Keyed by file name alone, a newer bundle's shapes were never fetched. */
+const layerKey = (file: string) => `${file}:${bundle?.index.files[file]?.sha256 ?? ''}`;
+/** The transport layers that are on, with their shapes if those have arrived. A layer that could not be read —
+ *  no signal, a checksum that did not match — used to be remembered as "nothing" for ever: the switch stayed
+ *  ticked, the app announced it was "on the map now", nothing was drawn, and it was never asked for again (web
+ *  review, 2026-09-20). Now the failure is a state of its own: it is said out loud, the switcher and the list
+ *  say so in one line, and "Try again" asks for it afresh. */
 function overlays(): Overlay[] {
   const out: Overlay[] = [];
   for (const l of bundle?.transit?.layers ?? []) {
     const id = 'go:' + l.id;
     if (!layerOn(id)) continue;
-    if (!layerFiles.has(l.file)) {
-      layerFiles.set(l.file, null);
-      void loadLayer(bundle!.index, l.file).then((d) => { layerFiles.set(l.file, d); render(false); });
-      continue;
-    }
-    const data = layerFiles.get(l.file);
-    if (data) out.push({ ...data, id, label: layerName(id, l.name), ...(LAYER_STYLE[id] ?? { css: '--lyr-bus' }) });
+    const key = layerKey(l.file);
+    if (!layerFiles.has(key)) { askForLayer(l.file, id); continue; }
+    const data = layerFiles.get(key);
+    if (data && data !== 'failed' && data !== 'loading') out.push({ ...data, id, label: layerName(id, l.name), ...(LAYER_STYLE[id] ?? { css: '--lyr-bus' }) });
   }
   return out;
 }
+function askForLayer(file: string, id: string): void {
+  const key = layerKey(file);
+  layerFiles.set(key, 'loading');
+  void loadLayer(bundle!.index, file).then((d) => {
+    layerFiles.set(key, d ?? 'failed');
+    render(false);
+    if (!d) announce(t('map.layer_failed_say', { name: layerName(id) }));
+  });
+}
+/** 'failed' when the last try for a switched-on layer did not come back; used by the switcher and the list. */
+function layerState(id: string): 'ok' | 'loading' | 'failed' {
+  const l = (bundle?.transit?.layers ?? []).find((x) => 'go:' + x.id === id);
+  if (!l) return 'ok';
+  const held = layerFiles.get(layerKey(l.file));
+  return held === 'failed' ? 'failed' : held === undefined || held === 'loading' ? 'loading' : 'ok';
+}
+/** "DDOT bus routes could not load." plus a Try again, wherever a switched-on layer has nothing to draw. */
+function layerProblem(id: string): string {
+  if (!layerOn(id) || layerState(id) !== 'failed') return '';
+  return `<p class="banner warn layerbad">${T('map.layer_failed', { name: layerName(id) })} <button class="chip" data-layer-retry="${esc(id)}">${T('map.layer_retry')}</button></p>`;
+}
 function layerSwitcher(): string {
   const box = (s: { group: string; items: { id: string; icon: string; name: string; note?: string }[] }) => `<fieldset><legend>${T(s.group)}</legend><div class="kinds">${s.items.map((i) =>
-    `<label class="pick"><input type="checkbox" data-layer="${esc(i.id)}"${layerOn(i.id) ? ' checked' : ''}><span>${esc(i.name)}${i.note ? ` <small>${esc(i.note)}</small>` : ''}</span></label>`).join('')}</div></fieldset>`;
+    `<label class="pick"><input type="checkbox" data-layer="${esc(i.id)}"${layerOn(i.id) ? ' checked' : ''}><span>${esc(i.name)}${i.note ? ` <small>${esc(i.note)}</small>` : ''}</span></label>`).join('')}</div>${s.items.map((i) => layerProblem(i.id)).join('')}</fieldset>`;
   return `<form class="layers" data-layers><h2>${T('map.layers')}</h2><p class="foot">${T('map.layers_note')}</p>${layerMenu().map(box).join('')}</form>`;
 }
 /** Everything the map is showing, in words. Bounded lists, so a cheap phone never draws thousands of rows. */
@@ -342,10 +421,21 @@ function layerList(rows: Ranked[], over: Overlay[]): string {
       const count = o.lines.length + o.points.length;
       return `<h3>${esc(o.label)} <span class="count">${count}</span></h3>${list.length ? names(list) : `<p class="foot">${T('map.list_unnamed', { count })}</p>`}`;
     }),
+    // A layer that is switched on but could not be read says so here too, not only in the switcher: the list is
+    // where a person looks when the map shows nothing.
+    ...(bundle?.transit?.layers ?? []).map((l) => layerProblem('go:' + l.id)),
   ].filter(Boolean);
   if (!parts.length) return `<h2>${T('map.list_title')}</h2><p class="empty">${T('map.list_none')}</p>`;
   // The heading lives inside the summary, so the sections below it are h3s under an h2 and the outline has no gap.
   return `<details class="browse maplist"><summary>${icon('info', 'sm')}<h2 class="sumh">${T('map.list_title')}</h2>${icon('chevron', 'sm turn dim')}</summary><div class="maplistbody">${parts.join('')}</div></details>`;
+}
+/** Who a layer came from, under what licence, and what we changed. A licence is only worth printing if a person
+ *  can read it, so where we know its address it is a link; and every one of these layers was cut down to our
+ *  four cities, which most of these licences oblige us to say (map.layer_filtered, printed once below). */
+function layerSource(l: NonNullable<Bundle['transit']>['layers'][number]): string {
+  const url = LICENSE_URL[l.source.license];
+  const license = url ? ext(url, t('map.layer_license', { name: l.source.license }), 'link') : esc(t('map.layer_license', { name: l.source.license }));
+  return `${owner(l.source.name)} (${license}, ${esc(prettyDate(l.source.fetched_at))})`;
 }
 function mapTab(): string {
   const g = bundle?.greenway, parks = bundle?.parks ?? [];
@@ -358,9 +448,9 @@ function mapTab(): string {
   // On a phone this is one column, exactly as before (.maptop and .mapside are display:contents). On a laptop
   // the map sits beside the switcher and the list, and stays put while the list scrolls.
   return `<main class="wide"><h1 class="page" tabindex="-1">${T('tab.map')}</h1><p class="lede">${T('map.lede')}</p>
-    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, segments: layerOn('place:greenway'), fit: CITY, cover: true })}
+    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, segments: layerOn('place:greenway'), parks: layerOn('place:parks'), fit: CITY, cover: true })}
     <div class="mapside">${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
-    ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map((l) => `${owner(l.source.name)} (${owner(l.source.license)}, ${esc(prettyDate(l.source.fetched_at))})`).join(' · ')}</p>` : ''}
+    ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map(layerSource).join(' · ')}<br>${T('map.layer_filtered')}</p>` : ''}
     ${g ? `<h2>${T('gw.title')}</h2><button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'turn dim')}</button>` : ''}
     ${parks.length ? `<h2>${T('rec.parks')}</h2>${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => `<li><div class="row static"><span class="rowic">${icon('rec')}</span><span class="rowtx"><strong>${owner(p.name)}</strong><small>${[p.address ? owner(p.address) : '', T('miles', { miles: mi.toFixed(1) })].filter(Boolean).join(' · ')}</small></span></div></li>`).join('')}</ul>` : ''}
       <button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.all_parks', { count: parks.length })}</button>` : ''}
@@ -448,17 +538,17 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
   const own = bundle!.alerts.filter((a) => a.status === 'published' && a.targets?.includes(r.id) && Date.parse(a.ends_at) > now().getTime())
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
   return { title: r.name, exit: priv, ownTitle: true, html: `<main class="detail"><p class="org">${owner(r.org)}</p>
-    <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${r.notice ? `<p class="notice">${owner(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
+    <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${holidayNote(o)}${r.notice ? `<p class="notice">${owner(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${owner(ph.label)}` : ''}</span><strong>${phoneHtml(ph.number)}</strong></a>`).join('')}
       ${goHere(r) ? `<div class="two"><a class="btn ghost" href="${esc(goHere(r)!)}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
         <a class="btn ghost" href="${esc(transitHref(r)!)}" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>
         ${busApp(r) ? `<a class="btn ghost" href="${esc(busApp(r)!)}" aria-label="${T('detail.bus_app_label', { name: r.name })}">${icon('transit', 'sm')}${T('detail.bus_app')} ${icon('out', 'sm')}</a>` : ''}` : ''}
-      <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button></div>
+      <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}${canShare(r.category) ? `<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button>` : ''}</div>
       ${savedIds.includes(r.id) ? `<p class="foot">${T('saved.note')}</p>` : ''}</div>
     ${sensitive ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
     ${currentLang() !== 'en' ? `<p class="foot">${T('detail.in_english')}</p>` : ''}<h2>${T('detail.what')}</h2><p lang="en">${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${owner(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: '' })}<span lang="en">${esc(r.hours_text)}</span></p>` : ''}
-    ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${clockHtml(clock(n.opens_at), clock(n.closes_at))}</span></li>`).join('')}</ul>` : ''}
+    ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${clockHtml(clock(n.opens_at), clock(n.closes_at))}${n.holiday ? ` · ${T('hours.holiday')}` : ''}</span></li>`).join('')}</ul>` : ''}
     ${r.address || (!sensitive && r.lat !== undefined) ? `<h2>${T('detail.where')}</h2>${r.address ? `<address lang="en"><bdi>${esc(r.address.line1)}</bdi><br><bdi>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</bdi></address>` : `<p>${T('detail.where_no_address', { source: r.facts.source.name })}</p>`}${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, quiet: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
     ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
     ${r.website ? `<p>${ext(r.website, t('detail.website'), 'link')}</p>` : ''}
@@ -469,12 +559,12 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; overlays?: Overlay[]; segments?: boolean }): string {
+function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
   // Every map but the Map tab's always draws the greenway; there, it is a layer a person switches on.
   const segments = o.segments === false ? [] : bundle?.greenway?.segments ?? [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, overlays: o.overlays,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, overlays: o.overlays, parks: o.parks,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
@@ -567,7 +657,8 @@ function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string;
 }
 // What this app keeps and sends, in plain words (docs/08). Everything here is true of the code; tests check the parts
 // that can be checked (no storage writes in main.ts, closed report fields, no IP in the Worker).
-let keyReset = false;
+let keyReset = false, keyResetFailed = false, queueCleared = false;
+let queued = 0;                                          // reports still waiting on this phone, counted on render
 function privacy(): string {
   const li = (keys: string[]) => `<ul class="plain">${keys.map((k) => `<li>${T(k)}</li>`).join('')}</ul>`;
   return `<main><p class="lede">${T('privacy.lede')}</p>
@@ -576,7 +667,10 @@ function privacy(): string {
     <h2>${T('privacy.sent_h')}</h2>${li(['privacy.sent_1', 'privacy.sent_2'])}
     <h2>${T('privacy.never_h')}</h2><p>${T('privacy.never')}</p>
     <h2>${T('privacy.reset_h')}</h2><p>${T('privacy.reset')}</p>
-    ${keyReset ? `<p class="banner ok" tabindex="-1">${icon('check', 'sm')} ${T('privacy.reset_done')}</p>` : `<button class="btn ghost" data-reset-key>${T('privacy.reset_btn')}</button>`}
+    ${keyReset ? `<p class="banner ok" tabindex="-1">${icon('check', 'sm')} ${T('privacy.reset_done')}</p>`
+      : `<button class="btn ghost" data-reset-key>${T('privacy.reset_btn')}</button>${keyResetFailed ? `<p class="banner warn" tabindex="-1">${T('privacy.reset_failed')}</p>` : ''}`}
+    ${queueCleared ? `<p class="banner ok" tabindex="-1">${icon('check', 'sm')} ${T('privacy.queued_cleared')}</p>`
+      : queued ? `<p class="foot">${T('privacy.queued_note', { count: queued })}</p><button class="btn ghost" data-clear-queue>${T('privacy.queued_clear')}</button>` : ''}
     <p class="foot">${T('about.maker')}</p>${contactLine()}</main>`;
 }
 function about(): string {
@@ -599,8 +693,16 @@ function credits(): string {
 }
 
 const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map' };
+/** Where the cursor is now, named so it can be found again after the page is drawn (focus.ts). */
+const whereIsTheCursor = () => focusSelector(document.activeElement as unknown as FocusEl | null, (n) => n !== (document.body as unknown as FocusEl) && app.contains(n as unknown as Node));
 function render(focus = true): void {
+  // A quick exit empties the stack before it navigates away (`location.replace` is not instant), so anything
+  // still in flight can redraw into an empty stack. There is nothing to draw then: leave the page as it is.
+  if (!stack.length) return;
   const v = stack[stack.length - 1]!;
+  // Where the cursor was, so a redraw that is not a new screen can hand it back (2.4.3). A caller that already
+  // knows where it wants the cursor (refocusSel) wins.
+  const wasFocused = focus ? '' : whereIsTheCursor();
   for (const m of mapViews) m.destroy();
   mapViews = []; mapSpecs = [];
   // `ownTitle`: the heading is a name its owner wrote, so it is marked English on a screen that is not English.
@@ -639,24 +741,57 @@ function render(focus = true): void {
   if (focus) { window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true }); }
   if (refocus) { app.querySelector<HTMLElement>(`[data-layer="${refocus}"]`)?.focus({ preventScroll: true }); refocus = ''; }
   if (refocusSel) { app.querySelector<HTMLElement>(refocusSel)?.focus({ preventScroll: true }); refocusSel = ''; }
+  else if (wasFocused) {
+    // Put the cursor back where it was. `preventScroll`, and no selection change, so a half-typed note is left
+    // exactly as it was found.
+    const back = app.querySelector<HTMLElement>(wasFocused);
+    if (back && back !== document.activeElement) {
+      back.focus({ preventScroll: true });
+      const box = back as HTMLTextAreaElement;
+      if (typeof box.setSelectionRange === 'function' && typeof box.value === 'string') { try { box.setSelectionRange(box.value.length, box.value.length); } catch { /* not a text field */ } }
+    }
+  }
 }
 function navigate(view: View): void {
   if (view.v === 'tab') searchText = '';   // a tab is a fresh start
   if (view.v !== 'detail') listMap = false;   // coming back from a place, the map is still open
   if (view.v === 'add') { proposed = null; proposeError = false; missing = []; addValues = {}; }
-  if (view.v === 'privacy') keyReset = false;
+  if (view.v === 'privacy') { keyReset = false; keyResetFailed = false; queueCleared = false; void queuedCount().then((n) => { if (n !== queued) { queued = n; render(false); } }); }
+  langOffline = false;
   router.navigate(view);
   render();
 }
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-retry],[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry]');
   if (!el) return;
   if ('skip' in el.dataset) { app.querySelector<HTMLElement>('main')?.focus(); }   // past the bar and the tabs, into the page
-  else if ('resetKey' in el.dataset) { await resetInstallSecret(); keyReset = true; refocusSel = '.banner.ok'; render(false); announce(t('privacy.reset_done')); }
+  else if ('resetKey' in el.dataset) {
+    // The new key is what every waiting report will be hashed with when it goes (report.ts recomputes the
+    // one-day hash at sending time), so "reports you send after this can't be matched to ones you sent before"
+    // is true of the queue as well, not only of what is typed next (web review, 2026-09-20).
+    // A phone whose storage refuses the write keeps its old key, and the screen says exactly that instead of
+    // leaving the button looking as though it had worked (strings `privacy.reset_failed`).
+    try {
+      await resetInstallSecret(); keyReset = true; queued = await queuedCount(); refocusSel = '.banner.ok'; render(false); announce(t('privacy.reset_done'));
+    } catch {
+      keyResetFailed = true; refocusSel = '.banner.warn'; render(false); announce(t('privacy.reset_failed'));
+    }
+  }
+  else if ('clearQueue' in el.dataset) { await clearQueue(); queued = 0; queueCleared = true; reported.clear(); refocusSel = '.banner.ok'; render(false); announce(t('privacy.queued_cleared')); }
   else if ('retry' in el.dataset) { el.setAttribute('disabled', ''); void checkForUpdate(true); }
+  else if ('layerRetry' in el.dataset) {
+    const id = el.dataset.layerRetry!, l = (bundle?.transit?.layers ?? []).find((x) => 'go:' + x.id === id);
+    if (l) { layerFiles.delete(layerKey(l.file)); refocus = id; render(false); }
+  }
   else if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
-  else if (el.dataset.lang) { const next = LANGS.find((l) => l.code === el.dataset.lang)?.code ?? ('en' as Lang); if (await setLang(next)) { refocusSel = '[data-lang]'; render(false); announce(t('lang.changed')); } }
+  else if (el.dataset.lang) {
+    const next = LANGS.find((l) => l.code === el.dataset.lang)?.code ?? ('en' as Lang);
+    // A language nobody has opened on this phone yet is its own small download. Offline it simply cannot arrive,
+    // and the switch used to do nothing at all and say nothing (web review, 2026-09-20).
+    if (await setLang(next)) { langOffline = false; refocusSel = '[data-lang]'; render(false); announce(t('lang.changed')); }
+    else { langOffline = true; refocusSel = `[data-lang="${next}"]`; render(false); announce(t('lang.needs_net')); }
+  }
   else if ('listmap' in el.dataset) { listMap = !listMap; refocusSel = '[data-listmap]'; render(false); announce(t(listMap ? 'map.shown' : 'map.hidden')); }
   else if (el.dataset.save) {
     const id = el.dataset.save, row = bundle?.rows.find((x) => x.id === id);
@@ -671,12 +806,19 @@ app.addEventListener('click', async (ev) => {
     const file = box.querySelector<HTMLInputElement>('[data-photo]')?.files?.[0];
     box.querySelectorAll('button').forEach((b) => (b.disabled = true));
     const photo = file ? await preparePhoto(file).then((b) => (b ? uploadPhoto(b) : null)) : null;
-    const state = await submit(await buildReport(target, el.dataset.report, box.querySelector('textarea')?.value ?? '', new Date(), photo));
-    const done = file && !photo && state === 'sent' ? 'sent_no_photo' : state;
-    reported.set(target, done);
-    refocusSel = `.report[data-target="${CSS.escape(target)}"] .banner.ok, .banner.ok`;
+    // This phone's own storage can refuse the write (a full or blocked IndexedDB). Then nothing was sent and
+    // nothing is waiting, and the screen has to say so rather than leave the buttons dead (web review).
+    let state: string;
+    try {
+      state = await submit(await buildReport(target, el.dataset.report, box.querySelector('textarea')?.value ?? '', new Date(), photo));
+    } catch { state = 'failed'; }
+    const done = state === 'failed' ? 'failed' : file && !photo && state === 'sent' ? 'sent_no_photo' : state;
+    reported.set(target, done as ReportOutcome);
+    notes.delete(target); openDetails.delete(target);
+    if (state === 'queued') queued = await queuedCount();
+    refocusSel = `.report[data-target="${CSS.escape(target)}"] .banner.ok, .report[data-target="${CSS.escape(target)}"] .banner.warn, .banner.ok`;
     render(false);
-    announce(t(done === 'queued' ? 'report.queued' : 'report.sent'));
+    announce(t(done === 'failed' ? 'report.failed' : done === 'queued' ? 'report.queued' : 'report.sent'));
   }
   else if ('back' in el.dataset) { if (stack.length > 1) history.back(); else navigate({ v: 'tab', tab: TAB_OF[stack[0]!.v] ?? 'home' }); }
   else if ('exit' in el.dataset) { stack.length = 0; location.replace('https://www.weather.gov/'); }   // replace(): this page leaves the back button too
@@ -709,10 +851,28 @@ app.addEventListener('change', (ev) => {
   const layerId = el.dataset.layer, turningOn = el.checked;
   void toggleLayer(layersOn, layerId).then((next) => { layersOn = next; render(false); announce(t(turningOn ? 'map.layer_on_say' : 'map.layer_off_say', { name: layerName(layerId) })); });
 });
+// Everything a person has typed but not sent is kept as they type it, so a redraw that is not a new screen
+// (a map layer arriving, a newer list, a window crossing the laptop line) never takes it away (WCAG 3.3.7).
+// Memory only: the same rule as the search box — nothing here is written to the phone or sent anywhere.
 app.addEventListener('input', (ev) => {
   const el = ev.target as HTMLInputElement;
-  if (el.id === 'q') { searchText = el.value; redraw(); }
+  if (el.id === 'q') { searchText = el.value; redraw(); return; }
+  const report = el.closest<HTMLElement>('.report');
+  if (report && el.tagName === 'TEXTAREA') { notes.set(report.dataset.target!, el.value); return; }
+  if (el.closest('.addform') && el.name) addValues[el.name] = el.value;
 });
+// A radio ("What kind of help?") is a change, not an input, and "Something wrong?" opening or closing is a
+// toggle. Both are remembered the same way.
+app.addEventListener('change', (ev) => {
+  const el = ev.target as HTMLInputElement;
+  if (el.closest?.('.addform') && el.name && el.type === 'radio' && el.checked) addValues[el.name] = el.value;
+});
+app.addEventListener('toggle', (ev) => {
+  const el = ev.target as HTMLDetailsElement;
+  const box = el.closest?.('.report') as HTMLElement | null;
+  if (!box?.dataset.target) return;
+  if (el.open) openDetails.add(box.dataset.target); else openDetails.delete(box.dataset.target);
+}, true);   // `toggle` does not bubble
 app.addEventListener('submit', (ev) => {
   ev.preventDefault();
   const form = ev.target as HTMLFormElement;
@@ -756,7 +916,7 @@ function checkForUpdate(force = false): Promise<void> {
     // A new list brings new neighborhood numbers: forget the old ones, and load again when a neighborhood screen asks.
     try {
       const next = await refresh(bundle);
-      if (next) { bundle = next; indicators = undefined; }
+      if (next) { bundle = next; indicators = undefined; router.retrace(); }
       if (loadError || next) { loadError = false; render(false); }
       retryIn = 5000;
     } catch (e) {
@@ -773,7 +933,7 @@ function checkForUpdate(force = false): Promise<void> {
 }
 async function start(): Promise<void> {
   // Listeners first, so nothing that happens while the list loads is missed.
-  window.addEventListener('online', () => { void flush(); void flushProposals(); void checkForUpdate(!bundle); });
+  window.addEventListener('online', () => { void flushQueues(); void checkForUpdate(!bundle); });
   // An installed app can stay open for days. Look for a newer list whenever it comes back into view
   // (at most every 15 minutes), so nobody is reading last week's list on a phone that has signal.
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void checkForUpdate(); });
@@ -787,15 +947,35 @@ async function start(): Promise<void> {
   await initLang();
   render(false);
   bundle = await cached();
+  if (bundle) router.retrace();
   savedIds = await loadSaved();
   layersOn = await loadLayers();
+  // What this phone has already said, and is still waiting to send. Without this a reload offered "Still open,
+  // info is right" again for a place whose confirmation was already in the queue (web review, 2026-09-20).
+  for (const id of await queuedTargets()) reported.set(id, 'queued');
+  queued = await queuedCount();
   if (bundle) render(false);
   await checkForUpdate(true);
-  void flush(); void flushProposals();
+  await flushQueues();
+  // A service worker that refuses to register (private mode, a blocked scope, an unsupported browser that still
+  // says `serviceWorker` in navigator) used to throw out of `start` and take everything after it with it.
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-    const reg = await navigator.serviceWorker.register('/sw.js');
-    await navigator.serviceWorker.ready;
-    reg.active?.postMessage({ type: 'cache', urls: performance.getEntriesByType('resource').map((r) => r.name) });
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+      reg.active?.postMessage({ type: 'cache', urls: performance.getEntriesByType('resource').map((r) => r.name) });
+    } catch (e) { console.warn('the app will not work offline: the service worker did not register', e); }
   }
+}
+/** Send what is waiting, then say what is left: the thank-you on a listing, and the count on Your privacy, both
+ *  come from the queue itself rather than from what happened to be clicked this visit. */
+async function flushQueues(): Promise<void> {
+  await Promise.all([flush(), flushProposals()]);
+  const left = new Set(await queuedTargets());
+  let changed = false;
+  for (const [id, state] of reported) if (state === 'queued' && !left.has(id)) { reported.set(id, 'sent'); changed = true; }
+  const n = await queuedCount();
+  if (n !== queued) { queued = n; changed = true; }
+  if (changed) render(false);
 }
 void start();

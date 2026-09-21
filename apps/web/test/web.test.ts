@@ -16,6 +16,7 @@ import { releaseKeyProblems } from '../src/keys.js';
 import { LANGS, dirFor, pickLang } from '../src/i18n.js';
 import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
 import { build as buildReport, fitWithin, nonce, plainJpeg } from '../src/report.js';
+import { hashFor, type View } from '../src/router.js';
 
 const root = join(__dirname, '../../..');
 const strings = JSON.parse(readFileSync(join(root, 'strings/en.json'), 'utf8')) as Record<string, string>;
@@ -473,10 +474,43 @@ describe('map', () => {
     for (const c of ['shelter.dv', 'health.mental', 'health.mental.crisis']) expect(isSensitive(c), c).toBe(true);
     for (const c of ['shelter.emergency', 'health.clinic', 'food.pantry']) expect(isSensitive(c), c).toBe(false);
     expect(main).toContain('helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s)');
-    expect(main).toContain('const sensitiveId = (id: string) => { const r = bundle?.rows.find((x) => x.id === id); return !!r && isPrivate(r.category); }');   // router.ts: no URL for these (private includes sensitive)
+    // No URL for these: router.test.ts drives hashFor and the cold-load case (the rule fails closed until the list loads).
     expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
   });
-  it('the full-screen map leaves the top bar (Urgent help, quick exit) in reach', () => expect(mapSrc).toContain("querySelector('header.top')"));
+  it('"Make the map bigger" really does cover the page: the cascade is worked out, not assumed', () => {
+    // `.mapbox.big { position:fixed; inset:0 }` and the wide-screen `.maptop > .mapbox { position:sticky }` had
+    // the same specificity, and the sticky one came later in the file, so it won: the "full-screen" map stayed
+    // inside its grid column, drew nothing, and left an inert page behind it (web review, 2026-09-20). So this
+    // runs the cascade the way a browser does — every rule that could set `position` on the full-screen map, by
+    // specificity and then by order — instead of trusting either rule on its own.
+    const body = readFileSync(join(__dirname, '../src/style.css'), 'utf8').replace(/\/\*[^]*?\*\//g, '');
+    const rules = [...body.matchAll(/([^{}@]+)\{([^{}]*)\}/g)].map((m, i) => ({ sel: m[1]!.trim(), decl: m[2]!, i }));
+    /** Does this selector match the full-screen map: `<div class="mapbox big">` inside `<div class="maptop">`? */
+    const matchesBigMap = (sel: string) => sel.split(',').map((s) => s.trim()).some((s) => {
+      const parts = s.split('>').map((p) => p.trim());
+      const own = parts[parts.length - 1]!;
+      if (!/^\.mapbox(\.big)?(:not\((\.big|\.small)\))?$/.test(own)) return false;
+      if (/:not\(\.big\)/.test(own)) return false;                      // written to step aside for the big map
+      return parts.length === 1 || parts.slice(0, -1).every((p) => ['.maptop', '.mapside', 'main', ''].includes(p));
+    });
+    const spec = (s: string) => [...s.matchAll(/[.#[:]/g)].length;      // enough to order these few rules
+    const setters = rules.filter((r) => matchesBigMap(r.sel) && /(?:^|;|\s)position\s*:/.test(r.decl));
+    expect(setters.length, 'no rule sets a position on the map box at all').toBeGreaterThan(0);
+    const winner = setters.reduce((a, b) => (spec(b.sel) >= spec(a.sel) ? b : a));
+    expect(`${winner.sel} -> ${/position\s*:\s*([\w-]+)/.exec(winner.decl)![1]}`).toBe(`${winner.sel} -> fixed`);
+    // …and it is pinned to the whole viewport, with nothing pushing it aside for the rail at any width.
+    expect(body).toMatch(/\.mapbox\.big \{[^}]*position:fixed; inset:0;/);
+    expect(body).not.toMatch(/\.mapbox\.big \{[^}]*inset-inline-start:/);
+  });
+  it('covering the page, it brings "Urgent help" (and any quick exit) inside with it', () => {
+    // Behaviour: apps/web/test/behaviour.test.ts drives coverTargets over a fixture page. Here: the buttons that
+    // must never be more than one tap away are the page's own, copied, so they keep their words and their hooks.
+    expect(mapSrc).toContain("private urgentBar(): HTMLElement | null");
+    expect(mapSrc).toContain("['[data-exit]', '.urgent']");
+    expect(mapSrc).toContain('this.el.prepend(this.bar)');
+    expect(mapSrc).toContain('this.hidden = coverTargets(this.el, document.body);');
+    expect(mapSrc).not.toContain("querySelector('header.top')?.getBoundingClientRect");   // no more half-covered bar
+  });
   it('a place with coordinates but no street address still gets directions, and its coordinate is never printed as an address', () => {
     const spot = { lat: 42.3314, lon: -83.0458 };                       // a naloxone station: no address, no phone
     const withAddress = { address: { line1: '1 Main St', city: 'Detroit', zip: '48226' }, lat: 42.33, lon: -83.05 };
@@ -573,8 +607,10 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     expect(PRIVATE_TOPS.sort()).toEqual(['assault', 'treatment']);
   });
   it('treatment, sexual assault, DV and crisis listings are never drawn on it', () => {
-    // The layer rows drop the private kinds outright and the sensitive ones row by row.
-    expect(main).toContain("!isSensitive(r.category)\n    && !PRIVATE_TOPS.includes(r.category.split('.')[0]!) && tops.includes(r.category.split('.')[0]!)");
+    // What the rule DOES, with a fixture holding one of each of these rows, is in apps/web/test/behaviour.test.ts
+    // ("a mixed list of listings"). Here: the Map tab asks that rule rather than writing a filter of its own.
+    expect(main).toContain('rank(mapDrawable(bundle?.rows ?? [], tops)');
+    expect(main).not.toMatch(/rows\.filter\([^)]*isSensitive/);
     for (const c of ['treatment.detox', 'assault', 'shelter.dv', 'health.mental']) {
       const top = c.split('.')[0]!;
       expect(MAP_GROUPS.some((g) => g.tops.includes(top)) && !isSensitive(c) && !isPrivate(c), c).toBe(false);
@@ -614,7 +650,11 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     expect(mapSrc).not.toContain('http');                                // still no tile server, no third party
     // refresh() leaves every map/ file alone, so a first visit downloads none of them.
     expect(readFileSync(join(__dirname, '../src/data.ts'), 'utf8')).toContain("!name.startsWith('map/')");
-    expect(main).toContain('void loadLayer(bundle!.index, l.file)');
+    expect(main).toContain('void loadLayer(bundle!.index, file)');
+    // and the shapes are held under the file AND its checksum, exactly as map.ts holds them, so a newer bundle
+    // is really fetched instead of being answered from a stale entry (web review, 2026-09-20).
+    expect(main).toContain("const layerKey = (file: string) => `${file}:${bundle?.index.files[file]?.sha256 ?? ''}`;");
+    expect(mapSrc).toContain('const key = `${file}:${meta.sha256}`;');
   });
   it('colour never carries the meaning alone: each layer is named in the switcher and again when tapped', () => {
     expect(mapSrc).toContain('stop.name || stop.label');
@@ -662,7 +702,7 @@ describe('wider screens: laptops and desktops (Kyle, 2026-09-20)', () => {
     expect(css).toContain('.maptop,.mapside { display:contents; }');            // the phone: the wrappers are not boxes
     expect(main).toContain('<div class="maptop">');
     expect(main).toContain('<div class="mapside">${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>');
-    expect(wideBlock).toContain('.maptop > .mapbox { position:sticky;');
+    expect(wideBlock).toContain('.maptop > .mapbox:not(.big) { position:sticky;');
   });
   it('the map is drawn again when the pixel ratio or the window changes, and Escape leaves the full-screen map', () => {
     const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
@@ -673,7 +713,7 @@ describe('wider screens: laptops and desktops (Kyle, 2026-09-20)', () => {
   });
   it('a listing prints (people print at a library): no app furniture, ink on white, link addresses spelled out', () => {
     const print = css.slice(css.indexOf('@media print'));
-    expect(print).toContain('.tabs,.skip,.maptools,.mappan,.report,.searchbtn,.langrow');
+    expect(print).toContain('.tabs,.skip,.maptools,.mappan,.mapbar,.report,.searchbtn,.langrow');
     expect(print).toContain('a[href^="http"]::after');
     expect(print).toContain('--ink:#000;');
     expect(print).not.toMatch(/\.top \{[^}]*display:none/);                     // the listing's name lives in the top bar
@@ -691,6 +731,28 @@ describe('release builds pin two good keys', () => {
     const rsa = generateKeyPairSync('rsa', { modulusLength: 1024 }).publicKey.export({ type: 'spki', format: 'der' }).toString('base64');
     expect(releaseKeyProblems([k, rsa]).join()).toMatch(/key 2 is not/);
     expect(releaseKeyProblems([k, 'not base64!']).join()).toMatch(/key 2 is not/);
+  });
+  // The eight small-order points, with the sign bit both ways: a signature verifies under any of them for a message
+  // the attacker did not choose, so a build that pinned one would "verify" a list nobody signed. iOS (HelpCore
+  // BundleCheck) and Android (Ed25519.kt) refuse the same list; the web release check now does too.
+  it('a small-order point is not a key a release may pin', () => {
+    const spki = (y: string) => Buffer.from('302a300506032b6570032100' + y, 'hex').toString('base64');
+    const smallOrder = [
+      '0000000000000000000000000000000000000000000000000000000000000000',
+      '0100000000000000000000000000000000000000000000000000000000000000',
+      '26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05',
+      'c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a',
+      'ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f',
+      'edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f',
+      'eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f',
+    ];
+    for (const y of smallOrder) {
+      const flipped = y.slice(0, 62) + (parseInt(y.slice(62), 16) | 0x80).toString(16).padStart(2, '0');
+      for (const variant of [y, flipped]) {
+        expect(releaseKeyProblems([key(), spki(variant)]).join(), variant).toMatch(/key 2 is a small-order point/);
+      }
+    }
+    expect(releaseKeyProblems([key(), key()])).toEqual([]);   // a real key is still a real key
   });
   it('the build uses the check when WEB_RELEASE=1, and the nightly publish sets it', () => {
     const cfg = readFileSync(join(__dirname, '../vite.config.ts'), 'utf8');
@@ -788,13 +850,20 @@ describe('privacy and copy rules, checked against the source', () => {
       expect(src.match(/method:\s*'POST'/), f).toBeNull();
     }
   });
-  it('need screens and search never put anything in the URL', () => {
-    // Behavior: test/router.test.ts. Here: the no-trace rule is in the router, and main.ts never writes history itself.
-    const router = readFileSync(join(__dirname, '../src/router.ts'), 'utf8');
-    const hashFor = router.slice(router.indexOf('export function hashFor'), router.indexOf('export function fromHash'));
-    expect(hashFor).toMatch(/return null; \/\/ the urgent sheet, search, saved places, and every "need" screen: no trace/);
-    expect(hashFor).not.toMatch(/'search'|'need'|'urgent'|'saved'/);
-    expect(main).not.toMatch(/history\.(pushState|replaceState)/);
+  it('need screens, search, saved places and the urgent sheet never put anything in the URL', () => {
+    // This used to assert that a particular COMMENT was still in router.ts, which a comment edit could satisfy
+    // and a behaviour change could not break. Ask the router instead (web review, 2026-09-20). The trips
+    // themselves — arriving, going back, quick exit — are driven in test/router.test.ts.
+    const never: View[] = [{ v: 'urgent' }, { v: 'search' }, { v: 'saved' }, { v: 'need', id: 'unsafe' },
+      { v: 'need', id: 'drugs', refine: 'detox' }, { v: 'need', id: 'food', all: true },
+      { v: 'list', cat: 'treatment' }, { v: 'list', cat: 'assault' }, { v: 'detail', id: 'sal_dv' }];
+    for (const v of never) expect(hashFor(v, (id) => id === 'sal_dv', '/'), JSON.stringify(v)).toBeNull();
+    // and the ordinary screens still have their own addresses, or nothing could be shared or bookmarked at all
+    for (const [v, want] of [[{ v: 'list', cat: 'food' }, '#/c/food'], [{ v: 'detail', id: 'sal_ok' }, '#/r/sal_ok'],
+      [{ v: 'about' }, '#/about'], [{ v: 'greenway' }, '#/greenway']] as [View, string][]) {
+      expect(hashFor(v, () => false, '/'), want).toBe(want);
+    }
+    expect(main).not.toMatch(/history\.(pushState|replaceState)/);   // only the router touches history
   });
   it('what a person types (search text, ZIP) stays in a variable: never in storage, a request, or the URL', () => {
     // idbSet is the only way this app writes to the phone, and main.ts never calls it.
@@ -886,13 +955,13 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
 
   it('every string key the app asks for exists in both languages (4.1.2: no control named "cat.x")', () => {
     const src = [main, mapSrc, readFileSync(join(__dirname, '../src/hoods.ts'), 'utf8')].join('\n');
-    const dynamic = /^(cat|need|tile|quick|refine|link|add|report|gw|day|open|badge|layer|bundle|hood)\./;
-    // Only whole keys: `t('od.s' + i)` is built from a list and is checked by the loops below.
+    // This loop used to skip a key EXACTLY when it was missing ("built from a list; covered below"), so a
+    // dynamic key no later loop happened to cover could go missing and nothing failed. The keys the app builds
+    // at run time are now enumerated from the lists that build them, and a hole fails, in all four languages:
+    // apps/web/test/behaviour.test.ts, "every word the app asks for exists". What is left here is the literal
+    // keys, which have no excuse at all.
     const keys = new Set([...src.matchAll(/(?<![\w.])[tT]\('((?:[a-z0-9_]+\.)+[a-z0-9_]+)'\s*[,)]/g)].map((m) => m[1]!));
-    for (const k of keys) {
-      if (dynamic.test(k) && !(k in strings)) continue;        // built from a list; the loops below cover those
-      expect(strings[k], `strings/en.json has no ${k}`).toBeTypeOf('string');
-    }
+    for (const k of keys) expect(strings[k], `strings/en.json has no ${k}`).toBeTypeOf('string');
     for (const k of Object.keys(strings)) expect(es[k], `strings/es.json has no ${k}`).toBeTypeOf('string');
     // Same placeholders in both languages, or a screen says "{count} places" out loud.
     const holes = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!).sort().join(',');
@@ -918,10 +987,34 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
     expect(main).toContain("if (refocusSel) { app.querySelector<HTMLElement>(refocusSel)?.focus({ preventScroll: true }); refocusSel = ''; }");
     // One live region, made once, outside the part of the page a redraw replaces.
     expect(main).toContain("sayEl.setAttribute('aria-live', 'polite'); document.body.append(sayEl);");
-    // Exactly one: the search count, which is the same element on every keystroke. Everything else goes through
-    // announce(), because a live region a redraw has just built is never read out.
-    expect(main.match(/role="status"/g) ?? []).toHaveLength(1);
+    // That it is really the ONE region, and that the full-screen map does not silence it, is behaviour, and
+    // counting `role="status"` in the source said neither: apps/web/test/behaviour.test.ts drives the predicate
+    // the map uses (isLiveRegion) and the set of things it covers, over a fixture page. What belongs here is
+    // that the app has exactly one region it builds itself, and that the one inside a screen is the search
+    // count — the only live region a redraw is allowed to replace, because it is replaced on every keystroke.
+    const inScreen = [...main.matchAll(/role="status"/g)];
+    expect(inScreen).toHaveLength(1);
     expect(main).toContain('<p class="vh" id="searchsay" role="status" aria-live="polite">');
+    expect(main.match(/sayEl = document\.createElement/g) ?? []).toHaveLength(1);
+  });
+  it('2.4.3: a redraw nobody asked for hands the cursor back by itself, instead of dropping it on the page', () => {
+    // A background redraw (a layer arriving, a newer list, a window crossing the laptop line) has no
+    // `refocusSel` to follow, so it works out where the cursor was and puts it back. focus.ts is held to a
+    // fixture in apps/web/test/behaviour.test.ts; here: render really asks it, and only when it is not moving
+    // to a new screen (a new screen belongs at its own heading).
+    expect(main).toContain('const wasFocused = focus ? \'\' : whereIsTheCursor();');
+    expect(main).toContain('else if (wasFocused) {');
+    expect(main).toContain('back.focus({ preventScroll: true });');
+  });
+  it('3.3.7: a half-typed note and an opened "Something wrong?" survive a redraw nobody asked for', () => {
+    // The same promise "Add a place" already made, kept for the report box too: the note, and whether the
+    // details are open, are read back out of memory when the box is drawn again.
+    expect(main).toContain('<textarea maxlength="280" rows="2">${esc(notes.get(targetId) ?? \'\')}</textarea>');
+    expect(main).toContain("<details${openDetails.has(targetId) ? ' open' : ''}>");
+    expect(main).toContain("if (report && el.tagName === 'TEXTAREA') { notes.set(report.dataset.target!, el.value); return; }");
+    expect(main).toContain("if (el.closest('.addform') && el.name) addValues[el.name] = el.value;");
+    // and it is memory only: main.ts still never writes to the phone
+    expect(main).not.toMatch(/idbSet|indexedDB|localStorage|sessionStorage/);
   });
   it('4.1.2: only one "Urgent help" button exists at a time, never one hidden behind the other', () => {
     expect(main).toContain("const urgentBtn = wide.matches ? '' : `<button class=\"urgent\"");
@@ -933,11 +1026,16 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
     expect(strings['map.keys']).toMatch(/arrow/i);
   });
   it('2.4.11 and 2.1.2: the full-screen map is a real overlay — nothing behind it is reachable', () => {
+    // WHAT it covers, and what it must never cover, is driven over a fixture page in
+    // apps/web/test/behaviour.test.ts ("the full-screen map is a real overlay"). What is left here is the
+    // handful of facts about the dialog itself that a fixture cannot show.
     expect(mapSrc).toContain("this.el.setAttribute('aria-modal', 'true')");
-    expect(mapSrc).toContain('(n as HTMLElement).inert = true');
     expect(mapSrc).toContain('private release(): void');
-    expect(mapSrc).toContain('(this.opener ?? b).focus();');
     expect(mapSrc).toContain('destroy(): void { this.release();');
+    // The cursor comes back to whatever opened the map — and iOS Safari leaves <body> focused after a tap, so
+    // "whatever opened it" falls back to the button (web review, 2026-09-20).
+    expect(mapSrc).toContain("this.opener = from && from !== document.body && from !== document.documentElement ? from : b;");
+    expect(mapSrc).toContain('(this.opener ?? b).focus();');
   });
   it('3.3.1 and 3.3.3: "Add a place" names the field that is empty and puts the cursor on it', () => {
     expect(main).toContain("missing = ['name', 'category', 'what', 'how_known'].filter");

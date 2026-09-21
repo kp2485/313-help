@@ -77,6 +77,49 @@ describe('what the browser keeps', () => {
   });
 });
 
+// Behaviour, driven through the same fake history a phone drives: what the address bar holds, and what Back
+// finds there. Treatment and help after sexual assault are private (needs.ts PRIVATE_TOPS), so their browse-by-
+// type list is as traceless as their listings — it used to write `#/c/treatment` and keep it (web review).
+describe('a private kind of help leaves no trace, list screen included', () => {
+  const treatment: View = { v: 'list', cat: 'treatment' }, food: View = { v: 'list', cat: 'food' };
+
+  it('no URL, so no window title either; an ordinary category keeps both', () => {
+    expect(hashFor(treatment, () => false, '/')).toBeNull();
+    expect(hashFor({ v: 'list', cat: 'assault' }, () => false, '/')).toBeNull();
+    expect(hashFor(food, () => false, '/')).toBe('#/c/food');
+  });
+  it('walking to it leaves the URL alone', () => {
+    const b = browser(); b.router.start('');
+    b.router.navigate(help); b.router.navigate(treatment); b.router.navigate({ v: 'detail', id: 'sal_t' });
+    expect(b.urls()).toEqual(['/', '#/help', '/', '#/r/sal_t']);
+  });
+  it('quick exit, then Back: the browser has no trip to a treatment screen to go back to', () => {
+    const b = browser(); b.router.start('');
+    b.router.navigate(help);
+    b.router.navigate(treatment);
+    // Quick exit empties the stack and replaces the page. What the browser keeps is what matters.
+    b.router.stack.length = 0;
+    expect(b.urls().join(' ')).not.toMatch(/treatment/);
+    expect(JSON.stringify(b.states())).not.toMatch(/treatment/);
+  });
+  it('a link that ARRIVES at a private screen is taken out of the address bar at once', () => {
+    // A shared or bookmarked link, opened cold. Before this, `#/r/sal_dv` sat in the address bar for as long as
+    // the screen was open, and stayed in the browser's own history list afterwards.
+    const dv = browser(['sal_dv']);
+    dv.router.start('#/r/sal_dv');
+    expect(dv.top()).toEqual({ v: 'detail', id: 'sal_dv' });
+    expect(dv.url()).toBe('/');
+    // And the same link followed while the app is already open.
+    const open = browser(['sal_dv']); open.router.start(''); open.router.navigate(help);
+    open.openLink('#/c/treatment');
+    expect(open.top()).toEqual(treatment);
+    expect(open.url()).toBe('/');
+    // An ordinary screen is left exactly where it was: nothing else changes.
+    const ok = browser(); ok.router.start('#/c/food');
+    expect(ok.url()).toBe('#/c/food');
+  });
+});
+
 describe('links nobody can trust', () => {
   it('an unknown or broken link opens Home or Help, never a half-built screen', () => {
     expect(fromHash('#/c/not_a_category')).toEqual(help);
@@ -96,5 +139,39 @@ describe('every tab can be reached by its own URL', () => {
   it('a tab that no longer exists opens Home, never a half-built screen', () => {
     expect(fromHash('#/transit')).toEqual({ v: 'tab', tab: 'home' });
     expect(fromHash('#/nonsense')).toEqual({ v: 'tab', tab: 'home' });
+  });
+});
+
+// Review, 2026-09-20: on a cold load the list has not loaded yet, so nobody knows whether an id is private.
+// The app's `sensitive` fails closed until it does, then calls retrace().
+describe('a listing link that arrives before the list has loaded', () => {
+  function coldLoad(privateIds: string[]) {
+    let loaded = false;
+    const entries = [{ state: null as unknown, url: '/' }];
+    const hist = {
+      get state() { return entries[0]!.state; },
+      pushState() { throw new Error('not used'); },
+      replaceState(state: unknown, _: string, url?: string | null) { entries[0] = { state, url: url ?? entries[0]!.url }; },
+    };
+    const router = createRouter(hist, { sensitive: (id) => !loaded || privateIds.includes(id), path: () => '/' });
+    return { router, url: () => entries[0]!.url, open(hash: string) { entries[0]!.url = '/' + hash; router.start(hash); }, listLoads() { loaded = true; router.retrace(); } };
+  }
+
+  it('takes a private listing out of the address bar at once, and never puts it back', () => {
+    const b = coldLoad(['sal_dv_x']);
+    b.open('#/r/sal_dv_x');
+    expect(b.url()).toBe('/');
+    expect(b.router.top()).toEqual({ v: 'detail', id: 'sal_dv_x' });
+    b.listLoads();
+    expect(b.url()).toBe('/');
+  });
+
+  it('gives a public listing its address back once the list says it is public', () => {
+    const b = coldLoad(['sal_dv_x']);
+    b.open('#/r/sal_pantry');
+    expect(b.url()).toBe('/');
+    b.listLoads();
+    expect(b.url()).toBe('#/r/sal_pantry');
+    expect(b.router.top()).toEqual({ v: 'detail', id: 'sal_pantry' });
   });
 });
