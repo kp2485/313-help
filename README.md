@@ -58,7 +58,9 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   segments, 302 parks, and **11 transport layers**, with two styles on all three apps: **Standard** and **Subway**
   ([MAP-STYLE](docs/MAP-STYLE.md)). Keyboard: arrows pan, N and P walk the features, Enter opens one.
 - **205 neighborhood pages** from public datasets: no rankings, no per-neighborhood crime, small counts suppressed
-  ([docs/13](docs/13-neighborhood-indicators.md)).
+  ([docs/13](docs/13-neighborhood-indicators.md)). On the web they have their own tab (2026-09-22), which finds
+  the neighborhood you are standing in on the device and lists all 205 A–Z or by council district — never by a
+  number.
 - **Four languages** — English, Español, العربية, বাংলা — each loaded only when chosen. The native apps follow
   the phone's language list. What a place wrote about itself is never machine-translated.
 - **WCAG 2.2 AA audit: 44 pass, 27 found and fixed, 0 open** ([audit](docs/ACCESSIBILITY-AUDIT-2026-09-20.md),

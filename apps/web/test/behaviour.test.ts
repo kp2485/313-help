@@ -433,7 +433,7 @@ describe('the line under the overdose steps says only what Kyle has told us', ()
 });
 
 describe('the Safe streets panel prints what SEMCOG requires, beside its source line', () => {
-  const ui = { t: (k: string, p: Record<string, string | number> = {}) => (table('en')[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), own: (x: unknown) => '<span lang="en">' + String(x) + '</span>', date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '' };
+  const ui = { t: (k: string, p: Record<string, string | number> = {}) => (table('en')[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), own: (x: unknown) => '<span lang="en">' + String(x) + '</span>', date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '', icon: (n: string) => '<svg data-ic="' + n + '"></svg>' };
   const src = { name: 'City data', url: 'https://example.org/x', last_edited: '2026-09-17' };
   const hood: Hood = { id: 'nbh_zug', name: 'Zug', district: 1, center: [42.4, -83.1], rings: [], years: {},
     help: { total: 1, by: {}, nearest_miles: {}, none_listed_yet: [], coverage_checked: false }, places: { parks: 1, rec_centers: 0, greenway_open: 0 },

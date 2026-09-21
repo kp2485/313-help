@@ -4,7 +4,7 @@
 
 ```
 Top bar, every screen:  313 Help · [Urgent help]      (on DV and crisis screens: [Leave this page fast] instead)
-Tab bar, every screen:  Home · Help · Map · Events
+Tab bar, every screen:  Home · Help · Map · Neighborhoods · Events
 
 Top bar (every tab): 313 Help · language (English · Español · العربية · বাংলা) · Urgent help
 Home
@@ -14,9 +14,9 @@ Home
 ├─ Find free help                    →  Help tab
 ├─ Quick needs: Food · A place to sleep · A doctor · Drugs or alcohol · A job · Free Narcan   →  need screen
 ├─ (Coming up: City events — hidden while there are none; dropped until a real feed, DECISIONS 2026-09-19)
-├─ Tiles: Map · Joe Louis Greenway
+├─ Tiles: Map · Joe Louis Greenway · Your neighborhood
 └─ Footer: Updated {date} · About this app · Your privacy
-     About  →  language switch · list version and signature · Neighborhoods
+     About  →  list version and signature · one line to the Neighborhoods tab
      Your privacy  →  the docs/08 table in plain words · "Make a new key"
 
 Help
@@ -31,18 +31,23 @@ Map          one map with a layer switcher (free help by kind · parks · Joe Lo
              thing as a list under the map, then: the greenway, City parks, recreation centers and libraries,
              trip planners, fares, free rides, transit phone numbers, MoGo Access Pass
              Joe Louis Greenway (segments  →  Neighborhoods) and City parks keep their own screens
+Neighborhoods: what the pages are · Your neighborhood (found on the device) · find one by name · all 205,
+             A–Z or by council district  →  one neighborhood (docs/13)
 Events:      City calendar, grouped by day
 
 Urgent help (top bar): 911 · 988 · shelter · crisis line · DV hotline · 211 · overdose steps
-Resource detail · Neighborhoods (from About and from greenway segments)
+Resource detail · a neighborhood (from the Neighborhoods tab, Home, About, a greenway segment, or a link)
 Report a problem with the app: not built.
 ```
+
+**Revised 2026-09-22 (Kyle): five tabs — Home · Help · Map · Neighborhoods · Events**, of which a phone normally shows four, because Events still hides itself. Before 2026-09-22 there were four: Kyle's reason for the fifth was that the neighborhood pages "should have its own tab" instead of being buried on About. Its hash is the `#/n` the screen has always had, so every link made before the tab existed still opens it.
 
 **Revised 2026-09-20 (Kyle): four tabs — Home · Help · Map · Events.** The Recreation and Transit tabs are one **Map** tab; everything either of them offered is still on it. No profile tab; there is no profile.
 
 - **Home**: a calm landing page — hero, a search button, active alerts, one "Find free help" card, six quick needs, tiles into the Map tab and the greenway. No red, no emergency strip.
 - **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
 - **Map** (2026-09-20): one map of the city with a **layer switcher**, then everything Recreation and Transit used to carry. See "Map tab" below. Every listing with an address still gets a **Bus directions** button on its own screen.
+- **Neighborhoods** (2026-09-22): public numbers about each of the City's 205 neighborhoods (docs/13). The tab's own screen is, top to bottom: what these pages are and that we do not rank neighborhoods · where the numbers come from, linked · **Your neighborhood**, worked out **on the device** by point-in-polygon against the outlines the bundle already carries (`apps/web/src/hoodfind.ts`; the shared cases are `schema/neighborhoods/points.json`) from a location already shared this visit or the centre of a typed ZIP, kept in memory and never sent or stored · the ordinary "Use my location" / "Type a ZIP code" chip, with no new permission pattern · **find a neighborhood**, search as you type, with a politely announced count · all 205, **A to Z or by council district** and never by any number (docs/13, rule 1: the index rows carry no indicator at all) · a plain line saying Hamtramck, Highland Park and Dearborn have no neighborhood pages, with the Map tab offered instead. The tab label is short on the phone bar ("Areas") because "Neighborhoods" is three times the width of a fifth of a 320 px screen; the side rail, the window title and the screen's own heading say the whole word.
 - **Events**: was the City calendar, grouped by day, with details linking out. **Dropped 2026-09-19** until the City publishes a real events feed, so the bundle carries no events and **the tab hides itself**; the code stays. (A tab bar that reserved a fifth column for it was a bug the 2026-09-20 audit found and fixed.)
 - **Urgent help**: a button in the top bar of every screen (replaced by quick-exit on DV and crisis screens) opens the numbers sheet: 911, 988, shelter, crisis line, DV hotline, 211, plus the overdose steps. One tap from anywhere (Principle 3). 911 is the only red element in the app besides quick exit.
 
@@ -50,7 +55,7 @@ The earlier "emergency strip" and needs-on-Home layout are superseded by this st
 
 ## Home
 
-- Top to bottom (**revised 2026-09-20**; the language control moved into the top bar 2026-09-21): "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · **six quick needs** (Food · A place to sleep · A doctor · Help with drugs or alcohol · A job · Free Narcan), one tap each · two tiles, **Map** and the greenway · a footer with "Updated {date}", About and Your privacy.
+- Top to bottom (**revised 2026-09-20**; the language control moved into the top bar 2026-09-21): "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · **six quick needs** (Food · A place to sleep · A doctor · Help with drugs or alcohol · A job · Free Narcan), one tap each · three tiles, **Map**, the greenway and **Your neighborhood** · a footer with "Updated {date}", About and Your privacy.
 - **Alerts**: cards with title, plain-language body, a call button for each phone number, when it ends ("Until {when}"), and a link to where it was announced. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
 - **"What do you need?"** now heads the Help tab (see above). Principle 3 path: Help → need (1) → refinement if any (2) → **Call** (3); from Home, a quick need skips the first tap.
 - **Browse by type** (Help tab chips): Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people.

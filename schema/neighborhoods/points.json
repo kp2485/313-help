@@ -1,0 +1,22 @@
+{
+  "description": "Which of the City's 205 neighborhood outlines a point on the device falls in (docs/13; apps/web/src/hoodfind.ts hoodAt). The outlines ride in the signed bundle as indicators/neighborhoods.json; a point never leaves the device, and these cases are run against the bundle by each client. Expect null is a real answer: the City's outlines cover Detroit only, so Hamtramck, Highland Park, Dearborn, Windsor and the lake are in none of them and the screen says so rather than naming the nearest.",
+  "cases": [
+    { "name": "Eastern Market", "lat": 42.3479, "lon": -83.0401, "expect": "nbh_eastern_market" },
+    { "name": "Belle Isle", "lat": 42.3389, "lon": -82.9781, "expect": "nbh_belle_isle" },
+    { "name": "Corktown, by Michigan Central", "lat": 42.329, "lon": -83.0776, "expect": "nbh_corktown" },
+    { "name": "Bagley, Livernois at Curtis", "lat": 42.4197, "lon": -83.1487, "expect": "nbh_bagley" },
+    { "name": "the DIA, which the City files under Cultural Center, not Midtown", "lat": 42.3594, "lon": -83.0645, "expect": "nbh_cultural_center" },
+    { "name": "Clark Park, southwest", "lat": 42.3128, "lon": -83.1074, "expect": "nbh_central_southwest" },
+    { "name": "Dearborn, by the city hall: no neighborhood page", "lat": 42.3223, "lon": -83.1763, "expect": null },
+    { "name": "Hamtramck, Jos Campau: no neighborhood page", "lat": 42.3928, "lon": -83.056, "expect": null },
+    { "name": "Highland Park, Woodward: no neighborhood page", "lat": 42.4056, "lon": -83.0969, "expect": null },
+    { "name": "across the river in Windsor", "lat": 42.3149, "lon": -83.0364, "expect": null },
+    { "name": "out on Lake St Clair", "lat": 42.45, "lon": -82.8, "expect": null }
+  ],
+  "zip_cases": [
+    { "name": "48226 downtown", "zip": "48226", "expect": ["nbh_downtown"] },
+    { "name": "48203, north end", "zip": "48203", "expect": ["nbh_grixdale_farms"] },
+    { "name": "48212, Davison", "zip": "48212", "expect": ["nbh_davison"] }
+  ],
+  "note": "zip_cases take the ZIP's centre point from places/zips.json, which is all the bundle carries: one point per ZIP. A ZIP covers more than one neighborhood, and the screen says so. When the bundle one day carries ZIP outlines, these lists grow and the cases stay where they are."
+}
