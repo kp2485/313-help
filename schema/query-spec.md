@@ -97,12 +97,37 @@ Dates are calendar days on a Detroit calendar: a timestamp of `2026-09-20T01:30Z
 
 1. **Eligibility**: active rows, category match (exact or prefix), every requested flag present.
 2. **Preferred flags** (only when the query asks, e.g. "I'm under 25" prefers `youth`): rows carrying every preferred flag come first. Nothing is left out.
-3. **Distance band**: 0–1 mi, 1–3 mi, 3+ mi. With no location, or for a row with no coordinates (hotlines, DV), band 0.
-4. **Reported-closed rows go last in their band** (still visible).
-5. **Open key.** Mode `now`: open → closes soon → opens later today → call first (and `holiday`, which ranks exactly as `call_first` does) → opens another day → no upcoming time → unknown. Mode `week`: open now or any time in the next 7 days → call first (and `holiday`) → nothing this week → unknown. A `holiday` row never sorts above a row that is known to be open.
-6. **Distance**, then **id** for a stable order.
+3. **Distance band**: 0–1 mi, 1–3 mi, 3+ mi. With no location, or for a row with no coordinates (hotlines), band 0. A domestic-violence row gets its band from its **service area** instead; see below.
+4. **Wide-area key** (domestic violence only): a row whose service area is `statewide` or `national` sorts after every row with a local area. 0 for everything else, so it never moves an ordinary list.
+5. **Reported-closed rows go last in their band** (still visible).
+6. **Open key.** Mode `now`: open → closes soon → opens later today → call first (and `holiday`, which ranks exactly as `call_first` does) → opens another day → no upcoming time → unknown. Mode `week`: open now or any time in the next 7 days → call first (and `holiday`) → nothing this week → unknown. A `holiday` row never sorts above a row that is known to be open.
+7. **Distance**, then **id** for a stable order. A domestic-violence row's distance is always `null` and contributes 0 here, so two rows in one area are separated only by the open key and their ids — never by anything derived from a location.
 
 Distance comes before openness because many users have no car. There is no freshness key: time since a check never reorders a list; only reports do.
+
+### Domestic-violence rows: service area, never a place
+
+A `shelter.dv` row (and any sub-category of it) carries **no `address`, no `lat`/`lon`, and no `zip`** — the bundle is public and signed, so anything in it is published, and a shelter's address can get someone killed. The rule holds even when the shelter publishes its own address (DECISIONS 2026-09-20). A steward may instead record `service_area`: one value from a small closed list of **coarse public areas** — a whole city or larger — that the owner's own page names as where it serves or is based.
+
+| `service_area` | Reference point (public, fixed, about the area) |
+|---|---|
+| `detroit` | Detroit City Hall (Coleman A. Young Municipal Center) |
+| `dearborn` | Dearborn Administrative Center |
+| `hamtramck` | Hamtramck City Hall |
+| `highland_park` | Highland Park City Hall |
+| `wayne_county` | the geographic centre of Wayne County |
+| `wayne_county_west` | Westland City Hall, the largest city of western Wayne County |
+| `wayne_county_downriver` | Taylor City Hall, the largest city of the Downriver communities |
+| `statewide` | none — ranks after every local area |
+| `national` | none — ranks after every local area |
+
+The table lives in **code** (`packages/query/src/areas.ts`, mirrored in `Areas.swift` and `Areas.kt`), never in a row. Every shelter serving one area therefore shares one identical point, and that point is a city hall, not a shelter. No ZIP codes and no neighbourhoods: an area must be a whole city or bigger.
+
+**Banding.** With a location (shared or typed as a ZIP), a `shelter.dv` row with a local `service_area` gets a **coarse** band from the distance between the person and that area's reference point: **0–3 mi → 0, 3–10 mi → 1, over 10 mi → 2**. `statewide` and `national` get band 2 and the wide-area key 1. Without a location, and for a row with no `service_area`, the band is 0 and the wide-area key is 0 — exactly as today.
+
+**`miles` is always `null`** on a ranked domestic-violence row, whatever its area. No client ever shows a distance, a map, a dot, directions, a bus link or a "near you" claim for one. The screen shows the area in words ("Serves Detroit"), a Call button, and one sentence: the shelter does not share its address; call and they will say where to go.
+
+**Why this leaks nothing.** Every input to the band is public: the person's own location, which never leaves the device, and a city hall's coordinate, which is in code and identical for every shelter in that area. The band is a function of the area alone, so two shelters that serve the same area are always in the same band and are separated only by their open key and their ids. Ordering can tell a reader which area a row serves — which the screen says in words anyway — and nothing finer.
 
 ## Search
 

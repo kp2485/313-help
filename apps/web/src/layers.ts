@@ -26,3 +26,13 @@ export async function setLayers(ids: string[]): Promise<string[]> {
   await idbSet('layers', next);
   return next;
 }
+
+// ---- the map style (docs/MAP-STYLE.md, section 1) ---------------------------------------------------------------
+// How the transport layers are drawn: `standard` (one colour per layer, the default) or `subway` (one line per
+// route, like a metro map). The same kind of fact as the layer list, kept in the same place under the same
+// rules: this phone only, never sent, not in any report.
+export type MapStyle = 'standard' | 'subway';
+/** Whatever was stored, read safely: only the exact word "subway" is subway; everything else is standard. */
+export const mapStyle = (stored: unknown): MapStyle => (stored === 'subway' ? 'subway' : 'standard');
+export async function loadStyle(): Promise<MapStyle> { return mapStyle(await idbGet<unknown>('style')); }
+export async function saveStyle(style: MapStyle): Promise<MapStyle> { const next = mapStyle(style); await idbSet('style', next); return next; }

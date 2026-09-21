@@ -30,8 +30,16 @@ object L {
 
     fun load(context: Context) {
         for (code in LANGUAGES) tables[code] = read(context, code)
-        val want = Locale.getDefault().language
-        lang = if (want in LANGUAGES && tables[want]?.isNotEmpty() == true) want else "en"
+        // The phone's own languages, in the person's order: the first one the app has words for. A phone set to
+        // Urdu, then Arabic, then English gets Arabic, as it does on the iPhone (Help.swift). Never asked for,
+        // never stored. LocaleList is API 24, which is minSdk. The choice itself is `pickLanguage` in Language.kt,
+        // which has no android.* in it and is held to a test on a plain JDK; this reads the list and nothing more.
+        val wanted = android.os.LocaleList.getDefault()
+        lang = pickLanguage(
+            wanted = (0 until wanted.size()).map { wanted[it].language },
+            carried = LANGUAGES,
+            hasWords = { tables[it]?.isNotEmpty() == true },
+        )
     }
 
     /** The language in use. Only for choosing a date format; never stored, never sent. */

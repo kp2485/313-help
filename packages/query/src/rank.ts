@@ -2,11 +2,15 @@ import type { Alert, Badge, BundleRow, OpenResult } from './types.js';
 import { badge } from './freshness.js';
 import { nextOccurrences, openNow } from './schedule.js';
 import { nowWallMinutes } from './time.js';
+import { AREA_BAND_MILES, SERVICE_AREAS, isDvCategory } from './areas.js';
 
 // One ranking rule (DECISIONS 10-B2):
-//   eligibility -> preferred flags (if asked) -> distance band -> reported-closed last -> open-now / next-open -> distance -> id
+//   eligibility -> preferred flags (if asked) -> distance band -> wide area -> reported-closed last
+//   -> open-now / next-open -> distance -> id
 // No freshness tier: time passing never reorders a list; only reports do (DECISIONS 2026-09-19).
 // Distance comes before everything except eligibility because many users have no car.
+// A domestic-violence row has no coordinate at all, so it gets its band from its service area's public
+// reference point instead, and never a distance (areas.ts, schema/query-spec.md, DECISIONS 2026-09-20).
 
 export interface Query {
   /** Category slug or prefix: "food" matches "food.pantry". */
@@ -43,6 +47,23 @@ function bandOf(mi: number | null): 0 | 1 | 2 {
   return mi <= 1 ? 0 : mi <= 3 ? 1 : 2;
 }
 
+/**
+ * Band and wide-area key for a domestic-violence row. Every input is public and per-area: the person's own
+ * location (which never leaves the device) and a city hall's coordinate that is identical for every shelter
+ * serving that area. The row itself contributes nothing but the name of the area.
+ *
+ * No location, or no service area: band 0 and wide 0, exactly as a row with no coordinates ranks today.
+ */
+function dvBand(row: BundleRow, near?: { lat: number; lon: number }): { band: 0 | 1 | 2; wide: 0 | 1 } {
+  const area = row.service_area ? SERVICE_AREAS[row.service_area] : undefined;
+  if (!near || !area) return { band: 0, wide: 0 };
+  // statewide and national have no local centre: farthest band, and after every local area.
+  if (!area.point) return { band: 2, wide: 1 };
+  const mi = miles(near, area.point);
+  const [close, mid] = AREA_BAND_MILES;
+  return { band: mi <= close ? 0 : mi <= mid ? 1 : 2, wide: 0 };
+}
+
 function openKeyNow(o: OpenResult, today: string): number {
   switch (o.state) {
     case 'open': return 0;
@@ -72,12 +93,15 @@ export function rank(rows: BundleRow[], q: Query, now: Date, alerts: Alert[] = [
     .filter((r) => !q.category || r.category === q.category || r.category.startsWith(q.category + '.'))
     .filter((r) => (q.flags ?? []).every((f) => r.flags.includes(f)))
     .map((row) => {
-      // DV rows never carry coordinates, so they never get a distance (docs/08).
-      const mi = q.near && row.lat !== undefined && row.lon !== undefined
+      // DV rows never carry coordinates and never get a distance (docs/08). Their band comes from the public
+      // reference point of the area they serve, so proximity works without any fact that locates a shelter.
+      const dv = isDvCategory(row.category);
+      const mi = !dv && q.near && row.lat !== undefined && row.lon !== undefined
         ? miles(q.near, { lat: row.lat, lon: row.lon }) : null;
+      const { band, wide } = dv ? dvBand(row, q.near) : { band: bandOf(mi), wide: 0 as const };
       const open = openNow(row, now, alerts);
       const key = mode === 'week' ? openKeyWeek(row, open, now, alerts) : openKeyNow(open, today);
-      return { row, open, badge: badge(row, now), miles: mi, band: bandOf(mi), key };
+      return { row, open, badge: badge(row, now), miles: mi, band, key, wide };
     });
 
   // Rows with 2+ standing closed reports stay visible but go last in their band (docs/04).
@@ -88,10 +112,13 @@ export function rank(rows: BundleRow[], q: Query, now: Date, alerts: Alert[] = [
   out.sort((a, b) =>
     preferred(a) - preferred(b)
     || a.band - b.band
+    // Statewide and national DV lines after every local area. 0 for every other row, so ordinary lists are untouched.
+    || a.wide - b.wide
     || reported(a) - reported(b)
     || a.key - b.key
+    // A DV row's miles is always null, so two shelters in one area are separated by the open key and the id only.
     || (a.miles ?? 0) - (b.miles ?? 0)
     || a.row.id.localeCompare(b.row.id));
 
-  return out.map(({ key: _key, ...r }) => r);
+  return out.map(({ key: _key, wide: _wide, ...r }) => r);
 }

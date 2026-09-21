@@ -14,11 +14,14 @@ struct Help313App: App {
     @StateObject private var saved = Saved.shared
     @StateObject private var reporter = Reporter.shared
     @StateObject private var nav = AppNav()
+    /// The Map tab's camera, layers and decoded shapes. It lives here rather than in the tab so that the city is
+    /// decoded once per launch instead of every time the tab comes back.
+    @State private var map = MapModel()
     @Environment(\.scenePhase) private var phase
     var body: some Scene {
         WindowGroup {
             RootView().environmentObject(store).environmentObject(here).environmentObject(saved)
-                .environmentObject(reporter).environmentObject(nav)
+                .environmentObject(reporter).environmentObject(nav).environment(map)
                 // The direction follows the words, not the phone's region: Arabic mirrors every screen, and
                 // every layout is already written in leading/trailing terms (docs/ACCESSIBILITY-AUDIT-2026-09-20).
                 .environment(\.layoutDirection, L.rightToLeft ? .rightToLeft : .leftToRight)
@@ -32,6 +35,10 @@ struct Help313App: App {
                     // directory that was recreated comes back without it (HelpCore/DeviceState).
                     try? DeviceState.prepare()
                     Net.start(version: Config.version)
+                    #if DEBUG
+                    if MapStage.has("-mapTab") { nav.tab = .map }
+                    map.applyStage()
+                    #endif
                     await store.start()
                     await reporter.flush()
                 }
@@ -45,7 +52,7 @@ struct Help313App: App {
 /// the stacks are thrown away, Home comes up, and a neutral page opens in the browser, so the app behind the
 /// browser shows nothing about why it was open (the same thing `location.replace` does on the web).
 @MainActor final class AppNav: ObservableObject {
-    enum Tab: Hashable { case home, help, greenway, events }
+    enum Tab: Hashable { case home, help, map, events }
     @Published var tab: Tab = .home
     /// Changing this rebuilds the navigation stacks, which pops every screen off them.
     @Published var rootID = UUID()
@@ -114,11 +121,12 @@ struct RootView: View {
         TabView(selection: $nav.tab) {
             NavigationStack { HomeView() }.tabItem { Label(L.t("tab.home"), systemImage: "house") }.tag(AppNav.Tab.home)
             NavigationStack { HelpView() }.tabItem { Label(L.t("tab.help"), systemImage: "heart") }.tag(AppNav.Tab.help)
-            // The web app folded Recreation and Transit into one Map tab (2026-09-20). This tab holds what that
-            // tab holds on the iPhone — the greenway — and takes its word, `tab.map`: the greenway's own name
-            // ("مسار Joe Louis Greenway") does not fit a tab bar item in Arabic and was cut off at the edge of the
-            // screen (iPhone review, 2026-09-20). The screen itself is still titled with `gw.title`.
-            NavigationStack { GreenwayView() }.tabItem { Label(L.t("tab.map"), systemImage: "tree") }.tag(AppNav.Tab.greenway)
+            // The web app folded Recreation and Transit into one Map tab (2026-09-20), and this tab is now the
+            // same thing on the iPhone: a full-screen map of the city, drawn on the phone from the signed bundle,
+            // with the greenway, our own listings, parks and the transport layers on it (Kyle, 2026-09-20). It
+            // carries its own NavigationStack, so it is not wrapped in another one here.
+            // Everything on it is also a list: "See this map as a list", and the greenway list under it.
+            MapTabView().tabItem { Label(L.t("tab.map"), systemImage: "map") }.tag(AppNav.Tab.map)
             // Only when the list carries events (none today: DECISIONS 2026-09-19).
             if !(store.bundle?.events.isEmpty ?? true) {
                 NavigationStack { EventsView() }.tabItem { Label(L.t("tab.events"), systemImage: "calendar") }.tag(AppNav.Tab.events)
@@ -383,7 +391,10 @@ struct ResultsView: View {
     var quickExit = false
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt)
-        var q = query; if !sensitive { q.near = here.point }
+        // The location goes into the ranker even on a sensitive screen: a DV row's `miles` comes back nil from the
+        // ranker whatever is passed, so withholding it only stopped those rows from being banded by service area.
+        // Nothing about the person leaves the device either way (docs/08).
+        var q = query; q.near = here.point
         let ranked = rank(store.bundle?.rows ?? [], q, now: now, alerts: store.bundle?.alerts ?? [])
         return ScrollView { VStack(alignment: .leading, spacing: 10) {
             if let intro { Text(L.t(intro)).font(.body).foregroundStyle(Color.muted) }
@@ -489,6 +500,9 @@ struct Card: View {
             HStack(spacing: 8) {
                 Pill(text: openText(r.open), tone: Pill.tone(for: r.open.state))
                 if showMiles, let mi = r.miles { Pill(text: L.t("miles", ["miles": String(format: "%.1f", mi)])) }
+                // A domestic-violence shelter publishes no address, so it can have no distance. What it can say is
+                // who it serves, which is the thing a person actually needs in order to choose (HelpCore/Listing).
+                if let area = serviceAreaStringKey(r.row) { Pill(text: L.t("safe.dv_serves", ["area": L.t(area)])) }
             }
             if let n = r.row.notice { Text(n).font(.footnote).foregroundStyle(Color.warnInk).padding(10).frame(maxWidth: .infinity, alignment: .leading).background(Color.warnBg, in: RoundedRectangle(cornerRadius: 10)) }
             Text(badgeText(r.badge)).font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
@@ -566,6 +580,15 @@ struct DetailView: View {
             // Saved places are kept on this phone only, and a private listing has no Save button at all (docs/08).
             SaveButton(row: row)
             if sensitive { Text(L.t("safe.calls_note")).font(.footnote).foregroundStyle(Color.muted) }
+            // A shelter that keeps its address secret says so plainly, and says who it serves, rather than simply
+            // showing nothing where an address would be.
+            if saysNoAddress(row) {
+                Text(L.t("safe.dv_no_address")).font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+            }
+            if let area = serviceAreaStringKey(row) {
+                Text(L.t("safe.dv_serves", ["area": L.t(area)])).font(.footnote).foregroundStyle(Color.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             if L.translated { Text(L.t("detail.in_english")).font(.footnote).foregroundStyle(Color.muted) }
             DetailSection(title: L.t("detail.what")) { Text(row.what).fixedSize(horizontal: false, vertical: true) }
             if let e = row.eligibility { DetailSection(title: L.t("detail.who")) { Text(e).fixedSize(horizontal: false, vertical: true) } }

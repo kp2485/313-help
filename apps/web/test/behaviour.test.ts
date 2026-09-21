@@ -13,7 +13,9 @@ import { HOW_KNOWN, PROPOSE_CATEGORIES } from '../src/propose.js';
 import { canSave, canShare } from '../src/saved.js';
 import { safeUrl } from '../src/url.js';
 import { focusSelector, type FocusEl } from '../src/focus.js';
-import { coverTargets, esc, isLiveRegion } from '../src/map.js';
+import { LAYER_STYLE } from '../src/layerstyle.js';
+import { coverTargets, esc, focusableDots, isLiveRegion, mapKey, orderFeatures } from '../src/map.js';
+import { langPicker } from '../src/i18n.js';
 import { hoodPage, SEMCOG_NOTICE, type Hood, type Indicators } from '../src/hoods.js';
 
 const root = join(__dirname, '../../..');
@@ -95,6 +97,154 @@ describe('the full-screen map is a real overlay, and the app can still speak fro
     // innerHTML and into aria-label.
     expect(esc(`Don't <b>zoom</b> & "stop"`)).toBe('Don&#39;t &lt;b&gt;zoom&lt;/b&gt; &amp; &quot;stop&quot;');
     expect(esc('plain words')).toBe('plain words');
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// The language control (Kyle, 2026-09-20): one line in the top bar, not a row of its own under it.
+// ---------------------------------------------------------------------------------------------------
+describe('choosing a language is one control on one line, and the platform draws the list', () => {
+  const esc = (s: string) => String(s).replace(/[&<>"\']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+  const render = (current: 'en' | 'es' | 'ar' | 'bn') => langPicker(current, 'Language', '<svg aria-hidden="true"></svg>', esc);
+
+  it('one row: a label, a decorative globe and a native select — no menu of our own to get wrong', () => {
+    const html = render('en');
+    expect(html.startsWith('<label class="langpick">')).toBe(true);
+    expect(html.endsWith('</select></label>')).toBe(true);
+    // Exactly one control, and it is a real <select>: the operating system draws the list, which is what makes
+    // it work under Switch Control and on a cheap Android phone.
+    expect(html.match(/<select/g)).toHaveLength(1);
+    expect(html).not.toMatch(/aria-expanded|role="menu"|<button/);
+    // Its name is exactly "Language", so it reads as "Language, English, pop-up button" (4.1.2). It is an
+    // aria-label and not text inside the <label>, because a label that wraps a select takes the select's own
+    // options into the name it computes — "Language English Español العربية বাংলা" (found live, 2026-09-21).
+    expect(html).toContain('aria-label="Language"');
+    expect(html).not.toContain('<span class="vh">');
+    expect(html).toContain('aria-hidden="true"');                     // the globe says nothing
+  });
+
+  it('four options, each naming its own language in its own language, each carrying its own lang (3.1.2)', () => {
+    const html = render('en');
+    const options = [...html.matchAll(/<option value="(\w+)" lang="(\w+)"([^>]*)>([^<]+)<\/option>/g)];
+    expect(options).toHaveLength(4);
+    expect(options.map((m) => [m[1], m[2], m[4]])).toEqual([
+      ['en', 'en', 'English'], ['es', 'es', 'Español'], ['ar', 'ar', 'العربية'], ['bn', 'bn', 'বাংলা'],
+    ]);
+    // Every language is offered on every screen, and the list is the app's own list, not a second copy of it.
+    expect(options.map((m) => m[1])).toEqual(LANGS.map((l) => l));
+  });
+
+  it('the one in use is the one selected, whichever it is', () => {
+    for (const code of LANGS) {
+      const picked = [...render(code).matchAll(/<option value="(\w+)"[^>]*?( selected)?>/g)].filter((m) => m[2]);
+      expect(picked.map((m) => m[1]), code).toEqual([code]);
+    }
+  });
+
+  it('it is in the top bar, on the screens a person browses from, and never inside the full-screen map', () => {
+    const main = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
+    const map = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
+    // One row: the bar itself, with the control between the name (or the page title) and Urgent help.
+    expect(main).toContain('</div>${picker}${urgentBtn}</header>');
+    expect(main).toContain('${picker}${quickExit ? `<button class="exit" data-exit>');
+    expect(main).toContain("const showLang = v.v === 'tab' || v.v === 'about';");
+    // The old row under the bar is gone from every screen that had it.
+    expect(main).not.toContain('langBtn');
+    expect(main).not.toContain('class="langrow"');
+    // The full-screen map copies only the two controls that must never be more than one tap away.
+    expect(map).toContain("const wanted = ['[data-exit]', '.urgent'].map(find)");
+    expect(map).not.toContain('langpick');
+  });
+
+  it('the choice still stays on the phone, still says so when it cannot be fetched, and keeps the cursor', () => {
+    const main = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
+    expect(main).toContain("refocusSel = '[data-lang-select]';");
+    expect(main).toContain("void setLang(next).then((ok) => { langOffline = !ok; render(false); announce(t(ok ? 'lang.changed' : 'lang.needs_net')); });");
+    expect(readFileSync(join(__dirname, '../src/i18n.ts'), 'utf8')).toContain("idbSet('lang'");
+    // A printed page has no language control on it.
+    expect(readFileSync(join(__dirname, '../src/style.css'), 'utf8')).toMatch(/@media print[\s\S]*\.langpick/);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// The picture answers to a keyboard and to a switch (WCAG 2.1.1). The text list under every map is still
+// the equivalent and still complete; this is the map itself becoming operable rather than an ornament.
+// ---------------------------------------------------------------------------------------------------
+describe('the map has a roving focus, and it is allowed nowhere the map is not', () => {
+  const dot = (label: string, category: string, d: number) => ({ kind: 'dot' as const, route: 0, d, label, category, lat: 42.33, lon: -83.05 });
+
+  it('greenway stretches first, in route order; then the places, nearest the middle of the screen first', () => {
+    const list = [
+      dot('Furthest pantry', 'food', 300),
+      { kind: 'segment' as const, route: 2, d: 0, label: 'Dequindre Cut, north' },
+      dot('Nearest pantry', 'food', 12),
+      { kind: 'segment' as const, route: 0, d: 0, label: 'Riverwalk' },
+      dot('Middle clinic', 'health', 140),
+      { kind: 'segment' as const, route: 1, d: 0, label: 'Dequindre Cut, south' },
+    ];
+    expect(orderFeatures(list).map((f) => f.label)).toEqual([
+      'Riverwalk', 'Dequindre Cut, south', 'Dequindre Cut, north',
+      'Nearest pantry', 'Middle clinic', 'Furthest pantry',
+    ]);
+    // and the order does not depend on the order they were found in
+    expect(orderFeatures([...list].reverse()).map((f) => f.label)).toEqual(orderFeatures(list).map((f) => f.label));
+  });
+
+  it('the ring can never land on a row the map is not allowed to draw — the same predicate, not a second copy', () => {
+    const dots = [
+      { lat: 42.33, lon: -83.05, label: 'Capuchin Soup Kitchen', category: 'food.meal' },
+      { lat: 42.34, lon: -83.06, label: 'A DV shelter', category: 'shelter.dv' },
+      { lat: 42.35, lon: -83.07, label: 'A crisis line', category: 'health.mental' },
+      { lat: 42.36, lon: -83.08, label: 'A treatment program', category: 'treatment.detox' },
+      { lat: 42.37, lon: -83.09, label: 'After an assault', category: 'assault' },
+      { lat: 42.38, lon: -83.10, label: 'A warming center', category: 'rec' },
+    ];
+    expect(focusableDots(dots).map((d) => d.label)).toEqual(['Capuchin Soup Kitchen', 'A warming center']);
+    // Exactly what mapDrawable itself says, so there is one rule and not two.
+    expect(focusableDots(dots)).toEqual(mapDrawable(dots, MAP_GROUPS.flatMap((g) => g.tops)));
+    // Fails closed: a dot that never said what kind of place it is is not walked either.
+    expect(focusableDots([{ lat: 42.33, lon: -83.05, label: 'Unlabelled' }])).toEqual([]);
+  });
+
+  it('the keys: N and P walk, the arrows still pan, Tab still leaves, and a modifier is never ours', () => {
+    const k = (key: string, mods: Record<string, boolean> = {}) => mapKey({ key, ...mods });
+    expect(k('n')).toBe('next'); expect(k('N')).toBe('next');
+    expect(k('p')).toBe('prev'); expect(k('P')).toBe('prev');
+    expect(k('Enter')).toBe('open'); expect(k(' ')).toBe('open');
+    expect(k('Escape')).toBe('escape');
+    // 2.5.7: the arrows are how the map moves without dragging. Driving the list with them would take that away.
+    for (const [key, act] of [['ArrowLeft', 'left'], ['ArrowRight', 'right'], ['ArrowUp', 'up'], ['ArrowDown', 'down']]) expect(k(key!)).toBe(act);
+    expect(k('+')).toBe('in'); expect(k('=')).toBe('in'); expect(k('-')).toBe('out');
+    // 2.1.2: nothing about Tab is the map's business, so Tab always walks out of it.
+    expect(k('Tab')).toBeNull();
+    expect(k('Tab', { shiftKey: true })).toBeNull();
+    // 2.1.4: a letter with a modifier belongs to the browser or to a screen reader.
+    for (const mod of ['metaKey', 'ctrlKey', 'altKey']) { expect(k('n', { [mod]: true })).toBeNull(); expect(k('p', { [mod]: true })).toBeNull(); }
+    expect(k('q')).toBeNull();
+  });
+
+  it('what the map source actually does with those actions, and what it says while doing it', () => {
+    const src = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
+    // The ring is the keyboard's cursor: a finger or a mouse puts it away, and so does leaving the picture.
+    expect(src).toContain("c.addEventListener('blur', () => { if (this.ringId) { this.ringId = ''; this.redraw(); } });");
+    expect(src).toContain("c.addEventListener('pointerdown', (e) => { if (this.ringId) { this.ringId = ''; this.redraw(); }");
+    // 2.4.11: a ring at the very edge of the canvas is a ring that is obscured, so the map moves first.
+    expect(src).toContain('if (cx < m || cy < m || cx > this.w - m || cy > this.h - m) this.pan(this.w / 2 - cx, this.h / 2 - cy);');
+    // 2.4.13: 3 px of ring with 1.5 px of casing either side, so it keeps its 3:1 over a street or a park.
+    expect(src).toContain('c.strokeStyle = case_; c.lineWidth = 6; path(); c.stroke();');
+    expect(src).toContain('c.strokeStyle = focus; c.lineWidth = 3; path(); c.stroke();');
+    // It is announced through the map's own live region, with the same words a tap produces plus what Enter does.
+    expect(src).toContain("this.note.setAttribute('aria-live', 'polite')");
+    const said = src.slice(src.indexOf('this.say(`<div class="mappick">'));
+    expect(said.slice(0, said.indexOf('\n'))).toMatch(/esc\(f\.label\)[\s\S]*esc\(f\.sub\)[\s\S]*data-go[\s\S]*esc\(S\.focusHint\)/);
+    // Enter opens it through the app's own handling, so there is no second copy of "what a map card does".
+    // (In the subway map style a feature may carry `sel` instead — a route to choose — and nothing else changes.)
+    expect(src).toContain("    this.note.querySelector<HTMLElement>('[data-go]')?.click();\n  }");
+    // and the words exist, in all four languages, and the help text names the keys
+    for (const lang of LANGS) for (const key of ['map.focus_hint', 'map.focus_none', 'map.focus_off', 'map.keys']) {
+      expect(table(lang)[key], `strings/${lang}.json has no ${key}`).toBeTypeOf('string');
+    }
+    expect(table('en')['map.keys']).toMatch(/\bN\b[^.]*\bP\b[^.]*Enter[^.]*Escape/);
   });
 });
 
@@ -349,7 +499,7 @@ describe('every word the app asks for exists, in all four languages', () => {
     for (const g of MAP_GROUPS) out.push(`layer.help.${g.id}`);
     for (const id of ['greenway', 'parks']) out.push(`layer.place.${id}`);
     // The transport layers: their ids are the keys of LAYER_STYLE in main.ts, which is the list the map draws.
-    for (const m of src('src/main.ts').matchAll(/'go:(\w+)':/g)) out.push(`layer.go.${m[1]}`);
+    for (const id of Object.keys(LAYER_STYLE)) out.push(`layer.${id.replace(':', '.')}`);
     for (const set of Object.keys(LINKS)) {
       if (LINKS[set]!.lede) out.push(LINKS[set]!.lede!);
       for (const b of LINKS[set]!.items) for (const part of ['title', 'body', 'label']) out.push(`link.${set}.${b.id}.${part}`);
@@ -387,7 +537,7 @@ describe('a map layer that will not load says so, and can be asked for again', (
   });
   it('it says so in the switcher and in the list, and "Try again" clears the failure and asks afresh', () => {
     expect(main).toContain("${s.items.map((i) => layerProblem(i.id)).join('')}</fieldset>");
-    expect(main).toContain("...(bundle?.transit?.layers ?? []).map((l) => layerProblem('go:' + l.id)),");
+    expect(main).toContain("problems: (bundle?.transit?.layers ?? []).map((l) => layerProblem('go:' + l.id)),");
     expect(main).toContain('layerFiles.delete(layerKey(l.file)); refocus = id;');
     // and nothing is said about a layer that is switched off, or one that is simply still coming
     expect(main).toContain("if (!layerOn(id) || layerState(id) !== 'failed') return '';");
@@ -400,7 +550,7 @@ describe('a map layer that will not load says so, and can be asked for again', (
   });
   it('every transport layer the map can draw has a look of its own', () => {
     // `go:intercity_bus` had no entry, so it was drawn exactly like the DDOT routes and nothing told them apart.
-    const styles = [...main.matchAll(/'(go:\w+)': \{ ([^}]+) \}/g)].map((m) => ({ id: m[1]!, decl: m[2]! }));
+    const styles = Object.entries(LAYER_STYLE).map(([id, s]) => ({ id, decl: JSON.stringify(s) }));
     expect(styles.map((s) => s.id)).toContain('go:intercity_bus');
     const look = (s: { decl: string }) => s.decl.replace(/\s/g, '');
     const ddot = styles.find((s) => s.id === 'go:ddot_routes')!;
@@ -415,8 +565,9 @@ describe('a map layer that will not load says so, and can be asked for again', (
 describe('what the app does when something cannot be fetched', () => {
   const main = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
   it('a language nobody has opened yet, with no signal: it says so instead of doing nothing', () => {
-    expect(main).toContain("else { langOffline = true; refocusSel = `[data-lang=\"${next}\"]`; render(false); announce(t('lang.needs_net')); }");
-    expect(main).toContain("${langOffline ? `<p class=\"banner warn\" role=\"note\">${T('lang.needs_net')}</p>` : ''}");
+    expect(main).toContain("void setLang(next).then((ok) => { langOffline = !ok; render(false); announce(t(ok ? 'lang.changed' : 'lang.needs_net')); });");
+    expect(main).toContain("const langNote = () => (langOffline ? `<p class=\"banner warn\" role=\"note\">${T('lang.needs_net')}</p>` : '');");
+    expect(main).toContain('if (showLang && langOffline) body = body.replace(');
     for (const l of LANGS) expect(table(l)['lang.needs_net'], l).toBeTypeOf('string');
   });
   it('a service worker that will not register does not take the rest of the start-up with it', () => {

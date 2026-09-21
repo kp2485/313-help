@@ -15,6 +15,8 @@ Primary: **any Detroit resident who needs help right now** — food this week, a
 Secondary:
 - **Helpers** — CHWs, church volunteers, librarians, outreach workers, SisterFriends, Health Hub students — who look things up on behalf of someone else and are the most likely people to report changes.
 - **Resource providers** — a church running a Forgotten Harvest mobile pantry, a barbershop with a Narcan newsstand — who want to be listed and keep their listing right.
+- **Everyone the Map and the neighborhood pages serve** (added 2026-09-21, as the app grew past crisis help): bus and rail riders (DDOT, SMART, QLINE, People Mover, Amtrak, intercity buses, park-and-ride, reduced-fare IDs, the Transit app hand-off); cyclists and MoGo users; families and older adults using parks, recreation centers and the Joe Louis Greenway; neighbors and block clubs reading their neighborhood page (help nearby, home sales beside permits, blight, Safe streets).
+- **People who use assistive technology** — screen readers, keyboards, switches, large text — for whom every map is also a text list and the app is audited against WCAG 2.2 AA.
 - **Data consumers** — 211/CIE, DHD, or anyone else who wants a clean, current dataset. *We do not assume any institution will maintain data for us.* As of 2026-09-18, DHD has not offered to maintain a list or a feed; the plan works without them.
 
 ## What it is

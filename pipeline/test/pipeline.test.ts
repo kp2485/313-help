@@ -2,12 +2,12 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { badge, openNow, rank, type BundleRow } from '@313help/query';
+import { badge, openNow, rank, SERVICE_AREAS, SERVICE_AREA_IDS, type BundleRow } from '@313help/query';
 import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, today, uuid5, type CsvRow } from '../src/util.js';
-import { scriptRefusingHosts, validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
+import { scriptRefusingHosts, validateAlerts, validateEmergency, validateHsdsPrivacy, validateRows } from '../src/validate.js';
 import { readScriptRefusingHosts } from '../src/seed-io.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
@@ -28,12 +28,84 @@ const row = (over: Partial<BundleRow>): BundleRow => ({
 });
 const errs = (r: Partial<BundleRow>) => validateRows([row(r)], '2026-09-18').errors.join(' | ');
 
+// The service-area table lives in code three times over — TypeScript, Swift, Kotlin — because each client
+// re-implements the query rules. A shelter would be ranked differently on a different phone if they drifted,
+// and the whole safety argument rests on the point being the same for everyone (schema/query-spec.md).
+describe('the service-area table is the same in all three languages', () => {
+  const areasOf = (path: string, re: RegExp) => {
+    const out: Record<string, string> = {};
+    for (const m of readFileSync(p(path), 'utf8').matchAll(re)) out[m[1]!] = m[2] === undefined ? 'none' : `${Number(m[2])},${Number(m[3])}`;
+    return out;
+  };
+  const ts = areasOf('packages/query/src/areas.ts', /^ {2}(\w+): \{ point: (?:\{ lat: (-?[\d.]+), lon: (-?[\d.]+) \}|null)/gm);
+  it('every id in the spec table is in the code table', () => {
+    expect(Object.keys(ts).sort()).toEqual([...SERVICE_AREA_IDS].sort());
+    expect(readFileSync(p('schema/query-spec.md'), 'utf8')).toContain('`wayne_county_downriver`');
+    for (const id of SERVICE_AREA_IDS) expect(readFileSync(p('schema/query-spec.md'), 'utf8'), id).toContain(`\`${id}\``);
+  });
+  it('Swift and Kotlin carry the same ids and the same points', () => {
+    expect(areasOf('apps/ios/Sources/DetroitQuery/Areas.swift', /^ {4}"(\w+)": ServiceArea\(point: (?:LatLon\(lat: (-?[\d.]+), lon: (-?[\d.]+)\)|nil)/gm)).toEqual(ts);
+    expect(areasOf('apps/android/query/src/main/kotlin/org/help313/query/Areas.kt', /^ {4}"(\w+)" to ServiceArea\((?:LatLon\((-?[\d.]+), (-?[\d.]+)\)|null)/gm)).toEqual(ts);
+  });
+  it('every reference point is a public place in or around Wayne County, never a shelter', () => {
+    for (const [id, pt] of Object.entries(ts)) {
+      if (pt === 'none') { expect(SERVICE_AREAS[id]!.wide, id).toBe(true); continue; }
+      const [lat, lon] = pt.split(',').map(Number) as [number, number];
+      expect(lat, id).toBeGreaterThan(42.0); expect(lat, id).toBeLessThan(42.5);
+      expect(lon, id).toBeLessThan(-82.8); expect(lon, id).toBeGreaterThan(-83.6);
+      // Nowhere near any shelter in the seed: a reference point is a city hall, not a place we list.
+      expect(SERVICE_AREAS[id]!.reference, id).toMatch(/City Hall|Administrative Center|geographic centre/);
+    }
+  });
+});
+
 describe('row validation', () => {
   it('accepts a plain row', () => expect(errs({})).toBe(''));
   it('rejects a DV row that carries an address', () =>
     expect(errs({ category: 'shelter.dv', address: { line1: '1 Main St', city: 'Detroit' } })).toMatch(/must not have an address/));
   it('rejects a DV row that carries coordinates', () =>
     expect(errs({ category: 'shelter.dv', lat: 42.35, lon: -83.05 })).toMatch(/must not have an address or coordinates/));
+  // Kyle, 2026-09-20: a DV shelter's address is never published — not even when the shelter's own page prints
+  // it. What may be published instead is one coarse area from the closed list (packages/query/src/areas.ts).
+  describe('a domestic violence row names no place at all (Kyle, 2026-09-20)', () => {
+    const dv = (r: Partial<BundleRow>) => errs({ category: 'shelter.dv', name: 'Crisis line', ...r });
+    const own = (url: string) => ({ reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list' as const, name: 'test', url } });
+    it('a plain phone-only row with an area is fine', () => expect(dv({ service_area: 'detroit' })).toBe(''));
+    it('no area at all is fine: the row ranks as a coordinate-less row does today', () => expect(dv({})).toBe(''));
+    it("the address rule beats the shelter's own website, which would otherwise allow it", () =>
+      expect(dv({ address: { line1: '1 Main St', city: 'Detroit' }, website: 'https://shelter.org', facts: own('https://shelter.org/') }))
+        .toMatch(/must not have an address/));
+    it('a sub-category is covered too', () =>
+      expect(errs({ category: 'shelter.dv', name: 'x', lat: 42.35, lon: -83.05 })).toMatch(/must not have an address or coordinates/));
+    it('a name that is a building or a street is refused', () => {
+      expect(dv({ name: 'Interim House, 100 Main St' })).toMatch(/reads as a building or a street/);
+      expect(dv({ name: 'Safe House, Suite 4' })).toMatch(/reads as a building or a street/);
+      expect(dv({ name: '24-hour helpline' })).toBe('');
+    });
+    it('a link whose path is an address page is refused, for the website and for the source', () => {
+      expect(dv({ website: 'https://shelter.org/our-locations/' })).toMatch(/points at an address page/);
+      expect(dv({ facts: own('https://shelter.org/visit-us') })).toMatch(/points at an address page/);
+      expect(dv({ website: 'https://shelter.org/100-main-street/' })).toMatch(/points at an address page/);
+      expect(dv({ website: 'https://shelter.org/get-help/', facts: own('https://shelter.org/get-help/') })).toBe('');
+    });
+    it('an unknown service_area is refused, and every id in the closed list is accepted', () => {
+      expect(dv({ service_area: '48226' })).toMatch(/unknown service_area/);
+      expect(dv({ service_area: 'midtown' })).toMatch(/unknown service_area/);
+      for (const id of SERVICE_AREA_IDS) expect(dv({ service_area: id }), id).toBe('');
+    });
+    it('a row with no phone is refused: a DV row publishes on its phone alone', () =>
+      expect(dv({ phones: [] })).toMatch(/publishes on its phone alone/));
+    it('service_area is for DV rows only', () =>
+      expect(errs({ category: 'food.pantry', service_area: 'detroit' })).toMatch(/domestic violence rows only/));
+  });
+  it('the HSDS export is checked on its own terms, not inherited from the rows', () => {
+    const virt = { x_detroit: { category: 'shelter.dv' }, service_at_locations: [{ x_detroit: { id: 'sal_dv' }, location: { location_type: 'virtual' } }] };
+    expect(validateHsdsPrivacy([virt]).errors).toEqual([]);
+    const leaked = { x_detroit: { category: 'shelter.dv' }, service_at_locations: [{ x_detroit: { id: 'sal_dv' }, location: { location_type: 'physical', latitude: 42.35, longitude: -83.05, addresses: [{ address_1: '1 Main St' }] } }] };
+    expect(validateHsdsPrivacy([leaked]).errors).toHaveLength(3);
+    // An ordinary service keeps its address in HSDS: this rule is about DV rows and nothing else.
+    expect(validateHsdsPrivacy([{ ...leaked, x_detroit: { category: 'shelter.emergency' } }]).errors).toEqual([]);
+  });
   it("shows a shelter's address only when it came from the shelter's own site (Kyle, 2026-09-19)", () => {
     const addr = { line1: '1 Main St', city: 'Detroit' };
     const src = (url: string) => ({ reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list' as const, name: 'test', url } });
@@ -298,6 +370,13 @@ describe('does the page still show this listing (one strict matcher)', () => {
     expect(listingOnPage(page, { address_1: 'Corner of Cass and Warren' }).ok).toBe(false);   // no house number: nothing to check
     expect(listingOnPage(page, {}).ok).toBe(false);
   });
+  it('a domestic violence row publishes on its phone alone, by rule (Kyle, 2026-09-20)', () => {
+    // It may never carry a street address (docs/04, docs/08), so asking for a house number would hold it for ever.
+    expect(listingOnPage(page, { phone: '313-555-0100', category: 'shelter.dv' })).toEqual({ ok: true, missing: [] });
+    expect(listingOnPage(page, { category: 'shelter.dv' }).missing).toEqual([expect.stringMatching(/publishes on its phone alone/)]);
+    // Every other listing is unchanged: no phone still means the house number has to be on the page.
+    expect(listingOnPage(page, { category: 'shelter.emergency' }).missing).toEqual(['a phone or a street address with a house number to look for']);
+  });
   it('a bot-protection challenge is unreadable, but a real page that loads Cloudflare\'s script is a page', () => {
     expect(isChallenge('<html><head><title>Just a moment...</title></head><body><script>window._cf_chl_opt={}</script></body></html>')).toBe(true);
     expect(isChallenge('<title>Domestic Violence Support</title><script src="/cdn-cgi/challenge-platform/scripts/jsd/main.js"></script><p>1-800-799-7233</p>')).toBe(false);
@@ -421,6 +500,16 @@ describe('hours from research text', () => {
     expect(lineToRows(`${base} | `)).toMatchObject({ resource: { flags: '', phone2: '' } });
     expect(lineToRows(`${base} | color=green`)).toMatch(/unknown extra/);
     expect(lineToRows(`${base} | phone2=313-555-0101`)).toMatch(/phone2_label/);
+  });
+  it('a domestic violence line carries a service_area and never a place (Kyle, 2026-09-20)', () => {
+    const dv = (address: string, zip: string, extras: string) =>
+      lineToRows(`Crisis line | Interim House | shelter.dv | Call any time. | ${address} | Detroit | ${zip} | 313-555-0100 | https://x.org | 24 hours | | https://x.org/get-help${extras}`);
+    expect(dv('', '', ' | service_area=detroit')).toMatchObject({ resource: { service_area: 'detroit', address_1: '', lat: '', lon: '' } });
+    expect(dv('1 Main St', '', ' | service_area=detroit')).toMatch(/must carry no address and no ZIP/);
+    expect(dv('', '48226', '')).toMatch(/must carry no address and no ZIP/);
+    expect(dv('', '', ' | service_area=midtown')).toMatch(/unknown service_area/);
+    expect(lineToRows('Career center | Detroit at Work | jobs.find | Help finding a job. | 1 Main St | Detroit | 48204 | 313-555-0100 | https://x.org | Mon-Fri 8am-5pm | | https://x.org/locations | service_area=detroit'))
+      .toMatch(/domestic violence rows only/);
   });
 });
 
@@ -756,11 +845,11 @@ describe('neighborhood indicators (docs/13)', () => {
 });
 
 describe('the real bundle', () => {
-  let out: string, index: any, rows: BundleRow[];
+  let out: string, index: any, rows: BundleRow[], services: any[];
   beforeAll(async () => {
     out = mkdtempSync(join(tmpdir(), 'dh-bundle-'));
     const r = await build({ aggregates: null, outDir: out, hsdsDir: null, quiet: true, now: new Date('2026-09-18T17:45:00Z') });
-    index = r.index; rows = r.rows;
+    index = r.index; rows = r.rows; services = r.services;
   }, 60000);
 
   it('carries the street map under the same signature, and cross streets on greenway segments', () => {
@@ -805,10 +894,21 @@ describe('the real bundle', () => {
   it('ships no City events until a real feed exists (DECISIONS 2026-09-19)', () => {
     expect(Object.keys(index.files)).not.toContain('events.json');
   });
-  it('no DV row has a place', () => {
-    const dv = rows.filter((r) => r.category === 'shelter.dv');
+  it('no DV row has a place, in the bundle or in the published HSDS export', () => {
+    const dv = rows.filter((r) => r.category.startsWith('shelter.dv'));
     expect(dv.length).toBeGreaterThan(0);
-    for (const r of dv) { expect(r.address).toBeUndefined(); expect(r.lat).toBeUndefined(); }
+    for (const r of dv) {
+      expect(r.address).toBeUndefined(); expect(r.lat).toBeUndefined(); expect(r.lon).toBeUndefined();
+      // An area is allowed and is the only thing that may say where the row is; it must be one of the closed list.
+      if (r.service_area !== undefined) expect(SERVICE_AREA_IDS).toContain(r.service_area);
+      // Nothing anywhere in the row's JSON reads as a street address or a Detroit-area ZIP.
+      const text = JSON.stringify(r);
+      expect(text, r.id).not.toMatch(/\b\d{2,6}\s+[A-Za-z][\w.'-]*(\s+[A-Za-z][\w.'-]*)?\s*(St|Street|Ave|Avenue|Blvd|Rd|Road|Dr|Drive|Lane|Ln|Way|Ct|Pl|Pkwy|Hwy)\b/i);
+      expect(text, r.id).not.toMatch(/\b48\d{3}\b/);
+    }
+    const hsds = services.filter((s: any) => (s.x_detroit?.category ?? '').startsWith('shelter.dv'));
+    expect(hsds.length).toBe(dv.length);
+    expect(validateHsdsPrivacy(services).errors).toEqual([]);
   });
   it('every badge a real row can produce has a plain-language string', () => {
     const strings = JSON.parse(readFileSync(p('strings/en.json'), 'utf8'));

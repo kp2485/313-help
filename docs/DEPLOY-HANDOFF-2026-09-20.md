@@ -1,6 +1,21 @@
 # Deploy handoff — 2026-09-20
 
-For Kyle. Everything below needs an account only you have. Nothing here costs money except the domain.
+> **Status, 2026-09-21: done. The app is live at <https://313help.com>.** Checked from outside that day, with one
+> honest GET each: `/` answers 200 with the `_headers` policy as real response headers (CSP with
+> `frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `nosniff`, `X-Frame-Options: DENY`, a
+> Permissions-Policy); `/data/bundle/v1/index.json` says 531 listings, `"signing": "release"`,
+> `"emergency_verified": true`, version `c4d7778-20260921T0324`, and its `index.json.sig` verifies against the
+> active key in `BUNDLE_PUBLIC_KEYS`; `/v1/health` answers `{"ok":true}`; `/admin/` and `/v1/steward/*` redirect
+> to Cloudflare Access. In GitHub, `PUBLISH_ENABLED=true`, `PAGES_PROJECT`, `REPORTS_API=https://313help.com` and
+> `BUNDLE_PUBLIC_KEYS` are set, and the publish workflow's first good run finished 2026-09-21 03:27 UTC: preflight
+> green, report facts read from the live API, release bundle signed, Pages deployed. Both lines in
+> `api/edge-protections.md` are signed (2026-09-20).
+>
+> **This page stays as the runbook** — for a rebuild, a handover to a new operator (docs/12), or a second region.
+> Step 6b (logs off in the dashboard) is a person's check that cannot be seen from outside; repeat it after any
+> change to the Worker's settings.
+
+For the operator. Everything below needs an account only you have. Nothing here costs money except the domain.
 Work top to bottom; `pnpm preflight` goes green as you go, and the last step turns the nightly publish on.
 
 Run `pnpm preflight` first to see where you are. It prints one line per check; `STOP` blocks a deploy.
@@ -37,15 +52,15 @@ Losing both private keys means shipping a new app build, because phones pin thes
 
 To see preflight go green locally: `BUNDLE_SIGNING_KEY="$(cat …)" BUNDLE_PUBLIC_KEYS="…,…" pnpm preflight`.
 
-### 2. D1 (done 2026-09-20 — one step left)
+### 2. D1
 
 ```
 wrangler d1 create 313-help                         # done: the id is in api/wrangler.toml
 pnpm --filter @313help/api exec wrangler d1 migrations apply 313-help --remote
 ```
 
-The four migrations have never been applied to the remote database. Until they are, every query the deployed
-Worker makes fails, including the nightly cron. Do this **before** the first deploy.
+Apply the migrations to the remote database **before** the first deploy. Until they are applied, every query
+the deployed Worker makes fails, including the nightly cron. Re-run the command after adding a migration.
 
 ### 3. Domain, Pages, Worker, origin
 
@@ -148,7 +163,7 @@ anything is built or deployed. After it finishes, run `pnpm smoke` once more and
   human work owed before telling the public the address, not a deploy blocker.
 - **App stores.** $99/yr and $25, and nothing in this list depends on them.
 
-## The first night, and what it will do
+## What the nightly runs do
 
 The cron (`17 8 * * *`, daily) runs the 180-day report purge and the 30-day photo delete. On a fresh database
 both find nothing and change nothing; without the R2 binding the photo pass does nothing at all and a report

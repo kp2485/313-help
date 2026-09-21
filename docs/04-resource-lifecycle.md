@@ -2,6 +2,30 @@
 
 This is the part D Compassion — and most resource directories — never solved. A resource app is only as good as its worst listing, because the person who followed a dead listing to a locked door doesn't come back.
 
+## How listings stay fresh: every mechanism, in one place
+
+*Current as of 2026-09-21. The site is live and the nightly job is on (`PUBLISH_ENABLED=true`; first good run
+2026-09-21 03:23 UTC). Each line names where it is enforced.*
+
+| # | Mechanism | Where it lives |
+|---|---|---|
+| 1 | **Own-page rule.** Facts come from the organization's own page or a public agency's own data layer — never an aggregator, directory or news story. | docs/02 tiers; `data/sources.yaml` |
+| 2 | **Machine match at entry.** A row goes live only when its phone and street number are found on its own page. Exceptions: a DV row publishes on its phone alone, by rule (it may never carry an address); a phone-only service is matched on its phone; an agency layer's row carries the layer's own date and its publisher's coordinate. | `pnpm check:sources`, `pipeline/src/page-match.ts` |
+| 3 | **Script-refusing hosts are recorded, not worked around.** A host that refuses our honestly labeled fetcher is listed with the date; a person reads those pages in a browser. An empty 200 or a challenge page is *unreadable*, never a match or a mismatch. | `data/seed/script-refusing-hosts.csv` |
+| 4 | **Badges say who looked.** `entry_method: auto_check` → "A program matched this to their website on {date}"; `web` → "Their website was read and matched on {date}". The build fails an `active` row that claims `auto_check` on a script-refusing host. | `pipeline/src/validate.ts`; `packages/query` badge rules |
+| 5 | **Nightly re-check.** The publish job re-reads every active row's page with the same matcher. A miss or an unreadable page becomes a steward task ("Pages that changed"); nothing in the app changes until a person decides. | `.github/workflows/publish.yml` step 5; `check:sources --recheck` |
+| 6 | **Open-data changes arrive as pull requests.** A changed station, greenway phase or street is a diff; merging it is the approval. Any phone, address or coordinate change from any source is held for a steward. | publish workflow step 4 |
+| 7 | **Freshness computed on the device** from dated facts in the bundle, never frozen at build time. | `packages/query`, mirrored in Swift and Kotlin; fixtures `06-badge` |
+| 8 | **One-tap anonymous reports and confirms.** Reports label and demote; they never hide. Two different phones saying "closed" puts the row last in its band with a warning. | `POST /v1/reports`; fixtures `07-rank` |
+| 9 | **Stewards archive, with a reason; nothing is deleted.** Archived rows keep their link and say "Closed as of {date}". | `admin/`, D1, `archived.json` |
+| 10 | **Unknown is never "open."** A schedule-derived "open" on a federal holiday (or its observed day) becomes `holiday`: usual hours, "Holiday today. Call first." A steward who learns a place is open sets `open_holidays`. Cancellations close any window they overlap. | `schema/query-spec.md` "Holidays"; fixtures `12-holidays` (40 cases) |
+| 11 | **Emergency numbers match their owners' pages.** 911 and 988 are hardcoded; the other nine are re-checked nightly; a mismatch fails the release build and yesterday's bundle stays up. The script never rewrites a number. | `pnpm check:emergency`, `build:bundle:release` |
+| 12 | **Signed bundles.** Ed25519; clients pin two keys and keep the copy they had if a new one fails. | `pipeline/src/sign.ts`; each client's verify step |
+| 13 | **Old copies say so; retirement is deliberate.** Over 72 hours: "Call before you go." Over 30 days: "Call first, or call 211." `retired: true` points every phone at 211. | docs/12; fixtures `08-bundle-age` |
+
+**The best next improvement is provider-verified listings** (docs/09): everything above notices a problem after
+it exists; only the owner knows before. `owner_attest` is already a method in the schema and the badge rules.
+
 ## Principles
 
 1. **Nothing is ever deleted.** Rows are archived with a reason and, when possible, a replacement. History is data.
@@ -39,6 +63,8 @@ This is the part D Compassion — and most resource directories — never solved
 *2026-09-19: there is no `stale` state at all (no timers). `flagged` rows stay visible with a warning. The diagram's transitions otherwise hold.*
 
 **How a row goes live.** A listing we researched goes from `proposed` to `active` when `pnpm check:sources` finds its phone number and street number on its own web page (`entry_method: auto_check`), or when a person reads the page in a browser because the site blocks scripts (`entry_method: web`). The two are **different badges**, because they are different claims about who looked, and since 2026-09-20 the build enforces the difference: an `active` row may claim `auto_check` only with a source URL, a check date, and a host that `data/seed/script-refusing-hosts.csv` does not record as refusing scripts by that date. A page that answers 200 with almost no text, or with a challenge or block page, is **unreadable** — never a match and never a mismatch.
+
+**One exception, and only one: a domestic-violence row publishes on its phone alone, by rule** (Kyle, 2026-09-20; DECISIONS). Every other listing with no phone must show its house number on its own page. A `shelter.dv` row may never carry a street address at all — the build fails if it does, even when the shelter prints its own address — so asking for one would hold every such row for ever. What `pnpm check:sources` checks is what the row actually claims: the number a survivor will dial (`pipeline/src/page-match.ts`, `phoneOnlyByRule`). A DV row with no phone is held, with that reason named. The one thing a DV row may say about where it is, is a coarse `service_area` from the closed list in `packages/query/src/areas.ts` — a whole city or bigger, entered by a steward from the owner's own page, and never a ZIP, a neighbourhood or an address (schema/query-spec.md, docs/08).
 
 **Archiving is a steward's act in the queue, not an edit to the seed.** There is no way to retire a row by editing `data/seed/resources.csv`: an `archived` row with no archive record (a date and one of the reasons below) fails the build, and the record itself is only ever written by the steward endpoint into D1, then applied at the next build. A duplicate is archived with reason `duplicate` and the surviving row as the replacement. One is owed today (OPERATIONS). A place sent from the app ("Add a place") waits in the steward queue. If it checks out, a steward adds it to `data/seed/resources.csv` by hand. Nothing in the queue goes live by itself.
 
@@ -117,7 +143,7 @@ Abuse model: a competitor pantry or a troll mass-reporting closures. Mitigations
 **Exceptions queue** — worked in one sitting, about weekly. Nothing in the app waits on it except archiving and new listings:
 1. Proposed rows (add-a-place) — one check at entry (phone or web), accept/reject with reason. An accepted place is then added to `data/seed/resources.csv` by hand. The entry check is not optional: it is what keeps scam numbers and private addresses out.
 2. Rows with 2+ open closed/moved reports and no confirm since — one call or look; archive or clear.
-3. Machine-raised tasks: watched page changed, row dropped from an open-data layer, website 404 twice, phone/address change held for approval (10-A5). Today the open-data part arrives as a nightly pull request (`.github/workflows/publish.yml`, written but not switched on yet). A changed station, greenway phase, or street shows up as a diff, and merging it is the approval. The website check is the nightly re-check: under "Pages that changed" on the steward page, each listing whose own page no longer shows its phone or street address, or couldn't be read. The steward looks and presses "Checked: it's fine" or "I'll fix it" (then edits `data/seed/resources.csv`); the task closes itself when the page matches again.
+3. Machine-raised tasks: watched page changed, row dropped from an open-data layer, website 404 twice, phone/address change held for approval (10-A5). The open-data part arrives as a nightly pull request (`.github/workflows/publish.yml`, on since 2026-09-21). A changed station, greenway phase, or street shows up as a diff, and merging it is the approval. The website check is the nightly re-check: under "Pages that changed" on the steward page, each listing whose own page no longer shows its phone or street address, or couldn't be read. The steward looks and presses "Checked: it's fine" or "I'll fix it" (then edits `data/seed/resources.csv`); the task closes itself when the page matches again.
 4. Alerts — always written and published by a person (10-B10). Nothing drafts them from press releases. A steward writes one with `pnpm alert:new`, which requires an end time (7 days at most), a link to where it was announced, and a valid phone number if it has one. `--demo` makes a practice alert that says "Demo," lasts 3 hours at most, needs no link, and can't carry a phone number.
 
 Labeling and demotion happen automatically with no steward. If the queue is never worked, the directory degrades honestly (badges age, reported rows carry warnings) instead of lying. See doc 12 for what happens if nobody operates the app at all.
@@ -130,7 +156,7 @@ Two entry points:
 
 **Resident/helper: "Add a place that helps"** (in app, on the Help tab under More). One screen. Fields: name of the place, what kind of help it is (one choice), what people get there, address (typed), days and times in your own words, the place's phone (optional), anything else, and "How do you know about it?" (I run it / I volunteer there / I went there / I heard about it). There is no choice for a domestic-violence shelter, and the API drops the address if one is sent anyway. It goes to the steward queue as a proposal. Confirmation: "Thanks. A person will check this place before it shows up. That can take a few days." *Note the honest promise: we say what actually happens.* Offline, it waits on the phone and sends when the phone is back online.
 
-**Provider: "List your organization"** (v1.1, not built). Same fields plus org contact email for verification and a request to become an `owner` of the row. Owner email verification is the one place we hold a contact — for providers, not residents — see 08.
+**Provider: "Confirm or fix your listing"** (roadmap, docs/09 — the biggest freshness lever). A signed, expiring link sent to the contact address on the organization's own page; *Still right* records an `owner_attest` confirmation, and any change is held for a steward. That address is the one contact the project would hold — a provider's, never a resident's — see 08.
 
 Church food banks: a church that posts its own food-bank distribution on its own site may be listed from that page. We never copy Forgotten Harvest or Gleaners partner lists.
 

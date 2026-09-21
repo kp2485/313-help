@@ -296,7 +296,20 @@ val generateStrings by tasks.registering {
 /**
  * The snapshot of the signed bundle that ships inside the APK, so the app works on first run with no signal ever
  * (docs/05 "Offline"). Build it first from the repository root: `pnpm build:bundle`. It is never committed here.
- * Map tiles and neighbourhood numbers are left out: they are large and are not needed to find help.
+ *
+ * The **map** travels with it (2026-09-21): the Map tab draws the city from `map/base.json`, `map/streets.json` and
+ * the eleven `map/transit/` layers, and a map that needs a network to appear the first time is not the offline map
+ * docs/05 promises. The files are checked against the signed index before a byte of them is decoded, exactly as
+ * they are when they come off the network (BundleStore.verifiedBytes). What is still left out:
+ *
+ * The subway style's network files travel with it too (2026-09-21, six of them, 330 KB raw): the style is a person's
+ * choice on the layers screen, and a choice that needs a network the first time it is made is not the offline map
+ * either. They are lazy all the same: nothing reads one until that style is on and that layer is on.
+ *
+ * What is still left out: the indicators folder — 387 KB of neighbourhood numbers, on no screen this app has.
+ * No glob is written out in this comment on purpose: Kotlin nests block comments, so a slash-star inside one opens
+ * a second and silently swallows the task below (found 2026-09-21, when the snapshot task vanished from the build
+ * and the map had no files to read).
  */
 val copyBundleSnapshot by tasks.registering(Copy::class) {
     val src = File(repoRoot, "data/bundle/v1")
@@ -309,7 +322,7 @@ val copyBundleSnapshot by tasks.registering(Copy::class) {
         }
     }
     from(src) {
-        exclude("map/**", "indicators/**")
+        exclude("indicators/**")
     }
     into(layout.buildDirectory.dir("generated/assets/app/bundle-snapshot"))
 }

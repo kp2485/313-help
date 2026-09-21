@@ -143,6 +143,13 @@ fun runFixtures(dir: File = fixturesDir()): FixtureResult {
                     val got = rank(rows, queryOf(c["query"]), now, alerts).map { it.row.id }
                     if (!matches(got, expect)) fail(got)
                 }
+                // "<id> band<n> <no-distance|distance>": the band a row landed in, and whether the result object
+                // carries a distance at all. A domestic-violence row must always read "no-distance".
+                "rankDetail" -> {
+                    val got = rank(rows, queryOf(c["query"]), now, alerts)
+                        .map { "${it.row.id} band${it.band} " + if (it.miles == null) "no-distance" else "distance" }
+                    if (!matches(got, expect)) fail(got)
+                }
                 "search" -> {
                     val got = search(rows, c["text"]?.str ?: "", queryOf(c["query"]), now, alerts).map { it.row.id }
                     if (!matches(got, expect)) fail(got)

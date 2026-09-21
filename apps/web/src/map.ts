@@ -7,6 +7,9 @@
 
 import type { Segment } from '@313help/query';
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
+import { MAP_GROUPS, mapDrawable } from './needs.js';
+import type { MapStyle } from './layers.js';
+import type { SubwayData, SubwayPainter } from './subway.js';
 
 // ---- world coordinates: flat projection around Detroit; one unit = one degree of latitude ----------------
 const LON0 = -83.1, LAT0 = 42.35, K = Math.cos((LAT0 * Math.PI) / 180), M_PER_UNIT = 111320;
@@ -82,26 +85,27 @@ export function decodeLayer(f: LayerFile): LayerData {
     points: (f.points ?? []).map(([n, x, y]) => ({ name: nm(n), x: wx(f.origin[0] + x / 1e5), y: wy(f.origin[1] + y / 1e5) })),
   };
 }
-const layers = new Map<string, LayerData>(), layerJobs = new Map<string, Promise<LayerData | null>>();
-/** One layer file, checked against the signed index, decoded once and kept on the phone for offline use.
- *  Null when the bundle has no such layer or it cannot be read; the map then simply draws without it. */
-export function loadLayer(index: BundleIndex, file: string): Promise<LayerData | null> {
+const layers = new Map<string, LayerData>(), jobs = new Map<string, Promise<LayerData | null>>();
+/** One file under map/, checked against the signed index, decoded once and kept on the phone for offline use.
+ *  Null when the bundle has no such file or it cannot be read. One path for every lazy map file: a layer's
+ *  shapes, and the subway style's `.net.json` beside them. */
+function loadChecked<T>(index: BundleIndex, file: string, decode: (raw: unknown) => T, kept: Map<string, T>, layerJobs: Map<string, Promise<T | null>>): Promise<T | null> {
   const meta = index.files[file];
   if (!meta) return Promise.resolve(null);
   const key = `${file}:${meta.sha256}`;
-  const have = layers.get(key);
+  const have = kept.get(key);
   if (have) return Promise.resolve(have);
   const job = layerJobs.get(key);
   if (job) return job;
   const run = (async () => {
     try {
-      let held = await idbGet<{ key: string; file: LayerFile }>('layer:' + file);
+      let held = await idbGet<{ key: string; file: unknown }>('layer:' + file);
       if (held?.key !== key) {
-        try { held = { key, file: (await fetchVerified(index, file)) as LayerFile }; await idbSet('layer:' + file, held); }
+        try { held = { key, file: await fetchVerified(index, file) }; await idbSet('layer:' + file, held); }
         catch (e) { if (!held) throw e; }                 // offline with last week's copy: better than nothing
       }
-      const data = decodeLayer(held!.file);
-      layers.set(key, data);
+      const data = decode(held!.file);
+      kept.set(key, data);
       return data;
     } catch (e) { console.warn('map layer not available', file, e); return null; }
     finally { layerJobs.delete(key); }
@@ -109,12 +113,71 @@ export function loadLayer(index: BundleIndex, file: string): Promise<LayerData |
   layerJobs.set(key, run);
   return run;
 }
+/** One layer file, checked against the signed index, decoded once and kept on the phone for offline use.
+ *  Null when the bundle has no such layer or it cannot be read; the map then simply draws without it. */
+export function loadLayer(index: BundleIndex, file: string): Promise<LayerData | null> { return loadChecked(index, file, (f) => decodeLayer(f as LayerFile), layers, jobs); }
+const nets = new Map<string, object>(), netJobs = new Map<string, Promise<object | null>>();
+/** A subway-style `.net.json` file (docs/MAP-STYLE.md), through the very same checksum path. It comes back as
+ *  the file itself: subway.ts, which only people who pick that style ever download, is what reads it. */
+export function loadNet(index: BundleIndex, file: string): Promise<object | null> { return loadChecked(index, file, (f) => f as object, nets, netJobs); }
 
 /** How one switched-on layer is drawn. `css` is a custom property in style.css, so dark mode works. */
 export interface Overlay extends LayerData { id: string; label: string; css: string; width?: number; dash?: number[]; ring?: boolean; dense?: boolean }
 
 // ---- the view -----------------------------------------------------------------
-export interface MapDot { lat: number; lon: number; label: string; go?: string; css?: string; sub?: string }
+export interface MapDot { lat: number; lon: number; label: string; go?: string; css?: string; sub?: string; category?: string }
+
+// ---- the features a keyboard can walk ------------------------------------------------------------------
+// The picture is an extra: every map in the app is also a list of the same places (docs/05). But "there is a
+// list" is not a reason for the picture itself to be dead to a keyboard or a switch (WCAG 2.1.1), so the map
+// carries a roving focus of its own: N and P step through what is on screen, Enter opens it, Escape steps back
+// out to the map. N and P rather than Tab, because Tab has to keep leaving the map (2.1.2, no keyboard trap)
+// and the arrows have to keep panning it (2.5.7); all three are written out in the map's keyboard help.
+export interface MapFeature {
+  kind: 'segment' | 'dot' | 'hub' | 'terminal' | 'interchange' | 'route';   // the last four: subway style only, always after the first two
+  id: string;                 // stable across a pan, so the ring stays on the same thing
+  route: number;              // a greenway stretch's place in the route
+  d: number;                  // a place's distance from the middle of the screen, in pixels
+  label: string; sub: string; go?: string;
+  sel?: string;               // subway style: what Enter chooses (a route, an interchange…), instead of a screen to go to
+  box: [number, number, number, number];   // on screen: what the ring is drawn round
+}
+/** A stable, meaningful order: the greenway first, stretch by stretch along the route, then the places, the
+ *  one nearest the middle of the screen first. Pure, so the order is held to a fixture rather than to a map. */
+export function orderFeatures<T extends { kind: 'segment' | 'dot'; route: number; d: number }>(list: readonly T[]): T[] {
+  return [...list].sort((a, b) => (a.kind === b.kind ? (a.kind === 'segment' ? a.route - b.route : a.d - b.d) : a.kind === 'segment' ? -1 : 1));
+}
+export type MapAction = 'in' | 'out' | 'left' | 'right' | 'up' | 'down' | 'next' | 'prev' | 'open' | 'escape' | null;
+/** What one key press means to the map — the whole of it, as a plain function, so the choice of keys can be
+ *  held to a test instead of to a browser.
+ *
+ *  Three rules decide the choice. **Tab is not here**, so Tab still walks out of the map and there is no
+ *  keyboard trap (2.1.2). **The arrows still pan**, so the one way to move the map without dragging is not
+ *  taken away to drive a list (2.5.7). And a bare letter is only ever read while the picture itself has focus,
+ *  which is the exception 2.1.4 makes for a single-character shortcut; a letter with Ctrl, Cmd or Alt belongs
+ *  to the browser or to a screen reader and is left alone. */
+export function mapKey(e: { key: string; metaKey?: boolean; ctrlKey?: boolean; altKey?: boolean }): MapAction {
+  const k = e.key, bare = !e.metaKey && !e.ctrlKey && !e.altKey;
+  if (k === '+' || k === '=') return 'in';
+  if (k === '-') return 'out';
+  if (k === 'ArrowLeft') return 'left';
+  if (k === 'ArrowRight') return 'right';
+  if (k === 'ArrowUp') return 'up';
+  if (k === 'ArrowDown') return 'down';
+  if (bare && (k === 'n' || k === 'N')) return 'next';
+  if (bare && (k === 'p' || k === 'P')) return 'prev';
+  if (k === 'Enter' || k === ' ') return 'open';
+  if (k === 'Escape') return 'escape';
+  return null;
+}
+const ALL_TOPS = MAP_GROUPS.flatMap((g) => g.tops);
+/** The dots a keyboard may land on. Exactly the rows the map is allowed to draw at all — `mapDrawable`, the one
+ *  predicate that decides it (needs.ts) — so a DV shelter or a crisis line can never be named by the ring even
+ *  if a screen were ever to hand one over as a dot. A dot with no category at all is not walked either: the
+ *  rule fails closed. */
+export function focusableDots(dots: readonly MapDot[]): MapDot[] {
+  return mapDrawable(dots.filter((d) => typeof d.category === 'string') as (MapDot & { category: string })[], ALL_TOPS);
+}
 export interface MapSpec {
   key: string;                                  // remembers pan and zoom while this screen is open
   label: string;                                // what a screen reader hears for the picture
@@ -129,10 +192,24 @@ export interface MapSpec {
   /** Draw the city's parks. False on the Map tab when "City parks" is switched off: the switch used to move only
    *  the list, and the parks stayed painted on the map whatever it said (web review, 2026-09-20). */
   parks?: boolean;
-  strings: { zoomIn: string; zoomOut: string; reset: string; bigger: string; smaller: string; details: string; park: string; noStreets: string; keys: string; panUp: string; panDown: string; panLeft: string; panRight: string; source: (date: string) => string; phase: Record<string, string> };
+  /** How the transport layers are drawn (docs/MAP-STYLE.md). `standard`, or nothing at all, is the drawing this
+   *  file has always done. `subway` also needs `subway`: the lazily loaded painter and its data. Until both are
+   *  there, and for any network whose data has not arrived, the map keeps drawing `standard`. */
+  style?: MapStyle;
+  subway?: { Painter: new (data: SubwayData) => SubwayPainter; order: typeof import('./subway.js').featureOrder; data: SubwayData; more: (count: number) => string };
+  strings: { zoomIn: string; zoomOut: string; reset: string; bigger: string; smaller: string; details: string; park: string; noStreets: string; keys: string; panUp: string; panDown: string; panLeft: string; panRight: string; focusHint: string; focusNone: string; focusOff: string; source: (date: string) => string; phase: Record<string, string> };
   segGo?: (id: string) => string;               // data-go value for a greenway segment
 }
 const cameras = new Map<string, { cx: number; cy: number; s: number }>();
+const selections = new Map<string, string>();          // subway style: the chosen route or stop, kept across a redraw of the page
+const live = new Map<string, MapView>();               // the maps on screen now, by `spec.key`
+/** Put a map's middle on a place at a scale, whether it is on screen now or opens later. Used to take the same
+ *  picture twice (the screenshot list in docs/MAP-STYLE.md); nothing is stored and nothing is sent. */
+export function placeCamera(key: string, lat: number, lon: number, metersPerPixel: number): void {
+  const cam = { cx: wx(lon), cy: wy(lat), s: M_PER_UNIT / Math.max(0.6, Math.min(90, metersPerPixel)) };
+  cameras.set(key, cam);
+  live.get(key)?.moveTo(cam);
+}
 let mapNo = 0;                                          // one id per map on the screen, for aria-describedby
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 /** The app's one live region. It sits outside #app precisely so a redraw cannot destroy it; making it inert
@@ -158,13 +235,92 @@ export function coverTargets(el: Element, root: Element): Element[] {
  *  apostrophe or an ampersand is ordinary punctuation. Escaped, always: a label is markup once it is set. */
 export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
+// ---- gestures: the maths, as plain functions ---------------------------------------------------------------
+// A phone map is judged on how it moves, and how it moves is arithmetic: what stays under the fingers, how far a
+// flung map carries, what counts as a tap. All of it lives here, out of the event handlers, so it can be held to
+// a test instead of to a thumb.
+export interface Cam { cx: number; cy: number; s: number }
+export const S_MIN = M_PER_UNIT / 90, S_MAX = M_PER_UNIT / 0.6;        // 90 m per pixel out, 0.6 m per pixel in
+export const PAN_X = 0.25, PAN_Y = 0.2;                                // how far the middle may leave the city
+/** Zoom about a point on the screen: the map point under `px,py` before is under `px,py` after. */
+export function zoomAbout(cam: Cam, f: number, px: number, py: number, w: number, h: number): Cam {
+  const s = Math.max(S_MIN, Math.min(S_MAX, cam.s * f));
+  const X = cam.cx + (px - w / 2) / cam.s, Y = cam.cy + (py - h / 2) / cam.s;
+  return { cx: X - (px - w / 2) / s, cy: Y - (py - h / 2) / s, s };
+}
+/** Drag: the map follows the finger, and the middle never leaves the four cities by more than a screen or two. */
+export function panCam(cam: Cam, dx: number, dy: number): Cam {
+  return { cx: Math.max(-PAN_X, Math.min(PAN_X, cam.cx - dx / cam.s)), cy: Math.max(-PAN_Y, Math.min(PAN_Y, cam.cy - dy / cam.s)), s: cam.s };
+}
+/** Two fingers, as one number each frame: how far apart they are and where their middle is. */
+export interface Grip { d: number; mx: number; my: number }
+export const gripOf = (a: { x: number; y: number }, b: { x: number; y: number }): Grip => ({ d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 });
+/** One frame of a pinch: zoom about where the fingers' middle WAS, then follow it to where it is NOW. Done in
+ *  that order, the map point under the middle at the start of the gesture stays under it however the two fingers
+ *  turn and slide — which is what makes a two-finger pan during a pinch feel like one gesture rather than two. */
+export function pinchCam(cam: Cam, was: Grip, now: Grip, w: number, h: number): Cam {
+  const zoomed = zoomAbout(cam, was.d > 0 ? now.d / was.d : 1, was.mx, was.my, w, h);
+  return panCam(zoomed, now.mx - was.mx, now.my - was.my);
+}
+export const TAP_PX = 8;                       // a finger that does not hold still is still pointing at one thing
+export const DOUBLE_MS = 300, DOUBLE_PX = 30;  // two taps this close in time and place are one double tap
+export const GRIP_STILL = 12;                  // two fingers that moved less than this never meant to pinch
+/** `dblclick` is not to be trusted after a pointer-events gesture on touch, so a double tap is detected here:
+ *  the second tap close enough in time and place to the first. */
+export function isSecondTap(prev: { x: number; y: number; t: number } | null | undefined, now: { x: number; y: number; t: number }): boolean {
+  return !!prev && now.t - prev.t <= DOUBLE_MS && now.t >= prev.t && Math.hypot(now.x - prev.x, now.y - prev.y) <= DOUBLE_PX;
+}
+/** A tap is one pointer that barely moved and never became part of a two-finger gesture. Anything else — a drag,
+ *  a pinch, the held second tap of a double tap — is a gesture, and a gesture never selects anything. */
+export function isTap(moved: number, mostPointers: number, dragZooming = false): boolean {
+  return moved < TAP_PX && mostPointers === 1 && !dragZooming;
+}
+/** Speed at the moment the finger left, in pixels per millisecond, from the last `ms` of its path. Older samples
+ *  are ignored: a finger that dragged across the map and then stopped dead must not fling. */
+export function flingVelocity(path: readonly { x: number; y: number; t: number }[], ms = 100): { vx: number; vy: number } {
+  const last = path[path.length - 1];
+  if (!last) return { vx: 0, vy: 0 };
+  let first = last;
+  for (let i = path.length - 1; i >= 0; i--) { const p = path[i]!; if (last.t - p.t > ms) break; first = p; }
+  const dt = last.t - first.t;
+  return dt < 8 ? { vx: 0, vy: 0 } : { vx: (last.x - first.x) / dt, vy: (last.y - first.y) / dt };
+}
+export const FLING_K = 0.0035;                 // e-folding per millisecond: about a second of carry
+export const FLING_STOP = 0.02, FLING_START = 0.35;   // px/ms: when to stop, and what is worth starting
+/** One frame of momentum. Done when the speed has died away or the map has reached the end of its leash — and
+ *  `panCam`'s own limits are what stop it, so a fling can never carry the map off the city. */
+export function flingFrame(cam: Cam, v: { vx: number; vy: number }, dt: number): { cam: Cam; v: { vx: number; vy: number }; done: boolean } {
+  const next = panCam(cam, v.vx * dt, v.vy * dt), f = Math.exp(-FLING_K * dt);
+  const nv = { vx: v.vx * f, vy: v.vy * f };
+  const still = next.cx === cam.cx && next.cy === cam.cy;
+  return { cam: next, v: nv, done: still || Math.hypot(nv.vx, nv.vy) < FLING_STOP };
+}
+export const DRAG_ZOOM_PX = 140;
+/** Double tap and hold, then drag: up zooms in, down zooms out, about the tap. The factor is against the scale
+ *  the gesture started at, not the last frame, so the map goes back exactly where it was on the way back. */
+export const dragZoom = (dy: number) => Math.exp(-dy / DRAG_ZOOM_PX);
+export const ZOOM_MS = 200;
+/** Ease-out for the animated double-tap zoom. */
+export const ease = (u: number) => 1 - Math.pow(1 - Math.max(0, Math.min(1, u)), 3);
+
 export class MapView {
   private canvas = document.createElement('canvas');
   private ctx = this.canvas.getContext('2d')!;
   private note = document.createElement('div');
   private cx = 0; private cy = 0; private s = 1; private home = { cx: 0, cy: 0, s: 1 };
   private w = 0; private h = 0; private raf = 0; private map: BaseMap | null = null;
-  private touched = false; private pointers = new Map<number, { x: number; y: number }>(); private moved = 0; private pinch = 0;
+  private touched = false; private pointers = new Map<number, { x: number; y: number }>(); private moved = 0;
+  // -- what one gesture in progress knows about itself (see the pure functions above)
+  private grip: Grip | null = null;                       // two fingers: their span and middle, last frame
+  private gripMoved = 0;                                  // how much those two fingers ever moved: a still pair is a tap
+  private twoAt = 0; private twoMid = { x: 0, y: 0 };     // when the second finger arrived, and where the middle was
+  private mostPts = 0;                                    // how many fingers this gesture ever had at once
+  private path: { x: number; y: number; t: number }[] = [];   // the last moments of one finger's drag, for the fling
+  private lastTap: { x: number; y: number; t: number } | null = null;
+  private tapWait = 0;                                    // the selection a second tap may still cancel
+  private dtz: { x: number; y: number; cam: Cam } | null = null;   // double tap, held: dragging now zooms
+  private animId = 0; private animAt = 0; private animN = 0;      // the fling, and the animated double-tap zoom
+  private slow = matchMedia('(prefers-reduced-motion: reduce)');
   private segs: { seg: Segment; lines: Float32Array[]; box: Box }[];
   private ro: ResizeObserver; private mq = matchMedia('(prefers-color-scheme: dark)');
   private onScheme = () => this.redraw();
@@ -174,9 +330,14 @@ export class MapView {
   private onWindow = () => { if (Math.min(window.devicePixelRatio || 1, 2) !== this.dpr) this.resize(); };
   // Escape leaves the full-screen map, like any other overlay.
   private onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && this.el.classList.contains('big')) { e.preventDefault(); this.tool('big', this.spec.strings); } };
+  private ringId = '';                                    // the feature the keyboard is on, '' for none
   private opener: HTMLElement | null = null;              // what to give the cursor back to when full screen closes
   private hidden: Element[] = [];                         // what full screen made inert
   private bar: HTMLElement | null = null;                 // Urgent help (and quick exit) inside the full-screen map
+  private sub: SubwayPainter | null = null;               // subway style only; null is `standard`
+  private sel = ''; private shown = ''; private lastGlyph = '';
+  private avoid: [number, number, number, number][] = [];   // where the zoom buttons and the arrow pad sit over the picture
+  private mqc = matchMedia('(prefers-contrast: more)');
   private release(): void { for (const n of this.hidden) (n as HTMLElement).inert = false; this.hidden = []; }
 
   constructor(private el: HTMLElement, private spec: MapSpec, index: BundleIndex) {
@@ -198,20 +359,27 @@ export class MapView {
     pad.addEventListener('click', (e) => this.tool((e.target as HTMLElement).closest<HTMLElement>('[data-map-act]')?.dataset.mapAct, S));
     el.replaceChildren(frame, this.note);
     this.ro = new ResizeObserver(() => this.resize()); this.ro.observe(frame);
-    this.mq.addEventListener('change', this.onScheme);
+    this.mq.addEventListener('change', this.onScheme); this.mqc.addEventListener('change', this.onScheme);
+    if (spec.style === 'subway' && spec.subway) { this.sub = new spec.subway.Painter(spec.subway.data); this.sel = selections.get(spec.key) ?? ''; }
+    // A route named on a card is a button that chooses it.
+    this.note.addEventListener('click', (e) => { const id = (e.target as HTMLElement).closest<HTMLElement>('[data-route]')?.dataset.route; if (id && this.sub) { this.choose(id); this.canvas.focus({ preventScroll: true }); } });
     window.addEventListener('resize', this.onWindow);
     document.addEventListener('keydown', this.onKey);
     tools.addEventListener('click', (e) => this.tool((e.target as HTMLElement).closest<HTMLElement>('[data-map-act]')?.dataset.mapAct, S));
     this.listen();
+    live.set(spec.key, this);
     this.resize(true);
     void loadMap(index).then((m) => { this.map = m; if (!m) this.say(`<p class="foot">${esc(S.noStreets)}</p>`); else if (!this.note.innerHTML) this.say(`<p class="foot">${esc(S.source(m.edited))}</p>`); this.redraw(); });
   }
-  destroy(): void { this.release(); this.bar?.remove(); this.bar = null; this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
+  moveTo(cam: { cx: number; cy: number; s: number }): void { Object.assign(this, cam); this.touched = true; this.redraw(); }
+  destroy(): void { this.release(); this.stopMotion(); this.cancelPick(); if (live.get(this.spec.key) === this) live.delete(this.spec.key); this.bar?.remove(); this.bar = null; this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); this.mqc.removeEventListener('change', this.onScheme); window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
 
   // -- camera
   private resize(first = false): void {
     const r = this.canvas.parentElement!.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
     if (!r.width || !r.height) return;
+    // Subway badges keep out from under the buttons that float over the map (they swap corners in Arabic, so they are measured).
+    if (this.sub) this.avoid = [...this.canvas.parentElement!.querySelectorAll('.maptools,.mappan')].map((n) => n.getBoundingClientRect()).filter((b) => b.width * b.height < (r.width * r.height) / 3).map((b) => [b.left - r.left, b.top - r.top, b.right - r.left, b.bottom - r.top]);
     this.dpr = dpr; this.w = r.width; this.h = r.height; this.canvas.width = Math.round(r.width * dpr); this.canvas.height = Math.round(r.height * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (first) {
@@ -224,16 +392,45 @@ export class MapView {
     } else if (!this.touched) { this.resize(true); return; }     // the box changed size before anyone moved the map: fit again
     this.redraw();
   }
-  private zoomAt(f: number, px = this.w / 2, py = this.h / 2): void {
-    this.touched = true;
-    const s = Math.max(M_PER_UNIT / 90, Math.min(M_PER_UNIT / 0.6, this.s * f));        // 90 m per pixel out, 0.6 m per pixel in
-    const X = this.cx + (px - this.w / 2) / this.s, Y = this.cy + (py - this.h / 2) / this.s;
-    this.cx = X - (px - this.w / 2) / s; this.cy = Y - (py - this.h / 2) / s; this.s = s; this.redraw();
+  private cam(): Cam { return { cx: this.cx, cy: this.cy, s: this.s }; }
+  private put(cam: Cam): void { this.cx = cam.cx; this.cy = cam.cy; this.s = cam.s; this.touched = true; this.redraw(); }
+  private zoomAt(f: number, px = this.w / 2, py = this.h / 2): void { this.put(zoomAbout(this.cam(), f, px, py, this.w, this.h)); }
+  private pan(dx: number, dy: number): void { this.put(panCam(this.cam(), dx, dy)); }
+  // -- movement that carries on after the finger has gone: the fling, and the animated double-tap zoom.
+  // One at a time, always stoppable, and never started at all under Reduce Motion (WCAG 2.3.3).
+  private now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  private run(step: (dt: number) => boolean): void {
+    this.stopMotion(); this.animAt = this.now(); this.animN = 0;
+    const tick = () => {
+      this.animId = 0;
+      const t = this.now(), dt = Math.max(1, Math.min(64, t - this.animAt)); this.animAt = t;
+      // The cap is not for a browser, where a fling dies in about a second: it is so a test whose frames run at
+      // once can never spin.
+      if (step(dt) && ++this.animN < 240) this.animId = requestAnimationFrame(tick);
+    };
+    this.animId = requestAnimationFrame(tick);
   }
-  private pan(dx: number, dy: number): void {
-    this.touched = true;
-    this.cx = Math.max(-0.25, Math.min(0.25, this.cx - dx / this.s)); this.cy = Math.max(-0.2, Math.min(0.2, this.cy - dy / this.s)); this.redraw();
+  private stopMotion(): void { if (this.animId) cancelAnimationFrame(this.animId); this.animId = 0; }
+  /** A double tap, or a two-finger tap: the same zoom, eased over a fifth of a second so the eye can follow it. */
+  private zoomTo(f: number, px: number, py: number): void {
+    if (this.slow.matches) { this.zoomAt(f, px, py); return; }
+    const from = this.cam(); let u = 0;
+    this.run((dt) => { u = Math.min(1, u + dt / ZOOM_MS); this.put(zoomAbout(from, Math.pow(f, ease(u)), px, py, this.w, this.h)); return u < 1; });
   }
+  private startFling(): void {
+    if (this.slow.matches) return;
+    let v = flingVelocity(this.path);
+    if (Math.hypot(v.vx, v.vy) < FLING_START) return;
+    this.run((dt) => { const r = flingFrame(this.cam(), v, dt); v = r.v; this.put(r.cam); return !r.done; });
+  }
+  /** A small inline map on a listing page sits in a page people scroll: one finger there belongs to the page, and
+   *  two fingers move the map (the map's own words already say "Drag or use the arrows to move. Pinch … to zoom",
+   *  and the four arrow buttons are on it either way). The Map tab's map and the full-screen dialog take one
+   *  finger, and a mouse or a pen is never held back anywhere. */
+  private oneFinger(kind: string | undefined): boolean {
+    return kind !== 'touch' || !this.el.classList.contains('small') || this.el.classList.contains('big');
+  }
+  private cancelPick(): void { if (this.tapWait) { clearTimeout(this.tapWait); this.tapWait = 0; } }
   private tool(act: string | undefined, S: MapSpec['strings']): void {
     const step = 0.35 * Math.min(this.w, this.h);
     if (act === 'in') this.zoomAt(1.6); else if (act === 'out') this.zoomAt(1 / 1.6);
@@ -286,28 +483,151 @@ export class MapView {
   }
   private listen(): void {
     const c = this.canvas, at = (e: PointerEvent | WheelEvent | MouseEvent) => { const r = c.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-    c.addEventListener('pointerdown', (e) => { c.setPointerCapture(e.pointerId); this.pointers.set(e.pointerId, at(e)); if (this.pointers.size === 1) this.moved = 0; this.pinch = 0; });
+    // A finger or a mouse puts the keyboard's ring away: it is the keyboard's cursor, and nothing about
+    // pointing at the map changed.
+    const when = (e: { timeStamp?: number }) => (typeof e.timeStamp === 'number' && e.timeStamp > 0 ? e.timeStamp : this.now());
+    c.addEventListener('pointerdown', (e) => { if (this.ringId) { this.ringId = ''; this.redraw(); }
+      // A finger on the map stops whatever the map was still doing on its own, at once and where it is.
+      this.stopMotion();
+      c.setPointerCapture(e.pointerId);
+      const q = at(e), t = when(e);
+      this.pointers.set(e.pointerId, q);
+      if (this.pointers.size === 1) {
+        this.moved = 0; this.mostPts = 1; this.path = [{ ...q, t }];
+        // The second tap of a double tap, held down: from here a drag up or down zooms about the first tap.
+        this.dtz = isSecondTap(this.lastTap, { ...q, t }) ? { x: q.x, y: q.y, cam: this.cam() } : null;
+        if (this.dtz) this.cancelPick();
+      } else {
+        this.dtz = null; this.mostPts = Math.max(this.mostPts, this.pointers.size);
+        if (this.pointers.size === 2) { const [a, b] = [...this.pointers.values()] as [{ x: number; y: number }, { x: number; y: number }]; this.twoAt = t; this.twoMid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; this.gripMoved = 0; }
+      }
+      this.grip = null;
+    });
+    c.addEventListener('blur', () => { if (this.ringId) { this.ringId = ''; this.redraw(); } });
     c.addEventListener('pointermove', (e) => {
       const was = this.pointers.get(e.pointerId); if (!was) return;
       const now = at(e); this.pointers.set(e.pointerId, now);
-      if (this.pointers.size === 1) { this.moved += Math.abs(now.x - was.x) + Math.abs(now.y - was.y); this.pan(now.x - was.x, now.y - was.y); }
-      else if (this.pointers.size === 2) {
-        const [a, b] = [...this.pointers.values()] as [{ x: number; y: number }, { x: number; y: number }], d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (this.pinch) this.zoomAt(d / this.pinch, (a.x + b.x) / 2, (a.y + b.y) / 2);
-        this.pinch = d; this.moved = 99;
+      if (this.pointers.size === 1) {
+        this.moved += Math.abs(now.x - was.x) + Math.abs(now.y - was.y);
+        this.path.push({ ...now, t: when(e) }); if (this.path.length > 24) this.path.shift();
+        if (this.dtz) this.put(zoomAbout(this.dtz.cam, dragZoom(now.y - this.dtz.y), this.dtz.x, this.dtz.y, this.w, this.h));
+        else if (this.oneFinger(e.pointerType)) this.pan(now.x - was.x, now.y - was.y);
+      } else if (this.pointers.size === 2) {
+        const [a, b] = [...this.pointers.values()] as [{ x: number; y: number }, { x: number; y: number }];
+        const grip = gripOf(a, b);
+        if (this.grip) { this.gripMoved += Math.abs(grip.d - this.grip.d) + Math.hypot(grip.mx - this.grip.mx, grip.my - this.grip.my); this.put(pinchCam(this.cam(), this.grip, grip, this.w, this.h)); }
+        this.grip = grip;
       }
     });
-    const up = (e: PointerEvent) => { if (!this.pointers.delete(e.pointerId)) return; this.pinch = 0; if (e.type === 'pointerup' && this.moved < 8 && !this.pointers.size) this.pick(at(e)); };
+    const up = (e: PointerEvent) => {
+      if (!this.pointers.delete(e.pointerId)) return;
+      this.grip = null;
+      if (this.pointers.size) return;                       // a finger is still down: the gesture is not over
+      const q = at(e), t = when(e), pts = this.mostPts, held = this.dtz;
+      this.mostPts = 0; this.dtz = null;
+      if (e.type !== 'pointerup') { this.lastTap = null; return; }   // cancelled (the page took the gesture)
+      // The second tap was held: if it dragged, the zoom already happened under the finger; if it did not, it was
+      // a plain double tap after all.
+      if (held) { this.lastTap = null; if (isTap(this.moved, pts)) this.zoomTo(1.8, held.x, held.y); return; }
+      // Two fingers put down and lifted without moving: zoom out, the other half of the double tap.
+      if (pts === 2) { this.lastTap = null; if (this.gripMoved < GRIP_STILL && t - this.twoAt <= DOUBLE_MS) this.zoomTo(1 / 1.8, this.twoMid.x, this.twoMid.y); return; }
+      if (isTap(this.moved, pts)) {
+        const tap = { x: q.x, y: q.y, t };
+        if (isSecondTap(this.lastTap, tap)) { this.cancelPick(); this.lastTap = null; this.zoomTo(1.8, q.x, q.y); return; }
+        this.lastTap = tap;
+        // On a touch screen a second tap can always follow, so selection waits out the double-tap window: a card
+        // that flashes up and is then thrown away by a zoom is worse than a fifth of a second. A mouse gets its
+        // card at once, exactly as it always did, and a double click selects and then zooms.
+        if (e.pointerType === 'touch') this.tapWait = setTimeout(() => { this.tapWait = 0; this.pick(q); }, DOUBLE_MS) as unknown as number;
+        else this.pick(q);
+      } else if (this.oneFinger(e.pointerType)) this.startFling();
+    };
     c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
-    c.addEventListener('wheel', (e) => { e.preventDefault(); const q = at(e); this.zoomAt(Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0022)), q.x, q.y); }, { passive: false });
-    c.addEventListener('dblclick', (e) => { const q = at(e); this.zoomAt(1.8, q.x, q.y); });
+    // A trackpad pinch arrives as a wheel with ctrlKey. It is zoom, not scroll, and it must not reach the page.
+    c.addEventListener('wheel', (e) => { e.preventDefault(); const q = at(e); this.zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : e.deltaMode ? 0.05 : 0.0022)), q.x, q.y); }, { passive: false });
+    // Older iOS Safari answers a pinch with its own page zoom before any pointer event is sent. These three are
+    // the only way to say no to it, and they have to be non-passive to be allowed to.
+    for (const g of ['gesturestart', 'gesturechange', 'gestureend']) (c as HTMLElement).addEventListener(g, (ev: Event) => ev.preventDefault(), { passive: false });
     c.addEventListener('keydown', (e) => {
-      const step = 60, k = e.key;
-      if (k === '+' || k === '=') this.zoomAt(1.5); else if (k === '-') this.zoomAt(1 / 1.5);
-      else if (k === 'ArrowLeft') this.pan(step, 0); else if (k === 'ArrowRight') this.pan(-step, 0); else if (k === 'ArrowUp') this.pan(0, step); else if (k === 'ArrowDown') this.pan(0, -step);
+      const step = 60, act = mapKey(e);
+      if (act === 'in') this.zoomAt(1.5); else if (act === 'out') this.zoomAt(1 / 1.5);
+      else if (act === 'left') this.pan(step, 0); else if (act === 'right') this.pan(-step, 0); else if (act === 'up') this.pan(0, step); else if (act === 'down') this.pan(0, -step);
+      else if (act === 'next') this.step(1); else if (act === 'prev') this.step(-1);
+      else if (act === 'open') { if (!this.ringId) return; this.open(); }
+      // Escape steps out of the features first and only then closes the full-screen map: one Escape, one thing.
+      else if (act === 'escape' && !this.ringId && this.sel) { this.choose(''); e.stopPropagation(); }   // then the chosen route, then full screen
+      else if (act === 'escape') { if (!this.ringId) return; this.ringId = ''; this.say(`<p class="foot">${esc(this.spec.strings.focusOff)}</p>`); this.shown = ''; this.redraw(); e.stopPropagation(); }   // (a chosen route's card comes back with the redraw)
       else return;
       e.preventDefault();
     });
+  }
+
+  // -- the roving focus: what is on screen, in order, and the ring that says where the keyboard is
+  private viewBox(): Box { return [this.cx - this.w / 2 / this.s, this.cy - this.h / 2 / this.s, this.cx + this.w / 2 / this.s, this.cy + this.h / 2 / this.s]; }
+  /** Everything on screen right now that a keyboard may land on, in order. Recomputed on every step, because
+   *  panning and zooming change what is there — the ring stays on its own feature by id, not by position. */
+  private features(): MapFeature[] {
+    const view = this.viewBox(), out: (MapFeature & { kind: 'segment' | 'dot' })[] = [], S = this.spec.strings;
+    this.segs.forEach((g, i) => {
+      if (!touches(g.box, view)) return;
+      const xs = [this.X(g.box[0]), this.X(g.box[2])], ys = [this.Y(g.box[1]), this.Y(g.box[3])];
+      out.push({ kind: 'segment', id: 'seg:' + g.seg.id, route: i, d: 0, label: g.seg.name, sub: S.phase[g.seg.phase] ?? '',
+        go: g.seg.id === this.spec.focus ? undefined : this.spec.segGo?.(g.seg.id),
+        box: [Math.max(6, Math.min(...xs)), Math.max(6, Math.min(...ys)), Math.min(this.w - 6, Math.max(...xs)), Math.min(this.h - 6, Math.max(...ys))] });
+    });
+    for (const dot of focusableDots(this.spec.dots ?? [])) {
+      const x = this.X(wx(dot.lon)), y = this.Y(wy(dot.lat));
+      if (x < 0 || y < 0 || x > this.w || y > this.h) continue;
+      out.push({ kind: 'dot', id: `dot:${dot.lat},${dot.lon},${dot.label}`, route: 0, d: Math.hypot(x - this.w / 2, y - this.h / 2),
+        label: dot.label, sub: dot.sub ?? '', go: dot.go, box: [x - 11, y - 11, x + 11, y + 11] });
+    }
+    const base = orderFeatures(out);
+    if (!this.sub || !this.spec.subway) return base;
+    // Subway style: today's order, kept exactly, and only added to (hubs, terminals, interchanges, routes).
+    return this.spec.subway.order(base, this.sub.features().map((f) => ({ ...f, route: 0, sel: f.id })));
+  }
+  /** Subway style: choose a route, a stop, an interchange — or nothing. Kept across a redraw of the page. */
+  private choose(id: string): void {
+    this.sel = id; this.shown = ''; this.lastGlyph = id ? this.lastGlyph : '';
+    if (id) selections.set(this.spec.key, id); else { selections.delete(this.spec.key); this.say(''); }
+    if (id) this.sub?.need(id);
+    this.redraw();
+  }
+  private step(dir: number): void {
+    const list = this.features(), S = this.spec.strings;
+    if (!list.length) { this.ringId = ''; this.redraw(); this.say(`<p class="foot">${esc(S.focusNone)}</p>`); return; }
+    const at = list.findIndex((f) => f.id === this.ringId);
+    const f = list[at < 0 ? (dir > 0 ? 0 : list.length - 1) : (at + dir + list.length) % list.length]!;
+    this.ringId = f.id;
+    // 2.4.11: a ring half off the edge of the canvas is a ring that is obscured. Anything not well inside the
+    // picture is brought to the middle before it is announced.
+    const cx = (f.box[0] + f.box[2]) / 2, cy = (f.box[1] + f.box[3]) / 2, m = 40;
+    if (cx < m || cy < m || cx > this.w - m || cy > this.h - m) this.pan(this.w / 2 - cx, this.h / 2 - cy);
+    this.redraw();
+    // The same card a tap produces — its words, and its "See details" button — plus what Enter will do.
+    // What the keyboard could not be given (the caps of section 9) and what the painter left out: the list has them all.
+    const added = list.filter((x) => x.kind !== 'segment' && x.kind !== 'dot').length;
+    const more = this.sub && f === list[list.length - 1] ? Math.max(0, this.sub.features().length - added) + this.sub.more : 0;
+    this.say(`<div class="mappick"><span><strong>${esc(f.label)}</strong>${f.sub ? `<small>${esc(f.sub)}</small>` : ''}</span>${f.go ? `<button class="btn ghost" data-go="${esc(f.go)}">${esc(S.details)}</button>` : ''}</div><p class="vh">${esc(S.focusHint)}</p>${more && this.spec.subway ? `<p class="foot">${esc(this.spec.subway.more(more))}</p>` : ''}`);
+  }
+  /** Enter on the ring opens the same screen the card's own button opens — the app's `data-go` handling, not a
+   *  second copy of it. A feature with nowhere to go (the stretch you are already on) simply stays put. */
+  private open(): void {
+    const f = this.sub ? this.features().find((x) => x.id === this.ringId) : undefined;
+    if (f?.sel) { this.choose(f.sel); return; }
+    this.note.querySelector<HTMLElement>('[data-go]')?.click();
+  }
+  private drawRing(c: CanvasRenderingContext2D, case_: string, focus: string): void {
+    if (!this.ringId) return;
+    const f = this.features().find((x) => x.id === this.ringId);
+    if (!f) { this.ringId = ''; return; }
+    const [x0, y0, x1, y1] = f.box, p = 7, r = 10;
+    const path = () => { c.beginPath(); c.moveTo(x0 - p + r, y0 - p); c.arcTo(x1 + p, y0 - p, x1 + p, y1 + p, r); c.arcTo(x1 + p, y1 + p, x0 - p, y1 + p, r); c.arcTo(x0 - p, y1 + p, x0 - p, y0 - p, r); c.arcTo(x0 - p, y0 - p, x1 + p, y0 - p, r); c.closePath(); };
+    c.setLineDash([]);
+    // A casing under the ring, so the ring keeps its 3:1 wherever it lands — over a street, a park or a route.
+    // 3 px of solid colour with 1.5 px of casing either side: 2.4.11, 2.4.13.
+    c.strokeStyle = case_; c.lineWidth = 6; path(); c.stroke();
+    c.strokeStyle = focus; c.lineWidth = 3; path(); c.stroke();
   }
 
   /** Parks are drawn unless a screen says otherwise; only the Map tab, which has a switch for them, ever does. */
@@ -323,9 +643,13 @@ export class MapView {
     let best: { d: number; dot: MapDot } | undefined;
     for (const dot of this.spec.dots ?? []) { const d = Math.hypot(this.X(wx(dot.lon)) - q.x, this.Y(wy(dot.lat)) - q.y); if (d < 24 && (!best || d < best.d)) best = { d, dot }; }
     if (best) return card(best.dot.label, best.dot.sub ?? '', best.dot.go);
+    // Subway style: a station, a pill, a terminal, a marker or a badge, each with a 44-unit box of its own.
+    const std = this.sub ? this.sub.rest : this.spec.overlays ?? [];
+    const glyph = this.sub?.hit(q, this.lastGlyph);
+    if (glyph) { this.lastGlyph = glyph.glyph; return this.choose(glyph.sel); }
     // A stop or station on a switched-on layer: its name, and what kind of thing it is, in words.
     let stop: { d: number; name: string; label: string } | undefined;
-    for (const o of this.spec.overlays ?? []) for (const pt of o.points) {
+    for (const o of std) for (const pt of o.points) {
       const d = Math.hypot(this.X(pt.x) - q.x, this.Y(pt.y) - q.y);
       if (d < 18 && (!stop || d < stop.d)) stop = { d, name: pt.name, label: o.label };
     }
@@ -336,9 +660,12 @@ export class MapView {
       if (d < 16 && (!near || d < near.d)) near = { d, seg: g.seg };
     }
     if (near) return card(near.seg.name, S.phase[near.seg.phase] ?? '', near.seg.id === this.spec.focus ? undefined : this.spec.segGo?.(near.seg.id));
+    const line = this.sub?.hitLine(q);
+    if (line) return this.choose(line);
+    if (this.sel) this.choose('');                       // a tap on the empty map lets the chosen route go
     // A route or a bike lane on a switched-on layer.
     let route: { d: number; name: string; label: string } | undefined;
-    for (const o of this.spec.overlays ?? []) for (const l of o.lines) {
+    for (const o of this.sub ? [...std, ...(this.spec.overlays ?? []).filter((x) => x.id === 'go:bike_lanes')] : this.spec.overlays ?? []) for (const l of o.lines) {
       if (!touches(l.box, [this.cx - this.w / 2 / this.s, this.cy - this.h / 2 / this.s, this.cx + this.w / 2 / this.s, this.cy + this.h / 2 / this.s])) continue;
       for (let i = 0; i + 3 < l.pts.length; i += 2) {
         const d = distToPiece(q.x, q.y, this.X(l.pts[i]!), this.Y(l.pts[i + 1]!), this.X(l.pts[i + 2]!), this.Y(l.pts[i + 3]!));
@@ -359,12 +686,28 @@ export class MapView {
   }
   private draw(): void {
     const c = this.ctx, { w, h } = this, mpp = M_PER_UNIT / this.s;                        // meters per pixel
-    const view: Box = [this.cx - w / 2 / this.s, this.cy - h / 2 / this.s, this.cx + w / 2 / this.s, this.cy + h / 2 / this.s];
-    const col = { out: css('--map-out'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus'), gwOpen: css('--gw-open'), gwBuild: css('--gw-build'), gwFund: css('--gw-fund'), gwPlan: css('--gw-plan'), gwCase: css('--gw-case') };
+    const view: Box = this.viewBox();
+    const col = { out: css('--map-out'), outInk: css('--map-out-ink'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus'), gwOpen: css('--gw-open'), gwBuild: css('--gw-build'), gwFund: css('--gw-fund'), gwPlan: css('--gw-plan'), gwCase: css('--gw-case') };
+    // Subway style (docs/MAP-STYLE.md): the painter works the frame out first, because its badges and names
+    // outrank street names and because the basemap under it is quietened. `sub` is null in `standard`, and
+    // every line below that mentions it then does exactly what it did before there was a second style.
+    const sub = this.sub;
+    const blocks = sub ? sub.begin({ c, w, h, s: this.s, cx: this.cx, cy: this.cy, overlays: this.spec.overlays ?? [], selection: this.sel, css, avoid: this.avoid,
+      contrast: matchMedia('(forced-colors: active)').matches ? 'forced' : this.mqc.matches ? 'more' : 'plain',
+      fontScale: Math.max(1, Math.min(1.5, (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16)) }) : [];
+    const quiet = !!sub?.quiet;
+    if (quiet) Object.assign(col, { park: css('--map-park-q'), parkInk: css('--map-park-ink-q'), road: css('--map-road-q'), main: css('--map-main-q'), fwy: css('--map-fwy-q'), ink: css('--map-ink-q') });
     c.lineCap = 'round'; c.lineJoin = 'round'; c.setLineDash([]);
     c.fillStyle = this.map ? col.out : col.land; c.fillRect(0, 0, w, h);
     const labels: { name: string; pts: Float32Array; cls: number }[] = [];
     if (this.map) {
+      // Outside the four cities. Two pale fills a step apart (1.20:1) were not a difference anyone could see, and
+      // no colour can fix that without making the ground outside darker than the streets inside it. So the area
+      // is a TEXTURE instead: sparse diagonal hatching whose own lines clear 3:1 against both fills, which reads
+      // as "not our area" at a glance and passes 1.4.11 on the lines themselves (DECISIONS 2026-09-20).
+      c.strokeStyle = col.outInk; c.lineWidth = 1; c.beginPath();
+      for (let x = -h; x < w + h; x += 11) { c.moveTo(x, 0); c.lineTo(x + h, h); }
+      c.stroke();
       c.fillStyle = col.land; c.beginPath(); for (const ring of this.map.boundary) { this.trace(ring); c.closePath(); } c.fill('evenodd');
       // The city edge is also a line, not only a change of shade: two pale fills a step apart are not a boundary
       // anyone can see (WCAG 1.4.11).
@@ -377,18 +720,33 @@ export class MapView {
         if (!this.spec.quiet) for (const a of this.map.parks) if (touches(a.box, view) && (a.box[2] - a.box[0]) * this.s < 7) { const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2); c.moveTo(x + 2, y); c.arc(x, y, 2, 0, 6.2832); }
         c.globalAlpha = 0.75; c.fill(); c.globalAlpha = 1;
       }
-      // Small streets appear as you zoom in; main roads are always there to get your bearings.
-      const showCls = mpp < 9 ? 4 : mpp < 16 ? 3 : 2;
-      const width = (cls: number) => Math.max(cls === 4 ? 0.8 : 1.2, Math.min(cls <= 2 ? 6.5 : 5, ([18, 20, 15, 11, 8][cls]!) / mpp));
+      // Every road is now drawn at a colour that really clears 3:1 against the land AND against a park (1.4.11).
+      // Three things stop that turning the map into a grey slab, which is why the item was open until today:
+      //  * a small street is a HAIRLINE. A 0.75 px line reads far lighter than its own swatch, so the mesh is a
+      //    texture and the greenway, the layers and the dots still sit on top of it.
+      //  * a small street only appears at the zoom where it means anything. It used to come in at 9 m/px, which
+      //    is a whole district's worth of side streets at once; now it waits for 6, and the next size for 11.
+      //  * width carries the hierarchy, not fade. Freeway, main road and side street are within a step of each
+      //    other in colour and a long way apart in weight.
+      const showCls = mpp < 6 ? 4 : mpp < 11 ? 3 : 2;
+      const width = (cls: number) => Math.max(cls === 4 ? 0.9 : cls === 3 ? 1.2 : 1.6, Math.min(cls <= 2 ? 6.5 : 4.5, ([18, 20, 15, 10, 7][cls]!) / mpp));
+      const widthQ = (cls: number) => (quiet ? Math.max(1, width(cls) * 0.8) : width(cls));   // quietened: thinner, never under 1
       const visible: Line[][] = [[], [], [], [], []];
       for (const r of this.map.roads) if (touches(r.box, view)) visible[r.cls]!.push(r);
       if (showCls > 2) for (const cell of this.map.cells) if (touches(cell.box, view)) for (const r of cell.roads) if (r.cls <= showCls && touches(r.box, view)) visible[r.cls]!.push(r);
-      for (const cls of [4, 3, 2, 1, 0]) {
+      // Close in, the big roads get a casing in the land colour. It is only worth the pass when the lines are
+      // wide enough for it to show, and it is what keeps a freeway readable where it runs through a park.
+      if (mpp < 4 && !quiet) for (const cls of [2, 1, 0]) {
         const list = visible[cls]!; if (!list.length) continue;
-        c.strokeStyle = cls === 0 ? col.fwy : cls <= 2 ? col.main : col.road; c.lineWidth = width(cls);
+        c.strokeStyle = col.land; c.lineWidth = width(cls) + 2.5;
         c.beginPath(); for (const r of list) this.trace(r.pts); c.stroke();
       }
-      const labelCls = mpp < 4.6 ? 4 : mpp < 8 ? 3 : mpp < 14 ? 2 : mpp < 30 ? 1 : 0;
+      for (const cls of [4, 3, 2, 1, 0]) {
+        const list = visible[cls]!; if (!list.length) continue;
+        c.strokeStyle = cls === 0 ? col.fwy : cls <= 2 ? col.main : col.road; c.lineWidth = widthQ(cls);
+        c.beginPath(); for (const r of list) this.trace(r.pts); c.stroke();
+      }
+      const labelCls = (mpp < 4.6 ? 4 : mpp < 8 ? 3 : mpp < 14 ? 2 : mpp < 30 ? 1 : 0) - (quiet ? 1 : 0);   // quietened: fewer names compete with badges
       for (const cls of [0, 1, 2, 3, 4]) if (cls <= labelCls) for (const r of visible[cls]!) if (r.name) labels.push({ name: r.name, pts: r.pts, cls });
     }
     if (this.spec.outline) {
@@ -398,13 +756,19 @@ export class MapView {
     // Transport layers a person switched on (bus routes, the streetcar, bike lanes, stations). They are drawn
     // under the greenway and under the listing dots, so switching a layer on never hides the thing a screen is
     // about. Colour never carries the meaning alone: the switcher names every layer, and tapping names it again.
-    for (const o of this.spec.overlays ?? []) {
+    for (const o of sub ? sub.rest : this.spec.overlays ?? []) {
       if (!o.lines.length) continue;
       const lw = Math.max(1.6, Math.min(o.width ?? 5, (o.width ?? 5) * 18 / mpp));
+      // A casing first, exactly as the greenway has one. A bus route is 3:1 against the land and against a park,
+      // but it crosses roads that are now 3:1 themselves, and no one colour can be 3:1 against both a near-white
+      // land and a mid-grey street. The casing is what its 3:1 is measured against, all the way along (1.4.11).
+      c.strokeStyle = col.gwCase; c.lineWidth = lw + 3; c.setLineDash([]);
+      c.beginPath(); for (const l of o.lines) if (touches(l.box, view)) this.trace(l.pts); c.stroke();
       c.strokeStyle = css(o.css) || col.brand; c.lineWidth = lw; c.setLineDash((o.dash ?? []).map((d) => d * lw));
       c.beginPath(); for (const l of o.lines) if (touches(l.box, view)) this.trace(l.pts); c.stroke();
     }
     c.setLineDash([]);
+    if (sub) sub.lines();                               // bike lanes, SMART, DDOT, trunks, QLINE, People Mover, the chosen route
     // Greenway, drawn like a transit line: one width the whole way, a casing so it reads over the streets, and a
     // colour and dash for each phase. Colour never carries the meaning alone: the key under the map says it in words,
     // and tapping a stretch names its phase. Where stretches meet, a station dot marks the join once you zoom in.
@@ -448,7 +812,7 @@ export class MapView {
 
     // Names. Bigger roads first, so they win when two names would overlap.
     // A name is a row of small circles along its text, so a slanted name only blocks the space it really covers.
-    const placed: [number, number, number][] = [], named: { n: string; x: number; y: number }[] = [];
+    const placed: [number, number, number][] = [...blocks], named: { n: string; x: number; y: number }[] = [];
     const free = (x: number, y: number, a: number, tw: number, size: number) => {
       const r = size / 2 + 3, n = Math.max(1, Math.ceil(tw / (2 * r))), mine: [number, number, number][] = [];
       for (let i = 0; i < n; i++) { const d = n === 1 ? 0 : (i / (n - 1) - 0.5) * (tw - size); mine.push([x + Math.cos(a) * d, y + Math.sin(a) * d, r]); }
@@ -480,7 +844,7 @@ export class MapView {
     // Stops and stations. There are thousands of bus stops, so a dense layer waits until the map is close enough
     // for them to be separate things rather than a smear; the layer switcher says so, and the list below the map
     // shows them at any zoom.
-    for (const o of this.spec.overlays ?? []) {
+    for (const o of sub ? sub.rest : this.spec.overlays ?? []) {
       if (!o.points.length) continue;
       const r = o.dense ? (mpp > 12 ? 0 : Math.max(2, Math.min(4, 30 / mpp))) : Math.max(3.5, Math.min(6.5, 45 / mpp));
       if (!r) continue;
@@ -491,9 +855,17 @@ export class MapView {
         c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fill(); if (o.ring) c.stroke();
       }
     }
+    if (sub) sub.marks();                               // stops, interchanges, terminals, hubs, markers, badges
     const dot = (d: { lat: number; lon: number; css?: string }, fill: string, r: number) => { c.beginPath(); c.arc(this.X(wx(d.lon)), this.Y(wy(d.lat)), r, 0, 6.2832); c.fillStyle = (d.css && css(d.css)) || fill; c.fill(); c.lineWidth = 2.5; c.strokeStyle = col.surface; c.stroke(); };
     for (const d of this.spec.dots ?? []) dot(d, col.brand, 7);
+    if (sub) {
+      sub.labels();
+      // The card of whatever is chosen, shown again after the page was redrawn; a choice whose layer is gone is let go.
+      if (this.sel && this.shown !== this.sel) { const html = sub.card(this.sel); if (html) { this.shown = this.sel; this.say(html); } else { this.sel = ''; selections.delete(this.spec.key); } }
+    }
     if (this.spec.me) dot(this.spec.me, col.focus, 7);
+    // Last of all, over everything: where the keyboard is.
+    this.drawRing(c, col.gwCase, col.focus);
   }
   /** Middle of the longest nearly straight, on-screen run of a line that is at least `need` pixels long. */
   private labelSpot(pts: Float32Array, need: number): { x: number; y: number; a: number; len: number } | null {

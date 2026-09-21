@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { assertScheduleValid, type Alert, type BundleRow } from '@313help/query';
+import { assertScheduleValid, isDvCategory, isServiceArea, SERVICE_AREA_IDS, type Alert, type BundleRow } from '@313help/query';
 import { inBbox, p, parsePhone, type CsvRow } from './util.js';
 
 export interface Issues { errors: string[]; warnings: string[] }
@@ -17,6 +17,22 @@ const CONTACT_NAME = /\b(?:[Cc]ontact|[Aa]sk for)\s+(?:(?:Mr|Ms|Mrs|Dr|Sister|Pa
 
 const host = (u?: string) => { try { return u ? new URL(u).hostname.replace(/^www\./, '') : null; } catch { return null; } };
 const sameSite = (a?: string, b?: string) => { const x = host(a), y = host(b); return !!x && x === y; };
+
+// ---- domestic violence: a row that names no place at all --------------------------------------------------
+// A shelter.dv row carries no address, no ZIP, no coordinate, no name that is a building or a street, and no
+// link whose own address is a "where we are" page. The bundle is public and signed, so anything in it is
+// published, and a DV shelter's address can get someone killed (docs/08, DECISIONS 2026-09-20). This overrides
+// the ordinary "a shelter's address is shown only if the shelter publishes it" rule: for shelter.dv there is no
+// such case — not even when the shelter prints its address on its own page.
+
+/** A house number followed by a street word: the shape of an address wherever it is written. */
+const STREET_IN_TEXT = /\b\d{2,6}\s+([NSEW]\.?\s+|(?:North|South|East|West)\s+)?[A-Za-z][A-Za-z.'-]*(\s+[A-Za-z][A-Za-z.'-]*)?\s*(St|Street|Ave|Avenue|Blvd|Boulevard|Rd|Road|Dr|Drive|Ln|Lane|Ct|Court|Pl|Place|Pkwy|Parkway|Hwy|Highway|Way|Ter|Terrace|Cir|Circle|Mile)\b\.?/i;
+/** A name that is really a building or a street: "Interim House, 100 Main St", "The Main Street shelter". */
+const BUILDING_NAME = new RegExp(`${STREET_IN_TEXT.source}|\\b(building|suite|apartments?|floor)\\b`, 'i');
+/** A URL path that is a "where we are" page, or that spells an address into the path itself. */
+const ADDRESS_PATH = /(^|[/_-])(address(es)?|directions?|our-?locations?|find-?us|visit-?us|where-?we-?are|get-?directions?|map|maps)([/_-]|$)|\d{2,6}[-_](north|south|east|west|[a-z]+)([-_][a-z]+)?[-_](st|street|ave|avenue|blvd|boulevard|rd|road|dr|drive|lane|ln|way|court|ct|place|pl)([/_-]|$)/i;
+
+const urlPath = (u?: string) => { try { return u ? new URL(u).pathname : null; } catch { return null; } };
 
 /**
  * One row of data/seed/script-refusing-hosts.csv: a host that refuses this pipeline's fetcher, and the first
@@ -49,8 +65,21 @@ export function validateRows(rows: BundleRow[], todayStr: string, refusing: Map<
     if (!r.name || !r.what) e('name and what are required');
     if (/�/.test(JSON.stringify(r))) e('contains a broken character (encoding problem in the source)');
 
-    // DV rows never carry a place. A schema rule, not an editorial habit (docs/08, audit A8).
-    if (r.category === 'shelter.dv' && (r.address || r.lat !== undefined || r.lon !== undefined)) e('domestic violence rows must not have an address or coordinates');
+    // DV rows never carry a place. A schema rule, not an editorial habit (docs/08, audit A8). This holds even
+    // when the shelter publishes its own address, which is why it is checked before the "own website" rule below
+    // and not as an exception to it (DECISIONS 2026-09-20).
+    if (isDvCategory(r.category)) {
+      if (r.address || r.lat !== undefined || r.lon !== undefined) e('domestic violence rows must not have an address or coordinates');
+      if (BUILDING_NAME.test(r.name)) e(`the name "${r.name}" reads as a building or a street; a domestic violence row is named by its service, never by where it is`);
+      for (const [what, url] of [['website', r.website], ['source url', r.facts.source?.url]] as const) {
+        const path = urlPath(url);
+        if (path && ADDRESS_PATH.test(path)) e(`${what} ${url} points at an address page; a domestic violence row links only to a page that is not about where it is`);
+      }
+      if (r.service_area !== undefined && !isServiceArea(r.service_area)) e(`unknown service_area "${r.service_area}" (one of: ${SERVICE_AREA_IDS.join(', ')})`);
+      if (r.phones.length === 0) e('a domestic violence row publishes on its phone alone, so it must have one');
+    } else if (r.service_area !== undefined) {
+      e('service_area is for domestic violence rows only; every other row says where it is with an address or a coordinate');
+    }
     // Any other shelter shows an address only if the shelter publishes it on its own site (DECISIONS 2026-09-19).
     // Warming and cooling centers are public buildings the City announces, not shelters people live in.
     if (/^shelter\.(?!warming|cooling)/.test(r.category) && r.address && !sameSite(r.website, r.facts.source?.url)) e("a shelter's address must come from the shelter's own website: source url and website must be on the same site");
@@ -93,6 +122,25 @@ export function validateRows(rows: BundleRow[], todayStr: string, refusing: Map<
     }
   }
   return { errors, warnings };
+}
+
+/**
+ * The HSDS export is published too, and it is the copy other people read. A domestic-violence service must be
+ * virtual there: no `addresses`, no `latitude`/`longitude`, no `postal_code`. Checked on the exported objects
+ * themselves rather than on the rows they came from, so a change to the exporter cannot quietly leak a place.
+ */
+export function validateHsdsPrivacy(services: unknown[]): Issues {
+  const errors: string[] = [];
+  for (const svc of services as any[]) {
+    if (!isDvCategory(svc?.x_detroit?.category ?? '')) continue;
+    for (const sal of svc.service_at_locations ?? []) {
+      const id = sal?.x_detroit?.id ?? svc.x_detroit?.id, loc = sal?.location ?? {};
+      if (loc.addresses?.length) errors.push(`HSDS ${id}: a domestic violence service must carry no address`);
+      if (loc.latitude !== undefined || loc.longitude !== undefined) errors.push(`HSDS ${id}: a domestic violence service must carry no coordinates`);
+      if (loc.location_type !== 'virtual') errors.push(`HSDS ${id}: a domestic violence location must be "virtual", not "${loc.location_type}"`);
+    }
+  }
+  return { errors, warnings: [] };
 }
 
 export function validateEmergency(rows: CsvRow[], todayStr: string, release: boolean): Issues & { verified: boolean } {

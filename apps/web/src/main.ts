@@ -1,18 +1,21 @@
 import {
-  badge, bundleAge, effectiveNow, helpAlong, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens,
+  badge, bundleAge, effectiveNow, helpAlong, isDvCategory, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens, serviceAreaKey,
   type Alert, type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@313help/query';
-import { LANGS, currentLang, initLang, locale, setLang, t, type Lang } from './i18n.js';
+import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang } from './i18n.js';
 import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
-import { MapView, loadLayer, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
+import { MapView, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
 import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
-import { loadLayers, toggleLayer } from './layers.js';
+import { loadLayers, loadStyle, mapStyle, saveStyle, toggleLayer, type MapStyle } from './layers.js';
+import { LAYER_STYLE } from './layerstyle.js';
+import { styleSwitchHtml, subwayKeyHtml } from './stylepanel.js';
+import { mapListHtml } from './maplist.js';
 import { createRouter, hashFor, type View } from './router.js';
 import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, clearQueue, flush, preparePhoto, queuedCount, queuedTargets, resetInstallSecret, submit, uploadPhoto } from './report.js';
-import { TRANSIT } from './transit.js';
+import { TRANSIT, plannerFor } from './transit.js';
 import { LINKS } from './links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitProposal } from './propose.js';
 import { canSave, canShare, clearSaved, loadSaved, toggleSaved } from './saved.js';
@@ -42,6 +45,13 @@ let layersOn: string[] = [];                             // map layers switched 
 // Layer shapes already loaded, this visit only, keyed by file AND the checksum the signed index gives it.
 // 'loading' is a request in flight; 'failed' is a try that did not come back and can be made again.
 const layerFiles = new Map<string, LayerData | 'loading' | 'failed'>();
+// The map style (docs/MAP-STYLE.md): `standard` unless a person picked "Subway lines" on this phone. The code that
+// draws subway lines is its own download, asked for the first time it is needed; so is each network's extra file.
+let styleNow: MapStyle = 'standard';
+let subwayMod: typeof import('./subway.js') | null = null, subwayState: '' | 'loading' | 'failed' = '';
+type NetHeld = import('./subway.js').Net | number[][];   // a routes file decoded, or a stops file's `serves`
+const netFiles = new Map<string, NetHeld | 'loading' | 'failed'>();
+const wantedStops = new Set<string>();                    // stops layers a chosen route asked for, this visit only
 let refocusSel = '';
 let refocus = '';                                        // a layer switch to put the cursor back on after redrawing
 // Where the cursor goes after a redraw that is not a new screen (a report sent, a place saved, the map opened on a
@@ -163,22 +173,31 @@ const logo = `<svg class="logo" viewBox="0 0 32 32" width="32" height="32" aria-
  *  of our words. Those are never translated, so on an Arabic or Bengali screen they carry `lang="en"` like every
  *  other owner-written run (WCAG 3.1.2) — and in Arabic that also keeps the name's own commas and parentheses at
  *  the end of the name instead of at the end of the line. */
-function topBar(title?: string, quickExit = false, ownTitle = false): string {
+function topBar(title?: string, quickExit = false, ownTitle = false, lang = false): string {
   // On a wide screen Urgent help lives in the side rail (tabBar puts it there), so the top bar does not draw a
   // second copy at all: two buttons with the same name, one of them hidden by CSS, is a trap for a screen reader.
   const urgentBtn = wide.matches ? '' : `<button class="urgent" ${go({ v: 'urgent' })}>${icon('phone', 'sm')}<span>${T('strip.more')}</span></button>`;
+  const picker = lang ? langSelect() : '';
   // The name is `<bdi>`: on a right-to-left screen "313 Help" is a number and a word, and without an isolate the
   // two swap places and the app calls itself "Help 313".
-  if (!title) return `<header class="top"><div class="brand">${logo}<bdi>${T('app.name')}</bdi></div>${urgentBtn}</header>`;
+  if (!title) return `<header class="top"><div class="brand">${logo}<bdi>${T('app.name')}</bdi></div>${picker}${urgentBtn}</header>`;
   return `<header class="top inner"><button class="iconbtn" data-back aria-label="${T('back')}">${icon('back', 'turn')}</button><h1 tabindex="-1">${ownTitle ? owner(title) : esc(title)}</h1>
-    ${quickExit ? `<button class="exit" data-exit>${T('safe.exit')}</button>` : urgentBtn}</header>`;
+    ${picker}${quickExit ? `<button class="exit" data-exit>${T('safe.exit')}</button>` : urgentBtn}</header>`;
 }
-// Every language names itself in its own words and carries its own `lang`, so an Arabic reader can find Arabic on
-// an English screen and a screen reader says each name in the right voice (WCAG 3.1.2). The one in use is not a
-// button: it is marked as the current choice instead, so nobody taps what they already have.
-const langBtn = () => `<nav class="langrow" aria-label="${T('lang.switch')}">${LANGS.map((l) => (l.code === currentLang()
-  ? `<span class="langnow" lang="${l.code}" aria-current="true">${esc(l.name)}</span>`
-  : `<button class="link" data-lang="${l.code}" lang="${l.code}">${esc(l.name)}</button>`)).join('')}</nav>${langOffline ? `<p class="banner warn" role="note">${T('lang.needs_net')}</p>` : ''}`;
+// The language control (Kyle, 2026-09-20: one line, in the top bar, not a row of its own below it).
+//
+// A real `<select>`, not a button and a menu of our own. On a cheap Android phone and under Switch Control,
+// VoiceOver or TalkBack, the platform's own picker is the one thing that is certain to work: it is a full-size
+// wheel or list drawn by the operating system, it takes a single switch action, and none of the menu-button
+// pattern (aria-expanded, arrow keys, Escape, click-outside, focus return) is ours to get wrong.
+//
+// Every language still names itself in its own words and carries its own `lang`, so an Arabic reader can find
+// Arabic on an English screen and a screen reader says each name in the right voice (WCAG 3.1.2). The visible
+// name is the one in use, which is what a select shows; the globe is decoration, and the control's name comes
+// from the wrapping <label> ("Language"), so it reads as "Language, English, pop-up button".
+const langSelect = () => langPicker(currentLang(), t('lang.switch'), icon('globe', 'sm'), esc);
+/** The one thing the old row carried that the top bar cannot: "that language needs a connection the first time." */
+const langNote = () => (langOffline ? `<p class="banner warn" role="note">${T('lang.needs_net')}</p>` : '');
 // The Events tab shows only when the list carries upcoming events (none today: DECISIONS 2026-09-19).
 const shownTabs = () => TABS.filter((x) => x.id !== 'events' || upcoming(1).length > 0);
 // A laptop or a desktop (Kyle, 2026-09-20). On a wide screen the tab bar is a rail down the side, so it is drawn
@@ -218,16 +237,26 @@ const searchBtn = () => `<button class="searchbtn" ${go({ v: 'search' })}>${icon
 const rowLink = (view: View, ic: string, title: string, sub = '', own = false) =>
   `<li><button class="row" ${go(view)}><span class="rowic">${icon(ic)}</span><span class="rowtx"><strong>${own ? owner(title) : esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${icon('chevron', 'sm turn dim')}</button></li>`;
 
+// A domestic-violence row's only statement about where it is: the coarse area it serves, in words. Never a
+// distance, never a dot, never "near you" — the row carries no place at all (docs/08, schema/query-spec.md).
+const areaPill = (row: BundleRow) => {
+  const key = isDvCategory(row.category) ? serviceAreaKey(row.service_area ?? '') : null;
+  return key ? `<span class="pill plain">${T('safe.dv_serves', { area: t(key) })}</span>` : '';
+};
 function card(r: Ranked, showDistance = true): string {
   const b = badgeText(r.row), ph = r.row.phones[0];
   return `<li class="card"><a class="cardlink" ${go({ v: 'detail', id: r.row.id })} href="#/r/${esc(r.row.id)}">
       <h3>${owner(r.row.name)}</h3><p class="what">${owner(r.row.what)}</p>
-      <p class="meta"><span class="pill ${r.open.state}">${esc(openText(r.open))}</span>${showDistance && r.miles !== null ? `<span class="pill plain">${T('miles', { miles: r.miles.toFixed(1) })}</span>` : ''}</p>
+      <p class="meta"><span class="pill ${r.open.state}">${esc(openText(r.open))}</span>${areaPill(r.row)}${showDistance && r.miles !== null ? `<span class="pill plain">${T('miles', { miles: r.miles.toFixed(1) })}</span>` : ''}</p>
       ${r.row.notice ? `<p class="notice">${owner(r.row.notice)}</p>` : ''}<p class="fresh ${b.level}">${esc(b.text)}</p></a>
     ${ph ? `<a class="btn" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.row.name })}">${icon('phone', 'sm')}${T('detail.call')} <strong>${phoneHtml(ph.number)}</strong></a>` : ''}</li>`;
 }
 function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?: string; noDistance?: boolean; linksBelow?: boolean }): string {
-  const ranked = rank(bundle!.rows, { ...query, ...(here && !opts.noDistance ? { near: here } : {}) }, now(), bundle!.alerts);
+  // The location still goes to `rank` on a no-distance screen: a domestic-violence row uses it only to work out
+  // which coarse area is nearest (packages/query/src/areas.ts) and its `miles` comes back null regardless, so
+  // nothing below can print a distance. What `noDistance` turns off is the screen: the location chip, the map,
+  // the dots and the mileage pill.
+  const ranked = rank(bundle!.rows, { ...query, ...(here ? { near: here } : {}) }, now(), bundle!.alerts);
   // Nothing listed: say so plainly. When the screen has links to programs below, point there instead of to 211.
   if (!ranked.length) return opts.linksBelow ? `<p class="empty">${T('results.none_links')}</p>` : `<p class="empty">${T(opts.emptyKey ?? 'results.none')} <a href="tel:211">211</a></p>`;
   const shown = opts.limit ? ranked.slice(0, opts.limit) : ranked;
@@ -235,7 +264,7 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
   // screen, and never a dot for a sensitive listing (those carry no coordinates in the first place).
   const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && !isSensitive(r.row.category));
   const map = !pins.length ? '' : listMap
-    ? `${mapBox({ key: 'list:' + JSON.stringify(query), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, go: JSON.stringify({ v: 'detail', id: r.row.id }) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
+    ? `${mapBox({ key: 'list:' + JSON.stringify(query), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: openText(r.open), category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id }) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
     : `<button class="chip" data-listmap>${icon('pin', 'sm')}${T('map.show', { count: pins.length })}</button>`;
   return `${opts.noDistance ? '' : locChip()}${map}<h2 class="vh">${T('results.head')}</h2><ul class="cards">${shown.map((r) => card(r, !opts.noDistance)).join('')}</ul>
     ${opts.seeAll && ranked.length > shown.length ? `<button class="btn ghost" ${go(opts.seeAll)}>${T('results.see_all', { count: ranked.length })}</button>` : ''}`;
@@ -289,7 +318,7 @@ function homeTab(): string {
   const alerts = bundle.alerts.filter((a) => Date.parse(a.ends_at) > now().getTime() && Date.parse(a.starts_at) <= now().getTime());
   const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const quick = ['food', 'shelter', 'doctor', 'drugs', 'job', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
-  return `<main>${langBtn()}<section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
+  return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
     ${alerts.map(alertBox).join('')}
     ${sunset ? '' : `<button class="feature" ${go({ v: 'tab', tab: 'help' })}><span class="rowic big">${icon('help')}</span><span class="rowtx"><strong>${T('home.help_title')}</strong><small>${T('home.help_sub')}</small></span>${icon('chevron', 'turn dim')}</button>
     <ul class="quick">${quick.map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>`).join('')}</ul>`}
@@ -314,21 +343,6 @@ function helpTab(): string {
 // never the only way to reach a fact. Layer choices live on this phone (layers.ts) and are never sent.
 // Help layers come from the category taxonomy (needs.ts MAP_GROUPS); treatment and sexual-assault listings are
 // never drawn at all, and inside a group a DV or crisis listing is dropped too (isSensitive).
-const LAYER_STYLE: Record<string, { css: string; width?: number; dash?: number[]; dense?: boolean; ring?: boolean }> = {
-  'go:ddot_routes': { css: '--lyr-bus', width: 3.2 },
-  'go:ddot_stops': { css: '--lyr-bus', dense: true },
-  'go:smart_routes': { css: '--lyr-smart', width: 2.8, dash: [3, 2] },
-  'go:smart_stops': { css: '--lyr-smart', dense: true },
-  'go:qline': { css: '--lyr-rail', width: 4, ring: true },
-  'go:people_mover': { css: '--lyr-rail', width: 3.4, ring: true },
-  'go:mogo': { css: '--lyr-bike', ring: true },
-  'go:bike_lanes': { css: '--lyr-bike', width: 2.4 },
-  'go:stations': { css: '--lyr-rail', ring: true },
-  'go:park_ride': { css: '--lyr-smart', ring: true },
-  // Intercity coaches (Greyhound and the rest): a few stops, not a network. It had no entry at all, so it was
-  // drawn exactly like the DDOT routes and nothing on the map told the two apart (web review, 2026-09-20).
-  'go:intercity_bus': { css: '--lyr-rail', width: 2.6, dash: [5, 3], ring: true },
-};
 /** Licence links. The manifest carries a licence NAME but no URL (pipeline/src/ingest-transit.ts, another
  *  agent's file), so the address for each name we actually ship is kept here and matched by name. A licence we
  *  have no address for is still printed, just without a link — never guessed at. */
@@ -400,34 +414,88 @@ function layerProblem(id: string): string {
   if (!layerOn(id) || layerState(id) !== 'failed') return '';
   return `<p class="banner warn layerbad">${T('map.layer_failed', { name: layerName(id) })} <button class="chip" data-layer-retry="${esc(id)}">${T('map.layer_retry')}</button></p>`;
 }
+// ---- the map style: "Standard" or "Subway lines" (docs/MAP-STYLE.md) ------------------------------------------
+/** Only a bundle that carries subway data offers the choice; with an older bundle the style is `standard`. */
+const hasSubway = () => (bundle?.transit?.layers ?? []).some((l) => !!l.net);
+const styleOn = (): MapStyle => (styleNow === 'subway' && hasSubway() ? 'subway' : 'standard');
+function askForSubway(): void {
+  if (subwayState === 'loading') return;
+  subwayState = 'loading';
+  void import('./subway.js').then((m) => { subwayMod = m; subwayState = ''; render(false); },
+    () => { subwayState = 'failed'; render(false); announce(t('map.layer_failed_say', { name: t('map.style_subway') })); });
+}
+function askForNet(file: string, id: string): void {
+  const key = layerKey(file);
+  netFiles.set(key, 'loading');
+  void loadNet(bundle!.index, file).then((raw) => {
+    const d = raw && subwayMod ? subwayMod.decodeNet(raw) ?? subwayMod.decodeServes(raw) : null;
+    netFiles.set(key, d ?? 'failed');
+    render(false);
+    if (!d) announce(t('map.layer_failed_say', { name: `${t('map.style_subway')}: ${layerName(id)}` }));
+  });
+}
+/** What the subway painter draws from, or nothing: in `standard`, while the code is still coming, or when it
+ *  could not come. Standard layer files already held are never asked for again; a network whose extra file has
+ *  not arrived (or could not be read) is simply left out, and map.ts keeps drawing it the standard way. */
+function subwaySpec(): MapSpec['subway'] {
+  if (styleOn() !== 'subway') return undefined;
+  if (!subwayMod) { if (subwayState !== 'failed') askForSubway(); return undefined; }
+  const nets: Record<string, import('./subway.js').Net> = {}, stops: import('./subway.js').SubwayData['stops'] = {};
+  for (const l of bundle?.transit?.layers ?? []) {
+    const on = layerOn('go:' + l.id), wanted = wantedStops.has(l.id);
+    if (!l.net || (!on && !wanted)) continue;
+    if (!on && !layerFiles.has(layerKey(l.file))) askForLayer(l.file, 'go:' + l.id);   // a chosen route's stops
+    const shapes = layerFiles.get(layerKey(l.file)), points = shapes && shapes !== 'loading' && shapes !== 'failed' ? shapes.points : undefined;
+    const key = layerKey(l.net.file);
+    if (!netFiles.has(key)) askForNet(l.net.file, 'go:' + l.id);
+    const held = netFiles.get(key), data = held === 'loading' || held === 'failed' ? undefined : held;
+    if (data && !Array.isArray(data)) { if (on) nets[l.id] = data; if (points && data.serves) stops[l.id] = { points, serves: data.serves }; }
+    else if (points) stops[l.id] = { points, ...(Array.isArray(data) ? { serves: data } : {}) };
+  }
+  return {
+    Painter: subwayMod.SubwayPainter, order: subwayMod.featureOrder, more: (count) => t('map.list_more', { count }),
+    data: {
+      nets, stops, hubs: bundle?.transit?.hubs ?? [], on: (bundle?.transit?.layers ?? []).filter((l) => layerOn('go:' + l.id)).map((l) => l.id),
+      t, label: (layer) => layerName('go:' + layer),
+      // One link, the owner's own trip planner: the address the Map tab already carries (transit.ts); the file's
+      // `agency_url` only when we have none. It goes through the same scheme check as every other link out.
+      planner: (system, agency, fallback) => { const url = plannerFor(system) ?? fallback; return url ? ext(url, t('map.route_plan', { agency })) : ''; },
+      // Not in the middle of the map's own tap: the page is drawn again once that has finished.
+      want: (layer) => { if (!wantedStops.has(layer)) { wantedStops.add(layer); queueMicrotask(() => render(false)); } },
+    },
+  };
+}
+/** "Subway lines: DDOT bus routes could not load. Try again" — the layer then stays on the map, drawn the standard way. */
+function styleProblems(): string {
+  if (styleOn() !== 'subway') return '';
+  const bad = (name: string, retry: string) => `<p class="banner warn layerbad">${T('map.layer_failed', { name })} <button class="chip" data-net-retry="${esc(retry)}">${T('map.layer_retry')}</button></p>`;
+  if (subwayState === 'failed') return bad(t('map.style_subway'), '*');
+  return (bundle?.transit?.layers ?? []).filter((l) => l.net && layerOn('go:' + l.id) && netFiles.get(layerKey(l.net.file)) === 'failed')
+    .map((l) => bad(`${t('map.style_subway')}: ${layerName('go:' + l.id)}`, l.id)).join('');
+}
+/** The two radio buttons (stylepanel.ts); hidden when the bundle has nothing to choose between. */
+const styleSwitch = () => styleSwitchHtml({ offered: hasSubway(), style: styleNow, T, problems: styleProblems() });
+/** What the lines mean, in words, under the map: only in the subway style, only for what is switched on. */
+function subwayKey(): string {
+  if (styleOn() !== 'subway' || !subwayMod) return '';
+  const qline = Object.values(netNow()).find((n) => n.system === 'qline');
+  return subwayKeyHtml({ on: (id) => layerOn('go:' + id), derived: qline?.routes.some((r) => r.derived), t });
+}
+const netNow = (): Record<string, import('./subway.js').Net> => Object.fromEntries((bundle?.transit?.layers ?? []).flatMap((l) => { const d = l.net && netFiles.get(layerKey(l.net.file)); return d && d !== 'loading' && d !== 'failed' && !Array.isArray(d) ? [[l.id, d]] : []; }));
 function layerSwitcher(): string {
   const box = (s: { group: string; items: { id: string; icon: string; name: string; note?: string }[] }) => `<fieldset><legend>${T(s.group)}</legend><div class="kinds">${s.items.map((i) =>
     `<label class="pick"><input type="checkbox" data-layer="${esc(i.id)}"${layerOn(i.id) ? ' checked' : ''}><span>${esc(i.name)}${i.note ? ` <small>${esc(i.note)}</small>` : ''}</span></label>`).join('')}</div>${s.items.map((i) => layerProblem(i.id)).join('')}</fieldset>`;
-  return `<form class="layers" data-layers><h2>${T('map.layers')}</h2><p class="foot">${T('map.layers_note')}</p>${layerMenu().map(box).join('')}</form>`;
+  return `<form class="layers" data-layers><h2>${T('map.layers')}</h2><p class="foot">${T('map.layers_note')}</p>${layerMenu().map((s) => (s.group === 'map.group_go' ? styleSwitch() : '') + box(s)).join('')}</form>`;
 }
-/** Everything the map is showing, in words. Bounded lists, so a cheap phone never draws thousands of rows. */
+/** Everything the map is showing, in words (maplist.ts). It is handed the standard layers and nothing about the
+ *  map style, so the list is the same list whichever style is drawn — and a test holds it to that. */
 function layerList(rows: Ranked[], over: Overlay[]): string {
   const parks = layerOn('place:parks') ? [...(bundle?.parks ?? [])].sort((a, b) => (here ? milesBetween(here, a) - milesBetween(here, b) : a.name.localeCompare(b.name))) : [];
-  const segs = layerOn('place:greenway') ? bundle?.greenway?.segments ?? [] : [];
-  // Route, stop and park names are written by the City, never by us: one English run, marked as one (WCAG 3.1.2),
-  // so an Arabic screen keeps the whole list left to right instead of reordering it around every "·".
-  const names = (list: string[], limit = 40) => `<p>${owner([...new Set(list)].filter(Boolean).slice(0, limit).join(' · '))}</p>${new Set(list).size > limit ? `<p class="foot">${T('map.list_more', { count: new Set(list).size - limit })}</p>` : ''}`;
-  const parts = [
-    rows.length ? `<h3>${T('map.list_help', { count: rows.length })}</h3><ul class="cards">${rows.slice(0, 20).map((r) => card(r)).join('')}</ul>${rows.length > 20 ? `<p class="foot">${T('map.list_more', { count: rows.length - 20 })}</p>` : ''}` : '',
-    segs.length ? `<h3>${T('gw.title')}</h3><ul class="rows">${segs.map((s) => rowLink({ v: 'segment', id: s.id }, 'path', s.name, t('gw.' + s.phase), true)).join('')}</ul>` : '',
-    parks.length ? `<h3>${T('rec.parks')} <span class="count">${parks.length}</span></h3>${names(parks.map((p) => p.name), 30)}<button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.all_parks', { count: parks.length })}</button>` : '',
-    ...over.map((o) => {
-      const list = [...o.lines.map((l) => l.name), ...o.points.map((q) => q.name)].filter(Boolean);
-      const count = o.lines.length + o.points.length;
-      return `<h3>${esc(o.label)} <span class="count">${count}</span></h3>${list.length ? names(list) : `<p class="foot">${T('map.list_unnamed', { count })}</p>`}`;
-    }),
-    // A layer that is switched on but could not be read says so here too, not only in the switcher: the list is
-    // where a person looks when the map shows nothing.
-    ...(bundle?.transit?.layers ?? []).map((l) => layerProblem('go:' + l.id)),
-  ].filter(Boolean);
-  if (!parts.length) return `<h2>${T('map.list_title')}</h2><p class="empty">${T('map.list_none')}</p>`;
-  // The heading lives inside the summary, so the sections below it are h3s under an h2 and the outline has no gap.
-  return `<details class="browse maplist"><summary>${icon('info', 'sm')}<h2 class="sumh">${T('map.list_title')}</h2>${icon('chevron', 'sm turn dim')}</summary><div class="maplistbody">${parts.join('')}</div></details>`;
+  return mapListHtml({
+    rows, overlays: over, parks, segments: layerOn('place:greenway') ? bundle?.greenway?.segments ?? [] : [],
+    problems: (bundle?.transit?.layers ?? []).map((l) => layerProblem('go:' + l.id)),
+    T, t, owner, icon, card: (r) => card(r), segmentRow: (s) => rowLink({ v: 'segment', id: s.id }, 'path', s.name, t('gw.' + s.phase), true), allParks: `<button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.all_parks', { count: parks.length })}</button>`,
+  });
 }
 /** Who a layer came from, under what licence, and what we changed. A licence is only worth printing if a person
  *  can read it, so where we know its address it is a link; and every one of these layers was cut down to our
@@ -441,15 +509,18 @@ function mapTab(): string {
   const g = bundle?.greenway, parks = bundle?.parks ?? [];
   const openCount = g?.segments.filter((s) => s.phase === 'open').length ?? 0;
   const rows = layerRows(), over = overlays();
-  const dots: MapDot[] = rows.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: layerName('help:' + groupOf(r.row.category)), go: JSON.stringify({ v: 'detail', id: r.row.id } satisfies View), css: '--grp-' + groupOf(r.row.category) }));
+  // `sub` is what a tap card says under the name, and what the keyboard's ring reads out: the kind of help, and
+  // whether it is open now. `category` is what lets map.ts run every dot through `mapDrawable` again before the
+  // keyboard is allowed to land on it.
+  const dots: MapDot[] = rows.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: `${layerName('help:' + groupOf(r.row.category))} · ${openText(r.open)}`, category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id } satisfies View), css: '--grp-' + groupOf(r.row.category) }));
   const nearParks = here ? [...parks].map((p) => ({ p, mi: milesBetween(here!, p) })).sort((a, b) => a.mi - b.mi).slice(0, 5) : [];
   const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now(), bundle?.alerts ?? []);
   const sources = (bundle?.transit?.layers ?? []).filter((l) => layerOn('go:' + l.id));
   // On a phone this is one column, exactly as before (.maptop and .mapside are display:contents). On a laptop
   // the map sits beside the switcher and the list, and stays put while the list scrolls.
   return `<main class="wide"><h1 class="page" tabindex="-1">${T('tab.map')}</h1><p class="lede">${T('map.lede')}</p>
-    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, segments: layerOn('place:greenway'), parks: layerOn('place:parks'), fit: CITY, cover: true })}
-    <div class="mapside">${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
+    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), fit: CITY, cover: true })}
+    <div class="mapside">${subwayKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
     ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map(layerSource).join(' · ')}<br>${T('map.layer_filtered')}</p>` : ''}
     ${g ? `<h2>${T('gw.title')}</h2><button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'turn dim')}</button>` : ''}
     ${parks.length ? `<h2>${T('rec.parks')}</h2>${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => `<li><div class="row static"><span class="rowic">${icon('rec')}</span><span class="rowtx"><strong>${owner(p.name)}</strong><small>${[p.address ? owner(p.address) : '', T('miles', { miles: mi.toFixed(1) })].filter(Boolean).join(' · ')}</small></span></div></li>`).join('')}</ul>` : ''}
@@ -498,7 +569,7 @@ function need(view: Extract<View, { v: 'need' }>): string {
   const dv = n.id === 'unsafe';
   // A link that comes before the phone numbers (313SafeBeds on the shelter screen): the same panel, at the top.
   const topLinks = n.firstLinks && !view.refine ? linkPanels(n.firstLinks, true) : '';
-  return `<main>${n.intro && !view.refine ? `<p class="lede">${T(n.intro)}</p>` : ''}${topLinks}${first ? `<div class="stackbtns">${first}</div>` : ''}${dv ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
+  return `<main>${n.intro && !view.refine ? `<p class="lede">${T(n.intro)}</p>` : ''}${topLinks}${first ? `<div class="stackbtns">${first}</div>` : ''}${dv ? `<p class="foot">${T('safe.dv_no_address')}</p><p class="foot">${T('safe.calls_note')}</p>` : ''}
     ${refine}${query ? results(query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true }, emptyKey: n.emptyKey, noDistance: dv, linksBelow: !!links }) : ''}
     ${links && query ? `<h2>${T('links.more')}</h2>${linkPanels(links)}` : ''}</main>`;
 }
@@ -538,18 +609,19 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
   const own = bundle!.alerts.filter((a) => a.status === 'published' && a.targets?.includes(r.id) && Date.parse(a.ends_at) > now().getTime())
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
   return { title: r.name, exit: priv, ownTitle: true, html: `<main class="detail"><p class="org">${owner(r.org)}</p>
-    <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span></p><p class="fresh ${b.level}">${esc(b.text)}</p>${holidayNote(o)}${r.notice ? `<p class="notice">${owner(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
+    <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span>${areaPill(r)}</p><p class="fresh ${b.level}">${esc(b.text)}</p>${holidayNote(o)}${r.notice ? `<p class="notice">${owner(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${owner(ph.label)}` : ''}</span><strong>${phoneHtml(ph.number)}</strong></a>`).join('')}
       ${goHere(r) ? `<div class="two"><a class="btn ghost" href="${esc(goHere(r)!)}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
         <a class="btn ghost" href="${esc(transitHref(r)!)}" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>
         ${busApp(r) ? `<a class="btn ghost" href="${esc(busApp(r)!)}" aria-label="${T('detail.bus_app_label', { name: r.name })}">${icon('transit', 'sm')}${T('detail.bus_app')} ${icon('out', 'sm')}</a>` : ''}` : ''}
       <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}${canShare(r.category) ? `<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button>` : ''}</div>
       ${savedIds.includes(r.id) ? `<p class="foot">${T('saved.note')}</p>` : ''}</div>
+    ${isDvCategory(r.category) ? `<p class="foot">${T('safe.dv_no_address')}</p>` : ''}
     ${sensitive ? `<p class="foot">${T('safe.calls_note')}</p>` : ''}
     ${currentLang() !== 'en' ? `<p class="foot">${T('detail.in_english')}</p>` : ''}<h2>${T('detail.what')}</h2><p lang="en">${esc(r.what)}</p>${r.eligibility ? `<h2>${T('detail.who')}</h2><p>${owner(r.eligibility)}</p>` : ''}
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: '' })}<span lang="en">${esc(r.hours_text)}</span></p>` : ''}
     ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${clockHtml(clock(n.opens_at), clock(n.closes_at))}${n.holiday ? ` · ${T('hours.holiday')}` : ''}</span></li>`).join('')}</ul>` : ''}
-    ${r.address || (!sensitive && r.lat !== undefined) ? `<h2>${T('detail.where')}</h2>${r.address ? `<address lang="en"><bdi>${esc(r.address.line1)}</bdi><br><bdi>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</bdi></address>` : `<p>${T('detail.where_no_address', { source: r.facts.source.name })}</p>`}${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, quiet: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
+    ${r.address || (!sensitive && r.lat !== undefined) ? `<h2>${T('detail.where')}</h2>${r.address ? `<address lang="en"><bdi>${esc(r.address.line1)}</bdi><br><bdi>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</bdi></address>` : `<p>${T('detail.where_no_address', { source: r.facts.source.name })}</p>`}${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, quiet: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name, category: r.category }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
     ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
     ${r.website ? `<p>${ext(r.website, t('detail.website'), 'link')}</p>` : ''}
     <h2>${T('detail.source')}</h2><p>${owner(r.facts.source.name)}</p>${reportBox(r.id, false, r.category)}</main>` };
@@ -559,17 +631,18 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
+function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
   // Every map but the Map tab's always draws the greenway; there, it is a layer a person switches on.
   const segments = o.segments === false ? [] : bundle?.greenway?.segments ?? [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, overlays: o.overlays, parks: o.parks,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
     strings: { zoomIn: t('map.zoom_in'), zoomOut: t('map.zoom_out'), reset: t('map.reset'), bigger: t('map.bigger'), smaller: t('map.smaller'), details: t('map.details'), park: t('map.park'), noStreets: t('map.no_streets'),
       keys: t('map.keys'), panUp: t('map.pan_up'), panDown: t('map.pan_down'), panLeft: t('map.pan_left'), panRight: t('map.pan_right'),
+      focusHint: t('map.focus_hint'), focusNone: t('map.focus_none'), focusOff: t('map.focus_off'),
       source: (date) => t('map.source', { date: prettyDate(date) }), phase },
   });
   return `<div class="mapbox${o.small ? ' small' : ''}" data-map="${mapSpecs.length - 1}"></div>`;
@@ -590,7 +663,7 @@ function segment(s: Segment): string {
   const near = helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s);
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `<main><p class="meta"><span class="pill ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}</span></p>${s.phase === 'open' ? '' : `<p class="lede">${T('gw.not_open')}</p>`}
-    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
+    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, category: n.row.category, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
     ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${owner(s.cross_streets.join(' · '))}</p>` : ''}
     <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
     ${s.phase === 'open' ? reportBox(s.id, true) : ''}
@@ -675,7 +748,7 @@ function privacy(): string {
 }
 function about(): string {
   const i = bundle?.index;
-  return `<main>${langBtn()}${['about.p1', 'about.independent', 'about.p2', 'about.p3'].map((k) => `<p>${T(k)}</p>`).join('')}
+  return `<main>${['about.p1', 'about.independent', 'about.p2', 'about.p3'].map((k) => `<p>${T(k)}</p>`).join('')}
     ${i ? `<p class="foot">${T('about.data', { version: `⁦${i.version}⁩`, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
     <ul class="rows">${rowLink({ v: 'privacy' }, 'shield', t('privacy.title'), t('privacy.sub'))}</ul>
     <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul>
@@ -692,6 +765,12 @@ function credits(): string {
     ${['about.credits_foodbanks', 'about.credits_city', 'about.credits_census'].map((k) => `<li>${T(k)}</li>`).join('')}</ul><p>${T('about.credits_thanks')}</p><p class="foot">${T('about.maker')}</p>${contactLine()}`;
 }
 
+/** What the browser is told a traceless screen is FOR. Every one of these is true of anybody: a person looking
+ *  for a food pantry and a person leaving a violent house are on a screen called "Find help". Nothing in this
+ *  table narrows down what a person needs, which is the whole point (docs/08; WCAG 2.4.2). */
+const PURPOSE: Partial<Record<View['v'], string>> = {
+  need: 'title.find', list: 'title.find', search: 'title.search', saved: 'title.saved', detail: 'title.listing', urgent: 'title.urgent',
+};
 const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map' };
 /** Where the cursor is now, named so it can be found again after the page is drawn (focus.ts). */
 const whereIsTheCursor = () => focusSelector(document.activeElement as unknown as FocusEl | null, (n) => n !== (document.body as unknown as FocusEl) && app.contains(n as unknown as Node));
@@ -727,18 +806,39 @@ function render(focus = true): void {
   const active = v.v === 'tab' ? v.tab : fromStack ?? TAB_OF[v.v];
   // Every list and listing says when this phone last got updates, if that was a while ago. Home has its own spot.
   if (['need', 'list', 'detail', 'segment', 'search', 'saved'].includes(v.v) || (v.v === 'tab' && v.tab === 'map')) body = body.replace(/^<main([^>]*)>/, (m) => m + ageBanner());
+  // The language control sits in the top bar on the screens a person browses from — the four tabs and About.
+  // Not on a pushed screen: at 320 px the bar there is already a back button, an owner-written name that may be
+  // three words long, and either Urgent help or the quick exit, and those three come first. The tabs are one tap
+  // away from every screen, so the control is never more than that (Kyle, 2026-09-20).
+  const showLang = v.v === 'tab' || v.v === 'about';
+  if (showLang && langOffline) body = body.replace(/^<main([^>]*)>/, (m) => m + langNote());
   body = body.replace(/^<main/, '<main tabindex="-1"');                    // where the skip link lands
-  const nav = tabBar(active), head = topBar(title, exit, ownTitle), skip = `<button class="skip" data-skip>${T('skip.main')}</button>`;
+  const nav = tabBar(active), head = topBar(title, exit, ownTitle, showLang), skip = `<button class="skip" data-skip>${T('skip.main')}</button>`;
   // Wide: the rail (leftmost), then the bar above the page, then the page. Narrow: the bar, the page, and the tab
   // bar along the bottom. Either way the order the keyboard walks is the order the eye reads.
   app.innerHTML = skip + (wide.matches ? nav + head + body : head + body + nav);
   // Every screen has its own title, so a browser tab, a window list and a voice control command all name the screen
-  // a person is on (WCAG 2.4.2). Screens that must leave no trace keep the plain app name: a browser can put a title
-  // in its own history list, and a DV, crisis or treatment screen must never show up there (docs/08, audit A8).
+  // a person is on (WCAG 2.4.2).
+  //
+  // A screen that must leave no trace cannot be named by what it is ABOUT: a browser puts a title in its own
+  // history list and in the task switcher, and "I am not safe at home" must never appear in either (docs/08,
+  // audit A8). It used to keep the plain app name, which satisfied docs/08 and failed 2.4.2 in the letter and in
+  // practice — four open windows all called "313 Help". So it is named by what it is FOR instead: "Find help",
+  // "Search", "Saved", "Listing", "Urgent help". That distinguishes the window and reveals nothing — every one of
+  // those titles is equally true of a person looking for a food pantry. The specific name is still on the screen
+  // itself, in the <h1> the cursor lands on, and it is said out loud below.
   const docTitle = title ?? (v.v === 'tab' && v.tab !== 'home' ? t('tab.' + v.tab) : '');
-  document.title = docTitle && traceable(v) ? `${docTitle} · ${t('app.name')}` : t('app.name');
+  const named = traceable(v) ? docTitle : t(PURPOSE[v.v] ?? 'title.find');
+  document.title = named ? `${named} · ${t('app.name')}` : t('app.name');
   mountMaps();
-  if (focus) { window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true }); }
+  if (focus) {
+    window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true });
+    // On a traceless screen the window's title says only what the screen is for, so the live region says which
+    // screen it actually is. A reader that has already read the <h1> may say it twice; a reader that moved the
+    // cursor without reading it hears it once instead of not at all. Which of the two happens is a question for
+    // real screen-reader users (docs/ACCESSIBILITY-TEST-SCRIPT.md, task 2).
+    if (title && !traceable(v)) announce(title);
+  }
   if (refocus) { app.querySelector<HTMLElement>(`[data-layer="${refocus}"]`)?.focus({ preventScroll: true }); refocus = ''; }
   if (refocusSel) { app.querySelector<HTMLElement>(refocusSel)?.focus({ preventScroll: true }); refocusSel = ''; }
   else if (wasFocused) {
@@ -763,7 +863,7 @@ function navigate(view: View): void {
 }
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-lang],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry]');
   if (!el) return;
   if ('skip' in el.dataset) { app.querySelector<HTMLElement>('main')?.focus(); }   // past the bar and the tabs, into the page
   else if ('resetKey' in el.dataset) {
@@ -784,14 +884,13 @@ app.addEventListener('click', async (ev) => {
     const id = el.dataset.layerRetry!, l = (bundle?.transit?.layers ?? []).find((x) => 'go:' + x.id === id);
     if (l) { layerFiles.delete(layerKey(l.file)); refocus = id; render(false); }
   }
-  else if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
-  else if (el.dataset.lang) {
-    const next = LANGS.find((l) => l.code === el.dataset.lang)?.code ?? ('en' as Lang);
-    // A language nobody has opened on this phone yet is its own small download. Offline it simply cannot arrive,
-    // and the switch used to do nothing at all and say nothing (web review, 2026-09-20).
-    if (await setLang(next)) { langOffline = false; refocusSel = '[data-lang]'; render(false); announce(t('lang.changed')); }
-    else { langOffline = true; refocusSel = `[data-lang="${next}"]`; render(false); announce(t('lang.needs_net')); }
+  else if ('netRetry' in el.dataset) {
+    // Ask again for the subway style's own code, or for one network's extra file; the cursor goes to the radio.
+    const id = el.dataset.netRetry!, l = (bundle?.transit?.layers ?? []).find((x) => x.id === id);
+    if (id === '*') subwayState = ''; else if (l?.net) netFiles.delete(layerKey(l.net.file));
+    refocusSel = '[data-mapstyle="subway"]'; render(false);
   }
+  else if (el.dataset.go) { ev.preventDefault(); navigate(JSON.parse(el.dataset.go) as View); }
   else if ('listmap' in el.dataset) { listMap = !listMap; refocusSel = '[data-listmap]'; render(false); announce(t(listMap ? 'map.shown' : 'map.hidden')); }
   else if (el.dataset.save) {
     const id = el.dataset.save, row = bundle?.rows.find((x) => x.id === id);
@@ -844,12 +943,33 @@ function redraw(): void {
 }
 // Map layers: a real checkbox, so the keyboard and a screen reader already work. The choice is kept on this
 // phone (layers.ts) and the cursor goes back to the switch that was just used.
+// The language control in the top bar. A select changes on `change`, not on `click`, and the cursor goes back
+// to the control itself after the page is drawn again, so a keyboard or a switch is left where it was.
+app.addEventListener('change', (ev) => {
+  const el = ev.target as HTMLSelectElement;
+  if (!el.dataset || !('langSelect' in el.dataset)) return;
+  const next = LANGS.find((l) => l.code === el.value)?.code ?? ('en' as Lang);
+  refocusSel = '[data-lang-select]';
+  // A language nobody has opened on this phone yet is its own small download. Offline it simply cannot arrive,
+  // and the switch used to do nothing at all and say nothing (web review, 2026-09-20).
+  void setLang(next).then((ok) => { langOffline = !ok; render(false); announce(t(ok ? 'lang.changed' : 'lang.needs_net')); });
+});
 app.addEventListener('change', (ev) => {
   const el = ev.target as HTMLInputElement;
   if (!el.dataset?.layer) return;
   refocus = el.dataset.layer;
   const layerId = el.dataset.layer, turningOn = el.checked;
   void toggleLayer(layersOn, layerId).then((next) => { layersOn = next; render(false); announce(t(turningOn ? 'map.layer_on_say' : 'map.layer_off_say', { name: layerName(layerId) })); });
+});
+// The map style: two real radio buttons, so the arrow keys already move between them. The choice is kept on this
+// phone only (layers.ts, beside the layer list), applies at once, is said out loud, and the cursor stays on the
+// radio. Nothing already held is asked for again: `standard` files stay where they are in `layerFiles`.
+app.addEventListener('change', (ev) => {
+  const el = ev.target as HTMLInputElement;
+  if (!el.dataset?.mapstyle) return;
+  const next = mapStyle(el.value);
+  refocusSel = `[data-mapstyle="${next}"]`;
+  void saveStyle(next).then((s) => { styleNow = s; if (s === 'subway' && subwayState === 'failed') subwayState = ''; render(false); announce(t('map.style_say', { name: t('map.style_' + s) })); });
 });
 // Everything a person has typed but not sent is kept as they type it, so a redraw that is not a new screen
 // (a map layer arriving, a newer list, a window crossing the laptop line) never takes it away (WCAG 3.3.7).
@@ -950,6 +1070,7 @@ async function start(): Promise<void> {
   if (bundle) router.retrace();
   savedIds = await loadSaved();
   layersOn = await loadLayers();
+  styleNow = await loadStyle();
   // What this phone has already said, and is still waiting to send. Without this a reload offered "Still open,
   // info is right" again for a place whose confirmation was already in the queue (web review, 2026-09-20).
   for (const id of await queuedTargets()) reported.set(id, 'queued');

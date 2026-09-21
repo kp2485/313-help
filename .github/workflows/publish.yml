@@ -1,5 +1,5 @@
-# Nightly publish (docs/06, docs/OPERATIONS.md step 9). Written 2026-09-18; NOT yet run: it does nothing until
-# Kyle creates the Cloudflare resources and sets the repository variable PUBLISH_ENABLED=true.
+# Nightly publish (docs/06, docs/OPERATIONS.md step 9). Written 2026-09-18; live since 2026-09-21, when Kyle
+# created the Cloudflare resources and set the repository variable PUBLISH_ENABLED=true. Unset it to stop publishing.
 #
 # What it does, in order:
 #   0. Runs `pnpm preflight`: the keys, the Worker's config, and the dated lines in api/edge-protections.md where a

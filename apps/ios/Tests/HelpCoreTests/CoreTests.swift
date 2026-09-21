@@ -472,6 +472,43 @@ final class ListingTests: XCTestCase {
         }
     }
 
+    /// Kyle, 2026-09-20: a DV shelter's only statement about where it is, is the coarse area it serves, in
+    /// words. No address, no ZIP, no coordinate, no distance, no map, no directions.
+    func testADvListingNamesAnAreaAndNothingElse() {
+        let json = #"{"id":"sal_dv","name":"Crisis line","org":"o","category":"shelter.dv","what":"Call any time.","service_area":"detroit","phones":[{"number":"313-555-0100"}],"availability":"always","schedules":[],"flags":[],"status":"active","facts":{"reports":{"closed_open":0,"wrong_open":0},"source":{"type":"web","name":"t"}}}"#
+        let dv = try! bundleDecoder().decode(BundleRow.self, from: Data(json.utf8))
+        XCTAssertEqual(dv.serviceArea, "detroit")
+        XCTAssertNil(dv.address); XCTAssertNil(dv.lat); XCTAssertNil(dv.lon)
+        XCTAssertEqual(serviceAreaStringKey(dv), "area.detroit")
+        XCTAssertTrue(saysNoAddress(dv))
+        // Still nothing to hand another app, area or no area.
+        XCTAssertNil(mapsDestination(dv)); XCTAssertNil(transitAppDestination(dv))
+        XCTAssertFalse(showsPointWithoutAddress(dv))
+        // A DV row with no area recorded still carries the sentence, and still names no key.
+        let noArea = row(category: "shelter.dv")
+        XCTAssertNil(serviceAreaStringKey(noArea)); XCTAssertTrue(saysNoAddress(noArea))
+        // An ordinary listing is untouched by all of this.
+        XCTAssertNil(serviceAreaStringKey(row(address: "1 Main St", category: "food.pantry")))
+        XCTAssertFalse(saysNoAddress(row(category: "food.pantry")))
+    }
+
+    /// The band is a function of the area alone: two shelters serving one area always tie, and neither ever
+    /// carries a distance, so nothing about the order can be read back as a place.
+    func testDvRowsBandByTheirAreaAndNeverCarryADistance() {
+        func dv(_ id: String, _ area: String?) -> BundleRow {
+            let extra = area.map { #","service_area":"\#($0)""# } ?? ""
+            let json = #"{"id":"\#(id)","name":"\#(id)","org":"o","category":"shelter.dv","what":"w"\#(extra),"phones":[{"number":"313-555-0100"}],"availability":"always","schedules":[],"flags":[],"status":"active","facts":{"reports":{"closed_open":0,"wrong_open":0},"source":{"type":"web","name":"t"}}}"#
+            return try! bundleDecoder().decode(BundleRow.self, from: Data(json.utf8))
+        }
+        let rows = [dv("a", "detroit"), dv("b", "detroit"), dv("c", "dearborn"), dv("d", "national")]
+        var q = Query(category: "shelter.dv")
+        q.near = LatLon(lat: 42.35, lon: -83.06)
+        let out = rank(rows, q, now: Date(timeIntervalSince1970: 1789753500))
+        XCTAssertEqual(out.map(\.row.id), ["a", "b", "c", "d"])
+        XCTAssertEqual(out.map(\.band), [0, 0, 1, 2])
+        XCTAssertTrue(out.allSatisfy { $0.miles == nil })
+    }
+
     func testNoAddressAndNoPointMeansNoDirections() {
         XCTAssertNil(mapsDestination(row()))
         XCTAssertNil(mapsURL(row()))

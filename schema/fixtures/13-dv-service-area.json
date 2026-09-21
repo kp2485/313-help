@@ -1,0 +1,227 @@
+{
+  "description": "Friday 2026-09-18 1:45pm. Domestic-violence rows sort by proximity WITHOUT any fact that locates a shelter (schema/query-spec.md, docs/08, DECISIONS 2026-09-20). A shelter.dv row carries no address, no ZIP and no coordinate; it may carry a coarse `service_area`, and each area maps IN CODE to one public reference point (a city hall). The band comes from the person to that point; `miles` on the result is always null, so no client can show a distance. statewide and national rank after every local area. Rows with no service_area rank exactly as a coordinate-less row ranks today. Near points: downtown Detroit 42.3500,-83.0600; Dearborn 42.3100,-83.1900; Downriver 42.2100,-83.2300.",
+  "rows": [
+    {
+      "id": "dv_detroit_a",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "call_first",
+      "service_area": "detroit",
+      "phones": [{ "number": "(313) 555-0101" }]
+    },
+    {
+      "id": "dv_detroit_b",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "detroit",
+      "phones": [{ "number": "(313) 555-0102" }]
+    },
+    {
+      "id": "dv_dearborn",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "dearborn",
+      "phones": [{ "number": "(313) 555-0103" }]
+    },
+    {
+      "id": "dv_hp",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "highland_park",
+      "phones": [{ "number": "(313) 555-0104" }]
+    },
+    {
+      "id": "dv_downriver",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "wayne_county_downriver",
+      "phones": [{ "number": "(313) 555-0105" }]
+    },
+    {
+      "id": "dv_statewide",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "statewide",
+      "phones": [{ "number": "(313) 555-0106" }]
+    },
+    {
+      "id": "dv_national",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "national",
+      "phones": [{ "number": "(313) 555-0107" }]
+    },
+    {
+      "id": "dv_no_area",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "phones": [{ "number": "(313) 555-0108" }]
+    },
+    {
+      "id": "s_near",
+      "category": "shelter.emergency",
+      "what": "A bed tonight.",
+      "availability": "always",
+      "lat": 42.3557,
+      "lon": -83.06,
+      "phones": [{ "number": "(313) 555-0201" }]
+    },
+    {
+      "id": "s_far",
+      "category": "shelter.emergency",
+      "what": "A bed tonight.",
+      "availability": "always",
+      "lat": 42.35,
+      "lon": -83.17,
+      "phones": [{ "number": "(313) 555-0202" }]
+    }
+  ],
+  "cases": [
+    {
+      "name": "no location: one band, no area effect at all — the open key, then the id (exactly as a coordinate-less row ranks today)",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv" },
+      "expect": [
+        "dv_dearborn",
+        "dv_detroit_b",
+        "dv_downriver",
+        "dv_hp",
+        "dv_national",
+        "dv_no_area",
+        "dv_statewide",
+        "dv_detroit_a"
+      ]
+    },
+    {
+      "name": "downtown Detroit: Detroit's area is band 0, Dearborn and Highland Park band 1, Downriver band 2; statewide and national last",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv", "near": { "lat": 42.35, "lon": -83.06 } },
+      "expect": [
+        "dv_detroit_b",
+        "dv_no_area",
+        "dv_detroit_a",
+        "dv_dearborn",
+        "dv_hp",
+        "dv_downriver",
+        "dv_national",
+        "dv_statewide"
+      ]
+    },
+    {
+      "name": "the same list from Dearborn: Dearborn's area comes first now — the order follows the AREA, never the shelter",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv", "near": { "lat": 42.31, "lon": -83.19 } },
+      "expect": [
+        "dv_dearborn",
+        "dv_no_area",
+        "dv_detroit_b",
+        "dv_downriver",
+        "dv_hp",
+        "dv_detroit_a",
+        "dv_national",
+        "dv_statewide"
+      ]
+    },
+    {
+      "name": "from Downriver: Downriver band 0, Dearborn band 1, Detroit and Highland Park band 2 — and still ahead of statewide and national",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv", "near": { "lat": 42.21, "lon": -83.23 } },
+      "expect": [
+        "dv_downriver",
+        "dv_no_area",
+        "dv_dearborn",
+        "dv_detroit_b",
+        "dv_hp",
+        "dv_detroit_a",
+        "dv_national",
+        "dv_statewide"
+      ]
+    },
+    {
+      "name": "two shelters in one area tie on the band: only the open key and the id separate them, never anything location-derived",
+      "fn": "rankDetail",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv", "near": { "lat": 42.35, "lon": -83.06 } },
+      "expect": [
+        "dv_detroit_b band0 no-distance",
+        "dv_no_area band0 no-distance",
+        "dv_detroit_a band0 no-distance",
+        "dv_dearborn band1 no-distance",
+        "dv_hp band1 no-distance",
+        "dv_downriver band2 no-distance",
+        "dv_national band2 no-distance",
+        "dv_statewide band2 no-distance"
+      ]
+    },
+    {
+      "name": "no location: every DV row is band 0 and still carries no distance",
+      "fn": "rankDetail",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv" },
+      "expect": [
+        "dv_dearborn band0 no-distance",
+        "dv_detroit_b band0 no-distance",
+        "dv_downriver band0 no-distance",
+        "dv_hp band0 no-distance",
+        "dv_national band0 no-distance",
+        "dv_no_area band0 no-distance",
+        "dv_statewide band0 no-distance",
+        "dv_detroit_a band0 no-distance"
+      ]
+    },
+    {
+      "name": "mixed list: ordinary shelters sort by their true distance, DV rows by their area, and no DV row carries a distance",
+      "fn": "rankDetail",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter", "near": { "lat": 42.35, "lon": -83.06 } },
+      "expect": [
+        "dv_detroit_b band0 no-distance",
+        "dv_no_area band0 no-distance",
+        "s_near band0 distance",
+        "dv_detroit_a band0 no-distance",
+        "dv_dearborn band1 no-distance",
+        "dv_hp band1 no-distance",
+        "dv_downriver band2 no-distance",
+        "s_far band2 distance",
+        "dv_national band2 no-distance",
+        "dv_statewide band2 no-distance"
+      ]
+    },
+    {
+      "name": "mixed list, ids only",
+      "fn": "rank",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter", "near": { "lat": 42.35, "lon": -83.06 } },
+      "expect": [
+        "dv_detroit_b",
+        "dv_no_area",
+        "s_near",
+        "dv_detroit_a",
+        "dv_dearborn",
+        "dv_hp",
+        "dv_downriver",
+        "s_far",
+        "dv_national",
+        "dv_statewide"
+      ]
+    },
+    {
+      "name": "an ordinary shelter far from the person is still band 2 and still carries its real distance: nothing here changed for them",
+      "fn": "rankDetail",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.emergency", "near": { "lat": 42.35, "lon": -83.06 } },
+      "expect": ["s_near band0 distance", "s_far band2 distance"]
+    }
+  ]
+}

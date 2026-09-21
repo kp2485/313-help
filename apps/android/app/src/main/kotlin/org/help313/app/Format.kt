@@ -51,16 +51,28 @@ fun badgeText(b: Badge): String {
     return L.t(b.key, p)
 }
 
-/** "Today" / "Tomorrow" when that is what it is, otherwise the date. `today` is a Detroit calendar day. */
-fun dayText(day: String, today: String): String {
-    val d = parseDay(day) ?: return day
-    val t = parseDay(today) ?: return dateText(day)
-    return when (d - t) {
-        0 -> L.t("day.today")
-        1 -> L.t("day.tomorrow")
-        else -> dateText(day)
-    }
+/**
+ * The weekday a calendar day falls on, in the reader's own words (`day.MO` … `day.SU`). 1970-01-01, day 0, was a
+ * Thursday, so the week starts there; the modulo is written twice over so a day before 1970 cannot give a negative
+ * index. The words come from the strings files like every other word in the app; nothing is built out of English here.
+ */
+fun weekdayText(day: String): String {
+    val d = parseDay(day) ?: return ""
+    val keys = listOf("TH", "FR", "SA", "SU", "MO", "TU", "WE")
+    return L.t("day." + keys[((d % 7) + 7) % 7])
 }
+
+/**
+ * "Today" / "Tomorrow" when that is what it is, otherwise **the day by name and the date, with no year** —
+ * "Friday, Sep 25". `today` is a Detroit calendar day.
+ *
+ * The rule is [DayWords], which is pure and tested on a plain JDK; this only hands it the app's two words and the
+ * reader's locale. It reads exactly like the web (`dayName` in apps/web/src/main.ts) and the iPhone
+ * (HelpCore/DayWords.swift). Until 2026-09-21 this printed "Fri, Sep 25, 2026": a short weekday out of the hours
+ * table's strings, and a year nobody needs to be told on a pill about next Friday.
+ */
+fun dayText(day: String, today: String): String =
+    DayWords.name(day, today, L.locale(), L.t("day.today"), L.t("day.tomorrow"))
 
 /** Unknown is never rendered as open (schema/query-spec.md "Open now"). */
 fun openText(o: OpenResult, today: String = ""): String = when (o.state) {

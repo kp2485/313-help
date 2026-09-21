@@ -12,11 +12,13 @@ import { LINKS } from '../src/links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
 import { telHref } from '../src/phone.js';
+import { rank, SERVICE_AREA_IDS } from '@313help/query';
 import { releaseKeyProblems } from '../src/keys.js';
 import { LANGS, dirFor, pickLang } from '../src/i18n.js';
 import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
 import { build as buildReport, fitWithin, nonce, plainJpeg } from '../src/report.js';
 import { hashFor, type View } from '../src/router.js';
+import { LAYER_STYLE } from '../src/layerstyle.js';
 
 const root = join(__dirname, '../../..');
 const strings = JSON.parse(readFileSync(join(root, 'strings/en.json'), 'utf8')) as Record<string, string>;
@@ -318,9 +320,12 @@ describe('the other languages', () => {
   // `miles` is "{miles} mi": Spanish writes the unit the same way.
   // `clock.am`/`clock.pm` and `list.sep` are a clock abbreviation and a comma: Spanish as written in the United
   // States uses the English ones, and Bengali writes the same comma. Arabic writes its own (ص, م, ،).
-  const SAME_ON_PURPOSE = new Set(['app.name', 'detail.source_line', 'hood.kind.harm', 'miles', 'gw.title', 'layer.place.greenway',
+  const SAME_ON_PURPOSE = new Set(['map.route_card' /* "{name} · {agency}": two names and a dot */, 'app.name', 'detail.source_line', 'hood.kind.harm', 'miles', 'gw.title', 'layer.place.greenway',
     'layer.go.people_mover', 'link.food.wic.title', 'link.food.wic.label', 'link.food.double_up.title', 'link.benefits.ser.title',
-    'clock.am', 'clock.pm', 'list.sep']);
+    'clock.am', 'clock.pm', 'list.sep',
+    // The four cities' own names. A city keeps its name in Spanish; the Arabic and Bengali tables transliterate
+    // them, which this loop only ever checks against the English.
+    'area.detroit', 'area.dearborn', 'area.hamtramck', 'area.highland_park']);
 
   for (const l of OTHER) {
     const w = table(l);
@@ -346,8 +351,8 @@ describe('the other languages', () => {
     expect(LANGS.map((l) => l.code)).toEqual(['en', 'es', 'ar', 'bn']);
     // Each language names itself, and the switch marks each name with its own lang (WCAG 3.1.2).
     expect(LANGS.map((l) => l.name)).toEqual(['English', 'Español', 'العربية', 'বাংলা']);
-    expect(main).toContain('<nav class="langrow" aria-label="${T(\'lang.switch\')}">');
-    expect(main).toContain('lang="${l.code}"');
+    // The control itself is held to what it renders, in apps/web/test/behaviour.test.ts.
+    expect(main).toContain("const langSelect = () => langPicker(currentLang(), t('lang.switch'), icon('globe', 'sm'), esc);");
   });
   it('the first language is the phone\'s own, and the choice is remembered on the phone only', () => {
     expect(pickLang(undefined, ['ar-EG', 'en-US'])).toBe('ar');
@@ -411,9 +416,9 @@ describe('the other languages', () => {
     expect(main).not.toMatch(/\$\{esc\(clock\([^)]*\)\)\} – /);
   });
   it('3.1.2: a name its owner wrote is marked English in the heading too, not only in the page', () => {
-    expect(main).toContain('function topBar(title?: string, quickExit = false, ownTitle = false)');
+    expect(main).toContain('function topBar(title?: string, quickExit = false, ownTitle = false, lang = false)');
     expect(main).toContain('${ownTitle ? owner(title) : esc(title)}');
-    expect(main).toContain('head = topBar(title, exit, ownTitle)');
+    expect(main).toContain('head = topBar(title, exit, ownTitle, showLang)');
     // and the screens whose heading is a name say so
     for (const k of ['ownTitle: true, html:', 'ownTitle = hs.ownTitle', 'ownTitle = d.ownTitle', "ownTitle = !!s;"]) expect(main).toContain(k);
   });
@@ -476,6 +481,35 @@ describe('map', () => {
     expect(main).toContain('helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s)');
     // No URL for these: router.test.ts drives hashFor and the cold-load case (the rule fails closed until the list loads).
     expect(main).not.toMatch(/category [!=]== 'shelter.dv'|category [!=]== 'health.mental'/);
+  });
+  // Kyle, 2026-09-20: a DV shelter sorts by proximity without any fact that locates it. The location reaches
+  // `rank`, which bands the row by the public reference point of the area it serves and hands back miles: null.
+  it('a DV listing shows the area it serves in words, and never a distance', () => {
+    // The location is no longer withheld from `rank` on a no-distance screen; the screen is what withholds.
+    expect(main).toContain('rank(bundle!.rows, { ...query, ...(here ? { near: here } : {}) }, now(), bundle!.alerts)');
+    // The mileage pill is still gated by the screen AND by miles being null.
+    expect(main).toContain("showDistance && r.miles !== null ? `<span class=\"pill plain\">${T('miles'");
+    // The area pill, and the one sentence, come from strings; neither names a place.
+    expect(main).toContain("isDvCategory(row.category) ? serviceAreaKey(row.service_area ?? '') : null");
+    expect(main).toContain("T('safe.dv_serves', { area: t(key) })");
+    expect(main).toContain("isDvCategory(r.category) ? `<p class=\"foot\">${T('safe.dv_no_address')}</p>` : ''");
+    for (const k of ['safe.dv_serves', 'safe.dv_no_address', ...SERVICE_AREA_IDS.map((a) => `area.${a}`)]) {
+      expect(strings[k], `strings/en.json has no ${k}`).toBeTypeOf('string');
+    }
+    // The band is a function of the area alone, so two shelters serving one area are always in the same band and
+    // neither of them ever carries a distance.
+    const dv = (id: string, service_area?: string) => ({
+      id, name: id, org: 'o', category: 'shelter.dv', what: 'Call any time.', phones: [{ number: '313-555-0100' }],
+      availability: 'always' as const, schedules: [], flags: [], status: 'active' as const,
+      facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list' as const, name: 't' } },
+      ...(service_area ? { service_area } : {}),
+    });
+    const rows = [dv('a', 'detroit'), dv('b', 'detroit'), dv('c', 'dearborn'), dv('d', 'national')];
+    const out = rank(rows, { category: 'shelter.dv', near: { lat: 42.35, lon: -83.06 } }, new Date('2026-09-18T17:45:00Z'));
+    expect(out.every((r) => r.miles === null)).toBe(true);
+    expect(out.map((r) => r.row.id)).toEqual(['a', 'b', 'c', 'd']);
+    expect(out[0]!.band).toBe(out[1]!.band);                       // one area, one band: order says nothing finer
+    expect(out.map((r) => r.band)).toEqual([0, 0, 1, 2]);
   });
   it('"Make the map bigger" really does cover the page: the cascade is worked out, not assumed', () => {
     // `.mapbox.big { position:fixed; inset:0 }` and the wide-screen `.maptop > .mapbox { position:sticky }` had
@@ -618,7 +652,7 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
   });
   it('every layer has plain words in both languages', () => {
     const ids = [...MAP_GROUPS.map((g) => 'layer.help.' + g.id), 'layer.place.greenway', 'layer.place.parks',
-      ...[...main.matchAll(/'go:(\w+)':/g)].map((m) => 'layer.go.' + m[1])];
+      ...Object.keys(LAYER_STYLE).map((id) => 'layer.' + id.replace(':', '.'))];
     expect(ids.length).toBeGreaterThan(15);
     for (const k of ids) { expect(strings[k], k).toBeTypeOf('string'); expect(es[k], `es ${k}`).toBeTypeOf('string'); }
     for (const k of ['map.lede', 'map.layers', 'map.layers_note', 'map.group_help', 'map.group_places', 'map.group_go',
@@ -636,7 +670,8 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
   it('whatever is on the map is also a list, in words', () => {
     expect(main).toContain('function layerList(');
     expect(main).toContain("${layerSwitcher()}${layerList(rows, over)}");
-    expect(main).toContain("T('map.list_title')");
+    expect(main).toContain('return mapListHtml({');                     // the list itself is maplist.ts, so a test can read what it says
+    expect(readFileSync(join(__dirname, '../src/maplist.ts'), 'utf8')).toContain("T('map.list_title')");
   });
   it('the layer choice is kept on this phone and never sent', () => {
     expect(layersSrc).toContain("idbSet('layers'");
@@ -701,7 +736,7 @@ describe('wider screens: laptops and desktops (Kyle, 2026-09-20)', () => {
   it('the Map tab is one column on a phone and map-beside-list on a laptop', () => {
     expect(css).toContain('.maptop,.mapside { display:contents; }');            // the phone: the wrappers are not boxes
     expect(main).toContain('<div class="maptop">');
-    expect(main).toContain('<div class="mapside">${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>');
+    expect(main).toContain('<div class="mapside">${subwayKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>');
     expect(wideBlock).toContain('.maptop > .mapbox:not(.big) { position:sticky;');
   });
   it('the map is drawn again when the pixel ratio or the window changes, and Escape leaves the full-screen map', () => {
@@ -713,7 +748,7 @@ describe('wider screens: laptops and desktops (Kyle, 2026-09-20)', () => {
   });
   it('a listing prints (people print at a library): no app furniture, ink on white, link addresses spelled out', () => {
     const print = css.slice(css.indexOf('@media print'));
-    expect(print).toContain('.tabs,.skip,.maptools,.mappan,.mapbar,.report,.searchbtn,.langrow');
+    expect(print).toContain('.tabs,.skip,.maptools,.mappan,.mapbar,.report,.searchbtn,.langpick');
     expect(print).toContain('a[href^="http"]::after');
     expect(print).toContain('--ink:#000;');
     expect(print).not.toMatch(/\.top \{[^}]*display:none/);                     // the listing's name lives in the top bar
@@ -900,14 +935,27 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
   const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
   const es = JSON.parse(readFileSync(join(root, 'strings/es.json'), 'utf8')) as Record<string, string>;
 
-  /** The custom properties of one theme, read out of style.css exactly as the browser would see them. */
-  function tokens(theme: 'light' | 'dark'): Record<string, string> {
-    const block = theme === 'light'
-      ? css.slice(css.indexOf(':root {'), css.indexOf('@media (prefers-color-scheme: dark)'))
-      : css.slice(css.indexOf('@media (prefers-color-scheme: dark)'), css.indexOf('* { box-sizing'));
+  /** The custom properties of one theme, read out of style.css exactly as the browser would see them. The two
+   *  "increase contrast" themes are the plain ones with the block's own overrides laid on top, which is what a
+   *  browser does with them too. */
+  const read = (block: string): Record<string, string> => {
     const out: Record<string, string> = {};
     for (const [, k, v] of block.matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-f]{6})\s*;/gi)) out[k!] = v!.toLowerCase();
     return out;
+  };
+  const slice = (from: string, to: string) => css.slice(css.indexOf(from), css.indexOf(to));
+  const PLAIN = {
+    light: read(slice(':root {', '@media (prefers-color-scheme: dark)')),
+    dark: read(slice('@media (prefers-color-scheme: dark)', '* { box-sizing')),
+  };
+  const MORE = {
+    light: read(slice('@media (prefers-contrast: more) {', '@media (prefers-contrast: more) and')),
+    dark: read(slice('@media (prefers-contrast: more) and (prefers-color-scheme: dark)', '@media (forced-colors: active) {')),
+  };
+  function tokens(theme: 'light' | 'dark', contrast: 'plain' | 'more' = 'plain'): Record<string, string> {
+    // The order a browser applies them in: light, then dark, then "more", then "more and dark".
+    const out = { ...PLAIN.light, ...(theme === 'dark' ? PLAIN.dark : {}) };
+    return contrast === 'plain' ? out : { ...out, ...MORE.light, ...(theme === 'dark' ? MORE.dark : {}) };
   }
   const lum = (hex: string) => {
     const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
@@ -925,33 +973,71 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
     ['a freshness warning', '--warn-ink', '--warn-bg'], ['the 911 row and quick exit', '--danger-ink', '--danger'],
     ['a street name on the map', '--map-ink', '--map-land'], ['a park name on the map', '--map-park-ink', '--map-park'],
   ];
+  // Every pair the map actually paints next to each other. A road is measured against the land AND against a
+  // park, because a street crosses a park; a route, a greenway stretch and the keyboard's focus ring are measured
+  // against their own casing, because that is what map.ts lays under them and it is what they touch all the way
+  // along (no single colour can be 3:1 against both a near-white land and a 3:1 street). The casing itself is
+  // measured against a road, which is the darkest thing it ever has to show up over.
   const NON_TEXT: [string, string, string][] = [
     ['the focus ring on the page', '--focus', '--bg'], ['the focus ring on a card', '--focus', '--surface'],
     ['the outline of a control on a card', '--edge', '--surface'], ['the outline of a control on the page', '--edge', '--bg'],
-    ['a main road', '--map-main', '--map-land'], ['a freeway', '--map-fwy', '--map-land'],
-    ['the greenway, open', '--gw-open', '--map-land'], ['the greenway, being built', '--gw-build', '--map-land'],
-    ['the greenway, funded', '--gw-fund', '--map-land'], ['the greenway, planned', '--gw-plan', '--map-land'],
+    ...['road', 'main', 'fwy'].flatMap((r): [string, string, string][] =>
+      [[`a ${r} on land`, `--map-${r}`, '--map-land'], [`a ${r} over a park`, `--map-${r}`, '--map-park'], [`a ${r} outside the cities`, `--map-${r}`, '--map-out']]),
+    ['the hatch outside the four cities, over its own ground', '--map-out-ink', '--map-out'],
+    ['the hatch outside the four cities, against the land inside them', '--map-out-ink', '--map-land'],
+    ['the casing under a route and the focus ring, over a road', '--gw-case', '--map-road'],
+    ['the ring round a listing dot, over a road', '--surface', '--map-road'],
+    ['the keyboard focus ring on the map', '--focus', '--gw-case'],
+    ...['open', 'build', 'fund', 'plan'].flatMap((p): [string, string, string][] =>
+      [[`the greenway (${p}) on land`, `--gw-${p}`, '--map-land'], [`the greenway (${p}) on its casing`, `--gw-${p}`, '--gw-case']]),
     ...['bus', 'smart', 'rail', 'bike'].flatMap((l): [string, string, string][] =>
-      [[`the ${l} layer on land`, `--lyr-${l}`, '--map-land'], [`the ${l} layer over a park`, `--lyr-${l}`, '--map-park']]),
+      [[`the ${l} layer on land`, `--lyr-${l}`, '--map-land'], [`the ${l} layer over a park`, `--lyr-${l}`, '--map-park'], [`the ${l} layer on its casing`, `--lyr-${l}`, '--gw-case']]),
     ...['food', 'shelter', 'health', 'rec', 'work', 'things', 'paperwork'].flatMap((g): [string, string, string][] =>
-      [[`${g} dots on land`, `--grp-${g}`, '--map-land'], [`${g} dots over a park`, `--grp-${g}`, '--map-park']]),
+      [[`${g} dots on land`, `--grp-${g}`, '--map-land'], [`${g} dots over a park`, `--grp-${g}`, '--map-park'], [`${g} dots inside their own ring`, `--grp-${g}`, '--surface']]),
   ];
-  for (const theme of ['light', 'dark'] as const) {
-    it(`${theme} theme: every text pair reaches 4.5:1`, () => {
-      const v = tokens(theme);
+  for (const theme of ['light', 'dark'] as const) for (const contrast of ['plain', 'more'] as const) {
+    const label = contrast === 'plain' ? `${theme} theme` : `${theme} theme with "increase contrast" on`;
+    it(`${label}: every text pair reaches 4.5:1`, () => {
+      const v = tokens(theme, contrast);
       for (const [what, fg, bg] of TEXT) {
-        expect(v[fg], `${fg} is missing in the ${theme} theme`).toBeTypeOf('string');
+        expect(v[fg], `${fg} is missing in the ${label}`).toBeTypeOf('string');
         expect(`${what}: ${ratio(v[fg]!, v[bg]!).toFixed(2)}:1`).toBe(`${what}: ${Math.max(4.5, ratio(v[fg]!, v[bg]!)).toFixed(2)}:1`);
       }
     });
-    it(`${theme} theme: every outline, ring and map line reaches 3:1`, () => {
-      const v = tokens(theme);
+    it(`${label}: every outline, ring and map line reaches 3:1`, () => {
+      const v = tokens(theme, contrast);
       for (const [what, fg, bg] of NON_TEXT) {
-        expect(v[fg], `${fg} is missing in the ${theme} theme`).toBeTypeOf('string');
+        expect(v[fg], `${fg} is missing in the ${label}`).toBeTypeOf('string');
+        expect(v[bg], `${bg} is missing in the ${label}`).toBeTypeOf('string');
         expect(`${what}: ${ratio(v[fg]!, v[bg]!).toFixed(2)}:1`).toBe(`${what}: ${Math.max(3, ratio(v[fg]!, v[bg]!)).toFixed(2)}:1`);
       }
     });
+    if (contrast === 'more') it(`${label}: it really is MORE contrast, not different contrast`, () => {
+      const plain = tokens(theme), more = tokens(theme, 'more');
+      for (const [what, fg, bg] of [...TEXT, ...NON_TEXT]) {
+        const a = ratio(plain[fg]!, plain[bg]!), b = ratio(more[fg]!, more[bg]!);
+        expect(`${what}: ${b >= a - 0.005}`).toBe(`${what}: true`);
+      }
+    });
   }
+  it('1.4.11 under forced colours: the canvas is told the system\'s own colours, because nothing else will tell it', () => {
+    // A canvas is painted by hand, so a forced-colours mode never repaints it: it gets whatever the page asked
+    // for. map.ts asks for these very custom properties every frame, so pointing them at the system keywords is
+    // the whole mechanism. Every map token the drawing code reads has to be in the block, or that one thing
+    // keeps its own colour on a high-contrast desktop and disappears.
+    const block = css.slice(css.indexOf('@media (forced-colors: active) {\n  :root'));
+    expect(block, 'no forced-colors block for the map tokens').toContain('--map-land:Canvas');
+    const reads = [...mapSrc.matchAll(/css\('(--[\w-]+)'\)/g)].map((m) => m[1]!);
+    const dynamic = ['--grp-', '--lyr-'];   // read through `o.css` / `d.css`, enumerated from the stylesheet
+    const wanted = new Set([...reads, ...Object.keys(PLAIN.light).filter((k) => dynamic.some((d) => k.startsWith(d)))]);
+    for (const token of wanted) {
+      if (token === '--ink' || token === '--muted' || token === '--brand') continue;   // page tokens; the system repaints the page itself
+      expect(`${token} in forced colours: ${new RegExp(`${token}\\s*:`).test(block)}`).toBe(`${token} in forced colours: true`);
+    }
+    // Colour is down to a handful of system values there, so every line must still say what it is another way.
+    expect(mapSrc).toContain('const gwStyle: Record<string, { color: string; dash: number[] }>');
+    expect(mapSrc).toMatch(/dash: \[gwW \* 2\.4/);
+  });
   it('white on the lightest part of the hero reaches 4.5:1 (the words there are normal size)', () => {
     const stop = /radial-gradient\([^)]*?(#[0-9a-f]{6}) 0%/i.exec(css)![1]!;
     expect(ratio('#ffffff', stop)).toBeGreaterThanOrEqual(4.5);
@@ -981,13 +1067,40 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
     for (const t of TABS) expect(strings['tab.' + t.id], t.id).toBeTypeOf('string');
   });
 
-  it('2.4.2: a screen that may be named in the browser has a title; one that must leave no trace does not', () => {
-    expect(main).toContain("document.title = docTitle && traceable(v) ? `${docTitle} · ${t('app.name')}` : t('app.name');");
+  it('2.4.2: every screen has a title of its own — a traceless one is named by what it is FOR', () => {
+    expect(main).toContain('const named = traceable(v) ? docTitle : t(PURPOSE[v.v] ?? \'title.find\');');
+    expect(main).toContain("document.title = named ? `${named} · ${t('app.name')}` : t('app.name');");
     expect(main).toContain('const traceable = (v: View) => hashFor(v, sensitiveId, location.pathname) !== null;');
+    // Every screen that leaves no trace is in the table, or it would fall back to "Find help" by accident
+    // rather than by decision. `hashFor` is the one predicate that says which those are (router.ts).
+    const traceless: View[] = [
+      { v: 'need', id: 'unsafe' }, { v: 'list', cat: 'treatment' }, { v: 'search' }, { v: 'saved' },
+      { v: 'detail', id: 'sal_dv' }, { v: 'urgent' },
+    ];
+    const kinds = new Set<string>();
+    for (const v of traceless) {
+      expect(hashFor(v, (id) => id === 'sal_dv'), JSON.stringify(v)).toBeNull();
+      kinds.add(v.v);
+      expect(main, `no purpose title for ${v.v}`).toMatch(new RegExp(`${v.v}: 'title\\.`));
+    }
+    // and a screen that IS named by what it is about keeps its own name, in every language
+    expect(hashFor({ v: 'list', cat: 'food' }, () => false)).toBe('#/c/food');
+    for (const lang of ['en', 'es', 'ar', 'bn']) {
+      const table = JSON.parse(readFileSync(join(root, `strings/${lang}.json`), 'utf8')) as Record<string, string>;
+      for (const k of ['title.find', 'title.search', 'title.saved', 'title.listing', 'title.urgent']) {
+        expect(table[k], `strings/${lang}.json has no ${k}`).toBeTypeOf('string');
+        // A purpose title must not name a need: it is the one thing it is not allowed to do.
+        expect(table[k]!.toLowerCase()).not.toMatch(/shelter|violen|crisis|drug|overdose|abuso|violencia/);
+      }
+    }
+    expect(kinds.size).toBe(6);
+  });
+  it('2.4.2: the screen a person is actually on is still said out loud on a traceless screen', () => {
+    expect(main).toContain('if (title && !traceable(v)) announce(title);');
   });
   it('2.4.3 and 4.1.3: a redraw that is not a new screen puts the cursor back and says what happened', () => {
     expect(main).toContain('refocusSel = `[data-save="${id}"]`;');
-    for (const hook of ['data-listmap]', 'data-loc="on"]', 'data-loc="off"]', 'data-lang]']) expect(main).toContain(`refocusSel = '[${hook}'`);
+    for (const hook of ['data-listmap]', 'data-loc="on"]', 'data-loc="off"]', 'data-lang-select]']) expect(main).toContain(`refocusSel = '[${hook}'`);
     expect(main).toContain("if (refocusSel) { app.querySelector<HTMLElement>(refocusSel)?.focus({ preventScroll: true }); refocusSel = ''; }");
     // One live region, made once, outside the part of the page a redraw replaces.
     expect(main).toContain("sayEl.setAttribute('aria-live', 'polite'); document.body.append(sayEl);");

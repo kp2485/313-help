@@ -76,6 +76,20 @@ public func transitAppURL(_ row: BundleRow, canOpen: (URL) -> Bool) -> URL? {
 /// A listing with no published phone number shows no Call button at all, rather than a button that does nothing.
 public func hasPhone(_ row: BundleRow) -> Bool { row.phones.first != nil }
 
+// ---- domestic violence: an area in words, never a place -------------------------------------------------
+/// The string key naming the coarse area a domestic-violence row serves ("area.detroit"), or nil when the row
+/// is not a DV row or a steward has recorded no area. It is the only thing such a row ever says about where it
+/// is: no address, no ZIP, no coordinate, no distance, no map and no directions (docs/08).
+/// A screen puts it into `safe.dv_serves` ("Serves {area}").
+public func serviceAreaStringKey(_ row: BundleRow) -> String? {
+    guard isDvCategory(row.category) else { return nil }
+    return serviceAreaKey(row.serviceArea)
+}
+
+/// Every domestic-violence listing carries the one sentence `safe.dv_no_address`: the shelter does not share
+/// its address, call and they will say where to go. True whatever area is recorded, and true when none is.
+public func saysNoAddress(_ row: BundleRow) -> Bool { isDvCategory(row.category) }
+
 /// A place that is somewhere real but publishes no street address (the Wayne County naloxone and test-strip
 /// stations, for example): the screen says so in words and offers directions to the point, and never prints a
 /// made-up address.

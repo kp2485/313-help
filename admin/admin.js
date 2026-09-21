@@ -40,7 +40,7 @@ async function loadNames() {
   } catch { /* the queue still works with ids only */ }
 }
 
-function reportGroup({ target_id: targetId, reports, hot }) {
+function reportGroup({ target_id: targetId, reports, hot, phones }) {
   const meta = names.get(targetId) ?? { name: targetId };
   const counts = {};
   for (const r of reports) counts[r.kind] = (counts[r.kind] ?? 0) + 1;
@@ -48,7 +48,7 @@ function reportGroup({ target_id: targetId, reports, hot }) {
   return `<article class="item ${hot ? 'hot' : ''}" data-target="${esc(targetId)}">
     <h3>${esc(meta.name)}</h3>
     <p class="sub">${esc(targetId)}${meta.phone ? ` · <a href="tel:${esc(meta.phone)}">${esc(meta.phone)}</a>` : ''}</p>
-    <p class="tags">${Object.entries(counts).map(([k, n]) => `<span class="tag ${CLOSED.includes(k) ? 'warn' : ''}">${esc(KIND[k] ?? k)} × ${n}</span>`).join(' ')}</p>
+    <p class="tags">${hot ? `<span class="tag warn">Look at this one first: ${esc(String(phones ?? 2))} different phones said it closed or moved</span> ` : ''}${Object.entries(counts).map(([k, n]) => `<span class="tag ${CLOSED.includes(k) ? 'warn' : ''}">${esc(KIND[k] ?? k)} × ${n}</span>`).join(' ')}</p>
     <ul class="notes">${reports.filter((r) => r.detail || r.suggested || r.photo_key).map((r) => `<li><strong>${esc(KIND[r.kind] ?? r.kind)}</strong> · ${esc(r.submitted_at.slice(0, 10))}${r.detail ? ` · “${esc(r.detail)}”` : ''}${r.suggested ? ` · suggested: ${esc(r.suggested)}` : ''}${r.photo_key ? `<div class="photo"><img src="/v1/steward/photos/${esc(r.photo_key)}" alt="Photo sent with this report" loading="lazy"><button data-act="discard-photo" data-photo="${esc(r.photo_key)}">Delete this photo now</button><small>Never share or post a photo. If it shows a person, a face, a license plate or a house number, delete it. It deletes itself 30 days after the report is closed.</small></div>` : ''}</li>`).join('')}</ul>
     ${isListing ? `<p class="script">${esc(SCRIPT)}</p>
     <div class="actions">

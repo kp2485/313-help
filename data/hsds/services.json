@@ -22336,7 +22336,8 @@
      "name": "24-hour helpline",
      "location_type": "virtual",
      "x_detroit": {
-      "id": "loc_first_step_helpline"
+      "id": "loc_first_step_helpline",
+      "service_area": "wayne_county"
      }
     },
     "phones": [
@@ -22352,6 +22353,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "service_area": "wayne_county",
      "checked_at_entry": "2026-09-18",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -32259,7 +32261,8 @@
      "name": "24-hour hotline",
      "location_type": "virtual",
      "x_detroit": {
-      "id": "loc_national_dv_hotline"
+      "id": "loc_national_dv_hotline",
+      "service_area": "national"
      }
     },
     "phones": [
@@ -32275,6 +32278,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "service_area": "national",
      "checked_at_entry": "2026-09-18",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -42613,7 +42617,8 @@
      "name": "Interim House crisis line",
      "location_type": "virtual",
      "x_detroit": {
-      "id": "loc_ywca_interim_house_line"
+      "id": "loc_ywca_interim_house_line",
+      "service_area": "detroit"
      }
     },
     "phones": [
@@ -42629,6 +42634,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "service_area": "detroit",
      "checked_at_entry": "2026-09-18",
      "entry_method": "web",
      "last_confirmed_at": null,

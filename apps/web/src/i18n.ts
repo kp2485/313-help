@@ -23,6 +23,26 @@ export const LANGS: readonly { code: Lang; name: string }[] = [
 ];
 const isLang = (x: unknown): x is Lang => LANGS.some((l) => l.code === x);
 
+/** The language control in the top bar (Kyle, 2026-09-20): one line, one control, the platform's own picker.
+ *
+ *  It lives here because everything it needs is here — the list, and each language's own name — and because a
+ *  plain function that returns a string can be held to a test without a browser. The caller passes its own
+ *  escaping and its own icon so this file keeps knowing nothing about the page.
+ *
+ *  A real `<select>`, not a menu of our own: on a cheap Android phone, and under Switch Control, VoiceOver or
+ *  TalkBack, the operating system's own picker is the one thing certain to work, and none of the menu-button
+ *  pattern is ours to get wrong. The visible name is the language in use, in its own words; every option
+ *  carries its own `lang`, so a screen reader reads each name in the right voice (WCAG 3.1.2); and the name of
+ *  the control itself ("Language") comes from the `<label>` that wraps it (4.1.2). */
+export function langPicker(current: Lang, label: string, iconHtml: string, esc: (s: string) => string): string {
+  const options = LANGS.map((l) => `<option value="${l.code}" lang="${l.code}"${l.code === current ? ' selected' : ''}>${esc(l.name)}</option>`).join('');
+  // The name is an `aria-label`, not text inside the `<label>`. A label that WRAPS a select has the select's
+  // own subtree in it, and the name a browser computes from it comes out as "Language English Español العربية
+  // বাংলা" — the whole list read back before anything else (checked live, 2026-09-21). The `<label>` stays,
+  // because it is what makes the globe and the pill around it part of the control's hit area.
+  return `<label class="langpick">${iconHtml}<select data-lang-select aria-label="${esc(label)}">${options}</select></label>`;
+}
+
 // English ships with the app. Every other language is its own small file, fetched only when it is chosen (or is
 // the phone's language), so an English reader never downloads any of them. Each `import()` below is written out in
 // full so the bundler gives each language its own chunk. Once fetched, the service worker keeps it for offline use.

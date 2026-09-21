@@ -11,13 +11,13 @@ import { loadSources } from './ingest-arcgis.js';
 import { buildIndicators, NEAR_MILES } from './indicators.js';
 import { GRID } from './ingest-basemap.js';
 import { fromIngested, fromSeed, toHsds, type Normalized } from './normalize.js';
-import { hsdsSchema, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsds, validateRows } from './validate.js';
+import { hsdsSchema, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsds, validateHsdsPrivacy, validateRows } from './validate.js';
 import { readScriptRefusingHosts } from './seed-io.js';
 import { loadSigningKey, publicKeyB64, signBytes } from './sign.js';
 import { applyAggregates, fetchAggregates, pushTargets, type Aggregates } from './reports-sync.js';
 
 /** One row of data/ingested/transit/source.json (pipeline/src/ingest-transit.ts). */
-interface TransitNote { id: string; kind: 'line' | 'point' | 'both'; lines: number; points: number; bytes: number; name: string; source: { name: string; url: string; page: string; license: string; fetched_at: string } }
+interface TransitNote { id: string; kind: 'line' | 'point' | 'both'; lines: number; points: number; bytes: number; name: string; source: { name: string; url: string; page: string; license: string; fetched_at: string }; net?: { file: string; v: number; routes?: number } }
 
 export interface BuildOptions { aggregates?: Aggregates | null; release?: boolean; offline?: boolean; outDir?: string; hsdsDir?: string | null; now?: Date; quiet?: boolean }
 
@@ -61,6 +61,8 @@ export async function build(opts: BuildOptions = {}) {
   const emg = validateEmergency(emergency, todayStr, !!opts.release);
   issues.push(emg);
   const services = toHsds(parts);
+  // The published HSDS copy gets the domestic-violence rule checked on its own terms, not inherited from the rows.
+  issues.push(validateHsdsPrivacy(services));
   const schema = await hsdsSchema(opts.offline);
   if (schema) issues.push(validateHsds(services, schema));
   else issues.push({ errors: opts.release ? ['HSDS schema unavailable; a release must validate against it'] : [], warnings: ['HSDS schema unavailable (offline); skipped HSDS validation'] });
@@ -115,16 +117,20 @@ export async function build(opts: BuildOptions = {}) {
   // of what exists (places/transit.json) travels with the bundle so the switcher can be drawn offline.
   const transitDir = p('data/ingested/transit');
   if (existsSync(`${transitDir}/source.json`)) {
-    const read = JSON.parse(readFileSync(`${transitDir}/source.json`, 'utf8')) as { layers: TransitNote[] };
+    const read = JSON.parse(readFileSync(`${transitDir}/source.json`, 'utf8')) as { layers: TransitNote[]; hubs?: unknown[] };
     const layers = [];
     for (const l of read.layers) {
       const from = `${transitDir}/${l.id}.json`;
       if (!existsSync(from)) continue;
       const name = `map/transit/${l.id}.json`;
       putCompact(name, JSON.parse(readFileSync(from, 'utf8')));
-      layers.push({ id: l.id, kind: l.kind, file: name, lines: l.lines, points: l.points, bytes: files[name]!.bytes, name: l.name, source: l.source });
+      // The subway style's own file for this layer (docs/MAP-STYLE.md): signed like every file, fetched only when a
+      // person picks that style. `net` and `hubs` are extra keys; a client that does not know them ignores them.
+      const extra = l.net && existsSync(`${transitDir}/${l.net.file}`) ? `map/transit/${l.net.file}` : '';
+      if (extra) putCompact(extra, JSON.parse(readFileSync(`${transitDir}/${l.net!.file}`, 'utf8')));
+      layers.push({ id: l.id, kind: l.kind, file: name, lines: l.lines, points: l.points, bytes: files[name]!.bytes, name: l.name, source: l.source, ...(extra ? { net: { file: extra, bytes: files[extra]!.bytes, v: l.net!.v, ...(l.net!.routes ? { routes: l.net!.routes } : {}) } } : {}) });
     }
-    if (layers.length) { put('places/transit.json', { layers }); counts.transit_layers = layers.length; }
+    if (layers.length) { put('places/transit.json', { layers, ...(read.hubs?.length ? { hubs: read.hubs } : {}) }); counts.transit_layers = layers.length; }
   }
   // Recreation and transit facts. City events are not shipped until a real feed exists (DECISIONS 2026-09-19).
   const parksFile = p('data/ingested/city_parks.json');

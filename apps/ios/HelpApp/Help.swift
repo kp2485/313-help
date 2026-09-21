@@ -154,14 +154,21 @@ func clock(_ hhmm: String) -> String {
     return "\((h + 11) % 12 + 1)\(mm > 0 ? String(format: ":%02d", mm) : "") \(half)"
 }
 
-func openText(_ o: OpenResult) -> String {
+/// "Today", "Tomorrow" or "Friday, Sep 25", in the phone's language: the web's `dayName`. The rule is
+/// `DayWords` in HelpCore, where it is tested; this only hands it the app's words and the app's locale.
+func dayName(_ date: String, now: Date = .now) -> String {
+    DayWords.name(date: date, today: DayWords.detroitDay(of: now), locale: L.locale,
+                  todayWord: L.t("day.today"), tomorrowWord: L.t("day.tomorrow"))
+}
+
+func openText(_ o: OpenResult, now: Date = .now) -> String {
     switch o.state {
     case .open: return o.closesAt.map { L.t("open.open_until", ["time": clock($0)]) } ?? L.t("open.open")
     case .closes_soon: return L.t("open.closes_soon", ["time": clock(o.closesAt ?? "")])
     case .closed:
         if o.cancelledNow { return L.t("open.cancelled") }
         guard let next = o.next ?? nil else { return L.t("open.closed_no_next") }
-        return L.t("open.closed_next", ["day": next.date, "time": clock(next.opensAt)])
+        return L.t("open.closed_next", ["day": dayName(next.date, now: now), "time": clock(next.opensAt)])
     case .call_first: return L.t("open.call_first")
     // A holiday: the schedule's hours are the usual ones and say nothing about today (query-spec "Holidays").
     case .holiday: return L.t("open.holiday")

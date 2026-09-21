@@ -41,6 +41,12 @@ kotlin.sourceSets["main"].kotlin.include(
     "org/help313/app/Needs.kt",          // the needs list, categories, the hardcoded numbers
     "org/help313/app/ReportModel.kt",    // what a report is, the daily hash, and which kinds a listing offers
     "org/help313/app/SavedRules.kt",     // what may not be saved at all
+    "org/help313/app/MapData.kt",        // the projection, the bundle's map files, the camera, hit testing
+    "org/help313/app/MapLayers.kt",      // what the map may draw and what it must never draw; the layer store
+    "org/help313/app/Language.kt",       // which of the four languages this phone gets
+    "org/help313/app/MapStyle.kt",       // the subway style: bands, palette as numbers, network files, geometry, badges
+    "org/help313/app/MapList.kt",        // "See this map as a list": never told the style, so identical in both
+    "org/help313/app/DayWords.kt",       // "Today" / "Tomorrow" / "Friday, Sep 25"
 )
 
 // Why the four new names above (Android review, 2026-09-20). :core used to cover Ed25519, Verify, ReportModel and

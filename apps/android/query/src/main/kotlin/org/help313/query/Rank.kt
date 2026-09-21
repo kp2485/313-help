@@ -1,8 +1,10 @@
 // One ranking rule (schema/query-spec.md "Ranking", DECISIONS 10-B2), port of packages/query/src/rank.ts:
-//   eligibility -> preferred flags (if asked) -> distance band -> reported-closed last -> open-now / next-open
-//   -> distance -> id
+//   eligibility -> preferred flags (if asked) -> distance band -> wide area -> reported-closed last
+//   -> open-now / next-open -> distance -> id
 // No freshness tier: time passing never reorders a list; only reports do (DECISIONS 2026-09-19).
 // Distance comes before everything except eligibility because many users have no car.
+// A domestic-violence row has no coordinate at all, so it gets its band from its service area's public
+// reference point instead, and never a distance (Areas.kt, docs/08, DECISIONS 2026-09-20).
 package org.help313.query
 
 import kotlin.math.asin
@@ -50,6 +52,22 @@ private fun bandOf(mi: Double?): Int = when {
     else -> 2
 }
 
+/**
+ * Band and wide-area key for a domestic-violence row. Every input is public and per-area: the person's own
+ * location (which never leaves the device) and a city hall's coordinate that is identical for every shelter
+ * serving that area. The row itself contributes nothing but the name of the area.
+ *
+ * No location, or no service area: band 0 and wide 0, exactly as a row with no coordinates ranks today.
+ */
+private fun dvBand(row: BundleRow, near: LatLon?): Pair<Int, Int> {
+    val area = row.serviceArea?.let { SERVICE_AREAS[it] }
+    if (near == null || area == null) return 0 to 0
+    // statewide and national have no local centre: farthest band, and after every local area.
+    val point = area.point ?: return 2 to 1
+    val mi = miles(near, point)
+    return (if (mi <= AREA_BAND_CLOSE_MILES) 0 else if (mi <= AREA_BAND_MID_MILES) 1 else 2) to 0
+}
+
 private fun openKeyNow(o: OpenResult, today: String): Int = when (o.state) {
     OpenState.OPEN -> 0
     OpenState.CLOSES_SOON -> 1
@@ -84,13 +102,16 @@ fun rank(rows: List<BundleRow>, q: Query, nowMillis: Long, alerts: List<Alert> =
         .filter { categoryMatches(it.category, q.category) }
         .filter { row -> q.flags.all { row.flags.contains(it) } }
         .map { row ->
-            // DV rows never carry coordinates, so they never get a distance (docs/08).
+            // DV rows never carry coordinates and never get a distance (docs/08). Their band comes from the public
+            // reference point of the area they serve, so proximity works without any fact that locates a shelter.
             val near = q.near
-            val mi = if (near != null && row.lat != null && row.lon != null)
+            val dv = isDvCategory(row.category)
+            val mi = if (!dv && near != null && row.lat != null && row.lon != null)
                 miles(near, LatLon(row.lat, row.lon)) else null
+            val bw = if (dv) dvBand(row, near) else bandOf(mi) to 0
             val open = openNow(row, nowMillis, alerts)
             val key = if (q.mode == "week") openKeyWeek(row, open, nowMillis, alerts) else openKeyNow(open, today)
-            Ranked(row, open, badge(row, nowMillis), mi, bandOf(mi)) to key
+            Triple(Ranked(row, open, badge(row, nowMillis), mi, bw.first), key, bw.second)
         }
 
     // Rows with 2+ standing closed reports stay visible but go last in their band (docs/04).
@@ -102,8 +123,13 @@ fun rank(rows: List<BundleRow>, q: Query, nowMillis: Long, alerts: List<Alert> =
         compareBy(
             { preferred(it.first) },
             { it.first.band },
+            // Statewide and national DV lines after every local area. 0 for every other row, so ordinary lists
+            // are untouched.
+            { it.third },
             { reported(it.first) },
             { it.second },
+            // A DV row's miles is always null, so two shelters in one area are separated by the open key and the
+            // id only.
             { it.first.miles ?: 0.0 },
             { it.first.row.id },
         )

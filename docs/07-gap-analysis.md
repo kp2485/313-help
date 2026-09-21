@@ -35,7 +35,7 @@ Source: reverse-engineering of `com.detroithealthdepartment.dcompassion` v1.0 (b
 | Hardcoded to DHD only | Couldn't grow | Multi-org: city, food banks, churches, partners |
 | English only | Excluded SW Detroit, Dearborn-adjacent, Bangladeshi communities | Four languages built 2026-09-20 — English, Spanish, Arabic (right to left) and Bengali (05). **None of the three translations has been read by a native speaker yet**, and no screen says otherwise |
 | No accessibility work | Generic WebView | Dynamic type, screen readers, contrast targets (05) |
-| Store release took a vendor and reached ~10 installs | Shipping wasn't the hard part; being worth installing was | To ship independently by Linwood Technologies (nothing is deployed yet) using public information, clearly marked as not a city app (08) |
+| Store release took a vendor and reached ~10 installs | Shipping wasn't the hard part; being worth installing was | To ship independently by Linwood Technologies (the web app is live at 313help.com since 2026-09-21; store releases are on the roadmap) using public information, clearly marked as not a city app (08) |
 
 ## What we deliberately don't add
 

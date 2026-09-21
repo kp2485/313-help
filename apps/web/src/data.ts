@@ -25,14 +25,19 @@ export interface Bundle {
   zips?: Record<string, [number, number]>;
   /** What transport layers this bundle carries (pipeline/src/ingest-transit.ts). The list itself is tiny and
    *  travels with the bundle; each layer's shapes live in map/transit/… and are fetched only when switched on. */
-  transit?: { layers: TransitLayer[] };
+  transit?: { layers: TransitLayer[]; hubs?: TransitHub[] };
 }
+/** Stations of different systems a short walk apart (subway map style only; `standard` never reads it). */
+/** `origin` ([lon, lat]) is what `at` and `span` count from, in whole 1e-5 degrees; a bundle from before 2026-09-21 has none. */
+export interface TransitHub { origin?: [number, number]; at: [number, number]; span: number[]; name: string; layers: string[]; stops: { layer: string; name: string }[] }
 export interface TransitLayer {
   id: string; kind: 'line' | 'point' | 'both'; file: string;
   lines: number; points: number; bytes: number;
   /** English fallback name, used only if the app has no words of its own for this layer id. */
   name: string;
   source: { name: string; url: string; page: string; license: string; fetched_at: string };
+  /** The subway map style's extra file for this layer (docs/MAP-STYLE.md), fetched only when that style is on. */
+  net?: { file: string; bytes: number; v: number; routes?: number };
 }
 
 const BASE = '/data/bundle/v1/';
