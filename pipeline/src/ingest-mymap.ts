@@ -18,6 +18,7 @@
 
 import { existsSync } from 'node:fs';
 import { INGESTED_COLUMNS, loadSources, sharpDrop, type Source } from './ingest-arcgis.js';
+import { assertNoMovedIds, assignIds, NO_PRIOR, oneRowPerRecord, readPrior, recordKey, RETIRED_COLUMNS, retiredPath, retiredRows, type IdRequest, type PriorIds, type Retired } from './ingest-ids.js';
 import { p, readCsv, writeCsv, slug, inBbox, today, type CsvRow } from './util.js';
 
 /** Same columns as an ArcGIS layer, plus the city this layer publishes for itself. */
@@ -124,11 +125,10 @@ export function hoursText(access: string[]): string {
   return '';
 }
 
-export function toRows(src: Source, lastEdited: string | null, placemarks: Placemark[], fetchedAt: string): { rows: CsvRow[]; warnings: string[] } {
+export function toRows(src: Source, lastEdited: string | null, placemarks: Placemark[], fetchedAt: string, prior: PriorIds = NO_PRIOR): { rows: CsvRow[]; warnings: string[]; retired: Retired[] } {
   const warnings: string[] = [];
   const cities = new Set((src.cities ?? []).map((c) => c.toLowerCase()));
-  const seen = new Map<string, number>();
-  const rows: CsvRow[] = [];
+  const all: CsvRow[] = [];
   for (const pm of [...placemarks].sort((a, b) => `${a.city}|${a.name}`.localeCompare(`${b.city}|${b.name}`))) {
     // The map covers the whole county. The service area is Detroit, Hamtramck, Highland Park and Dearborn, and the
     // map states each station's city itself, so the city decides (Dearborn Heights is not Dearborn). The bbox is a
@@ -137,11 +137,6 @@ export function toRows(src: Source, lastEdited: string | null, placemarks: Place
     if (!inBbox(pm.lat, pm.lon)) { warnings.push(`${src.id}: "${pm.name}" (${pm.city}) is at ${pm.lat},${pm.lon}, outside the service area; skipped`); continue; }
 
     const d = parseDetails(pm.description);
-    let id = `sal_${slug(`${src.id_prefix ?? src.id} ${pm.city} ${pm.name}`)}`;
-    const n = (seen.get(id) ?? 0) + 1;
-    seen.set(id, n);
-    if (n > 1) { warnings.push(`${src.id}: two stations slug to ${id} ("${pm.name}")`); id = `${id}_${n}`; }
-
     // `extra` is a "; "-separated list of key=value, so a value's own semicolons become commas. Nothing else changes.
     const comma = (s: string) => s.replace(/\s*;\s*/g, ', ');
     const fields: [string, string][] = [
@@ -152,16 +147,31 @@ export function toRows(src: Source, lastEdited: string | null, placemarks: Place
         : d.box_locations.map((b, i) => [`Box_Location${i + 1}`, comma(b)] as [string, string])),
       ['Supplies', comma(d.supplies.join(', '))],
     ];
-    rows.push({
-      sal_id: id, record_ref: '', name: pm.name, address_1: '', city: pm.city, zip: '',
+    all.push({
+      sal_id: '', record_ref: '', name: pm.name, address_1: '', city: pm.city, zip: '',
       lat: pm.lat.toFixed(7), lon: pm.lon.toFixed(7), phone: '', website: d.website,
       hours_text: hoursText(d.access),
       extra: fields.filter(([, v]) => v).map(([k, v]) => `${k}=${v}`).join('; '),
       source_id: src.id, source_last_edited: lastEdited ?? '', fetched_at: fetchedAt,
     });
   }
+
+  // The KML carries no per-placemark id, so the stable key this map has is the city and site name it states
+  // (ingest-ids.ts says what that costs). The slug still covers prefix, city and name together, so an id this
+  // layer has already published keeps exactly the spelling it has.
+  const one = oneRowPerRecord(all);
+  const rows = one.rows;
+  warnings.push(...one.warnings.map((w) => `${src.id}: ${w}`));
+  const requests: IdRequest[] = rows.map((r) => ({
+    key: recordKey(r), base: slug(`${src.id_prefix ?? src.id} ${r.city} ${r.name}`), alt: slug(r.name!).slice(0, 20),
+  }));
+  const assigned = assignIds('sal_', requests, prior, fetchedAt);
+  for (const r of rows) r.sal_id = assigned.ids.get(recordKey(r))!;
+  warnings.push(...assigned.warnings.map((w) => `${src.id}: ${w}`));
+  assertNoMovedIds(src.id, prior, rows);
+
   rows.sort((a, b) => a.sal_id!.localeCompare(b.sal_id!));
-  return { rows, warnings };
+  return { rows, warnings, retired: assigned.retired };
 }
 
 async function main() {
@@ -171,7 +181,9 @@ async function main() {
     if (!res.ok) throw new Error(`${res.status} ${src.url}`);
     const { lastEdited, placemarks } = parseKml(await res.text());
     if (!placemarks.length) throw new Error(`${src.id}: no placemarks read; not overwriting anything`);
-    const { rows, warnings } = toRows(src, lastEdited, placemarks, fetchedAt);
+    // What this map committed last time: the ids it has already handed out, and the ids it has retired.
+    const prior = readPrior(src.id);
+    const { rows, warnings, retired } = toRows(src, lastEdited, placemarks, fetchedAt, prior);
     const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
     // A map its publisher hasn't updated in max_age_days publishes nothing new: fresh rows go to staging for a
     // person and the last published file stays live. Nothing disappears on a timer.
@@ -188,6 +200,8 @@ async function main() {
       continue;
     }
     writeCsv(out, rows, MYMAP_COLUMNS);
+    // Tombstones ride with the file whose ids they retire, and are committed with it: nothing is deleted.
+    if (retired.length) writeCsv(retiredPath(mode === 'publish' ? 'data/ingested' : 'data/staging', src.id), retiredRows(retired), RETIRED_COLUMNS);
     console.log(`${src.id}: ${rows.length} of ${placemarks.length} stations are in the service area, map updated ${lastEdited ?? 'unknown'} -> ${mode} (${out})`);
     for (const w of warnings) console.warn('  warn:', w);
   }
