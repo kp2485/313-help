@@ -144,8 +144,12 @@ export const CATEGORIES: { id: string; icon: string; query: Query }[] = [
 
 // One Map tab instead of the old Recreation and Transit tabs (Kyle, 2026-09-20). Everything both tabs offered is
 // still on it: the greenway, parks, recreation centers, bus and streetcar facts, fares and phone numbers.
+// Neighborhoods became a tab on 2026-09-22 (Kyle): the numbers about each of the City's 205 neighborhoods were
+// reachable only from a line on the About screen, where nobody looks. Its own hash is still `#/n`, so every link
+// and bookmark made before the tab existed opens the same screen. Events still hides itself when the bundle
+// carries none, so a phone normally shows four.
 export const TABS = [
-  { id: 'home', icon: 'home' }, { id: 'help', icon: 'help' }, { id: 'map', icon: 'pin' }, { id: 'events', icon: 'events' },
+  { id: 'home', icon: 'home' }, { id: 'help', icon: 'help' }, { id: 'map', icon: 'pin' }, { id: 'hoods', icon: 'district' }, { id: 'events', icon: 'events' },
 ] as const;
 export type TabId = (typeof TABS)[number]['id'];
 

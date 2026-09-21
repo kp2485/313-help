@@ -5,7 +5,8 @@ import {
 import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang } from './i18n.js';
 import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
-import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
+import { hoodIndex, hoodList, hoodPage, hoodRows, loadIndicators, outline, type Hood, type Indicators, type Ui } from './hoods.js';
+import { hoodAt, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
 import { icon } from './icons.js';
 import { MapView, focusRadius, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
 import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, positionOutcome, rememberLocateAnswered, requestPosition } from './locate.js';
@@ -47,6 +48,9 @@ let listMap = false;                                      // "Show these on a ma
 let langOffline = false;                                 // the last language tapped could not be fetched
 let searchText = '';                                     // memory only: never stored, sent, or put in the URL
 let searchCount = '';                                    // "12 places found": what the live region says after a keystroke
+// The Neighborhoods tab's own two choices: what has been typed into "Find a neighborhood", and whether the list
+// is in A–Z or council-district order. Memory only, like the search box, and neither is ever an indicator.
+let hoodQuery = '', hoodOrder: HoodOrder = 'abc';
 let layersOn: string[] = [];                             // map layers switched on (layers.ts): this phone only
 // Layer shapes already loaded, this visit only, keyed by file AND the checksum the signed index gives it.
 // 'loading' is a request in flight; 'failed' is a try that did not come back and can be made again.
@@ -206,6 +210,11 @@ const langSelect = () => langPicker(currentLang(), t('lang.switch'), icon('globe
 const langNote = () => (langOffline ? `<p class="banner warn" role="note">${T('lang.needs_net')}</p>` : '');
 // The Events tab shows only when the list carries upcoming events (none today: DECISIONS 2026-09-19).
 const shownTabs = () => TABS.filter((x) => x.id !== 'events' || upcoming(1).length > 0);
+/** What a tab is called where there is room for the whole word: the side rail, and the window's own title.
+ *  Only Neighborhoods has a second name — at 320 px with five tabs, "Neighborhoods" is three times the width of
+ *  its column, and a word broken across lines is not a label. The short word on the bar is the whole of that
+ *  button's name, never a truncation and never a different name from the one read out (WCAG 2.5.3). */
+const tabName = (id: TabId) => { const k = `tab.${id}_wide`, full = t(k); return full === k ? t(`tab.${id}`) : full; };
 // A laptop or a desktop (Kyle, 2026-09-20). On a wide screen the tab bar is a rail down the side, so it is drawn
 // before the page instead of after it: what the keyboard reaches follows what the eye sees, at either width.
 // A phone, and a laptop zoomed to 400%, are both narrow and get the phone layout untouched.
@@ -214,7 +223,7 @@ function tabBar(active?: TabId): string {
   // In the rail, Urgent help is the first thing and the top bar drops its copy (style.css hides it), so the
   // numbers are still one click from every screen (Principle 3).
   const urgentFirst = wide.matches ? `<button class="urgent" ${go({ v: 'urgent' })}>${icon('phone', 'sm')}<span>${T('strip.more')}</span></button>` : '';
-  return `<nav class="tabs" aria-label="${T('tabs.label')}">${urgentFirst}${shownTabs().map((x) => `<button ${go({ v: 'tab', tab: x.id })} ${x.id === active ? 'aria-current="page"' : ''}>${icon(x.icon)}<span>${T('tab.' + x.id)}</span></button>`).join('')}</nav>`;
+  return `<nav class="tabs" aria-label="${T('tabs.label')}">${urgentFirst}${shownTabs().map((x) => `<button ${go({ v: 'tab', tab: x.id })} ${x.id === active ? 'aria-current="page"' : ''}>${icon(x.icon)}<span>${esc(wide.matches ? tabName(x.id) : t('tab.' + x.id))}</span></button>`).join('')}</nav>`;
 }
 function ageBanner(): string {
   if (!bundle) return '';
@@ -333,7 +342,8 @@ function homeTab(): string {
     <ul class="quick">${quick.map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>`).join('')}</ul>`}
     ${ev.length ? `<div class="sechead"><h2>${T('home.events')}</h2><button class="link" ${go({ v: 'tab', tab: 'events' })}>${T('home.see_all')}</button></div><ul class="events">${ev.map(eventItem).join('')}</ul>` : ''}
     <div class="duo"><button class="tile" ${go({ v: 'tab', tab: 'map' })}>${icon('pin')}<strong>${T('tab.map')}</strong><small>${T('home.map_sub')}</small></button>
-      <button class="tile" ${go({ v: 'greenway' })}>${icon('path')}<strong>${T('gw.title')}</strong><small>${T('home.rec_sub', { count: openSegs })}</small></button></div>
+      <button class="tile" ${go({ v: 'greenway' })}>${icon('path')}<strong>${T('gw.title')}</strong><small>${T('home.rec_sub', { count: openSegs })}</small></button>
+      <button class="tile" ${go({ v: 'tab', tab: 'hoods' })}>${icon('district')}<strong>${T('home.hoods_title')}</strong><small>${T('home.hoods_sub')}</small></button></div>
     <p class="foot">${T('home.updated', { when: prettyDate(bundle.index.generated_at) })} · <button class="link" ${go({ v: 'about' })}>${T('about.title')}</button> · <button class="link" ${go({ v: 'privacy' })}>${T('privacy.title')}</button></p>
     </main>`;
 }
@@ -821,16 +831,47 @@ function addScreen(): string {
       ${radios('how_known', HOW_KNOWN, (id) => t('add.how.' + id))}${field('notes', 280, { area: true, hint: 'add.h.notes' })}
       <button class="btn" type="submit">${T('add.send')}</button><p class="foot">${T('add.privacy')}</p></form></main>`;
 }
-// Neighborhood pages (docs/13, hoods.ts). Not in the crisis path; the numbers load only when one of these screens opens.
+// Neighborhood pages (docs/13, hoods.ts). Its own tab since 2026-09-22; the numbers are still downloaded only
+// when one of these screens opens, so nothing on the crisis path waits for them.
+const hoodUi = (d: Indicators): Ui => ({
+  t, esc, own: owner, date: prettyDate, icon: (name: string) => icon(name), link: (url: string, label: string) => ext(url, label, 'link'), go: (view: object) => go(view as View),
+  map: (h: Hood) => mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), quiet: false, outline: outline(h, d.origin), fit: outline(h, d.origin).flat(), minMeters: 900 }),
+});
+/** The numbers, or a screen that says why there are none yet. */
+function hoodsReady(): Indicators | null {
+  if (indicators === undefined) void loadIndicators(bundle!.index).then((d) => { indicators = d; render(false); });
+  return indicators ?? null;
+}
+const hoodsWaiting = () => `<main><h1 class="page" tabindex="-1">${T('hood.title')}</h1><p class="empty">${T(indicators === null ? 'hood.unavailable' : 'home.loading')}</p></main>`;
+/**
+ * The Neighborhoods tab. "Your neighborhood" is worked out here, on this phone, from the position the person
+ * has already shared this visit (or the centre of the ZIP they typed) and the outlines the bundle already
+ * carries — `hoodAt` in hoodfind.ts. Nothing is sent, nothing is written: `here` is a variable that dies with
+ * the page, and the only thing that ever reaches the browser's history is a neighborhood's own id, and only
+ * when the person taps the row.
+ */
+function hoodsTab(): string {
+  const d = hoodsReady();
+  if (!d) return hoodsWaiting();
+  const mine = here ? (hereZip ? hoodsForZip(d.neighborhoods, d.origin, here)[0] ?? null : hoodAt(d.neighborhoods, d.origin, here)) : null;
+  // The ordinary location chip, until there is a location: then the answer above it is the whole point, and the
+  // chip's own line ("Sorted by distance from you") would be a claim about a list that is in ABC order. What
+  // stays is the button that turns it off, which is the same button, with the same handler, as everywhere else.
+  return hoodIndex(d, hoodUi(d), { order: hoodOrder, query: hoodQuery, located: !!here, zip: hereZip, mine, locHtml: here ? '' : locChip() });
+}
+/** "14 neighborhoods", for the live region under the box. Silent until something has been typed. */
+function hoodSaid(d: Indicators): string {
+  if (!hoodQuery.trim()) return '';
+  const n = matchHoods(d.neighborhoods, hoodQuery).length;
+  return n === 0 ? t('hood.find_none') : n === 1 ? t('hood.find_one') : t('hood.find_count', { count: n });
+}
 function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string; html: string; ownTitle: boolean } {
-  if (indicators === undefined) { void loadIndicators(bundle!.index).then((d) => { indicators = d; render(false); }); }
-  if (!indicators) return { title: t('hood.title'), ownTitle: false, html: `<main><p class="empty">${T(indicators === null ? 'hood.unavailable' : 'home.loading')}</p></main>` };
-  const d = indicators, ui = {
-    t, esc, own: owner, date: prettyDate, link: (url: string, label: string) => ext(url, label, 'link'), go: (view: object) => go(view as View),
-    map: (h: Hood) => mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), quiet: false, outline: outline(h, d.origin), fit: outline(h, d.origin).flat(), minMeters: 900 }),
-  };
+  const d = hoodsReady();
+  if (!d) return { title: t('hood.title'), ownTitle: false, html: hoodsWaiting() };
+  const ui = hoodUi(d);
   if (v.v === 'hoods') return { title: t(v.lens === 'jlg' ? 'hood.lens_jlg' : 'hood.title'), ownTitle: false, html: hoodList(d, ui, v.lens) };
   const h = d.neighborhoods.find((x) => x.id === v.id);
+  // An id nobody knows (an old link, a typo): the whole list, under the tab's own name, never a half-built page.
   return h ? { title: h.name, ownTitle: true, html: hoodPage(h, d, ui) } : { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
 }
 // What this app keeps and sends, in plain words (docs/08). Everything here is true of the code; tests check the parts
@@ -856,7 +897,7 @@ function about(): string {
   return `<main>${['about.p1', 'about.independent', 'about.p2', 'about.p3'].map((k) => `<p>${T(k)}</p>`).join('')}
     ${i ? `<p class="foot">${T('about.data', { version: `⁦${i.version}⁩`, date: prettyDate(i.generated_at) })} ${T(i.signing === 'release' ? 'about.sig_ok' : 'about.sig_dev')}</p>` : ''}<p class="foot">${T('about.open')}</p>
     <ul class="rows">${rowLink({ v: 'privacy' }, 'shield', t('privacy.title'), t('privacy.sub'))}</ul>
-    <h2>${T('hood.title')}</h2><ul class="rows">${rowLink({ v: 'hoods' }, 'info', t('hood.title'), t('hood.about_sub'))}</ul>
+    <p>${T('about.hoods')} <button class="link" ${go({ v: 'tab', tab: 'hoods' })}>${T('hood.title')}</button></p>
     ${credits()}</main>`;
 }
 // Who makes the app, and how to reach them (Kyle, 2026-09-19). An organization's address, not a resident's.
@@ -876,7 +917,7 @@ function credits(): string {
 const PURPOSE: Partial<Record<View['v'], string>> = {
   need: 'title.find', list: 'title.find', search: 'title.search', saved: 'title.saved', detail: 'title.listing', urgent: 'title.urgent',
 };
-const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'home', hood: 'home', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map' };
+const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'hoods', hood: 'hoods', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map' };
 /** Where the cursor is now, named so it can be found again after the page is drawn (focus.ts). */
 const whereIsTheCursor = () => focusSelector(document.activeElement as unknown as FocusEl | null, (n) => n !== (document.body as unknown as FocusEl) && app.contains(n as unknown as Node));
 function render(focus = true): void {
@@ -893,7 +934,7 @@ function render(focus = true): void {
   let title: string | undefined, body: string, exit = false, ownTitle = false;
   // Without a list, only the screens that don't need one: the urgent numbers and the overdose steps.
   const standsAlone = v.v === 'urgent' || v.v === 'privacy' || (v.v === 'need' && !!NEEDS.find((x) => x.id === v.id)?.stepsOnly);
-  if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' && shownTabs().some((x) => x.id === v.tab) ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'map' ? mapTab() : eventsTab(); }
+  if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' && shownTabs().some((x) => x.id === v.tab) ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'map' ? mapTab() : tab === 'hoods' ? hoodsTab() : eventsTab(); }
   else if (v.v === 'urgent') { title = t('strip.more'); body = urgent(); }
   else if (v.v === 'about') { title = t('about.title'); body = about(); }
   else if (v.v === 'privacy') { title = t('privacy.title'); body = privacy(); }
@@ -932,7 +973,7 @@ function render(focus = true): void {
   // "Search", "Saved", "Listing", "Urgent help". That distinguishes the window and reveals nothing — every one of
   // those titles is equally true of a person looking for a food pantry. The specific name is still on the screen
   // itself, in the <h1> the cursor lands on, and it is said out loud below.
-  const docTitle = title ?? (v.v === 'tab' && v.tab !== 'home' ? t('tab.' + v.tab) : '');
+  const docTitle = title ?? (v.v === 'tab' && v.tab !== 'home' ? tabName(v.tab) : '');
   const named = traceable(v) ? docTitle : t(PURPOSE[v.v] ?? 'title.find');
   document.title = named ? `${named} · ${t('app.name')}` : t('app.name');
   mountMaps();
@@ -959,7 +1000,7 @@ function render(focus = true): void {
   }
 }
 function navigate(view: View): void {
-  if (view.v === 'tab') searchText = '';   // a tab is a fresh start
+  if (view.v === 'tab') { searchText = ''; hoodQuery = ''; }   // a tab is a fresh start
   if (view.v !== 'detail') listMap = false;   // coming back from a place, the map is still open
   if (view.v === 'add') { proposed = null; proposeError = false; missing = []; addValues = {}; }
   if (view.v === 'privacy') { keyReset = false; keyResetFailed = false; queueCleared = false; void queuedCount().then((n) => { if (n !== queued) { queued = n; render(false); } }); }
@@ -1093,9 +1134,23 @@ app.addEventListener('change', (ev) => {
 // Everything a person has typed but not sent is kept as they type it, so a redraw that is not a new screen
 // (a map layer arriving, a newer list, a window crossing the laptop line) never takes it away (WCAG 3.3.7).
 // Memory only: the same rule as the search box — nothing here is written to the phone or sent anywhere.
+/**
+ * The Neighborhoods tab, after a letter is typed or the order is changed: only the list is drawn again, and the
+ * count is said in the region that is already on the screen. The box keeps the cursor and the keyboard, and
+ * nothing above the list moves, so the page does not jump under a thumb on a small phone.
+ */
+function redrawHoodList(): void {
+  const out = app.querySelector('#hoodlist');
+  const d = indicators;
+  if (!out || !d) return;
+  out.innerHTML = hoodRows(d, hoodUi(d), { order: hoodOrder, query: hoodQuery });
+  const say = app.querySelector('#hoodsay');
+  if (say) say.textContent = hoodSaid(d);
+}
 app.addEventListener('input', (ev) => {
   const el = ev.target as HTMLInputElement;
   if (el.id === 'q') { searchText = el.value; redraw(); return; }
+  if (el.id === 'hoodq') { hoodQuery = el.value; redrawHoodList(); return; }
   const report = el.closest<HTMLElement>('.report');
   if (report && el.tagName === 'TEXTAREA') { notes.set(report.dataset.target!, el.value); return; }
   if (el.closest('.addform') && el.name) addValues[el.name] = el.value;
@@ -1105,6 +1160,15 @@ app.addEventListener('input', (ev) => {
 app.addEventListener('change', (ev) => {
   const el = ev.target as HTMLInputElement;
   if (el.closest?.('.addform') && el.name && el.type === 'radio' && el.checked) addValues[el.name] = el.value;
+});
+// A to Z, or by council district. Two real radio buttons, so the arrow keys already move between them; the
+// choice is this visit's only, and neither order is an indicator.
+app.addEventListener('change', (ev) => {
+  const el = ev.target as HTMLInputElement;
+  if (!el.dataset?.hoodorder) return;
+  hoodOrder = el.dataset.hoodorder === 'district' ? 'district' : 'abc';
+  redrawHoodList();
+  announce(t(hoodOrder === 'district' ? 'hood.group_district' : 'hood.group_abc'));
 });
 app.addEventListener('toggle', (ev) => {
   const el = ev.target as HTMLDetailsElement;

@@ -7,6 +7,7 @@
 // are drawn in ONE panel so neither is shown without the other; "none listed yet" describes our list, not the place.
 
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
+import { groupHoods, matchHoods, type HoodOrder } from './hoodfind.js';
 import { locale } from './i18n.js';
 
 type Count = number | 'lt5';
@@ -57,7 +58,7 @@ export function outline(h: Hood, origin: [number, number]): { lat: number; lon: 
   return h.rings.map((enc) => { const out: { lat: number; lon: number }[] = []; let x = 0, y = 0; for (let i = 0; i + 1 < enc.length; i += 2) { x += enc[i]!; y += enc[i + 1]!; out.push({ lon: origin[0] + x / 1e5, lat: origin[1] + y / 1e5 }); } return out; });
 }
 
-export interface Ui { t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; own: (s: unknown) => string; date: (d: string) => string; link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string }
+export interface Ui { t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; own: (s: unknown) => string; date: (d: string) => string; link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string; icon: (name: string) => string }
 /** Per 1,000 parcels. No rate without a count we can show and a base we can defend (honesty rules 2 and 3). */
 /**
  * One of our sentences with a run the City wrote dropped into it: the sentence is escaped, the run is marked
@@ -85,6 +86,54 @@ const dollars = (n: number, o: Intl.NumberFormatOptions) => {
 };
 const money = (n: number) => dollars(n, { maximumFractionDigits: 0 });
 const bigMoney = (n: number) => dollars(n, { notation: 'compact', compactDisplay: 'long', maximumFractionDigits: 1 });
+
+/** One row of the index: the neighborhood's name and nothing else. No count, no number, nothing that could be
+ *  read as a score — an index row carries no indicator at all, so the list cannot become a league table by the
+ *  back door (docs/13, rule 1). The name is the City's, marked English so it is read in the right voice. */
+const indexRow = (ui: Ui, n: Hood) => `<li><button class="row" ${ui.go({ v: 'hood', id: n.id })}><span class="rowtx"><strong>${ui.own(n.name)}</strong></span></button></li>`;
+
+/** The groups of the index list, in the order asked for: A to Z, or by council district. `matchHoods` narrows
+ *  the list by what has been typed and leaves the order alone. Drawn on its own so typing a letter can replace
+ *  this one piece of the screen instead of the whole page: the keyboard stays up and nothing jumps. */
+export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string }): string {
+  const found = matchHoods(d.neighborhoods, o.query);
+  if (!found.length) return `<p class="empty">${ui.esc(ui.t('hood.find_none'))}</p>`;
+  const head = (key: string | number) =>
+    o.order === 'district' ? (key === '' ? ui.t('hood.no_district') : ui.t('hood.district', { n: key })) : key === '' ? ui.t('hood.letter_other') : String(key);
+  return groupHoods(found, o.order).map((g) => `<h3 class="sub">${ui.esc(head(g.key))}</h3><ul class="rows">${g.items.map((n) => indexRow(ui, n)).join('')}</ul>`).join('');
+}
+
+/**
+ * The Neighborhoods tab's own screen (docs/05): what these pages are, then the fastest way to the person's own
+ * neighborhood, then all 205 by name.
+ *
+ * `mine` is the answer the device worked out from a location or a typed ZIP — it is handed in already decided
+ * (hoodfind.ts), is used to draw one row, and is kept nowhere. `locHtml` is the ordinary location chip, the
+ * same one every list screen uses, so there is no second way of asking for a location anywhere in the app.
+ */
+export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; located: boolean; zip: string; mine: Hood | null; locHtml: string }): string {
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const src = d.sources.neighborhoods;
+  const mine = !o.located
+    ? ''
+    : o.mine
+      ? `<ul class="rows"><li><button class="row" ${ui.go({ v: 'hood', id: o.mine.id })}><span class="rowic">${ui.icon('district')}</span><span class="rowtx"><strong>${ui.own(o.mine.name)}</strong>${o.mine.district ? `<small>${T('hood.district', { n: o.mine.district })}</small>` : ''}</span></button></li></ul>
+        ${o.zip ? `<p class="foot">${T('hood.mine_zip', { zip: o.zip })}</p>` : ''}<p class="foot">${T('hood.mine_note')}</p>
+        <p class="loc"><button class="chip" data-loc="off">${T(o.zip ? 'loc.zip_off' : 'loc.off')}</button></p>`
+      : `<p class="banner plain">${T('hood.mine_outside')}</p><div class="stackbtns"><button class="btn ghost" ${ui.go({ v: 'tab', tab: 'map' })}>${T('hood.mine_map')}</button></div>`;
+  const radio = (value: HoodOrder, label: string) =>
+    `<label class="pick"><input type="radio" name="hoodorder" value="${value}" data-hoodorder="${value}"${o.order === value ? ' checked' : ''}><span>${T(label)}</span></label>`;
+  return `<main><h1 class="page" tabindex="-1">${T('hood.title')}</h1><p class="lede">${T('hood.index_intro')}</p>
+    <p class="foot">${T('hood.index_sources')} ${ui.link(src.url, src.name)} <small>${T('hood.updated', { date: ui.date(src.last_edited) })}</small></p>
+    <h2>${T('hood.mine_head')}</h2>${mine}${o.locHtml}
+    <label class="searchbox">${T('hood.find_label')}<input id="hoodq" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" maxlength="40" value="${ui.esc(o.query)}" aria-describedby="hoodsay"></label>
+    <p class="vh" id="hoodsay" role="status" aria-live="polite"></p>
+    <fieldset class="hoodorder"><legend>${T('hood.group_label')}</legend><div class="kinds">${radio('abc', 'hood.group_abc')}${radio('district', 'hood.group_district')}</div></fieldset>
+    <div id="hoodlist">${hoodRows(d, ui, o)}</div>
+    <p class="foot">${T('hood.only_detroit')}</p>
+    <ul class="rows"><li><button class="row" ${ui.go({ v: 'hoods', lens: 'jlg' })}><span class="rowtx"><strong>${T('hood.lens_jlg')}</strong><small>${T('hood.lens_jlg_sub')}</small></span></button></li></ul>
+    <p class="foot">${T('hood.describe')}</p></main>`;
+}
 
 /** Alphabetical inside each council district. Never sorted by a number: no league tables (rule 1). */
 export function hoodList(d: Indicators, ui: Ui, lens?: string): string {

@@ -13,7 +13,9 @@ import { CATEGORIES, TABS, isPrivate, type TabId } from './needs.js';
 export const isPrivateCat = (cat: string) => isPrivate(cat);
 
 export type View =
-  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'privacy' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens?: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
+  // `hoods` is a lens over the list (today only the greenway study area). The plain list of all 205 is the
+  // Neighborhoods tab itself, at the same `#/n` it has always had.
+  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'privacy' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
   | { v: 'need'; id: string; refine?: string; all?: boolean }
   | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
 
@@ -21,7 +23,9 @@ const HOME: View = { v: 'tab', tab: 'home' };
 
 /** The URL for a screen, or null for screens that must leave no trace. `sensitive(id)` says a listing is DV/crisis. */
 export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/'): string | null {
-  if (v.v === 'tab') return v.tab === 'home' ? path : `#/${v.tab}`;
+  // The Neighborhoods tab keeps the address its screen had before it was a tab: every `#/n` link a partner or a
+  // resident saved still opens it, and Back and Forward walk the same trips they walked (2026-09-22).
+  if (v.v === 'tab') return v.tab === 'home' ? path : v.tab === 'hoods' ? '#/n' : `#/${v.tab}`;
   if (v.v === 'detail') return sensitive(v.id) ? null : `#/r/${v.id}`;
   if (v.v === 'list') return isPrivateCat(v.cat) ? null : `#/c/${v.cat}`;
   if (v.v === 'greenway') return '#/greenway';
@@ -30,7 +34,7 @@ export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/')
   if (v.v === 'about') return '#/about';
   if (v.v === 'privacy') return '#/privacy';
   if (v.v === 'add') return '#/add';
-  if (v.v === 'hoods') return v.lens ? `#/n/lens-${v.lens}` : '#/n';
+  if (v.v === 'hoods') return `#/n/lens-${v.lens}`;
   if (v.v === 'hood') return `#/n/${v.id}`;
   return null; // the urgent sheet, search, saved places, and every "need" screen: no trace
 }
@@ -44,7 +48,9 @@ export function fromHash(h: string): View {
   if (!m) return HOME;
   if (m[1] === 'r') return m[2] ? { v: 'detail', id: m[2] } : HOME;
   if (m[1] === 'c') return m[2] && CATEGORIES.some((c) => c.id === m[2]) ? { v: 'list', cat: m[2] } : { v: 'tab', tab: 'help' };
-  if (m[1] === 'n') return !m[2] ? { v: 'hoods' } : m[2].startsWith('lens-') ? { v: 'hoods', lens: m[2].slice(5) } : { v: 'hood', id: m[2] };
+  // `#/n` is the Neighborhoods tab; `#/n/lens-jlg` a lens over it; `#/n/nbh_…` one neighborhood. A lens with no
+  // name is not half a screen: it opens the tab.
+  if (m[1] === 'n') return !m[2] ? { v: 'tab', tab: 'hoods' } : m[2].startsWith('lens-') ? (m[2].length > 5 ? { v: 'hoods', lens: m[2].slice(5) } : { v: 'tab', tab: 'hoods' }) : { v: 'hood', id: m[2] };
   if (m[1] === 'greenway') return m[2] ? { v: 'segment', id: m[2] } : { v: 'greenway' };
   if (m[1] === 'about' || m[1] === 'privacy' || m[1] === 'parks' || m[1] === 'add') return m[2] ? HOME : { v: m[1] };
   return !m[2] && TABS.some((x) => x.id === m[1]) ? { v: 'tab', tab: m[1] as TabId } : HOME;

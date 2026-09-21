@@ -213,7 +213,7 @@ describe('add a place, saved places, help paying for food', () => {
 });
 
 describe('neighborhood pages (docs/13 honesty rules)', () => {
-  const ui = { t: (k: string, p: Record<string, string | number> = {}) => (strings[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), own: (x: unknown) => '<span lang="en">' + String(x) + '</span>', date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '<div class="mapbox"></div>' };
+  const ui = { t: (k: string, p: Record<string, string | number> = {}) => (strings[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), own: (x: unknown) => '<span lang="en">' + String(x) + '</span>', date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '<div class="mapbox"></div>', icon: (n: string) => '<svg data-ic="' + n + '"></svg>' };
   const hood = (name: string, district: number | null, total: number): Hood => ({ id: 'nbh_' + name.toLowerCase(), name, district, center: [42.4, -83.1], rings: [], years: { 2024: { sales: 'lt5', permits: 12, permit_cost: 500000 }, 2025: { sales: 40, median_price: 90000 } },
     help: { total, by: { food: 0, harm: total }, nearest_miles: { food: 2.3, clinic: null, narcan: 0.5, indoors: 0.8 }, none_listed_yet: ['food', 'health'], coverage_checked: false }, places: { parks: 3, rec_centers: 1, greenway_open: 0 } });
   const src = { name: 'City data', url: 'https://example.org/x', last_edited: '2026-09-17' };
@@ -616,8 +616,8 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
   const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
   const layersSrc = readFileSync(join(__dirname, '../src/layers.ts'), 'utf8');
 
-  it('four tabs: Home, Help, Map, Events', () => {
-    expect(TABS.map((t) => t.id)).toEqual(['home', 'help', 'map', 'events']);
+  it('Home, Help, Map, Neighborhoods, Events — in that order (Neighborhoods, 2026-09-22)', () => {
+    expect(TABS.map((t) => t.id)).toEqual(['home', 'help', 'map', 'hoods', 'events']);
     for (const tab of TABS) { expect(strings[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); expect(es[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); }
     expect(main).toContain("tab === 'map' ? mapTab()");
     // The greenway, parks and segment screens now sit under Map, so the tab bar highlights Map on them.
@@ -942,12 +942,12 @@ describe('privacy and copy rules, checked against the source', () => {
   it('what a person types (search text, ZIP) stays in a variable: never in storage, a request, or the URL', () => {
     // idbSet is the only way this app writes to the phone, and main.ts never calls it.
     expect(main).not.toMatch(/idbSet|indexedDB/);
-    for (const name of ['searchText', 'hereZip']) {
+    for (const name of ['searchText', 'hereZip', 'hoodQuery']) {
       const lines = main.split('\n').filter((l) => l.includes(name));
       expect(lines.length, name).toBeGreaterThan(0);
       for (const l of lines) expect(l, name).not.toMatch(/fetch\(|pushState|location\.|href=/);
     }
-    expect(main).toMatch(/if \(view\.v === 'tab'\) searchText = '';/);
+    expect(main).toMatch(/if \(view\.v === 'tab'\) \{ searchText = ''; hoodQuery = ''; \}/);
     expect(main).toMatch(/<input id="q"[^>]*autocomplete="off"/);
     // The ZIP field names its purpose so a browser can fill it in (WCAG 1.3.5); we still never store or send it.
     expect(main).toMatch(/<input name="zip"[^>]*autocomplete="postal-code"/);

@@ -288,6 +288,11 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
 .layers legend:lang(en),.layers legend:lang(es) { text-transform:uppercase; letter-spacing:.06em; }
 .layers .kinds { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:0; }
 .layers .pick span { display:inline-flex; flex-wrap:wrap; align-items:baseline; gap:.375rem; }
+/* The Neighborhoods tab: A to Z or by council district. Two real radio buttons, which the keyboard and a screen
+   reader already work; the list under them is redrawn in place, so nothing above it moves as a person types. */
+.hoodorder { border:0; margin:.25rem 0 1rem; padding:0; } .hoodorder legend { font-weight:700; font-size:.9375rem; color:var(--muted); margin-bottom:.5rem; padding:0; }
+.hoodorder .kinds { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:0; }
+#hoodlist h3.sub { margin-top:1.25rem; }
 /* The map style: two radio buttons, one under the other, each with a line that says what it does. */
 .layers .mapstyle .kinds { flex-direction:column; align-items:stretch; } .layers .mapstyle .pick { border-radius:var(--r-sm); } .layers .mapstyle small { font-weight:500; color:var(--muted); }
 /* The subway style's key: what each line means, in words, with a small drawn sample (colour is never the only
