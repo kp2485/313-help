@@ -204,7 +204,7 @@ address **or** a point, and `virtual` only when it has neither.
   - `places/greenway.json`, `places/parks.json`, `places/zips.json`, and since 2026-09-20 `places/transit.json` (the index of the transport layers, with each one's owner and licence text).
   - `map/base.json`, `map/streets.json` (docs/06), and since 2026-09-20 `map/transit/*.json` — the 11 transport
     layers, one file each, listed in `places/transit.json` and downloaded only when a person switches that layer on.
-  - `indicators/neighborhoods.json` (docs/13).
+  - `indicators/neighborhoods.json` (docs/13). Each neighborhood's `help` block carries `nearest_miles` (miles from the middle to the nearest listed food, clinic, Narcan and indoor place) and, since 2026-09-22, `nearest_id` — the `sal_` id of the listing each of those distances was measured to, `null` wherever the distance is `null`, so the row can open that listing. Never a sensitive or private listing, and never a row without coordinates; `nearest_miles` is unchanged, so an older client prints the same distances.
 - The app checks each file against the signed index before using it, swaps to a new bundle in one step, and refuses a bundle older than the one it already holds.
 
 ## Freshness rules (summary — full logic in 04)
