@@ -3,6 +3,7 @@
 // held in memory, and never sent. Screens about domestic violence or a mental-health crisis show numbers first.
 import CoreLocation
 import DetroitQuery
+import HelpCore
 import SwiftUI
 import UIKit
 
@@ -12,18 +13,59 @@ struct Help313App: App {
     @StateObject private var here = Here()
     @StateObject private var saved = Saved.shared
     @StateObject private var reporter = Reporter.shared
+    @StateObject private var nav = AppNav()
     @Environment(\.scenePhase) private var phase
     var body: some Scene {
         WindowGroup {
-            RootView().environmentObject(store).environmentObject(here).environmentObject(saved).environmentObject(reporter)
+            RootView().environmentObject(store).environmentObject(here).environmentObject(saved)
+                .environmentObject(reporter).environmentObject(nav)
                 // The direction follows the words, not the phone's region: Arabic mirrors every screen, and
                 // every layout is already written in leading/trailing terms (docs/ACCESSIBILITY-AUDIT-2026-09-20).
                 .environment(\.layoutDirection, L.rightToLeft ? .rightToLeft : .leftToRight)
                 .environment(\.locale, L.locale)
-                .task { await store.start(); await reporter.flush() }
+                // The app-switcher takes a picture of this window the moment it stops being active, and iOS keeps
+                // that picture. A DV, crisis, treatment or assault screen must never be in it (docs/08, audit A8),
+                // so the whole UI is covered while the app is not in front.
+                .overlay { if phase != .active { PrivacyShield() } }
+                .task {
+                    // The flag that keeps the install key out of every backup is re-applied at each launch: a
+                    // directory that was recreated comes back without it (HelpCore/DeviceState).
+                    try? DeviceState.prepare()
+                    Net.start(version: Config.version)
+                    await store.start()
+                    await reporter.flush()
+                }
                 // Back to the front: look for a newer list, and try anything the outbox is still holding.
                 .onChange(of: phase) { _, p in if p == .active { Task { await store.refresh(); await reporter.flush() } } }
         }
+    }
+}
+
+/// Which tab is showing, and one way to send every screen back to its first page. "Leave this page fast" uses it:
+/// the stacks are thrown away, Home comes up, and a neutral page opens in the browser, so the app behind the
+/// browser shows nothing about why it was open (the same thing `location.replace` does on the web).
+@MainActor final class AppNav: ObservableObject {
+    enum Tab: Hashable { case home, help, greenway, events }
+    @Published var tab: Tab = .home
+    /// Changing this rebuilds the navigation stacks, which pops every screen off them.
+    @Published var rootID = UUID()
+
+    func quickExit(_ open: (URL) -> Void) {
+        tab = .home
+        rootID = UUID()
+        if let url = quickExitURL { open(url) }
+    }
+}
+
+/// What the app-switcher gets to photograph: the app's name on its own colour, and nothing else.
+struct PrivacyShield: View {
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: [Color.brand, Color.brandDeep], startPoint: .topLeading, endPoint: .bottomTrailing)
+            Text(L.t("app.name")).font(.largeTitle.bold()).foregroundStyle(.white)
+        }
+        .ignoresSafeArea()
+        .accessibilityHidden(true)
     }
 }
 
@@ -67,33 +109,48 @@ struct Help313App: App {
 
 struct RootView: View {
     @EnvironmentObject var store: BundleStore
+    @EnvironmentObject var nav: AppNav
     var body: some View {
-        TabView {
-            NavigationStack { HomeView() }.tabItem { Label(L.t("tab.home"), systemImage: "house") }
-            NavigationStack { HelpView() }.tabItem { Label(L.t("tab.help"), systemImage: "heart") }
-            // The web app folded Recreation and Transit into one Map tab (2026-09-20); the iPhone has no map yet,
-            // so the greenway keeps its own tab, named after itself rather than with the retired `tab.rec` key.
-            NavigationStack { GreenwayView() }.tabItem { Label(L.t("gw.title"), systemImage: "tree") }
+        TabView(selection: $nav.tab) {
+            NavigationStack { HomeView() }.tabItem { Label(L.t("tab.home"), systemImage: "house") }.tag(AppNav.Tab.home)
+            NavigationStack { HelpView() }.tabItem { Label(L.t("tab.help"), systemImage: "heart") }.tag(AppNav.Tab.help)
+            // The web app folded Recreation and Transit into one Map tab (2026-09-20). This tab holds what that
+            // tab holds on the iPhone — the greenway — and takes its word, `tab.map`: the greenway's own name
+            // ("مسار Joe Louis Greenway") does not fit a tab bar item in Arabic and was cut off at the edge of the
+            // screen (iPhone review, 2026-09-20). The screen itself is still titled with `gw.title`.
+            NavigationStack { GreenwayView() }.tabItem { Label(L.t("tab.map"), systemImage: "tree") }.tag(AppNav.Tab.greenway)
             // Only when the list carries events (none today: DECISIONS 2026-09-19).
             if !(store.bundle?.events.isEmpty ?? true) {
-                NavigationStack { EventsView() }.tabItem { Label(L.t("tab.events"), systemImage: "calendar") }
+                NavigationStack { EventsView() }.tabItem { Label(L.t("tab.events"), systemImage: "calendar") }.tag(AppNav.Tab.events)
             }
         }
+        .id(nav.rootID)
         .tint(Color.brand)
     }
 }
 
-/// "Urgent help" in the top bar of every screen: emergency numbers are one tap away from anywhere.
+/// "Urgent help" in the top bar of every screen: emergency numbers are one tap away from anywhere. On a screen
+/// that carries a quick exit (DV, crisis, treatment, assault) the exit takes that place instead, exactly as in the
+/// web app's top bar — those screens already lead with the hotline and 911 as call buttons, so nothing is lost.
 struct UrgentButton: ViewModifier {
+    var quickExit = false
     @State private var open = false
+    @EnvironmentObject private var nav: AppNav
+    @Environment(\.openURL) private var openURL
     func body(content: Content) -> some View {
         content.toolbar { ToolbarItem(placement: .topBarTrailing) {
-            Button { open = true } label: { Label(L.t("strip.more"), systemImage: "phone") }.labelStyle(.titleAndIcon)
+            if quickExit {
+                Button { nav.quickExit { openURL($0) } } label: { Label(L.t("safe.exit"), systemImage: "xmark.circle") }
+                    .labelStyle(.titleAndIcon)
+                    .accessibilityLabel(L.t("safe.exit"))
+            } else {
+                Button { open = true } label: { Label(L.t("strip.more"), systemImage: "phone") }.labelStyle(.titleAndIcon)
+            }
         } }
         .sheet(isPresented: $open) { NavigationStack { UrgentView() } }
     }
 }
-extension View { func urgentHelp() -> some View { modifier(UrgentButton()) } }
+extension View { func urgentHelp(quickExit: Bool = false) -> some View { modifier(UrgentButton(quickExit: quickExit)) } }
 
 struct CallRow: View {
     let label: String, number: String
@@ -295,16 +352,18 @@ struct NeedView: View {
                 if !need.first.isEmpty { EmergencyRows(ids: need.first) }
                 ForEach(need.refine) { r in
                     NavRow(title: L.t("refine.\(need.id).\(r.id)"), symbol: need.symbol) {
-                        ResultsView(query: r.query, sensitive: need.sensitive, first: r.first, emptyKey: need.emptyKey)
+                        ResultsView(query: r.query, sensitive: need.sensitive, first: r.first, emptyKey: need.emptyKey,
+                                    quickExit: need.quickExit)
                             .navigationTitle(L.t("refine.\(need.id).\(r.id)"))
                     }
                 }
             }.padding(16) }
             .background(Color.appBg.ignoresSafeArea())
-            .navigationTitle(L.t("need." + need.id)).navigationBarTitleDisplayMode(.inline).urgentHelp()
+            .navigationTitle(L.t("need." + need.id)).navigationBarTitleDisplayMode(.inline)
+            .urgentHelp(quickExit: need.quickExit)
         } else {
             ResultsView(query: need.query ?? Query(), sensitive: need.sensitive, first: need.first, intro: need.intro,
-                        firstLink: need.firstLink, emptyKey: need.emptyKey)
+                        firstLink: need.firstLink, emptyKey: need.emptyKey, quickExit: need.quickExit)
                 .navigationTitle(L.t("need." + need.id))
         }
     }
@@ -320,6 +379,8 @@ struct ResultsView: View {
     var firstLink: (key: String, url: String)? = nil
     /// What to say when nothing is listed, when the plain "we don't have anything yet" is not the right answer.
     var emptyKey: String? = nil
+    /// "Leave this page fast" in the top bar instead of "Urgent help" (docs/08): the need's own setting.
+    var quickExit = false
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt)
         var q = query; if !sensitive { q.near = here.point }
@@ -335,7 +396,7 @@ struct ResultsView: View {
                 CardLink(r: r, showMiles: !sensitive) { DetailView(row: r.row) }
             }
         }.padding(16) }
-        .background(Color.appBg.ignoresSafeArea()).urgentHelp()
+        .background(Color.appBg.ignoresSafeArea()).urgentHelp(quickExit: quickExit)
     }
 }
 
@@ -442,24 +503,36 @@ struct DetailView: View {
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt), alerts = store.bundle?.alerts ?? []
         let sensitive = isSensitive(row.category)
+        // A private listing (DV, crisis, treatment, assault) keeps its name off the navigation bar, which is what
+        // the parent screen's Back button and any screenshot of it would carry. The name is in the page instead,
+        // where it belongs to this screen only (docs/08, audit A8; iPhone review 2026-09-20).
+        let priv = isPrivate(row.category)
         let open = openNow(row, now: now, alerts: alerts)
         let next = nextOccurrences(row, now: now, n: 3, alerts: alerts)
         return ScrollView { VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 8) {
+                if priv {
+                    Text(row.name).font(.title3.bold()).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+                }
                 Text(row.org).font(.subheadline).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
                 Pill(text: openText(open), tone: Pill.tone(for: open.state))
                 Text(badgeText(DetroitQuery.badge(row, now: now))).font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                if let note = holidayNote(open) {
+                    Text(note).font(.subheadline).foregroundStyle(Color.warnInk).padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading).background(Color.warnBg, in: RoundedRectangle(cornerRadius: 12))
+                }
                 if let n = row.notice {
                     Text(n).font(.subheadline).foregroundStyle(Color.warnInk).padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading).background(Color.warnBg, in: RoundedRectangle(cornerRadius: 12))
                 }
             }.card()
-            ForEach(row.phones, id: \.number) { p in CallRow(label: L.t("detail.call") + (p.label.map { " · " + $0 } ?? ""), number: p.number) }
+            ForEach(row.phones, id: \.number) { p in CallRow(label: L.t("detail.call") + (p.label.map { L.t("list.sep") + $0 } ?? ""), number: p.number) }
             // Directions to the street address when the place publishes one, and otherwise to its point on the
             // map (the Wayne County naloxone stations have coordinates and no address). The coordinate is passed
             // to the maps app as a coordinate; it is never printed as if it were an address.
-            if let dest = mapsDestination(row), let q = dest.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-               let url = URL(string: "https://maps.apple.com/?daddr=\(q)") {
+            // The destination is escaped strictly (HelpCore/Listing), so an address that reads "…&from=42.3,-83.0"
+            // cannot put a second parameter — an origin — into the link.
+            if let url = mapsURL(row) {
                 Link(destination: url) {
                     HStack(spacing: 10) { Image(systemName: "mappin.and.ellipse"); Text(L.t("detail.directions")).fontWeight(.semibold); Spacer() }
                         .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
@@ -500,7 +573,13 @@ struct DetailView: View {
                 DetailSection(title: L.t("detail.next")) {
                     VStack(alignment: .leading, spacing: 6) {
                         ForEach(next, id: \.start) { o in
-                            HStack { Text(o.date); Spacer(); Text("\(clock(o.opensAt)) – \(clock(o.closesAt))").foregroundStyle(Color.muted) }
+                            // A holiday occurrence is labelled, never dropped (query-spec "Holidays").
+                            HStack {
+                                Text(o.date)
+                                Spacer()
+                                Text("\(clock(o.opensAt)) – \(clock(o.closesAt))" + (o.holiday ? " · " + L.t("hours.holiday") : ""))
+                                    .foregroundStyle(o.holiday ? Color.warnInk : Color.muted)
+                            }
                         }
                     }
                 }
@@ -520,7 +599,8 @@ struct DetailView: View {
             ReportBox(targetId: row.id, category: row.category)
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea())
-        .navigationTitle(row.name).navigationBarTitleDisplayMode(.inline).urgentHelp()
+        .navigationTitle(priv ? L.t("app.name") : row.name).navigationBarTitleDisplayMode(.inline)
+        .urgentHelp(quickExit: priv)
     }
 }
 
@@ -581,7 +661,7 @@ struct SegmentView: View {
         ScrollView { VStack(alignment: .leading, spacing: 10) {
             Pill(text: L.t("gw." + segment.phase), tone: segment.phase == "open" ? .open : .plain)
             if let cross = segment.crossStreets, !cross.isEmpty {
-                DetailSection(title: L.t("gw.crosses")) { Text(cross.joined(separator: " · ")).fixedSize(horizontal: false, vertical: true) }
+                DetailSection(title: L.t("gw.crosses")) { Text(cross.joined(separator: L.t("list.sep"))).fixedSize(horizontal: false, vertical: true) }
             }
             SectionHead(text: L.t("gw.help_along"))
             if near.isEmpty { Text(L.t("gw.help_none")).foregroundStyle(Color.muted).card() }
@@ -607,7 +687,7 @@ struct EventsView: View {
             ForEach(events) { e in
                 VStack(alignment: .leading, spacing: 6) {
                     Text(e.title).font(.headline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
-                    Text([String(e.startsAt.prefix(10)), e.location].compactMap { $0 }.joined(separator: " · ")).font(.subheadline).foregroundStyle(Color.muted)
+                    Text([String(e.startsAt.prefix(10)), e.location].compactMap { $0 }.joined(separator: L.t("list.sep"))).font(.subheadline).foregroundStyle(Color.muted)
                     if let url = URL(string: e.url) { Link(L.t("events.details"), destination: url).font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand) }
                 }.card()
             }

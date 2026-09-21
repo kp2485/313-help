@@ -70,6 +70,8 @@ struct Pill: View {
         switch state {
         case .open, .closes_soon: return .open
         case .closed: return .closed
+        // A holiday is never the open colour. The words say "Call first" and the colour agrees with them.
+        case .holiday: return .closed
         case .call_first, .unknown, .not_listed: return .plain
         }
     }

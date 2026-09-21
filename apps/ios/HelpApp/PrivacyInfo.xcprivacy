@@ -3,17 +3,30 @@
 <plist version="1.0">
 <dict>
 	<!--
-	  313 Help collects nothing and tracks nobody (docs/08). This file says so in Apple's own terms.
+	  313 Help tracks nobody and collects nothing about a person (docs/08). This file says so in Apple's own terms.
 
 	  NSPrivacyTracking: false. There is no advertising identifier, no third-party SDK of any kind, and nothing
 	  the app sends could be joined to a person or a device: a report carries a listing id, a kind, an optional
 	  note, a minute-precision time, and sha256(random on-device key ‖ target ‖ day), which differs for every
 	  target and every day.
 
-	  NSPrivacyCollectedDataTypes: empty. Reports and proposals are text a person chooses to send about a place,
-	  not data collected about the person. If the store questionnaire asks, that is "User Content", not linked to
-	  identity and not used for tracking. Location is used on the device to sort a list by distance and is never
-	  written down or sent, so it is not collected either.
+	  NSPrivacyCollectedDataTypes: one entry, "Other user content" (NSPrivacyCollectedDataTypeOtherUserContent).
+	  This declares the optional note a person may type on a report ("Add a note if you want. Don't put your name
+	  or number."). Apple's definition of "collect" is transmitting data off the device in a way that persists
+	  longer than the request, and that note is stored in D1 for 180 days, so it is collected even though it is
+	  about a place rather than about the person. It is:
+	    - not linked to identity (NSPrivacyCollectedDataTypeLinked: false) — the app has no account, no name, no
+	      email, no phone number and no device identifier, and the Worker never reads an IP or user-agent header;
+	    - not used for tracking (NSPrivacyCollectedDataTypeTracking: false) — nothing is joined to anything else,
+	      here or anywhere;
+	    - for App Functionality only: a steward reads it and fixes a listing.
+	  docs/08 ("App Store / Play review notes") says to declare User Content for exactly this, and this file used
+	  to declare nothing at all (iPhone review, 2026-09-20). Nothing else is declared: a location is used on the
+	  device to sort a list by distance and is never written down or sent, so it is not collected; saved places
+	  never leave the phone; there is no analytics code.
+
+	  Photos on condition reports are not built on iPhone. When they are, add
+	  NSPrivacyCollectedDataTypePhotosorVideos here in the same commit (docs/11 — demo only until legal advice).
 
 	  NSPrivacyAccessedAPITypes: empty. The app uses no required-reason API. It keeps its own state in files it
 	  creates (not UserDefaults), never reads file timestamps, never asks for free disk space, never reads system
@@ -25,7 +38,20 @@
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
 	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeOtherUserContent</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array/>
 </dict>

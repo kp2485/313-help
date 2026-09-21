@@ -1,17 +1,19 @@
-// Where this build talks to, and which signing keys it will accept. Both come from Info.plist, and both are set per
-// build configuration (see apps/ios/README.md): Debug points at `pnpm dev`; Release carries a marked placeholder so a
-// release that nobody has configured cannot ship. `Scripts/preflight.sh` runs the same rules at build time and fails
-// the Release build; `releaseProblems` below is the same check in Swift, used by the app tests.
+// Where this build talks to, which signing keys it will accept, and how old a list it will accept. All of it comes
+// from the app bundle, and all of it is set per build configuration (see apps/ios/README.md): Debug points at
+// `pnpm dev`; Release carries a marked placeholder so a release that nobody has configured cannot ship.
+// `Scripts/preflight.sh` runs the same rules at build time and fails the Release build; `releaseProblems` in
+// HelpCore is the same check in Swift, and `swift test` runs it.
 //
 // Nothing here is a secret. A pinned key is a *public* key; a private key never goes near this repo.
 import Foundation
+import HelpCore
 
 enum Config {
-    /// Marked placeholders. A release that still holds one of these is not configured (Kyle sets the real values).
-    static let placeholderHost = "set-this-domain.invalid"
-    static let placeholderKey = "SET-RELEASE-KEY"
-    /// The throwaway key the pipeline writes to `.keys/dev-ed25519.pem`. A release must never pin it.
-    static let devKey = "MCowBQYDK2VwAyEA8lho2BDn7lpQzqJrs9UHHB/3ScO2T8JUwXpSt/hFdZ8="
+    /// Marked placeholders, and the throwaway development key. The rules themselves live in HelpCore
+    /// (ReleaseRules), where the tests can reach them without an app bundle.
+    static let placeholderHost = ReleaseRules.placeholderHost
+    static let placeholderKey = ReleaseRules.placeholderKey
+    static let devKey = ReleaseRules.devKey
 
     private static func string(_ key: String) -> String {
         ((Bundle.main.object(forInfoDictionaryKey: key) as? String) ?? "").trimmingCharacters(in: .whitespaces)
@@ -27,6 +29,20 @@ enum Config {
     static let pinnedKeys: [String] = ((Bundle.main.object(forInfoDictionaryKey: "DCPinnedKeys") as? [String]) ?? [])
         .map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
 
+    /// What this build calls itself to a server: "313Help-iOS/0.1" and nothing about the phone (HelpCore/Net).
+    static let version = string("CFBundleShortVersionString").isEmpty ? "0" : string("CFBundleShortVersionString")
+
+    /// The oldest list this build will accept, written in at build time by `Scripts/verify-snapshot.swift`: the
+    /// `generated_at` of the snapshot shipped inside the app. Without it a brand-new install held nothing, so any
+    /// correctly signed old list counted as newer than nothing and a phone could be started months in the past
+    /// (iPhone review, 2026-09-20). It is read even when the snapshot itself fails to load, which is the point.
+    static let snapshotFloor: String? = {
+        guard let url = Bundle.main.url(forResource: "bundle-floor", withExtension: "txt"),
+              let s = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        let floor = s.trimmingCharacters(in: .whitespacesAndNewlines)
+        return floor.isEmpty ? nil : floor
+    }()
+
     /// A URL only when this build is actually pointed somewhere: an unconfigured release reaches nothing at all.
     static func url(_ base: String, _ path: String = "") -> URL? {
         guard !base.isEmpty, !base.contains(placeholderHost), let u = URL(string: base) else { return nil }
@@ -34,39 +50,4 @@ enum Config {
     }
     static var bundleBaseURL: URL? { url(bundleBase) }
     static var reportsURL: URL? { url(apiBase, "v1/reports") }
-}
-
-// SPKI DER for Ed25519 is a fixed 12-byte header and then the 32-byte key: 44 bytes, 88 hex characters.
-// This is the Swift copy of `releaseKeyProblems` in apps/web/src/keys.ts, and it is checked by the same rules.
-private let spkiEd25519 = "302a300506032b6570032100"
-
-private func spkiHex(_ base64: String) -> String? {
-    guard let d = Data(base64Encoded: base64) else { return nil }
-    return d.map { String(format: "%02x", $0) }.joined()
-}
-
-/// Problems with a release's pinned keys; empty when there are exactly two different Ed25519 keys (active + spare),
-/// neither of them the development key.
-func releaseKeyProblems(_ keys: [String]) -> [String] {
-    var out: [String] = []
-    if keys.count != 2 { out.append("a release pins exactly two keys (active and spare); got \(keys.count)") }
-    for (i, k) in keys.enumerated() {
-        if k.isEmpty || k.contains(Config.placeholderKey) { out.append("key \(i + 1) is still the placeholder; set the real release key") }
-        else if let h = spkiHex(k), h.count == 88, h.hasPrefix(spkiEd25519) {
-            if k == Config.devKey { out.append("key \(i + 1) is the development key; a release must never pin it") }
-        } else { out.append("key \(i + 1) is not a base64 SPKI Ed25519 public key") }
-    }
-    if keys.count == 2 && keys[0] == keys[1] { out.append("the active and spare keys are the same key") }
-    return out
-}
-
-/// Everything wrong with a release build's configuration. Empty means it is ready to ship.
-func releaseProblems(bundleBase: String, apiBase: String, keys: [String]) -> [String] {
-    var out: [String] = []
-    for (name, value) in [("DCBundleBase", bundleBase), ("DCApiBase", apiBase)] {
-        if value.isEmpty { out.append("\(name) is empty") }
-        else if value.contains(Config.placeholderHost) { out.append("\(name) is still the placeholder; set the real origin") }
-        else if !value.hasPrefix("https://") { out.append("\(name) must be https in a release") }
-    }
-    return out + releaseKeyProblems(keys)
 }

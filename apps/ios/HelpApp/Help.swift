@@ -2,6 +2,7 @@
 // app by the build phase in README.md); the needs list mirrors apps/web/src/needs.ts.
 import DetroitQuery
 import Foundation
+import HelpCore
 
 enum L {
     /// Every language with a strings file. English is the fallback and ships first.
@@ -42,6 +43,15 @@ enum L {
         for (k, v) in p { s = s.replacingOccurrences(of: "{\(k)}", with: v) }
         return s
     }
+
+    /// Words for a key that `strings/*.json` does not carry **yet**, with the English sentence written here so the
+    /// screen shows a sentence rather than a raw key. It is deliberately not spelled the way a normal lookup is,
+    /// because AppParityTests reads that spelling as a promise that `strings/en.json` already has the key.
+    ///
+    /// Nothing uses it today: the two error paths that did (`report.failed` and `privacy.reset_failed`, both added
+    /// by the iPhone review of 2026-09-20) now have their words in all four string files, so they are ordinary
+    /// lookups and the parity test covers them. It stays here for the next key that arrives before its words do.
+    static func pending(_ key: String, english: String) -> String { tables[current]?[key] ?? en[key] ?? english }
 }
 
 /// 911 and 988 are hardcoded. No bundle, feed, or server can change them (audit A5).
@@ -64,6 +74,9 @@ struct Need: Identifiable {
     var query: Query? = nil
     var stepsOnly = false               // overdose: 911 and steps, never a list (audit A7)
     var sensitive = false               // no distance, no map, not saved
+    /// A visible "Leave this page fast" in the top bar (docs/08 "Quick-exit"), on the same needs the web app
+    /// marks `quickExit` in apps/web/src/needs.ts. AppParityTests holds the two lists together.
+    var quickExit = false
     /// Last, so that every setting of a need is written above its choices, as in apps/web/src/needs.ts.
     /// AppParityTests reads the two files side by side and relies on that order.
     var refine: [Refine] = []
@@ -74,17 +87,17 @@ let needs: [Need] = [
     Need(id: "shelter", symbol: "bed.double", now: true, first: ["emg_shelter_helpline", "emg_shelter_outwayne"],
          firstLink: ("beds.safebeds", "https://313safebeds.com/"), refine: [
         .init(id: "me", query: Query(category: "shelter.emergency")), .init(id: "kids", query: Query(category: "shelter.emergency")), .init(id: "young", query: Query(category: "shelter.emergency", prefer: ["youth"]))]),   // youth shelters first
-    Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], intro: "safe.dv_intro", query: Query(category: "shelter.dv"), sensitive: true),
-    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], intro: "talk.intro", query: Query(category: "health.mental"), sensitive: true),
+    Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], intro: "safe.dv_intro", query: Query(category: "shelter.dv"), sensitive: true, quickExit: true),
+    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], intro: "talk.intro", query: Query(category: "health.mental"), sensitive: true, quickExit: true),
     // Treatment and sexual assault (DECISIONS 2026-09-19): numbers first. The iPhone app saves nothing and keeps no
     // history, so "private" needs no extra rule here; addresses and distance stay.
     Need(id: "drugs", symbol: "leaf", now: true, first: ["emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"],
-         intro: "drugs.intro", refine: [
+         intro: "drugs.intro", quickExit: true, refine: [
         .init(id: "today", query: Query(category: "treatment", prefer: ["walk_in"])), .init(id: "detox", query: Query(category: "treatment.detox")),
         .init(id: "meds", query: Query(category: "treatment.meds")), .init(id: "stay", query: Query(category: "treatment.residential")),
         .init(id: "home", query: Query(category: "treatment.outpatient")), .init(id: "recovery", query: Query(category: "treatment.recovery")),
         .init(id: "supplies", query: Query(category: "harm.supplies"))]),
-    Need(id: "assault", symbol: "shield", now: true, first: ["emg_avalon", "emg_voices4", "emg_911"], intro: "assault.intro", query: Query(category: "assault")),
+    Need(id: "assault", symbol: "shield", now: true, first: ["emg_avalon", "emg_voices4", "emg_911"], intro: "assault.intro", query: Query(category: "assault"), quickExit: true),
     Need(id: "food", symbol: "fork.knife", now: false, refine: [.init(id: "today", query: Query(category: "food.meal", mode: "now")), .init(id: "week", query: Query(category: "food", mode: "week"))]),
     // Emergency room first, and that screen leads with 911 (mirrors apps/web/src/needs.ts).
     Need(id: "doctor", symbol: "cross.case", now: false, refine: [
@@ -132,10 +145,13 @@ func badgeText(_ b: Badge) -> String {
     return L.t(b.key, p)
 }
 
+/// "1:30 pm". am and pm come from `strings/*.json` (`clock.am`, `clock.pm`) — Arabic writes ص and م, and a
+/// hard-coded "am" left an English word in the middle of an Arabic sentence (iPhone review, 2026-09-20).
 func clock(_ hhmm: String) -> String {
     guard let m = parseClock(hhmm) else { return hhmm }
     let h = m / 60, mm = m % 60
-    return "\((h + 11) % 12 + 1)\(mm > 0 ? String(format: ":%02d", mm) : "") \(h < 12 || h == 24 ? "am" : "pm")"
+    let half = L.t(h < 12 || h == 24 ? "clock.am" : "clock.pm")
+    return "\((h + 11) % 12 + 1)\(mm > 0 ? String(format: ":%02d", mm) : "") \(half)"
 }
 
 func openText(_ o: OpenResult) -> String {
@@ -147,6 +163,14 @@ func openText(_ o: OpenResult) -> String {
         guard let next = o.next ?? nil else { return L.t("open.closed_no_next") }
         return L.t("open.closed_next", ["day": next.date, "time": clock(next.opensAt)])
     case .call_first: return L.t("open.call_first")
+    // A holiday: the schedule's hours are the usual ones and say nothing about today (query-spec "Holidays").
+    case .holiday: return L.t("open.holiday")
     default: return L.t("open.unknown")
     }
+}
+
+/// The detail screen's holiday line: the usual hours, and a plain "call before you go".
+func holidayNote(_ o: OpenResult) -> String? {
+    guard o.state == .holiday, let u = o.usualHours else { return nil }
+    return L.t("detail.holiday", ["hours": "\(clock(u.opensAt)) - \(clock(u.closesAt))"])
 }

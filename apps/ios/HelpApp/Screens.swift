@@ -2,6 +2,7 @@
 // About / Your privacy (docs/05, docs/08). Their words come from strings/en.json and strings/es.json, the same
 // keys the web app uses, so the two apps say the same thing.
 import DetroitQuery
+import HelpCore
 import SwiftUI
 
 /// A date in the phone's language, from a bundle timestamp.
@@ -28,13 +29,21 @@ struct ReportBox: View {
 
     var body: some View {
         if let outcome = reporter.done[targetId] {
+            // A report that could not even be written to this phone says so. Telling somebody "we will keep
+            // trying" when nothing was kept is the one answer this screen must never give (iPhone review,
+            // 2026-09-20).
+            let failed = outcome == .failed
             HStack(alignment: .top, spacing: 10) {
-                Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.brandSoftInk)
-                Text(L.t(outcome == .queued ? "report.queued" : isPlace ? "report.sent_place" : "report.sent"))
-                    .font(.subheadline).foregroundStyle(Color.brandSoftInk).fixedSize(horizontal: false, vertical: true)
+                Image(systemName: failed ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                    .foregroundStyle(failed ? Color.warnInk : Color.brandSoftInk)
+                Text(failed
+                     ? L.t("report.failed")
+                     : L.t(outcome == .queued ? "report.queued" : isPlace ? "report.sent_place" : "report.sent"))
+                    .font(.subheadline).foregroundStyle(failed ? Color.warnInk : Color.brandSoftInk)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.brandSoft, in: RoundedRectangle(cornerRadius: 14))
+            .background(failed ? Color.warnBg : Color.brandSoft, in: RoundedRectangle(cornerRadius: 14))
             .accessibilityElement(children: .combine)
         } else {
             VStack(alignment: .leading, spacing: 10) {
@@ -209,7 +218,12 @@ struct Bullet: View {
 /// What this app keeps and sends, in plain words (docs/08). Everything here is true of the code: the app tests
 /// check the parts that can be checked (the day-hash, the outbox, what a saved list may hold).
 struct PrivacyView: View {
+    @EnvironmentObject var reporter: Reporter
     @State private var didReset = false
+    /// Set when "Make a new key" could not be carried out. The screen then says nothing was changed, rather than
+    /// showing "Done. This phone has a new key." over a key that is still there (iPhone review, 2026-09-20).
+    @State private var resetFailed = false
+    @State private var didClearQueue = false
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 10) {
             Text(L.t("privacy.lede")).font(.body).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
@@ -226,6 +240,21 @@ struct PrivacyView: View {
             }.card()
             SectionHead(text: L.t("privacy.never_h"))
             Text(L.t("privacy.never")).font(.subheadline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true).card()
+            // What is still waiting to be sent, and a way to throw it away: nothing is queued out of sight, and
+            // what is on this phone is the person's to delete (the web app shows the same two things).
+            if reporter.waiting > 0 {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L.t("privacy.queued_note", ["count": String(reporter.waiting)]))
+                        .font(.subheadline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+                    Button(L.t("privacy.queued_clear")) { Task { didClearQueue = await reporter.clearQueue() } }
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand)
+                }.card()
+            } else if didClearQueue {
+                Text(L.t("privacy.queued_cleared")).font(.subheadline).foregroundStyle(Color.brandSoftInk)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(14).frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.brandSoft, in: RoundedRectangle(cornerRadius: 14))
+            }
             SectionHead(text: L.t("privacy.reset_h"))
             Text(L.t("privacy.reset")).font(.subheadline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
             if didReset {
@@ -238,8 +267,19 @@ struct PrivacyView: View {
                 .background(Color.brandSoft, in: RoundedRectangle(cornerRadius: 14))
                 .accessibilityElement(children: .combine)
             } else {
+                if resetFailed {
+                    Text(L.t("privacy.reset_failed"))
+                        .font(.subheadline).foregroundStyle(Color.warnInk).fixedSize(horizontal: false, vertical: true)
+                        .padding(14).frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.warnBg, in: RoundedRectangle(cornerRadius: 14))
+                }
                 Button {
-                    Task { _ = await InstallKey.shared.reset(); didReset = true }
+                    // A reset that fails is never reported as a success: the button stays, and the line above says
+                    // the old key is still here (iPhone review, 2026-09-20).
+                    Task {
+                        do { _ = try await InstallKey.shared.reset(); didReset = true; resetFailed = false }
+                        catch { resetFailed = true }
+                    }
                 } label: {
                     Text(L.t("privacy.reset_btn")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand)
                         .padding(.horizontal, 16).padding(.vertical, 13).frame(maxWidth: .infinity, alignment: .leading)
@@ -254,6 +294,7 @@ struct PrivacyView: View {
             ContactLine()
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea())
+        .task { await reporter.count() }
         .navigationTitle(L.t("privacy.title")).navigationBarTitleDisplayMode(.inline).urgentHelp()
     }
 }

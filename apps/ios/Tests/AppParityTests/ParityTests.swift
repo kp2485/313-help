@@ -104,7 +104,8 @@ final class ParityTests: XCTestCase {
         var built = (1...6).map { "od.s\($0)" } + (1...3).map { "about.p\($0)" } + (1...5).map { "privacy.phone_\($0)" }
         built += ["title", "body", "label"].map { "link.beds.safebeds.\($0)" }
         built += ["open", "under_construction", "funded", "planned"].map { "gw.\($0)" }
-        let reports = try text("apps/ios/HelpApp/Reports.swift")
+        // ReportKinds moved into the HelpCore library on 2026-09-20, so that `swift test` covers it.
+        let reports = try text("apps/ios/Sources/HelpCore/Reports.swift")
         for name in ["listing", "place"] {
             let kinds = quoted(bracketed(reports, after: "static let \(name) = "))
             XCTAssertFalse(kinds.isEmpty, "could not read ReportKinds.\(name) from Reports.swift")
@@ -112,6 +113,20 @@ final class ParityTests: XCTestCase {
         }
         for key in built where en[key] == nil { missing.append("built: \(key)") }
         XCTAssertEqual(missing, [], "string keys the app asks for that strings/en.json does not have")
+    }
+
+    /// "Leave this page fast" is on four needs in both apps, and HelpCore keeps the same four in one list for the
+    /// screens and the tests to share. All three have to agree (iPhone review, 2026-09-20).
+    func testTheQuickExitNeedsAgreeEverywhere() throws {
+        let flagged = try swiftNeeds().filter { $0.line.contains("quickExit=true") }.map(\.id).sorted()
+        XCTAssertEqual(flagged, ["assault", "drugs", "talk", "unsafe"], "Help.swift marks different needs quickExit")
+        let core = try text("apps/ios/Sources/HelpCore/Listing.swift")
+        let listed = quoted(bracketed(core, after: "let quickExitNeeds = ")).sorted()
+        XCTAssertEqual(listed, flagged, "HelpCore.quickExitNeeds and Help.swift disagree")
+        // And the page the exit leaves for is the one the web app leaves for.
+        let web = try text("apps/web/src/main.ts")
+        XCTAssertTrue(web.contains("location.replace('https://www.weather.gov/')"), "the web app's quick-exit target moved")
+        XCTAssertTrue(core.contains("\"https://www.weather.gov/\""), "HelpCore's quick-exit target differs from the web app's")
     }
 
     /// Keys retired on 2026-09-20, when the web app folded Recreation and Transit into one Map tab.
@@ -143,9 +158,13 @@ final class ParityTests: XCTestCase {
         }
         // A need with choices carries no query of its own; without them, its query is on the need.
         let query = refineBody == nil ? queryLine(head) : "cat=- mode=- prefer=-"
+        // `quickExit` is the "Leave this page fast" button (docs/08). Both files spell it `quickExit: true`, and
+        // it is compared here so a screen that gains or loses one in the web app cannot quietly keep or lose it on
+        // the iPhone (iPhone review, 2026-09-20).
         let line = """
             \(id) group=\(group) first=\(list(head, "first")) steps=\(head.contains("stepsOnly: true")) \
-            sensitive=\(head.contains("sensitive: true")) intro=\(value(head, "intro") ?? "-") \
+            sensitive=\(head.contains("sensitive: true")) quickExit=\(head.contains("quickExit: true")) \
+            intro=\(value(head, "intro") ?? "-") \
             empty=\(value(head, "emptyKey") ?? "-") \(query)
             """
         return Parsed(id: id, group: group, intro: value(head, "intro"), emptyKey: value(head, "emptyKey"),
