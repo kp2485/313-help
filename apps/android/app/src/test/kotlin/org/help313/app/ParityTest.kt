@@ -126,6 +126,12 @@ class ParityTest {
         for (id in CATEGORIES.map { it.first }) built += "cat.$id"
         for (kind in LISTING_KINDS) built += "report.kind.$kind"
         // Keys chosen inside an expression (`L.t(if (sent) … else …)`) or read out of a list of keys.
+        // The Neighborhoods tab's keys that are built rather than written out (HoodScreens.kt, docs/13).
+        for (kind in HOOD_NEAREST) built += "hood.nearest.$kind"
+        for (kind in listOf("food", "health", "harm")) built += "hood.kind.$kind"
+        for (key in listOf("walk", "bike", "severe")) built += "hood.crash_$key"
+        for (key in listOf("snap", "grocery", "bus")) built += "hood.near.$key"
+        built += listOf("hood.group_abc", "hood.group_district", "tab.hoods", "tab.hoods_wide")
         built += listOf(
             "tab.home", "tab.help", "search.title", "saved.title", "tabs.label",
             "help.now", "help.soon", "help.later", "results.none",
@@ -148,6 +154,87 @@ class ParityTest {
                 assertFalse("${file.name} asks for the retired key $key", body.contains("\"$key\""))
             }
         }
+    }
+
+    // ---- the Neighborhoods tab, panel by panel (docs/13) -------------------------------------------------------
+
+    /**
+     * The neighborhood page draws the web's panels, in the web's order, under the web's headings.
+     *
+     * Both files are read: apps/web/src/hoods.ts for the order a browser draws, HoodScreens.kt for the order this
+     * phone draws. The crash panel is a function of its own in the web file and sits ABOVE `hoodPage` in it, so it
+     * is expanded at its call site rather than counted where it is written — otherwise a plain scan would put
+     * "Safe streets" first, which is not what anybody sees.
+     *
+     * Two apps, one page: a panel moved, renamed or dropped on the web fails here rather than drifting quietly.
+     */
+    @Test
+    fun theNeighborhoodPageHasTheWebsPanelsInTheWebsOrder() {
+        val web = text("apps/web/src/hoods.ts")
+        val crash = web.substringAfter("export function crashPanel").substringBefore("export function hoodPage")
+        val page = web.substringAfter("export function hoodPage").replace("\${crashPanel(h, d, ui)}", crash)
+        fun keysAfter(marker: String, body: String) =
+            Regex(Regex.escape(marker) + "\\$\\{T\\('(hood\\.[a-z_.]+)'").findAll(body).map { it.groupValues[1] }.toList()
+
+        val webPanels = keysAfter("<h2>", page)
+        assertEquals("apps/web/src/hoods.ts draws panels HOOD_PANELS does not name", webPanels, HOOD_PANELS)
+
+        // And this phone draws them in that order. UI.sectionHead is what makes a panel heading here.
+        val screens = text("apps/android/app/src/main/kotlin/org/help313/app/HoodScreens.kt")
+        val androidPanels = Regex("UI\\.sectionHead\\(a, L\\.t\\(\"(hood\\.[a-z_.]+)\"\\)\\)")
+            .findAll(screens).map { it.groupValues[1] }.toList()
+        assertEquals("the Android neighborhood page draws its panels in a different order", webPanels, androidPanels)
+
+        // The three lists inside the help panel, under their own smaller headings, in the same order too.
+        val webSubs = keysAfter("<h3 class=\"sub\">", page)
+        assertEquals(listOf("hood.nearest_head", "hood.places_head", "hood.city_near_head"), webSubs)
+        for (key in webSubs) assertTrue("HoodScreens.kt never draws $key", screens.contains("L.t(\"$key\""))
+    }
+
+    /** SEMCOG asks for their notice wherever their data is reproduced. Both apps print the same sentence. */
+    @Test
+    fun theSemcogNoticeIsTheSameSentenceInBothApps() {
+        val web = text("apps/web/src/hoods.ts")
+        val quoted = Regex("SEMCOG_NOTICE = '([^']+)'").find(web)?.groupValues?.get(1)
+        assertNotNull("apps/web/src/hoods.ts no longer declares SEMCOG_NOTICE", quoted)
+        assertEquals(quoted, SEMCOG_NOTICE)
+        // It is never translated: the same English on an Arabic, Bengali or Spanish screen.
+        for (lang in LANGS) {
+            val s = strings("strings/$lang.json")
+            assertFalse("strings/$lang.json has taken a copy of SEMCOG's notice", s.values.any { it.contains("SEMCOG") })
+        }
+    }
+
+    /**
+     * Every kind the help panel counts has a word for it, in every language: the panel is built from whatever
+     * categories the bundle publishes, so a new one must not reach a screen as a raw key.
+     */
+    @Test
+    fun everyHelpCategoryOnANeighborhoodPageHasItsWords() {
+        val file = File(root, "data/bundle/v1/$HOOD_FILE")
+        assertTrue("run `pnpm build:bundle` first: no ${file.path}", file.isFile)
+        val d = decodeIndicators(file.readBytes())
+        val wanted = d.neighborhoods.flatMap { it.help.by.keys }.toSortedSet().map { hoodCategoryKey(it) } +
+            d.neighborhoods.flatMap { it.help.noneListedYet }.toSortedSet().map { "hood.kind.$it" }
+        for (lang in LANGS) {
+            val s = strings("strings/$lang.json")
+            for (key in wanted) assertNotNull("strings/$lang.json has no $key", s[key])
+        }
+    }
+
+    /**
+     * A neighborhood id is not a secret and a neighborhood page is not private: it is public City data about a
+     * public place. So these screens are not photographed out of recents, offer no "Leave this page fast", and do
+     * come back after the activity is recreated (Route.keepable).
+     */
+    @Test
+    fun aNeighborhoodScreenIsPublic() {
+        assertFalse(Route.isPrivate(Route.Hoods()))
+        assertFalse(Route.isPrivate(Route.Hood("nbh_corktown")))
+        val stack = listOf(Route.Home, Route.Hoods(), Route.Hood("nbh_corktown"))
+        assertEquals(3, Route.keepable(stack).size)
+        // And a private screen opened from one still cuts the stack where it always did.
+        assertEquals(2, Route.keepable(stack.take(2) + Route.Need("unsafe")).size)
     }
 
     // ---- which report buttons one listing gets ---------------------------------------------------------------

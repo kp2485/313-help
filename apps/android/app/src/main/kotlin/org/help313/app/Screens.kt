@@ -40,6 +40,8 @@ object Screens {
         is Route.Map -> MapScreen.tab(a)
         is Route.MapLayers -> MapScreen.layers(a)
         is Route.MapList -> MapScreen.list(a)
+        is Route.Hoods -> HoodScreens.index(a, route.lens)
+        is Route.Hood -> HoodScreens.page(a, route.hoodId)
         is Route.Stretch -> {
             // A route outlives a draw, so the stretch is looked up again: the bundle may have been refreshed since.
             val s = a.store.bundle?.segments?.firstOrNull { it.id == route.segmentId }
@@ -138,6 +140,15 @@ object Screens {
         }
 
         col.addView(UI.button(a, L.t("home.see_all"), topDp = 16) { a.go(Route.Help) })
+
+        // The neighborhood numbers, from Home as well as from their own tab (docs/13; they are not in the crisis
+        // path, so they sit below the four needs and the "See all" button, never above them).
+        if (HoodRepo.offered(a.store)) {
+            val hoods = UI.tappableCard(a, L.t("home.hoods_title")) { a.go(Route.Hoods()) }
+            hoods.addView(UI.text(a, L.t("home.hoods_title"), 18f, R.color.ink, bold = true))
+            hoods.addView(UI.text(a, L.t("home.hoods_sub"), 16f, R.color.muted, topDp = 2))
+            col.addView(hoods)
+        }
 
         val alerts = a.store.bundle?.alerts.orEmpty().filter { it.status == "published" && it.kind != "cancellation" }
         if (alerts.isNotEmpty()) {
@@ -601,6 +612,18 @@ object Screens {
         }
         val signing = a.store.bundle?.index?.signing
         col.addView(UI.text(a, L.t(if (signing == "dev") "about.sig_dev" else "about.sig_ok"), 15f, R.color.muted, topDp = 12))
+
+        // The neighborhood pages used to be reachable only from here. They have their own tab now (Kyle,
+        // 2026-09-21), and About says so rather than losing the way in for anyone who knew where it was.
+        if (HoodRepo.offered(a.store)) {
+            col.addView(UI.text(a, L.t("about.hoods"), 16f, R.color.ink, topDp = 12))
+            col.addView(
+                UI.button(a, L.t("hood.title"), description = L.t("hood.about_sub"),
+                    backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                    a.go(Route.Hoods())
+                },
+            )
+        }
 
         col.addView(UI.sectionHead(a, L.t("privacy.title")))
         col.addView(UI.text(a, L.t("privacy.lede"), 16f, R.color.ink))

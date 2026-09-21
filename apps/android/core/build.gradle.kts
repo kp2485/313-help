@@ -48,6 +48,7 @@ kotlin.sourceSets["main"].kotlin.include(
     "org/help313/app/MapList.kt",        // "See this map as a list": never told the style, so identical in both
     "org/help313/app/DayWords.kt",       // "Today" / "Tomorrow" / "Friday, Sep 25"
     "org/help313/app/Locate.kt",         // the four cities as a box, the first-open decision, the answered flag
+    "org/help313/app/Hoods.kt",          // the neighborhood numbers: the decode, where a point falls, the index order
 )
 
 // Why the four new names above (Android review, 2026-09-20). :core used to cover Ed25519, Verify, ReportModel and

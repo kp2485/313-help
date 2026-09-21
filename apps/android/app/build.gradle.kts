@@ -306,10 +306,16 @@ val generateStrings by tasks.registering {
  * choice on the layers screen, and a choice that needs a network the first time it is made is not the offline map
  * either. They are lazy all the same: nothing reads one until that style is on and that layer is on.
  *
- * What is still left out: the indicators folder — 387 KB of neighbourhood numbers, on no screen this app has.
- * No glob is written out in this comment on purpose: Kotlin nests block comments, so a slash-star inside one opens
- * a second and silently swallows the task below (found 2026-09-21, when the snapshot task vanished from the build
- * and the map had no files to read).
+ * The neighbourhood numbers travel with it too (2026-09-22), now that the Neighborhoods tab exists: one file of
+ * about 380 KB, which compresses to a fraction of that in the APK. It is lazy in exactly the same way — nothing
+ * reads it until that tab is opened (BundleCheck.loadedNow leaves it out of the start-up load) — and it is checked
+ * against the signed index before a byte of it is decoded. A tab that needed a network the first time it was
+ * opened would not be the offline app docs/05 promises, and the neighborhood a person is standing in is worked
+ * out from the outlines in this very file.
+ *
+ * Nothing is left out of the snapshot any more. No glob is written out in this comment on purpose: Kotlin nests
+ * block comments, so a slash-star inside one opens a second and silently swallows the task below (found
+ * 2026-09-21, when the snapshot task vanished from the build and the map had no files to read).
  */
 val copyBundleSnapshot by tasks.registering(Copy::class) {
     val src = File(repoRoot, "data/bundle/v1")
@@ -321,9 +327,7 @@ val copyBundleSnapshot by tasks.registering(Copy::class) {
             )
         }
     }
-    from(src) {
-        exclude("indicators/**")
-    }
+    from(src)
     into(layout.buildDirectory.dir("generated/assets/app/bundle-snapshot"))
 }
 
