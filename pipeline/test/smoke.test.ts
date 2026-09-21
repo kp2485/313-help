@@ -76,6 +76,13 @@ describe('pnpm smoke: what only a live origin can answer', () => {
     expect(probes.filter((p) => !p.ok).map((p) => p.level)).toEqual(['look']);
   });
 
+  it('waits out the rate-limit window before asking about photos, so the edge cannot answer for the Worker', async () => {
+    const { fetcher, sent } = fakeOrigin();
+    const waits: { ms: number; photoAsked: boolean }[] = [];
+    await smoke(SITE, fetcher, 0, async (ms) => { waits.push({ ms, photoAsked: sent.some((s) => s.url.endsWith('/v1/photos')) }); });
+    expect(waits).toEqual([{ ms: 11_000, photoAsked: false }]);
+  });
+
   it('sends nothing that could become a row, and says honestly who it is', async () => {
     const { fetcher, sent } = fakeOrigin();
     await smoke(SITE, fetcher, 5, nap);

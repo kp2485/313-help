@@ -21,6 +21,8 @@ export type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
 
 const STEWARD_READS = ['/v1/steward/queue', '/v1/steward/tasks', '/v1/steward/aggregates'];
 const NONCE = '0'.repeat(64);
+// A second longer than the WAF rule's counting window (api/edge-protections.md).
+const RATE_WINDOW_MS = 11_000;
 // A slug nobody will ever publish, so the API answers 422 and stores nothing.
 const NO_SUCH_TARGET = 'sal_smoke_test_no_such_listing';
 
@@ -91,7 +93,9 @@ export async function smoke(origin: string, ask: Fetcher = fetch, burst = 25, pa
   const acao = cors.headers.get('access-control-allow-origin') ?? '';
   add(acao === origin, 'stop', 'CORS names this site and nobody else', acao === '' ? 'no Access-Control-Allow-Origin' : acao);
 
-  // 5. Photos: off until the legal advice in docs/11 is in hand.
+  // 5. Photos: off until the legal advice in docs/11 is in hand. The two writes above can already fill the edge's
+  //    rate-limit window (2 per 10 seconds on the free plan), and a 429 from the edge says nothing about the Worker.
+  await pause(RATE_WINDOW_MS);
   const photo = await fetcher(`${origin}/v1/photos`, { method: 'POST', headers: head({ 'content-type': 'image/jpeg' }), body: '' });
   add(photo.status === 503, 'look', 'photo uploads are off (503)', `${photo.status}`);
 
