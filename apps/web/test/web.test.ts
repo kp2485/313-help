@@ -640,6 +640,41 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     for (const t of PRIVATE_TOPS) expect(tops, t).not.toContain(t);
     expect(PRIVATE_TOPS.sort()).toEqual(['assault', 'treatment']);
   });
+  it('nothing surprising sits in a layer: computers with the libraries, kids and teens on their own (category audit, 2026-09-22)', () => {
+    const group = (c: string) => MAP_GROUPS.find((g) => g.tops.includes(c.split('.')[0]!))?.id;
+    expect(MAP_GROUPS.map((g) => g.id)).toEqual(['food', 'shelter', 'health', 'rec', 'work', 'kids', 'things', 'paperwork']);
+    expect(group('connect')).toBe('rec'); expect(group('rec.library')).toBe('rec');
+    expect(group('youth')).toBe('kids'); expect(group('kids.care')).toBe('kids');
+    expect(MAP_GROUPS.find((g) => g.id === 'things')!.tops).toEqual(['goods', 'hygiene', 'pets']);
+    // The label names what is in the layer, and only that.
+    expect(strings['layer.help.things']).toBe('Clothes, showers, and pets');
+    expect(strings['layer.help.rec']).toMatch(/internet/i);
+    // The Main Library is a library like the other three, not a dot under clothes and showers.
+    const seed = readFileSync(join(root, 'data/seed/resources.csv'), 'utf8');
+    expect(seed).toMatch(/^sal_detroit_public_main_library,[^\n]*,rec\.library,/m);
+  });
+  it('every category a listing may carry can be reached from a screen, and is on one map layer or is private', () => {
+    // The list is pipeline/src/validate.ts KNOWN_CATEGORIES, read as text so the web app does not import the pipeline.
+    const src = readFileSync(join(root, 'pipeline/src/validate.ts'), 'utf8');
+    const block = src.slice(src.indexOf('export const KNOWN_CATEGORIES = ['), src.indexOf('] as const;'));
+    const known = [...block.matchAll(/'([a-z_.]+)'/g)].map((m) => m[1]!);
+    expect(known.length).toBe(46);
+    const hits = (q: string | undefined, c: string) => !!q && (c === q || c.startsWith(q + '.'));
+    const needQueries = NEEDS.flatMap((n) => [n.query?.category, ...(n.refine ?? []).map((r) => r.query?.category)]);
+    const chipQueries = CATEGORIES.map((c) => c.query.category);
+    const fromNeed = (c: string) => needQueries.some((q) => hits(q, c));
+    const unreachable = known.filter((c) => !fromNeed(c) && !chipQueries.some((q) => hits(q, c)));
+    // Warming and cooling centers are announced as alerts and have no rows of their own (docs/03).
+    expect(unreachable).toEqual(['shelter.warming', 'shelter.cooling']);
+    // Reached from "Browse every kind of help" only, and from no need screen. Listed for Kyle in the audit; a
+    // category added later must get a need screen or be added here on purpose.
+    expect(known.filter((c) => !fromNeed(c) && !unreachable.includes(c))).toEqual(['hygiene.shower', 'youth']);
+    for (const c of known) {
+      const top = c.split('.')[0]!;
+      const groups = MAP_GROUPS.filter((g) => g.tops.includes(top)).length;
+      expect(PRIVATE_TOPS.includes(top) ? groups === 0 : groups === 1, c).toBe(true);
+    }
+  });
   it('treatment, sexual assault, DV and crisis listings are never drawn on it', () => {
     // What the rule DOES, with a fixture holding one of each of these rows, is in apps/web/test/behaviour.test.ts
     // ("a mixed list of listings"). Here: the Map tab asks that rule rather than writing a filter of its own.
@@ -992,7 +1027,7 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
       [[`the greenway (${p}) on land`, `--gw-${p}`, '--map-land'], [`the greenway (${p}) on its casing`, `--gw-${p}`, '--gw-case']]),
     ...['bus', 'smart', 'rail', 'bike'].flatMap((l): [string, string, string][] =>
       [[`the ${l} layer on land`, `--lyr-${l}`, '--map-land'], [`the ${l} layer over a park`, `--lyr-${l}`, '--map-park'], [`the ${l} layer on its casing`, `--lyr-${l}`, '--gw-case']]),
-    ...['food', 'shelter', 'health', 'rec', 'work', 'things', 'paperwork'].flatMap((g): [string, string, string][] =>
+    ...['food', 'shelter', 'health', 'rec', 'work', 'kids', 'things', 'paperwork'].flatMap((g): [string, string, string][] =>
       [[`${g} dots on land`, `--grp-${g}`, '--map-land'], [`${g} dots over a park`, `--grp-${g}`, '--map-park'], [`${g} dots inside their own ring`, `--grp-${g}`, '--surface']]),
   ];
   for (const theme of ['light', 'dark'] as const) for (const contrast of ['plain', 'more'] as const) {

@@ -169,6 +169,15 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 **46 slugs in all; 44 of them had at least one live listing on 2026-09-20.** The two that do not are
 `shelter.warming` and `shelter.cooling`, which are alert-driven and empty on purpose.
 
+*Category audit, 2026-09-22 (DECISIONS; `docs/CATEGORY-AUDIT-2026-09-22.md`):* **a row has exactly one category, and it
+says what that row offers.** A door with two kinds of help gets **two rows** under one `org_id` at one address (HSDS:
+one organization, one location, several services), as Pope Francis Center has for its meals, showers and day center.
+Rows of one family share a category: a library building is `rec.library` (its computers are in its `what`), a
+Neighborhood Wellness Center is `health.dhd`, help signing up for benefits is `money.benefits`, a property-tax hardship
+exemption is `housing.owner`, recovery coaching is `treatment.recovery`. Since that audit `food.benefits` has no rows
+(the three that carried it were benefits sign-up offices), so 43 of the 46 slugs have a live listing. The 46 slugs are
+`KNOWN_CATEGORIES` in `pipeline/src/validate.ts`. Map layers (`MAP_GROUPS`, eight of them) are listed in docs/05.
+
 *Added 2026-09-20 (DECISIONS):* `health.er` and `health.urgent`. A row may now carry a **city and a point but no
 street address** — Wayne County's naloxone and test-strip stations publish exactly that — and a coordinate is never
 reverse-geocoded into an address we then print as a fact. In the HSDS export a location is `physical` when it has an

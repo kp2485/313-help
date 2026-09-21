@@ -19,14 +19,15 @@ public struct MapGroup: Equatable, Sendable, Identifiable {
     public init(id: String, symbol: String, tops: [String]) { self.id = id; self.symbol = symbol; self.tops = tops }
 }
 
-/// The same seven groups, in the same order, as `MAP_GROUPS` in apps/web/src/needs.ts.
+/// The same eight groups (category audit, 2026-09-22), in the same order, as `MAP_GROUPS` in apps/web/src/needs.ts.
 public let mapGroups: [MapGroup] = [
     MapGroup(id: "food", symbol: "fork.knife", tops: ["food"]),
     MapGroup(id: "shelter", symbol: "bed.double", tops: ["shelter"]),
     MapGroup(id: "health", symbol: "cross.case", tops: ["health", "harm"]),
-    MapGroup(id: "rec", symbol: "figure.run", tops: ["rec"]),
+    MapGroup(id: "rec", symbol: "figure.run", tops: ["rec", "connect"]),
     MapGroup(id: "work", symbol: "briefcase", tops: ["jobs", "learn"]),
-    MapGroup(id: "things", symbol: "tshirt", tops: ["goods", "hygiene", "kids", "youth", "pets", "connect"]),
+    MapGroup(id: "kids", symbol: "figure.2.and.child.holdinghands", tops: ["kids", "youth"]),
+    MapGroup(id: "things", symbol: "tshirt", tops: ["goods", "hygiene", "pets"]),
     MapGroup(id: "paperwork", symbol: "person.text.rectangle", tops: ["housing", "utilities", "money", "legal", "ids", "transport"]),
 ]
 

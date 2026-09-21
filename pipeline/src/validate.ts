@@ -9,7 +9,20 @@ import { inBbox, p, parsePhone, type CsvRow } from './util.js';
 export interface Issues { errors: string[]; warnings: string[] }
 
 const ID = /^sal_[a-z0-9_]+$/;
-const CATEGORY = /^(food\.(pantry|meal|mobile|benefits)|shelter\.(emergency|warming|cooling|dv|day)|harm\.(narcan|supplies)|health\.(clinic|mental|dhd|dental|vision|er|urgent)|utilities|housing\.(rent|owner)|hygiene\.shower|transport|youth|rec\.(center|library)|jobs\.(find|training)|learn\.(school|english)|treatment\.(crisis|detox|residential|outpatient|meds|recovery)|legal|ids|assault|money\.(tax|benefits)|goods\.(clothes|baby)|kids\.care|connect|pets)$/;
+/** Every category a listing may carry (docs/03, 46 slugs). One list, so the app's tests can hold the need screens,
+ *  the browse chips and the map layers to it: apps/web/test/web.test.ts reads this block and fails when a category
+ *  here can be reached from no screen or belongs to no map layer (category audit, 2026-09-22). */
+export const KNOWN_CATEGORIES = [
+  'food.pantry', 'food.meal', 'food.mobile', 'food.benefits',
+  'shelter.emergency', 'shelter.warming', 'shelter.cooling', 'shelter.dv', 'shelter.day',
+  'harm.narcan', 'harm.supplies',
+  'health.clinic', 'health.mental', 'health.dhd', 'health.dental', 'health.vision', 'health.er', 'health.urgent',
+  'utilities', 'housing.rent', 'housing.owner', 'hygiene.shower', 'transport', 'youth',
+  'rec.center', 'rec.library', 'jobs.find', 'jobs.training', 'learn.school', 'learn.english',
+  'treatment.crisis', 'treatment.detox', 'treatment.residential', 'treatment.outpatient', 'treatment.meds', 'treatment.recovery',
+  'legal', 'ids', 'assault', 'money.tax', 'money.benefits', 'goods.clothes', 'goods.baby', 'kids.care', 'connect', 'pets',
+] as const;
+const CATEGORY = { test: (c: string) => (KNOWN_CATEGORIES as readonly string[]).includes(c) };
 // Patterns that suggest a person's contact details leaked into public text.
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]+/;
 // Case-sensitive on purpose: the name part must be Capitalized Words, or "ask for help today" would match.

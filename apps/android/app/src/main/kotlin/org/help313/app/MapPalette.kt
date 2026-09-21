@@ -93,6 +93,7 @@ class MapPalette(private val context: Context) {
         "health" -> c(R.color.grp_health)
         "rec" -> c(R.color.grp_rec)
         "work" -> c(R.color.grp_work)
+        "kids" -> c(R.color.grp_kids)
         "things" -> c(R.color.grp_things)
         "paperwork" -> c(R.color.grp_paperwork)
         else -> brand

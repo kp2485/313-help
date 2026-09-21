@@ -21,14 +21,15 @@ import kotlin.math.min
  */
 class MapGroup(val id: String, val tops: List<String>)
 
-/** The same seven groups, in the same order, as `MAP_GROUPS` in apps/web/src/needs.ts. */
+/** The same eight groups (category audit, 2026-09-22), in the same order, as `MAP_GROUPS` in apps/web/src/needs.ts. */
 val mapGroups: List<MapGroup> = listOf(
     MapGroup("food", listOf("food")),
     MapGroup("shelter", listOf("shelter")),
     MapGroup("health", listOf("health", "harm")),
-    MapGroup("rec", listOf("rec")),
+    MapGroup("rec", listOf("rec", "connect")),
     MapGroup("work", listOf("jobs", "learn")),
-    MapGroup("things", listOf("goods", "hygiene", "kids", "youth", "pets", "connect")),
+    MapGroup("kids", listOf("kids", "youth")),
+    MapGroup("things", listOf("goods", "hygiene", "pets")),
     MapGroup("paperwork", listOf("housing", "utilities", "money", "legal", "ids", "transport")),
 )
 

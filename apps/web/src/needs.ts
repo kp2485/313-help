@@ -134,16 +134,22 @@ export const TABS = [
 ] as const;
 export type TabId = (typeof TABS)[number]['id'];
 
-/** One map layer per group of our own listings, derived from the category taxonomy above.
+/** One map layer per group of our own listings, derived from the category taxonomy above. Eight groups since the
+ *  category audit of 2026-09-22 (docs/CATEGORY-AUDIT-2026-09-22.md); the iPhone and Android apps carry the same list.
  *  `tops` are top-level categories (the part before the first dot). Every top-level category a listing can carry
  *  belongs to exactly one group, except the private ones, which are never drawn (see PRIVATE_TOPS below). */
 export const MAP_GROUPS: { id: string; icon: string; tops: string[] }[] = [
   { id: 'food', icon: 'food', tops: ['food'] },
   { id: 'shelter', icon: 'bed', tops: ['shelter'] },
   { id: 'health', icon: 'health', tops: ['health', 'harm'] },
-  { id: 'rec', icon: 'rec', tops: ['rec'] },
+  // Free computers and internet sit with the libraries and rec centers that offer them (category audit, 2026-09-22).
+  { id: 'rec', icon: 'rec', tops: ['rec', 'connect'] },
   { id: 'work', icon: 'work', tops: ['jobs', 'learn'] },
-  { id: 'things', icon: 'shirt', tops: ['goods', 'hygiene', 'kids', 'youth', 'pets', 'connect'] },
+  // Their own layer since 2026-09-22: child care, after-school programs and places for young people used to sit
+  // under "Clothes, showers, and things", where nobody would look for them.
+  { id: 'kids', icon: 'people', tops: ['kids', 'youth'] },
+  // Every label names what is in its layer: this one is clothes and baby things, showers and laundry, and pet help.
+  { id: 'things', icon: 'shirt', tops: ['goods', 'hygiene', 'pets'] },
   { id: 'paperwork', icon: 'card', tops: ['housing', 'utilities', 'money', 'legal', 'ids', 'transport'] },
 ];
 /** Never a layer, never a dot: treatment and help after sexual assault are private (PRIVATE), and inside the

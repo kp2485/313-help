@@ -552,6 +552,12 @@ class MapLayerRuleTest {
         assertTrue("a category in two groups would draw twice: $seen", seen.values.all { it == 1 })
         for (t in mapPrivateTops) assertEquals("$t must not be in any layer at all", null, seen[t])
         assertEquals("health", mapGroupId("harm.supplies"))
+        // Category audit, 2026-09-22: the same eight groups as the web, and nothing surprising in any of them.
+        assertEquals(listOf("food", "shelter", "health", "rec", "work", "kids", "things", "paperwork"), mapGroups.map { it.id })
+        assertEquals("rec", mapGroupId("connect"))
+        assertEquals("kids", mapGroupId("youth"))
+        assertEquals("kids", mapGroupId("kids.care"))
+        assertEquals(listOf("goods", "hygiene", "pets"), mapGroups.first { it.id == "things" }.tops)
         assertEquals("", mapGroupId("nothing.like.this"))
     }
 

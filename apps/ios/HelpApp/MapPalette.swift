@@ -65,6 +65,7 @@ enum MapColor {
     static let grpHealth = mapPair(0xBE185D, 0xF9A8D4)
     static let grpRec = mapPair(0x15803D, 0x4FCF93)
     static let grpWork = mapPair(0x0E7490, 0x67E8F9)
+    static let grpKids = mapPair(0x7E22CE, 0xD8B4FE)
     static let grpThings = mapPair(0x7C2D12, 0xFDBA74)
     static let grpPaperwork = mapPair(0x475569, 0xCBD5E1)
     /// Where this phone is, when the person asked for it.
@@ -94,6 +95,7 @@ enum MapColor {
         case "health": return grpHealth
         case "rec": return grpRec
         case "work": return grpWork
+        case "kids": return grpKids
         case "things": return grpThings
         case "paperwork": return grpPaperwork
         default: return .brand
