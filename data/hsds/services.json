@@ -16663,7 +16663,7 @@
      "reports": {
       "closed_open": 0,
       "closed_last_at": null,
-      "wrong_open": 0
+      "wrong_open": 1
      },
      "source": {
       "type": "seed_list",
