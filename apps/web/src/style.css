@@ -221,6 +221,13 @@ ol.steps li::before { content:counter(s); flex:none; display:grid; place-items:c
 /* Detail, events, greenway, reports */
 .detail .org { color:var(--muted); margin-top:1rem; } .hours { display:grid; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); overflow:hidden; }
 .hours li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.125rem 1rem; padding:.625rem 1rem; } .hours li + li { border-top:1px solid var(--line); } .hours li span:first-child { font-weight:600; }
+/* A fact list whose row opens the place it names (the neighborhood page's "nearest" rows). The button IS the
+   row, so the touch target is the whole line and the two columns stay where they are in every list. */
+.hours li.golink { padding:0; }
+.hours li.golink > button { flex:1; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:.125rem 1rem; min-height:2.75rem; padding:.625rem 1rem; background:none; border:0; border-radius:0; font:inherit; color:inherit; text-align:start; cursor:pointer; }
+.hours li.golink > button span:first-child { font-weight:600; }
+.hours li.golink > button .goto { color:var(--brand); text-decoration:underline; text-underline-offset:.15em; }
+.hours li.golink > button:hover .goto { text-decoration-thickness:2px; }
 address { font-style:normal; font-size:1.0625rem; }
 .events { display:grid; gap:.625rem; } .event { display:flex; gap:.875rem; padding:.875rem 1rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); }
 .when { flex:none; display:grid; place-content:center; justify-items:center; width:3.25rem; min-height:3.5rem; padding:.25rem; border-radius:.875rem; background:var(--brand-soft); color:var(--brand-soft-ink); line-height:1.1; } .when span { font-size:.75rem; font-weight:700; } .when strong { font-size:1.375rem; }

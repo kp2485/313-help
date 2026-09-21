@@ -222,6 +222,7 @@
   "hood.nearest.narcan": "Narcan مجانًا",
   "hood.nearest.indoors": "مكتبة أو مركز ترفيهي",
   "hood.nearest_none": "لا شيء مدرج",
+  "hood.nearest_open": "{kind}: {name}، {distance}. افتح هذه البطاقة.",
   "hood.places_head": "داخل الحي أو على بعد {miles} ميل",
   "hood.parks": "حدائق المدينة",
   "hood.rec_centers": "المراكز الترفيهية والمكتبات التي ندرجها",

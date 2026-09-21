@@ -233,6 +233,51 @@ describe('neighborhood pages (docs/13 honesty rules)', () => {
     expect(html).toContain('That describes our list, not the neighborhood');
     expect(html).not.toContain('MISSING:');
   });
+  // The gap this closes: the "nearest" rows said how far away free food was and gave no way to get to it,
+  // because the numbers carried miles per kind and not which listing (Kyle, 2026-09-22).
+  describe('the "nearest" rows open the listing the distance belongs to', () => {
+    const rows: Record<string, { id: string; name: string; category: string }> = {
+      sal_capuchin: { id: 'sal_capuchin', name: 'Capuchin Soup Kitchen', category: 'food.pantry' },
+      sal_dv: { id: 'sal_dv', name: 'A DV shelter', category: 'shelter.dv' },
+      sal_detox: { id: 'sal_detox', name: 'A detox program', category: 'treatment.detox' },
+    };
+    const withIds = (nearest_id: Record<string, string | null>, listing = (id: string) => rows[id] ?? null) =>
+      hoodPage({ ...d.neighborhoods[0]!, help: { ...d.neighborhoods[0]!.help, nearest_id } }, d, { ...ui, listing });
+
+    it('names the place, links to its page, and says the whole fact in one accessible name', () => {
+      const html = withIds({ food: 'sal_capuchin', clinic: null, narcan: null, indoors: null });
+      expect(html).toContain('"v":"detail","id":"sal_capuchin"');
+      expect(html).toContain('<span lang="en">Capuchin Soup Kitchen</span> · 2.3 mi');
+      expect(html).toContain('aria-label="Food: Capuchin Soup Kitchen, 2.3 mi. Open this listing."');
+      expect(html).not.toContain('MISSING:');
+    });
+    it('an older bundle, or an id this bundle no longer carries, is the plain row it always was', () => {
+      // No ids at all: the distances still print, and nothing on the page pretends to be a link.
+      const old = hoodPage(d.neighborhoods[0]!, d, { ...ui, listing: (id: string) => rows[id] ?? null });
+      expect(old).toContain('2.3 mi'); expect(old).not.toContain('"v":"detail"');
+      // An id whose listing has been archived since the numbers were built: same plain row, no dead page.
+      const gone = withIds({ food: 'sal_archived_since', clinic: null, narcan: null, indoors: null });
+      expect(gone).toContain('2.3 mi'); expect(gone).not.toContain('"v":"detail"');
+      // And with no `listing` at hand at all (the bundle has not loaded), the page still draws.
+      const bare = hoodPage({ ...d.neighborhoods[0]!, help: { ...d.neighborhoods[0]!.help, nearest_id: { food: 'sal_capuchin' } } }, d, ui);
+      expect(bare).toContain('2.3 mi'); expect(bare).not.toContain('"v":"detail"');
+    });
+    it('a sensitive or private listing is never linked or named, even if the numbers name one', () => {
+      for (const id of ['sal_dv', 'sal_detox']) {
+        const html = withIds({ food: id, clinic: null, narcan: null, indoors: null });
+        expect(html, id).not.toContain('"v":"detail"');
+        expect(html, id).not.toContain(rows[id]!.name);
+        expect(html, id).toContain('2.3 mi');
+      }
+    });
+    it('"none listed" stays a sentence, never a link', () => {
+      const html = withIds({ food: 'sal_capuchin', clinic: 'sal_capuchin', narcan: null, indoors: null });
+      const clinic = html.slice(html.indexOf('Clinic'));
+      expect(clinic.slice(0, clinic.indexOf('</li>'))).toContain('none listed');
+      expect(clinic.slice(0, clinic.indexOf('</li>'))).not.toContain('detail');
+    });
+  });
+
   it('hidden counts read "fewer than 5", a missing price says why, the unfinished year says "so far", and both tables sit in one panel', () => {
     const html = hoodPage(d.neighborhoods[0]!, d, ui);
     expect(html).toContain('fewer than 5'); expect(html).toContain('too few sales to show a price'); expect(html).toContain('2026 so far');
