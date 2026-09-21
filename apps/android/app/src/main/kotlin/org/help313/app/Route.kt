@@ -37,6 +37,24 @@ sealed class Route {
     /** "See this map as a list": the text alternative the whole tab depends on. */
     object MapList : Route()
 
+    /**
+     * The Neighborhoods tab: the index of the City's 205 neighborhoods (docs/13, Kyle 2026-09-21 — "not just on
+     * the web, in the apps too").
+     */
+    class Hoods(val lens: String? = null) : Route()
+
+    /**
+     * One neighborhood's numbers. The id is the City's own `nbh_` slug for a place on a public map, so it is not
+     * private and the screen joins the retained stack like any other public one ([keepable]).
+     */
+    class Hood(val hoodId: String) : Route()
+
+    /**
+     * "Add a place that helps" (docs/04). Not private: what is typed here is about a place, never about the person
+     * typing it, and a form half filled in is worth having back after a rotation.
+     */
+    object Add : Route()
+
     /** One stretch of the Joe Louis Greenway. */
     class Stretch(val segmentId: String) : Route()
 

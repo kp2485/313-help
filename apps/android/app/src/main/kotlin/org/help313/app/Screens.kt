@@ -40,6 +40,9 @@ object Screens {
         is Route.Map -> MapScreen.tab(a)
         is Route.MapLayers -> MapScreen.layers(a)
         is Route.MapList -> MapScreen.list(a)
+        is Route.Hoods -> HoodScreens.index(a, route.lens)
+        is Route.Hood -> HoodScreens.page(a, route.hoodId)
+        is Route.Add -> AddScreen.view(a)
         is Route.Stretch -> {
             // A route outlives a draw, so the stretch is looked up again: the bundle may have been refreshed since.
             val s = a.store.bundle?.segments?.firstOrNull { it.id == route.segmentId }
@@ -139,6 +142,15 @@ object Screens {
 
         col.addView(UI.button(a, L.t("home.see_all"), topDp = 16) { a.go(Route.Help) })
 
+        // The neighborhood numbers, from Home as well as from their own tab (docs/13; they are not in the crisis
+        // path, so they sit below the four needs and the "See all" button, never above them).
+        if (HoodRepo.offered(a.store)) {
+            val hoods = UI.tappableCard(a, L.t("home.hoods_title")) { a.go(Route.Hoods()) }
+            hoods.addView(UI.text(a, L.t("home.hoods_title"), 18f, R.color.ink, bold = true))
+            hoods.addView(UI.text(a, L.t("home.hoods_sub"), 16f, R.color.muted, topDp = 2))
+            col.addView(hoods)
+        }
+
         val alerts = a.store.bundle?.alerts.orEmpty().filter { it.status == "published" && it.kind != "cancellation" }
         if (alerts.isNotEmpty()) {
             col.addView(UI.sectionHead(a, L.t("alert.from")))
@@ -191,6 +203,19 @@ object Screens {
             val card = UI.tappableCard(a, label) { a.push(Route.Category(id)) }
             card.addView(UI.text(a, label, 17f, R.color.ink))
             col.addView(card)
+        }
+
+        // "Add a place that helps", where the web puts it (`help.more`) and on the same condition: a retired list
+        // takes no proposals, because nobody is left to check them (schema/query-spec.md "Bundle age").
+        if (!a.retired()) {
+            col.addView(UI.sectionHead(a, L.t("help.more")))
+            val add = UI.tappableCard(a, L.t("add.title")) {
+                AddScreen.reset()
+                a.push(Route.Add)
+            }
+            add.addView(UI.text(a, L.t("add.title"), 18f, R.color.ink, bold = true))
+            add.addView(UI.text(a, L.t("add.sub"), 16f, R.color.muted, topDp = 2))
+            col.addView(add)
         }
         return UI.scroller(a, col)
     }
@@ -313,10 +338,21 @@ object Screens {
                 col.addView(UI.button(a, L.t("loc.use"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
                     a.askForLocation()
                 })
-                if (a.locationRefused) col.addView(UI.text(a, L.t("loc.denied"), 15f, R.color.muted, topDp = 6))
-            } else {
+                if (a.locationRefused) {
+                    col.addView(
+                        UI.text(a, L.t(if (a.locationPermanentlyDenied()) "loc.denied_settings" else "loc.denied"), 15f, R.color.muted, topDp = 6),
+                    )
+                }
+            } else if (a.nearZip == null) {
                 col.addView(UI.text(a, L.t("loc.using"), 15f, R.color.muted, topDp = 8))
+                col.addView(UI.button(a, L.t("loc.off"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                    a.near = null
+                    a.render()
+                })
             }
+            // The other way to say roughly where you are, for the person who will not hand over their location and
+            // for the phone that cannot give one (ZipBox.kt). Typed, not taken, and it stays on the phone.
+            ZipBox.add(a, col)
             col.addView(UI.text(a, L.t("loc.note"), 14f, R.color.muted, topDp = 4))
         }
 
@@ -601,6 +637,18 @@ object Screens {
         }
         val signing = a.store.bundle?.index?.signing
         col.addView(UI.text(a, L.t(if (signing == "dev") "about.sig_dev" else "about.sig_ok"), 15f, R.color.muted, topDp = 12))
+
+        // The neighborhood pages used to be reachable only from here. They have their own tab now (Kyle,
+        // 2026-09-21), and About says so rather than losing the way in for anyone who knew where it was.
+        if (HoodRepo.offered(a.store)) {
+            col.addView(UI.text(a, L.t("about.hoods"), 16f, R.color.ink, topDp = 12))
+            col.addView(
+                UI.button(a, L.t("hood.title"), description = L.t("hood.about_sub"),
+                    backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                    a.go(Route.Hoods())
+                },
+            )
+        }
 
         col.addView(UI.sectionHead(a, L.t("privacy.title")))
         col.addView(UI.text(a, L.t("privacy.lede"), 16f, R.color.ink))

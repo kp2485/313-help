@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.Toast
 import org.help313.query.LatLon
@@ -46,6 +47,35 @@ class MainActivity : Activity() {
     /** Triage, in memory only. Never written to disk, never sent, gone when this activity is gone. */
     var near: LatLon? = null
     var locationRefused = false
+
+    /**
+     * A ZIP somebody typed, and whether the field is open (docs/05 "Type a ZIP"; Zip.kt).
+     *
+     * Both are fields on this activity and nowhere else: not a file, not `savedInstanceState`, not a Route. A ZIP
+     * is not sensitive — it is a hundred thousand people — but it is still something a person typed about
+     * themselves, and in this app that stays on the phone and dies with the process.
+     */
+    var nearZip: String? = null
+    var zipWanted = false
+
+    /** A typed ZIP becomes the point the list is sorted from. The point is the middle of the ZIP, not a person. */
+    fun useZip(zip: String, point: LatLon) {
+        nearZip = zip
+        near = point
+        zipWanted = false
+        locationRefused = false
+        locateOutside = false
+        if (current() is Route.Map) MapModel.show(point)
+        render()
+    }
+
+    /** "Stop using this ZIP": back to the whole city, and nothing about it is left anywhere. */
+    fun clearZip() {
+        nearZip = null
+        near = null
+        zipWanted = false
+        render()
+    }
 
     /**
      * The Map tab's first open (docs/05, DECISIONS 2026-09-21). All three are in memory: our own card waiting to
@@ -88,7 +118,9 @@ class MainActivity : Activity() {
     fun mapTabOpened() {
         if (locateChecked) return
         locateChecked = true
-        when (firstOpenAction(locateFlags.answered, locatePermission(), near != null)) {
+        // "A typed ZIP wins over everything" (Locate.kt) means a ZIP, not any point at all: this used to pass
+        // `near != null`, which is also true of a fix the person had already given us.
+        when (firstOpenAction(locateFlags.answered, locatePermission(), nearZip != null)) {
             FirstOpenAction.SHOW_CARD -> locateCard = true
             FirstOpenAction.CENTRE_ON_PERSON -> content.post { askForLocation() }
             FirstOpenAction.CENTRE_ON_ZIP -> near?.let { MapModel.show(it) }
@@ -107,6 +139,8 @@ class MainActivity : Activity() {
     private val stack = ArrayList<Route>()
     private lateinit var content: FrameLayout
     private lateinit var tabs: LinearLayout
+    /** Holds the tab row, or the sideways scroller around it at the largest text sizes. See rebuildTabs. */
+    private lateinit var tabBar: FrameLayout
     private lateinit var root: LinearLayout
 
     /**
@@ -138,8 +172,9 @@ class MainActivity : Activity() {
         )
         root.addView(content)
 
-        tabs = buildTabs()
-        root.addView(tabs)
+        tabBar = FrameLayout(this)
+        root.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        rebuildTabs()
         setContentView(root)
         // After setContentView, never before: window.insetsController is backed by the decor view, which does not
         // exist until the content is set, and asking for it early threw a NullPointerException on first run.
@@ -162,6 +197,7 @@ class MainActivity : Activity() {
         // A dead activity must not be called back into, whether it is finishing or being rebuilt.
         if (store.onChange != null) store.onChange = null
         MapModel.onChange = null
+        HoodRepo.onChange = null
         if (isFinishing) {
             // Really leaving: the route stack, the background thread and the loader all go. Nothing about this
             // session outlives it (docs/08, "cleared on exit").
@@ -279,6 +315,8 @@ class MainActivity : Activity() {
         // (Android review, 2026-09-20). ReportStore.flush refuses to run twice at once by itself.
         val app = applicationContext
         Work.net { ReportStore.flush(app) }
+        // And any place somebody added while the phone had no signal (docs/05 "Offline").
+        Work.net { ProposeStore.flush(app) }
     }
 
     // ---- navigation ----------------------------------------------------------------------------------------
@@ -335,6 +373,8 @@ class MainActivity : Activity() {
         // The map hands its redraws to whatever view is on screen; a view that has been thrown away must not be
         // called back into. The Map tab sets this again as it is built.
         if (route !is Route.Map) MapModel.onChange = null
+        // The same rule for the neighborhood numbers: a screen that has been thrown away is never called back into.
+        if (route !is Route.Hoods && route !is Route.Hood) HoodRepo.onChange = null
         content.removeAllViews()
         content.addView(
             Screens.view(this, route),
@@ -370,40 +410,89 @@ class MainActivity : Activity() {
         finishAndRemoveTask()
     }
 
+    /**
+     * The tab bar, built from scratch — because whether it scrolls depends on the text size, which is one of the
+     * configurations this activity handles itself rather than being recreated for.
+     *
+     * Six tabs since Neighborhoods arrived. Up to about 1.3x they share the width equally, as four did and then
+     * five did. Past that, six words will not fit across a phone however they are laid out, and Android's answer to
+     * a word that will not fit is to break it in the middle ("Searc / h") — so above that size each tab takes the
+     * room its word needs and the bar scrolls sideways, which leaves every word whole and every tab reachable, by
+     * finger and by screen reader. The scrolling bar is used **only** at those sizes: measured unbounded, a row of
+     * six Arabic words is wider than the phone even at the ordinary size, and a tab half off the screen for every
+     * Arabic reader would be a worse answer than the equal shares they had before (emulator, 2026-09-22).
+     */
     private fun rebuildTabs() {
-        tabs.removeAllViews()
+        tabBar.removeAllViews()
+        tabBar.setBackgroundColor(UI.color(this, R.color.surface))
+        tabs = LinearLayout(this)
+        tabs.orientation = LinearLayout.HORIZONTAL
         tabs.setBackgroundColor(UI.color(this, R.color.surface))
         fillTabs(tabs)
+        if (!tabsScroll()) {
+            tabBar.addView(
+                tabs,
+                FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+            )
+            return
+        }
+        val scroller = HorizontalScrollView(this)
+        scroller.isFillViewport = true
+        scroller.isHorizontalScrollBarEnabled = false
+        scroller.setBackgroundColor(UI.color(this, R.color.surface))
+        scroller.addView(
+            tabs,
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+        )
+        tabBar.addView(
+            scroller,
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+        )
     }
 
-    private fun buildTabs(): LinearLayout {
-        val bar = LinearLayout(this)
-        bar.orientation = LinearLayout.HORIZONTAL
-        bar.setBackgroundColor(UI.color(this, R.color.surface))
-        fillTabs(bar)
-        return bar
-    }
+    private fun tabsScroll(): Boolean = resources.configuration.fontScale > 1.3f
 
     private fun fillTabs(bar: LinearLayout) {
         bar.contentDescription = L.t("tabs.label")
+        // Home · Help · Map · Neighborhoods, then the two that were already here (Kyle, 2026-09-21: neighborhood
+        // information gets its own tab, "not just on the web, in the apps too").
+        //
+        // The bar shows `tab.hoods` — "Areas", the short variant the strings files carry — because six words have
+        // to share one line at any text size and "Neighborhoods" is the longest word in the app. A screen reader is
+        // told the whole word instead (`tab.hoods_wide`), so nothing is abbreviated for the person who cannot see
+        // that the bar is narrow.
         val items = listOf(
-            "tab.home" to Route.Home,
-            "tab.help" to Route.Help,
-            "tab.map" to Route.Map,
-            "search.title" to Route.Search,
-            "saved.title" to Route.Saved,
+            Triple("tab.home", null, Route.Home),
+            Triple("tab.help", null, Route.Help),
+            Triple("tab.map", null, Route.Map),
+            Triple("tab.hoods", "tab.hoods_wide", Route.Hoods()),
+            Triple("search.title", null, Route.Search),
+            Triple("saved.title", null, Route.Saved),
         )
-        for ((key, route) in items) {
-            val b = UI.button(this, L.t(key), backgroundId = 0, textColorId = R.color.brand, topDp = 0) { go(route) }
+        for ((key, spoken, route) in items) {
+            val b = UI.button(
+                this, L.t(key), description = spoken?.let { L.t(it) },
+                backgroundId = 0, textColorId = R.color.brand, topDp = 0,
+            ) { go(route) }
             b.setBackgroundColor(UI.color(this, R.color.surface))
             b.layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
             b.gravity = Gravity.CENTER
-            // Five tabs, not four, since the Map tab arrived (2026-09-21). At 17 sp with 16 dp of padding each
-            // side, "Saved places" was broken in the middle of a word ("Saved place / s"). The bar is the one
-            // place in this app that has a fixed width to share, so it gets its own smaller size and thinner
-            // padding; nothing is ellipsized and the words still grow with the phone's text size.
-            b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12f)
+            // Six tabs since Neighborhoods arrived (2026-09-22), five since the Map tab (2026-09-21), four before
+            // that. At 17 sp with 16 dp of padding each side, "Saved places" was broken in the middle of a word
+            // ("Saved place / s"). The bar is the one place in this app that has a fixed width to share, so it gets
+            // its own smaller size and thinner padding; nothing is ellipsized and the words still grow with the
+            // phone's text size — a word that will not fit wraps onto a second line and the bar gets taller.
+            b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
             b.setPaddingRelative(UI.dp(this, 2), UI.dp(this, 10), UI.dp(this, 2), UI.dp(this, 10))
+            // In the scrolling bar a tab takes the width its word needs (see rebuildTabs).
+            if (tabsScroll()) {
+                b.layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+                b.setSingleLine(true)
+                // Never "Searc…": a tab that does not fit makes the bar wider, it does not lose letters.
+                b.ellipsize = null
+            }
             bar.addView(b)
         }
     }

@@ -42,6 +42,8 @@ Report a problem with the app: not built.
 
 **Revised 2026-09-22 (Kyle): five tabs — Home · Help · Map · Neighborhoods · Events**, of which a phone normally shows four, because Events still hides itself. Before 2026-09-22 there were four: Kyle's reason for the fifth was that the neighborhood pages "should have its own tab" instead of being buried on About. Its hash is the `#/n` the screen has always had, so every link made before the tab existed still opens it.
 
+**Android, 2026-09-22.** The Android app has the tab too, as **Home · Help · Map · Neighborhoods · Search · Saved places** — six, because that client keeps Search and Saved places in the bar rather than under Help. The bar shows the short label `tab.hoods` ("Areas") and tells a screen reader the whole word (`tab.hoods_wide`); above a font scale of about 1.3 it scrolls sideways so that no word is ever broken in the middle. Android also gained "Type a ZIP code" and "Add a place that helps" on the same day, so the three clients now offer the same ways to say roughly where you are and to tell us about a place we do not list. What Android still does not have is the Joe Louis Greenway lens row and an "About this area" link from a greenway stretch.
+
 **Revised 2026-09-20 (Kyle): four tabs — Home · Help · Map · Events.** The Recreation and Transit tabs are one **Map** tab; everything either of them offered is still on it. No profile tab; there is no profile.
 
 - **Home**: a calm landing page — hero, a search button, active alerts, one "Find free help" card, six quick needs, tiles into the Map tab and the greenway. No red, no emergency strip.

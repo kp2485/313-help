@@ -207,16 +207,32 @@ object UI {
      * None of this can be relied on absolutely — a keyboard is another app and does what it does — but each of
      * these is the documented way to ask, and asking is the difference between a leak and a choice.
      */
-    fun field(c: Context, label: String, hint: String, suggestions: Boolean = true): EditText {
+    fun field(
+        c: Context,
+        label: String,
+        hint: String,
+        suggestions: Boolean = true,
+        numeric: Boolean = false,
+        lines: Int = 1,
+    ): EditText {
         val e = EditText(c)
         e.hint = hint
         e.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
         e.setTextColor(color(c, R.color.ink))
         e.contentDescription = label
         e.minimumHeight = dp(c, MIN_TAP_DP)
-        e.setSingleLine(true)
-        var input = android.text.InputType.TYPE_CLASS_TEXT
-        if (!suggestions) input = input or android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        e.setSingleLine(lines <= 1)
+        if (lines > 1) {
+            // A note about a place is prose: it wraps and grows, and nothing in it is ever cut short.
+            e.setLines(lines)
+            e.maxLines = Int.MAX_VALUE
+            e.gravity = Gravity.TOP or Gravity.START
+        }
+        // A ZIP code is five digits and the keyboard should open on the digits. The field still carries the two
+        // flags below, because a ZIP is as much something a person typed about themselves as a search is.
+        var input = if (numeric) android.text.InputType.TYPE_CLASS_NUMBER else android.text.InputType.TYPE_CLASS_TEXT
+        if (!numeric && lines > 1) input = input or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        if (!numeric && !suggestions) input = input or android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         e.inputType = input
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             e.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
