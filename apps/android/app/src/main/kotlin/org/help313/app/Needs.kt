@@ -10,6 +10,14 @@ import org.help313.query.Query
  */
 class Refine(val id: String, val query: Query, val first: List<String> = emptyList())
 
+/**
+ * A second list, under its own heading, BELOW the need's own list. A crisis screen keeps its hotlines and its
+ * crisis places first (docs/05 ordering); the ongoing, non-crisis places come after them rather than being mixed
+ * in or hidden behind a tap. Its heading is `also.<need>.<id>`, and its rows are ordinary rows: a `health.support`
+ * listing keeps its address, its map and its Save button.
+ */
+class Also(val id: String, val query: Query)
+
 class Need(
     val id: String,
     /** "now" needs come first, under "Right now", then "This week", then "Work, school, and paperwork".
@@ -23,6 +31,9 @@ class Need(
      *  else's site are translated like the rest of the app; the second is its address. */
     val firstLink: Pair<String, String>? = null,
     val query: Query? = null,
+    /** Written after `query` and read after it, in all three apps, so a need's own list is never mistaken for
+     *  this one (ParityTest compares both). */
+    val also: Also? = null,
     val refine: List<Refine> = emptyList(),
     /** No list at all: 911 and rescue steps only. A bystander must not be sent on an errand (audit A7). */
     val stepsOnly: Boolean = false,
@@ -51,7 +62,10 @@ val NEEDS: List<Need> = listOf(
     // DV: hotline and 911 before anything else; rows have no address and never show a distance.
     Need("unsafe", "now", first = listOf("emg_ndvh", "emg_911"), query = Query(category = "shelter.dv"),
         sensitive = true, quickExit = true, intro = "safe.dv_intro"),
+    // Crisis first: 988, DWIHN's line, then the crisis places. Under those, the daytime places a person can walk
+    // into (health.support), which are ordinary listings with an address (category audit 2026-09-22, K3).
     Need("talk", "now", first = listOf("emg_988", "emg_dwihn_crisis"), query = Query(category = "health.mental"),
+        also = Also("support", Query(category = "health.support")),
         sensitive = true, quickExit = true, intro = "talk.intro"),
     // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door for all four cities, then SAMHSA's.
     Need(
@@ -87,6 +101,8 @@ val NEEDS: List<Need> = listOf(
         Refine("dhd", Query(category = "health.dhd")),
         Refine("dentist", Query(category = "health.dental")),
         Refine("eyes", Query(category = "health.vision")),
+        // Ongoing mental-health support that is not a crisis service: day programmes a person can walk into.
+        Refine("support", Query(category = "health.support")),
     )),
     Need("home", "soon", refine = listOf(
         Refine("rent", Query(category = "housing.rent")),
@@ -98,7 +114,10 @@ val NEEDS: List<Need> = listOf(
         Refine("clothes", Query(category = "goods.clothes")),
         Refine("baby", Query(category = "goods.baby")),
     )),
-    Need("narcan", "soon", query = Query(category = "harm.narcan")),
+    // Every harm-reduction place that stocks naloxone: the whole `harm` top-level, which is `harm.narcan` plus
+    // `harm.supplies` (Wayne County's Well Wayne stations and the Life Points outreach), each of which says it
+    // gives out Narcan (Kyle, 2026-09-22; audit K1). Ranking unchanged: open now, then distance.
+    Need("narcan", "soon", query = Query(category = "harm"), intro = "narcan.intro"),
     // Warming and cooling centres are announced as alerts. Day to day, libraries and recreation centres are the
     // free indoor places.
     Need("hot_cold", "soon", query = Query(category = "rec"), intro = "hotcold.intro", emptyKey = "hotcold.none"),

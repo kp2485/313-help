@@ -53,6 +53,8 @@ final class ParityTests: XCTestCase {
             if let intro = n.intro { wanted.append(intro) }
             if let empty = n.emptyKey { wanted.append(empty) }
             for r in n.refine { wanted.append("refine.\(n.id).\(r.id)") }
+            // The heading over a need's second list ("Places to go during the day" under the crisis numbers).
+            if let also = alsoId(in: n.line) { wanted.append("also.\(n.id).\(also)") }
         }
         wanted += ["food", "shelter", "doctor", "drugs", "job", "narcan"].map { "quick.\($0)" }
         for key in wanted { XCTAssertNotNil(en[key], "strings/en.json has no \(key)") }
@@ -129,6 +131,35 @@ final class ParityTests: XCTestCase {
         XCTAssertTrue(core.contains("\"https://www.weather.gov/\""), "HelpCore's quick-exit target differs from the web app's")
     }
 
+    /// The two decisions of the category audit of 2026-09-22, on this phone as on the web.
+    ///
+    /// K1: "I want free Narcan" asks for the whole `harm` kind, so Wayne County's Well Wayne stations
+    /// (`harm.supplies`, every one of which gives out naloxone) are on it beside the Health Department's boxes.
+    /// K3: "I need to talk to someone" keeps 988 and the crisis places first, and lists the daytime places
+    /// (`health.support`) under their own heading below them.
+    func testTheCategoryAuditOf20260922IsOnThisPhoneToo() throws {
+        let needs = try swiftNeeds()
+        let narcan = try XCTUnwrap(needs.first { $0.id == "narcan" })
+        XCTAssertTrue(narcan.line.contains("cat=harm "), "the Narcan need must ask for the whole harm kind: \(narcan.line)")
+        XCTAssertEqual(narcan.intro, "narcan.intro")
+        let talk = try XCTUnwrap(needs.first { $0.id == "talk" })
+        XCTAssertTrue(talk.line.contains("cat=health.mental"), "the talk screen's own list is still the crisis one")
+        XCTAssertTrue(talk.line.contains("first=emg_988|emg_dwihn_crisis"), "988 still comes first")
+        XCTAssertTrue(talk.line.contains("sensitive=true quickExit=true"))
+        XCTAssertEqual(alsoId(in: talk.line), "support")
+        XCTAssertTrue(talk.line.contains("also=support:cat=health.support"), talk.line)
+        let doctor = try XCTUnwrap(needs.first { $0.id == "doctor" })
+        XCTAssertTrue(doctor.refine.contains { $0.line.contains("support cat=health.support") }, "the doctor need lists it too")
+        // The second list is drawn after the first, never mixed into it, and its rows are ordinary rows.
+        let views = try text("apps/ios/HelpApp/Views.swift")
+        XCTAssertTrue(views.contains("if let also, !alsoRanked.isEmpty {"), "ResultsView does not draw a second list")
+        XCTAssertTrue(views.contains("CardLink(r: r, showMiles: true) { DetailView(row: r.row) }"),
+                      "the second list's rows must keep their distance, like any ordinary row")
+        // And the sensitive pair did not change while a new health kind was added (HelpCore owns the rule).
+        XCTAssertTrue(try text("apps/ios/Sources/HelpCore/Saved.swift")
+            .contains("public let sensitiveCategories = [\"shelter.dv\", \"health.mental\"]"))
+    }
+
     /// Keys retired on 2026-09-20, when the web app folded Recreation and Transit into one Map tab.
     func testRetiredKeysAreNotAskedForAgain() throws {
         for file in try swiftSources() {
@@ -191,7 +222,7 @@ final class ParityTests: XCTestCase {
             \(id) group=\(group) first=\(list(head, "first")) steps=\(head.contains("stepsOnly: true")) \
             sensitive=\(head.contains("sensitive: true")) quickExit=\(head.contains("quickExit: true")) \
             intro=\(value(head, "intro") ?? "-") \
-            empty=\(value(head, "emptyKey") ?? "-") \(query)
+            empty=\(value(head, "emptyKey") ?? "-") \(query) also=\(alsoLine(head))
             """
         return Parsed(id: id, group: group, intro: value(head, "intro"), emptyKey: value(head, "emptyKey"),
                       refine: refines, line: line)
@@ -230,6 +261,23 @@ final class ParityTests: XCTestCase {
     private func split(_ s: String, at marker: String) -> (head: String, body: String?) {
         guard let r = s.range(of: marker) else { return (s, nil) }
         return (String(s[..<r.lowerBound]), String(s[r.upperBound...]))
+    }
+
+    /// The id in the `also=` fragment of a parsed line, or nil when that need has no second list.
+    private func alsoId(in line: String) -> String? {
+        guard let r = line.range(of: "also=") else { return nil }
+        let rest = line[r.upperBound...]
+        guard let colon = rest.firstIndex(of: ":") else { return nil }
+        return String(rest[..<colon])
+    }
+
+    /// The second list under a need's own, written `also: { id: 'support', query: { category: 'x' } }` or
+    /// `also: .init(id: "support", query: Query(category: "x"))`. Both files write it AFTER the need's own
+    /// query, so `queryLine(head)` above still reads the need's own and this reads only this one.
+    private func alsoLine(_ s: String) -> String {
+        guard let r = s.range(of: "also: ") else { return "-" }
+        let rest = String(s[r.upperBound...])
+        return "\(quoted(rest).first ?? "?"):\(queryLine(rest))"
     }
 
     /// A query written either way: `query: { category: 'x', mode: 'week', prefer: ['youth'] }` or

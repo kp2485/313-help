@@ -70,6 +70,8 @@ class ParityTest {
             n.intro?.let { wanted += it }
             n.emptyKey?.let { wanted += it }
             for (r in n.refine) wanted += "refine.${n.id}.${r.id}"
+            // The heading over a need's second list ("Places to go during the day" under the crisis numbers).
+            n.also?.let { wanted += "also.${n.id}.${it.id}" }
         }
         for (id in listOf("food", "shelter", "doctor", "narcan")) wanted += "quick.$id"
         for (key in wanted) assertNotNull("strings/en.json has no $key", en[key])
@@ -240,6 +242,55 @@ class ParityTest {
         assertEquals("1234 Woodward Ave, Detroit, MI 48226", mapsDestination(row))
     }
 
+    /**
+     * The two decisions of the category audit of 2026-09-22, on this phone as on the web.
+     *
+     * K1: "I want free Narcan" asks for the whole `harm` kind, so Wayne County's Well Wayne stations
+     * (`harm.supplies`, every one of which gives out naloxone) are on it beside the Health Department's boxes.
+     * K3: "I need to talk to someone" keeps 988 and the crisis places first and lists the daytime places
+     * (`health.support`) under their own heading below them.
+     */
+    @Test
+    fun theCategoryAuditOf20260922IsOnThisPhoneToo() {
+        val needs = kotlinNeeds()
+        val narcan = needs.first { it.id == "narcan" }
+        assertTrue("the Narcan need must ask for the whole harm kind: ${narcan.line}", narcan.line.contains("cat=harm "))
+        val talk = needs.first { it.id == "talk" }
+        assertTrue(talk.line.contains("cat=health.mental"))
+        assertTrue("988 still comes first", talk.line.contains("first=emg_988|emg_dwihn_crisis"))
+        assertTrue(talk.line.contains("sensitive=true exit=true"))
+        assertEquals("support", alsoId(talk.line))
+        assertTrue(talk.line, talk.line.contains("also=support:cat=health.support"))
+        val doctor = needs.first { it.id == "doctor" }
+        assertTrue(doctor.refine.any { it.second.contains("support cat=health.support") })
+        // The sensitive pair did not change while a new health kind was added.
+        assertTrue(text("apps/android/app/src/main/kotlin/org/help313/app/Needs.kt")
+            .contains("""private val SENSITIVE = listOf("shelter.dv", "health.mental")"""))
+        for (category in listOf("health.support", "health.supported", "health.mentalhealth", "shelter.dvx")) {
+            assertFalse(category, isSensitive(category))
+            assertFalse(category, isPrivate(category))
+            assertTrue(category, Saved.canSave(category))
+        }
+        for (category in listOf("shelter.dv", "shelter.dv.transitional", "health.mental", "health.mental.crisis")) {
+            assertTrue(category, isSensitive(category))
+            assertFalse(category, Saved.canSave(category))
+        }
+        // The clubhouse is an ordinary listing: an address, directions, a map and a Save button.
+        val club = BundleRow(id = "sal_goodwill_industries_a_place_of_our_own_clubhouse", name = "A Place of Our Own Clubhouse",
+            category = "health.support", address = Address("1401 Ash St", "Detroit", "48208"),
+            lat = 42.340442, lon = -83.070889, phones = listOf(Phone("313-931-0901", "Clubhouse")))
+        assertEquals("1401 Ash St, Detroit, MI 48208", mapsDestination(club))
+        assertNotNull(transitAppDestination(club))
+        assertTrue(hasPhone(club))
+        assertFalse(saysNoAddress(club))
+        assertFalse(Route.isPrivate(Route.Detail(club.id, club.category)))
+        // The second list is drawn after the first, under its own heading, and never mixed into it.
+        val screens = text("apps/android/app/src/main/kotlin/org/help313/app/Screens.kt")
+        assertTrue(screens.contains("""col.addView(UI.sectionHead(a, L.t("also.${'$'}{need.id}.${'$'}{al.id}")))"""))
+        assertTrue("the need's own list comes before its second one",
+            screens.indexOf("listBody(a, col, q,") < screens.indexOf("listBody(a, col, al.query,"))
+    }
+
     @Test
     fun aSensitiveListingIsNeverHandedToAMapsApp() {
         for (category in listOf("shelter.dv", "health.mental")) {
@@ -408,7 +459,7 @@ class ParityTest {
         val line = "$id group=$group first=${list(head, "first")} steps=${flag(head, "stepsOnly")} " +
             "sensitive=${flag(head, "sensitive")} exit=${flag(head, "quickExit")} " +
             "intro=${value(head, "intro") ?: "-"} " +
-            "empty=${value(head, "emptyKey") ?: "-"} $query"
+            "empty=${value(head, "emptyKey") ?: "-"} $query also=${alsoLine(head)}"
         return Parsed(id, line, refine)
     }
 
@@ -435,6 +486,30 @@ class ParityTest {
             else -> return "cat=- mode=- prefer=-"
         }
         return "cat=${value(chunk, "category") ?: "-"} mode=${value(chunk, "mode") ?: "now"} prefer=${list(chunk, "prefer")}"
+    }
+
+    /**
+     * The second list under a need's own, written `also: { id: "support", query: { category: "x" } }`
+     * (TypeScript) or `also = Also("support", Query(category = "x"))` (Kotlin). Both files write it AFTER the
+     * need's own query, so `queryLine(head)` above still reads the need's own and this reads only this one.
+     */
+    private fun alsoLine(s: String): String {
+        for (sep in listOf("also: ", "also = ")) {
+            val at = s.indexOf(sep)
+            if (at < 0) continue
+            val rest = s.substring(at + sep.length)
+            return "${quoted(rest).firstOrNull() ?: "?"}:${queryLine(rest)}"
+        }
+        return "-"
+    }
+
+    /** The id in the `also=` fragment of a parsed line, or null when that need has no second list. */
+    private fun alsoId(line: String): String? {
+        val at = line.indexOf("also=")
+        if (at < 0) return null
+        val rest = line.substring(at + "also=".length)
+        val colon = rest.indexOf(':')
+        return if (colon < 0) null else rest.substring(0, colon)
     }
 
     /** What is inside the brackets opened by `marker`, counting nesting. */

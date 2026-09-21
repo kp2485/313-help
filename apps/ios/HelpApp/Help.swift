@@ -61,6 +61,10 @@ struct Need: Identifiable {
     /// One way to narrow a need. `first` is emergency numbers shown above that refinement's own list
     /// (the emergency room screen leads with 911).
     struct Refine: Identifiable { var id: String; var query: Query; var first: [String] = [] }
+    /// A second list, under its own heading, BELOW the need's own list. A crisis screen keeps its hotlines and
+    /// its crisis places first (docs/05 ordering); the ongoing, non-crisis places come after them. Its heading
+    /// is `also.<need>.<id>`, and its rows are ordinary rows, with an address and a Save button.
+    struct Also { var id: String; var query: Query }
     var id: String
     var symbol: String
     var now: Bool                       // listed first, under "Right now"
@@ -72,6 +76,9 @@ struct Need: Identifiable {
     /// (warming and cooling centres: libraries and recreation centres are the everyday answer).
     var emptyKey: String? = nil
     var query: Query? = nil
+    /// Written after `query` and read after it, in all three apps, so a need's own list is never mistaken for
+    /// this one (AppParityTests compares both).
+    var also: Also? = nil
     var stepsOnly = false               // overdose: 911 and steps, never a list (audit A7)
     var sensitive = false               // no distance, no map, not saved
     /// A visible "Leave this page fast" in the top bar (docs/08 "Quick-exit"), on the same needs the web app
@@ -88,7 +95,9 @@ let needs: [Need] = [
          firstLink: ("beds.safebeds", "https://313safebeds.com/"), refine: [
         .init(id: "me", query: Query(category: "shelter.emergency")), .init(id: "kids", query: Query(category: "shelter.emergency")), .init(id: "young", query: Query(category: "shelter.emergency", prefer: ["youth"]))]),   // youth shelters first
     Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], intro: "safe.dv_intro", query: Query(category: "shelter.dv"), sensitive: true, quickExit: true),
-    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], intro: "talk.intro", query: Query(category: "health.mental"), sensitive: true, quickExit: true),
+    // Crisis first: 988, DWIHN's line, then the crisis places. Under those, the daytime places a person can walk
+    // into (health.support), which are ordinary listings with an address (category audit 2026-09-22, K3).
+    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], intro: "talk.intro", query: Query(category: "health.mental"), also: .init(id: "support", query: Query(category: "health.support")), sensitive: true, quickExit: true),
     // Treatment and sexual assault (DECISIONS 2026-09-19): numbers first. The iPhone app saves nothing and keeps no
     // history, so "private" needs no extra rule here; addresses and distance stay.
     Need(id: "drugs", symbol: "leaf", now: true, first: ["emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"],
@@ -108,12 +117,17 @@ let needs: [Need] = [
         // category, because they are city programs rather than a clinic that says it is free (2026-09-20).
         .init(id: "dhd", query: Query(category: "health.dhd")),
         .init(id: "dentist", query: Query(category: "health.dental")),
-        .init(id: "eyes", query: Query(category: "health.vision"))]),
+        .init(id: "eyes", query: Query(category: "health.vision")),
+        // Ongoing mental-health support that is not a crisis service: day programs a person can walk into.
+        .init(id: "support", query: Query(category: "health.support"))]),
     Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner"))]),
     Need(id: "utilities", symbol: "bolt", now: false, query: Query(category: "utilities")),
     Need(id: "day", symbol: "clock", now: false, query: Query(category: "shelter.day")),
     Need(id: "things", symbol: "tshirt", now: false, refine: [.init(id: "clothes", query: Query(category: "goods.clothes")), .init(id: "baby", query: Query(category: "goods.baby"))]),
-    Need(id: "narcan", symbol: "shippingbox", now: false, query: Query(category: "harm.narcan")),
+    // Every harm-reduction place that stocks naloxone: the whole `harm` top-level, which is `harm.narcan` plus
+    // `harm.supplies` (Wayne County's Well Wayne stations and the Life Points outreach), each of which says it
+    // gives out Narcan (Kyle, 2026-09-22; audit K1). Ranking unchanged: open now, then distance.
+    Need(id: "narcan", symbol: "shippingbox", now: false, intro: "narcan.intro", query: Query(category: "harm")),
     Need(id: "hot_cold", symbol: "sun.max", now: false, intro: "hotcold.intro", emptyKey: "hotcold.none", query: Query(category: "rec")),
     // The web app also shows link-outs (unemployment, Lifeline, child-care scholarships…) on these screens; the
     // iPhone lists places only until link-outs are built here.

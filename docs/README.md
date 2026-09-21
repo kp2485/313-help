@@ -25,6 +25,7 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 13 | [Neighborhood indicators](13-neighborhood-indicators.md) | Citywide public-data picture for all 205 neighborhoods; honesty rules; the greenway as one lens |
 | — | [research/](research/) | Source research: Wayne County data, the 2026-09-19 [new kinds of help](research/2026-09-19-new-help/README.md) (jobs, treatment, housing, legal, IDs and more), and [2026-09-20](research/2026-09-20/) (the held backlog, the hand checks read in a browser, the empty categories, emergency rooms and urgent care) |
 | — | [AUDIT-2026-09-20.md](AUDIT-2026-09-20.md) | **What is active versus only planned**, checked in the code and data, with four detailed reports in [audit-2026-09-20/](audit-2026-09-20/) |
+| — | [CATEGORY-AUDIT-2026-09-22.md](CATEGORY-AUDIT-2026-09-22.md) | Every listing's category checked against its own words: 8 re-filed, the one-row-per-service rule, the eight map layers, and the judgement calls left for Kyle |
 | — | [ACCESSIBILITY-AUDIT-2026-09-20.md](ACCESSIBILITY-AUDIT-2026-09-20.md) | Full WCAG 2.2 AA pass over the web app: 44 pass, 27 fixed, 0 open |
 | — | [ACCESSIBILITY-TEST-SCRIPT.md](ACCESSIBILITY-TEST-SCRIPT.md) | The script for sessions with people who use assistive technology |
 | — | [MAP-STYLE.md](MAP-STYLE.md) | The shared spec for the Map's two styles, Standard and Subway, on all three clients |

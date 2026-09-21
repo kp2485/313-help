@@ -378,6 +378,12 @@ final class MapLayerRuleTests: XCTestCase {
         XCTAssertTrue(seen.values.allSatisfy { $0 == 1 }, "a category in two groups would draw twice: \(seen)")
         for t in mapPrivateTops { XCTAssertNil(seen[t], "\(t) must not be in any layer at all") }
         XCTAssertEqual(mapGroupId(for: "harm.supplies"), "health")
+        // Category audit, 2026-09-22: the same eight groups as the web, and nothing surprising in any of them.
+        XCTAssertEqual(mapGroups.map(\.id), ["food", "shelter", "health", "rec", "work", "kids", "things", "paperwork"])
+        XCTAssertEqual(mapGroupId(for: "connect"), "rec", "free computers sit with the libraries that offer them")
+        XCTAssertEqual(mapGroupId(for: "youth"), "kids")
+        XCTAssertEqual(mapGroupId(for: "kids.care"), "kids")
+        XCTAssertEqual(mapGroups.first { $0.id == "things" }?.tops, ["goods", "hygiene", "pets"])
         XCTAssertEqual(mapGroupId(for: "nothing.like.this"), "")
     }
 

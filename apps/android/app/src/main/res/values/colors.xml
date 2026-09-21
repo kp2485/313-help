@@ -43,6 +43,7 @@
     <color name="grp_health">#BE185D</color>
     <color name="grp_rec">#15803D</color>
     <color name="grp_work">#0E7490</color>
+    <color name="grp_kids">#7E22CE</color>
     <color name="grp_things">#7C2D12</color>
     <color name="grp_paperwork">#475569</color>
 </resources>

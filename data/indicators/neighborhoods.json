@@ -262,7 +262,7 @@
     "nearest_miles": {
      "food": 1,
      "clinic": 1.6,
-     "narcan": 2.2,
+     "narcan": 1.1,
      "indoors": 2
     },
     "none_listed_yet": [],
@@ -408,10 +408,10 @@
      "jobs": 0,
      "learn": 0,
      "treatment": 0,
-     "housing": 0,
+     "housing": 1,
      "legal": 0,
      "ids": 0,
-     "money": 1,
+     "money": 0,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -1269,7 +1269,7 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 1.5,
-     "narcan": 1.9,
+     "narcan": 1.2,
      "indoors": 2
     },
     "none_listed_yet": [
@@ -1725,10 +1725,10 @@
      "jobs": 1,
      "learn": 0,
      "treatment": 1,
-     "housing": 0,
+     "housing": 1,
      "legal": 0,
      "ids": 0,
-     "money": 1,
+     "money": 0,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -2049,7 +2049,7 @@
      "food": 0.5,
      "clinic": 0.4,
      "narcan": 0.4,
-     "indoors": 1.3
+     "indoors": 1.1
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -2141,7 +2141,7 @@
     },
     "nearest_miles": {
      "food": 0.4,
-     "clinic": 2.7,
+     "clinic": 3.3,
      "narcan": 1.2,
      "indoors": 1.2
     },
@@ -2302,7 +2302,7 @@
      "food": 0.4,
      "clinic": 0.3,
      "narcan": 0.4,
-     "indoors": 1.4
+     "indoors": 1.2
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -2427,10 +2427,10 @@
      "jobs": 0,
      "learn": 0,
      "treatment": 1,
-     "housing": 0,
+     "housing": 1,
      "legal": 0,
      "ids": 0,
-     "money": 2,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -2440,7 +2440,7 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 1.3,
-     "narcan": 1,
+     "narcan": 0.8,
      "indoors": 0.4
     },
     "none_listed_yet": [],
@@ -3060,7 +3060,7 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 1.2,
-     "narcan": 0.5,
+     "narcan": 0.4,
      "indoors": 0.8
     },
     "none_listed_yet": [
@@ -3679,7 +3679,7 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 0.8,
-     "narcan": 0.8,
+     "narcan": 0.7,
      "indoors": 1.4
     },
     "none_listed_yet": [],
@@ -4154,7 +4154,7 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 1.2,
-     "narcan": 1,
+     "narcan": 0.6,
      "indoors": 1
     },
     "none_listed_yet": [
@@ -4463,8 +4463,8 @@
     },
     "nearest_miles": {
      "food": 0.7,
-     "clinic": 0.5,
-     "narcan": 1,
+     "clinic": 0.8,
+     "narcan": 0.6,
      "indoors": 2.1
     },
     "none_listed_yet": [],
@@ -5055,7 +5055,7 @@
     "nearest_miles": {
      "food": 0.8,
      "clinic": 1.4,
-     "narcan": 0.5,
+     "narcan": 0.3,
      "indoors": 1.4
     },
     "none_listed_yet": [],
@@ -5648,7 +5648,7 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0,
+     "rec": 1,
      "jobs": 3,
      "learn": 2,
      "treatment": 1,
@@ -5658,7 +5658,7 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 1,
+     "connect": 0,
      "transport": 0,
      "pets": 0
     },
@@ -5666,7 +5666,7 @@
      "food": 0.7,
      "clinic": 1.2,
      "narcan": 0.2,
-     "indoors": 1.8
+     "indoors": 0.3
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -6568,7 +6568,7 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 0.4,
-     "narcan": 0.8,
+     "narcan": 0.4,
      "indoors": 1.3
     },
     "none_listed_yet": [],
@@ -7847,7 +7847,7 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 1.8,
-     "narcan": 1.1,
+     "narcan": 0.7,
      "indoors": 0.9
     },
     "none_listed_yet": [],
@@ -7995,7 +7995,7 @@
     },
     "nearest_miles": {
      "food": 0.8,
-     "clinic": 3.2,
+     "clinic": 3.4,
      "narcan": 1.6,
      "indoors": 1.6
     },
@@ -8283,7 +8283,7 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 0.7,
-     "narcan": 1.6,
+     "narcan": 0.4,
      "indoors": 1.6
     },
     "none_listed_yet": [],
@@ -8440,8 +8440,8 @@
     },
     "nearest_miles": {
      "food": 0.7,
-     "clinic": 0.3,
-     "narcan": 1.4,
+     "clinic": 1.4,
+     "narcan": 0.2,
      "indoors": 1.7
     },
     "none_listed_yet": [],
@@ -9230,7 +9230,7 @@
     "nearest_miles": {
      "food": 1,
      "clinic": 2.1,
-     "narcan": 1.9,
+     "narcan": 1.6,
      "indoors": 2
     },
     "none_listed_yet": [
@@ -9390,8 +9390,8 @@
     "nearest_miles": {
      "food": 0.1,
      "clinic": 1.1,
-     "narcan": 0.7,
-     "indoors": 1.5
+     "narcan": 0.2,
+     "indoors": 0.9
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -10250,10 +10250,10 @@
      "jobs": 0,
      "learn": 0,
      "treatment": 1,
-     "housing": 0,
+     "housing": 1,
      "legal": 0,
      "ids": 0,
-     "money": 1,
+     "money": 0,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -11025,7 +11025,7 @@
     },
     "nearest_miles": {
      "food": 0.9,
-     "clinic": 2.1,
+     "clinic": 2.2,
      "narcan": 0.4,
      "indoors": 2.2
     },
@@ -11655,7 +11655,7 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 1.8,
-     "narcan": 1.9,
+     "narcan": 1.4,
      "indoors": 1.9
     },
     "none_listed_yet": [
@@ -13613,7 +13613,7 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 1.4,
-     "narcan": 0.8,
+     "narcan": 0.6,
      "indoors": 0.8
     },
     "none_listed_yet": [
@@ -14996,8 +14996,8 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 0.8,
-     "narcan": 0.9,
-     "indoors": 1.6
+     "narcan": 0.4,
+     "indoors": 0.8
     },
     "none_listed_yet": [
      "food"
@@ -17086,7 +17086,7 @@
     },
     "nearest_miles": {
      "food": 0.2,
-     "clinic": 1.1,
+     "clinic": 1.7,
      "narcan": 0.9,
      "indoors": 0.8
     },
@@ -17216,7 +17216,7 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0,
+     "rec": 1,
      "jobs": 6,
      "learn": 2,
      "treatment": 1,
@@ -17226,7 +17226,7 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 1,
+     "connect": 0,
      "transport": 0,
      "pets": 0
     },
@@ -17234,7 +17234,7 @@
      "food": 0.6,
      "clinic": 1.5,
      "narcan": 0.5,
-     "indoors": 1.6
+     "indoors": 0.5
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -17338,7 +17338,7 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0,
+     "rec": 1,
      "jobs": 2,
      "learn": 1,
      "treatment": 2,
@@ -17348,7 +17348,7 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 1,
+     "connect": 0,
      "transport": 0,
      "pets": 0
     },
@@ -17356,7 +17356,7 @@
      "food": 0.3,
      "clinic": 0.6,
      "narcan": 0.4,
-     "indoors": 1.7
+     "indoors": 0.6
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -17482,7 +17482,7 @@
     "nearest_miles": {
      "food": 1.1,
      "clinic": 1.6,
-     "narcan": 0.9,
+     "narcan": 0.8,
      "indoors": 1
     },
     "none_listed_yet": [
@@ -17871,7 +17871,7 @@
      "utilities": 0,
      "hygiene": 1,
      "youth": 1,
-     "rec": 0,
+     "rec": 1,
      "jobs": 5,
      "learn": 1,
      "treatment": 2,
@@ -17881,7 +17881,7 @@
      "money": 1,
      "goods": 1,
      "kids": 0,
-     "connect": 1,
+     "connect": 0,
      "transport": 1,
      "pets": 0
     },
@@ -17889,7 +17889,7 @@
      "food": 0.2,
      "clinic": 0.2,
      "narcan": 0.3,
-     "indoors": 1.7
+     "indoors": 1
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -18193,7 +18193,7 @@
     },
     "nearest_miles": {
      "food": 0.2,
-     "clinic": 1.6,
+     "clinic": 2,
      "narcan": 0.5,
      "indoors": 0.4
     },
@@ -18346,8 +18346,8 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 1.3,
-     "narcan": 1,
-     "indoors": 1.8
+     "narcan": 0.6,
+     "indoors": 1.1
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -18477,7 +18477,7 @@
     },
     "nearest_miles": {
      "food": 0.4,
-     "clinic": 1.3,
+     "clinic": 2,
      "narcan": 0.9,
      "indoors": 1.3
     },
@@ -18783,7 +18783,7 @@
     "nearest_miles": {
      "food": 0.1,
      "clinic": 1.9,
-     "narcan": 1.3,
+     "narcan": 1.2,
      "indoors": 1.7
     },
     "none_listed_yet": [
@@ -19423,7 +19423,7 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 1.9,
-     "narcan": 0.9,
+     "narcan": 0.7,
      "indoors": 0.9
     },
     "none_listed_yet": [
@@ -20306,8 +20306,8 @@
     },
     "nearest_miles": {
      "food": 0.7,
-     "clinic": 0.6,
-     "narcan": 0.8,
+     "clinic": 1.4,
+     "narcan": 0.7,
      "indoors": 1.6
     },
     "none_listed_yet": [],
@@ -21089,7 +21089,7 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 0.5,
-     "narcan": 2.2,
+     "narcan": 1,
      "indoors": 2.2
     },
     "none_listed_yet": [
@@ -21968,7 +21968,7 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 1.7,
-     "narcan": 1.2,
+     "narcan": 0.4,
      "indoors": 1.4
     },
     "none_listed_yet": [
@@ -23320,7 +23320,7 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 0.3,
-     "narcan": 0.3,
+     "narcan": 0.2,
      "indoors": 1.6
     },
     "none_listed_yet": [],
@@ -23958,8 +23958,8 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 1.3,
-     "narcan": 1.3,
-     "indoors": 1.9
+     "narcan": 0.8,
+     "indoors": 1.5
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -25178,7 +25178,7 @@
     },
     "nearest_miles": {
      "food": 0.5,
-     "clinic": 1.5,
+     "clinic": 2.1,
      "narcan": 0.7,
      "indoors": 1.6
     },
@@ -25432,7 +25432,7 @@
    "help": {
     "total": 10,
     "by": {
-     "food": 3,
+     "food": 2,
      "health": 1,
      "harm": 2,
      "shelter": 0,
@@ -25446,7 +25446,7 @@
      "housing": 0,
      "legal": 0,
      "ids": 0,
-     "money": 0,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -25456,7 +25456,7 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 0.7,
-     "narcan": 0.9,
+     "narcan": 0.6,
      "indoors": 0.9
     },
     "none_listed_yet": [],
@@ -26481,7 +26481,7 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 1.8,
-     "narcan": 1.9,
+     "narcan": 1.3,
      "indoors": 1.9
     },
     "none_listed_yet": [
@@ -27231,7 +27231,7 @@
    "help": {
     "total": 18,
     "by": {
-     "food": 5,
+     "food": 4,
      "health": 0,
      "harm": 3,
      "shelter": 0,
@@ -27245,7 +27245,7 @@
      "housing": 0,
      "legal": 0,
      "ids": 1,
-     "money": 1,
+     "money": 2,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -27253,7 +27253,7 @@
      "pets": 1
     },
     "nearest_miles": {
-     "food": 0.4,
+     "food": 0.5,
      "clinic": 1.6,
      "narcan": 0.3,
      "indoors": 0.2
@@ -27518,7 +27518,7 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0,
+     "rec": 1,
      "jobs": 5,
      "learn": 1,
      "treatment": 1,
@@ -27528,15 +27528,15 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 1,
+     "connect": 0,
      "transport": 0,
      "pets": 0
     },
     "nearest_miles": {
      "food": 0.7,
      "clinic": 1.6,
-     "narcan": 0.8,
-     "indoors": 1.2
+     "narcan": 0.4,
+     "indoors": 0.6
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -29075,7 +29075,7 @@
      "utilities": 0,
      "hygiene": 0,
      "youth": 1,
-     "rec": 0,
+     "rec": 1,
      "jobs": 3,
      "learn": 2,
      "treatment": 0,
@@ -29085,15 +29085,15 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 1,
+     "connect": 0,
      "transport": 0,
      "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
      "clinic": 1.1,
-     "narcan": 0.7,
-     "indoors": 1.6
+     "narcan": 0.3,
+     "indoors": 0.5
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -29523,7 +29523,7 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 0.7,
-     "narcan": 0.8,
+     "narcan": 0.6,
      "indoors": 1
     },
     "none_listed_yet": [],
@@ -30113,7 +30113,7 @@
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 1.9,
+     "clinic": 2.4,
      "narcan": 0.5,
      "indoors": 1.7
     },
@@ -30578,8 +30578,8 @@
     "nearest_miles": {
      "food": 1,
      "clinic": 1.2,
-     "narcan": 0.9,
-     "indoors": 1.7
+     "narcan": 0.7,
+     "indoors": 0.9
     },
     "none_listed_yet": [
      "food"

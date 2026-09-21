@@ -37,7 +37,7 @@
   /* The quietened basemap under subway lines: paler streets that still clear 3:1 against the land, a paler park.
      Never used with "increase contrast" or forced colours (subway.ts basemapTokens). */
   --map-road-q:#818a84; --map-main-q:#7d8680; --map-fwy-q:#a2833d; --map-park-q:#e3f1e5; --map-park-ink-q:#3f6b4c; --map-ink-q:#5a6760;
-  --grp-food:#a16207; --grp-shelter:#4338ca; --grp-health:#be185d; --grp-rec:#15803d; --grp-work:#0e7490; --grp-things:#7c2d12; --grp-paperwork:#475569;
+  --grp-food:#a16207; --grp-shelter:#4338ca; --grp-health:#be185d; --grp-rec:#15803d; --grp-work:#0e7490; --grp-kids:#7e22ce; --grp-things:#7c2d12; --grp-paperwork:#475569;
 }
 @media (prefers-color-scheme: dark) { :root {
   --bg:#0b1410; --surface:#121e18; --sunken:#0f1a15; --ink:#e9f1ec; --muted:#a3b5aa; --line:#25362d; --edge:#5c7266;
@@ -50,7 +50,7 @@
   --tr-rail:#eef2f6; --tr-dpm:#e59bf0; --tr-trunk:#cbd5e1; --tr-bike:#6ee7a0; --tr-coach:#fdba74; --tr-pr:#93b4ff;
   --tr-ring:#eef5f0; --tr-fill:#0a110e; --tr-sel:#eef5f0;
   --map-road-q:#66756c; --map-main-q:#6c7b73; --map-fwy-q:#837039; --map-park-q:#182c20; --map-park-ink-q:#7fb394; --map-ink-q:#a3b2a9;
-  --grp-food:#e3b341; --grp-shelter:#a5b4fc; --grp-health:#f9a8d4; --grp-rec:#4fcf93; --grp-work:#67e8f9; --grp-things:#fdba74; --grp-paperwork:#cbd5e1;
+  --grp-food:#e3b341; --grp-shelter:#a5b4fc; --grp-health:#f9a8d4; --grp-rec:#4fcf93; --grp-work:#67e8f9; --grp-kids:#d8b4fe; --grp-things:#fdba74; --grp-paperwork:#cbd5e1;
 } }
 * { box-sizing:border-box; }
 html { -webkit-text-size-adjust:100%; }
@@ -411,7 +411,7 @@ main:focus { outline:none; }
     --tr-bike:GrayText; --tr-fill:Canvas; --tr-sel:Highlight;
     --map-road-q:GrayText; --map-main-q:CanvasText; --map-fwy-q:LinkText; --map-park-q:Canvas; --map-park-ink-q:GrayText; --map-ink-q:CanvasText;
     --grp-food:CanvasText; --grp-shelter:LinkText; --grp-health:Highlight; --grp-rec:CanvasText;
-    --grp-work:LinkText; --grp-things:Highlight; --grp-paperwork:CanvasText;
+    --grp-work:LinkText; --grp-kids:CanvasText; --grp-things:Highlight; --grp-paperwork:CanvasText;
     --focus:Highlight; --surface:Canvas; --brand:LinkText;
   }
 }

@@ -38,6 +38,7 @@
     <color name="grp_health">#F9A8D4</color>
     <color name="grp_rec">#4FCF93</color>
     <color name="grp_work">#67E8F9</color>
+    <color name="grp_kids">#D8B4FE</color>
     <color name="grp_things">#FDBA74</color>
     <color name="grp_paperwork">#CBD5E1</color>
 </resources>

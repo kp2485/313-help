@@ -18,6 +18,11 @@ export interface Need {
    *  list even when the need itself has none: the emergency-room choice leads with 911 (DECISIONS 2026-09-20). */
   refine?: { id: string; query?: Query; links?: string; first?: string[] }[];
   query?: Query;
+  /** A second list, under its own heading, BELOW the need's own list. It exists for one thing: a crisis screen
+   *  keeps its hotlines and its crisis places first (docs/05 ordering), and the ongoing, non-crisis places come
+   *  after them rather than being mixed in or hidden behind a tap. Its heading is `also.<need>.<id>`, and its
+   *  rows are ordinary rows: a `health.support` listing keeps its address, map, Save, Share and its own URL. */
+  also?: { id: string; query: Query };
   links?: string;
   /** No list at all: 911 and rescue steps only. A bystander must not be sent on an errand (audit A7). */
   stepsOnly?: boolean;
@@ -37,7 +42,10 @@ export const NEEDS: Need[] = [
   ] },
   // DV: hotline and 911 before anything else; rows have no address and never show a distance.
   { id: 'unsafe', icon: 'shield', group: 'now', first: ['emg_ndvh', 'emg_911'], query: { category: 'shelter.dv' }, sensitive: true, quickExit: true, intro: 'safe.dv_intro' },
-  { id: 'talk', icon: 'chat', group: 'now', first: ['emg_988', 'emg_dwihn_crisis'], query: { category: 'health.mental' }, sensitive: true, quickExit: true, intro: 'talk.intro' },
+  // Crisis first: 988, DWIHN's line, then the crisis places (health.mental, sensitive). Under those, and only
+  // under those, the daytime places a person can walk into (health.support) — ordinary listings with an address
+  // (category audit 2026-09-22, K3). The screen itself stays traceless and keeps its quick exit.
+  { id: 'talk', icon: 'chat', group: 'now', first: ['emg_988', 'emg_dwihn_crisis'], query: { category: 'health.mental' }, also: { id: 'support', query: { category: 'health.support' } }, sensitive: true, quickExit: true, intro: 'talk.intro' },
   // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door for all four cities, then SAMHSA's.
   // Listings are private (not saved, not in history) but keep their address and distance: people have to get there.
   { id: 'drugs', icon: 'sprout', group: 'now', first: ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true, intro: 'drugs.intro', refine: [
@@ -68,6 +76,9 @@ export const NEEDS: Need[] = [
     { id: 'dhd', query: { category: 'health.dhd' } },
     { id: 'dentist', query: { category: 'health.dental' }, links: 'dental' },
     { id: 'eyes', query: { category: 'health.vision' } },
+    // Ongoing mental-health support that is not a crisis service: day programs a person can walk into. Also the
+    // second half of "I need to talk to someone", where it sits below 988 and the crisis places (docs/05).
+    { id: 'support', query: { category: 'health.support' } },
   ] },
   { id: 'home', icon: 'key', group: 'soon', refine: [
     { id: 'rent', query: { category: 'housing.rent' }, links: 'rent' },
@@ -79,7 +90,11 @@ export const NEEDS: Need[] = [
     { id: 'clothes', query: { category: 'goods.clothes' }, links: 'clothes' },
     { id: 'baby', query: { category: 'goods.baby' }, links: 'baby' },
   ] },
-  { id: 'narcan', icon: 'box', group: 'soon', query: { category: 'harm.narcan' } },
+  // Every harm-reduction place that stocks naloxone, not only the Health Department's boxes: the whole `harm`
+  // top-level, which is `harm.narcan` plus `harm.supplies` (Wayne County's Well Wayne stations and the Life
+  // Points outreach), each of which says it gives out Narcan (Kyle, 2026-09-22; audit K1). Ranking is unchanged:
+  // open now, then distance. Home's "Free Narcan" shortcut opens this same need, so it lists the same places.
+  { id: 'narcan', icon: 'box', group: 'soon', query: { category: 'harm' }, intro: 'narcan.intro' },
   // Warming and cooling centers are announced as alerts. Day to day, libraries and recreation centers are the free indoor places.
   { id: 'hot_cold', icon: 'sun', group: 'soon', query: { category: 'rec' }, intro: 'hotcold.intro', emptyKey: 'hotcold.none' },
   { id: 'job', icon: 'work', group: 'later', refine: [
@@ -134,16 +149,22 @@ export const TABS = [
 ] as const;
 export type TabId = (typeof TABS)[number]['id'];
 
-/** One map layer per group of our own listings, derived from the category taxonomy above.
+/** One map layer per group of our own listings, derived from the category taxonomy above. Eight groups since the
+ *  category audit of 2026-09-22 (docs/CATEGORY-AUDIT-2026-09-22.md); the iPhone and Android apps carry the same list.
  *  `tops` are top-level categories (the part before the first dot). Every top-level category a listing can carry
  *  belongs to exactly one group, except the private ones, which are never drawn (see PRIVATE_TOPS below). */
 export const MAP_GROUPS: { id: string; icon: string; tops: string[] }[] = [
   { id: 'food', icon: 'food', tops: ['food'] },
   { id: 'shelter', icon: 'bed', tops: ['shelter'] },
   { id: 'health', icon: 'health', tops: ['health', 'harm'] },
-  { id: 'rec', icon: 'rec', tops: ['rec'] },
+  // Free computers and internet sit with the libraries and rec centers that offer them (category audit, 2026-09-22).
+  { id: 'rec', icon: 'rec', tops: ['rec', 'connect'] },
   { id: 'work', icon: 'work', tops: ['jobs', 'learn'] },
-  { id: 'things', icon: 'shirt', tops: ['goods', 'hygiene', 'kids', 'youth', 'pets', 'connect'] },
+  // Their own layer since 2026-09-22: child care, after-school programs and places for young people used to sit
+  // under "Clothes, showers, and things", where nobody would look for them.
+  { id: 'kids', icon: 'people', tops: ['kids', 'youth'] },
+  // Every label names what is in its layer: this one is clothes and baby things, showers and laundry, and pet help.
+  { id: 'things', icon: 'shirt', tops: ['goods', 'hygiene', 'pets'] },
   { id: 'paperwork', icon: 'card', tops: ['housing', 'utilities', 'money', 'legal', 'ids', 'transport'] },
 ];
 /** Never a layer, never a dot: treatment and help after sexual assault are private (PRIVATE), and inside the

@@ -244,7 +244,7 @@
   ],
   "x_detroit": {
    "id": "svc_access_benefits_help_at_the_east_dearborn_office",
-   "category": "food.benefits"
+   "category": "money.benefits"
   },
   "assured_date": "2026-09-19"
  },
@@ -319,7 +319,7 @@
   ],
   "x_detroit": {
    "id": "svc_access_benefits_help_at_the_hamtramck_office",
-   "category": "food.benefits"
+   "category": "money.benefits"
   },
   "assured_date": "2026-09-19"
  },
@@ -394,7 +394,7 @@
   ],
   "x_detroit": {
    "id": "svc_access_benefits_help_at_the_main_dearborn_office",
-   "category": "food.benefits"
+   "category": "money.benefits"
   },
   "assured_date": "2026-09-19"
  },
@@ -4830,7 +4830,7 @@
   ],
   "x_detroit": {
    "id": "svc_city_of_help_with_a_highland_park_property_tax_bill_you_",
-   "category": "money.tax"
+   "category": "housing.owner"
   },
   "assured_date": "2026-09-20"
  },
@@ -4944,7 +4944,7 @@
   ],
   "x_detroit": {
    "id": "svc_city_of_help_with_a_property_tax_bill_you_cannot_pay",
-   "category": "money.tax"
+   "category": "housing.owner"
   },
   "assured_date": "2026-09-20"
  },
@@ -7913,7 +7913,7 @@
   ],
   "x_detroit": {
    "id": "svc_dearborn_department_free_narcan_and_test_strips_at_the_w",
-   "category": "harm.narcan"
+   "category": "harm.supplies"
   },
   "assured_date": "2026-09-19"
  },
@@ -12851,7 +12851,7 @@
   ],
   "x_detroit": {
    "id": "svc_detroit_health_neighborhood_wellness_center_at_wcccd_nor",
-   "category": "health.clinic"
+   "category": "health.dhd"
   },
   "assured_date": "2026-09-18"
  },
@@ -16676,7 +16676,7 @@
   ],
   "x_detroit": {
    "id": "svc_detroit_public_main_library",
-   "category": "connect"
+   "category": "rec.library"
   },
   "assured_date": "2026-09-19"
  },
@@ -25636,7 +25636,7 @@
   ],
   "x_detroit": {
    "id": "svc_goodwill_industries_a_place_of_our_own_clubhouse",
-   "category": "health.mental"
+   "category": "health.support"
   },
   "assured_date": "2026-09-20"
  },
@@ -33842,7 +33842,7 @@
   ],
   "x_detroit": {
    "id": "svc_passenger_recovery_free_recovery_coaching_hamtramck_cent",
-   "category": "treatment.outpatient"
+   "category": "treatment.recovery"
   },
   "assured_date": "2026-09-20"
  },
