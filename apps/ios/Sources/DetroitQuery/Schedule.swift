@@ -91,6 +91,8 @@ func opensOn(_ s: Schedule, _ day: Int) -> Bool {
 
 func occurrences(_ row: BundleRow, nowMin: Int, days: Int) -> [Occurrence] {
     let today = Int((Double(nowMin) / 1440).rounded(.down))
+    // A row a steward marked `open_holidays` is computed as though no day were a holiday (the owner's page says so).
+    let holidays = !row.flags.contains(openHolidaysFlag)
     var out: [Occurrence] = []
     for s in row.schedules where scheduleIsValid(s) {
         guard let o = parseClock(s.opensAt), let c = parseClock(s.closesAt) else { continue }
@@ -102,7 +104,10 @@ func occurrences(_ row: BundleRow, nowMin: Int, days: Int) -> [Occurrence] {
             let start = d * 1440 + o
             var end = d * 1440 + c
             if end <= start { end += 1440 }
-            out.append(Occurrence(date: dayString(d), opensAt: s.opensAt, closesAt: s.closesAt, start: start, end: end))
+            // The occurrence belongs to the date it opens, so that is the date the holiday rule asks about: a
+            // window that opened on Christmas Eve and runs to 2am is an ordinary evening's window.
+            out.append(Occurrence(date: dayString(d), opensAt: s.opensAt, closesAt: s.closesAt, start: start, end: end,
+                                  holiday: holidays && isHoliday(day: d)))
         }
     }
     return out.sorted { $0.start != $1.start ? $0.start < $1.start : $0.end < $1.end }
@@ -149,9 +154,19 @@ public func openNow(_ row: BundleRow, now: Date, alerts: [Alert] = []) -> OpenRe
         if current == nil || o.end > current!.end { current = o }   // overlapping windows: the one open longest
     }
     if let cur = current {
+        // A window that opens on a holiday tells us the usual hours and nothing about today. Never "open".
+        if cur.holiday { return usualHours(cur) }
         let left = cur.end - nowMin
         return OpenResult(state: left < closesSoonMinutes ? .closes_soon : .open, closesAt: cur.closesAt, minutesLeft: left)
     }
     let next = occ.first { $0.start > nowMin && !isCancelled($0, w) }
+    // "Opens later today" on a holiday is the same guess as "open now" on a holiday. A next time on a *later* day
+    // stands as written: the date is a fact about the schedule, and the next-times list carries the holiday label.
+    if let n = next, n.holiday, n.date == dayString(Int((Double(nowMin) / 1440).rounded(.down))) { return usualHours(n) }
     return OpenResult(state: .closed, next: .some(next.map { .init(date: $0.date, opensAt: $0.opensAt, closesAt: $0.closesAt) }), cancelledNow: cancelledNow)
+}
+
+/// The `holiday` result: the schedule's own times, offered as usual hours. No `closesAt`, nothing to count down to.
+private func usualHours(_ o: Occurrence) -> OpenResult {
+    OpenResult(state: .holiday, usualHours: .init(opensAt: o.opensAt, closesAt: o.closesAt))
 }

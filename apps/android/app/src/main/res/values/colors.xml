@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The web app's palette (apps/web/src/style.css), the same values as apps/ios/HelpApp/Palette.swift.
+     Colour never carries meaning on its own: every state also has words. Red is kept for 911. -->
+<resources>
+    <color name="brand">#0B6B43</color>
+    <color name="brand_deep">#063F29</color>
+    <color name="brand_soft">#E0F0E6</color>
+    <color name="brand_soft_ink">#0A5236</color>
+    <color name="brand_ink">#FFFFFF</color>
+    <color name="app_bg">#F4F7F4</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="ink">#10201A</color>
+    <color name="muted">#47584F</color>
+    <color name="line">#D9E3DC</color>
+    <color name="warn_bg">#FDF1D8</color>
+    <color name="warn_ink">#6B4300</color>
+    <color name="danger">#8F1D1D</color>
+</resources>

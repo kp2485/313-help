@@ -5,6 +5,7 @@
 import { milesToLine, miles, type BundleRow, type Segment } from '@313help/query';
 import { encodeLine, GRID } from './ingest-basemap.js';
 import { pointInRing, type Neighborhood, type NowStats, type YearStats } from './ingest-neighborhoods.js';
+import type { CrashCounts, CrashRow } from './ingest-crashes.js';
 
 export const NEAR_MILES = 0.5;                       // "inside or within half a mile" (docs/13)
 export const HELP_TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec', 'jobs', 'learn', 'treatment', 'housing', 'legal', 'ids', 'money', 'goods', 'kids', 'connect', 'transport', 'pets'] as const;
@@ -23,6 +24,9 @@ export interface NeighborhoodIndicators {
   parcels?: number;                                  // the City's parcel count here: the base for "per 1,000 parcels"
   years: Record<string, YearStats>;
   now?: NowStats;
+  /** "Safe streets" (docs/13): crashes involving people walking or biking, added up over the years the panel
+   *  names. Plain counts, already hidden under 5. No rate: docs/13 defines no denominator for crashes. */
+  crashes?: CrashCounts;
 }
 
 /** 0 when the point is inside; otherwise miles to the nearest edge. */
@@ -43,6 +47,8 @@ export function buildIndicators(input: {
   stats: { neighborhoods: Record<string, Record<string, YearStats>>; parcels?: Record<string, number>; current?: { neighborhoods: Record<string, NowStats> } }; coverageChecked?: Set<string>;
   /** City points: SNAP stores as [lon, lat, 1 if a grocery store], bus stops as [lon, lat]. */
   snap?: number[][]; busStops?: number[][];
+  /** Crashes involving people walking or biking, per neighborhood (pipeline/src/ingest-crashes.ts). */
+  crashes?: Record<string, CrashRow>;
 }): { neighborhoods: NeighborhoodIndicators[]; segments: Record<string, string[]> } {
   const asPt = (q: number[]) => ({ lat: q[1]!, lon: q[0]! });
   const located = input.rows.filter((r) => r.status === 'active' && r.lat !== undefined && r.lon !== undefined);
@@ -81,6 +87,7 @@ export function buildIndicators(input: {
       },
       ...(input.snap && input.busStops ? { nearest_city: { snap: nearestMiles(center, input.snap), grocery: nearestMiles(center, input.snap.filter((q) => q[2] === 1)), bus: nearestMiles(center, input.busStops) } } : {}),
       ...(input.stats.parcels?.[n.id] ? { parcels: input.stats.parcels[n.id] } : {}),
+      ...(input.crashes?.[n.id] ? { crashes: input.crashes[n.id]!.window } : {}),
       years: input.stats.neighborhoods[n.id] ?? {},
       ...(input.stats.current?.neighborhoods[n.id] ? { now: input.stats.current.neighborhoods[n.id] } : {}),
     };

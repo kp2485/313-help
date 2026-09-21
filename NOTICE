@@ -5,6 +5,14 @@ Contact: kyle@linwoodtechnologies.com
 The code is licensed under the Apache License, Version 2.0 (LICENSE). The dataset
 under data/hsds is licensed CC BY 4.0. Source data keeps its own terms.
 
+Apache-2.0 covers the source code only. The third-party data files under
+data/ingested/ and data/seed/ are NOT licensed under Apache-2.0: each keeps its
+publisher's terms, as recorded in data/sources.yaml, data/ingested/transit/source.json
+and this file. In particular data/ingested/transit/intercity_bus.json is
+CC BY-NC 4.0 (attribution, non-commercial), and the SEMCOG crash aggregate in
+data/ingested/crashes.json is used under SEMCOG's Copyright License Agreement.
+The carve-out is spelled out in data/LICENSE-DATA.md.
+
 Every listing in the app names its own source and the date it was checked; this file
 credits everyone together. Thank you.
 
@@ -16,14 +24,32 @@ Food banks, and the pantries, meal sites and mobile stops they supply:
   Forgotten Harvest (find-food pages)
 
 Drug and alcohol treatment programs were found on:
-  SAMHSA, National Directory of Drug and Alcohol Use Treatment Facilities (public domain)
-  SAMHSA, Opioid Treatment Program Directory (public domain)
+  SAMHSA, National Directory of Drug and Alcohol Use Treatment Facilities.
+    In the public domain, with the publication's own stated condition: it "may
+    not be reproduced or distributed for a fee." We accept that condition; the
+    app is free and nothing here is sold. Recorded in data/sources.yaml.
+  SAMHSA, Opioid Treatment Program Directory (a federal government work)
   Detroit Wayne Integrated Health Network, provider directory
   Each listing's own facts come from the program's own website, named on the listing.
 
 Public lists (City of Detroit open data, data.detroitmi.gov):
   Detroit Health Department: harm reduction stations
   Detroit Parks and Recreation: recreation centers
+
+Naloxone and test-strip stations outside Detroit:
+  Wayne County Healthy Communities, "Well Wayne Stations" location map
+    (endoverdosewayne.org). The map states no terms of use; we publish the
+    County's own facts, name the County on every row, and carry the map's own
+    "Map updated" date. Asking the County about reuse is still owed. The
+    content is the County's; the delivery is Google's — the map is a published
+    Google My Map and we read its own KML endpoint
+    (google.com/maps/d/kml?mid=...&forcekml=1), which Google documents nowhere.
+    Asking the County for the file directly is owed too.
+
+NARCAN is a registered trademark of Emergent BioSolutions Inc. We use the word
+  because it is the word Detroit residents, outreach workers and the City's own
+  pages use for naloxone; naloxone is the drug. There is no affiliation with,
+  sponsorship by, or endorsement from Emergent BioSolutions.
 
 Organizations whose own websites supplied their listings:
   ACCESS
@@ -214,9 +240,71 @@ US Census Bureau (TIGER/Line and TIGERweb; public domain):
   Streets in Hamtramck, Highland Park and Dearborn
   ZIP Code Tabulation Areas for Dearborn ZIP codes
 
+Pedestrian and bicycle crash counts ("Safe streets"):
+  Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without
+    Permission is Prohibited.
+  Southeast Michigan Council of Governments (SEMCOG), "Crash Locations,
+    2015-2024". The underlying police reports are the Michigan State Police's
+    (CJIC), and MSP has not been asked about them. SEMCOG's open-data portal
+    carries a Copyright License Agreement covering everything it publishes
+    (https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement):
+    a perpetual, royalty-free licence to reproduce, modify and publish; the
+    REQUIRED copyright notice reproduced above, which since 2026-09-20 is
+    printed on the Safe streets panel itself as well as here (the panel also
+    names SEMCOG and the State Police); a one-way clause under which the user indemnifies
+    SEMCOG; and a clause granting no third-party rights, which is why MSP's
+    position matters. The layer is read by hand about once a year and kept as
+    counts only, and both bodies are named on the panel. Open for Kyle: accept
+    the agreement including its indemnification clause knowingly, or remove the
+    layer. If SEMCOG or MSP objects the layer is deleted and the panel
+    disappears.
+
+
+THE ELEVEN TRANSPORT LAYERS ON THE MAP
+
+Each layer names its owner and its licence text on the Map tab and in
+data/ingested/transit/source.json. Nothing is drawn from a tile server and no
+layer owner is contacted while the map is open.
+
+  City of Detroit open data (data.detroitmi.gov) — the portal publishes a
+    disclaimer and no licence grant:
+      DDOT Bus Routes; DDOT Bus Stops; QLine Stops (M-1 RAIL); MoGo Stations;
+      Bike Lanes (Department of Public Works)
+    DDOT also publishes a GTFS feed its portal marks CC0. We cannot read it:
+    detroitmi.gov answers 403 to scripts and we do not disguise a request.
+  SMART, published GTFS feed (routes and stops) — no terms published
+  Detroit People Mover, published GTFS feed (stations) — no terms published
+  Michigan Department of Transportation, Carpool Lots (park and ride) —
+    a disclaimer, no redistribution limit stated
+  US DOT Bureau of Transportation Statistics, NTAD Amtrak Stations —
+    a work of the United States government, unrestricted public use
+  US DOT Bureau of Transportation Statistics, NTAD Intercity Bus Atlas Stops —
+    CC BY-NC 4.0 (attribution, non-commercial).
+    Licence: https://creativecommons.org/licenses/by-nc/4.0/
+    Modified: filtered to Detroit, Hamtramck, Highland Park and Dearborn plus a
+    surrounding margin, and reduced to the fields the app draws. 9 stops of the
+    national file. data/ingested/transit/intercity_bus.json is NOT covered by
+    this repository's Apache-2.0 licence (data/LICENSE-DATA.md).
+
+
+PLACES WE LINK TO, AND TAKE NOTHING FROM
+
+  313SafeBeds (313safebeds.com) — real-time shelter status. Its page was read
+    in a browser; the shelter screen opens with a link to it and copies nothing.
+  Transit (transitapp.com) — the "Bus directions in the Transit app" button uses
+    Transit's own documented URL scheme and passes only a destination. Their
+    developer page states no terms and no branding rule, so we use the plain
+    word "Transit" in text, no logo, no asset of theirs, and fetch nothing from
+    their servers. Asking them what they want is still owed.
+  DDOT and SMART trip planners, and the public application sites behind the
+    link-outs on several need screens. Named as theirs; never an endorsement of
+    ours, and none of them endorses us.
+
 
 FORMATS AND STANDARDS
   Human Services Data Specification (HSDS) 3.2, Open Referral
+  General Transit Feed Specification (GTFS), read for the SMART, People Mover
+    and (by hand) DDOT layers
 
 
 OPEN-SOURCE SOFTWARE THE APP AND ITS TOOLS USE
@@ -226,8 +314,14 @@ OPEN-SOURCE SOFTWARE THE APP AND ITS TOOLS USE
   ajv 8.20.0 and ajv-formats 3.0.1 (MIT), Evgeny Poberezkin
   csv-parse 7.0.2 and csv-stringify 6.8.3 (MIT), David Worms / Adaltas
   yaml 2.9.1 (ISC), Eemeli Aro
-  Built and tested with TypeScript, Vite, Vitest, Wrangler (Cloudflare) and Swift.
+  Built and tested with TypeScript, Vite, Vitest, Wrangler (Cloudflare), Swift,
+  and Kotlin with Gradle and the Android Gradle Plugin.
   Each package's own license file ships with it.
+
+  The iPhone and Android apps ship with no third-party code at all: the Android
+  APK contains no AndroidX, no Jetpack Compose, no Play Services and no HTTP or
+  JSON library. JUnit 4 (Eclipse Public License 1.0) is used only to run the
+  Android tests on a laptop and is never distributed.
 
 
 AND

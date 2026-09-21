@@ -3,6 +3,7 @@ import type { Alert, BundleRow, Occurrence, OpenResult, Schedule, WallMinutes } 
 import {
   dateToFloating, floatingToDateString, nowWallMinutes, parseScheduleDate, parseTime, toWall, wallMinutes,
 } from './time.js';
+import { isHoliday, OPEN_HOLIDAYS_FLAG } from './holidays.js';
 
 // Node resolves rrule's CommonJS build (everything under `default`); bundlers resolve its ESM build
 // (named exports). Take whichever is there.
@@ -88,13 +89,16 @@ function occurrenceDates(s: Schedule, from: Date, to: Date): Date[] {
   return rule.between(lo, hi, true);
 }
 
-function toOccurrence(s: Schedule, date: Date): Occurrence {
+function toOccurrence(s: Schedule, date: Date, holidays: boolean): Occurrence {
   const o = parseTime(s.opens_at), c = parseTime(s.closes_at);
   const base = date.getTime() / 60000;
   const start = base + o.hh * 60 + o.mm;
   let end = base + c.hh * 60 + c.mm;
   if (end <= start) end += DAY; // runs past midnight
-  return { date: floatingToDateString(date), opens_at: s.opens_at, closes_at: s.closes_at, start, end };
+  const day = floatingToDateString(date);
+  // The occurrence belongs to the date it opens, so that is the date the holiday rule asks about: a window that
+  // opened on Christmas Eve and runs to 2am is an ordinary evening's window.
+  return { date: day, opens_at: s.opens_at, closes_at: s.closes_at, start, end, ...(holidays && isHoliday(day) ? { holiday: true } : {}) };
 }
 
 /** Wall-clock windows of published cancellation alerts that name this row. */
@@ -117,9 +121,11 @@ function allOccurrences(row: BundleRow, nowMin: WallMinutes, days: number): Occu
   const today = new Date(Math.floor(nowMin / DAY) * DAY * 60000);
   const from = new Date(today.getTime() - 86400000); // yesterday, for overnight windows
   const to = new Date(today.getTime() + days * 86400000);
+  // A row a steward marked `open_holidays` is computed as though no day were a holiday (the owner's page says so).
+  const holidays = !row.flags.includes(OPEN_HOLIDAYS_FLAG);
   const out: Occurrence[] = [];
   for (const s of row.schedules.filter(isValid)) {
-    for (const d of occurrenceDates(s, from, to)) out.push(toOccurrence(s, d));
+    for (const d of occurrenceDates(s, from, to)) out.push(toOccurrence(s, d, holidays));
   }
   return out.sort((a, b) => a.start - b.start || a.end - b.end);
 }
@@ -158,6 +164,8 @@ export function openNow(row: BundleRow, now: Date, alerts: Alert[] = []): OpenRe
     if (!current || o.end > current.end) current = o;
   }
   if (current) {
+    // A window that opens on a holiday tells us the usual hours and nothing about today. Never "open".
+    if (current.holiday) return usualHours(current);
     const left = current.end - nowMin;
     return {
       state: left < CLOSES_SOON_MINUTES ? 'closes_soon' : 'open',
@@ -166,9 +174,17 @@ export function openNow(row: BundleRow, now: Date, alerts: Alert[] = []): OpenRe
     };
   }
   const next = occ.find((o) => o.start > nowMin && !isCancelled(o, windows));
+  // "Opens later today" on a holiday is the same guess as "open now" on a holiday. A next time on a *later* day
+  // stands as written: the date is a fact about the schedule, and the next-times list carries the holiday label.
+  if (next?.holiday && next.date === floatingToDateString(new Date(Math.floor(nowMin / DAY) * DAY * 60000))) return usualHours(next);
   return {
     state: 'closed',
     next: next ? { date: next.date, opens_at: next.opens_at, closes_at: next.closes_at } : null,
     ...(cancelledNow ? { cancelled_now: true } : {}),
   };
+}
+
+/** The `holiday` result: the schedule's own times, offered as usual hours. No `closes_at`, nothing to count down. */
+function usualHours(o: Occurrence): OpenResult {
+  return { state: 'holiday', usual_hours: { opens_at: o.opens_at, closes_at: o.closes_at } };
 }

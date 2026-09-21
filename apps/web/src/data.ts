@@ -23,6 +23,16 @@ export interface Bundle {
   parks_source?: { name: string; last_edited: string };
   /** ZIP -> [lat, lon] center point, for "Type a ZIP". */
   zips?: Record<string, [number, number]>;
+  /** What transport layers this bundle carries (pipeline/src/ingest-transit.ts). The list itself is tiny and
+   *  travels with the bundle; each layer's shapes live in map/transit/… and are fetched only when switched on. */
+  transit?: { layers: TransitLayer[] };
+}
+export interface TransitLayer {
+  id: string; kind: 'line' | 'point' | 'both'; file: string;
+  lines: number; points: number; bytes: number;
+  /** English fallback name, used only if the app has no words of its own for this layer id. */
+  name: string;
+  source: { name: string; url: string; page: string; license: string; fetched_at: string };
 }
 
 const BASE = '/data/bundle/v1/';
@@ -48,7 +58,7 @@ export async function idbSet(key: string, val: unknown): Promise<void> {
 export const cached = () => idbGet<Bundle>('bundle');
 
 async function bytes(path: string): Promise<Uint8Array> {
-  const res = await fetch(BASE + path, { cache: 'no-store' });
+  const res = await fetch(BASE + path, { cache: 'no-store', credentials: 'omit' });
   if (!res.ok) throw new Error(`${res.status} ${path}`);
   return new Uint8Array(await res.arrayBuffer());
 }
@@ -94,6 +104,7 @@ export async function refresh(current?: Bundle): Promise<Bundle | null> {
     parks: (files['places/parks.json'] as { parks?: Bundle['parks'] } | undefined)?.parks,
     parks_source: (files['places/parks.json'] as { source?: Bundle['parks_source'] } | undefined)?.source,
     zips: (files['places/zips.json'] as { zips?: Bundle['zips'] } | undefined)?.zips,
+    transit: files['places/transit.json'] as Bundle['transit'],
   };
   await idbSet('bundle', next); // one put = atomic swap
   return next;

@@ -1,49 +1,89 @@
-// Interface language (docs/05 "Language"): English and Spanish. Only the app's own words are translated.
-// What a place says about itself (name, what you get, who it is for, hours notes) stays as its owner wrote it,
-// in English, and the screen says so: safety facts are never machine-translated.
+// Interface language (docs/05 "Language"): English, Spanish, Arabic and Bengali. Only the app's own words are
+// translated. What a place says about itself (name, what you get, who it is for, hours notes) stays as its owner
+// wrote it, in English, and the screen says so: safety facts are never machine-translated.
 //
 // The choice is a preference, not a fact about a person: it is kept on the phone only and never sent.
+//
+// Arabic and Bengali were drafted by machine on 2026-09-20 and have not yet been read by a native speaker
+// (DECISIONS 2026-09-20). The app never claims otherwise on screen.
 
 import en from '../../../strings/en.json';
 import { idbGet, idbSet } from './data.js';
 
-export type Lang = 'en' | 'es';
-// English ships with the app. Spanish is its own small file, fetched only when it is chosen (or is the phone's
-// language), so an English reader never downloads it. Once fetched, the service worker keeps it for offline use.
+export type Lang = 'en' | 'es' | 'ar' | 'bn';
+
+/** Every language, in the order the switch shows them, each named in its own words.
+ *  A language's own name can only live here: a name has to be readable from inside every other language, so it
+ *  cannot sit in a per-language strings file. Everything else about the switch comes from `strings/<lang>.json`. */
+export const LANGS: readonly { code: Lang; name: string }[] = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Español' },
+  { code: 'ar', name: 'العربية' },
+  { code: 'bn', name: 'বাংলা' },
+];
+const isLang = (x: unknown): x is Lang => LANGS.some((l) => l.code === x);
+
+// English ships with the app. Every other language is its own small file, fetched only when it is chosen (or is
+// the phone's language), so an English reader never downloads any of them. Each `import()` below is written out in
+// full so the bundler gives each language its own chunk. Once fetched, the service worker keeps it for offline use.
+const LOAD: Record<Exclude<Lang, 'en'>, () => Promise<{ default: Record<string, string> }>> = {
+  es: () => import('../../../strings/es.json'),
+  ar: () => import('../../../strings/ar.json'),
+  bn: () => import('../../../strings/bn.json'),
+};
 const TABLES: Partial<Record<Lang, Record<string, string>>> = { en };
 let lang: Lang = 'en';
 
 /** Load a language's words. False if they can't be fetched (no signal and never loaded): the app stays in English. */
 async function load(l: Lang): Promise<boolean> {
   if (TABLES[l]) return true;
-  try { TABLES[l] = (await import('../../../strings/es.json')).default; return true; } catch { return false; }
+  if (l === 'en') return true;
+  try { TABLES[l] = (await LOAD[l]()).default; return true; } catch { return false; }
 }
 
 export const currentLang = () => lang;
-/** For dates and times. Spanish as used in the United States: same calendar, same 12-hour clock. */
-export const locale = () => (lang === 'es' ? 'es-US' : 'en-US');
+/**
+ * For dates, times and numbers. Spanish as used in the United States: same calendar, same 12-hour clock.
+ * Arabic and Bengali ask for Latin digits (`-u-nu-latn`): a phone number or a clock time has to match what a
+ * person dials and what the sign on the door says (DECISIONS 2026-09-20).
+ */
+export const locale = () => ({ en: 'en-US', es: 'es-US', ar: 'ar-u-nu-latn', bn: 'bn-u-nu-latn' }[lang]);
 
-/** A missing Spanish string falls back to English, never to a blank or a raw key. */
+/** A missing translation falls back to English, never to a blank or a raw key. */
 export function t(key: string, p: Record<string, string | number> = {}): string {
   return (TABLES[lang]?.[key] ?? en[key as keyof typeof en] ?? key).replace(/\{(\w+)\}/g, (_, k) => String(p[k] ?? ''));
 }
 
 export function pickLang(saved: unknown, browserLangs: readonly string[]): Lang {
-  if (saved === 'en' || saved === 'es') return saved;
-  return browserLangs.some((l) => l.toLowerCase().startsWith('es')) ? 'es' : 'en';
+  if (isLang(saved)) return saved;
+  // The phone's own order decides, not ours: the first of its languages we have words for wins.
+  for (const want of browserLangs) {
+    const code = want.toLowerCase().split('-')[0];
+    if (isLang(code)) return code;
+  }
+  return 'en';
+}
+
+/** Languages that read right to left. The whole interface mirrors, because style.css uses logical properties. */
+const RTL: readonly string[] = ['ar'];
+export const dirFor = (l: string) => (RTL.includes(l) ? 'rtl' : 'ltr');
+function apply(l: Lang): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = l;
+  document.documentElement.dir = dirFor(l);
 }
 
 export async function initLang(): Promise<void> {
   const want = pickLang(await idbGet<string>('lang'), typeof navigator === 'undefined' ? [] : navigator.languages ?? [navigator.language]);
   lang = (await load(want)) ? want : 'en';
-  if (typeof document !== 'undefined') document.documentElement.lang = lang;
+  apply(lang);
 }
 
 /** Switch language. False (and nothing changes) if the words can't be fetched right now. */
 export async function setLang(next: Lang): Promise<boolean> {
   if (!(await load(next))) return false;
   lang = next;
-  if (typeof document !== 'undefined') document.documentElement.lang = lang;
+  apply(lang);
   await idbSet('lang', lang);
   return true;
 }

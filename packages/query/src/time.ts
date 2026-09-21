@@ -2,6 +2,16 @@
 // A pantry's door sign says "Fridays 1:30"; that is 1:30 on the wall in July and in December.
 // So we convert the current instant to Detroit wall time once, then compare wall to wall.
 // No UTC offsets enter the schedule logic, which is why DST cannot break it.
+//
+// The one conversion asks `Intl.DateTimeFormat` for the zone, so this file carries **no zone rule of its own**: the
+// platform's copy of tzdata answers, and it is right for all of Detroit's history. The iPhone does the same through
+// Foundation. Android cannot — java.time needs API 26 — so apps/android/query/.../Time.kt writes the United States
+// rule out by hand and is correct from 1987, clamping anything earlier to Eastern Standard Time the year round
+// (Android review, 2026-09-20). The three therefore agree on every date this app handles and can only differ before
+// 1987. No fixture pins a pre-1987 instant, because the three would not agree on one; Android pins its own clamp in
+// FixtureTest.theZoneRuleIsClampedBefore1987, which records that 1985-07-01T12:00Z reads as 07:00 there and 08:00
+// here. Nothing in this app has a date that old: every date is a schedule a place published, a day a steward wrote
+// down, or the moment a bundle was built.
 
 import type { WallMinutes } from './types.js';
 

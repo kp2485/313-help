@@ -26,6 +26,8 @@ const note = (r: Record<string, string | undefined>, why: string) => {
 const promoteOnly = !process.argv.includes('--recheck');
 const rows = readResources();
 let ok = 0, held = 0, unread = 0;
+/** Active rows that carry the "Matched their website when added" badge for a page we cannot read today. */
+const claimed: string[] = [];
 const tasks: RecheckTask[] = [];
 const task = (r: Record<string, string | undefined>, outcome: { missing: string[] } | { why: string }) => {
   const t = r.status === 'active' && r.sal_id ? recheckTask(r.sal_id, outcome, today()) : null;
@@ -35,7 +37,16 @@ for (const r of rows) {
   if (promoteOnly && r.status !== 'proposed') continue;
   if (!r.source_url) { held++; continue; }
   const got = await page(r.source_url);
-  if (!got.ok) { task(r, { why: got.why }); note(r, `source page could not be read (${got.why}); check by eye`); unread++; continue; }
+  if (!got.ok) {
+    task(r, { why: got.why });
+    note(r, `source page could not be read (${got.why}); check by eye`);
+    // Worth naming on its own: the row tells residents a machine matched this page, and today it cannot be read
+    // at all. A page that answered on the day the row was added keeps the badge honestly — validate.ts fails the
+    // build for the other case, where the host was already refusing when the row was entered.
+    if (r.status === 'active' && r.entry_method === 'auto_check') claimed.push(`  ${r.sal_id} (entered ${r.checked_at_entry}): ${got.why} — ${r.source_url}`);
+    unread++;
+    continue;
+  }
   const m = listingOnPage(got.html, r);
   // A second number published on another owner's page is checked there.
   if (r.phone2 && r.phone2_source_url) {
@@ -55,5 +66,9 @@ for (const r of rows) {
   }
 }
 writeResources(rows);
-if (!promoteOnly) { writeJson(RECHECK, tasks); console.log(`${tasks.length} re-check tasks written to ${RECHECK}`); }
+if (!promoteOnly) {
+  writeJson(RECHECK, tasks);
+  console.log(`${tasks.length} re-check tasks written to ${RECHECK}`);
+  if (claimed.length) console.log(`${claimed.length} active rows say "matched their website when added" but their page could not be read today:\n${claimed.join('\n')}`);
+}
 console.log(`${ok} matched their source page, ${held} held for a person to check, ${unread} pages could not be read`);

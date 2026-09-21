@@ -1,6 +1,16 @@
 // All schedule math happens on a floating America/Detroit wall clock (schema/query-spec.md "Time").
 // A pantry's sign says "Fridays 1:30"; that is 1:30 on the wall in July and in December. The current instant
 // is turned into Detroit wall time once, then compared wall to wall, so daylight saving time can't break it.
+//
+// That one conversion asks Foundation for the zone, so this file carries **no zone rule of its own**: the system's
+// copy of tzdata answers, and it is right for all of Detroit's history. The web does the same through `Intl`.
+// Android cannot — java.time needs API 26 — so apps/android/query/.../Time.kt writes the United States rule out by
+// hand and is correct from 1987, clamping anything earlier to Eastern Standard Time the year round (Android review,
+// 2026-09-20). The three therefore agree on every date this app handles and can only differ before 1987. No fixture
+// pins a pre-1987 instant, because the three would not agree on one; Android pins its own clamp in
+// FixtureTest.theZoneRuleIsClampedBefore1987, which records that 1985-07-01T12:00Z reads as 07:00 there and 08:00
+// here. Nothing in this app has a date that old: every date is a schedule a place published, a day a steward wrote
+// down, or the moment a bundle was built.
 import Foundation
 
 public let zone = TimeZone(identifier: "America/Detroit")!

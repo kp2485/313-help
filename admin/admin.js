@@ -8,6 +8,7 @@
 import { CLOSED, esc, groupReports, settleBody, taskItem } from './queue.js';
 
 const app = document.getElementById('app');
+const say = (text) => { const el = document.getElementById('say'); if (el) { el.textContent = ''; setTimeout(() => (el.textContent = text), 60); } };
 const KIND = { closed_permanently: 'Closed for good', moved: 'Moved', wrong_hours: 'Hours are different', wrong_phone: 'Wrong phone', out_of_stock: 'Out of supplies', wrong_info: 'Something else', confirmed_ok: 'Still open', looks_good: 'Looks good',
   light_out: 'Light out', glass_trash: 'Glass or trash', flooding_ice: 'Flooding or ice', path_damaged: 'Path damaged', overgrown: 'Overgrown', broken_fixture: 'Broken fixture', restroom: 'Restroom', dumping: 'Dumping' };
 const SCRIPT = 'Phone script: “Are you still running this? What days and times? Any ID or address needed? Is it okay to list you?”';
@@ -83,7 +84,8 @@ async function render() {
     const groups = groupReports(queue.reports, queue.closed_phones);
     shown = new Map(groups.map((g) => [g.target_id, g]));
     const archived = (agg.overrides ?? []).filter((o) => o.status === 'archived');
-    app.innerHTML = `${message ? `<p class="flash" role="status">${esc(message)}</p>` : ''}
+    if (message) say(message);
+    app.innerHTML = `${message ? `<p class="flash">${esc(message)}</p>` : ''}
       ${agg.circuit_breaker ? '<p class="breaker"><strong>Circuit breaker is on.</strong> More than 5 listings were reported closed in the last day. Closure reports are not changing any badges until you work through them below. This is either an attack or a real emergency; look before you archive.</p>' : ''}
       <section><h2>Reported listings and places <span class="count">${groups.length}</span></h2>${groups.map(reportGroup).join('') || '<p class="empty">Nothing to look at. Visitor confirmations are counted automatically.</p>'}</section>
       <section><h2>Proposed new places <span class="count">${queue.proposals.length}</span></h2>${queue.proposals.map(proposal).join('') || '<p class="empty">No proposals waiting.</p>'}</section>
@@ -93,7 +95,7 @@ async function render() {
       </section>
       <section><h2>Archived by a steward <span class="count">${archived.length}</span></h2><p class="sub">Nothing here was deleted. If a place turns out to be open, restore it; it comes back at the next build.</p>
         ${archived.sort((a, b) => b.at.localeCompare(a.at)).map((o) => `<article class="item" data-target="${esc(o.target_id)}"><h3>${esc(names.get(o.target_id)?.name ?? o.target_id)}</h3><p class="sub">${esc(o.target_id)} · ${esc(o.reason_code)} · ${esc(o.at.slice(0, 10))}</p><div class="actions"><button data-act="active" class="good">It's open again: restore it</button></div></article>`).join('') || '<p class="empty">None.</p>'}</section>`;
-  } catch (e) { app.innerHTML = `<p class="breaker">${esc(e.message)}</p>`; }
+  } catch (e) { say(e.message); app.innerHTML = `<p class="breaker">${esc(e.message)}</p>`; }
 }
 
 app.addEventListener('click', async (ev) => {

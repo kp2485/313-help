@@ -44,6 +44,7 @@ final class FixtureTests: XCTestCase {
         if let c = o.closesAt { d["closes_at"] = c }
         if let m = o.minutesLeft { d["minutes_left"] = m }
         if let n = o.next { d["next"] = n.map { ["date": $0.date, "opens_at": $0.opensAt, "closes_at": $0.closesAt] as Any } ?? NSNull() }
+        if let u = o.usualHours { d["usual_hours"] = ["opens_at": u.opensAt, "closes_at": u.closesAt] }
         if o.cancelledNow { d["cancelled_now"] = true }
         return d
     }
@@ -79,7 +80,8 @@ final class FixtureTests: XCTestCase {
                 switch c["fn"] as! String {
                 case "openNow": ok = matches(dict(openNow(r!, now: now, alerts: alerts)), expect)
                 case "nextOccurrences":
-                    let got = nextOccurrences(r!, now: now, n: c["n"] as? Int ?? 3, alerts: alerts).map { "\($0.date) \($0.opensAt)-\($0.closesAt)" }
+                    // " holiday" marks an occurrence that opens on a holiday: labelled, never dropped.
+                    let got = nextOccurrences(r!, now: now, n: c["n"] as? Int ?? 3, alerts: alerts).map { "\($0.date) \($0.opensAt)-\($0.closesAt)\($0.holiday ? " holiday" : "")" }
                     ok = got == expect as? [String]; if !ok { failures.append("\(name): got \(got)") ; ran += 1; continue }
                 case "badge":
                     let b = badge(r!, now: now)

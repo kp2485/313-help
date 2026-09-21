@@ -1,0 +1,28 @@
+# Gradle and Android build output.
+.gradle/
+build/
+*/build/
+local.properties
+.cxx/
+*.apk
+*.aab
+*.iml
+.idea/
+captures/
+
+# The bundle snapshot and the words are copied in at build time from data/bundle/v1 and strings/ into
+# app/build/generated/ (see app/build.gradle.kts), which `build/` already covers. This line is a safety net in
+# case anyone ever copies them into the source tree by hand: the repository rule is that data/bundle/ is not
+# committed at all, and that there is one source of truth for strings/.
+app/src/main/assets/
+
+# The Gradle wrapper — gradlew, gradlew.bat and gradle/wrapper/gradle-wrapper.jar — is committed, as it normally
+# is, so that a checkout builds with the exact Gradle named in gradle-wrapper.properties and nobody has to guess.
+# It was written on 2026-09-20 by `gradle wrapper --gradle-version 8.11.1` (Gradle 9.7.1 from Homebrew).
+# Nothing here is ignored; this line only says so out loud.
+!gradle/wrapper/gradle-wrapper.properties
+
+# Never, under any circumstances, a signing key.
+*.jks
+*.keystore
+keystore.properties

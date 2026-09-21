@@ -43,9 +43,10 @@ Two halves, deliberately separated:
   api/               Cloudflare Worker (Hono) + D1 migrations
   admin/             steward queue: plain HTML, CSS and JS, no build step; served at /admin/ behind Cloudflare Access
   apps/
-    ios/             SwiftUI, iOS 17+ (Sources/DetroitQuery: the Swift query library, tested; HelpApp/: SwiftUI screens, not compiled yet)
-    web/             PWA — same bundle, read-only + reporting (also our Android answer)
-  strings/           en.json, es.json — every word the app shows
+    ios/             SwiftUI, iOS 17+. Two SwiftPM libraries CI can run without Xcode: Sources/DetroitQuery (the Swift copy of the query rules, held to schema/fixtures) and Sources/HelpCore (the app's own non-screen logic — install key, outbox, saved rules, session, signature check, release rules). HelpApp/ holds the screens and needs Xcode. Tests/: DetroitQueryTests, HelpCoreTests, AppParityTests — 73 tests
+    web/             PWA — same bundle, read-only + reporting (still our Android answer)
+    android/         Kotlin, platform Views, no dependencies (query/: a third copy of the shared rules; core/: the android-free files on a plain JVM; app/: the screens). Compiled, tested and run on 2026-09-20 — on an API 35 emulator only, never a phone
+  strings/           en.json, es.json, ar.json, bn.json — every word the app shows, the same keys in all four
   docs/              these design docs
   schema/            query-spec.md + fixtures/ (JSON in, expected answer out)
   .github/workflows/ ci.yml (tests), publish.yml (nightly publish)
@@ -72,10 +73,10 @@ Public endpoints (all anonymous). Rate limiting is a Cloudflare WAF rule in fron
 - `POST /v1/reports` — body per 03. The target must be in the `targets` list the pipeline syncs at each publish (422 if not). The same device, target, kind and day counts once. Returns 202.
 - `POST /v1/proposals` — add-a-place. Stored as an open proposal. Returns 202 and a display-only reference code.
 - `POST /v1/photos` — one JPEG for a condition report (docs/11). Refused if it carries any metadata. Returns a `ph_…` key. Answers 503 while the photo bucket is not set up.
-- `GET /v1/health` — for the app's "reporting available" indicator.
+- `GET /v1/health` — answers `{ok:true}`. **No client calls it** (corrected 2026-09-20: this line used to describe a "reporting available" indicator, which was never built; the app simply queues a report it cannot send).
 - `POST /v1/provider/claim` — provider requests ownership; sends a verification email (the only email we would ever hold; see 08). **(later, v1.1; not built)**
 
-Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a service token for the pipeline):
+Steward endpoints, behind Cloudflare Access (steward email allowlist, plus a service token for the pipeline). **Their bodies are closed schemas with size caps too, since 2026-09-20** — being behind a login is not a reason to accept a field nobody designed. An unknown field is a 400; a steward `note` is capped at 500 characters and `report_ids` at 500 ids; the request body itself is capped at 4 KB on the two resolve routes, 32 KB on the listing-status route, and 1 MB with a 20,000-id limit on `PUT /v1/steward/targets`, which used to read the body raw and uncapped. A bad listing id answers `{"error":"bad listing id"}`.
 - `GET /v1/steward/queue` — open reports (not confirmations: those only feed the badge), proposals, and per target the number of different phones that said closed (`closed_phones`; the hashes never leave D1).
 - `GET /v1/steward/aggregates` — counts and dates per target, steward decisions, and the circuit-breaker flag, for the bundle build. Closure and wrong-info counts are different phones, not reports; `open_after_closed` is the different phones that said "still open" after the latest closed report.
 - `GET /v1/steward/photos/:key` — view one photo.
@@ -108,12 +109,14 @@ Not built: a resource editor (stewards edit `data/seed/` in git), an alert compo
 
 ### iOS (SwiftUI, iOS 17+)
 - Kyle's home stack. Bundle loader → plain Codable cache → on-device query layer → views. The query layer is `DetroitQuery` (Swift, `apps/ios/Sources/DetroitQuery`): open-now, next times, badges, ranking, search and greenway distances, tested against the same `schema/fixtures` as the web.
-- No map on iPhone yet; list-first. The SwiftUI screens have not been compiled yet (they need a Mac).
+- No map on iPhone yet; list-first. The SwiftUI screens compile and run in the simulator (first built 2026-09-20; see `apps/ios/README.md`), reading the signed bundle offline. Reports with an offline outbox, saved places, an About/privacy screen with a key reset and the "Bus directions in the Transit app" link-out are built; the street map, neighborhood pages, transit screens, add-a-place and photos are not. The origin and the two pinned keys are **build settings**, and a Release build refuses to start until they are real.
 - Local notifications only.
 - Ships as Kyle Peterson / Linwood Technologies.
 
-### Android — the web app
-The Android answer is the PWA (`apps/web`): same bundle, installable, reporting works, reaches every Android phone. Missing: reliable background fetch; local notifications are limited. A native app (Kotlin + Jetpack Compose) comes later only if the PWA falls short. KMP / Flutter / React Native are not worth a new stack for two thin read-mostly clients over a static bundle.
+### Android — the web app today, a Kotlin client that has run on an emulator
+The Android answer **is still the PWA** (`apps/web`): same bundle, installable, reporting works, reaches every Android phone. Missing: reliable background fetch; local notifications are limited.
+
+Since 2026-09-20 `apps/android` also holds a native client. Kyle OK'd the Android SDK that day (one licence, `android-sdk-license`, for `platform-tools`, `platforms;android-35` and `build-tools;35.0.0`), and since then it compiles, its tests pass, `assembleDebug` produces a **1.13 MiB APK with two permissions and no third-party code at all**, and it has **run on an AOSP API 35 emulator — never on a phone, and never below Android 15**. CI builds `:query` and `:core` only and sets `HELP313_NO_ANDROID=1` on purpose: a workflow should not accept Google's SDK licence for this repository. It is deliberately not the Compose app this doc used to imagine: platform Views built in code, **no Jetpack Compose, no AndroidX and no dependency of any kind inside the APK**, `minSdk` 24 / `targetSdk` 35. The reader we design for is a cheap old phone, and Compose alone would cost 2–4 MB and work at every start and every frame. The Detroit wall-clock rule and Ed25519 verification are written out by hand (checked against the JVM's tz database and RFC 8032's vectors) because `java.time` needs API 26 and platform Ed25519 needs API 33. KMP / Flutter / React Native are still not worth a new stack. See `apps/android/README.md` for what is verified and what is not.
 
 ### Web (PWA)
 - Vanilla TypeScript. **Map:** our own street map, drawn on a canvas from the signed bundle (`apps/web/src/map.ts`): no tile server, no map library, works offline. Must work with the map failing: every map screen also lists the same places and cross streets as text.
@@ -123,9 +126,9 @@ The Android answer is the PWA (`apps/web`): same bundle, installable, reporting 
 - The service worker caches the app shell only (never `/data/`). Listings live in IndexedDB, stored only after the signature and checksum checks pass. IndexedDB also queues reports made with no signal.
 - Also serves as the shareable deep-link target (`https://<domain>/#/r/sal_…`) that resolves for people without the app.
 
-## Shared query semantics (one spec, two implementations)
+## Shared query semantics (one spec, three implementations)
 
-Keep a single `schema/query-spec.md` + fixture tests (JSON in, expected ranking out) so the web app (`packages/query`, TypeScript) and the iPhone app (`DetroitQuery`, Swift) agree on: open-now evaluation across DST, "next 3 occurrences," distance banding (0–1 mi, 1–3, 3+), sort by freshness tier, and the rule that reported-closed rows stay listed but go last in their band. The fixtures came first, then the clients.
+Keep a single `schema/query-spec.md` + fixture tests (JSON in, expected ranking out) so the web app (`packages/query`, TypeScript), the iPhone app (`DetroitQuery`, Swift) and, since 2026-09-20, the Android app (`apps/android/query`, Kotlin) — three implementations — agree on: open-now evaluation across DST, "next 3 occurrences," distance banding (0–1 mi, 1–3, 3+), sort by freshness tier, and the rule that reported-closed rows stay listed but go last in their band. The fixtures came first, then the clients.
 
 ## Hosting & cost
 
@@ -133,7 +136,7 @@ Cloudflare Pages + R2 (photos only) + Workers + D1 + Access: within free/near-fr
 
 ## Observability
 
-Worker logs (the Worker logs no requests and reads no IPs), a public status line on the About screen ("Data last updated …"). Not built: pipeline run summaries in the admin tool (for now, read the GitHub Actions log), and an uptime check on `index.json`.
+**There are no Worker logs.** Workers Logs are off by configuration (`[observability.logs] enabled = false`, `invocation_logs = false`); the error and not-found handlers log nothing at all, not even the route pattern; and the only permitted `console` call is `api/src/log.ts`, whose message type is an allow-list of two fixed sentences about the nightly cron. Tests enforce both. So the only thing to watch is the public status line on the About screen ("Data last updated …") and the GitHub Actions log. Not built: pipeline run summaries in the admin tool (for now, read the GitHub Actions log), and an uptime check on `index.json`.
 
 ## Licensing
 

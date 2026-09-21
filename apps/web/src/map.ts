@@ -70,23 +70,93 @@ export function loadMap(index: BundleIndex): Promise<BaseMap | null> {
   })());
 }
 
+// ---- extra layers (ingest-transit.ts): bus routes and stops, the streetcar, bike lanes, stations ----------
+// Each layer is its own file in the signed bundle, fetched only when a person switches that layer on, decoded
+// the same way as the streets. `names` holds each line's or point's name once; -1 means it has none.
+export interface LayerFile { origin: [number, number]; names: string[]; lines?: [number, number[]][]; points?: [number, number, number][] }
+export interface LayerData { lines: Line[]; points: { name: string; x: number; y: number }[] }
+export function decodeLayer(f: LayerFile): LayerData {
+  const nm = (n: number) => (n < 0 ? '' : f.names[n] ?? '');
+  return {
+    lines: (f.lines ?? []).map(([n, enc]) => { const pts = decodeLine(enc, f.origin); return { cls: 1, name: nm(n), pts, box: boxOf(pts) }; }),
+    points: (f.points ?? []).map(([n, x, y]) => ({ name: nm(n), x: wx(f.origin[0] + x / 1e5), y: wy(f.origin[1] + y / 1e5) })),
+  };
+}
+const layers = new Map<string, LayerData>(), layerJobs = new Map<string, Promise<LayerData | null>>();
+/** One layer file, checked against the signed index, decoded once and kept on the phone for offline use.
+ *  Null when the bundle has no such layer or it cannot be read; the map then simply draws without it. */
+export function loadLayer(index: BundleIndex, file: string): Promise<LayerData | null> {
+  const meta = index.files[file];
+  if (!meta) return Promise.resolve(null);
+  const key = `${file}:${meta.sha256}`;
+  const have = layers.get(key);
+  if (have) return Promise.resolve(have);
+  const job = layerJobs.get(key);
+  if (job) return job;
+  const run = (async () => {
+    try {
+      let held = await idbGet<{ key: string; file: LayerFile }>('layer:' + file);
+      if (held?.key !== key) {
+        try { held = { key, file: (await fetchVerified(index, file)) as LayerFile }; await idbSet('layer:' + file, held); }
+        catch (e) { if (!held) throw e; }                 // offline with last week's copy: better than nothing
+      }
+      const data = decodeLayer(held!.file);
+      layers.set(key, data);
+      return data;
+    } catch (e) { console.warn('map layer not available', file, e); return null; }
+    finally { layerJobs.delete(key); }
+  })();
+  layerJobs.set(key, run);
+  return run;
+}
+
+/** How one switched-on layer is drawn. `css` is a custom property in style.css, so dark mode works. */
+export interface Overlay extends LayerData { id: string; label: string; css: string; width?: number; dash?: number[]; ring?: boolean; dense?: boolean }
+
 // ---- the view -----------------------------------------------------------------
-export interface MapDot { lat: number; lon: number; label: string; go?: string }
+export interface MapDot { lat: number; lon: number; label: string; go?: string; css?: string; sub?: string }
 export interface MapSpec {
   key: string;                                  // remembers pan and zoom while this screen is open
   label: string;                                // what a screen reader hears for the picture
   segments: Segment[]; focus?: string;          // greenway; `focus` is drawn bold
   outline?: { lat: number; lon: number }[][];   // a neighborhood's edge
+  overlays?: Overlay[];                         // switched-on transport layers, already loaded (Map tab)
   dots?: MapDot[]; me?: { lat: number; lon: number } | null;
   fit: { lat: number; lon: number }[];          // show at least these points at the start
   minMeters?: number;                           // never start closer than this many meters across
   quiet?: boolean;                              // a map about help, not parks: no dots for small parks, so the listing dots stand out
   cover?: boolean;                              // fill the box with the fit area (the wide city on a tall phone) instead of showing all of it
-  strings: { zoomIn: string; zoomOut: string; reset: string; bigger: string; smaller: string; details: string; park: string; noStreets: string; source: (date: string) => string; phase: Record<string, string> };
+  /** Draw the city's parks. False on the Map tab when "City parks" is switched off: the switch used to move only
+   *  the list, and the parks stayed painted on the map whatever it said (web review, 2026-09-20). */
+  parks?: boolean;
+  strings: { zoomIn: string; zoomOut: string; reset: string; bigger: string; smaller: string; details: string; park: string; noStreets: string; keys: string; panUp: string; panDown: string; panLeft: string; panRight: string; source: (date: string) => string; phase: Record<string, string> };
   segGo?: (id: string) => string;               // data-go value for a greenway segment
 }
 const cameras = new Map<string, { cx: number; cy: number; s: number }>();
+let mapNo = 0;                                          // one id per map on the screen, for aria-describedby
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+/** The app's one live region. It sits outside #app precisely so a redraw cannot destroy it; making it inert
+ *  behind the full-screen map silenced every announcement while the map was open, which is the one time a
+ *  person is most likely to switch a layer on (web review, 2026-09-20). */
+export const isLiveRegion = (n: Element) => n.hasAttribute('aria-live') || n.getAttribute('role') === 'status';
+/** Everything that has to be made inert while the full-screen map is open: every part of the page that is not
+ *  the map and does not contain it, from the root down to the map's own parent — except the live region, which
+ *  is how the app speaks and must keep speaking. Pure, so it can be tested against a fixture tree. */
+export function coverTargets(el: Element, root: Element): Element[] {
+  const out: Element[] = [];
+  const take = (n: Element) => {
+    for (const sib of n.children) {
+      if (sib === el || sib.contains(el) || isLiveRegion(sib) || (sib as HTMLElement).inert || out.includes(sib)) continue;
+      out.push(sib);
+    }
+  };
+  take(root);
+  for (let n: Element | null = el.parentElement; n; n = n.parentElement) { take(n); if (n === root) break; }
+  return out;
+}
+/** Our own words go into `innerHTML` and into `aria-label` here; they come from strings/*.json, where an
+ *  apostrophe or an ampersand is ordinary punctuation. Escaped, always: a label is markup once it is set. */
+export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
 export class MapView {
   private canvas = document.createElement('canvas');
@@ -98,31 +168,51 @@ export class MapView {
   private segs: { seg: Segment; lines: Float32Array[]; box: Box }[];
   private ro: ResizeObserver; private mq = matchMedia('(prefers-color-scheme: dark)');
   private onScheme = () => this.redraw();
+  // A laptop: the window can move to a screen with a different pixel ratio, or be zoomed. The canvas is then the
+  // wrong number of pixels for its box and the map looks soft, so it is drawn again at the ratio it now has.
+  private dpr = 0;
+  private onWindow = () => { if (Math.min(window.devicePixelRatio || 1, 2) !== this.dpr) this.resize(); };
+  // Escape leaves the full-screen map, like any other overlay.
+  private onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && this.el.classList.contains('big')) { e.preventDefault(); this.tool('big', this.spec.strings); } };
+  private opener: HTMLElement | null = null;              // what to give the cursor back to when full screen closes
+  private hidden: Element[] = [];                         // what full screen made inert
+  private bar: HTMLElement | null = null;                 // Urgent help (and quick exit) inside the full-screen map
+  private release(): void { for (const n of this.hidden) (n as HTMLElement).inert = false; this.hidden = []; }
 
   constructor(private el: HTMLElement, private spec: MapSpec, index: BundleIndex) {
     const S = spec.strings;
     this.segs = spec.segments.map((seg) => { const lines = seg.lines.map((l) => { const a = new Float32Array(l.length * 2); l.forEach((pt, i) => { a[i * 2] = wx(pt[0]); a[i * 2 + 1] = wy(pt[1]); }); return a; }); return { seg, lines, box: merge(lines.map(boxOf)) }; });
     this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', spec.label); this.canvas.tabIndex = 0;
-    const btn = (act: string, text: string, label: string) => `<button type="button" data-map-act="${act}" aria-label="${label}">${text}</button>`;
+    // The picture answers to the keyboard, so it says how, and the description is read out with the label.
+    const help = document.createElement('p'); help.className = 'vh'; help.id = 'mapkeys' + ++mapNo; help.textContent = S.keys;
+    this.canvas.setAttribute('aria-describedby', help.id);
+    const btn = (act: string, text: string, label: string, cls = '') => `<button type="button" class="${cls}" data-map-act="${act}" aria-label="${esc(label)}">${text}</button>`;
     const tools = document.createElement('div'); tools.className = 'maptools';
     tools.innerHTML = btn('in', '+', S.zoomIn) + btn('out', '&minus;', S.zoomOut) + btn('reset', '&#8982;', S.reset) + btn('big', '&#10530;', S.bigger);
+    // Moving the map by dragging is not the only way to move it (WCAG 2.5.7): these four buttons do the same,
+    // one tap at a time, for anyone who cannot hold and drag. They are also what a switch or a head pointer uses.
+    const pad = document.createElement('div'); pad.className = 'mappan';
+    pad.innerHTML = btn('left', '&#8592;', S.panLeft) + btn('up', '&#8593;', S.panUp) + btn('down', '&#8595;', S.panDown) + btn('right', '&#8594;', S.panRight);
     this.note.className = 'mapnote'; this.note.setAttribute('aria-live', 'polite');
-    const frame = document.createElement('div'); frame.className = 'mapframe'; frame.append(this.canvas, tools);
+    const frame = document.createElement('div'); frame.className = 'mapframe'; frame.append(this.canvas, help, tools, pad);
+    pad.addEventListener('click', (e) => this.tool((e.target as HTMLElement).closest<HTMLElement>('[data-map-act]')?.dataset.mapAct, S));
     el.replaceChildren(frame, this.note);
     this.ro = new ResizeObserver(() => this.resize()); this.ro.observe(frame);
     this.mq.addEventListener('change', this.onScheme);
+    window.addEventListener('resize', this.onWindow);
+    document.addEventListener('keydown', this.onKey);
     tools.addEventListener('click', (e) => this.tool((e.target as HTMLElement).closest<HTMLElement>('[data-map-act]')?.dataset.mapAct, S));
     this.listen();
     this.resize(true);
-    void loadMap(index).then((m) => { this.map = m; if (!m) this.say(`<p class="foot">${S.noStreets}</p>`); else if (!this.note.innerHTML) this.say(`<p class="foot">${S.source(m.edited)}</p>`); this.redraw(); });
+    void loadMap(index).then((m) => { this.map = m; if (!m) this.say(`<p class="foot">${esc(S.noStreets)}</p>`); else if (!this.note.innerHTML) this.say(`<p class="foot">${esc(S.source(m.edited))}</p>`); this.redraw(); });
   }
-  destroy(): void { this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); cancelAnimationFrame(this.raf); if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
+  destroy(): void { this.release(); this.bar?.remove(); this.bar = null; this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
 
   // -- camera
   private resize(first = false): void {
     const r = this.canvas.parentElement!.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
     if (!r.width || !r.height) return;
-    this.w = r.width; this.h = r.height; this.canvas.width = Math.round(r.width * dpr); this.canvas.height = Math.round(r.height * dpr);
+    this.dpr = dpr; this.w = r.width; this.h = r.height; this.canvas.width = Math.round(r.width * dpr); this.canvas.height = Math.round(r.height * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (first) {
       const xs = this.spec.fit.map((q) => wx(q.lon)), ys = this.spec.fit.map((q) => wy(q.lat));
@@ -145,14 +235,54 @@ export class MapView {
     this.cx = Math.max(-0.25, Math.min(0.25, this.cx - dx / this.s)); this.cy = Math.max(-0.2, Math.min(0.2, this.cy - dy / this.s)); this.redraw();
   }
   private tool(act: string | undefined, S: MapSpec['strings']): void {
+    const step = 0.35 * Math.min(this.w, this.h);
     if (act === 'in') this.zoomAt(1.6); else if (act === 'out') this.zoomAt(1 / 1.6);
+    else if (act === 'left') this.pan(step, 0); else if (act === 'right') this.pan(-step, 0);
+    else if (act === 'up') this.pan(0, step); else if (act === 'down') this.pan(0, -step);
     else if (act === 'reset') { Object.assign(this, this.home); this.touched = false; cameras.delete(this.spec.key); this.redraw(); }
     else if (act === 'big') {
       const big = this.el.classList.toggle('big'); document.body.classList.toggle('mapbig', big);
-      // The big map starts under the top bar, so "Urgent help" (or quick exit) is still one tap away.
-      this.el.style.top = big ? `${Math.max(0, document.querySelector('header.top')?.getBoundingClientRect().bottom ?? 0)}px` : '';
       const b = this.el.querySelector<HTMLElement>('[data-map-act="big"]')!; b.innerHTML = big ? '&times;' : '&#10530;'; b.setAttribute('aria-label', big ? S.smaller : S.bigger);
+      // Full screen covers the page, so for the keyboard and for a screen reader it has to BE the page: everything
+      // underneath is made inert (not focusable, not read), Escape closes it, and the cursor comes back to the
+      // button that opened it (WCAG 2.4.3, 2.4.11, 2.1.2).
+      //
+      // It used to start below the top bar instead, to leave "Urgent help" in reach — but inert is what the page
+      // behind a modal gets, so the bar (and, on a laptop, the whole side rail) sat there looking like buttons and
+      // answering nothing: the worst of both (web review, 2026-09-20). Now the map really does cover the page, and
+      // the buttons that must never be more than one tap away are brought INSIDE it. They are the page's own
+      // buttons, cloned, so they carry their own words in whatever language the screen is in and keep working
+      // through the app's own click handling.
+      if (big) {
+        this.el.setAttribute('role', 'dialog'); this.el.setAttribute('aria-modal', 'true'); this.el.setAttribute('aria-label', this.spec.label);
+        // iOS Safari leaves `document.body` as the active element after a tap, so "what opened this" has to fall
+        // back to the button itself or the cursor lands nowhere when the map closes (web review, 2026-09-20).
+        const from = document.activeElement as HTMLElement | null;
+        this.opener = from && from !== document.body && from !== document.documentElement ? from : b;
+        this.bar = this.urgentBar();
+        if (this.bar) this.el.prepend(this.bar);
+        // The map's own box sits inside #app, so the parts of #app that are not it are made inert one by one too.
+        this.hidden = coverTargets(this.el, document.body);
+        for (const n of this.hidden) (n as HTMLElement).inert = true;
+        this.canvas.focus();
+      } else {
+        this.el.removeAttribute('role'); this.el.removeAttribute('aria-modal'); this.el.removeAttribute('aria-label');
+        this.bar?.remove(); this.bar = null;
+        this.release();
+        (this.opener ?? b).focus(); this.opener = null;
+      }
     }
+  }
+  /** The page's own "Urgent help" — and its quick exit, on a screen that has one — copied into the full-screen
+   *  map. Copies, not new buttons: they keep their words, their labels and the `data-go`/`data-exit` hooks the
+   *  app already listens for, in every language, with nothing to keep in step. */
+  private urgentBar(): HTMLElement | null {
+    const find = (sel: string) => document.querySelector<HTMLElement>(`header.top ${sel}`) ?? document.querySelector<HTMLElement>(`nav.tabs ${sel}`);
+    const wanted = ['[data-exit]', '.urgent'].map(find).filter((n): n is HTMLElement => !!n);
+    if (!wanted.length) return null;
+    const bar = document.createElement('div'); bar.className = 'mapbar';
+    for (const n of wanted) { const copy = n.cloneNode(true) as HTMLElement; copy.removeAttribute('id'); bar.append(copy); }
+    return bar;
   }
   private listen(): void {
     const c = this.canvas, at = (e: PointerEvent | WheelEvent | MouseEvent) => { const r = c.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
@@ -180,24 +310,44 @@ export class MapView {
     });
   }
 
+  /** Parks are drawn unless a screen says otherwise; only the Map tab, which has a switch for them, ever does. */
+  private parksOn = () => this.spec.parks !== false;
+
   // -- tap: a listing dot, then the greenway, then a park
   private X = (x: number) => (x - this.cx) * this.s + this.w / 2;
   private Y = (y: number) => (y - this.cy) * this.s + this.h / 2;
   private say(html: string): void { this.note.innerHTML = html; }
   private pick(q: { x: number; y: number }): void {
-    const S = this.spec.strings, esc = (t: string) => t.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
+    const S = this.spec.strings;
     const card = (title: string, sub: string, go?: string) => this.say(`<div class="mappick"><span><strong>${esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${go ? `<button class="btn ghost" data-go="${esc(go)}">${esc(S.details)}</button>` : ''}</div>`);
     let best: { d: number; dot: MapDot } | undefined;
     for (const dot of this.spec.dots ?? []) { const d = Math.hypot(this.X(wx(dot.lon)) - q.x, this.Y(wy(dot.lat)) - q.y); if (d < 24 && (!best || d < best.d)) best = { d, dot }; }
-    if (best) return card(best.dot.label, '', best.dot.go);
+    if (best) return card(best.dot.label, best.dot.sub ?? '', best.dot.go);
+    // A stop or station on a switched-on layer: its name, and what kind of thing it is, in words.
+    let stop: { d: number; name: string; label: string } | undefined;
+    for (const o of this.spec.overlays ?? []) for (const pt of o.points) {
+      const d = Math.hypot(this.X(pt.x) - q.x, this.Y(pt.y) - q.y);
+      if (d < 18 && (!stop || d < stop.d)) stop = { d, name: pt.name, label: o.label };
+    }
+    if (stop) return card(stop.name || stop.label, stop.name ? stop.label : '');
     let near: { d: number; seg: Segment } | undefined;
     for (const g of this.segs) for (const l of g.lines) for (let i = 0; i + 3 < l.length; i += 2) {
       const d = distToPiece(q.x, q.y, this.X(l[i]!), this.Y(l[i + 1]!), this.X(l[i + 2]!), this.Y(l[i + 3]!));
       if (d < 16 && (!near || d < near.d)) near = { d, seg: g.seg };
     }
     if (near) return card(near.seg.name, S.phase[near.seg.phase] ?? '', near.seg.id === this.spec.focus ? undefined : this.spec.segGo?.(near.seg.id));
+    // A route or a bike lane on a switched-on layer.
+    let route: { d: number; name: string; label: string } | undefined;
+    for (const o of this.spec.overlays ?? []) for (const l of o.lines) {
+      if (!touches(l.box, [this.cx - this.w / 2 / this.s, this.cy - this.h / 2 / this.s, this.cx + this.w / 2 / this.s, this.cy + this.h / 2 / this.s])) continue;
+      for (let i = 0; i + 3 < l.pts.length; i += 2) {
+        const d = distToPiece(q.x, q.y, this.X(l.pts[i]!), this.Y(l.pts[i + 1]!), this.X(l.pts[i + 2]!), this.Y(l.pts[i + 3]!));
+        if (d < 14 && (!route || d < route.d)) route = { d, name: l.name, label: o.label };
+      }
+    }
+    if (route) return card(route.name || route.label, route.name ? route.label : '');
     const X = this.cx + (q.x - this.w / 2) / this.s, Y = this.cy + (q.y - this.h / 2) / this.s;
-    const park = this.map?.parks.find((a) => a.name && X >= a.box[0] && X <= a.box[2] && Y >= a.box[1] && Y <= a.box[3] && inside(X, Y, a.pts));
+    const park = !this.parksOn() ? undefined : this.map?.parks.find((a) => a.name && X >= a.box[0] && X <= a.box[2] && Y >= a.box[1] && Y <= a.box[3] && inside(X, Y, a.pts));
     if (park) card(park.name, S.park);
   }
 
@@ -216,11 +366,17 @@ export class MapView {
     const labels: { name: string; pts: Float32Array; cls: number }[] = [];
     if (this.map) {
       c.fillStyle = col.land; c.beginPath(); for (const ring of this.map.boundary) { this.trace(ring); c.closePath(); } c.fill('evenodd');
-      c.fillStyle = col.park; c.beginPath(); for (const a of this.map.parks) if (touches(a.box, view)) { this.trace(a.pts); c.closePath(); } c.fill();
-      // Zoomed out, a pocket park is smaller than a pixel: mark it with a small dot so it can still be found.
-      c.fillStyle = col.parkInk; c.beginPath();
-      if (!this.spec.quiet) for (const a of this.map.parks) if (touches(a.box, view) && (a.box[2] - a.box[0]) * this.s < 7) { const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2); c.moveTo(x + 2, y); c.arc(x, y, 2, 0, 6.2832); }
-      c.globalAlpha = 0.75; c.fill(); c.globalAlpha = 1;
+      // The city edge is also a line, not only a change of shade: two pale fills a step apart are not a boundary
+      // anyone can see (WCAG 1.4.11).
+      c.strokeStyle = col.main; c.lineWidth = 1.5; c.stroke();
+      // "City parks" off means off: no green shapes, no pocket-park dots, no names further down.
+      if (this.parksOn()) {
+        c.fillStyle = col.park; c.beginPath(); for (const a of this.map.parks) if (touches(a.box, view)) { this.trace(a.pts); c.closePath(); } c.fill();
+        // Zoomed out, a pocket park is smaller than a pixel: mark it with a small dot so it can still be found.
+        c.fillStyle = col.parkInk; c.beginPath();
+        if (!this.spec.quiet) for (const a of this.map.parks) if (touches(a.box, view) && (a.box[2] - a.box[0]) * this.s < 7) { const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2); c.moveTo(x + 2, y); c.arc(x, y, 2, 0, 6.2832); }
+        c.globalAlpha = 0.75; c.fill(); c.globalAlpha = 1;
+      }
       // Small streets appear as you zoom in; main roads are always there to get your bearings.
       const showCls = mpp < 9 ? 4 : mpp < 16 ? 3 : 2;
       const width = (cls: number) => Math.max(cls === 4 ? 0.8 : 1.2, Math.min(cls <= 2 ? 6.5 : 5, ([18, 20, 15, 11, 8][cls]!) / mpp));
@@ -239,6 +395,16 @@ export class MapView {
       c.beginPath(); for (const ring of this.spec.outline) { ring.forEach((q, i) => (i ? c.lineTo(this.X(wx(q.lon)), this.Y(wy(q.lat))) : c.moveTo(this.X(wx(q.lon)), this.Y(wy(q.lat))))); c.closePath(); }
       c.globalAlpha = 0.12; c.fillStyle = col.brand; c.fill(); c.globalAlpha = 1; c.strokeStyle = col.strong; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.stroke(); c.setLineDash([]);
     }
+    // Transport layers a person switched on (bus routes, the streetcar, bike lanes, stations). They are drawn
+    // under the greenway and under the listing dots, so switching a layer on never hides the thing a screen is
+    // about. Colour never carries the meaning alone: the switcher names every layer, and tapping names it again.
+    for (const o of this.spec.overlays ?? []) {
+      if (!o.lines.length) continue;
+      const lw = Math.max(1.6, Math.min(o.width ?? 5, (o.width ?? 5) * 18 / mpp));
+      c.strokeStyle = css(o.css) || col.brand; c.lineWidth = lw; c.setLineDash((o.dash ?? []).map((d) => d * lw));
+      c.beginPath(); for (const l of o.lines) if (touches(l.box, view)) this.trace(l.pts); c.stroke();
+    }
+    c.setLineDash([]);
     // Greenway, drawn like a transit line: one width the whole way, a casing so it reads over the streets, and a
     // colour and dash for each phase. Colour never carries the meaning alone: the key under the map says it in words,
     // and tapping a stretch names its phase. Where stretches meet, a station dot marks the join once you zoom in.
@@ -302,7 +468,7 @@ export class MapView {
       named.push({ n: l.name, x: spot.x, y: spot.y });
       c.save(); c.translate(spot.x, spot.y); c.rotate(spot.a); c.strokeStyle = col.halo; c.lineWidth = 3.5; c.strokeText(l.name, 0, 0); c.fillStyle = col.ink; c.fillText(l.name, 0, 0); c.restore();
     }
-    if (this.map && mpp < 7) {
+    if (this.map && mpp < 7 && this.parksOn()) {
       c.font = 'italic 600 12px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
       for (const a of this.map.parks) {
         if (!a.name || !touches(a.box, view) || (a.box[2] - a.box[0]) * this.s < 46) continue;
@@ -311,7 +477,21 @@ export class MapView {
         c.strokeStyle = col.park; c.lineWidth = 3.5; c.strokeText(a.name, x, y); c.fillStyle = col.parkInk; c.fillText(a.name, x, y);
       }
     }
-    const dot = (d: { lat: number; lon: number }, fill: string, r: number) => { c.beginPath(); c.arc(this.X(wx(d.lon)), this.Y(wy(d.lat)), r, 0, 6.2832); c.fillStyle = fill; c.fill(); c.lineWidth = 2.5; c.strokeStyle = col.surface; c.stroke(); };
+    // Stops and stations. There are thousands of bus stops, so a dense layer waits until the map is close enough
+    // for them to be separate things rather than a smear; the layer switcher says so, and the list below the map
+    // shows them at any zoom.
+    for (const o of this.spec.overlays ?? []) {
+      if (!o.points.length) continue;
+      const r = o.dense ? (mpp > 12 ? 0 : Math.max(2, Math.min(4, 30 / mpp))) : Math.max(3.5, Math.min(6.5, 45 / mpp));
+      if (!r) continue;
+      c.fillStyle = css(o.css) || col.brand; c.strokeStyle = col.surface; c.lineWidth = Math.max(1, r * 0.4);
+      for (const q of o.points) {
+        const x = this.X(q.x), y = this.Y(q.y);
+        if (x < -6 || y < -6 || x > w + 6 || y > h + 6) continue;
+        c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fill(); if (o.ring) c.stroke();
+      }
+    }
+    const dot = (d: { lat: number; lon: number; css?: string }, fill: string, r: number) => { c.beginPath(); c.arc(this.X(wx(d.lon)), this.Y(wy(d.lat)), r, 0, 6.2832); c.fillStyle = (d.css && css(d.css)) || fill; c.fill(); c.lineWidth = 2.5; c.strokeStyle = col.surface; c.stroke(); };
     for (const d of this.spec.dots ?? []) dot(d, col.brand, 7);
     if (this.spec.me) dot(this.spec.me, col.focus, 7);
   }

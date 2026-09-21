@@ -42,14 +42,16 @@ private func openKeyNow(_ o: OpenResult, today: String) -> Int {
     case .closed:
         guard let next = o.next ?? nil else { return 5 }
         return next.date == today ? 2 : 4
-    case .call_first: return 3
+    // A holiday row ranks exactly where "call first" does: we do not know today's hours, so it never sorts above
+    // a row that is known to be open (schema/query-spec.md "Holidays").
+    case .call_first, .holiday: return 3
     default: return 6                           // unknown sorts last: never implied open
     }
 }
 private func openKeyWeek(_ row: BundleRow, _ o: OpenResult, now: Date, alerts: [Alert]) -> Int {
     switch o.state {
     case .open, .closes_soon: return 0
-    case .call_first: return 1
+    case .call_first, .holiday: return 1
     case .unknown, .not_listed: return 3
     default:
         guard let next = nextOccurrences(row, now: now, n: 1, alerts: alerts).first else { return 2 }

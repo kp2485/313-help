@@ -6,8 +6,9 @@
 
 import { Hono, type Context } from 'hono';
 import { keyring, verifyAccess, type JwksFetcher } from './access.js';
+import { logFixed } from './log.js';
 import { MAX_PHOTO_BYTES, PHOTO_KEY, checkJpeg, type PhotoStore } from './photo.js';
-import { ARCHIVE_REASONS, CLOSED_KINDS, CONFIRM_KINDS, WRONG_KINDS, isListingId, parseDismiss, parseProposal, parseReport, parseSettle, parseTasks, reportIds } from './validate.js';
+import { CLOSED_KINDS, CONFIRM_KINDS, WRONG_KINDS, isListingId, parseDismiss, parseListingStatus, parseProposal, parseReport, parseResolve, parseSettle, parseTargets, parseTasks } from './validate.js';
 
 export interface Stmt { bind(...args: unknown[]): Stmt; run(): Promise<{ meta: { changes: number } }>; all<T = Record<string, unknown>>(): Promise<{ results: T[] }>; first<T = Record<string, unknown>>(): Promise<T | null> }
 /** A batch is one transaction (D1), answering one result per statement. */
@@ -23,9 +24,19 @@ const randomId = (prefix: string, bytes = 8) => prefix + [...crypto.getRandomVal
 const REASONS = ['confirmed_by_phone', 'confirmed_in_person', 'confirmed_on_web', 'could_not_confirm', 'not_true', 'duplicate', 'spam', 'about_a_person', 'listed', 'not_a_fit', 'restored'];
 const inList = (kinds: string[]) => kinds.map((k) => `'${k}'`).join(',');
 
+/** The one value `DEV_STEWARD` may hold, and only with no Cloudflare Access settings present (api/.dev.vars). */
+export const DEV_STEWARD_VALUE = 'local';
+
 export function createApp(deps: Deps = { now: () => new Date() }) {
   const app = new Hono<{ Bindings: Env; Variables: { who: string } }>();
   const keys = keyring(deps.jwks);
+
+  // Every unhandled throw ends here, so Hono's default handler - which is `console.error(err)` - never runs. A D1
+  // error message can quote the statement and its bound values (a dedupe hash, a steward's note, a masked detail), and
+  // anything written here would be kept in Cloudflare Workers Logs. So: a fixed body, nothing logged, not even the
+  // route (see src/log.ts for why the route pattern is not safe either).
+  app.onError((_err, c) => c.json({ error: 'something went wrong' }, 500));
+  app.notFound((c) => c.json({ error: 'not found' }, 404));
 
   app.use('/v1/*', async (c, next) => {
     const origin = c.env.ALLOWED_ORIGIN;
@@ -94,10 +105,15 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
 
   // ---- stewards and the pipeline, behind Cloudflare Access --------------------------------
   app.use('/v1/steward/*', async (c, next) => {
-    // Local development only: `DEV_STEWARD` in api/.dev.vars stands in for Cloudflare Access, and only when the
-    // Worker is being reached as localhost. A deployed Worker is never localhost, so this cannot open production.
-    const url = new URL(c.req.url), local = (h: string) => h === 'localhost' || h === '127.0.0.1';
-    const dev = c.env.DEV_STEWARD && local(url.hostname) ? { who: `dev:${c.env.DEV_STEWARD}` } : null;
+    // Local development only: `DEV_STEWARD=local` in api/.dev.vars stands in for Cloudflare Access. Three locks, none
+    // of which a caller can reach (review 2026-09-20): the value must be exactly `local` (any other value, including a
+    // truthy leftover like "1" or "true", is nothing); there must be no Access settings at all, and a deployed Worker
+    // always has them, because `wrangler.toml` sets ACCESS_TEAM_DOMAIN and ACCESS_AUD; and `pnpm preflight` refuses to
+    // release while DEV_STEWARD appears in `wrangler.toml`. The request's Host is not part of the decision: a header a
+    // caller writes must never be what opens a steward route.
+    const local = (h: string) => h === 'localhost' || h === '127.0.0.1';
+    const url = new URL(c.req.url);
+    const dev = c.env.DEV_STEWARD === DEV_STEWARD_VALUE && !c.env.ACCESS_TEAM_DOMAIN && !c.env.ACCESS_AUD ? { who: 'dev:local' } : null;
     const id = dev ?? (await verifyAccess(c.req.header('Cf-Access-Jwt-Assertion'), c.env, deps.now(), keys));
     if (!id) return c.json({ error: 'not signed in' }, 401);
     // Cross-site request forgery: a steward's browser carries the Access cookie to any site that posts here. A form
@@ -142,13 +158,14 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
   });
 
   const resolve = (table: 'reports' | 'proposals') => async (c: Context<{ Bindings: Env; Variables: { who: string } }>) => {
-    const b = (await body(c)) as { status?: string; reason_code?: string; note?: string } | undefined;
-    if (!b || !['accepted', 'rejected', 'duplicate'].includes(b.status ?? '') || !REASONS.includes(b.reason_code ?? '')) return c.json({ error: 'status and a known reason_code are required' }, 400);
+    const parsed = parseResolve(await body(c, 4096), REASONS);
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const b = parsed.value;
     const id = c.req.param('id'), at = minute(deps.now());
     const done = await c.env.DB.prepare(`UPDATE ${table} SET status = ?, reason_code = ?, resolved_at = ? WHERE id = ? AND status = 'open'`).bind(b.status, b.reason_code, at, id).run();
     if (!done.meta.changes) return c.json({ error: 'not found or already resolved' }, 404);
     await c.env.DB.prepare('INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) VALUES (?, ?, ?, ?, ?, ?)')
-      .bind(at, c.get('who'), `${table}.${b.status}`, id, b.reason_code, typeof b.note === 'string' ? b.note.slice(0, 500) : null).run();
+      .bind(at, c.get('who'), `${table}.${b.status}`, id, b.reason_code, b.note).run();
     return c.json({ ok: true });
   };
   app.post('/v1/steward/reports/:id/resolve', resolve('reports'));
@@ -172,31 +189,29 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
   // step; one that came in after the page loaded stays open.
   app.post('/v1/steward/listings/:id/status', async (c) => {
     const id = c.req.param('id');
-    const b = (await body(c, 32768)) as { status?: string; reason_code?: string; replacement_id?: string; note?: string; report_ids?: unknown } | undefined;
-    if (!isListingId(id) || !b || !['archived', 'suspended', 'active'].includes(b.status ?? '')) return c.json({ error: 'status must be archived, suspended, or active' }, 400);
-    const shown = reportIds(b.report_ids);
-    if (!shown) return c.json({ error: 'report_ids must be a list of at most 500 report ids' }, 400);
+    if (!isListingId(id)) return c.json({ error: 'bad listing id' }, 400);
+    const parsed = parseListingStatus(await body(c, 32768));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
     // Restoring records `restored`, never a phone check: nobody called, so the badge must not say anyone did (review 10b).
-    const reason = b.status === 'archived' ? b.reason_code : b.status === 'active' ? 'restored' : b.reason_code ?? 'seasonal';
-    if (b.status === 'archived' && !ARCHIVE_REASONS.includes(reason ?? '')) return c.json({ error: `archiving needs a reason: ${ARCHIVE_REASONS.join(', ')}` }, 400);
-    if (b.status === 'active' && b.reason_code != null && b.reason_code !== 'restored') return c.json({ error: 'restoring takes no reason_code' }, 400);
-    if (b.replacement_id != null && !isListingId(b.replacement_id)) return c.json({ error: 'bad replacement_id' }, 400);
+    const { status, reason, replacement_id, note, report_ids: shown } = parsed.value;
     if (!(await c.env.DB.prepare('SELECT 1 AS ok FROM targets WHERE id = ?').bind(id).first())) return c.json({ error: 'unknown listing' }, 404);
     const at = minute(deps.now());
     await c.env.DB.prepare('INSERT INTO listing_overrides (target_id, status, reason_code, replacement_id, at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (target_id) DO UPDATE SET status = excluded.status, reason_code = excluded.reason_code, replacement_id = excluded.replacement_id, at = excluded.at')
-      .bind(id, b.status, reason, b.replacement_id ?? null, at).run();
-    const settle = b.status === 'archived' ? 'accepted' : b.status === 'active' ? 'rejected' : null;
+      .bind(id, status, reason, replacement_id, at).run();
+    const settle = status === 'archived' ? 'accepted' : status === 'active' ? 'rejected' : null;
     if (settle && shown.length) await c.env.DB.prepare(`UPDATE reports SET status = ?, reason_code = ?, resolved_at = ? WHERE target_id = ? AND status = 'open' AND kind IN (${inList(CLOSED_KINDS)}) AND id IN (${shown.map(() => '?').join(',')})`).bind(settle, reason, at, id, ...shown).run();
     await c.env.DB.prepare('INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) VALUES (?, ?, ?, ?, ?, ?)')
-      .bind(at, c.get('who'), `listing.${b.status}`, id, reason, typeof b.note === 'string' ? b.note.slice(0, 500) : null).run();
+      .bind(at, c.get('who'), `listing.${status}`, id, reason, note).run();
     return c.json({ ok: true });
   });
 
   // The pipeline tells us which ids exist at each publish, so reports can only target real rows.
   app.put('/v1/steward/targets', async (c) => {
-    const b = (await c.req.json().catch(() => null)) as { listings?: string[]; places?: string[] } | null;
-    if (!b || !Array.isArray(b.listings) || !Array.isArray(b.places)) return c.json({ error: 'listings and places arrays are required' }, 400);
-    const rows = [...b.listings.map((id) => [id, 'listing']), ...b.places.map((id) => [id, 'place'])].filter(([id]) => /^(sal|seg|plc)_[a-z0-9_]{1,80}$/.test(id!));
+    // A closed schema with a size cap like every other body: one publish carries a few thousand ids, not a megabyte.
+    const parsed = parseTargets(await body(c, 1024 * 1024));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const { listings, places } = parsed.value;
+    const rows = [...listings.map((id) => [id, 'listing']), ...places.map((id) => [id, 'place'])].filter(([id]) => /^(sal|seg|plc)_[a-z0-9_]{1,80}$/.test(id!));
     // Nothing is deleted: archived ids keep resolving (CLAUDE.md).
     for (let i = 0; i < rows.length; i += 50) await c.env.DB.batch(rows.slice(i, i + 50).map(([id, kind]) => c.env.DB.prepare('INSERT OR IGNORE INTO targets (id, kind) VALUES (?, ?)').bind(id, kind)));
     return c.json({ ok: true, count: rows.length });
@@ -314,5 +329,11 @@ export async function retention(db: Db, now: Date, photos?: PhotoStore): Promise
 const app = createApp();
 export default {
   fetch: app.fetch,
-  scheduled: async (_event: unknown, env: Env) => { await photoRetention(env.DB, env.PHOTOS, new Date()); await retention(env.DB, new Date(), env.PHOTOS); },
+  // Each pass stands alone: one failing (a D1 hiccup, R2 down) must not stop the other, and neither may put an error
+  // message anywhere. A crash mid-pass changes nothing (each pass is transactional) and tonight's failure is retried
+  // tomorrow; what a person sees is one fixed sentence, with no id, no count and no error text.
+  scheduled: async (_event: unknown, env: Env) => {
+    try { await photoRetention(env.DB, env.PHOTOS, new Date()); } catch { logFixed('the nightly photo pass failed'); }
+    try { await retention(env.DB, new Date(), env.PHOTOS); } catch { logFixed('the nightly retention pass failed'); }
+  },
 };

@@ -1,0 +1,364 @@
+{
+  "description": "A holiday makes a schedule-derived \"open\" unknown, and unknown is never rendered as open. Every `now` here is noon on the Detroit wall clock unless the name says otherwise.",
+  "rows": [
+    {
+      "id": "sal_always",
+      "availability": "always"
+    },
+    {
+      "id": "sal_call",
+      "availability": "call_first"
+    },
+    {
+      "id": "sal_daily",
+      "schedules": [
+        { "freq": "DAILY", "dtstart": "2026-01-01", "opens_at": "09:00", "closes_at": "17:00" }
+      ]
+    },
+    {
+      "id": "sal_flagged",
+      "flags": ["open_holidays"],
+      "schedules": [
+        { "freq": "DAILY", "dtstart": "2026-01-01", "opens_at": "09:00", "closes_at": "17:00" }
+      ]
+    },
+    {
+      "id": "sal_fri",
+      "schedules": [
+        { "freq": "WEEKLY", "byday": "FR", "dtstart": "2026-01-02", "opens_at": "09:00", "closes_at": "17:00" }
+      ]
+    },
+    {
+      "id": "sal_mon",
+      "schedules": [
+        { "freq": "WEEKLY", "byday": "MO", "dtstart": "2026-01-05", "opens_at": "09:00", "closes_at": "17:00" }
+      ]
+    },
+    {
+      "id": "sal_night",
+      "schedules": [
+        { "freq": "DAILY", "dtstart": "2026-01-01", "opens_at": "22:00", "closes_at": "02:00" }
+      ]
+    },
+    {
+      "id": "sal_thu",
+      "schedules": [
+        { "freq": "WEEKLY", "byday": "TH", "dtstart": "2026-01-01", "opens_at": "09:00", "closes_at": "17:00" }
+      ]
+    },
+    {
+      "id": "sal_unknown",
+      "availability": "unknown"
+    }
+  ],
+  "cases": [
+    {
+      "name": "Christmas Day: a Friday pantry does not say open",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2026-12-25T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "the Friday before Christmas is an ordinary Friday",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2026-12-18T17:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "Christmas Eve is not a holiday here: a Thursday pantry is open",
+      "fn": "openNow",
+      "row": "sal_thu",
+      "now": "2026-12-24T17:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "Thanksgiving: a Thursday pantry does not say open",
+      "fn": "openNow",
+      "row": "sal_thu",
+      "now": "2026-11-26T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "the Thursday before Thanksgiving is an ordinary Thursday",
+      "fn": "openNow",
+      "row": "sal_thu",
+      "now": "2026-11-19T17:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "the day after Thanksgiving is not a holiday here: a Friday pantry is open",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2026-11-27T17:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "the day after Christmas is an ordinary Saturday",
+      "fn": "openNow",
+      "row": "sal_daily",
+      "now": "2026-12-26T17:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "New Year's Day 2027",
+      "fn": "openNow",
+      "row": "sal_daily",
+      "now": "2027-01-01T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Veterans Day, a Wednesday in 2026",
+      "fn": "openNow",
+      "row": "sal_daily",
+      "now": "2026-11-11T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Juneteenth 2026, a Friday, in daylight time",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2026-06-19T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Independence Day 2026 falls on a Saturday, so Friday 3 July is observed",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2026-07-03T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Martin Luther King Jr. Day, third Monday in January",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-01-19T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "the second Monday in January is an ordinary Monday",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-01-12T17:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "Washington's Birthday, third Monday in February",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-02-16T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Memorial Day, last Monday in May",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-05-25T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "the Monday before Memorial Day is an ordinary Monday",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-05-18T16:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "Labor Day, first Monday in September",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-09-07T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Columbus / Indigenous Peoples' Day, second Monday in October",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-10-12T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "the first Monday in October is an ordinary Monday",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2026-10-05T16:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "Juneteenth 2027 falls on a Saturday, so Friday 18 June is observed",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2027-06-18T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Independence Day 2027 falls on a Sunday, so Monday 5 July is observed",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2027-07-05T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Christmas 2027 falls on a Saturday, so Friday 24 December is observed",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2027-12-24T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "New Year's Day 2028 falls on a Saturday, so Friday 31 December 2027 is observed",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2027-12-31T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Juneteenth 2028 falls on a Monday and needs no observed day",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2028-06-19T16:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Veterans Day 2029 falls on a Sunday, so Monday 12 November is observed",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2029-11-12T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "Veterans Day 2030 is itself a Monday",
+      "fn": "openNow",
+      "row": "sal_mon",
+      "now": "2030-11-11T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "before opening on a holiday: not \"opens later today\" but a holiday",
+      "fn": "openNow",
+      "row": "sal_daily",
+      "now": "2026-12-25T12:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "after closing on a holiday, with nothing more that day, it is closed as usual",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2026-12-25T23:00:00Z",
+      "expect": { "state": "closed", "next": { "date": "2027-01-01", "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "the day before a holiday still names the holiday as the next time",
+      "fn": "openNow",
+      "row": "sal_fri",
+      "now": "2026-12-24T22:00:00Z",
+      "expect": { "state": "closed", "next": { "date": "2026-12-25", "opens_at": "09:00", "closes_at": "17:00" } }
+    },
+    {
+      "name": "an overnight window that opened on Christmas Eve is open in the small hours of Christmas",
+      "fn": "openNow",
+      "row": "sal_night",
+      "now": "2026-12-25T05:30:00Z",
+      "expect": { "state": "open", "closes_at": "02:00", "minutes_left": 90 }
+    },
+    {
+      "name": "the overnight window that opens on Christmas night is a holiday",
+      "fn": "openNow",
+      "row": "sal_night",
+      "now": "2026-12-26T04:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "22:00", "closes_at": "02:00" } }
+    },
+    {
+      "name": "at noon on Christmas the overnight row opens later that day, so it is a holiday too",
+      "fn": "openNow",
+      "row": "sal_night",
+      "now": "2026-12-25T17:00:00Z",
+      "expect": { "state": "holiday", "usual_hours": { "opens_at": "22:00", "closes_at": "02:00" } }
+    },
+    {
+      "name": "24 hours a day is 24 hours a day on Christmas",
+      "fn": "openNow",
+      "row": "sal_always",
+      "now": "2026-12-25T17:00:00Z",
+      "expect": { "state": "open" }
+    },
+    {
+      "name": "call first is unchanged on a holiday",
+      "fn": "openNow",
+      "row": "sal_call",
+      "now": "2026-12-25T17:00:00Z",
+      "expect": { "state": "call_first" }
+    },
+    {
+      "name": "unknown hours are unchanged on a holiday",
+      "fn": "openNow",
+      "row": "sal_unknown",
+      "now": "2026-12-25T17:00:00Z",
+      "expect": { "state": "unknown" }
+    },
+    {
+      "name": "a row a steward marked open_holidays is open on Christmas",
+      "fn": "openNow",
+      "row": "sal_flagged",
+      "now": "2026-12-25T17:00:00Z",
+      "expect": { "state": "open", "closes_at": "17:00" }
+    },
+    {
+      "name": "next times label the holidays instead of dropping them",
+      "fn": "nextOccurrences",
+      "row": "sal_fri",
+      "now": "2026-12-18T23:00:00Z",
+      "n": 3,
+      "expect": [
+        "2026-12-25 09:00-17:00 holiday",
+        "2027-01-01 09:00-17:00 holiday",
+        "2027-01-08 09:00-17:00"
+      ]
+    },
+    {
+      "name": "next times on an open_holidays row carry no holiday label",
+      "fn": "nextOccurrences",
+      "row": "sal_flagged",
+      "now": "2026-12-24T23:00:00Z",
+      "n": 2,
+      "expect": [
+        "2026-12-25 09:00-17:00",
+        "2026-12-26 09:00-17:00"
+      ]
+    },
+    {
+      "name": "a holiday row ranks with call first, never above a row that is open",
+      "fn": "rank",
+      "now": "2026-12-25T17:00:00Z",
+      "expect": [
+        "sal_always",
+        "sal_flagged",
+        "sal_call",
+        "sal_daily",
+        "sal_fri",
+        "sal_night",
+        "sal_mon",
+        "sal_thu",
+        "sal_unknown"
+      ]
+    },
+    {
+      "name": "in week mode a holiday row still ranks with call first",
+      "fn": "rank",
+      "now": "2026-12-25T17:00:00Z",
+      "query": { "mode": "week" },
+      "expect": [
+        "sal_always",
+        "sal_flagged",
+        "sal_mon",
+        "sal_thu",
+        "sal_call",
+        "sal_daily",
+        "sal_fri",
+        "sal_night",
+        "sal_unknown"
+      ]
+    }
+  ]
+}

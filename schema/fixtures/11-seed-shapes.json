@@ -1,0 +1,711 @@
+{
+  "description": "The recurrence shapes data/seed/schedules.csv actually uses but 03-recurrence-shapes.json does not reach: monthly BYDAY with several ordinals, a last-weekday rule, fifth-week ordinals, plus DST nights, an overnight window, a midnight close, negative BYMONTHDAY, a leap day, UNTIL and INTERVAL.",
+  "rows": [
+    {
+      "id": "sal_1st_3rd_sat",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "1SA,3SA",
+          "dtstart": "2026-01-03",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_2nd_4th_fri",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "2FR,4FR",
+          "dtstart": "2026-01-09",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_last_wed",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "-1WE",
+          "dtstart": "2026-01-28",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_all_but_first_fri",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "2FR,3FR,4FR,5FR",
+          "dtstart": "2026-01-09",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_all_but_first_sat",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "2SA,3SA,4SA,5SA",
+          "dtstart": "2026-01-10",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_first_three_mon",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "1MO,2MO,3MO",
+          "dtstart": "2026-01-05",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_fourth_wed",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "4WE",
+          "dtstart": "2026-01-28",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_third_sat_late_start",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "3SA",
+          "dtstart": "2026-09-14",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_1st_3rd_thu",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "1TH,3TH",
+          "dtstart": "2026-01-01",
+          "opens_at": "09:00",
+          "closes_at": "11:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_fifth_fri_only",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "byday": "5FR",
+          "dtstart": "2026-01-30",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_weekdays",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "MO,TU,WE,TH,FR",
+          "dtstart": "2026-09-14",
+          "opens_at": "08:30",
+          "closes_at": "09:30"
+        }
+      ]
+    },
+    {
+      "id": "sal_summer_sundays",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "SU",
+          "dtstart": "2026-01-04",
+          "valid_from": "2026-06-01",
+          "valid_to": "2026-08-31",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_ends_november",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "MO,TH",
+          "dtstart": "2026-01-01",
+          "valid_to": "2026-11-30",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_closes_midnight",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "SA",
+          "dtstart": "2026-09-05",
+          "opens_at": "20:00",
+          "closes_at": "24:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_until_christmas",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-01-02",
+          "until": "2026-12-25",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_every_third_wed",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "interval": 3,
+          "byday": "WE",
+          "dtstart": "2026-01-07",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_every_other_day",
+      "schedules": [
+        {
+          "freq": "DAILY",
+          "interval": 2,
+          "dtstart": "2026-09-01",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_last_day_of_month",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "bymonthday": "-1",
+          "dtstart": "2026-01-31",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_31st",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "bymonthday": "31",
+          "dtstart": "2026-01-31",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_second_last_and_15th",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "bymonthday": "-2,15",
+          "dtstart": "2026-01-15",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_leap_day",
+      "schedules": [
+        {
+          "freq": "YEARLY",
+          "dtstart": "2024-02-29",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_friday_overnight",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "FR",
+          "dtstart": "2026-09-04",
+          "opens_at": "22:00",
+          "closes_at": "02:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_sunday_clock_change",
+      "schedules": [
+        {
+          "freq": "WEEKLY",
+          "byday": "SU",
+          "dtstart": "2026-01-04",
+          "opens_at": "01:00",
+          "closes_at": "03:00"
+        }
+      ]
+    },
+    {
+      "id": "sal_every_other_month_2tu",
+      "schedules": [
+        {
+          "freq": "MONTHLY",
+          "interval": 2,
+          "byday": "2TU",
+          "dtstart": "2026-01-13",
+          "opens_at": "10:00",
+          "closes_at": "12:00"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "first and third Saturday",
+      "fn": "nextOccurrences",
+      "row": "sal_1st_3rd_sat",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 8,
+      "expect": [
+        "2026-10-03 10:00-12:00",
+        "2026-10-17 10:00-12:00",
+        "2026-11-07 10:00-12:00",
+        "2026-11-21 10:00-12:00",
+        "2026-12-05 10:00-12:00",
+        "2026-12-19 10:00-12:00",
+        "2027-01-02 10:00-12:00",
+        "2027-01-16 10:00-12:00"
+      ]
+    },
+    {
+      "name": "second and fourth Friday",
+      "fn": "nextOccurrences",
+      "row": "sal_2nd_4th_fri",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 8,
+      "expect": [
+        "2026-09-25 10:00-12:00",
+        "2026-10-09 10:00-12:00",
+        "2026-10-23 10:00-12:00",
+        "2026-11-13 10:00-12:00",
+        "2026-11-27 10:00-12:00",
+        "2026-12-11 10:00-12:00",
+        "2026-12-25 10:00-12:00 holiday",
+        "2027-01-08 10:00-12:00"
+      ]
+    },
+    {
+      "name": "last Wednesday of the month",
+      "fn": "nextOccurrences",
+      "row": "sal_last_wed",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 6,
+      "expect": [
+        "2026-09-30 10:00-12:00",
+        "2026-10-28 10:00-12:00",
+        "2026-11-25 10:00-12:00",
+        "2026-12-30 10:00-12:00"
+      ]
+    },
+    {
+      "name": "every Friday but the first skips months with no fifth Friday",
+      "fn": "nextOccurrences",
+      "row": "sal_all_but_first_fri",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 12,
+      "expect": [
+        "2026-09-25 10:00-12:00",
+        "2026-10-09 10:00-12:00",
+        "2026-10-16 10:00-12:00",
+        "2026-10-23 10:00-12:00",
+        "2026-10-30 10:00-12:00",
+        "2026-11-13 10:00-12:00",
+        "2026-11-20 10:00-12:00",
+        "2026-11-27 10:00-12:00",
+        "2026-12-11 10:00-12:00",
+        "2026-12-18 10:00-12:00",
+        "2026-12-25 10:00-12:00 holiday",
+        "2027-01-08 10:00-12:00"
+      ]
+    },
+    {
+      "name": "every Saturday but the first",
+      "fn": "nextOccurrences",
+      "row": "sal_all_but_first_sat",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 12,
+      "expect": [
+        "2026-09-26 10:00-12:00",
+        "2026-10-10 10:00-12:00",
+        "2026-10-17 10:00-12:00",
+        "2026-10-24 10:00-12:00",
+        "2026-10-31 10:00-12:00",
+        "2026-11-14 10:00-12:00",
+        "2026-11-21 10:00-12:00",
+        "2026-11-28 10:00-12:00",
+        "2026-12-12 10:00-12:00",
+        "2026-12-19 10:00-12:00",
+        "2026-12-26 10:00-12:00",
+        "2027-01-09 10:00-12:00"
+      ]
+    },
+    {
+      "name": "first, second and third Monday",
+      "fn": "nextOccurrences",
+      "row": "sal_first_three_mon",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 9,
+      "expect": [
+        "2026-09-21 10:00-12:00",
+        "2026-10-05 10:00-12:00",
+        "2026-10-12 10:00-12:00 holiday",
+        "2026-10-19 10:00-12:00",
+        "2026-11-02 10:00-12:00",
+        "2026-11-09 10:00-12:00",
+        "2026-11-16 10:00-12:00",
+        "2026-12-07 10:00-12:00",
+        "2026-12-14 10:00-12:00"
+      ]
+    },
+    {
+      "name": "fourth Wednesday, which is not always the last",
+      "fn": "nextOccurrences",
+      "row": "sal_fourth_wed",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 5,
+      "expect": [
+        "2026-09-23 10:00-12:00",
+        "2026-10-28 10:00-12:00",
+        "2026-11-25 10:00-12:00",
+        "2026-12-23 10:00-12:00"
+      ]
+    },
+    {
+      "name": "third Saturday when dtstart is not itself a third Saturday",
+      "fn": "nextOccurrences",
+      "row": "sal_third_sat_late_start",
+      "now": "2026-09-14T16:00:00Z",
+      "n": 4,
+      "expect": [
+        "2026-09-19 10:00-12:00",
+        "2026-10-17 10:00-12:00",
+        "2026-11-21 10:00-12:00",
+        "2026-12-19 10:00-12:00"
+      ]
+    },
+    {
+      "name": "first and third Thursday",
+      "fn": "nextOccurrences",
+      "row": "sal_1st_3rd_thu",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 8,
+      "expect": [
+        "2026-10-01 09:00-11:00",
+        "2026-10-15 09:00-11:00",
+        "2026-11-05 09:00-11:00",
+        "2026-11-19 09:00-11:00",
+        "2026-12-03 09:00-11:00",
+        "2026-12-17 09:00-11:00",
+        "2027-01-07 09:00-11:00"
+      ]
+    },
+    {
+      "name": "fifth Friday happens only in some months",
+      "fn": "nextOccurrences",
+      "row": "sal_fifth_fri_only",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 6,
+      "expect": [
+        "2026-10-30 10:00-12:00"
+      ]
+    },
+    {
+      "name": "weekday mornings",
+      "fn": "nextOccurrences",
+      "row": "sal_weekdays",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 7,
+      "expect": [
+        "2026-09-21 08:30-09:30",
+        "2026-09-22 08:30-09:30",
+        "2026-09-23 08:30-09:30",
+        "2026-09-24 08:30-09:30",
+        "2026-09-25 08:30-09:30",
+        "2026-09-28 08:30-09:30",
+        "2026-09-29 08:30-09:30"
+      ]
+    },
+    {
+      "name": "seasonal Sundays stop at valid_to",
+      "fn": "nextOccurrences",
+      "row": "sal_summer_sundays",
+      "now": "2026-06-15T16:00:00Z",
+      "n": 15,
+      "expect": [
+        "2026-06-21 10:00-12:00",
+        "2026-06-28 10:00-12:00",
+        "2026-07-05 10:00-12:00",
+        "2026-07-12 10:00-12:00",
+        "2026-07-19 10:00-12:00",
+        "2026-07-26 10:00-12:00",
+        "2026-08-02 10:00-12:00",
+        "2026-08-09 10:00-12:00",
+        "2026-08-16 10:00-12:00",
+        "2026-08-23 10:00-12:00",
+        "2026-08-30 10:00-12:00"
+      ]
+    },
+    {
+      "name": "valid_to ends the run mid-week",
+      "fn": "nextOccurrences",
+      "row": "sal_ends_november",
+      "now": "2026-11-20T16:00:00Z",
+      "n": 8,
+      "expect": [
+        "2026-11-23 10:00-12:00",
+        "2026-11-26 10:00-12:00 holiday",
+        "2026-11-30 10:00-12:00"
+      ]
+    },
+    {
+      "name": "a window that closes at 24:00",
+      "fn": "nextOccurrences",
+      "row": "sal_closes_midnight",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 3,
+      "expect": [
+        "2026-09-26 20:00-24:00",
+        "2026-10-03 20:00-24:00",
+        "2026-10-10 20:00-24:00"
+      ]
+    },
+    {
+      "name": "open in the last half hour before a 24:00 close",
+      "fn": "openNow",
+      "row": "sal_closes_midnight",
+      "now": "2026-09-27T03:30:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "24:00",
+        "minutes_left": 30
+      }
+    },
+    {
+      "name": "until is inclusive of its own date",
+      "fn": "nextOccurrences",
+      "row": "sal_until_christmas",
+      "now": "2026-12-10T16:00:00Z",
+      "n": 6,
+      "expect": [
+        "2026-12-11 10:00-12:00",
+        "2026-12-18 10:00-12:00",
+        "2026-12-25 10:00-12:00 holiday"
+      ]
+    },
+    {
+      "name": "every third Wednesday counts from the week of dtstart",
+      "fn": "nextOccurrences",
+      "row": "sal_every_third_wed",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 5,
+      "expect": [
+        "2026-10-07 10:00-12:00",
+        "2026-10-28 10:00-12:00",
+        "2026-11-18 10:00-12:00",
+        "2026-12-09 10:00-12:00",
+        "2026-12-30 10:00-12:00"
+      ]
+    },
+    {
+      "name": "every other day",
+      "fn": "nextOccurrences",
+      "row": "sal_every_other_day",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 5,
+      "expect": [
+        "2026-09-21 10:00-12:00",
+        "2026-09-23 10:00-12:00",
+        "2026-09-25 10:00-12:00",
+        "2026-09-27 10:00-12:00",
+        "2026-09-29 10:00-12:00"
+      ]
+    },
+    {
+      "name": "the last day of the month, whatever its length",
+      "fn": "nextOccurrences",
+      "row": "sal_last_day_of_month",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 8,
+      "expect": [
+        "2026-09-30 10:00-12:00",
+        "2026-10-31 10:00-12:00",
+        "2026-11-30 10:00-12:00",
+        "2026-12-31 10:00-12:00"
+      ]
+    },
+    {
+      "name": "the 31st skips months that have none",
+      "fn": "nextOccurrences",
+      "row": "sal_31st",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 8,
+      "expect": [
+        "2026-10-31 10:00-12:00",
+        "2026-12-31 10:00-12:00"
+      ]
+    },
+    {
+      "name": "second to last day, and the 15th",
+      "fn": "nextOccurrences",
+      "row": "sal_second_last_and_15th",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 8,
+      "expect": [
+        "2026-09-29 10:00-12:00",
+        "2026-10-15 10:00-12:00",
+        "2026-10-30 10:00-12:00",
+        "2026-11-15 10:00-12:00",
+        "2026-11-29 10:00-12:00",
+        "2026-12-15 10:00-12:00",
+        "2026-12-30 10:00-12:00",
+        "2027-01-15 10:00-12:00"
+      ]
+    },
+    {
+      "name": "a leap day has no occurrence in a common year",
+      "fn": "nextOccurrences",
+      "row": "sal_leap_day",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 3,
+      "expect": []
+    },
+    {
+      "name": "a Friday window that runs into Saturday",
+      "fn": "nextOccurrences",
+      "row": "sal_friday_overnight",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 4,
+      "expect": [
+        "2026-09-25 22:00-02:00",
+        "2026-10-02 22:00-02:00",
+        "2026-10-09 22:00-02:00",
+        "2026-10-16 22:00-02:00"
+      ]
+    },
+    {
+      "name": "still open after midnight on an overnight window",
+      "fn": "openNow",
+      "row": "sal_friday_overnight",
+      "now": "2026-09-26T05:00:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "02:00",
+        "minutes_left": 60
+      }
+    },
+    {
+      "name": "spring forward: the door hours do not move",
+      "fn": "nextOccurrences",
+      "row": "sal_sunday_clock_change",
+      "now": "2027-03-13T16:00:00Z",
+      "n": 3,
+      "expect": [
+        "2027-03-14 01:00-03:00",
+        "2027-03-21 01:00-03:00",
+        "2027-03-28 01:00-03:00"
+      ]
+    },
+    {
+      "name": "fall back: the door hours do not move",
+      "fn": "nextOccurrences",
+      "row": "sal_sunday_clock_change",
+      "now": "2026-10-30T16:00:00Z",
+      "n": 3,
+      "expect": [
+        "2026-11-01 01:00-03:00",
+        "2026-11-08 01:00-03:00",
+        "2026-11-15 01:00-03:00"
+      ]
+    },
+    {
+      "name": "open on the morning the clocks go forward",
+      "fn": "openNow",
+      "row": "sal_sunday_clock_change",
+      "now": "2027-03-14T06:30:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "03:00",
+        "minutes_left": 90
+      }
+    },
+    {
+      "name": "open on the first 1:30am of the fall-back night",
+      "fn": "openNow",
+      "row": "sal_sunday_clock_change",
+      "now": "2026-11-01T05:30:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "03:00",
+        "minutes_left": 90
+      }
+    },
+    {
+      "name": "open on the second 1:30am of the fall-back night",
+      "fn": "openNow",
+      "row": "sal_sunday_clock_change",
+      "now": "2026-11-01T06:30:00Z",
+      "expect": {
+        "state": "open",
+        "closes_at": "03:00",
+        "minutes_left": 90
+      }
+    },
+    {
+      "name": "second Tuesday of every other month",
+      "fn": "nextOccurrences",
+      "row": "sal_every_other_month_2tu",
+      "now": "2026-09-20T16:00:00Z",
+      "n": 5,
+      "expect": [
+        "2026-11-10 10:00-12:00",
+        "2027-01-12 10:00-12:00"
+      ]
+    }
+  ]
+}

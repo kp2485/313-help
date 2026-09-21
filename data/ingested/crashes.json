@@ -1,0 +1,1506 @@
+{
+ "source": {
+  "name": "SEMCOG — Crash Locations, 2015-2024",
+  "url": "https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/crash2024_10year/FeatureServer/0",
+  "page": "https://maps-semcog.opendata.arcgis.com/datasets/SEMCOG::crash-locations-2015-2024",
+  "license": "SEMCOG Copyright License Agreement",
+  "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+  "license_notice": "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.",
+  "records_from": "Michigan State Police (CJIC) police-reported crashes, published by SEMCOG",
+  "last_edited": "2025-10-08",
+  "review": "SEMCOG's Copyright License Agreement (license_url, read 2026-09-20) grants a perpetual royalty-free licence to use and publish its data, on the condition that license_notice is stated prominently; it also disclaims all warranties and, in section 8(a), asks the licensee to indemnify SEMCOG against third-party claims arising from the licensee's own breach. Section 1(b) grants no third-party rights, and the records are the Michigan State Police's (CJIC): MSP has not been asked about its terms or attribution. Open in docs/DECISIONS.md — a person accepts or declines the indemnity, asks MSP, and the layer comes out if either owner objects."
+ },
+ "fetched_at": "2026-09-20",
+ "years": [
+  2020,
+  2024
+ ],
+ "years_covered": [
+  2020,
+  2021,
+  2022,
+  2023,
+  2024
+ ],
+ "cities": [
+  "Detroit",
+  "Hamtramck",
+  "Highland Park",
+  "Dearborn"
+ ],
+ "kept": "Counts only: crashes involving a person walking or biking, added up over the years in years_covered, per neighborhood and per city, and how many of those crashes killed or seriously hurt someone. Nothing per year and nothing else from the layer is kept, so a hidden \"fewer than 5\" cannot be recovered by subtracting published numbers from a total.",
+ "city": {
+  "window": {
+   "walk": 2024,
+   "bike": 664,
+   "severe": 630
+  }
+ },
+ "city_by_name": {
+  "Detroit": {
+   "window": {
+    "walk": 2024,
+    "bike": 664,
+    "severe": 630
+   }
+  },
+  "Hamtramck": {
+   "window": {
+    "walk": 69,
+    "bike": 29,
+    "severe": 15
+   }
+  },
+  "Highland Park": {
+   "window": {
+    "walk": 28,
+    "bike": 12,
+    "severe": 9
+   }
+  },
+  "Dearborn": {
+   "window": {
+    "walk": 147,
+    "bike": 122,
+    "severe": 41
+   }
+  }
+ },
+ "neighborhoods": {
+  "nbh_airport_sub": {
+   "window": {
+    "walk": 49,
+    "bike": 9,
+    "severe": 22
+   }
+  },
+  "nbh_arden_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_aviation_sub": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_bagley": {
+   "window": {
+    "walk": 22,
+    "bike": 5,
+    "severe": "lt5"
+   }
+  },
+  "nbh_barton_mcfarland": {
+   "window": {
+    "walk": 23,
+    "bike": 7,
+    "severe": 13
+   }
+  },
+  "nbh_belle_isle": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_belmont": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_berg_lahser": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_bethune_community": {
+   "window": {
+    "walk": 27,
+    "bike": 9,
+    "severe": 8
+   }
+  },
+  "nbh_blackstone_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_boston_edison": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_boynton": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_brewster_homes": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_brightmoor": {
+   "window": {
+    "walk": 19,
+    "bike": 5,
+    "severe": 6
+   }
+  },
+  "nbh_brush_park": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_buffalo_charles": {
+   "window": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_butler": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_cadillac_community": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_cadillac_heights": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_campau_banglatown": {
+   "window": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_carbon_works": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_castle_rouge": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_central_southwest": {
+   "window": {
+    "walk": 34,
+    "bike": 16,
+    "severe": 12
+   }
+  },
+  "nbh_chadsey_condon": {
+   "window": {
+    "walk": 13,
+    "bike": 7,
+    "severe": "lt5"
+   }
+  },
+  "nbh_chalfonte": {
+   "window": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_chandler_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_chandler_park_chalmers": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_claytown": {
+   "window": {
+    "walk": 33,
+    "bike": 17,
+    "severe": 15
+   }
+  },
+  "nbh_college_park": {
+   "window": {
+    "walk": 12,
+    "bike": 6,
+    "severe": "lt5"
+   }
+  },
+  "nbh_conant_gardens": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_conner_creek": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_conner_creek_industrial": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_core_city": {
+   "window": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_corktown": {
+   "window": {
+    "walk": 7,
+    "bike": 9,
+    "severe": "lt5"
+   }
+  },
+  "nbh_cornerstone_village": {
+   "window": {
+    "walk": 15,
+    "bike": 8,
+    "severe": 6
+   }
+  },
+  "nbh_crary_st_marys": {
+   "window": {
+    "walk": 21,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_cultural_center": {
+   "window": {
+    "walk": 5,
+    "bike": 10,
+    "severe": "lt5"
+   }
+  },
+  "nbh_davison": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 7
+   }
+  },
+  "nbh_davison_schoolcraft": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_delray": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_denby": {
+   "window": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_detroit_golf": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_dexter_fenkell": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_dexter_linwood": {
+   "window": {
+    "walk": 24,
+    "bike": 9,
+    "severe": 5
+   }
+  },
+  "nbh_douglass": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_downtown": {
+   "window": {
+    "walk": 101,
+    "bike": 26,
+    "severe": 12
+   }
+  },
+  "nbh_east_canfield": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_east_english_village": {
+   "window": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_east_village": {
+   "window": {
+    "walk": 15,
+    "bike": 8,
+    "severe": 6
+   }
+  },
+  "nbh_eastern_market": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_eden_gardens": {
+   "window": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": 6
+   }
+  },
+  "nbh_elijah_mccoy": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_eliza_howell": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_elmwood_park": {
+   "window": {
+    "walk": 7,
+    "bike": 6,
+    "severe": "lt5"
+   }
+  },
+  "nbh_evergreen_lahser_7_8": {
+   "window": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_evergreen_outer_drive": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_far_west_detroit": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_farwell": {
+   "window": {
+    "walk": 10,
+    "bike": 5,
+    "severe": 5
+   }
+  },
+  "nbh_fiskhorn": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_fitzgerald_marygrove": {
+   "window": {
+    "walk": 18,
+    "bike": 9,
+    "severe": 5
+   }
+  },
+  "nbh_five_points": {
+   "window": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_forest_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_fox_creek": {
+   "window": {
+    "walk": "lt5",
+    "bike": 7,
+    "severe": "lt5"
+   }
+  },
+  "nbh_franklin": {
+   "window": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_franklin_park": {
+   "window": {
+    "walk": 36,
+    "bike": 11,
+    "severe": 12
+   }
+  },
+  "nbh_garden_homes": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_garden_view": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_gateway_community": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_gold_coast": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_grand_river_i96": {
+   "window": {
+    "walk": 16,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_grand_river_st_marys": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_grandmont": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_grandmont_1": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_grant": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_gratiot_findlay": {
+   "window": {
+    "walk": 14,
+    "bike": "lt5",
+    "severe": 8
+   }
+  },
+  "nbh_gratiot_grand": {
+   "window": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_gratiot_town_kettering": {
+   "window": {
+    "walk": 13,
+    "bike": 6,
+    "severe": 9
+   }
+  },
+  "nbh_gratiot_woods": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_greektown": {
+   "window": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_green_acres": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_greenfield": {
+   "window": {
+    "walk": 12,
+    "bike": 5,
+    "severe": "lt5"
+   }
+  },
+  "nbh_greenfield_grand_river": {
+   "window": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": 7
+   }
+  },
+  "nbh_greenfield_park": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_greenwich": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_grixdale_farms": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_happy_homes": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_harmony_village": {
+   "window": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_hawthorne_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_historic_atkinson": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_holcomb_community": {
+   "window": {
+    "walk": 20,
+    "bike": 6,
+    "severe": "lt5"
+   }
+  },
+  "nbh_hubbard_farms": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_hubbard_richard": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_hubbell_lyndon": {
+   "window": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_hubbell_puritan": {
+   "window": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_indian_village": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_islandview": {
+   "window": {
+    "walk": 19,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_jamison": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_jefferson_chalmers": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_jeffries": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_joseph_berry_sub": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_joy_community": {
+   "window": {
+    "walk": 20,
+    "bike": "lt5",
+    "severe": 6
+   }
+  },
+  "nbh_joy_schaefer": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_krainz_woods": {
+   "window": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_lafayette_park": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_lasalle_college_park": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_lasalle_gardens": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_littlefield_community": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_mapleridge": {
+   "window": {
+    "walk": 23,
+    "bike": "lt5",
+    "severe": 13
+   }
+  },
+  "nbh_marina_district": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_martin_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_mcdougall_hunt": {
+   "window": {
+    "walk": 17,
+    "bike": 5,
+    "severe": 6
+   }
+  },
+  "nbh_mcdowell": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_mcnichols_evergreen": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_medbury_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_medical_center": {
+   "window": {
+    "walk": 13,
+    "bike": 9,
+    "severe": "lt5"
+   }
+  },
+  "nbh_melvern_hill": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_mexicantown": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_michigan_martin": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_midtown": {
+   "window": {
+    "walk": 48,
+    "bike": 32,
+    "severe": 11
+   }
+  },
+  "nbh_midwest": {
+   "window": {
+    "walk": 17,
+    "bike": 17,
+    "severe": 8
+   }
+  },
+  "nbh_miller_grove": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_milwaukee_junction": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_minock_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_mohican_regent": {
+   "window": {
+    "walk": 18,
+    "bike": "lt5",
+    "severe": 8
+   }
+  },
+  "nbh_morningside": {
+   "window": {
+    "walk": 7,
+    "bike": 6,
+    "severe": "lt5"
+   }
+  },
+  "nbh_moross_morang": {
+   "window": {
+    "walk": 19,
+    "bike": "lt5",
+    "severe": 12
+   }
+  },
+  "nbh_mount_olivet": {
+   "window": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_nardin_park": {
+   "window": {
+    "walk": 18,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_new_center": {
+   "window": {
+    "walk": 18,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_new_center_commons": {
+   "window": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_nolan": {
+   "window": {
+    "walk": 19,
+    "bike": 8,
+    "severe": 9
+   }
+  },
+  "nbh_north_campau": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_north_corktown": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_north_end": {
+   "window": {
+    "walk": 12,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_north_rosedale_park": {
+   "window": {
+    "walk": 16,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_northeast_central_district": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_northwest_community": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_nortown": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_nw_goldberg": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_o_hair_park": {
+   "window": {
+    "walk": 17,
+    "bike": "lt5",
+    "severe": 6
+   }
+  },
+  "nbh_oak_grove_district_1": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_oak_grove_district_2": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_oakman_blvd_community": {
+   "window": {
+    "walk": 38,
+    "bike": 7,
+    "severe": 11
+   }
+  },
+  "nbh_oakwood_heights": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_old_redford": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_outer_drive_hayes": {
+   "window": {
+    "walk": 24,
+    "bike": "lt5",
+    "severe": 8
+   }
+  },
+  "nbh_palmer_park": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_palmer_woods": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_paveway": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_pembroke": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_penrose": {
+   "window": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_pershing": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_petoskey_otsego": {
+   "window": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_piety_hill": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_pilgrim_village": {
+   "window": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_pingree_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_plymouth_hubbell": {
+   "window": {
+    "walk": 21,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_plymouth_i96": {
+   "window": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_poletown_east": {
+   "window": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_pride_area_community": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_pulaski": {
+   "window": {
+    "walk": 20,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_ravendale": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_regent_park": {
+   "window": {
+    "walk": 35,
+    "bike": 5,
+    "severe": 8
+   }
+  },
+  "nbh_riverbend": {
+   "window": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_riverdale": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_rivertown": {
+   "window": {
+    "walk": "lt5",
+    "bike": 8,
+    "severe": "lt5"
+   }
+  },
+  "nbh_rosedale_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_rouge_park": {
+   "window": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_russell_industrial": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_russell_woods": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 7
+   }
+  },
+  "nbh_san_bernardo": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_schaefer_7_8_lodge": {
+   "window": {
+    "walk": 14,
+    "bike": "lt5",
+    "severe": 6
+   }
+  },
+  "nbh_schoolcraft_southfield": {
+   "window": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": 5
+   }
+  },
+  "nbh_schulze": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_seven_mile_lodge": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_seven_mile_rouge": {
+   "window": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_sherwood": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_sherwood_forest": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_south_of_six": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_southfield_plymouth": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_springwells": {
+   "window": {
+    "walk": 26,
+    "bike": 12,
+    "severe": 9
+   }
+  },
+  "nbh_state_fair": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_tech_town": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_the_eye": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_tri_point": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_university_district": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_virginia_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_virginia_park_community": {
+   "window": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_von_steuben": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_wade": {
+   "window": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_warren_ave_community": {
+   "window": {
+    "walk": 18,
+    "bike": 7,
+    "severe": "lt5"
+   }
+  },
+  "nbh_warrendale": {
+   "window": {
+    "walk": 46,
+    "bike": 14,
+    "severe": 15
+   }
+  },
+  "nbh_waterworks_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_wayne_state": {
+   "window": {
+    "walk": 10,
+    "bike": 9,
+    "severe": "lt5"
+   }
+  },
+  "nbh_we_care_community": {
+   "window": {
+    "walk": 16,
+    "bike": "lt5",
+    "severe": 6
+   }
+  },
+  "nbh_weatherby": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_west_end": {
+   "window": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_west_outer_drive": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_west_side_industrial": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_west_village": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_westwood_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_wildemere_park": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_winship": {
+   "window": {
+    "walk": 23,
+    "bike": 6,
+    "severe": 5
+   }
+  },
+  "nbh_woodbridge": {
+   "window": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  },
+  "nbh_yorkshire_woods": {
+   "window": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   }
+  }
+ }
+}

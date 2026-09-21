@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Two permissions and no more.
+
+  INTERNET is for two things: fetching the signed list over HTTPS, and sending an anonymous report when a person
+  taps one of the report buttons. Both are https only (usesCleartextTraffic is false, and Http.kt refuses anything
+  else), both carry exactly one header of ours — the fixed "313Help-Android/<version>", which names the app and
+  nothing about the phone — and neither carries a cookie, a cache entry, a query string or a referrer. A report is
+  a listing id, a kind, an optional note, a time to the minute and a one-day hash, and nothing else exists to send
+  (ReportModel.kt). Nothing is sent unless a person taps a button.
+
+  ACCESS_COARSE_LOCATION is strictly optional and is asked for only when a person taps "Use my location". It
+  sorts the list by distance and is held in memory for as long as the screen is open. It is never written to
+  disk and never leaves the phone (docs/08). Fine location is deliberately not requested: the list is sorted in
+  miles, and a neighbourhood is precise enough.
+
+  There is no advertising id, no ACCESS_NETWORK_STATE, no READ_PHONE_STATE, no CALL_PHONE (a call opens the
+  phone's own dialler with the number in it and the person presses the button), no storage permission, and no
+  analytics, crash reporting or Play Services library that could ask for one.
+
+  allowBackup is false: the only secret on the phone is the random install secret behind the daily report hash,
+  and it must not be copied off the device by a cloud backup. There is nothing else worth restoring: the list
+  itself is re-fetched and is public.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+    <!-- A tablet or a phone with no dialler is fine; the number is shown as text either way. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <!--
+          The Transit app's own scheme (transitapp.com). This entry only lets the app ask Android, on this phone,
+          whether anything can open a transit:// link, so the "Bus directions in the Transit app" button can be
+          left out when nothing can. Asking is entirely local: no network request, nothing sent anywhere, and no
+          list of installed apps is read, stored or transmitted — the answer is one yes or no about one scheme.
+          Without this entry Android 11 and up would always answer no and the button would never appear.
+        -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="transit" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
+        android:theme="@style/Theme.Help313">
+
+        <!-- Arabic is written right to left: supportsRtl is on and no layout in this app uses left or right,
+             so Android mirrors every screen for an Arabic phone. -->
+
+        <!--
+          Every configuration this app can answer itself is declared in configChanges, so the activity is not
+          destroyed and rebuilt for it. Only orientation|screenSize|keyboardHidden used to be, which meant that
+          changing the font size, turning on dark mode, changing the phone's language or entering multi-window
+          cleared the back stack, dropped the person back on Home, verified the bundle all over again and started
+          another background thread that nobody stopped (Android review, 2026-09-20).
+          MainActivity.onConfigurationChanged re-reads the words and redraws the screen the person is on; a screen
+          is built in code from a route, so redrawing it is the same work as opening it was.
+
+          There is no android:screenOrientation and no android:resizeableActivity="false": a phone that is held in
+          a stand, or a person using two apps side by side, is not a case to refuse.
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="fontScale|uiMode|locale|layoutDirection|density|smallestScreenSize|screenLayout|orientation|screenSize|keyboard|keyboardHidden|navigation|touchscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

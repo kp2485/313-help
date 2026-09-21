@@ -11,10 +11,20 @@ name = "313-help-api"
 main = "src/index.ts"
 compatibility_date = "2026-09-01"
 
-# Zero-PII: Cloudflare's default invocation logs record request metadata. Off. Logpush stays off.
-# The Worker itself never reads an IP header and never logs a request (a test enforces both).
+# Zero-PII: Workers Logs is off entirely, and Logpush stays off.
+# Cloudflare's own words: "Each Workers invocation returns a single invocation log that contains details such as the
+# Request, Response, and related metadata", and "All console.log() statements, exceptions, request metadata, and
+# headers are automatically captured during the Worker invocation"
+# (https://developers.cloudflare.com/workers/observability/logs/workers-logs/). `invocation_logs = false` stops the
+# per-request log; what the docs do not say is whether an uncaught exception still lands somewhere (`Exceptions` is a
+# field of that same invocation log), and an exception message from D1 can quote the statement and its bound values -
+# a per-day dedupe hash, a steward's note, a masked detail. Kept for up to 7 days (3 on the free plan) and
+# readable by anyone who can open the dashboard, that is a record of residents' requests we promised not to keep
+# (CLAUDE.md). So: `enabled = false`, and the Worker also logs nothing of its own (src/log.ts, enforced by a test in
+# api/test/api.test.ts). Aggregate Worker metrics - requests, errors, CPU time - do not come from Workers Logs and are
+# still in the dashboard; live debugging is `wrangler tail`, which streams to a terminal and stores nothing.
 [observability.logs]
-enabled = true
+enabled = false
 invocation_logs = false
 
 [[d1_databases]]

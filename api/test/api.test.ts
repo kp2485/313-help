@@ -2,8 +2,8 @@ import { generateKeyPairSync, createSign } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { createApp, retention, type Db, type Env, type Stmt } from '../src/index.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DEV_STEWARD_VALUE, createApp, retention, type Db, type Env, type Stmt } from '../src/index.js';
 import { keyring, verifyAccess } from '../src/access.js';
 import { mask } from '../src/validate.js';
 
@@ -82,11 +82,49 @@ describe('zero PII: nothing about the person reaches the database', () => {
     expect(all).toContain('[removed]');
     expect(mask('text 313.555.0142 now')).toBe('text [removed] now');
   });
-  it('the source never reads an IP or user-agent header and never logs', () => {
+  it('the source never reads an IP or user-agent header, and never calls console outside the one fixed-string logger', () => {
     for (const f of readdirSync(join(__dirname, '../src'))) {
       const src = readFileSync(join(__dirname, '../src', f), 'utf8').replace(/\/\/.*$/gm, '');
-      expect(src, f).not.toMatch(/connecting-ip|forwarded-for|real-ip|user-agent|console\.(log|info|debug)|req\.raw\.cf|\.cf\b/i);
+      expect(src, f).not.toMatch(/connecting-ip|forwarded-for|real-ip|user-agent|req\.raw\.cf|\.cf\b/i);
+      // Nothing in the Worker may write to the log: Hono's own default error handler is `console.error(err)`, and an
+      // error message from D1 can quote the statement and its bound values. src/log.ts is the single exception, and it
+      // may only write one of a handful of fixed sentences typed into it (no template literal, no variable).
+      if (f !== 'log.ts') expect(src, f).not.toMatch(/console\./);
     }
+    const logger = readFileSync(join(__dirname, '../src/log.ts'), 'utf8').replace(/\/\/.*$/gm, '');
+    expect(logger.match(/console\.\w+\(/g)).toEqual(['console.warn(']);
+    expect(logger).toContain('console.warn(message)');
+    expect(logger).toMatch(/export type FixedMessage = '[^']+'( \| '[^']+')*;/);
+  });
+  it('an error thrown while a report is in the frame logs nothing at all, and answers a generic 500', async () => {
+    const nonce = 'd'.repeat(64), secret = 'Sign on the door says closed';
+    // A D1 error message can carry the statement and its bound values. This is the worst case: all of them.
+    const angry = (sql: string): Stmt => ({
+      bind: (...args: unknown[]) => angry(`${sql} -- ${JSON.stringify(args)}`),
+      run: async () => { throw new Error(`D1_ERROR: near "SELECT": ${sql}`); },
+      all: async () => { throw new Error(`D1_ERROR: near "SELECT": ${sql}`); },
+      first: async () => { throw new Error(`D1_ERROR: near "SELECT": ${sql}`); },
+    });
+    const broken: Env = { DB: { prepare: (sql) => angry(sql), batch: async () => { throw new Error('D1_ERROR: transaction'); } }, ACCESS_TEAM_DOMAIN: 'team.cloudflareaccess.com', ACCESS_AUD: 'aud123' };
+    const said: string[] = [];
+    const spies = (['log', 'info', 'debug', 'warn', 'error', 'trace', 'dir'] as const)
+      .map((m) => vi.spyOn(console, m).mockImplementation((...a: unknown[]) => { said.push(a.map((x) => (x instanceof Error ? `${x.message} ${x.stack}` : String(x))).join(' ')); }));
+    // The bodies are read after the spies are restored, so the log assertion below is what fails first if anything
+    // was written (Hono's default handler, the one this replaces, calls console.error(err) with the message and stack).
+    let bodies: unknown[] = [], statuses: number[] = [];
+    try {
+      const res = await app.request('/v1/reports', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ target_id: 'sal_b', kind: 'closed_permanently', detail: secret, client_nonce: nonce }) }, broken);
+      // The same for a steward write, whose body carries a note, and for a path that does not exist.
+      const wrote = await app.request('/v1/steward/reports/rpt_1/resolve', { method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://localhost', 'Cf-Access-Jwt-Assertion': accessToken(goodClaims) }, body: JSON.stringify({ status: 'accepted', reason_code: 'spam', note: 'called Jo back on the mobile' }) }, broken);
+      const missing = await app.request('/v1/nope/' + nonce, {}, broken);
+      statuses = [res.status, wrote.status, missing.status];
+      bodies = [await res.text(), await wrote.text(), await missing.text()];
+    } finally { for (const s of spies) s.mockRestore(); }
+    const all = said.join('\n');
+    for (const leak of [nonce, secret, 'sal_b', 'called Jo back', 'D1_ERROR', 'INSERT', 'SELECT', '/v1/reports', 'resolve']) expect(all, leak).not.toContain(leak);
+    expect(said).toEqual([]);
+    expect(statuses).toEqual([500, 500, 404]);
+    expect(bodies).toEqual([JSON.stringify({ error: 'something went wrong' }), JSON.stringify({ error: 'something went wrong' }), JSON.stringify({ error: 'not found' })]);
   });
   it('place reports keep only the hour, because the reporter is standing there', async () => {
     await post('/v1/reports', { target_id: 'seg_conrail_warren_to_joy', kind: 'light_out', observed_at: '2026-09-18T17:40:12Z', client_nonce: NONCE });
@@ -471,13 +509,131 @@ describe('archiving a listing', () => {
 });
 
 describe('local development login', () => {
-  it('works on localhost only, and only when DEV_STEWARD is set', async () => {
-    const at = (url: string, e: Env) => app.request(url, {}, e);
-    expect((await at('http://localhost:8787/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(200);
-    expect((await at('http://127.0.0.1:8787/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(200);
-    expect((await at('https://313help.example/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(401);
-    expect((await at('https://localhost.evil.example/v1/steward/queue', { DB: db, DEV_STEWARD: 'local' })).status).toBe(401);
+  const at = (url: string, e: Env) => app.request(url, {}, e);
+  it('opens the steward routes only for the one documented value, with no Access settings at all', async () => {
+    expect((await at('http://localhost:8787/v1/steward/queue', { DB: db, DEV_STEWARD: DEV_STEWARD_VALUE })).status).toBe(200);
+    expect((await at('http://127.0.0.1:8787/v1/steward/queue', { DB: db, DEV_STEWARD: DEV_STEWARD_VALUE })).status).toBe(200);
+    // Any other value is nothing, however truthy: a leftover secret cannot become a login.
+    for (const v of ['1', 'true', 'yes', 'kyle', 'Local', 'local ', '']) expect((await at('http://localhost:8787/v1/steward/queue', { DB: db, DEV_STEWARD: v })).status, v).toBe(401);
     expect((await at('http://localhost:8787/v1/steward/queue', { DB: db })).status).toBe(401);
+  });
+  it('is refused when any Access setting is present, even with the right value', async () => {
+    for (const e of [{ ACCESS_TEAM_DOMAIN: 'team.cloudflareaccess.com' }, { ACCESS_AUD: 'aud123' }, { ACCESS_TEAM_DOMAIN: 'team.cloudflareaccess.com', ACCESS_AUD: 'aud123' }])
+      expect((await at('http://localhost:8787/v1/steward/queue', { DB: db, DEV_STEWARD: DEV_STEWARD_VALUE, ...e })).status, JSON.stringify(e)).toBe(401);
+  });
+  it('never decides anything from the Host the caller wrote: a deployed Worker always has the Access settings', async () => {
+    // The gate is env-only now (review 2026-09-20). A spoofed `Host: localhost` grants nothing, because the deployed
+    // Worker has ACCESS_TEAM_DOMAIN and ACCESS_AUD in wrangler.toml and DEV_STEWARD is never set there.
+    const src = readFileSync(join(__dirname, '../src/index.ts'), 'utf8').replace(/\/\/.*$/gm, '');
+    const gate = /const dev = ([^;]+);/.exec(src)?.[1] ?? '';
+    expect(gate).toContain('DEV_STEWARD === DEV_STEWARD_VALUE');
+    expect(gate).not.toMatch(/hostname|host|url/i);
+    const toml = readFileSync(join(__dirname, '../wrangler.toml'), 'utf8');
+    expect(toml).not.toMatch(/^DEV_STEWARD/m);
+    expect(toml).toMatch(/^ACCESS_TEAM_DOMAIN\s*=\s*"[^"]+"/m);
+    expect(toml).toMatch(/^ACCESS_AUD\s*=\s*"[^"]+"/m);
+    // With the production vars in place, a look-alike or spoofed host is still 401.
+    const prod: Env = { DB: db, DEV_STEWARD: DEV_STEWARD_VALUE, ACCESS_TEAM_DOMAIN: 'team.cloudflareaccess.com', ACCESS_AUD: 'aud123' };
+    for (const url of ['http://localhost:8787/v1/steward/queue', 'https://localhost.evil.example/v1/steward/queue', 'https://313help.example/v1/steward/queue'])
+      expect((await at(url, prod)).status, url).toBe(401);
+  });
+});
+
+describe('Workers Logs stays off in the Worker config', () => {
+  // Workers Logs captures "console.log() statements, exceptions, request metadata, and headers" and keeps them for
+  // days (developers.cloudflare.com/workers/observability/logs/workers-logs/). Nothing about a resident's request may
+  // be kept, so the whole thing is off, not just the per-request part.
+  it('has [observability.logs] enabled = false and invocation_logs = false', () => {
+    const toml = readFileSync(join(__dirname, '../wrangler.toml'), 'utf8');
+    const block = toml.slice(toml.indexOf('[observability'));
+    expect(toml).toContain('[observability.logs]');
+    expect(block).toMatch(/^enabled\s*=\s*false\s*$/m);
+    expect(block).toMatch(/^invocation_logs\s*=\s*false\s*$/m);
+    expect(toml).not.toMatch(/logpush\s*=\s*true/);
+    expect(toml).not.toMatch(/head_sampling_rate/);
+  });
+});
+
+describe('steward writes are closed schemas, like everything a resident sends', () => {
+  const write = (path: string, b: unknown, method = 'POST') => steward(path, { method, body: JSON.stringify(b) });
+  it('refuses an unknown field on resolve, listing status, targets, settle, tasks, and dismiss', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'closed_permanently', client_nonce: NONCE });
+    const id = ((await (await steward('/v1/steward/queue')).json()) as { reports: { id: string }[] }).reports[0]!.id;
+    const cases: [string, object, string][] = [
+      [`/v1/steward/reports/${id}/resolve`, { status: 'accepted', reason_code: 'spam', steward: 'someone@else' }, 'POST'],
+      [`/v1/steward/proposals/${id}/resolve`, { status: 'accepted', reason_code: 'spam', install_id: 'x' }, 'POST'],
+      ['/v1/steward/listings/sal_b/status', { status: 'archived', reason_code: 'moved', target_id: 'sal_other' }, 'POST'],
+      ['/v1/steward/targets', { listings: [], places: [], delete: ['sal_b'] }, 'PUT'],
+      ['/v1/steward/reports/settle', { target_id: 'sal_b', ids: [], status: 'rejected', reason_code: 'spam', all: true }, 'POST'],
+      ['/v1/steward/tasks', { tasks: [], clear: true }, 'PUT'],
+      [`/v1/steward/tasks/task_1/dismiss`, { reason: 'checked_fine', note: 'x' }, 'POST'],
+    ];
+    for (const [path, b, method] of cases) {
+      const res = await write(path, b, method);
+      expect(res.status, path).toBe(400);
+      expect((await res.json() as { error: string }).error, path).toMatch(/unknown field/);
+    }
+    // Nothing happened: the report is still open and no override or action was written.
+    expect(db.raw.prepare("SELECT COUNT(*) AS n FROM reports WHERE status = 'open'").get()).toEqual({ n: 1 });
+    expect(db.raw.prepare('SELECT COUNT(*) AS n FROM listing_overrides').get()).toEqual({ n: 0 });
+    expect(db.raw.prepare('SELECT COUNT(*) AS n FROM steward_actions').get()).toEqual({ n: 0 });
+  });
+  it('refuses a body that is not a JSON object, and a note that is not text', async () => {
+    await post('/v1/reports', { target_id: 'sal_b', kind: 'closed_permanently', client_nonce: NONCE });
+    const id = ((await (await steward('/v1/steward/queue')).json()) as { reports: { id: string }[] }).reports[0]!.id;
+    for (const [path, method] of [[`/v1/steward/reports/${id}/resolve`, 'POST'], ['/v1/steward/listings/sal_b/status', 'POST'], ['/v1/steward/targets', 'PUT']] as const) {
+      for (const raw of ['[]', '"x"', 'null', 'not json'])
+        expect((await steward(path, { method, body: raw })).status, `${path} ${raw}`).toBe(400);
+    }
+    expect((await write(`/v1/steward/reports/${id}/resolve`, { status: 'accepted', reason_code: 'spam', note: { ha: 1 } })).status).toBe(400);
+    expect((await write('/v1/steward/listings/sal_b/status', { status: 'archived', reason_code: 'moved', note: 42 })).status).toBe(400);
+  });
+  it('caps the size of every steward write, including the targets sync', async () => {
+    const long = 'x'.repeat(40000);
+    expect((await write(`/v1/steward/reports/rpt_1/resolve`, { status: 'accepted', reason_code: 'spam', note: long })).status).toBe(400);
+    expect((await write('/v1/steward/listings/sal_b/status', { status: 'archived', reason_code: 'moved', note: long })).status).toBe(400);
+    expect((await write('/v1/steward/targets', { listings: Array.from({ length: 30000 }, (_, i) => `sal_x${i}`), places: [] }, 'PUT')).status).toBe(400);
+    expect((await steward('/v1/steward/targets', { method: 'PUT', body: `{"listings":[],"places":[],"pad":"${'x'.repeat(1024 * 1024 + 10)}"}` })).status).toBe(400);
+    expect(db.raw.prepare("SELECT COUNT(*) AS n FROM targets WHERE id LIKE 'sal_x%'").get()).toEqual({ n: 0 });
+  });
+  it('still takes the good body it always took', async () => {
+    expect((await write('/v1/steward/targets', { listings: ['sal_new'], places: ['plc_new'] }, 'PUT')).status).toBe(200);
+    expect((await write('/v1/steward/listings/sal_b/status', { status: 'suspended', note: 'closed for the season' })).status).toBe(200);
+    expect((await write('/v1/steward/listings/not-a-listing/status', { status: 'suspended' })).status).toBe(400);
+  });
+});
+
+describe('steward writes refuse cross-site requests (weakness 15)', () => {
+  const at = (origin: string | undefined, token = accessToken(goodClaims)) =>
+    steward('/v1/steward/targets', { method: 'PUT', body: JSON.stringify({ listings: [], places: [] }) }, token, { ...(origin ? { origin } : {}) });
+  it('needs our own origin: another site, a missing origin, and a junk origin are all 403', async () => {
+    expect((await at('http://localhost')).status).toBe(200);
+    expect((await at('https://evil.example')).status).toBe(403);
+    expect((await at('null')).status).toBe(403);         // a sandboxed iframe posts Origin: null
+    expect((await at(undefined)).status).toBe(403);       // a fetch from a script with no origin, i.e. not a browser
+    // A form cannot send a JSON content type, so a form post is refused before anything else.
+    const form = await app.request('/v1/steward/targets', { method: 'PUT', body: '{"listings":[],"places":[]}', headers: { 'content-type': 'application/x-www-form-urlencoded', origin: 'http://localhost', 'Cf-Access-Jwt-Assertion': accessToken(goodClaims) } }, env);
+    expect(form.status).toBe(415);
+  });
+  it('exempts only the pipeline\'s Access service token, which no browser can present', async () => {
+    const service = accessToken({ ...goodClaims, email: undefined, common_name: 'pipeline' });
+    expect((await at(undefined, service)).status).toBe(200);
+    // A browser-borne steward token gets no such exemption.
+    expect((await at('https://evil.example', service)).status).toBe(200);   // a site cannot set Cf-Access-Jwt-Assertion
+    expect((await at('https://evil.example')).status).toBe(403);
+  });
+  it('never reflects the caller\'s origin, and never allows credentials, on a steward route or a resident one', async () => {
+    for (const path of ['/v1/steward/queue', '/v1/health', '/v1/reports']) {
+      const res = await app.request(path, { method: path === '/v1/reports' ? 'OPTIONS' : 'GET', headers: { origin: 'https://evil.example', 'Cf-Access-Jwt-Assertion': accessToken(goodClaims) } }, { ...env, ALLOWED_ORIGIN: 'https://313help.com' });
+      expect(res.headers.get('access-control-allow-origin'), path).toBe('https://313help.com');
+      expect(res.headers.get('access-control-allow-credentials'), path).toBe(null);
+      expect(res.headers.get('vary'), path).toBe('Origin');
+      expect(res.headers.get('cache-control'), path).toBe('no-store');
+    }
+    // The source never echoes a request origin back.
+    const src = readFileSync(join(__dirname, '../src/index.ts'), 'utf8');
+    expect(src).not.toMatch(/Allow-Origin[^\n]*req\.header/);
+    expect(src).not.toMatch(/Allow-Credentials/i);
   });
 });
 

@@ -132,7 +132,14 @@ export const LINKS: Record<string, LinkSet> = {
     { id: 'great_start', url: 'https://greatstarttoquality.org/free-or-low-cost-programs/' },
     { id: 'starfish', url: 'https://www.starfishfamilyservices.org/services/early-childhood-education/' },
   ] },
+  // Transit (transitapp.com) is not a program to apply for, but it is the free thing that answers "when is my
+  // bus coming?" on this screen, so it leads (Kyle, 2026-09-20). We link to their own page, not to a store, and
+  // we claim no partnership: SMART's page lists it among third-party apps, DDOT's page could not be read
+  // (docs/research/2026-09-20/transit-app.md).
+  // The set's date stays 2026-09-19: the Transit page was read on 2026-09-20, and a freshness date is never
+  // moved forward for pages nobody re-read, only back. So the screen understates this one link by a day.
   rides: { checked: '2026-09-19', items: [
+    { id: 'transit_app', url: 'https://transitapp.com/' },
     { id: 'medicaid_rides', url: 'https://www.michigan.gov/mdhhs/doing-business/providers/providers/billingreimbursement/non-emergency-medical-transportation' },
     { id: 'ddot_reduced', url: 'https://detroitmi.gov/departments/detroit-department-transportation/transportation-fares' },
     { id: 'ride_to_rise', url: 'https://detroitmi.gov/news/ride-rise-how-detroit-students-can-ride-ddot-bus-free' },

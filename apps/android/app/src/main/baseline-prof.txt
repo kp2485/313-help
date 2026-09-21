@@ -1,0 +1,69 @@
+# An ART baseline profile: the handful of methods that must not be interpreted on a cold start.
+#
+# This is the other half of the cold-start fix, and on an old phone it is the bigger half. Measured on the API 35
+# emulator on 2026-09-20: one software Ed25519 verification costs about 100 ms once ART's JIT has seen the loop,
+# and about 4,200 ms the first time through, because a cold start runs each of these methods exactly once and the
+# JIT never gets a second chance. The same is true of the JSON reader, which reads 740 KB of bundle once.
+#
+# A profile shipped in the APK is used by ART at install time (and by `dexopt` afterwards) to compile these methods
+# ahead of time. It is supported from Android 7.0 — minSdk here — needs no dependency and no plugin, and cannot
+# change behaviour: a line ART does not understand is ignored, and a method named here does exactly what it did
+# before, only compiled. AGP picks this file up by name from src/main/ and rewrites it through R8's mapping for a
+# release build.
+#
+# `H` = hot, `S` = startup, `P` = post-startup. A bare class line asks for the class to be loaded and verified.
+# Keep this list short and honest: it is for code that a cold start really runs, not a wish list.
+
+# ---- the signature check ---------------------------------------------------------------------------------------
+Lorg/help313/app/Ed25519;
+HSPLorg/help313/app/Ed25519;-><clinit>()V
+HSPLorg/help313/app/Ed25519;->verify([B[B[B)Z
+HSPLorg/help313/app/Ed25519;->platformVerify([B[B[B)Ljava/lang/Boolean;
+HSPLorg/help313/app/Ed25519;->softwareVerify([B[B[B)Z
+HSPLorg/help313/app/Ed25519;->modp(Ljava/math/BigInteger;)Ljava/math/BigInteger;
+HSPLorg/help313/app/Ed25519;->add(Lorg/help313/app/Ed25519$Point;Lorg/help313/app/Ed25519$Point;)Lorg/help313/app/Ed25519$Point;
+HSPLorg/help313/app/Ed25519;->dbl(Lorg/help313/app/Ed25519$Point;)Lorg/help313/app/Ed25519$Point;
+HSPLorg/help313/app/Ed25519;->negate(Lorg/help313/app/Ed25519$Point;)Lorg/help313/app/Ed25519$Point;
+HSPLorg/help313/app/Ed25519;->doubleScalarMul(Ljava/math/BigInteger;Ljava/math/BigInteger;Lorg/help313/app/Ed25519$Point;)Lorg/help313/app/Ed25519$Point;
+HSPLorg/help313/app/Ed25519;->equal(Lorg/help313/app/Ed25519$Point;Lorg/help313/app/Ed25519$Point;)Z
+HSPLorg/help313/app/Ed25519;->recoverX(Ljava/math/BigInteger;I)Ljava/math/BigInteger;
+HSPLorg/help313/app/Ed25519;->decompress([B)Lorg/help313/app/Ed25519$Point;
+HSPLorg/help313/app/Ed25519;->littleEndian([B)Ljava/math/BigInteger;
+HSPLorg/help313/app/Ed25519;->rawKeyFromSpkiDer([B)[B
+Lorg/help313/app/Ed25519$Point;
+HSPLorg/help313/app/Ed25519$Point;-><init>(Ljava/math/BigInteger;Ljava/math/BigInteger;Ljava/math/BigInteger;Ljava/math/BigInteger;)V
+
+# ---- what makes a bundle acceptable ----------------------------------------------------------------------------
+Lorg/help313/app/BundleCheck;
+HSPLorg/help313/app/BundleCheck;->verifiedIndex([B[BLjava/util/List;)Lorg/help313/app/BundleIndex;
+HSPLorg/help313/app/BundleCheck;->sha256Hex([B)Ljava/lang/String;
+HSPLorg/help313/app/BundleCheck;->base64(Ljava/lang/String;)[B
+HSPLorg/help313/app/BundleCheck;->loadedNow(Ljava/lang/String;)Z
+Lorg/help313/app/BundleStore;
+HSPLorg/help313/app/BundleStore;->load(Lkotlin/jvm/functions/Function1;)Lorg/help313/app/LoadedBundle;
+
+# ---- reading the bundle: 740 KB of JSON, once, on every cold start ---------------------------------------------
+Lorg/help313/query/Json;
+Lorg/help313/query/Json$Companion;
+Lorg/help313/query/Json$Obj;
+Lorg/help313/query/Json$Arr;
+Lorg/help313/query/Json$Str;
+Lorg/help313/query/Json$Num;
+Lorg/help313/query/Json$Bool;
+HSPLorg/help313/query/Json$Companion;->parse(Ljava/lang/String;)Lorg/help313/query/Json;
+HSPLorg/help313/query/Json;->get(Ljava/lang/String;)Lorg/help313/query/Json;
+HSPLorg/help313/query/Json;->getStr()Ljava/lang/String;
+HSPLorg/help313/query/Json;->getArr()Ljava/util/List;
+HSPLorg/help313/query/Json;->getObj()Ljava/util/Map;
+Lorg/help313/query/Parser;
+HSPLorg/help313/query/Parser;->value()Lorg/help313/query/Json;
+HSPLorg/help313/query/Parser;->obj()Lorg/help313/query/Json;
+HSPLorg/help313/query/Parser;->arr()Lorg/help313/query/Json;
+HSPLorg/help313/query/Parser;->string()Ljava/lang/String;
+HSPLorg/help313/query/Parser;->number()Lorg/help313/query/Json;
+HSPLorg/help313/query/Parser;->skipWhitespace()V
+HSPLorg/help313/query/Parser;->expect(C)V
+HSPLorg/help313/query/Parser;->atEnd()Z
+Lorg/help313/query/BundleRow;
+Lorg/help313/query/BundleRow$Companion;
+HSPLorg/help313/query/BundleRow$Companion;->fromJson(Lorg/help313/query/Json;)Lorg/help313/query/BundleRow;

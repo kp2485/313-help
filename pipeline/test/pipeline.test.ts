@@ -6,17 +6,18 @@ import { badge, openNow, rank, type BundleRow } from '@313help/query';
 import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
-import { p, parsePhone, sha256, today, uuid5 } from '../src/util.js';
-import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
+import { p, parsePhone, sha256, today, uuid5, type CsvRow } from '../src/util.js';
+import { scriptRefusingHosts, validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
+import { readScriptRefusingHosts } from '../src/seed-io.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
-import { lineToRows, parseSchedule } from '../src/import-lines.js';
+import { importInto, lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, milesToArea, nearestMiles } from '../src/indicators.js';
 import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
-import { addressOnPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
+import { addressOnPage, fetchPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
 import { GRID, crossings, encodeLine, insideRings, mergeChains, packRoads, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
@@ -56,6 +57,12 @@ describe('row validation', () => {
     expect(errs({ eligibility: 'Email jane@example.org first' })).toMatch(/personal contact/);
   });
   it('rejects an unknown category', () => expect(errs({ category: 'food.pantries' })).toMatch(/unknown category/));
+  // Emergency rooms and urgent care are their own kinds (DECISIONS 2026-09-20): neither says it is free or
+  // low-cost, which is what health.clinic means.
+  it('takes an emergency room and an urgent care as their own kinds of help', () => {
+    for (const c of ['health.er', 'health.urgent']) expect(errs({ category: c }), c).toBe('');
+    expect(errs({ category: 'health.emergency' })).toMatch(/unknown category/);
+  });
   it('rejects a status or availability the app doesn\'t know (a typo must not read as open)', () => {
     expect(errs({ status: 'Active' as never })).toMatch(/unknown status/);
     expect(errs({ status: 'proposed' as never })).toMatch(/unknown status/);
@@ -300,6 +307,86 @@ describe('does the page still show this listing (one strict matcher)', () => {
   });
 });
 
+// Two listings shipped the badge "Matched their website when added" for DMC emergency-room pages that dmc.org
+// has never let this pipeline read (2026-09-20). check-sources.ts had not promoted them — it cannot — but
+// nothing checked the claim, so a hand-written row published it. These fix both halves: what "could not be
+// read" means, and a build check that fails on the claim itself.
+describe('a page the fetcher could not read is never a match', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const answer = (status: number, body: string, headers: Record<string, string> = {}) =>
+    vi.stubGlobal('fetch', async () => new Response(body, { status, headers }));
+  const REAL_PAGE = `<html><body><h1>Clinic</h1><p>${'Open to everyone in the neighborhood, walk in any weekday. '.repeat(6)}</p><p>1 Main St, Detroit</p><p>313-555-0100</p></body></html>`;
+  // Cloudflare's own refusal for https://www.dmc.org/locations/detail/... , shortened.
+  const CHALLENGE = '<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title></head><body><div id="challenge-error-text">3990 John R Street</div><script>window._cf_chl_opt={cvId:"3"}</script></body></html>';
+
+  it('reads a real page', async () => {
+    answer(200, REAL_PAGE);
+    expect((await fetchPage('https://example.org/clinic')).ok).toBe(true);
+  });
+  it('a 403 body is a refusal, not a page, even when the listing\'s facts appear in it', async () => {
+    answer(403, CHALLENGE);
+    const got = await fetchPage('https://www.dmc.org/locations/detail/dmc-harper-university-hospital---emergency');
+    expect(got.ok).toBe(false);
+    expect(got.ok === false && got.why).toBe('HTTP 403');
+    answer(403, CHALLENGE, { 'cf-mitigated': 'challenge' });
+    expect((await fetchPage('https://www.dmc.org/z')).ok).toBe(false);
+  });
+  it('a bot-challenge page answered with 200 is still a refusal', async () => {
+    answer(200, CHALLENGE);
+    expect((await fetchPage('https://www.dmc.org/x')).ok).toBe(false);
+    answer(200, '<html><head><title>Attention Required! | Cloudflare</title></head><body>3901 Beaubien Boulevard</body></html>');
+    expect((await fetchPage('https://www.dmc.org/y')).ok).toBe(false);
+  });
+  it('an empty or near-empty 200 body could not be read either (a house number is easy to find in nothing)', async () => {
+    answer(200, '');
+    const empty = await fetchPage('https://example.org/gone');
+    expect(empty.ok).toBe(false);
+    expect(empty.ok === false && empty.why).toMatch(/almost no text/);
+    answer(200, '<html><body><p>3901 Beaubien Boulevard</p></body></html>');
+    expect((await fetchPage('https://example.org/stub')).ok).toBe(false);
+    // A data file is short on purpose and is read entry by entry, so it is still a page.
+    answer(200, JSON.stringify([{ name: 'Pantry', address: '1 Main St', phone: '313-555-0100' }]));
+    expect((await fetchPage('https://example.org/food.json')).ok).toBe(true);
+  });
+  it('a 404, a 500 and a failed connection are all "could not be read"', async () => {
+    for (const s of [404, 500]) { answer(s, REAL_PAGE); expect((await fetchPage('https://example.org/x')).ok, String(s)).toBe(false); }
+    vi.stubGlobal('fetch', async () => { throw new Error('getaddrinfo ENOTFOUND'); });
+    expect((await fetchPage('https://example.org/x')).ok).toBe(false);
+  });
+
+  const REFUSING = scriptRefusingHosts([
+    { host: 'dmc.org', refusing_since: '2026-09-20', refusal: 'HTTP 403 with a Cloudflare challenge page' },
+    { host: 'www.detroitmi.gov', refusing_since: '2026-09-20', refusal: 'HTTP 403 with a Cloudflare challenge page' },
+  ]);
+  const auto = (over: Partial<BundleRow['facts']>) => validateRows([row({ facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'DMC', url: 'https://www.dmc.org/locations/detail/dmc-harper-university-hospital---emergency' }, entry_method: 'auto_check', checked_at_entry: '2026-09-20', ...over } })], '2026-09-20', REFUSING).errors.join(' | ');
+
+  it('fails the build when an active row claims a machine match on a host that was already refusing', () => {
+    expect(auto({})).toMatch(/entry_method is "auto_check".*dmc\.org has refused this pipeline's fetcher since 2026-09-20/);
+    // The list is read with "www." dropped, like every other host check here.
+    expect(auto({ source: { type: 'seed_list', name: 'City', url: 'https://detroitmi.gov/departments/x' } })).toMatch(/detroitmi\.gov has refused/);
+  });
+  it('a person read it in a browser: entry_method "web" is fine on the same page', () => {
+    expect(auto({ entry_method: 'web' })).toBe('');
+  });
+  it('keeps the badge for a row added while the host still answered: it was true that day', () => {
+    expect(auto({ checked_at_entry: '2026-09-18' })).toBe('');
+  });
+  it('a machine match needs a page and a date to point at', () => {
+    expect(auto({ source: { type: 'seed_list', name: 'DMC' } })).toMatch(/no source url/);
+    expect(auto({ checked_at_entry: null })).toMatch(/no checked_at_entry/);
+  });
+  it('the committed list is a data file a steward can edit, and every host on it parses', () => {
+    const list = scriptRefusingHosts(readScriptRefusingHosts());
+    expect(list.size).toBeGreaterThan(0);
+    for (const [h, r] of list) {
+      expect(h, h).toBe(h.toLowerCase().replace(/^www\./, ''));
+      expect(r.refusing_since, h).toMatch(/^\d{4}-\d\d-\d\d$/);
+      expect(r.refusal, h).toBeTruthy();
+      expect(r.note, h).toBeTruthy();                                    // why it is on the list, for the next person
+    }
+  });
+});
+
 describe('hours from research text', () => {
   it('become a schedule only when every part is understood', () => {
     expect(parseSchedule('Mon-Fri 8am-9pm; Sat 9am-5pm')).toEqual([{ byday: 'MO,TU,WE,TH,FR', opens_at: '08:00', closes_at: '21:00' }, { byday: 'SA', opens_at: '09:00', closes_at: '17:00' }]);
@@ -334,6 +421,74 @@ describe('hours from research text', () => {
     expect(lineToRows(`${base} | `)).toMatchObject({ resource: { flags: '', phone2: '' } });
     expect(lineToRows(`${base} | color=green`)).toMatch(/unknown extra/);
     expect(lineToRows(`${base} | phone2=313-555-0101`)).toMatch(/phone2_label/);
+  });
+});
+
+describe('importing lines into the seed', () => {
+  // Two cities' assessors, one service name: both slugs are "sal_city_of_help_with_a_property_tax_bill..."
+  const hamtramck = 'Help with a property tax bill you cannot pay | City of Hamtramck Assessor | money.tax | Ask the Board of Review to lower it. | 3401 Evaline St | Hamtramck | 48212 | 313-800-5233 | https://hamtramckcity.gov | Mon-Fri 8am-4pm | Homeowners. | https://hamtramckcity.gov/departments/assessor/';
+  const highlandPark = 'Help with a property tax bill you cannot pay | City of Highland Park Assessor | money.tax | Ask the Board of Review to lower it. | 12050 Woodward Ave | Highland Park | 48203 | 313-252-0050 | https://highlandparkmi.gov | Mon-Fri 8:30am-5pm | Homeowners. | https://highlandparkmi.gov/government/assessor/';
+
+  function run(files: { file: string; text: string }[], resources: CsvRow[] = []) {
+    const logs: string[] = [], warns: string[] = [], schedules: CsvRow[] = [];
+    const summary = importInto(files, resources, schedules, (m) => logs.push(m), (m) => warns.push(m));
+    return { ...summary, logs, warns, resources, schedules };
+  }
+
+  it('a second line whose id is taken by a different organisation is reported, counted and not silently dropped', () => {
+    const out = run([{ file: 'a.txt', text: `# note\n${hamtramck}\n${highlandPark}\n` }]);
+    expect(out.added).toBe(1);
+    expect(out.collisions).toBe(1);
+    expect(out.resources).toHaveLength(1);
+    expect(out.warns).toEqual(['a.txt:3 skipped: id collision with sal_city_of_help_with_a_property_tax_bill_you_cannot_pay (a different organisation or address already has this id); change the service name so the id is unique']);
+  });
+
+  it('a collision against a row already in the seed is reported too', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    const out = run([{ file: 'b.txt', text: `\n${highlandPark}` }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 1 });
+    expect(out.warns[0]).toMatch(/^b\.txt:2 skipped: id collision with sal_city_of_/);
+  });
+
+  it('a same-organisation, same-address re-import is silent and changes nothing', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    const before = JSON.stringify(seeded);
+    const out = run([{ file: 'a.txt', text: hamtramck }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 0 });
+    expect(out.warns).toEqual([]);
+    expect(out.logs).toEqual([]);
+    expect(JSON.stringify(out.resources)).toBe(before);
+  });
+
+  it('an address corrected in the seed after the import is a note, not a collision', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    seeded[0]!.address_1 = '3401 Evaline Street, 1st Floor';
+    const out = run([{ file: 'a.txt', text: hamtramck }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 0 });
+    expect(out.warns).toEqual([]);
+    expect(out.logs[0]).toMatch(/already imported as sal_city_of_.*address reads "3401 Evaline Street, 1st Floor"/);
+  });
+
+  it('same organisation, different address and different phone is a collision', () => {
+    const seeded = run([{ file: 'a.txt', text: hamtramck }]).resources;
+    const branch = hamtramck.replace('3401 Evaline St', '9000 Jos Campau').replace('313-800-5233', '313-800-9999');
+    const out = run([{ file: 'b.txt', text: branch }], seeded);
+    expect(out).toMatchObject({ added: 0, collisions: 1 });
+    expect(out.warns[0]).toMatch(/^b\.txt:1 skipped: id collision with sal_city_of_/);
+  });
+
+  it('the same organisation with a different service is imported, not called a collision', () => {
+    const other = hamtramck.replace('Help with a property tax bill you cannot pay', 'Pay your water bill in person');
+    const out = run([{ file: 'a.txt', text: `${hamtramck}\n${other}` }]);
+    expect(out).toMatchObject({ added: 2, collisions: 0 });
+    expect(new Set(out.resources.map((r) => r.sal_id)).size).toBe(2);
+    expect(out.warns).toEqual([]);
+  });
+
+  it('a malformed line is still a plain skip, with no collision count', () => {
+    const out = run([{ file: 'a.txt', text: 'one | two | three' }]);
+    expect(out).toMatchObject({ added: 0, collisions: 0 });
+    expect(out.warns[0]).toMatch(/^a\.txt:1 skipped: expected 12 fields/);
   });
 });
 

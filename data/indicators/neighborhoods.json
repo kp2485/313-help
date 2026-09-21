@@ -64,6 +64,14 @@
    "name": "DDOT: bus stops",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/DDOT_Bus_Stops/FeatureServer/0",
    "last_edited": "2026-02-09"
+  },
+  "crashes": {
+   "name": "SEMCOG — Crash Locations, 2015-2024",
+   "url": "https://maps-semcog.opendata.arcgis.com/datasets/SEMCOG::crash-locations-2015-2024",
+   "last_edited": "2025-10-08",
+   "license": "SEMCOG Copyright License Agreement",
+   "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+   "notice": "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited."
   }
  },
  "stats_fetched_at": "2026-09-19",
@@ -171,6 +179,16 @@
   "Park Issue",
   "Street Light Out"
  ],
+ "crash_years": [
+  2020,
+  2024
+ ],
+ "city_crashes": {
+  "walk": 2024,
+  "bike": 664,
+  "severe": 630
+ },
+ "crash_records_from": "Michigan State Police (CJIC) police-reported crashes, published by SEMCOG",
  "city_now": {
   "rental_certs": 12276,
   "vacant_reg": 1493,
@@ -218,11 +236,11 @@
     -83.02288
    ],
    "help": {
-    "total": 14,
+    "total": 22,
     "by": {
      "food": 7,
-     "health": 0,
-     "harm": 2,
+     "health": 3,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -230,7 +248,7 @@
      "rec": 0,
      "jobs": 1,
      "learn": 1,
-     "treatment": 2,
+     "treatment": 4,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -247,9 +265,7 @@
      "narcan": 2.2,
      "indoors": 2
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -265,6 +281,11 @@
     "bus": 0
    },
    "parcels": 10244,
+   "crashes": {
+    "walk": 49,
+    "bike": 9,
+    "severe": 22
+   },
    "years": {
     "2019": {
      "blight": 395,
@@ -374,10 +395,10 @@
     -83.08138
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -390,7 +411,7 @@
      "housing": 0,
      "legal": 0,
      "ids": 0,
-     "money": 0,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -403,9 +424,7 @@
      "narcan": 0.5,
      "indoors": 1.1
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -421,6 +440,11 @@
     "bus": 0.2
    },
    "parcels": 110,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 10,
@@ -497,10 +521,10 @@
     -83.16515
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -526,9 +550,7 @@
      "narcan": 0.8,
      "indoors": 2.7
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -544,6 +566,11 @@
     "bus": 0.2
    },
    "parcels": 1481,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 259,
@@ -693,6 +720,11 @@
     "bus": 0.1
    },
    "parcels": 4711,
+   "crashes": {
+    "walk": 22,
+    "bike": 5,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 497,
@@ -798,10 +830,10 @@
     -83.15691
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 4,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 1,
      "utilities": 0,
@@ -827,9 +859,7 @@
      "narcan": 0.8,
      "indoors": 2.1
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -845,6 +875,11 @@
     "bus": 0.1
    },
    "parcels": 5547,
+   "crashes": {
+    "walk": 23,
+    "bike": 7,
+    "severe": 13
+   },
    "years": {
     "2019": {
      "blight": 1174,
@@ -1003,6 +1038,11 @@
     "bus": 0.9
    },
    "parcels": 1,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "issues": "lt5"
@@ -1092,6 +1132,11 @@
     "bus": 0.2
    },
    "parcels": 973,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 113,
@@ -1198,11 +1243,11 @@
     -83.26934
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -1228,8 +1273,7 @@
      "indoors": 2
     },
     "none_listed_yet": [
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -1246,6 +1290,11 @@
     "bus": 0.5
    },
    "parcels": 1504,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 470,
@@ -1397,6 +1446,11 @@
     "bus": 0.1
    },
    "parcels": 5592,
+   "crashes": {
+    "walk": 27,
+    "bike": 9,
+    "severe": 8
+   },
    "years": {
     "2019": {
      "blight": 572,
@@ -1554,6 +1608,11 @@
     "bus": 0.2
    },
    "parcels": 753,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 96,
@@ -1653,10 +1712,10 @@
     -83.09284
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
      "food": 4,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -1669,7 +1728,7 @@
      "housing": 0,
      "legal": 0,
      "ids": 0,
-     "money": 0,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -1682,9 +1741,7 @@
      "narcan": 0.7,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -1700,6 +1757,11 @@
     "bus": 0.1
    },
    "parcels": 981,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 345,
@@ -1801,10 +1863,10 @@
     -83.15632
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -1830,9 +1892,7 @@
      "narcan": 0.4,
      "indoors": 0.1
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -1848,6 +1908,11 @@
     "bus": 0.1
    },
    "parcels": 4251,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 175,
@@ -1957,10 +2022,10 @@
     -83.04895
    ],
    "help": {
-    "total": 9,
+    "total": 21,
     "by": {
-     "food": 1,
-     "health": 1,
+     "food": 2,
+     "health": 11,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -1977,12 +2042,12 @@
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.6,
-     "clinic": 1.4,
+     "food": 0.5,
+     "clinic": 0.4,
      "narcan": 0.4,
      "indoors": 1.3
     },
@@ -2002,6 +2067,11 @@
     "bus": 0.2
    },
    "parcels": 7,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "fires": "lt5"
@@ -2046,10 +2116,10 @@
     -83.26215
    ],
    "help": {
-    "total": 18,
+    "total": 19,
     "by": {
      "food": 11,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -2075,9 +2145,7 @@
      "narcan": 1.2,
      "indoors": 1.2
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -2093,6 +2161,11 @@
     "bus": 0.4
    },
    "parcels": 9876,
+   "crashes": {
+    "walk": 19,
+    "bike": 5,
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 2925,
@@ -2202,12 +2275,12 @@
     -83.05184
    ],
    "help": {
-    "total": 17,
+    "total": 31,
     "by": {
-     "food": 2,
-     "health": 1,
-     "harm": 4,
-     "shelter": 1,
+     "food": 3,
+     "health": 11,
+     "harm": 5,
+     "shelter": 2,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
@@ -2222,12 +2295,12 @@
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
-     "clinic": 1.1,
+     "clinic": 0.3,
      "narcan": 0.4,
      "indoors": 1.4
     },
@@ -2247,6 +2320,11 @@
     "bus": 0.2
    },
    "parcels": 772,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 15,
@@ -2336,11 +2414,11 @@
     -83.04764
    ],
    "help": {
-    "total": 8,
+    "total": 14,
     "by": {
      "food": 3,
-     "health": 0,
-     "harm": 1,
+     "health": 2,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -2352,7 +2430,7 @@
      "housing": 0,
      "legal": 0,
      "ids": 0,
-     "money": 1,
+     "money": 2,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -2365,9 +2443,7 @@
      "narcan": 1,
      "indoors": 0.4
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -2383,6 +2459,11 @@
     "bus": 0.3
    },
    "parcels": 2298,
+   "crashes": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 181,
@@ -2490,7 +2571,7 @@
     -83.07578
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 1,
      "health": 0,
@@ -2502,7 +2583,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -2538,6 +2619,11 @@
     "bus": 0.2
    },
    "parcels": 904,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 60,
@@ -2688,6 +2774,11 @@
     "bus": 0.1
    },
    "parcels": 399,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 105,
@@ -2783,9 +2874,9 @@
     -83.07701
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
-     "food": 5,
+     "food": 6,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -2795,7 +2886,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 1,
+     "treatment": 2,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -2808,7 +2899,7 @@
     },
     "nearest_miles": {
      "food": 0.3,
-     "clinic": 1.6,
+     "clinic": 1.3,
      "narcan": 0.5,
      "indoors": 1.4
     },
@@ -2830,6 +2921,11 @@
     "bus": 0.2
    },
    "parcels": 2773,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 74,
@@ -2938,11 +3034,11 @@
     -83.07147
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -2963,7 +3059,7 @@
     },
     "nearest_miles": {
      "food": 0.4,
-     "clinic": 1.4,
+     "clinic": 1.2,
      "narcan": 0.5,
      "indoors": 0.8
     },
@@ -2985,6 +3081,11 @@
     "bus": 0.2
    },
    "parcels": 2213,
+   "crashes": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 62,
@@ -3141,6 +3242,11 @@
     "bus": 0.3
    },
    "parcels": 518,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 97,
@@ -3280,6 +3386,11 @@
     "bus": 0.3
    },
    "parcels": 800,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 549,
@@ -3382,19 +3493,19 @@
     -83.09804
    ],
    "help": {
-    "total": 39,
+    "total": 44,
     "by": {
      "food": 11,
-     "health": 6,
-     "harm": 5,
-     "shelter": 1,
+     "health": 7,
+     "harm": 6,
+     "shelter": 2,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 2,
-     "jobs": 3,
+     "jobs": 4,
      "learn": 6,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 1,
      "ids": 0,
@@ -3427,6 +3538,11 @@
     "bus": 0.1
    },
    "parcels": 6235,
+   "crashes": {
+    "walk": 34,
+    "bike": 16,
+    "severe": 12
+   },
    "years": {
     "2019": {
      "blight": 988,
@@ -3537,19 +3653,19 @@
     -83.10325
    ],
    "help": {
-    "total": 23,
+    "total": 31,
     "by": {
      "food": 9,
-     "health": 6,
-     "harm": 2,
-     "shelter": 1,
+     "health": 8,
+     "harm": 3,
+     "shelter": 2,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 5,
      "housing": 0,
      "legal": 1,
      "ids": 0,
@@ -3557,7 +3673,7 @@
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
@@ -3582,6 +3698,11 @@
     "bus": 0.1
    },
    "parcels": 5885,
+   "crashes": {
+    "walk": 13,
+    "bike": 7,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 428,
@@ -3737,6 +3858,11 @@
     "bus": 0.3
    },
    "parcels": 2392,
+   "crashes": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 155,
@@ -3844,11 +3970,11 @@
     -82.97745
    ],
    "help": {
-    "total": 18,
+    "total": 27,
     "by": {
      "food": 4,
-     "health": 1,
-     "harm": 4,
+     "health": 8,
+     "harm": 6,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
@@ -3889,6 +4015,11 @@
     "bus": 0.3
    },
    "parcels": 1268,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 97,
@@ -3997,11 +4128,11 @@
     -82.95913
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -4027,8 +4158,7 @@
      "indoors": 1
     },
     "none_listed_yet": [
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -4045,6 +4175,11 @@
     "bus": 0.1
    },
    "parcels": 643,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 42,
@@ -4144,10 +4279,10 @@
     -83.13992
    ],
    "help": {
-    "total": 17,
+    "total": 21,
     "by": {
      "food": 8,
-     "health": 4,
+     "health": 7,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
@@ -4164,7 +4299,7 @@
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
@@ -4189,6 +4324,11 @@
     "bus": 0.2
    },
    "parcels": 7842,
+   "crashes": {
+    "walk": 33,
+    "bike": 17,
+    "severe": 15
+   },
    "years": {
     "2019": {
      "blight": 1354,
@@ -4298,11 +4438,11 @@
     -83.21232
    ],
    "help": {
-    "total": 9,
+    "total": 11,
     "by": {
      "food": 3,
-     "health": 2,
-     "harm": 1,
+     "health": 3,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -4343,6 +4483,11 @@
     "bus": 0.1
    },
    "parcels": 3221,
+   "crashes": {
+    "walk": 12,
+    "bike": 6,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 366,
@@ -4452,7 +4597,7 @@
     -83.06616
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 4,
      "health": 0,
@@ -4464,7 +4609,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -4500,6 +4645,11 @@
     "bus": 0.2
    },
    "parcels": 712,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 46,
@@ -4596,10 +4746,10 @@
     -83.00892
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 2,
-     "health": 1,
+     "health": 2,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
@@ -4641,6 +4791,11 @@
     "bus": 0.2
    },
    "parcels": 1949,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 164,
@@ -4750,11 +4905,11 @@
     -82.96555
    ],
    "help": {
-    "total": 18,
+    "total": 26,
     "by": {
      "food": 3,
-     "health": 1,
-     "harm": 4,
+     "health": 8,
+     "harm": 5,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
@@ -4795,6 +4950,11 @@
     "bus": 0.2
    },
    "parcels": 253,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 24,
@@ -4869,17 +5029,17 @@
     -83.09121
    ],
    "help": {
-    "total": 9,
+    "total": 15,
     "by": {
      "food": 1,
-     "health": 3,
-     "harm": 1,
-     "shelter": 1,
+     "health": 4,
+     "harm": 3,
+     "shelter": 3,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 1,
+     "jobs": 2,
      "learn": 1,
      "treatment": 1,
      "housing": 0,
@@ -4914,6 +5074,11 @@
     "bus": 0.3
    },
    "parcels": 1419,
+   "crashes": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 48,
@@ -5013,17 +5178,17 @@
     -83.07415
    ],
    "help": {
-    "total": 25,
+    "total": 31,
     "by": {
      "food": 4,
-     "health": 4,
-     "harm": 4,
+     "health": 5,
+     "harm": 5,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
      "rec": 2,
-     "jobs": 2,
+     "jobs": 4,
      "learn": 4,
      "treatment": 1,
      "housing": 0,
@@ -5033,7 +5198,7 @@
      "goods": 1,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
@@ -5058,6 +5223,11 @@
     "bus": 0.1
    },
    "parcels": 880,
+   "crashes": {
+    "walk": 7,
+    "bike": 9,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 74,
@@ -5152,10 +5322,10 @@
     -82.92028
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
      "food": 1,
-     "health": 2,
+     "health": 4,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -5197,6 +5367,11 @@
     "bus": 0.2
    },
    "parcels": 4023,
+   "crashes": {
+    "walk": 15,
+    "bike": 8,
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 845,
@@ -5306,11 +5481,11 @@
     -83.21277
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
      "food": 0,
-     "health": 2,
-     "harm": 3,
+     "health": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -5353,6 +5528,11 @@
     "bus": 0.1
    },
    "parcels": 3405,
+   "crashes": {
+    "walk": 21,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 362,
@@ -5459,15 +5639,15 @@
     -83.06197
    ],
    "help": {
-    "total": 16,
+    "total": 21,
     "by": {
      "food": 3,
-     "health": 1,
-     "harm": 1,
+     "health": 2,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0,
      "jobs": 3,
      "learn": 2,
@@ -5484,7 +5664,7 @@
     },
     "nearest_miles": {
      "food": 0.7,
-     "clinic": 2.1,
+     "clinic": 1.2,
      "narcan": 0.2,
      "indoors": 1.8
     },
@@ -5504,6 +5684,11 @@
     "bus": 0.1
    },
    "parcels": 878,
+   "crashes": {
+    "walk": 5,
+    "bike": 10,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 48,
@@ -5640,6 +5825,11 @@
     "bus": 0
    },
    "parcels": 2686,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 7
+   },
    "years": {
     "2019": {
      "blight": 105,
@@ -5796,6 +5986,11 @@
     "bus": 0.2
    },
    "parcels": 1204,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 103,
@@ -5906,11 +6101,11 @@
     -83.11023
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 5,
      "health": 1,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -5951,6 +6146,11 @@
     "bus": 0.2
    },
    "parcels": 2773,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 257,
@@ -6097,6 +6297,11 @@
     "bus": 0.3
    },
    "parcels": 1133,
+   "crashes": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 337,
@@ -6251,6 +6456,11 @@
     "bus": 0.4
    },
    "parcels": 136,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 15,
@@ -6332,11 +6542,11 @@
     -83.12912
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 6,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -6377,6 +6587,11 @@
     "bus": 0.1
    },
    "parcels": 685,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 83,
@@ -6474,11 +6689,11 @@
     -83.10866
    ],
    "help": {
-    "total": 19,
+    "total": 20,
     "by": {
      "food": 9,
      "health": 2,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -6519,6 +6734,11 @@
     "bus": 0
    },
    "parcels": 5372,
+   "crashes": {
+    "walk": 24,
+    "bike": 9,
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 1354,
@@ -6628,10 +6848,10 @@
     -83.04737
    ],
    "help": {
-    "total": 14,
+    "total": 25,
     "by": {
-     "food": 1,
-     "health": 1,
+     "food": 2,
+     "health": 10,
      "harm": 3,
      "shelter": 1,
      "utilities": 0,
@@ -6648,12 +6868,12 @@
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
      "food": 0.5,
-     "clinic": 1.2,
+     "clinic": 0.5,
      "narcan": 0.5,
      "indoors": 1.2
     },
@@ -6673,6 +6893,11 @@
     "bus": 0.4
    },
    "parcels": 47,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "issues": "lt5"
@@ -6716,27 +6941,27 @@
     -83.04659
    ],
    "help": {
-    "total": 36,
+    "total": 47,
     "by": {
      "food": 6,
-     "health": 1,
-     "harm": 8,
+     "health": 3,
+     "harm": 10,
      "shelter": 2,
      "utilities": 0,
      "hygiene": 2,
      "youth": 0,
      "rec": 0,
-     "jobs": 4,
+     "jobs": 5,
      "learn": 2,
      "treatment": 3,
      "housing": 4,
-     "legal": 1,
-     "ids": 0,
-     "money": 1,
+     "legal": 2,
+     "ids": 1,
+     "money": 2,
      "goods": 1,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 2,
      "pets": 0
     },
     "nearest_miles": {
@@ -6761,6 +6986,11 @@
     "bus": 0.1
    },
    "parcels": 876,
+   "crashes": {
+    "walk": 101,
+    "bike": 26,
+    "severe": 12
+   },
    "years": {
     "2019": {
      "blight": 226,
@@ -6895,6 +7125,11 @@
     "bus": 0.2
    },
    "parcels": 583,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 108,
@@ -7034,6 +7269,11 @@
     "bus": 0.2
    },
    "parcels": 2143,
+   "crashes": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 364,
@@ -7135,10 +7375,10 @@
     -82.98566
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 2,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -7180,6 +7420,11 @@
     "bus": 0.1
    },
    "parcels": 4091,
+   "crashes": {
+    "walk": 15,
+    "bike": 8,
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 566,
@@ -7290,10 +7535,10 @@
     -83.04137
    ],
    "help": {
-    "total": 14,
+    "total": 20,
     "by": {
      "food": 5,
-     "health": 0,
+     "health": 3,
      "harm": 2,
      "shelter": 1,
      "utilities": 0,
@@ -7305,23 +7550,21 @@
      "treatment": 1,
      "housing": 1,
      "legal": 1,
-     "ids": 0,
-     "money": 1,
+     "ids": 1,
+     "money": 2,
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
      "food": 0.8,
-     "clinic": 1.6,
+     "clinic": 0.8,
      "narcan": 0.6,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -7337,6 +7580,11 @@
     "bus": 0
    },
    "parcels": 615,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 27,
@@ -7459,6 +7707,11 @@
     "bus": 0.3
    },
    "parcels": 2273,
+   "crashes": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 118,
@@ -7568,21 +7821,21 @@
     -83.08471
    ],
    "help": {
-    "total": 12,
+    "total": 17,
     "by": {
      "food": 2,
-     "health": 1,
-     "harm": 0,
+     "health": 3,
+     "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 1,
      "treatment": 0,
      "housing": 0,
-     "legal": 2,
+     "legal": 3,
      "ids": 0,
      "money": 0,
      "goods": 2,
@@ -7593,13 +7846,11 @@
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 2.5,
+     "clinic": 1.8,
      "narcan": 1.1,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -7615,6 +7866,11 @@
     "bus": 0.1
    },
    "parcels": 778,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 267,
@@ -7762,6 +8018,11 @@
     "bus": 0.2
    },
    "parcels": 416,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 290,
@@ -7856,38 +8117,36 @@
     -83.02726
    ],
    "help": {
-    "total": 16,
+    "total": 22,
     "by": {
      "food": 6,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
-     "hygiene": 0,
+     "hygiene": 1,
      "youth": 0,
      "rec": 1,
      "jobs": 2,
      "learn": 0,
-     "treatment": 1,
-     "housing": 3,
+     "treatment": 2,
+     "housing": 5,
      "legal": 0,
      "ids": 0,
      "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
      "food": 0.4,
-     "clinic": 1.6,
+     "clinic": 1.5,
      "narcan": 0.6,
      "indoors": 0.1
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -7903,6 +8162,11 @@
     "bus": 0.1
    },
    "parcels": 610,
+   "crashes": {
+    "walk": 7,
+    "bike": 6,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 41,
@@ -7993,11 +8257,11 @@
     -83.25192
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -8022,9 +8286,7 @@
      "narcan": 1.6,
      "indoors": 1.6
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -8040,6 +8302,11 @@
     "bus": 0.3
    },
    "parcels": 2969,
+   "crashes": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 1402,
@@ -8148,11 +8415,11 @@
     -83.227
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
      "food": 4,
-     "health": 1,
-     "harm": 0,
+     "health": 2,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -8177,9 +8444,7 @@
      "narcan": 1.4,
      "indoors": 1.7
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -8195,6 +8460,11 @@
     "bus": 0.2
    },
    "parcels": 3153,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 1894,
@@ -8350,6 +8620,11 @@
     "bus": 0.4
    },
    "parcels": 1363,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 195,
@@ -8500,6 +8775,11 @@
     "bus": 0.1
    },
    "parcels": 3858,
+   "crashes": {
+    "walk": 10,
+    "bike": 5,
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 265,
@@ -8609,10 +8889,10 @@
     -83.19313
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -8638,9 +8918,7 @@
      "narcan": 0.5,
      "indoors": 2.8
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -8656,6 +8934,11 @@
     "bus": 0.2
    },
    "parcels": 1088,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 140,
@@ -8807,6 +9090,11 @@
     "bus": 0.2
    },
    "parcels": 4821,
+   "crashes": {
+    "walk": 18,
+    "bike": 9,
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 625,
@@ -8965,6 +9253,11 @@
     "bus": 0.3
    },
    "parcels": 1095,
+   "crashes": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 305,
@@ -9071,11 +9364,11 @@
     -83.04712
    ],
    "help": {
-    "total": 7,
+    "total": 12,
     "by": {
      "food": 2,
-     "health": 0,
-     "harm": 3,
+     "health": 3,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -9096,13 +9389,11 @@
     },
     "nearest_miles": {
      "food": 0.1,
-     "clinic": 2.2,
+     "clinic": 1.1,
      "narcan": 0.7,
      "indoors": 1.5
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -9118,6 +9409,11 @@
     "bus": 0.1
    },
    "parcels": 357,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 15,
@@ -9197,10 +9493,10 @@
     -82.96086
    ],
    "help": {
-    "total": 15,
+    "total": 22,
     "by": {
      "food": 4,
-     "health": 1,
+     "health": 8,
      "harm": 3,
      "shelter": 0,
      "utilities": 1,
@@ -9242,6 +9538,11 @@
     "bus": 0.2
    },
    "parcels": 2735,
+   "crashes": {
+    "walk": "lt5",
+    "bike": 7,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 468,
@@ -9347,10 +9648,10 @@
     -82.98547
    ],
    "help": {
-    "total": 11,
+    "total": 12,
     "by": {
      "food": 4,
-     "health": 0,
+     "health": 1,
      "harm": 3,
      "shelter": 1,
      "utilities": 0,
@@ -9376,9 +9677,7 @@
      "narcan": 0.3,
      "indoors": 1.2
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -9394,6 +9693,11 @@
     "bus": 0.1
    },
    "parcels": 1931,
+   "crashes": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 170,
@@ -9548,6 +9852,11 @@
     "bus": 0.1
    },
    "parcels": 4277,
+   "crashes": {
+    "walk": 36,
+    "bike": 11,
+    "severe": 12
+   },
    "years": {
     "2019": {
      "blight": 364,
@@ -9705,6 +10014,11 @@
     "bus": 0.3
    },
    "parcels": 1661,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 199,
@@ -9810,10 +10124,10 @@
     -83.2106
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
-     "health": 2,
+     "health": 3,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -9858,6 +10172,11 @@
     "bus": 0.2
    },
    "parcels": 22,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": "lt5",
@@ -9918,10 +10237,10 @@
     -83.09077
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -9934,7 +10253,7 @@
      "housing": 0,
      "legal": 0,
      "ids": 0,
-     "money": 0,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -9948,7 +10267,6 @@
      "indoors": 1.2
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -9966,6 +10284,11 @@
     "bus": 0.1
    },
    "parcels": 1579,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 480,
@@ -10122,6 +10445,11 @@
     "bus": 0.1
    },
    "parcels": 506,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 44,
@@ -10244,6 +10572,11 @@
     "bus": 0.2
    },
    "parcels": 2612,
+   "crashes": {
+    "walk": 16,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 268,
@@ -10400,6 +10733,11 @@
     "bus": 0.1
    },
    "parcels": 885,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 168,
@@ -10554,6 +10892,11 @@
     "bus": 0.1
    },
    "parcels": 1012,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 187,
@@ -10705,6 +11048,11 @@
     "bus": 0.2
    },
    "parcels": 887,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 371,
@@ -10849,6 +11197,11 @@
     "bus": 0.1
    },
    "parcels": 2073,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 197,
@@ -11003,6 +11356,11 @@
     "bus": 0.2
    },
    "parcels": 2256,
+   "crashes": {
+    "walk": 14,
+    "bike": "lt5",
+    "severe": 8
+   },
    "years": {
     "2019": {
      "blight": 138,
@@ -11111,10 +11469,10 @@
     -83.00956
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -11123,7 +11481,7 @@
      "rec": 0,
      "jobs": 1,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 3,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -11141,7 +11499,6 @@
      "indoors": 0.9
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -11159,6 +11516,11 @@
     "bus": 0.1
    },
    "parcels": 2447,
+   "crashes": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 310,
@@ -11267,10 +11629,10 @@
     -83.02417
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -11279,7 +11641,7 @@
      "rec": 0,
      "jobs": 1,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 3,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -11297,7 +11659,6 @@
      "indoors": 1.9
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -11315,6 +11676,11 @@
     "bus": 0.4
    },
    "parcels": 2905,
+   "crashes": {
+    "walk": 13,
+    "bike": 6,
+    "severe": 9
+   },
    "years": {
     "2019": {
      "blight": 521,
@@ -11417,10 +11783,10 @@
     -83.00117
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -11447,7 +11813,6 @@
      "indoors": 1.4
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -11465,6 +11830,11 @@
     "bus": 0
    },
    "parcels": 2112,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 198,
@@ -11572,11 +11942,11 @@
     -83.04073
    ],
    "help": {
-    "total": 21,
+    "total": 27,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 6,
+     "harm": 7,
      "shelter": 2,
      "utilities": 0,
      "hygiene": 1,
@@ -11586,13 +11956,13 @@
      "learn": 0,
      "treatment": 0,
      "housing": 3,
-     "legal": 1,
-     "ids": 0,
-     "money": 1,
+     "legal": 2,
+     "ids": 1,
+     "money": 2,
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 2,
      "pets": 0
     },
     "nearest_miles": {
@@ -11619,6 +11989,11 @@
     "bus": 0
    },
    "parcels": 47,
+   "crashes": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 20,
@@ -11731,6 +12106,11 @@
     "bus": 0.4
    },
    "parcels": 1006,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 20,
@@ -11878,6 +12258,11 @@
     "bus": 0.4
    },
    "parcels": 3349,
+   "crashes": {
+    "walk": 12,
+    "bike": 5,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 238,
@@ -12035,6 +12420,11 @@
     "bus": 0.2
    },
    "parcels": 1094,
+   "crashes": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": 7
+   },
    "years": {
     "2019": {
      "blight": 138,
@@ -12143,9 +12533,9 @@
     -83.0966
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 2,
      "shelter": 0,
@@ -12155,7 +12545,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 3,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -12167,7 +12557,7 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.5,
+     "food": 0.3,
      "clinic": 0.7,
      "narcan": 0.4,
      "indoors": 2.3
@@ -12188,6 +12578,11 @@
     "bus": 0.3
    },
    "parcels": 1775,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 52,
@@ -12281,10 +12676,10 @@
     -83.17473
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -12310,9 +12705,7 @@
      "narcan": 0.4,
      "indoors": 0.6
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -12328,6 +12721,11 @@
     "bus": 0.2
    },
    "parcels": 871,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 89,
@@ -12429,9 +12827,9 @@
     -83.106
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 1,
      "harm": 4,
      "shelter": 0,
@@ -12441,7 +12839,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 3,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -12453,14 +12851,12 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 1,
+     "food": 0.3,
      "clinic": 0.7,
      "narcan": 0.3,
      "indoors": 2.7
     },
-    "none_listed_yet": [
-     "food"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -12476,6 +12872,11 @@
     "bus": 0.1
    },
    "parcels": 1532,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 262,
@@ -12633,6 +13034,11 @@
     "bus": 0.2
    },
    "parcels": 500,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 134,
@@ -12725,10 +13131,10 @@
     -83.1736
    ],
    "help": {
-    "total": 11,
+    "total": 12,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 1,
@@ -12754,9 +13160,7 @@
      "narcan": 0.4,
      "indoors": 0.7
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -12772,6 +13176,11 @@
     "bus": 0.2
    },
    "parcels": 1551,
+   "crashes": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 260,
@@ -12878,9 +13287,9 @@
     -83.09136
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 0,
      "shelter": 0,
@@ -12890,7 +13299,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 1,
+     "treatment": 2,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -12925,6 +13334,11 @@
     "bus": 0.4
    },
    "parcels": 1002,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 49,
@@ -13032,10 +13446,10 @@
     -83.0972
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -13062,7 +13476,6 @@
      "indoors": 0.5
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -13080,6 +13493,11 @@
     "bus": 0.1
    },
    "parcels": 234,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 139,
@@ -13169,11 +13587,11 @@
     -83.24891
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -13216,6 +13634,11 @@
     "bus": 0.4
    },
    "parcels": 3129,
+   "crashes": {
+    "walk": 20,
+    "bike": 6,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 1151,
@@ -13325,7 +13748,7 @@
     -83.08922
    ],
    "help": {
-    "total": 16,
+    "total": 17,
     "by": {
      "food": 4,
      "health": 1,
@@ -13335,7 +13758,7 @@
      "hygiene": 0,
      "youth": 0,
      "rec": 1,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 5,
      "treatment": 0,
      "housing": 0,
@@ -13370,6 +13793,11 @@
     "bus": 0.1
    },
    "parcels": 358,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 125,
@@ -13462,17 +13890,17 @@
     -83.07385
    ],
    "help": {
-    "total": 14,
+    "total": 16,
     "by": {
      "food": 4,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
      "rec": 2,
-     "jobs": 1,
+     "jobs": 2,
      "learn": 4,
      "treatment": 0,
      "housing": 0,
@@ -13507,6 +13935,11 @@
     "bus": 0.1
    },
    "parcels": 364,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": "lt5",
@@ -13644,6 +14077,11 @@
     "bus": 0.4
    },
    "parcels": 1878,
+   "crashes": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 132,
@@ -13753,10 +14191,10 @@
     -83.19064
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 2,
-     "health": 1,
+     "health": 2,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
@@ -13798,6 +14236,11 @@
     "bus": 0.2
    },
    "parcels": 1422,
+   "crashes": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 168,
@@ -13905,10 +14348,10 @@
     -82.99524
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 2,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -13950,6 +14393,11 @@
     "bus": 0.1
    },
    "parcels": 426,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 65,
@@ -14044,19 +14492,19 @@
     -83.00244
    ],
    "help": {
-    "total": 10,
+    "total": 13,
     "by": {
      "food": 5,
-     "health": 1,
+     "health": 2,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
-     "hygiene": 0,
+     "hygiene": 1,
      "youth": 0,
      "rec": 1,
      "jobs": 0,
      "learn": 0,
-     "treatment": 1,
+     "treatment": 2,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -14089,6 +14537,11 @@
     "bus": 0.2
    },
    "parcels": 3913,
+   "crashes": {
+    "walk": 19,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 603,
@@ -14245,6 +14698,11 @@
     "bus": 0.2
    },
    "parcels": 1109,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 349,
@@ -14399,6 +14857,11 @@
     "bus": 0.1
    },
    "parcels": 3734,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 1236,
@@ -14507,17 +14970,17 @@
     -83.07276
    ],
    "help": {
-    "total": 2,
+    "total": 7,
     "by": {
      "food": 0,
-     "health": 0,
-     "harm": 0,
-     "shelter": 0,
+     "health": 1,
+     "harm": 2,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 1,
+     "jobs": 2,
      "learn": 1,
      "treatment": 0,
      "housing": 0,
@@ -14532,14 +14995,12 @@
     },
     "nearest_miles": {
      "food": 0.7,
-     "clinic": 1.4,
+     "clinic": 0.8,
      "narcan": 0.9,
      "indoors": 1.6
     },
     "none_listed_yet": [
-     "food",
-     "health",
-     "harm"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -14556,6 +15017,11 @@
     "bus": 0.2
    },
    "parcels": 128,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": "lt5",
@@ -14670,6 +15136,11 @@
     "bus": 0.2
    },
    "parcels": 131,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 16,
@@ -14744,10 +15215,10 @@
     -83.20375
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 5,
-     "health": 2,
+     "health": 3,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -14791,6 +15262,11 @@
     "bus": 0
    },
    "parcels": 3108,
+   "crashes": {
+    "walk": 20,
+    "bike": "lt5",
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 245,
@@ -14947,6 +15423,11 @@
     "bus": 0.2
    },
    "parcels": 556,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 70,
@@ -15093,6 +15574,11 @@
     "bus": 0.2
    },
    "parcels": 1909,
+   "crashes": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 225,
@@ -15203,10 +15689,10 @@
     -83.03515
    ],
    "help": {
-    "total": 14,
+    "total": 18,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 1,
      "utilities": 0,
@@ -15218,23 +15704,21 @@
      "treatment": 1,
      "housing": 1,
      "legal": 1,
-     "ids": 0,
-     "money": 1,
+     "ids": 1,
+     "money": 2,
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
      "food": 0.3,
-     "clinic": 1.5,
+     "clinic": 1.2,
      "narcan": 0.8,
      "indoors": 0.6
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -15250,6 +15734,11 @@
     "bus": 0.1
    },
    "parcels": 434,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 35,
@@ -15383,6 +15872,11 @@
     "bus": 0.1
    },
    "parcels": 1419,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 95,
@@ -15491,10 +15985,10 @@
     -83.09537
    ],
    "help": {
-    "total": 9,
+    "total": 11,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -15520,9 +16014,7 @@
      "narcan": 0.7,
      "indoors": 0.4
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -15538,6 +16030,11 @@
     "bus": 0.1
    },
    "parcels": 701,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 295,
@@ -15689,6 +16186,11 @@
     "bus": 0.3
    },
    "parcels": 1373,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 143,
@@ -15843,6 +16345,11 @@
     "bus": 0.2
    },
    "parcels": 5240,
+   "crashes": {
+    "walk": 23,
+    "bike": "lt5",
+    "severe": 13
+   },
    "years": {
     "2019": {
      "blight": 236,
@@ -16001,6 +16508,11 @@
     "bus": 0.2
    },
    "parcels": 678,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 30,
@@ -16125,6 +16637,11 @@
     "bus": 0.1
    },
    "parcels": 1657,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 177,
@@ -16233,11 +16750,11 @@
     -83.02998
    ],
    "help": {
-    "total": 11,
+    "total": 14,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 2,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -16245,7 +16762,7 @@
      "rec": 1,
      "jobs": 1,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 3,
      "housing": 1,
      "legal": 0,
      "ids": 0,
@@ -16280,6 +16797,11 @@
     "bus": 0
    },
    "parcels": 4260,
+   "crashes": {
+    "walk": 17,
+    "bike": 5,
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 217,
@@ -16430,6 +16952,11 @@
     "bus": 0.2
    },
    "parcels": 934,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 131,
@@ -16534,10 +17061,10 @@
     -83.24181
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -16563,9 +17090,7 @@
      "narcan": 0.9,
      "indoors": 0.8
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -16581,6 +17106,11 @@
     "bus": 0.1
    },
    "parcels": 532,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 267,
@@ -16677,17 +17207,17 @@
     -83.06466
    ],
    "help": {
-    "total": 16,
+    "total": 20,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0,
-     "jobs": 5,
+     "jobs": 6,
      "learn": 2,
      "treatment": 1,
      "housing": 0,
@@ -16702,7 +17232,7 @@
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 1.8,
+     "clinic": 1.5,
      "narcan": 0.5,
      "indoors": 1.6
     },
@@ -16722,6 +17252,11 @@
     "bus": 0.1
    },
    "parcels": 155,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 18,
@@ -16794,15 +17329,15 @@
     -83.05548
    ],
    "help": {
-    "total": 16,
+    "total": 31,
     "by": {
-     "food": 2,
-     "health": 1,
-     "harm": 2,
+     "food": 3,
+     "health": 11,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0,
      "jobs": 2,
      "learn": 1,
@@ -16819,7 +17354,7 @@
     },
     "nearest_miles": {
      "food": 0.3,
-     "clinic": 1.7,
+     "clinic": 0.6,
      "narcan": 0.4,
      "indoors": 1.7
     },
@@ -16839,6 +17374,11 @@
     "bus": 0.1
    },
    "parcels": 90,
+   "crashes": {
+    "walk": 13,
+    "bike": 9,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 50,
@@ -16916,11 +17456,11 @@
     -83.26368
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -16947,8 +17487,7 @@
     },
     "none_listed_yet": [
      "food",
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -16965,6 +17504,11 @@
     "bus": 0.3
    },
    "parcels": 101,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 37,
@@ -17040,7 +17584,7 @@
     -83.08474
    ],
    "help": {
-    "total": 15,
+    "total": 16,
     "by": {
      "food": 4,
      "health": 0,
@@ -17050,7 +17594,7 @@
      "hygiene": 0,
      "youth": 0,
      "rec": 2,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 5,
      "treatment": 0,
      "housing": 0,
@@ -17087,6 +17631,11 @@
     "bus": 0.1
    },
    "parcels": 281,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 23,
@@ -17163,10 +17712,10 @@
     -83.11984
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 2,
-     "health": 2,
+     "health": 3,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
@@ -17208,6 +17757,11 @@
     "bus": 0.2
    },
    "parcels": 613,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 118,
@@ -17308,17 +17862,17 @@
     -83.06043
    ],
    "help": {
-    "total": 30,
+    "total": 49,
     "by": {
-     "food": 4,
-     "health": 2,
-     "harm": 6,
-     "shelter": 1,
+     "food": 5,
+     "health": 13,
+     "harm": 8,
+     "shelter": 2,
      "utilities": 0,
      "hygiene": 1,
-     "youth": 0,
+     "youth": 1,
      "rec": 0,
-     "jobs": 4,
+     "jobs": 5,
      "learn": 1,
      "treatment": 2,
      "housing": 0,
@@ -17328,12 +17882,12 @@
      "goods": 1,
      "kids": 0,
      "connect": 1,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.4,
-     "clinic": 1.1,
+     "food": 0.2,
+     "clinic": 0.2,
      "narcan": 0.3,
      "indoors": 1.7
     },
@@ -17353,6 +17907,11 @@
     "bus": 0
    },
    "parcels": 1545,
+   "crashes": {
+    "walk": 48,
+    "bike": 32,
+    "severe": 11
+   },
    "years": {
     "2019": {
      "blight": 158,
@@ -17450,10 +18009,10 @@
     -83.1262
    ],
    "help": {
-    "total": 16,
+    "total": 21,
     "by": {
      "food": 10,
-     "health": 1,
+     "health": 3,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -17462,7 +18021,7 @@
      "rec": 0,
      "jobs": 1,
      "learn": 1,
-     "treatment": 2,
+     "treatment": 4,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -17470,7 +18029,7 @@
      "goods": 0,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
@@ -17495,6 +18054,11 @@
     "bus": 0.2
    },
    "parcels": 9744,
+   "crashes": {
+    "walk": 17,
+    "bike": 17,
+    "severe": 8
+   },
    "years": {
     "2019": {
      "blight": 1040,
@@ -17604,10 +18168,10 @@
     -83.25005
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -17633,9 +18197,7 @@
      "narcan": 0.5,
      "indoors": 0.4
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -17651,6 +18213,11 @@
     "bus": 0.2
    },
    "parcels": 750,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 462,
@@ -17753,21 +18320,21 @@
     -83.05688
    ],
    "help": {
-    "total": 14,
+    "total": 18,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0,
-     "jobs": 4,
+     "jobs": 5,
      "learn": 1,
      "treatment": 1,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -17782,9 +18349,7 @@
      "narcan": 1,
      "indoors": 1.8
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -17800,6 +18365,11 @@
     "bus": 0.1
    },
    "parcels": 315,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 29,
@@ -17882,10 +18452,10 @@
     -83.23433
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -17912,7 +18482,6 @@
      "indoors": 1.3
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -17930,6 +18499,11 @@
     "bus": 0.2
    },
    "parcels": 379,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 343,
@@ -18072,6 +18646,11 @@
     "bus": 0.2
    },
    "parcels": 1180,
+   "crashes": {
+    "walk": 18,
+    "bike": "lt5",
+    "severe": 8
+   },
    "years": {
     "2019": {
      "blight": 109,
@@ -18178,11 +18757,11 @@
     -82.94469
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -18225,6 +18804,11 @@
     "bus": 0.1
    },
    "parcels": 5521,
+   "crashes": {
+    "walk": 7,
+    "bike": 6,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 1046,
@@ -18379,6 +18963,11 @@
     "bus": 0.2
    },
    "parcels": 2833,
+   "crashes": {
+    "walk": 19,
+    "bike": "lt5",
+    "severe": 12
+   },
    "years": {
     "2019": {
      "blight": 583,
@@ -18533,6 +19122,11 @@
     "bus": 0.2
    },
    "parcels": 1234,
+   "crashes": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 91,
@@ -18689,6 +19283,11 @@
     "bus": 0.3
    },
    "parcels": 3558,
+   "crashes": {
+    "walk": 18,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 492,
@@ -18798,21 +19397,21 @@
     -83.07818
    ],
    "help": {
-    "total": 8,
+    "total": 11,
     "by": {
      "food": 1,
-     "health": 1,
+     "health": 2,
      "harm": 0,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 0,
      "treatment": 1,
      "housing": 0,
-     "legal": 2,
+     "legal": 3,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -18823,7 +19422,7 @@
     },
     "nearest_miles": {
      "food": 0.5,
-     "clinic": 2.1,
+     "clinic": 1.9,
      "narcan": 0.9,
      "indoors": 0.9
     },
@@ -18845,6 +19444,11 @@
     "bus": 0.1
    },
    "parcels": 112,
+   "crashes": {
+    "walk": 18,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 22,
@@ -18918,21 +19522,21 @@
     -83.08069
    ],
    "help": {
-    "total": 10,
+    "total": 13,
     "by": {
      "food": 2,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 0,
      "treatment": 1,
      "housing": 0,
-     "legal": 2,
+     "legal": 3,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -18963,6 +19567,11 @@
     "bus": 0.1
    },
    "parcels": 445,
+   "crashes": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 88,
@@ -19053,9 +19662,9 @@
     -83.09326
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 1,
      "shelter": 0,
@@ -19065,7 +19674,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -19098,6 +19707,11 @@
     "bus": 0.2
    },
    "parcels": 5281,
+   "crashes": {
+    "walk": 19,
+    "bike": 8,
+    "severe": 9
+   },
    "years": {
     "2019": {
      "blight": 311,
@@ -19208,7 +19822,7 @@
     -83.07461
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 3,
      "health": 0,
@@ -19220,7 +19834,7 @@
      "rec": 1,
      "jobs": 0,
      "learn": 0,
-     "treatment": 1,
+     "treatment": 2,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -19233,7 +19847,7 @@
     },
     "nearest_miles": {
      "food": 0.6,
-     "clinic": 1.8,
+     "clinic": 1.1,
      "narcan": 0.3,
      "indoors": 1.1
     },
@@ -19255,6 +19869,11 @@
     "bus": 0.1
    },
    "parcels": 1914,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 41,
@@ -19354,17 +19973,17 @@
     -83.08025
    ],
    "help": {
-    "total": 17,
+    "total": 24,
     "by": {
      "food": 3,
-     "health": 4,
-     "harm": 2,
-     "shelter": 1,
+     "health": 5,
+     "harm": 4,
+     "shelter": 3,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
      "rec": 1,
-     "jobs": 1,
+     "jobs": 2,
      "learn": 0,
      "treatment": 2,
      "housing": 0,
@@ -19399,6 +20018,11 @@
     "bus": 0.1
    },
    "parcels": 1246,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 45,
@@ -19498,21 +20122,21 @@
     -83.07155
    ],
    "help": {
-    "total": 16,
+    "total": 20,
     "by": {
      "food": 5,
-     "health": 1,
-     "harm": 1,
+     "health": 2,
+     "harm": 2,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 1,
-     "jobs": 3,
+     "jobs": 4,
      "learn": 1,
      "treatment": 1,
      "housing": 0,
-     "legal": 2,
+     "legal": 3,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -19543,6 +20167,11 @@
     "bus": 0.1
    },
    "parcels": 3402,
+   "crashes": {
+    "walk": 12,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 653,
@@ -19652,11 +20281,11 @@
     -83.2255
    ],
    "help": {
-    "total": 8,
+    "total": 11,
     "by": {
      "food": 2,
-     "health": 1,
-     "harm": 1,
+     "health": 3,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -19697,6 +20326,11 @@
     "bus": 0.3
    },
    "parcels": 1926,
+   "crashes": {
+    "walk": 16,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 650,
@@ -19800,7 +20434,7 @@
     -83.07771
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 6,
      "health": 0,
@@ -19812,7 +20446,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -19848,6 +20482,11 @@
     "bus": 0.2
    },
    "parcels": 1395,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 108,
@@ -20006,6 +20645,11 @@
     "bus": 0.1
    },
    "parcels": 921,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 65,
@@ -20155,6 +20799,11 @@
     "bus": 0.2
    },
    "parcels": 1569,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 188,
@@ -20264,10 +20913,10 @@
     -83.10077
    ],
    "help": {
-    "total": 9,
+    "total": 12,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -20276,7 +20925,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 1,
-     "treatment": 2,
+     "treatment": 4,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -20293,9 +20942,7 @@
      "narcan": 0.4,
      "indoors": 1.1
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -20311,6 +20958,11 @@
     "bus": 0.1
    },
    "parcels": 1201,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 77,
@@ -20411,9 +21063,9 @@
     -83.23033
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 1,
      "harm": 0,
      "shelter": 0,
@@ -20458,6 +21110,11 @@
     "bus": 0.4
    },
    "parcels": 2513,
+   "crashes": {
+    "walk": 17,
+    "bike": "lt5",
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 1135,
@@ -20565,7 +21222,7 @@
     -83.26411
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 1,
      "health": 0,
@@ -20575,7 +21232,7 @@
      "hygiene": 0,
      "youth": 1,
      "rec": 1,
-     "jobs": 0,
+     "jobs": 1,
      "learn": 2,
      "treatment": 1,
      "housing": 0,
@@ -20612,6 +21269,11 @@
     "bus": 0.1
    },
    "parcels": 306,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 126,
@@ -20752,6 +21414,11 @@
     "bus": 0.4
    },
    "parcels": 618,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 39,
@@ -20849,11 +21516,11 @@
     -83.13869
    ],
    "help": {
-    "total": 20,
+    "total": 21,
     "by": {
      "food": 11,
      "health": 2,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -20894,6 +21561,11 @@
     "bus": 0
    },
    "parcels": 4370,
+   "crashes": {
+    "walk": 38,
+    "bike": 7,
+    "severe": 11
+   },
    "years": {
     "2019": {
      "blight": 623,
@@ -21050,6 +21722,11 @@
     "bus": 0.5
    },
    "parcels": 866,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 6,
@@ -21169,6 +21846,11 @@
     "bus": 0.2
    },
    "parcels": 351,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 130,
@@ -21260,11 +21942,11 @@
     -82.96213
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -21307,6 +21989,11 @@
     "bus": 0.3
    },
    "parcels": 5152,
+   "crashes": {
+    "walk": 24,
+    "bike": "lt5",
+    "severe": 8
+   },
    "years": {
     "2019": {
      "blight": 569,
@@ -21417,9 +22104,9 @@
     -83.11821
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 0,
      "harm": 4,
      "shelter": 0,
@@ -21441,13 +22128,12 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 1.1,
+     "food": 0.8,
      "clinic": 0.8,
      "narcan": 0.4,
      "indoors": 2.4
     },
     "none_listed_yet": [
-     "food",
      "health"
     ],
     "coverage_checked": false
@@ -21465,6 +22151,11 @@
     "bus": 0.3
    },
    "parcels": 152,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 144,
@@ -21597,6 +22288,11 @@
     "bus": 0.2
    },
    "parcels": 321,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 12,
@@ -21735,6 +22431,11 @@
     "bus": 0.2
    },
    "parcels": 372,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 50,
@@ -21876,6 +22577,11 @@
     "bus": 0.2
    },
    "parcels": 635,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 92,
@@ -21977,9 +22683,9 @@
     -83.11328
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
-     "food": 0,
+     "food": 1,
      "health": 1,
      "harm": 3,
      "shelter": 0,
@@ -22001,14 +22707,12 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 1.5,
+     "food": 0.8,
      "clinic": 0.5,
      "narcan": 0.3,
      "indoors": 2.6
     },
-    "none_listed_yet": [
-     "food"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -22024,6 +22728,11 @@
     "bus": 0.2
    },
    "parcels": 1374,
+   "crashes": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 190,
@@ -22116,7 +22825,7 @@
     -83.07051
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 3,
      "health": 0,
@@ -22128,7 +22837,7 @@
      "rec": 1,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -22164,6 +22873,11 @@
     "bus": 0.2
    },
    "parcels": 1393,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 115,
@@ -22270,7 +22984,7 @@
     -83.11696
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
      "food": 3,
      "health": 0,
@@ -22282,7 +22996,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 4,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -22317,6 +23031,11 @@
     "bus": 0.1
    },
    "parcels": 1668,
+   "crashes": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 393,
@@ -22425,21 +23144,21 @@
     -83.08522
    ],
    "help": {
-    "total": 8,
+    "total": 12,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 1,
+     "jobs": 2,
      "learn": 0,
      "treatment": 0,
      "housing": 0,
-     "legal": 2,
+     "legal": 3,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -22454,9 +23173,7 @@
      "narcan": 0.2,
      "indoors": 0.8
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -22472,6 +23189,11 @@
     "bus": 0.1
    },
    "parcels": 807,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 387,
@@ -22572,11 +23294,11 @@
     -83.12024
    ],
    "help": {
-    "total": 15,
+    "total": 16,
     "by": {
      "food": 6,
      "health": 2,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -22617,6 +23339,11 @@
     "bus": 0
    },
    "parcels": 2778,
+   "crashes": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 132,
@@ -22726,10 +23453,10 @@
     -83.00622
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 1,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -22756,7 +23483,6 @@
      "indoors": 1.1
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -22774,6 +23500,11 @@
     "bus": 0.2
    },
    "parcels": 900,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 262,
@@ -22927,6 +23658,11 @@
     "bus": 0.2
    },
    "parcels": 2252,
+   "crashes": {
+    "walk": 21,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 290,
@@ -23084,6 +23820,11 @@
     "bus": 0.3
    },
    "parcels": 1450,
+   "crashes": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 175,
@@ -23191,11 +23932,11 @@
     -83.04603
    ],
    "help": {
-    "total": 9,
+    "total": 12,
     "by": {
      "food": 3,
-     "health": 0,
-     "harm": 1,
+     "health": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -23220,9 +23961,7 @@
      "narcan": 1.3,
      "indoors": 1.9
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -23238,6 +23977,11 @@
     "bus": 0.1
    },
    "parcels": 2735,
+   "crashes": {
+    "walk": 9,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 89,
@@ -23387,6 +24131,11 @@
     "bus": 0.2
    },
    "parcels": 1023,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 64,
@@ -23488,10 +24237,10 @@
     -83.00023
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 3,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -23533,6 +24282,11 @@
     "bus": 0.2
    },
    "parcels": 2538,
+   "crashes": {
+    "walk": 20,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 240,
@@ -23642,11 +24396,11 @@
     -82.98469
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 1,
      "health": 0,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -23689,6 +24443,11 @@
     "bus": 0
    },
    "parcels": 735,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 42,
@@ -23827,6 +24586,11 @@
     "bus": 0.4
    },
    "parcels": 4495,
+   "crashes": {
+    "walk": 35,
+    "bike": 5,
+    "severe": 8
+   },
    "years": {
     "2019": {
      "blight": 315,
@@ -23981,6 +24745,11 @@
     "bus": 0
    },
    "parcels": 4677,
+   "crashes": {
+    "walk": 15,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 661,
@@ -24088,7 +24857,7 @@
     -83.26692
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 0,
      "health": 0,
@@ -24098,7 +24867,7 @@
      "hygiene": 0,
      "youth": 1,
      "rec": 1,
-     "jobs": 0,
+     "jobs": 1,
      "learn": 2,
      "treatment": 1,
      "housing": 0,
@@ -24136,6 +24905,11 @@
     "bus": 0.2
    },
    "parcels": 910,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 355,
@@ -24245,23 +25019,23 @@
     -83.01792
    ],
    "help": {
-    "total": 9,
+    "total": 15,
     "by": {
      "food": 4,
-     "health": 0,
+     "health": 1,
      "harm": 0,
      "shelter": 1,
      "utilities": 0,
-     "hygiene": 1,
+     "hygiene": 2,
      "youth": 0,
      "rec": 1,
      "jobs": 0,
      "learn": 0,
      "treatment": 0,
-     "housing": 2,
+     "housing": 4,
      "legal": 0,
-     "ids": 0,
-     "money": 0,
+     "ids": 1,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -24275,7 +25049,6 @@
      "indoors": 0.7
     },
     "none_listed_yet": [
-     "health",
      "harm"
     ],
     "coverage_checked": false
@@ -24293,6 +25066,11 @@
     "bus": 0.2
    },
    "parcels": 730,
+   "crashes": {
+    "walk": "lt5",
+    "bike": 8,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 47,
@@ -24375,10 +25153,10 @@
     -83.23026
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 4,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -24404,9 +25182,7 @@
      "narcan": 0.7,
      "indoors": 1.6
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -24422,6 +25198,11 @@
     "bus": 0.2
    },
    "parcels": 1703,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 703,
@@ -24570,6 +25351,11 @@
     "bus": 0.2
    },
    "parcels": 94,
+   "crashes": {
+    "walk": 7,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 5,
@@ -24644,11 +25430,11 @@
     -83.06338
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 0,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -24673,9 +25459,7 @@
      "narcan": 0.9,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -24691,6 +25475,11 @@
     "bus": 0.2
    },
    "parcels": 82,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": "lt5",
@@ -24799,6 +25588,11 @@
     "bus": 0.1
    },
    "parcels": 1041,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": 7
+   },
    "years": {
     "2019": {
      "blight": 409,
@@ -24952,6 +25746,11 @@
     "bus": 0.2
    },
    "parcels": 514,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 51,
@@ -25050,10 +25849,10 @@
     -83.18815
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 3,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -25095,6 +25894,11 @@
     "bus": 0.3
    },
    "parcels": 2045,
+   "crashes": {
+    "walk": 14,
+    "bike": "lt5",
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 219,
@@ -25245,6 +26049,11 @@
     "bus": 0.4
    },
    "parcels": 3423,
+   "crashes": {
+    "walk": 10,
+    "bike": "lt5",
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 671,
@@ -25354,10 +26163,10 @@
     -83.17015
    ],
    "help": {
-    "total": 14,
+    "total": 16,
     "by": {
      "food": 5,
-     "health": 0,
+     "health": 2,
      "harm": 3,
      "shelter": 0,
      "utilities": 1,
@@ -25383,9 +26192,7 @@
      "narcan": 0.6,
      "indoors": 0.3
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -25401,6 +26208,11 @@
     "bus": 0.2
    },
    "parcels": 3312,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 449,
@@ -25505,10 +26317,10 @@
     -83.19366
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 3,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -25550,6 +26362,11 @@
     "bus": 0.3
    },
    "parcels": 315,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 54,
@@ -25686,6 +26503,11 @@
     "bus": 0.4
    },
    "parcels": 772,
+   "crashes": {
+    "walk": 8,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 324,
@@ -25839,6 +26661,11 @@
     "bus": 0.1
    },
    "parcels": 968,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 143,
@@ -25990,6 +26817,11 @@
     "bus": 0.3
    },
    "parcels": 513,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": "lt5",
@@ -26086,7 +26918,7 @@
     -83.28288
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -26096,7 +26928,7 @@
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 0,
+     "jobs": 1,
      "learn": 0,
      "treatment": 0,
      "housing": 0,
@@ -26135,6 +26967,11 @@
     "bus": 0.4
    },
    "parcels": 641,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 368,
@@ -26286,6 +27123,11 @@
     "bus": 0.3
    },
    "parcels": 446,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 53,
@@ -26387,11 +27229,11 @@
     -83.13552
    ],
    "help": {
-    "total": 17,
+    "total": 18,
     "by": {
      "food": 5,
      "health": 0,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -26434,6 +27276,11 @@
     "bus": 0.1
    },
    "parcels": 5095,
+   "crashes": {
+    "walk": 26,
+    "bike": 12,
+    "severe": 9
+   },
    "years": {
     "2019": {
      "blight": 843,
@@ -26566,7 +27413,7 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 1.4,
+     "food": 1.2,
      "clinic": 0.8,
      "narcan": 0.2,
      "indoors": 2.6
@@ -26590,6 +27437,11 @@
     "bus": 0.2
    },
    "parcels": 18,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": "lt5",
@@ -26657,21 +27509,21 @@
     -83.07512
    ],
    "help": {
-    "total": 14,
+    "total": 19,
     "by": {
      "food": 1,
-     "health": 1,
-     "harm": 0,
+     "health": 2,
+     "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0,
-     "jobs": 4,
+     "jobs": 5,
      "learn": 1,
      "treatment": 1,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 1,
      "goods": 0,
@@ -26682,13 +27534,11 @@
     },
     "nearest_miles": {
      "food": 0.7,
-     "clinic": 2.2,
+     "clinic": 1.6,
      "narcan": 0.8,
      "indoors": 1.2
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -26704,6 +27554,11 @@
     "bus": 0.1
    },
    "parcels": 132,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 9,
@@ -26773,7 +27628,7 @@
     -83.28134
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -26783,7 +27638,7 @@
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 0,
+     "jobs": 1,
      "learn": 0,
      "treatment": 0,
      "housing": 0,
@@ -26822,6 +27677,11 @@
     "bus": 0.4
    },
    "parcels": 981,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 562,
@@ -26925,10 +27785,10 @@
     -83.18162
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -26954,9 +27814,7 @@
      "narcan": 0.2,
      "indoors": 0.7
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -26972,6 +27830,11 @@
     "bus": 0.1
    },
    "parcels": 165,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": "lt5",
@@ -27092,6 +27955,11 @@
     "bus": 0.3
    },
    "parcels": 1368,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 38,
@@ -27193,21 +28061,21 @@
     -83.08272
    ],
    "help": {
-    "total": 9,
+    "total": 13,
     "by": {
      "food": 2,
-     "health": 0,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 0,
      "treatment": 1,
      "housing": 0,
-     "legal": 2,
+     "legal": 3,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -27222,9 +28090,7 @@
      "narcan": 0.5,
      "indoors": 0.7
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -27240,6 +28106,11 @@
     "bus": 0.1
    },
    "parcels": 69,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 17,
@@ -27304,21 +28175,21 @@
     -83.09267
    ],
    "help": {
-    "total": 16,
+    "total": 21,
     "by": {
      "food": 5,
-     "health": 1,
+     "health": 4,
      "harm": 1,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 1,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 0,
      "treatment": 0,
      "housing": 0,
-     "legal": 2,
+     "legal": 3,
      "ids": 0,
      "money": 0,
      "goods": 2,
@@ -27349,6 +28220,11 @@
     "bus": 0.1
    },
    "parcels": 2103,
+   "crashes": {
+    "walk": 13,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 607,
@@ -27458,10 +28334,10 @@
     -82.9953
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -27487,9 +28363,7 @@
      "narcan": 0.6,
      "indoors": 1.9
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -27505,6 +28379,11 @@
     "bus": 0.3
    },
    "parcels": 2636,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 198,
@@ -27614,11 +28493,11 @@
     -82.98685
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -27661,6 +28540,11 @@
     "bus": 0.4
    },
    "parcels": 1904,
+   "crashes": {
+    "walk": 5,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 97,
@@ -27770,17 +28654,17 @@
     -83.20881
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
      "food": 0,
-     "health": 2,
+     "health": 3,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 0,
+     "jobs": 1,
      "learn": 0,
      "treatment": 0,
      "housing": 0,
@@ -27818,6 +28702,11 @@
     "bus": 0.1
    },
    "parcels": 4049,
+   "crashes": {
+    "walk": 18,
+    "bike": 7,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 354,
@@ -27927,11 +28816,11 @@
     -83.23183
    ],
    "help": {
-    "total": 11,
+    "total": 13,
     "by": {
      "food": 3,
-     "health": 2,
-     "harm": 2,
+     "health": 3,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -27972,6 +28861,11 @@
     "bus": 0.1
    },
    "parcels": 9013,
+   "crashes": {
+    "walk": 46,
+    "bike": 14,
+    "severe": 15
+   },
    "years": {
     "2019": {
      "blight": 1509,
@@ -28130,6 +29024,11 @@
     "bus": 0.3
    },
    "parcels": 4,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2020": {
      "blight": "lt5",
@@ -28167,15 +29066,15 @@
     -83.07338
    ],
    "help": {
-    "total": 13,
+    "total": 15,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
-     "youth": 0,
+     "youth": 1,
      "rec": 0,
      "jobs": 3,
      "learn": 2,
@@ -28192,7 +29091,7 @@
     },
     "nearest_miles": {
      "food": 0.8,
-     "clinic": 1.9,
+     "clinic": 1.1,
      "narcan": 0.7,
      "indoors": 1.6
     },
@@ -28212,6 +29111,11 @@
     "bus": 0.1
    },
    "parcels": 58,
+   "crashes": {
+    "walk": 10,
+    "bike": 9,
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 6,
@@ -28276,10 +29180,10 @@
     -83.18982
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 5,
-     "health": 0,
+     "health": 1,
      "harm": 2,
      "shelter": 1,
      "utilities": 0,
@@ -28305,9 +29209,7 @@
      "narcan": 0.7,
      "indoors": 2.7
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -28323,6 +29225,11 @@
     "bus": 0.2
    },
    "parcels": 1220,
+   "crashes": {
+    "walk": 16,
+    "bike": "lt5",
+    "severe": 6
+   },
    "years": {
     "2019": {
      "blight": 108,
@@ -28479,6 +29386,11 @@
     "bus": 0.1
    },
    "parcels": 976,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 127,
@@ -28585,11 +29497,11 @@
     -82.99356
    ],
    "help": {
-    "total": 9,
+    "total": 18,
     "by": {
      "food": 1,
-     "health": 1,
-     "harm": 1,
+     "health": 9,
+     "harm": 2,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -28630,6 +29542,11 @@
     "bus": 0.2
    },
    "parcels": 4408,
+   "crashes": {
+    "walk": 11,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 345,
@@ -28786,6 +29703,11 @@
     "bus": 0.2
    },
    "parcels": 772,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 36,
@@ -28887,27 +29809,27 @@
     -83.07609
    ],
    "help": {
-    "total": 30,
+    "total": 36,
     "by": {
      "food": 7,
      "health": 2,
-     "harm": 6,
+     "harm": 8,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 1,
      "youth": 0,
      "rec": 2,
-     "jobs": 2,
+     "jobs": 3,
      "learn": 5,
      "treatment": 0,
      "housing": 3,
-     "legal": 0,
+     "legal": 1,
      "ids": 0,
      "money": 0,
      "goods": 1,
      "kids": 0,
      "connect": 0,
-     "transport": 0,
+     "transport": 1,
      "pets": 0
     },
     "nearest_miles": {
@@ -28932,6 +29854,11 @@
     "bus": 0
    },
    "parcels": 567,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 45,
@@ -29017,10 +29944,10 @@
     -82.99777
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 2,
-     "health": 1,
+     "health": 2,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -29062,6 +29989,11 @@
     "bus": 0.1
    },
    "parcels": 409,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 171,
@@ -29203,6 +30135,11 @@
     "bus": 0.1
    },
    "parcels": 733,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 188,
@@ -29305,10 +30242,10 @@
     -83.10633
    ],
    "help": {
-    "total": 9,
+    "total": 12,
     "by": {
      "food": 3,
-     "health": 0,
+     "health": 1,
      "harm": 1,
      "shelter": 0,
      "utilities": 0,
@@ -29317,7 +30254,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 4,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -29334,9 +30271,7 @@
      "narcan": 0.2,
      "indoors": 0.9
     },
-    "none_listed_yet": [
-     "health"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -29352,6 +30287,11 @@
     "bus": 0.2
    },
    "parcels": 1147,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 230,
@@ -29460,10 +30400,10 @@
     -83.19156
    ],
    "help": {
-    "total": 15,
+    "total": 17,
     "by": {
      "food": 4,
-     "health": 2,
+     "health": 4,
      "harm": 4,
      "shelter": 0,
      "utilities": 1,
@@ -29505,6 +30445,11 @@
     "bus": 0.1
    },
    "parcels": 2305,
+   "crashes": {
+    "walk": 23,
+    "bike": 6,
+    "severe": 5
+   },
    "years": {
     "2019": {
      "blight": 240,
@@ -29607,17 +30552,17 @@
     -83.07955
    ],
    "help": {
-    "total": 2,
+    "total": 7,
     "by": {
      "food": 0,
-     "health": 0,
-     "harm": 0,
-     "shelter": 0,
+     "health": 2,
+     "harm": 1,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 1,
+     "jobs": 2,
      "learn": 1,
      "treatment": 0,
      "housing": 0,
@@ -29632,14 +30577,12 @@
     },
     "nearest_miles": {
      "food": 1,
-     "clinic": 1.7,
+     "clinic": 1.2,
      "narcan": 0.9,
      "indoors": 1.7
     },
     "none_listed_yet": [
-     "food",
-     "health",
-     "harm"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -29656,6 +30599,11 @@
     "bus": 0.1
    },
    "parcels": 1256,
+   "crashes": {
+    "walk": 6,
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 118,
@@ -29799,6 +30747,11 @@
     "bus": 0.2
    },
    "parcels": 1759,
+   "crashes": {
+    "walk": "lt5",
+    "bike": "lt5",
+    "severe": "lt5"
+   },
    "years": {
     "2019": {
      "blight": 469,

@@ -84,18 +84,23 @@ public struct Occurrence: Equatable, Sendable {
     public var closesAt: String
     public var start: Int             // minutes on a floating Detroit wall clock
     public var end: Int
+    /// This window opens on a holiday, so its hours are the usual ones and not a promise. Labelled, never dropped.
+    public var holiday: Bool = false
 }
 
-public enum OpenState: String, Sendable { case open, closes_soon, closed, call_first, unknown, not_listed }
+public enum OpenState: String, Sendable { case open, closes_soon, closed, call_first, unknown, not_listed, holiday }
 
 public struct OpenResult: Equatable, Sendable {
     public struct Next: Equatable, Sendable { public var date: String; public var opensAt: String; public var closesAt: String }
+    public struct UsualHours: Equatable, Sendable { public var opensAt: String; public var closesAt: String }
     public var state: OpenState
     public var closesAt: String? = nil
     public var minutesLeft: Int? = nil
     /// Set only for `closed`: nil inside means "no upcoming time".
     public var next: Next?? = nil
     public var cancelledNow: Bool = false
+    /// `holiday` only: what the schedule says about today, offered as usual hours and never as "open".
+    public var usualHours: UsualHours? = nil
 }
 
 public struct Badge: Equatable, Sendable {

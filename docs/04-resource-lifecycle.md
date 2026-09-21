@@ -38,7 +38,9 @@ This is the part D Compassion — and most resource directories — never solved
 
 *2026-09-19: there is no `stale` state at all (no timers). `flagged` rows stay visible with a warning. The diagram's transitions otherwise hold.*
 
-**How a row goes live.** A listing we researched goes from `proposed` to `active` when `pnpm check:sources` finds its phone number and street number on its own web page (`entry_method: auto_check`), or when a person reads the page in a browser because the site blocks scripts (`entry_method: web`). A place sent from the app ("Add a place") waits in the steward queue. If it checks out, a steward adds it to `data/seed/resources.csv` by hand. Nothing in the queue goes live by itself.
+**How a row goes live.** A listing we researched goes from `proposed` to `active` when `pnpm check:sources` finds its phone number and street number on its own web page (`entry_method: auto_check`), or when a person reads the page in a browser because the site blocks scripts (`entry_method: web`). The two are **different badges**, because they are different claims about who looked, and since 2026-09-20 the build enforces the difference: an `active` row may claim `auto_check` only with a source URL, a check date, and a host that `data/seed/script-refusing-hosts.csv` does not record as refusing scripts by that date. A page that answers 200 with almost no text, or with a challenge or block page, is **unreadable** — never a match and never a mismatch.
+
+**Archiving is a steward's act in the queue, not an edit to the seed.** There is no way to retire a row by editing `data/seed/resources.csv`: an `archived` row with no archive record (a date and one of the reasons below) fails the build, and the record itself is only ever written by the steward endpoint into D1, then applied at the next build. A duplicate is archived with reason `duplicate` and the surviving row as the replacement. One is owed today (OPERATIONS). A place sent from the app ("Add a place") waits in the steward queue. If it checks out, a steward adds it to `data/seed/resources.csv` by hand. Nothing in the queue goes live by itself.
 
 **Default results show:** everything except `proposed`, `suspended`, and `archived`, sorted as described under "What the badge says."
 **Search-by-name shows:** everything except `proposed`, with `flagged`/`archived` clearly warned ("{count} people said this was closed. Call first." / "Closed as of {date}").
@@ -52,7 +54,9 @@ The bundle ships facts per row: `checked_at_entry`, `last_confirmed_at`, `last_c
 | What we know | Badge text |
 |---|---|
 | Confirmed (any age) | "A visitor said this was open {days} days ago" / "We checked by phone {days} days ago" (method shown plainly; a tap is not a phone call) |
-| Checked when added (any age) | "Matched their website when added, {date}" / "Checked by phone when added, {date}" |
+| Checked when added by a script (`auto_check`) | "A program matched this to their website on {date}" |
+| Checked when added by a person reading the page (`web`) | "Their website was read and matched on {date}" |
+| Checked when added, other methods | "Checked by phone when added, {date}" / "Checked in person when added, {date}" |
 | From a public list with a known edit date; no person checked the row (`source_listed`) | "From the {source}, last updated {source_date}" |
 | From a list with no date, and no person checked the row (`never_checked`) | "From the {source}. Nobody has checked it. Call first." |
 | 1 open closed/moved report | "Someone said this was closed on {date}. Call first." |
@@ -74,7 +78,7 @@ A listing never changes because time passed. There is no check-by date, no "stal
 
 Alerts are different: they end at the time their owner announced (`ends_at`, 7 days at most).
 
-**The exception: safety-critical rows** (the Urgent help numbers: 911, 988, shelter, the local crisis line, the DV hotline, and 211. That is 6 rows in `data/seed/emergency.csv`). `pnpm check:emergency` reads each number's own page. A release build fails only when a page is read and shows a different number (a mismatch); a page that can't be fetched is logged for a person but doesn't stop a release (DECISIONS 2026-09-19). The three-digit national numbers (911, 988, 211) are not checked this way. The script never rewrites a number. If one stops matching, a person reads the page and decides.
+**The exception: safety-critical rows** (the Urgent help numbers. **11 rows in `data/seed/emergency.csv`** as of 2026-09-20: 911, 988, Detroit's shelter line, Out-Wayne's shelter line for Dearborn, the DWIHN crisis line and its walk-in Care Center, the National Domestic Violence Hotline, 211, SAMHSA's helpline, Avalon, and Michigan's VOICES4 sexual-assault line). `pnpm check:emergency` reads each number's own page. A release build fails only when a page is read and shows a different number (a mismatch); a page that can't be fetched is logged for a person but doesn't stop a release (DECISIONS 2026-09-19). **Only 911 and 988 are never checked this way** — 211 is matched against mi211.org like every other number (corrected 2026-09-20; this line used to say 6 rows and exempt 211). The script never rewrites a number. If one stops matching, a person reads the page and decides.
 
 ## Verification methods (cheapest first)
 
@@ -99,7 +103,7 @@ Detail screen → **"Something wrong?"** → one tap:
 Any report can carry an optional note, up to 280 characters ("Add a note if you want. Don't put your name or number."). The API also accepts a suggested correction (new hours, address, or phone), but the app doesn't offer one yet. The report's time is the moment it is sent; there is no "when did you see this?" question.
 
 Submission:
-- Sent to `POST /v1/reports` with `client_nonce = sha256(install_secret ‖ target_id ‖ YYYY-MM-DD)`. The nonce dedupes one device's reports per target per day. It differs for every target and every day, so a helper's five reports cannot be linked into a trail. `install_secret` is random, made the first time it is needed, stored only on the device, and never sent. Clearing the site's data resets it (a reset button is not built yet).
+- Sent to `POST /v1/reports` with `client_nonce = sha256(install_secret ‖ target_id ‖ YYYY-MM-DD)`. The nonce dedupes one device's reports per target per day. It differs for every target and every day, so a helper's five reports cannot be linked into a trail. `install_secret` is random, made the first time it is needed, stored only on the device, and never sent. Clearing the site's data resets it, and so does **"Make a new key"** on the Your privacy screen, which all three clients now have. A queued report is hashed at the moment it is **sent**, not when it was written, so a new key covers the backlog; beside the button, "Delete what is waiting" throws the queue away instead.
 - No IP logged: the Worker never reads the IP header at all, and a test checks its source for that. No timestamps finer than the minute.
 - Offline: queued locally, sent on next connection. Show "Thanks. We'll send this when you're back online."
 - Rate limiting happens at Cloudflare's edge, keyed on IP that the Worker never reads or stores. Nonces are client-made and forgeable, so they dedupe honest devices only; they are not a security control (10-A1).

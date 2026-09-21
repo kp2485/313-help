@@ -3,7 +3,14 @@
 // or session store (audit A8); the key finds the stack in memory. After a reload the keys are gone, and the URL's
 // hash (only ever a public screen) is where the app starts again.
 
-import { CATEGORIES, TABS, type TabId } from './needs.js';
+import { CATEGORIES, TABS, isPrivate, type TabId } from './needs.js';
+
+/** A browse-by-type list that must leave no trace either, judged by the same `isPrivate` that decides a listing's
+ *  own screen. A category screen names what a person was looking for just as plainly as a listing does:
+ *  `#/c/treatment` sat in the address bar, "Drug and alcohol help" in the window title and in the browser's own
+ *  history list, and Back after a quick exit landed straight back on it. The detail screens under those
+ *  categories have been traceless since the start; the list above them was not (web review, 2026-09-20). */
+export const isPrivateCat = (cat: string) => isPrivate(cat);
 
 export type View =
   | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'privacy' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens?: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
@@ -16,7 +23,7 @@ const HOME: View = { v: 'tab', tab: 'home' };
 export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/'): string | null {
   if (v.v === 'tab') return v.tab === 'home' ? path : `#/${v.tab}`;
   if (v.v === 'detail') return sensitive(v.id) ? null : `#/r/${v.id}`;
-  if (v.v === 'list') return `#/c/${v.cat}`;
+  if (v.v === 'list') return isPrivateCat(v.cat) ? null : `#/c/${v.cat}`;
   if (v.v === 'greenway') return '#/greenway';
   if (v.v === 'segment') return `#/greenway/${v.id}`;
   if (v.v === 'parks') return '#/parks';
@@ -30,7 +37,10 @@ export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/')
 
 /** The screen for a URL hash. Anything it doesn't know opens Home, never a half-built screen. */
 export function fromHash(h: string): View {
-  const m = /^#\/(r|c|n|greenway|about|privacy|add|parks|help|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
+  // `map` was missing here while the Map tab's own URL is #/map, so a shared or bookmarked map link opened Home
+  // and going back from the Map tab skipped it (found in the accessibility pass, 2026-09-20). `rec` and `transit`
+  // are the tab ids the Map tab replaced: they still parse, and TABS below sends them to Home.
+  const m = /^#\/(r|c|n|greenway|about|privacy|add|parks|help|map|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
   if (!m) return HOME;
   if (m[1] === 'r') return m[2] ? { v: 'detail', id: m[2] } : HOME;
   if (m[1] === 'c') return m[2] && CATEGORIES.some((c) => c.id === m[2]) ? { v: 'list', cat: m[2] } : { v: 'tab', tab: 'help' };
@@ -56,13 +66,23 @@ export function createRouter(hist: HistoryLike, opts: { sensitive: (id: string) 
     return typeof k === 'string' ? snapshots.get(k) : undefined;
   };
   const same = (a: View | undefined, b: View) => JSON.stringify(a) === JSON.stringify(b);
-  const reset = (v: View) => { stack.length = 0; stack.push(v); hist.replaceState(remember(), ''); };
+  // A screen we arrive AT has to be made traceless too, not only one we navigate to. A shared or bookmarked
+  // `#/r/sal_national_dv_hotline` (or `#/c/treatment`) otherwise sat in the address bar for as long as the screen
+  // was open, in front of whoever was looking over the person's shoulder, and stayed in the browser's history
+  // list afterwards. So every reset rewrites the URL to the screen's own address, or to the plain path when the
+  // screen has none (web review, 2026-09-20).
+  const reset = (v: View) => { stack.length = 0; stack.push(v); hist.replaceState(remember(), '', hashFor(v, opts.sensitive, opts.path()) ?? opts.path()); };
 
   return {
     stack,
     top: () => stack[stack.length - 1]!,
     /** First load: start where the URL says. */
     start(hash: string) { reset(fromHash(hash)); },
+    /** What `sensitive` knows has changed (the list loaded): write the top screen's address again, or take it away. */
+    retrace() {
+      const v = stack[stack.length - 1];
+      if (v) hist.replaceState(hist.state, '', hashFor(v, opts.sensitive, opts.path()) ?? opts.path());
+    },
     /** A new screen. A tab is a fresh start, not one more screen to back out of. */
     navigate(view: View) {
       if (view.v === 'tab') stack.length = 0;

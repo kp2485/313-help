@@ -76,7 +76,28 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 | City calendar (detroitmi.gov/Calendar-and-Events) | ~70 upcoming events | B | **No RSS, iCal, or JSON feed exists** (every candidate URL is 404 or blocked). Since about 2026-09-19 detroitmi.gov answers scripted requests with a bot-protection challenge, and we don't get around it. **Not read; no events ship** until the City offers a feed (DECISIONS 2026-09-19). Ask the City for one. |
 | Recreation centers page | 17 centers, each with a subpage for address, phone, hours | B | 16 are listed, entered by hand and each checked against its City page by `pnpm check:sources`. The 2016 open-data layer is only staged |
 | DDOT / SMART / People Mover / QLINE / MoGo | Links, fares, phone numbers | B | In `apps/web/src/transit.ts` with a `checked` date. The City's pages disagree about which app they recommend (Bus Tracker, Token Transit, Transit), so we list them without calling one official. MoGo's Access Pass asks for a state benefits case number: link out only |
-| DDOT GTFS (`ddot_gtfs.zip`, 9.4 MB, updated 2026-09-02) | Stops, routes, schedules | A | Not ingested yet. Next step for "nearest stop" on each listing |
+| DDOT GTFS (`ddot_gtfs.zip`, 9.4 MB, updated 2026-09-02) | Stops, routes, schedules | A | Its portal item marks it **CC0** — the clearest licence of any transport source here — but detroitmi.gov answers 403 to scripts and we do not disguise a request, so it is **read by hand or not at all** (DECISIONS 2026-09-20). Meanwhile the bus layers come from the City's DDOT ArcGIS layers, last edited 2026-02-09 |
+
+### The eleven transport layers on the Map tab (added 2026-09-20)
+
+`pnpm ingest:transit` → `data/ingested/transit/`, **by hand about monthly**, deliberately not in the nightly publish. Each layer's owner and licence text travel with it in `source.json`, into `places/transit.json` in the signed bundle, and onto the Map tab. All of them are drawn on the device; no owner's server is contacted while a map is open.
+
+| Source | Layers | Tier | Licence |
+|---|---|---|---|
+| City of Detroit open data | DDOT Bus Routes, DDOT Bus Stops, QLine Stops, MoGo Stations, Bike Lanes | A | **Unstated** — the portal publishes a disclaimer and no grant. Flagged; ask the City (DECISIONS 2026-09-20) |
+| SMART | routes and stops, from its published GTFS feed | A | **No terms published with the feed.** Flagged |
+| Detroit People Mover | stations, from its published GTFS feed | A | **No terms published with the feed.** Flagged |
+| MDOT | Carpool Lots (park and ride) | A | A disclaimer with no redistribution limit |
+| US DOT BTS (NTAD) | Amtrak Stations | A | A US government work, unrestricted public use. **Clear** |
+| US DOT BTS (NTAD) | Intercity Bus Atlas Stops | A | **CC BY-NC 4.0** — attribution and non-commercial, accepted on purpose |
+
+### Other layers added 2026-09-20
+
+| Source | What | Tier | Notes |
+|---|---|---|---|
+| Wayne County Healthy Communities, "Well Wayne Stations" map | 26 naloxone and test-strip stations in Dearborn, Hamtramck and Highland Park | A (a Google My Maps KML) | `pnpm ingest:mymap`. **No terms stated**, the same footing as the DHD layer; the County is named on every row and the map's own "Map updated" date drives the badge. They publish a point and a city and **no street address**, which we never invent. Asking the County is owed — and so is asking for the file directly: the content is the County's, but the delivery is Google's undocumented My Maps KML endpoint (DECISIONS 2026-09-20) |
+| SEMCOG, "Crash Locations, 2015-2024" | Pedestrian and bicycle crash counts for the "Safe streets" panel; the records are the **Michigan State Police's** (CJIC) | A | `pnpm ingest:crashes`, by hand about once a year. **Licence stated, and not yet accepted knowingly.** SEMCOG's portal carries a [Copyright License Agreement](https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement) covering everything it publishes: a perpetual, royalty-free licence to reproduce, modify and publish; a **required** notice, "Copyright © \<year\> SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.", which NOTICE carries and which is owed on the Safe streets panel, where it is not printed yet; a **one-way indemnification clause**; and no third-party rights, which is why MSP's position matters. Counts only; nothing about a crash beyond the year survives the read. **Open for Kyle:** accept the agreement including the indemnification clause, or remove the layer. If SEMCOG or MSP objects, one file is deleted and the panel disappears (DECISIONS 2026-09-20) |
+| Transit (transitapp.com) | Nothing — a **link-out only**, using their documented URL scheme | — | We take no data at all and fetch nothing from their servers. Their page states no terms and no branding rule; asking them is owed |
 
 ## Ingestion strategy summary
 
@@ -85,6 +106,9 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
    - `pnpm ingest:opendata` runs three: the ArcGIS layers in `data/sources.yaml` (DHD stations → `data/ingested/`; rec centers → staged only in `data/staging/`), the Joe Louis Greenway segments, and the City's events, parks and ZIP areas.
    - `pnpm ingest:neighborhoods`: the 205 neighborhoods and their public-data numbers (doc 13).
    - `pnpm ingest:basemap`: streets, parks and the city boundary for the app's map.
+   - `pnpm ingest:mymap`: Wayne County's Well Wayne naloxone and test-strip stations.
+   - `pnpm ingest:transit` (monthly, by hand) and `pnpm ingest:crashes` (yearly, by hand): the 11 transport layers and the "Safe streets" counts. Both stay out of the nightly job on purpose (DECISIONS 2026-09-20).
+   - `pnpm ingest:treatment`: SAMHSA's treatment directory and OTP list with DWIHN's provider list — staging and matching only; `check:sources` still decides what goes live.
    Libraries and precincts are not ingested yet.
 3. **Alerts** for activations (warming/cooling/respite) are written by a person with `pnpm alert:new` from the owner's announcement. A press-release watcher is planned (not built yet); it would only draft, and a person always publishes.
 4. **Food listings** — each site was researched on the organization's own site and checked with `pnpm check:sources` (or read by a person in a browser when the site blocks scripts). Forgotten Harvest and Gleaners own the facts about their own distributions, so their own pages count as a source (DECISIONS 2026-09-19); a host's own site counts too. In parallel, ask FH and Gleaners for a feed.
@@ -94,7 +118,7 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 
 ## What to ask DHD for (optional — nothing blocks on a reply)
 
-DHD has been informally supportive but has not signalled it will maintain anything. Send this once; build as if the answer is silence.
+DHD has been informally supportive but has not signalled it will maintain anything **(Kyle's account; no written record in this repository — DECISIONS 2026-09-20)**. Send this once; build as if the answer is silence.
 
 - Is the council-district food-access ArcGIS map a DHD product, and is its layer public?
 - The current DHD program list with a named contact per program.

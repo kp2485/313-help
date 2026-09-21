@@ -11,13 +11,17 @@ interface Section {
 }
 
 export const TRANSIT: { checked: string; sections: Section[]; bike: { body: string; label: string; url: string } } = {
+  // Not moved to 2026-09-20: only the Transit app's label changed that day. The fares and phone numbers below
+  // were last read on the date here, and this date is what the screen shows.
   checked: '2026-09-18',
   sections: [
+    // The Transit app's own words for what it does, and nothing about a partnership: SMART's page lists it among
+    // third-party apps that get SMART data, and DDOT's page could not be read (research/2026-09-20/transit-app.md).
     { title: 'Plan a trip', body: 'See which bus to take and when it comes.',
       links: [
         { label: 'DDOT trip planner', url: 'http://myddotbus.com/map?selector=tripplanner' },
         { label: 'When is my bus coming?', url: 'http://www.myddotbus.com/home' },
-        { label: 'Transit app', url: 'https://transitapp.com/' },
+        { label: 'Transit app: live DDOT and SMART buses on your phone', url: 'https://transitapp.com/' },
         { label: 'Bus routes and schedules', url: 'https://detroitmi.gov/departments/detroit-department-transportation/bus-schedules' },
       ] },
     { title: 'What it costs', body: 'One pass works on DDOT and SMART buses.',

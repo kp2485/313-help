@@ -113,22 +113,83 @@ export function lineToRows(line: string): { resource: CsvRow; schedules: CsvRow[
 
 const SCHEDULE_COLUMNS = ['sal_id', 'freq', 'interval', 'byday', 'bymonthday', 'dtstart', 'until', 'valid_from', 'valid_to', 'opens_at', 'closes_at', 'description'];
 
+const norm = (s: string | undefined): string => (s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
+const digits = (s: string | undefined): string => (s ?? '').replace(/\D/g, '');
+
+/**
+ * Is the row that already holds this id the same door the line describes?
+ *
+ * The organisation must match. The address alone cannot decide it: a steward or the geocoder corrects an
+ * address in place after the import (three rows in the seed today read "Fenkell Ave." or a corrected house
+ * number where the incoming line still says what the research said), and calling those collisions would cry
+ * wolf on every run. So a differing address is only a collision when the phone differs too — two doors of one
+ * organisation that share a phone and a service name still land on one id and are still dropped, as today;
+ * that stays a note rather than an error, because it is far more often a corrected address.
+ */
+function sameDoor(existing: CsvRow, line: CsvRow): boolean {
+  if (norm(existing.org_name) !== norm(line.org_name)) return false;
+  return norm(existing.address_1) === norm(line.address_1) || (!!digits(line.phone) && digits(existing.phone) === digits(line.phone));
+}
+
+export interface ImportSummary { added: number; collisions: number }
+
+/**
+ * Imports parsed lines into `resources`/`schedules` (both mutated). A line whose id is already present is
+ * skipped; when the row that holds the id is a *different* door, the skip is reported and counted.
+ *
+ * Why the ids collide at all: `lineToRows` builds the slug from the first two words of the org name plus the
+ * service name, cut to 56 characters. "City of Hamtramck Assessor" and "City of Highland Park Assessor" both
+ * contribute just "city_of", so two different cities' "Help with a property tax bill you cannot pay" landed on
+ * one id and the second line vanished without a word (2026-09-20). Taking more of the org name would be a
+ * better slug, but ids are stable slugs that are never reused: they are already in data/seed/schedules.csv,
+ * the published data/hsds/ rows and signed bundles, and in reports that name a sal_id, so changing generation
+ * would move existing ids. Doing it only when a collision is detected is worse still — the id a line gets
+ * would then depend on which file happened to be read first. So generation is untouched and a collision is a
+ * loud skip: a person renames the service, as they did by hand for the Highland Park line.
+ */
+export function importInto(
+  files: { file: string; text: string }[],
+  resources: CsvRow[],
+  schedules: CsvRow[],
+  log: (msg: string) => void = console.log,
+  warn: (msg: string) => void = console.warn,
+): ImportSummary {
+  const have = new Map(resources.map((r) => [r.sal_id ?? '', r]));
+  let added = 0, collisions = 0;
+  for (const { file, text } of files) {
+    for (const [n, line] of text.split('\n').entries()) {
+      if (!line.trim() || line.startsWith('#')) continue;
+      const out = lineToRows(line);
+      if (typeof out === 'string') { warn(`${file}:${n + 1} skipped: ${out}`); continue; }
+      const id = out.resource.sal_id!;
+      const existing = have.get(id);
+      if (existing) {
+        if (!sameDoor(existing, out.resource)) {
+          collisions++;
+          warn(`${file}:${n + 1} skipped: id collision with ${id} (a different organisation or address already has this id); change the service name so the id is unique`);
+        } else if (norm(existing.address_1) !== norm(out.resource.address_1)) {
+          // Same organisation and phone, different address text: almost always an address corrected in the seed
+          // after this line was imported. Worth one line so a person can see it, but not an error.
+          log(`~ ${file}:${n + 1} already imported as ${id}; the seed row's address reads "${existing.address_1}" (corrected since, or a second site that needs its own service name)`);
+        }
+        // An identical re-import says nothing and changes nothing, as it always has.
+        continue;
+      }
+      have.set(id, out.resource); resources.push(out.resource); schedules.push(...out.schedules); added++;
+      log(`+ ${id}  ${out.resource.availability}${out.resource.hours_text ? `  (hours kept as written: "${out.resource.hours_text}")` : ''}`);
+    }
+  }
+  return { added, collisions };
+}
+
 if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/import-lines.ts')) {
   const dir = p('data/seed/incoming');
   const resources = readResources(), schedules = readCsv(p('data/seed/schedules.csv'));
-  const have = new Set(resources.map((r) => r.sal_id));
-  let added = 0;
-  for (const file of readdirSync(dir).filter((f) => f.endsWith('.txt')).sort()) {
-    for (const [n, line] of readFileSync(`${dir}/${file}`, 'utf8').split('\n').entries()) {
-      if (!line.trim() || line.startsWith('#')) continue;
-      const out = lineToRows(line);
-      if (typeof out === 'string') { console.warn(`${file}:${n + 1} skipped: ${out}`); continue; }
-      if (have.has(out.resource.sal_id)) continue;
-      have.add(out.resource.sal_id!); resources.push(out.resource); schedules.push(...out.schedules); added++;
-      console.log(`+ ${out.resource.sal_id}  ${out.resource.availability}${out.resource.hours_text ? `  (hours kept as written: "${out.resource.hours_text}")` : ''}`);
-    }
-  }
+  const files = readdirSync(dir).filter((f) => f.endsWith('.txt')).sort().map((file) => ({ file, text: readFileSync(`${dir}/${file}`, 'utf8') }));
+  const { added, collisions } = importInto(files, resources, schedules);
   writeResources(resources);
   writeCsv(p('data/seed/schedules.csv'), schedules, SCHEDULE_COLUMNS);
-  console.log(`${added} added as proposed. Next: pnpm check:sources, then pnpm geocode.`);
+  // Exit 0 even with collisions: every other skipped line (bad field count, unknown extra) is a warning here
+  // too, and the person reads the summary. Nothing half-written — the good lines are saved either way.
+  console.log(`${added} added as proposed, ${collisions} skipped for an id collision. Next: pnpm check:sources, then pnpm geocode.`);
 }

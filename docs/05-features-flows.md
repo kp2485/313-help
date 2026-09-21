@@ -4,19 +4,20 @@
 
 ```
 Top bar, every screen:  313 Help · [Urgent help]      (on DV and crisis screens: [Leave this page fast] instead)
-Tab bar, every screen:  Home · Help · Recreation · Transit · Events
+Tab bar, every screen:  Home · Help · Map · Events
 
 Home
-├─ Español / English switch
+├─ Language switch: English · Español · العربية · বাংলা
 ├─ "What do you need today?" + tagline
 ├─ Search by name or street          →  Search
 ├─ Active alerts (cards, auto-expire)
 ├─ Find free help                    →  Help tab
-├─ Quick needs: Food · A place to sleep · A doctor · Free Narcan   →  need screen
+├─ Quick needs: Food · A place to sleep · A doctor · Drugs or alcohol · A job · Free Narcan   →  need screen
 ├─ (Coming up: City events — hidden while there are none; dropped until a real feed, DECISIONS 2026-09-19)
-├─ Tiles: Recreation · Transit
-└─ Footer: List updated {date} · Works offline · About this app
-     About  →  Español / English switch · list version and signature · Neighborhoods
+├─ Tiles: Map · Joe Louis Greenway
+└─ Footer: Updated {date} · About this app · Your privacy
+     About  →  language switch · list version and signature · Neighborhoods
+     Your privacy  →  the docs/08 table in plain words · "Make a new key"
 
 Help
 ├─ Search by name or street          →  Search
@@ -25,8 +26,11 @@ Help
 ├─ Browse by type: Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people   →  list (+ map on request)
 └─ More: Saved places · Add a place that helps
 
-Recreation:  Joe Louis Greenway (map, segments  →  Neighborhoods) · City parks · Recreation centers and libraries · Bikes
-Transit:     trip planner and real-time links, fares, free rides, phone numbers
+Map          one map with a layer switcher (free help by kind · parks · Joe Louis Greenway · bus routes and
+             stops · streetcar · People Mover · bike lanes and MoGo · stations · park and ride), the same
+             thing as a list under the map, then: the greenway, City parks, recreation centers and libraries,
+             trip planners, fares, free rides, transit phone numbers, MoGo Access Pass
+             Joe Louis Greenway (segments  →  Neighborhoods) and City parks keep their own screens
 Events:      City calendar, grouped by day
 
 Urgent help (top bar): 911 · 988 · shelter · crisis line · DV hotline · 211 · overdose steps
@@ -34,30 +38,29 @@ Resource detail · Neighborhoods (from About and from greenway segments)
 Report a problem with the app: not built.
 ```
 
-**Revised 2026-09-18 (Kyle): five tabs — Home · Help · Recreation · Transit · Events.** No profile tab; there is no profile.
+**Revised 2026-09-20 (Kyle): four tabs — Home · Help · Map · Events.** The Recreation and Transit tabs are one **Map** tab; everything either of them offered is still on it. No profile tab; there is no profile.
 
-- **Home**: a calm landing page — the Español/English switch, hero, a search button, active alerts, one "Find free help" card, four quick needs, tiles into Recreation and Transit. No red, no emergency strip.
+- **Home**: a calm landing page — the four-language switch, hero, a search button, active alerts, one "Find free help" card, six quick needs, tiles into the Map tab and the greenway. No red, no emergency strip.
 - **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
-- **Recreation**: Joe Louis Greenway (map, segments, help within a 10-minute walk), City parks (302, nearest first with location), recreation centers, MoGo Access Pass. The greenway is drawn like a transit line (DECISIONS 2026-09-20): one width with a casing, a colour and dash for each phase, station dots where stretches join once zoomed in, the chosen stretch bright with the rest dimmed, and a key under the map naming each phase in words.
-- **Transit**: DDOT trip planner and real-time links, fares, free rides (People Mover, QLINE), phone numbers. Every listing with an address gets a **Bus directions** button.
-- **Events**: the City calendar, read by the pipeline into the signed bundle, grouped by day; details link out.
+- **Map** (2026-09-20): one map of the city with a **layer switcher**, then everything Recreation and Transit used to carry. See "Map tab" below. Every listing with an address still gets a **Bus directions** button on its own screen.
+- **Events**: was the City calendar, grouped by day, with details linking out. **Dropped 2026-09-19** until the City publishes a real events feed, so the bundle carries no events and **the tab hides itself**; the code stays. (A tab bar that reserved a fifth column for it was a bug the 2026-09-20 audit found and fixed.)
 - **Urgent help**: a button in the top bar of every screen (replaced by quick-exit on DV and crisis screens) opens the numbers sheet: 911, 988, shelter, crisis line, DV hotline, 211, plus the overdose steps. One tap from anywhere (Principle 3). 911 is the only red element in the app besides quick exit.
 
 The earlier "emergency strip" and needs-on-Home layout are superseded by this structure; the rules about what each screen must show first are unchanged.
 
 ## Home
 
-- Top to bottom: Español/English switch · "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · four quick needs (Food · A place to sleep · A doctor · Free Narcan), one tap each · Recreation and Transit tiles · footer.
+- Top to bottom (**revised 2026-09-20**): the language switch, listing all four languages in their own names · "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · **six quick needs** (Food · A place to sleep · A doctor · Help with drugs or alcohol · A job · Free Narcan), one tap each · two tiles, **Map** and the greenway · a footer with "Updated {date}", About and Your privacy.
 - **Alerts**: cards with title, plain-language body, a call button for each phone number, when it ends ("Until {when}"), and a link to where it was announced. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
 - **"What do you need?"** now heads the Help tab (see above). Principle 3 path: Help → need (1) → refinement if any (2) → **Call** (3); from Home, a quick need skips the first tap.
 - **Browse by type** (Help tab chips): Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people.
-- Small footer: "List updated {when} · Works offline". When this phone's copy is more than 72 hours old, every list and listing says so ("Your phone last got updates 12 days ago. Call before you go."); see doc 12.
+- Small footer: "Updated {when}", then About this app and Your privacy. When this phone's copy is more than 72 hours old, every list and listing says so ("Your phone last got updates 12 days ago. Call before you go."); see doc 12.
 
 ## Urgent help
 
 - A button in the top bar of every screen, so the numbers are one tap from anywhere (Principle 3). On DV and crisis screens that slot holds "Leave this page fast" instead, and the numbers are already first on the page.
 - The sheet: 911 · Suicide and crisis lifeline (988) · Shelter tonight (Detroit, Hamtramck, Highland Park) · Shelter help (Dearborn) · Local mental health crisis line · Domestic violence hotline · Find help near you (211) · then "Someone is overdosing right now" with the steps. 911 is the only red row.
-- **911 and 988 are hardcoded and can never be overridden.** Other numbers come from `emergency.csv` through the signed bundle, so they can be corrected without a store release but not by a tampered feed (10-A5). Each must match what its owner currently publishes, machine-checked within 30 days (`pnpm check:emergency`); the release build fails otherwise.
+- **911 and 988 are hardcoded and can never be overridden.** Other numbers come from `emergency.csv` through the signed bundle, so they can be corrected without a store release but not by a tampered feed (10-A5). Each must be the number its owner currently publishes; `pnpm check:emergency` reads each page, and a release build fails when a page **was read and showed a different number**. A page that could not be read is logged for a person and never blocks a release (DECISIONS 2026-09-19; the earlier "within 30 days" rule was superseded).
 
 ## Triage — "Find what I need" (the D Compassion replacement)
 
@@ -94,6 +97,27 @@ Safety rules baked into the flow:
 - "I'm not safe at home" shows no distance and no map.
 - "I want help with drugs or alcohol" and "Help after sexual assault" (DECISIONS 2026-09-19): numbers first, a quick exit, and **private listings**: never saved, never in the browser history, but with an address, distance and map dot so a person can get there.
 
+## Map tab (2026-09-20)
+
+One tab replaces Recreation and Transit. Top to bottom:
+
+1. **The map**, drawn on the phone from the signed bundle as before — no tile server, no map company, nothing sent.
+2. **"What to show on the map"** — a layer switcher of real `<input type="checkbox">` in labelled `<fieldset>`s, in three groups:
+   - *Free help*: one layer per group of our own listings, **derived from the category taxonomy** (`MAP_GROUPS` in `apps/web/src/needs.ts`): free food · places to sleep · health and Narcan · rec centers and libraries · jobs and school · clothes, showers and things · money, housing and papers. Every top-level category belongs to exactly one group (a test checks it).
+   - *Parks and paths*: the Joe Louis Greenway · City parks.
+   - *Getting around*: DDOT bus routes and stops · SMART bus routes and stops · QLINE · People Mover · MoGo bike stations · bike lanes · train and bus stations · intercity bus stops · park and ride lots.
+   The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. A first visit starts with the greenway, parks and DDOT routes.
+3. **"See this map as a list"** — everything switched on, in words: the help listings as cards, greenway stretches as rows, park names, and each transport layer's route and stop names with a count. Nothing on the map is reachable only by looking at it.
+4. Then the rest of what Recreation and Transit carried: the greenway, City parks, recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass. The trip-planner list names the **Transit app** ("live DDOT and SMART buses on your phone") beside DDOT's own planner, as a link-out to transitapp.com like every other; the same link appears in the **"Rides to the doctor or cheaper bus fare"** link-outs, where it leads, because it is the free thing that answers "when is my bus coming?". Neither says DDOT or SMART recommends it: SMART's own page lists Transit among third-party apps that receive SMART data, DDOT's pages could not be read (`docs/research/2026-09-20/transit-app.md`), and we state only what an owner page states.
+
+Rules that do not change:
+- **Sensitive and private listings are never drawn.** Treatment and help after sexual assault are excluded from every layer (`PRIVATE_TOPS`), and inside a group a DV or mental-health-crisis listing is dropped row by row (`isSensitive`).
+- **Colour never carries the meaning alone.** Each layer is named in the switcher, named again when you tap a route or a stop, and named in the list under the map.
+- **Bus stops wait for the zoom.** There are thousands, so a dense point layer draws only once the map is close enough for stops to be separate things; the list shows them at any zoom, and the switcher says so.
+- Unknown is never rendered as open, and freshness is still computed on the device.
+
+Each transport layer is its own file in the signed bundle under `map/transit/`, **downloaded only when that layer is first switched on** and checked against the signed index, then kept for offline use. The small list of which layers exist travels with the bundle (`places/transit.json`), so the switcher draws offline. Sources, sizes and licence notes: `pipeline/src/ingest-transit.ts` and DECISIONS 2026-09-20.
+
 ## List / Map
 
 - Same query, two views. The map is closed until asked for ("Show these {count} on a map"), so the first **Call** button stays near the top. Every listed place with coordinates is a dot that opens its details. Sensitive listings (DV, mental-health crisis) never get a dot, and the "not safe at home" screen has no map. The list is fully usable if the map fails to load.
@@ -104,11 +128,23 @@ Safety rules baked into the flow:
 ## Resource detail
 
 Top → bottom:
-1. Name (in the top bar) · organization · open now or next time, computed from RRULE ("Open now until {time}" / "Closed now. Next: {day} {time}") · freshness badge, which states a fact and never says "verified" ("Matched their website when added, {date}" / "Nobody has confirmed this since {date}. Call first.") · a notice, if the listing has one.
-2. Big buttons: **Call** (one per phone number) · **Directions** · **Bus directions** · **Save** · **Share** (share a deep link — no personal data in the link). DV and crisis listings have no Save button.
+1. Name (in the top bar) · organization · open now or next time, computed from RRULE ("Open now until {time}" / "Closed now. Next: {day} {time}") · freshness badge, which states a fact and never says "verified" and which distinguishes who looked ("A program matched this to their website on {date}" for a script's match, "Their website was read and matched on {date}" for a person's browser read, "Nobody has checked it. Call first." for neither) · a notice, if the listing has one.
+   **On a holiday** a row whose schedule would have said "Open" says "Holiday today. Call first." instead, with a line naming its usual hours ("Today is a holiday. The usual hours are {hours}, but they may be different today. Call before you go."), and an occurrence in "Next times" that falls on a holiday is labelled "Holiday. Call first." rather than dropped. Nobody's holiday hours are in any source we read, so the app stops claiming and starts saying what it knows (`schema/query-spec.md`, "Holidays").
+2. Big buttons: **Call** (one per phone number) · **Directions** · **Bus directions** · **Bus directions in the Transit app** (phones only, see below) · **Save** · **Share** (share a deep link — no personal data in the link). DV and crisis listings have no Save button.
+   - **Bus directions** is first and needs no app: it opens a trip plan in the browser, wherever the person is.
+   - **Bus directions in the Transit app** is an addition under it, for the app DDOT and SMART riders use for
+     real-time buses. It is Transit's own documented link (`transit://directions?to=…`, `apps/web/src/directions.ts`
+     and `apps/ios/HelpApp/Listing.swift`; sources in `docs/research/2026-09-20/transit-app.md`) and carries the
+     **destination only** — no origin, ever; Transit asks the person for their location itself, on their phone.
+     The destination is the publisher's coordinate when there is one, otherwise the written address.
+     **Exactly the same gate as Bus directions:** an address or a coordinate. DV and crisis listings have
+     neither, so they show no Directions, no Bus directions and no Transit link.
+     **Phones only.** Transit documents no https link and no behaviour when the app is missing, and ships for iOS
+     and Android only, so the web hides the link off a phone user-agent and iOS hides it unless the app is
+     installed. We never guess a URL, never load anything of theirs, and never claim a partnership.
 3. What you get (plain language), who it's for and what to bring ("No ID needed" / "Bring proof of Detroit address"). Languages: later.
 4. Hours table, or "Hours as listed: {text}" when a list gave hours as text. "Next times": the next 3 dates.
-5. Where: address, a small map (never for a sensitive listing), and "Directions open in a maps app, which will see the address."
+5. Where: address, a small map (never for a sensitive listing), and "Directions open in another app, which will see where this place is." — worded for any app the person picks, maps or Transit, and true on a laptop too.
 6. "{miles} mi from the Joe Louis Greenway ({segment})" when an open segment is within half a mile. Tapping it opens the segment.
 7. Website.
 8. Where this came from: the name of the list or site the row came from.
@@ -135,7 +171,9 @@ See 04. One screen, under Help → More. The address is typed. Days and times ar
 
 ## Language
 
-English and Spanish are built. The app picks Spanish when the phone's language is Spanish, and an "Español / English" switch on Home and About changes it; the choice stays on the phone. **Spanish is a separate file, fetched only when it is chosen** (DECISIONS 2026-09-19), so an English reader never downloads it; once fetched it is kept for offline use. With no signal and no saved copy the switch does nothing and the app stays in English. Arabic is next (RTL layout — test early, it breaks tab bars). What a place wrote about itself stays in English, marked as English, with the line "This place's own words are shown in English, the way they wrote them." We never machine-translate safety-critical text. Later: the bundle may carry an owner's own translation of a description.
+Four languages are built: English, Spanish, **Arabic** and **Bengali**. The app picks the first of the phone's own languages it has words for, and a switch on Home and About lists all four, each written in its own name (English · Español · العربية · বাংলা) with its own `lang` attribute; the choice stays on the phone and is never sent. **Each language other than English is a separate file, fetched only when it is chosen** (DECISIONS 2026-09-19), so an English reader downloads none of them; once fetched they are kept for offline use. With no signal and no saved copy the switch does nothing and the app stays in English. **Arabic reads right to left** and the whole interface mirrors — the stylesheet is written in logical properties, so there is no second stylesheet; the map itself never mirrors, because left is west in every language. Dates, times and numbers in Arabic and Bengali use Western digits, so a phone number reads as it is dialled (DECISIONS 2026-09-20). **Arabic and Bengali were drafted by machine on 2026-09-20 and no native speaker has read either one yet** (DECISIONS): no screen says they were checked, and a native reviewer is a condition of a public release, crisis screens first. What a place wrote about itself stays in English, marked as English, with the line "This place's own words are shown in English, the way they wrote them." We never machine-translate safety-critical text. Later: the bundle may carry an owner's own translation of a description.
+
+**Details settled by the 2026-09-20 walk-through of every screen in Arabic and Bengali:** "am" and "pm" are translated strings (`clock.am`, `clock.pm`) while the digits beside them stay Western, and the list separator is a string (`list.sep`) — the iPhone and Android apps still hard-code am/pm and should not. Dollar amounts are written the way the record writes them (`$85,000`), falling back to `en-US` where a language's own `Intl` rules do not lead with the sign. The uppercase, letter-spaced section headings apply only under `:lang(en)` and `:lang(es)`, because letter-spacing breaks Arabic joining and Bengali conjuncts. A phone number and its extension sit inside **one** `<bdi>`, so nothing can reorder into a number a person would misdial. **Known limit: searching in Arabic or Bengali returns nothing**, because every listing is written in English; the empty state needs one honest line about that, and its wording waits on the native reviewer (CHECKS-2026-09-20 §7).
 
 ## Accessibility
 

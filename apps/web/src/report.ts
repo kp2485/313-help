@@ -79,14 +79,32 @@ export async function uploadPhoto(photo: Blob): Promise<string | null> {
   } catch { return null; }
 }
 
-async function post(r: Report): Promise<Sent<undefined>> {
+/** The one-day hash is worked out again the moment the report actually leaves, never reused from the queue.
+ *  "Make a new key" is a promise that nothing sent after it can be matched to anything sent before; a report
+ *  that was queued under the old key and then posted carrying that old key would have broken that promise
+ *  silently, hours later (web review, 2026-09-20). Recomputing costs one hash and makes the promise true: the
+ *  day is the one the report was observed on, so a report queued yesterday still dedupes against yesterday. */
+export async function withCurrentNonce(r: Report): Promise<Report> {
+  return { ...r, client_nonce: await nonce(r.target_id, new Date(r.observed_at)) };
+}
+
+async function post(queued: Report): Promise<Sent<undefined>> {
   try {
+    const r = await withCurrentNonce(queued);
     const res = await fetch('/v1/reports', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(r), credentials: 'omit', referrerPolicy: 'no-referrer' });
     return { sent: !retryable(res.status) };   // any other 4xx will never succeed later; don't keep it
   } catch { return { sent: false }; }
 }
 
 const reports = outbox<Report>('queue', 50, post);
+/** How many reports are waiting on this phone, and a way to throw them away (Your privacy screen). */
+export const queuedCount = () => reports.count();
+export const clearQueue = () => reports.clear();
+/** Which targets already have a report waiting. A reload used to forget, so the same place asked to be confirmed
+ *  again while the first confirmation was still sitting in the queue (web review, 2026-09-20). */
+export async function queuedTargets(): Promise<string[]> {
+  return [...new Set(((await idbGet<Report[]>('queue')) ?? []).map((r) => r.target_id))];
+}
 
 /** Sends now if it can; otherwise keeps it on the phone and tries again later. */
 export async function submit(r: Report): Promise<'sent' | 'queued'> {

@@ -1,6 +1,6 @@
 # 11 — Healthy Places: the Joe Louis Greenway, Parks, and Rec Sites
 
-Status: **approved by Kyle 2026-09-18.** Changes scope set in 01. Built so far: segment ingest (52 segments, 20 open), on-device geometry (`packages/query/src/places.ts`), access-shed report, all 302 City parks, a Recreation tab, condition reports on open segments with an optional photo (photos are demo-only until the private bucket exists and we have legal advice), the app's own street map with the cross streets of each segment, and in-app neighborhood pages with a greenway lens (doc 13). **Layer B below is superseded by [doc 13](13-neighborhood-indicators.md): the public-data indicators now cover every Detroit neighborhood, with the greenway study area as one lens.** Facts marked **[checked]** were verified on the web on this date.
+Status: **approved by Kyle 2026-09-18.** Changes scope set in 01. Built so far: segment ingest (52 segments, 20 open), on-device geometry (`packages/query/src/places.ts`), access-shed report, all 302 City parks, a Recreation tab (merged into the **Map** tab on 2026-09-20, which draws the greenway like a transit line with a colour and dash per phase; the greenway keeps its own screen and is the iPhone app's fourth tab), condition reports on open segments with an optional photo (photos are demo-only until the private bucket exists and we have legal advice), the app's own street map with the cross streets of each segment, and in-app neighborhood pages with a greenway lens (doc 13). **Layer B below is superseded by [doc 13](13-neighborhood-indicators.md): the public-data indicators now cover every Detroit neighborhood, with the greenway study area as one lens.** Facts marked **[checked]** were verified on the web on this date.
 
 ## Why this belongs in a help app (and the test for what doesn't)
 
@@ -36,7 +36,7 @@ So the feature is not "a parks app bolted on." It is one map where the greenway 
 
 ### 1. Places (browse and find)
 
-**Resident sees:** the Recreation tab → list/map of nearby places. Each greenway segment shows **Open / Being built / Planned**. *(Not built; no amenity data exists:)* what's there — restroom, water, playground, splash pad, walking loop, shade, lighting, paved/accessible path, bus stop nearby — and free programs (yoga on the greenway, senior walking club, open gym) with "Next: Sat 9:00am," using the same schedule machinery as pantries.
+**Resident sees:** the Map tab (the Recreation tab until 2026-09-20) → list/map of nearby places. Each greenway segment shows **Open / Being built / Planned**. *(Not built; no amenity data exists:)* what's there — restroom, water, playground, splash pad, walking loop, shade, lighting, paved/accessible path, bus stop nearby — and free programs (yoga on the greenway, senior walking club, open gym) with "Next: Sat 9:00am," using the same schedule machinery as pantries.
 
 **The bridge feature — "Help along the Greenway":** tap any trailhead or segment → "Within a 10-minute walk or roll": the pantry, the clinic, the Narcan station, the rec center, the library. And the reverse on every help listing near the route: "0.3 mi from the Joe Louis Greenway (Joy Rd entrance)." This is the screen to show a greenway judge: it treats the trail as infrastructure for reaching help, which is what the framework plan says it's for.
 
