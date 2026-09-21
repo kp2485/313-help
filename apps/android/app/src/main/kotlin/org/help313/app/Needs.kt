@@ -27,6 +27,10 @@ class Need(
     /** No list at all: 911 and rescue steps only. A bystander must not be sent on an errand (audit A7). */
     val stepsOnly: Boolean = false,
     val sensitive: Boolean = false,
+    /** A screen someone may need to get off fast: it offers "Leave this page fast", and it is never in the recents
+     *  thumbnail or a screenshot (FLAG_SECURE, applied from the route in MainActivity.render). Exactly the needs
+     *  the web app marks `quickExit` in apps/web/src/needs.ts — domestic violence, crisis, treatment, assault. */
+    val quickExit: Boolean = false,
     val intro: String? = null,
     val emptyKey: String? = null,
 )
@@ -46,13 +50,14 @@ val NEEDS: List<Need> = listOf(
     ),
     // DV: hotline and 911 before anything else; rows have no address and never show a distance.
     Need("unsafe", "now", first = listOf("emg_ndvh", "emg_911"), query = Query(category = "shelter.dv"),
-        sensitive = true, intro = "safe.dv_intro"),
+        sensitive = true, quickExit = true, intro = "safe.dv_intro"),
     Need("talk", "now", first = listOf("emg_988", "emg_dwihn_crisis"), query = Query(category = "health.mental"),
-        sensitive = true, intro = "talk.intro"),
+        sensitive = true, quickExit = true, intro = "talk.intro"),
     // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door for all four cities, then SAMHSA's.
     Need(
         "drugs", "now",
         first = listOf("emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"),
+        quickExit = true,
         intro = "drugs.intro",
         refine = listOf(
             Refine("today", Query(category = "treatment", prefer = listOf("walk_in"))),
@@ -65,7 +70,7 @@ val NEEDS: List<Need> = listOf(
         ),
     ),
     Need("assault", "now", first = listOf("emg_avalon", "emg_voices4", "emg_911"),
-        query = Query(category = "assault"), intro = "assault.intro"),
+        query = Query(category = "assault"), quickExit = true, intro = "assault.intro"),
     Need("food", "soon", refine = listOf(
         Refine("today", Query(category = "food.meal", mode = "now")),
         Refine("week", Query(category = "food", mode = "week")),

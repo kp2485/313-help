@@ -2,20 +2,34 @@
 // Android's own Ed25519 (java.security.Signature "Ed25519", through Conscrypt) arrives at API 33, and this app
 // runs from API 24. The alternatives all cost megabytes of APK for one signature check at start-up.
 //
-// So there are two paths, and they must always agree:
+// **One implementation, on every API level.** `verify` is the verification half of RFC 8032 section 5.1, using
+// java.math.BigInteger for the field arithmetic and java.security.MessageDigest for SHA-512 (both on every Android
+// version we support). There is no platform fast path any more, and the reasons are in the Android review of
+// 2026-09-20:
 //
-//  - `platformVerify` asks the platform. It answers null when this device has no Ed25519 provider (every Android
-//    below 13), and otherwise gives its own true/false. It is used first because it is native code and takes
-//    about a millisecond.
-//  - `softwareVerify` is the verification half of RFC 8032, section 5.1, using java.math.BigInteger for the field
-//    arithmetic and java.security.MessageDigest for SHA-512 (both on every Android version we support). It is the
-//    only path below API 33, so it is the one that has to be fast on an old phone.
+//   - There is no software Ed25519 provider on Android to be fast *with*. This repository's own measurement found
+//     that on an API 35 image the only Ed25519 services are in AndroidKeyStore and AndroidKeyStoreBCWorkaround,
+//     which serve hardware-held keys and will not load a public key from bytes. The path never ran on any device
+//     we have, so it bought nothing and was never exercised outside a unit test.
+//   - "Only a yes counts" was not the safe rule it read as. `platformVerify` walked the installed providers and
+//     returned the *first* one that offered KeyFactory/Ed25519, so a provider added by anything on the device
+//     decided whether the strict code below ran at all; and when that provider had no Signature it fell back to
+//     `Signature.getInstance("Ed25519")` from the *default* provider, initialised with a key object made by a
+//     different one. A "yes" from that arrangement short-circuited the only implementation this repository can
+//     reason about, on the app's single security decision.
+//   - Two implementations that "must always agree" cannot be made to. Non-canonical encodings and small-order
+//     points are the classic Ed25519 disagreements, cofactored and cofactorless verification differ on real
+//     signatures, and the old comment admitted as much. One implementation has one accept/reject set, everywhere.
 //
-// VerifyTest runs the RFC 8032 vectors, the tampering cases and the real bundle through *both* and asserts they
-// give the same answer, so neither can drift. (One caveat worth writing down: the two are not provably identical
-// on pathological inputs — non-canonical encodings and small-order points are the classic disagreements between
-// Ed25519 implementations. That cannot affect this app, whose signatures come from one signer using the standard
-// canonical encoding, but it is why the software path is never skipped in the tests.)
+// The agreement test against the JVM's own SunEC is kept — in `VerifyTest`, where it belongs: it is worth knowing
+// that this code matches a reference implementation, and worth nothing to ask a phone at start-up.
+//
+// **Small-order public keys are refused** (`isSmallOrder`). Under a public key of order 1, 2, 4 or 8, an all-zero
+// 64-byte signature verifies *any* message in cofactorless Ed25519: h·A is the neutral point whatever h is, so
+// [s]B − [h]A = [0]B − O = O = R. A release pins its keys at build time, so this is not reachable today — but the
+// check costs three point doublings once per bundle and removes a whole class of "the key file was wrong" from
+// ever being a forgery. The same eight points are refused by the release gate in app/build.gradle.kts, which reads
+// the list at the bottom of this file so the two cannot disagree.
 //
 // It verifies only. There is no signing code here and no private key anywhere in this repository.
 //
@@ -40,10 +54,7 @@
 package org.help313.app
 
 import java.math.BigInteger
-import java.security.KeyFactory
 import java.security.MessageDigest
-import java.security.Signature
-import java.security.spec.X509EncodedKeySpec
 
 object Ed25519 {
     private val ZERO: BigInteger = BigInteger.ZERO
@@ -194,63 +205,17 @@ object Ed25519 {
      * True when `signature` (64 bytes) is a valid Ed25519 signature of `message` under `publicKey` (32 raw bytes).
      * Anything malformed is false; nothing throws, so a damaged file can only ever mean "refuse this bundle".
      *
-     * The platform's own Ed25519 is asked first and the software path answers when there is none. A device that
-     * has a provider never pays for the BigInteger arithmetic; a device that does not gets the same answer.
+     * RFC 8032 section 5.1, cofactorless, and the only implementation — on API 24 and on API 35 alike, so the set
+     * of things this app accepts does not depend on which phone it is running on. See the header of this file for
+     * why the platform provider path was removed.
      */
     fun verify(publicKey: ByteArray, signature: ByteArray, message: ByteArray): Boolean {
-        if (publicKey.size != 32 || signature.size != 64) return false
-        // A "yes" from the platform is enough. Anything else — no provider, or a provider that says no — is
-        // settled by the software path, which is the RFC and is the only answer every Android below 13 ever gets.
-        // So a provider that is missing, or odd, or wrong can never turn a good bundle into a refused one, and can
-        // never make this app accept anything that API 24 would not accept.
-        if (platformVerify(publicKey, signature, message) == true) return true
-        return softwareVerify(publicKey, signature, message)
-    }
-
-    /**
-     * The platform's answer, or null when this device has no usable Ed25519 provider — which is every Android
-     * below 13 (API 33), and the whole reason the software path exists.
-     *
-     * The provider is chosen by asking every installed one, not by taking whatever `getInstance("Ed25519")`
-     * happens to return. On an API 35 emulator (2026-09-20) that default is **AndroidKeyStore**, the hardware
-     * key store, which cannot load a plain public key at all: the fast path silently never ran until this looked
-     * the providers up itself. The one we want is Conscrypt (AndroidOpenSSL).
-     */
-    fun platformVerify(publicKey: ByteArray, signature: ByteArray, message: ByteArray): Boolean? {
-        if (publicKey.size != 32 || signature.size != 64) return false
-        val spec = X509EncodedKeySpec(SPKI_HEADER + publicKey)
-        for (provider in java.security.Security.getProviders()) {
-            if (provider.getService("KeyFactory", "Ed25519") == null) continue
-            val key = try {
-                KeyFactory.getInstance("Ed25519", provider).generatePublic(spec)
-            } catch (_: Exception) {
-                continue
-            }
-            val verifier = try {
-                Signature.getInstance("Ed25519", provider).also { it.initVerify(key) }
-            } catch (_: Exception) {
-                try {
-                    Signature.getInstance("Ed25519").also { it.initVerify(key) }
-                } catch (_: Exception) {
-                    continue
-                }
-            }
-            return try {
-                verifier.update(message)
-                verifier.verify(signature)
-            } catch (_: Exception) {
-                // A signature the provider cannot even parse is a signature that does not verify.
-                false
-            }
-        }
-        return null
-    }
-
-    /** RFC 8032 section 5.1 verification, done here. Used below API 33, and checked by the tests everywhere. */
-    fun softwareVerify(publicKey: ByteArray, signature: ByteArray, message: ByteArray): Boolean {
         return try {
             if (publicKey.size != 32 || signature.size != 64) return false
             val a = decompress(publicKey) ?: return false
+            // A key of order 1, 2, 4 or 8 makes [h]A the neutral point for every h, under which the all-zero
+            // signature verifies any message at all. Refused before anything is hashed.
+            if (isSmallOrder(a)) return false
             val rBytes = signature.copyOfRange(0, 32)
             val r = decompress(rBytes) ?: return false
             val s = littleEndian(signature.copyOfRange(32, 64))
@@ -258,10 +223,35 @@ object Ed25519 {
             val h = littleEndian(sha512(rBytes, publicKey, message)).mod(L)
             // [s]B - [h]A must be R. Subtracting is adding the negated point, which costs nothing here.
             Trace.time("ed25519.scalar_mul") { equal(doubleScalarMul(s, h, negate(a)), r) }
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             false
         }
     }
+
+    /**
+     * Kept as the old name so the one public entry point has one meaning. `verify` *is* the software path now;
+     * this exists because the tests, the timing hook in BundleStore and apps/android/README.md all name it.
+     */
+    fun softwareVerify(publicKey: ByteArray, signature: ByteArray, message: ByteArray): Boolean =
+        verify(publicKey, signature, message)
+
+    /**
+     * True for the eight points whose order divides 8 — the neutral point, the one point of order 2, the two of
+     * order 4 and the four of order 8. [8]P is the neutral point for exactly those and for nothing else, so three
+     * doublings settle it, whatever encoding the key arrived in. The two non-canonical encodings of small-order
+     * points (y = p and y = p + 1) never reach here at all: `recoverX` refuses any y that is not less than p.
+     */
+    private fun isSmallOrder(p: Point): Boolean = isNeutral(dbl(dbl(dbl(p))))
+
+    /** The same question about 32 raw key bytes. False for anything that is not a point on the curve. */
+    fun isSmallOrderKey(publicKey: ByteArray): Boolean {
+        val a = decompress(publicKey) ?: return false
+        return isSmallOrder(a)
+    }
+
+    /** (X : Y : Z) is the neutral point when X is 0 and Y = Z, in any representative. */
+    private fun isNeutral(p: Point): Boolean =
+        modp(p.x).signum() == 0 && modp(p.y.subtract(p.z)).signum() == 0
 
     /**
      * The 32 raw key bytes inside a base64 SPKI DER Ed25519 public key (the form the bundle's .sig file and
@@ -273,4 +263,35 @@ object Ed25519 {
         for (i in SPKI_HEADER.indices) if (der[i] != SPKI_HEADER[i]) return null
         return der.copyOfRange(12, 44)
     }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // SMALL-ORDER PUBLIC KEYS (begin)
+    //
+    // Every encoding of a point whose order divides 8, with the sign bit cleared. `verify` does not need this list
+    // — it refuses these points by arithmetic ([8]A = O), which is stronger because it needs no list to be
+    // complete. The list exists for two other readers:
+    //
+    //   - the release gate in app/build.gradle.kts, which cannot run app code at configuration time and reads
+    //     these lines out of this file as text, between the markers, expecting exactly SMALL_ORDER_COUNT of them;
+    //   - VerifyTest, which puts all of them (each with the sign bit both ways, so 14 encodings) through `verify`
+    //     with an all-zero signature and asserts every one is refused. That is what ties the arithmetic to the list
+    //     and would catch either one drifting.
+    //
+    // Seven values, fourteen encodings, eight points: y = 0 and y = p give the same two order-4 points, and y = 1
+    // and y = p + 1 the same neutral point. The two y >= p forms are the classic non-canonical encodings; they are
+    // here because the *gate* compares bytes, while `recoverX` refuses them outright at verify time.
+    // (Source: the same set libsodium's crypto_core_ed25519_is_valid_point blacklists.)
+    const val SMALL_ORDER_COUNT = 7
+
+    val SMALL_ORDER_KEYS: List<String> = listOf(
+        "0000000000000000000000000000000000000000000000000000000000000000", // y = 0, order 4
+        "0100000000000000000000000000000000000000000000000000000000000000", // y = 1, the neutral point
+        "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05", // order 8
+        "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a", // order 8
+        "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f", // y = p - 1, order 2
+        "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f", // y = p, non-canonical 0
+        "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f", // y = p + 1, non-canonical 1
+    )
+    // SMALL-ORDER PUBLIC KEYS (end)
+    // -----------------------------------------------------------------------------------------------------------
 }

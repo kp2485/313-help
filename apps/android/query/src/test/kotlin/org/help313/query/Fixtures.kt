@@ -67,6 +67,7 @@ private fun openMap(o: OpenResult): Map<String, Any?> {
     if (o.state == OpenState.CLOSED) {
         m["next"] = o.next?.let { mapOf("date" to it.date, "opens_at" to it.opensAt, "closes_at" to it.closesAt) }
     }
+    o.usualHours?.let { m["usual_hours"] = mapOf("opens_at" to it.opensAt, "closes_at" to it.closesAt) }
     if (o.cancelledNow) m["cancelled_now"] = true
     return m
 }
@@ -129,8 +130,9 @@ fun runFixtures(dir: File = fixturesDir()): FixtureResult {
                     if (!matches(got, expect)) fail(got)
                 }
                 "nextOccurrences" -> {
+                    // " holiday" marks an occurrence that opens on a holiday: labelled, never dropped.
                     val got = nextOccurrences(row!!, now, c["n"]?.int ?: 3, alerts)
-                        .map { "${it.date} ${it.opensAt}-${it.closesAt}" }
+                        .map { "${it.date} ${it.opensAt}-${it.closesAt}" + if (it.holiday) " holiday" else "" }
                     if (!matches(got, expect)) fail(got)
                 }
                 "badge" -> {

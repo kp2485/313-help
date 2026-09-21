@@ -16,6 +16,7 @@ package org.help313.app
 
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -81,7 +82,12 @@ object UI {
         val t = text(c, value.uppercase(L.locale()), 13f, R.color.muted, bold = true, topDp = 18)
         t.letterSpacing = 0.08f
         t.setPaddingRelative(dp(c, 4), 0, dp(c, 4), dp(c, 4))
-        // A screen reader announces this as a heading, so the list can be skimmed by heading.
+        // The comment here used to say a screen reader announces this as a heading. It did not: a contentDescription
+        // is what to read, not what kind of thing it is, and nothing marked these as headings at all, so "jump to
+        // next heading" found nothing on any screen (Android review, 2026-09-20). This is the API that says it,
+        // added in Android 9; below that, Android has no way to say it and the text is read as ordinary text.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) t.isAccessibilityHeading = true
+        // Read the heading in its own case, not shouted: the capitals are a visual style.
         t.contentDescription = value
         return t
     }
@@ -150,12 +156,24 @@ object UI {
         val p = params()
         p.topMargin = dp(c, 8)
         l.layoutParams = p
-        l.addView(text(c, label, 17f, R.color.brand_ink, bold = true))
+        val labelView = text(c, label, 17f, R.color.brand_ink, bold = true)
+        l.addView(labelView)
         val n = text(c, number, 20f, R.color.brand_ink, bold = true, topDp = 2)
-        // A number is read digit by digit, never as one huge integer, and never wraps mid-number.
-        n.contentDescription = number.toCharArray().joinToString(" ")
         l.addView(n)
-        l.contentDescription = L.t("strip.call_label", "label" to label, "number" to number)
+        // The spoken form goes on the row, which is the focusable thing. It used to be a contentDescription on the
+        // inner TextView, which is not focusable and is inside a container that has its own description — so a
+        // screen reader never reached it and "911" was read as nine hundred and eleven (Android review,
+        // 2026-09-20). The digits are spaced so they are read one at a time, and the row's own words say what the
+        // number is for: "Call Emergency, 9 1 1".
+        l.contentDescription = L.t(
+            "strip.call_label",
+            "label" to label,
+            "number" to number.toCharArray().joinToString(" "),
+        )
+        // The two lines inside are already said by the row, so they are not announced a second time. Both are still
+        // drawn and still selectable by eye; this only changes what is spoken.
+        labelView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        n.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         l.setOnClickListener { onTap() }
         return l
     }
@@ -171,7 +189,25 @@ object UI {
         return t
     }
 
-    fun field(c: Context, label: String, hint: String): EditText {
+    /**
+     * A text field — the search box, and the note on a report. Both hold things that must not go anywhere but this
+     * phone, so both are set up so that the rest of Android does not take a copy (Android review, 2026-09-20).
+     *
+     *  - **No autofill.** Android's autofill service is another app. Without this, an Android 8-or-later phone with
+     *    a password manager or Google's own autofill enabled would offer to fill these fields, and a field that can
+     *    be filled is a field whose contents can be *saved* by that service. A search for a shelter, or a note on a
+     *    report, is not something to hand to a third app. `NO_EXCLUDE_DESCENDANTS` rather than `NO`, so it holds for
+     *    anything inside the field too.
+     *  - **No personalised learning.** Keyboards learn from what is typed and keep a per-person dictionary; some
+     *    sync it. This is the flag that says "do not learn from this", the same one a password field uses.
+     *  - **No suggestions, for the search box.** A suggestion strip is the keyboard reading along, and a search here
+     *    is a street name or the name of a clinic. The note keeps its suggestions, because it is prose a person is
+     *    writing and spelling help is worth having.
+     *
+     * None of this can be relied on absolutely — a keyboard is another app and does what it does — but each of
+     * these is the documented way to ask, and asking is the difference between a leak and a choice.
+     */
+    fun field(c: Context, label: String, hint: String, suggestions: Boolean = true): EditText {
         val e = EditText(c)
         e.hint = hint
         e.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
@@ -179,6 +215,13 @@ object UI {
         e.contentDescription = label
         e.minimumHeight = dp(c, MIN_TAP_DP)
         e.setSingleLine(true)
+        var input = android.text.InputType.TYPE_CLASS_TEXT
+        if (!suggestions) input = input or android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        e.inputType = input
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            e.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+            e.imeOptions = e.imeOptions or android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+        }
         val p = params()
         p.topMargin = dp(c, 8)
         e.layoutParams = p

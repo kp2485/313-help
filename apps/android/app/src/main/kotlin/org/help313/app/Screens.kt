@@ -6,6 +6,8 @@ package org.help313.app
 import android.view.View
 import android.widget.LinearLayout
 import org.help313.query.BundleRow
+import org.help313.query.OpenResult
+import org.help313.query.OpenState
 import org.help313.query.Query
 import org.help313.query.Ranked
 import org.help313.query.badge
@@ -15,6 +17,76 @@ import org.help313.query.rank
 import org.help313.query.search as querySearch
 
 object Screens {
+
+    // ---- one screen, from a route ---------------------------------------------------------------------------
+
+    /**
+     * The screen a route names. This is the only way a screen is built, so everything that has to be true of
+     * *every* screen — the "Leave this page fast" button on a private one, FLAG_SECURE (which MainActivity.render
+     * sets from the same route) — happens in one place rather than being remembered screen by screen.
+     */
+    fun view(a: MainActivity, route: Route): View {
+        val inner = build(a, route)
+        return if (Route.isPrivate(route)) withQuickExit(a, inner) else inner
+    }
+
+    private fun build(a: MainActivity, route: Route): View = when (route) {
+        is Route.Home -> home(a)
+        is Route.Help -> help(a)
+        is Route.Search -> search(a)
+        is Route.Saved -> saved(a)
+        is Route.About -> about(a)
+        is Route.Urgent -> urgent(a)
+        is Route.Need -> {
+            val need = NEEDS.firstOrNull { it.id == route.needId }
+            if (need == null) home(a) else needScreen(a, need)
+        }
+        is Route.Refine -> {
+            val need = NEEDS.firstOrNull { it.id == route.needId }
+            val refine = need?.refine?.firstOrNull { it.id == route.refineId }
+            if (need == null || refine == null) home(a)
+            else results(
+                a, L.t("refine.${need.id}.${refine.id}"), refine.query,
+                need.emptyKey, need.sensitive, refine.first,
+            )
+        }
+        is Route.Category -> {
+            val found = CATEGORIES.firstOrNull { it.first == route.categoryId }
+            if (found == null) help(a) else results(a, L.t("cat.${found.first}"), found.second)
+        }
+        is Route.Detail -> {
+            // A route outlives a draw, so the listing is looked up again: the bundle may have been refreshed, or
+            // may not have arrived yet, since the person tapped.
+            val row = a.store.bundle?.rows?.firstOrNull { it.id == route.rowId }
+            if (row != null) {
+                detail(a, row)
+            } else {
+                val col = UI.column(a, 16)
+                col.addView(UI.text(a, L.t(if (a.store.bundle == null) "home.loading" else "detail.not_found"), 17f, R.color.muted))
+                UI.scroller(a, col)
+            }
+        }
+    }
+
+    /**
+     * A private screen with "Leave this page fast" pinned above it — the same button, in the same place, going to
+     * the same address as the web app's (docs/05, `safe.exit`). It is outside the scroller on purpose: it has to be
+     * reachable without scrolling, at any text size, at the moment somebody needs it.
+     */
+    private fun withQuickExit(a: MainActivity, inner: View): View {
+        val wrap = UI.column(a)
+        val exit = UI.button(
+            a, L.t("safe.exit"),
+            backgroundId = R.drawable.pill_warn, textColorId = R.color.warn_ink, topDp = 0,
+        ) { a.quickExit() }
+        exit.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,
+        )
+        wrap.addView(exit)
+        inner.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
+        wrap.addView(inner)
+        return wrap
+    }
 
     // ---- Home ----------------------------------------------------------------------------------------------
 
@@ -30,7 +102,7 @@ object Screens {
         // (audit A5) and need no bundle at all: making a person in trouble wait on a signature check would be the
         // one delay in this app that could actually hurt someone. Nothing below this line is shown until the
         // bundle's signature has passed.
-        col.addView(UI.button(a, L.t("strip.more"), topDp = 16) { a.push { urgent(a) } })
+        col.addView(UI.button(a, L.t("strip.more"), topDp = 16) { a.push(Route.Urgent) })
 
         if (a.store.bundle == null) {
             col.addView(UI.text(a, if (a.store.loadFailed) L.t("home.no_data") else L.t("home.loading"), 17f, R.color.muted, topDp = 16))
@@ -46,13 +118,12 @@ object Screens {
             val needId = when (key) {
                 "quick.food" -> "food"; "quick.shelter" -> "shelter"; "quick.doctor" -> "doctor"; else -> "narcan"
             }
-            val need = NEEDS.first { it.id == needId }
-            val card = UI.tappableCard(a, L.t(key)) { a.push { needScreen(a, need) } }
+            val card = UI.tappableCard(a, L.t(key)) { a.push(Route.Need(needId)) }
             card.addView(UI.text(a, L.t(key), 18f, R.color.ink, bold = true))
             col.addView(card)
         }
 
-        col.addView(UI.button(a, L.t("home.see_all"), topDp = 16) { a.go { help(a) } })
+        col.addView(UI.button(a, L.t("home.see_all"), topDp = 16) { a.go(Route.Help) })
 
         val alerts = a.store.bundle?.alerts.orEmpty().filter { it.status == "published" && it.kind != "cancellation" }
         if (alerts.isNotEmpty()) {
@@ -66,7 +137,7 @@ object Screens {
         }
 
         col.addView(UI.button(a, L.t("about.title"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink, topDp = 20) {
-            a.push { about(a) }
+            a.push(Route.About)
         })
         return UI.scroller(a, col)
     }
@@ -94,16 +165,16 @@ object Screens {
             col.addView(UI.sectionHead(a, L.t(headKey)))
             for (need in NEEDS.filter { it.group == group }) {
                 val label = L.t("need.${need.id}")
-                val card = UI.tappableCard(a, label) { a.push { needScreen(a, need) } }
+                val card = UI.tappableCard(a, label) { a.push(Route.Need(need.id)) }
                 card.addView(UI.text(a, label, 18f, R.color.ink, bold = true))
                 col.addView(card)
             }
         }
 
         col.addView(UI.sectionHead(a, L.t("home.categories")))
-        for ((id, query) in CATEGORIES) {
+        for ((id, _) in CATEGORIES) {
             val label = L.t("cat.$id")
-            val card = UI.tappableCard(a, label) { a.push { results(a, label, query) } }
+            val card = UI.tappableCard(a, label) { a.push(Route.Category(id)) }
             card.addView(UI.text(a, label, 17f, R.color.ink))
             col.addView(card)
         }
@@ -152,10 +223,10 @@ object Screens {
         if (need.refine.isNotEmpty()) {
             for (r in need.refine) {
                 val label = L.t("refine.${need.id}.${r.id}")
-                val card = UI.tappableCard(a, label) {
-                    // A choice may bring its own numbers: the emergency-room list leads with 911.
-                    a.push { results(a, label, r.query, need.emptyKey, need.sensitive, r.first) }
-                }
+                // A choice may bring its own numbers: the emergency-room list leads with 911. Route.Refine looks
+                // both the need and the choice up again when the screen is drawn, so the list, the numbers and the
+                // empty-list wording cannot drift from what Needs.kt says.
+                val card = UI.tappableCard(a, label) { a.push(Route.Refine(need.id, r.id)) }
                 card.addView(UI.text(a, label, 18f, R.color.ink, bold = true))
                 col.addView(card)
             }
@@ -218,12 +289,17 @@ object Screens {
         return UI.scroller(a, col)
     }
 
+    /** The open-now pill. A holiday is never the open colour: the words say "Call first" and the colour agrees. */
+    private fun openPill(a: MainActivity, o: OpenResult): View =
+        if (o.state == OpenState.HOLIDAY) UI.pill(a, openText(o, a.today()), R.drawable.pill_warn, R.color.warn_ink)
+        else UI.pill(a, openText(o, a.today()))
+
     /** One row in a list: name, what you get, open now, the badge, and how far. Never a bare colour. */
     private fun listingCard(a: MainActivity, r: Ranked, showDistance: Boolean): View {
-        val card = UI.tappableCard(a, r.row.name) { a.push { detail(a, r.row) } }
+        val card = UI.tappableCard(a, r.row.name) { a.push(Route.Detail(r.row.id, r.row.category)) }
         card.addView(UI.text(a, r.row.name, 18f, R.color.ink, bold = true))
         if (r.row.what.isNotEmpty()) card.addView(UI.text(a, r.row.what, 16f, R.color.muted, topDp = 2))
-        card.addView(UI.pill(a, openText(r.open, a.today())))
+        card.addView(openPill(a, r.open))
         card.addView(UI.text(a, badgeText(r.badge), 14f, R.color.muted, topDp = 6))
         if (showDistance) r.miles?.let {
             card.addView(UI.text(a, L.t("miles", "miles" to String.format(L.locale(), "%.1f", it)), 14f, R.color.muted, topDp = 2))
@@ -243,8 +319,9 @@ object Screens {
         noteBar(a, col)
 
         val open = openNow(row, now, bundle?.alerts.orEmpty())
-        col.addView(UI.pill(a, openText(open, a.today())))
+        col.addView(openPill(a, open))
         col.addView(UI.text(a, badgeText(badge(row, now)), 15f, R.color.muted, topDp = 8))
+        holidayNote(open)?.let { col.addView(UI.pill(a, it, R.drawable.pill_warn, R.color.warn_ink)) }
         row.notice?.let { col.addView(UI.pill(a, it, R.drawable.pill_warn, R.color.warn_ink)) }
 
         // Call buttons show the number, so a person can read it, write it down, or dial it elsewhere. A listing
@@ -269,7 +346,8 @@ object Screens {
             val addr = row.address
             if (addr != null) {
                 col.addView(UI.sectionHead(a, L.t("detail.where")))
-                col.addView(UI.text(a, addr.line1 + ", " + addr.city + (addr.zip?.let { " $it" } ?: ""), 17f, R.color.ink))
+                // The separator is the reader's own (`list.sep`), not always a Latin comma and space.
+                col.addView(UI.text(a, joinParts(listOf(addr.line1, addr.city, addr.zip)), 17f, R.color.ink))
             } else if (showsPointWithoutAddress(row)) {
                 // Somewhere real that publishes no street address: say so in the source's own name, and let
                 // Directions below open the point. A coordinate is never printed as if it were an address.
@@ -304,7 +382,10 @@ object Screens {
             col.addView(UI.text(a, openText(open, a.today()), 16f, R.color.ink))
         } else {
             for (o in next) {
-                col.addView(UI.text(a, dayText(o.date, a.today()) + " " + clock(o.opensAt) + "-" + clock(o.closesAt), 16f, R.color.ink, topDp = 2))
+                // A holiday occurrence is labelled, never dropped (query-spec "Holidays").
+                val line = dayText(o.date, a.today()) + " " + clock(o.opensAt) + "-" + clock(o.closesAt) +
+                    if (o.holiday) " \u00b7 " + L.t("hours.holiday") else ""
+                col.addView(UI.text(a, line, 16f, if (o.holiday) R.color.warn_ink else R.color.ink, topDp = 2))
             }
         }
 
@@ -342,7 +423,10 @@ object Screens {
             send(a, row.id, CONFIRM_LISTING, "")
         })
         card.addView(note)
-        for (kind in LISTING_KINDS) {
+        // Not every kind on every listing: "Out of supplies or food today" is only offered where there are supplies,
+        // exactly as the web app and the iPhone app do it (listingKinds in ReportModel.kt, checked by ParityTest).
+        // This screen used to offer it on an emergency room (Android review, 2026-09-20).
+        for (kind in listingKinds(row.category)) {
             card.addView(UI.button(a, L.t("report.kind.$kind"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
                 send(a, row.id, kind, note.text.toString())
             })
@@ -353,15 +437,23 @@ object Screens {
 
     private fun send(a: MainActivity, targetId: String, kind: String, detail: String) {
         val nowMillis = a.now()
-        Thread {
-            // Building the report reads (or makes) the install secret, and sending it touches the network:
-            // neither belongs on the main thread.
-            val r = ReportStore.build(a, targetId, kind, detail, nowMillis)
-            val sent = ReportStore.submit(a, r)
-            a.runOnUiThread {
-                android.widget.Toast.makeText(a, L.t(if (sent) "report.sent" else "report.queued"), android.widget.Toast.LENGTH_LONG).show()
+        val app = a.applicationContext
+        // Building the report reads (or makes) the install secret, and sending it touches the network: neither
+        // belongs on the main thread. The shared network thread, not a new one per tap.
+        // Building reads (or writes) the install secret and queueing writes a file, and this phone's own storage can
+        // refuse both. Then nothing was sent and nothing is waiting, so the toast says that (`report.failed`, the
+        // sentence the iPhone shows) instead of thanking a person for a report that does not exist.
+        Work.net {
+            val key = try {
+                val r = ReportStore.build(app, targetId, kind, detail, nowMillis)
+                if (ReportStore.submit(app, r)) "report.sent" else "report.queued"
+            } catch (_: Throwable) {
+                "report.failed"
             }
-        }.start()
+            a.runOnUiThread {
+                android.widget.Toast.makeText(a, L.t(key), android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     // ---- Urgent help ---------------------------------------------------------------------------------------
@@ -378,8 +470,7 @@ object Screens {
         a.emergency("emg_911")?.let { e -> col.addView(UI.callButton(a, e.first, e.second, emergency = true) { a.dial(e.second) }) }
         a.emergency("emg_988")?.let { e -> col.addView(UI.callButton(a, e.first, e.second) { a.dial(e.second) }) }
 
-        val od = NEEDS.first { it.id == "overdose_now" }
-        val card = UI.tappableCard(a, L.t("od.title")) { a.push { needScreen(a, od) } }
+        val card = UI.tappableCard(a, L.t("od.title")) { a.push(Route.Need("overdose_now")) }
         card.addView(UI.text(a, L.t("od.title"), 18f, R.color.ink, bold = true))
         card.addView(UI.text(a, L.t("urgent.od_sub"), 16f, R.color.muted, topDp = 2))
         col.addView(card)
@@ -398,7 +489,9 @@ object Screens {
         val col = UI.column(a, 16)
         col.addView(UI.text(a, L.t("search.title"), 24f, R.color.ink, bold = true))
         col.addView(UI.text(a, L.t("search.hint"), 15f, R.color.muted, topDp = 4))
-        val box = UI.field(a, L.t("search.label"), L.t("search.label"))
+        // No autofill, no personalised keyboard learning, no suggestion strip: what is typed here is a street or the
+        // name of a clinic, and it stays on this phone (UI.field).
+        val box = UI.field(a, L.t("search.label"), L.t("search.label"), suggestions = false)
         col.addView(box)
         val out = UI.column(a)
         col.addView(UI.button(a, L.t("search.title")) {
@@ -454,10 +547,58 @@ object Screens {
         for (k in listOf("privacy.phone_1", "privacy.phone_2", "privacy.phone_3", "privacy.phone_4", "privacy.phone_5")) {
             col.addView(UI.text(a, L.t(k), 16f, R.color.ink, topDp = 6))
         }
+        // What is waiting to be sent, so nothing is queued out of sight, and a way to throw it away. Both are the
+        // web app's (`queuedCount`, `clearQueue`). The count is read in the background and cached, so drawing this
+        // screen never opens a file on the main thread.
+        val app = a.applicationContext
+        val countWhenDrawn = ReportStore.queued
+        val unreadableWhenDrawn = ReportStore.unreadable
+        Work.io {
+            ReportStore.queuedCount(app)
+            // Draw again only if reading the file changed the answer. Without that condition this screen would
+            // redraw itself forever, because drawing it is what starts the read.
+            if (ReportStore.queued != countWhenDrawn || ReportStore.unreadable != unreadableWhenDrawn) {
+                a.runOnUiThread { if (a.current() is Route.About) a.render() }
+            }
+        }
+        if (ReportStore.queued > 0 || ReportStore.unreadable) {
+            if (ReportStore.queued > 0) {
+                col.addView(UI.text(a, L.t("privacy.queued_note", "count" to ReportStore.queued.toString()), 16f, R.color.ink, topDp = 12))
+            }
+            // The control is here whenever there is anything to delete, including bytes that could not be read:
+            // otherwise the one case where a person most wants them gone is the case with no button.
+            col.addView(UI.button(a, L.t("privacy.queued_clear"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                Work.io {
+                    ReportStore.clearQueue(app)
+                    a.runOnUiThread {
+                        android.widget.Toast.makeText(a, L.t("privacy.queued_cleared"), android.widget.Toast.LENGTH_LONG).show()
+                        a.render()
+                    }
+                }
+            })
+        }
+        // A queue that could not be read is said out loud, never silently dropped: those were somebody's reports,
+        // and the bytes are kept beside the app's files for a steward to look at (ReportStore.read).
+        if (ReportStore.unreadable) {
+            col.addView(UI.pill(a, L.t("privacy.queued_unreadable"), R.drawable.pill_warn, R.color.warn_ink))
+        }
+
         col.addView(UI.text(a, L.t("privacy.reset"), 16f, R.color.ink, topDp = 12))
         col.addView(UI.button(a, L.t("privacy.reset_btn"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
-            ReportStore.resetInstallSecret(a)
-            android.widget.Toast.makeText(a, L.t("privacy.reset_done"), android.widget.Toast.LENGTH_LONG).show()
+            // Off the main thread: SecureRandom's first use in a process can wait on the kernel's entropy pool and
+            // this writes a file. On the main thread the reviewer measured the UI frozen for 3.6 seconds (Android
+            // review, 2026-09-20). What is already waiting in the outbox is not orphaned by this — every queued
+            // report's one-day hash is worked out again from the new key as it leaves (Reports.withCurrentNonce),
+            // so the promise the button makes is true of them too.
+            Work.io {
+                // The write can fail (a full or read-only data directory). Then the old key is still the key, and
+                // the screen says exactly that rather than claiming a new one (strings `privacy.reset_failed`).
+                val made = try { ReportStore.resetInstallSecret(app); true } catch (_: Throwable) { false }
+                a.runOnUiThread {
+                    val words = L.t(if (made) "privacy.reset_done" else "privacy.reset_failed")
+                    android.widget.Toast.makeText(a, words, android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
         })
         return UI.scroller(a, col)
     }

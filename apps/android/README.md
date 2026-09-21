@@ -7,9 +7,10 @@ Three Gradle modules:
   Plain Kotlin/JVM with **no dependencies at all**, so it runs in a unit test on a laptop and compiles unchanged
   into the app. **Compiled and green.**
 - **`core/`** — no sources of its own. It compiles the app's *android-free* files (`Ed25519.kt`, `Verify.kt`,
-  `Trace.kt`, `Listing.kt`, `Needs.kt`, `ReportModel.kt`, `SavedRules.kt`) and runs the app's own unit tests against them on
-  a plain JVM, so the signature check, the daily report hash and the needs list are checked on every build
-  whether or not anyone has an Android SDK. **Compiled and green.**
+  `Net.kt`, `Http.kt`, `Outbox.kt`, `Route.kt`, `Trace.kt`, `Listing.kt`, `Needs.kt`, `ReportModel.kt`,
+  `SavedRules.kt`) and runs the app's own unit tests against them on a plain JVM, so the signature check, the daily
+  report hash, the needs list, the network policy, the report queue's rules and which screens are private are
+  checked on every build whether or not anyone has an Android SDK. **Compiled and green.**
 - **`app/`** — the screens, the signed-bundle loader and the report queue. Platform Android views (no Jetpack
   Compose, no AndroidX), minSdk 24. **Compiled, tested, built and run** for the first time on 2026-09-20.
 
@@ -28,8 +29,16 @@ Three Gradle modules:
 > on an emulator** (AOSP `android-35` arm64, no Play Services) — Home, the refine screens, a results list, a
 > listing detail, Urgent help and Home in Arabic, all screenshotted. Five real errors were found and fixed; they
 > are listed under "What the first compile found", and two of them would have broken the app on every phone
-> below Android 15. Totals now:
-> **8 + 32 + 32 JUnit tests and 111 fixture cases, 0 failures.**
+> below Android 15.
+>
+> **State on 2026-09-20 (third entry).** Two adversarial reviews went through this app and found sixteen defects,
+> three of them serious enough to have shipped as bugs: a crash loop reachable before any signature was checked, a
+> class of public key under which any bundle would verify, and a provider lookup that could skip the only
+> verification code in this repository. All sixteen are dealt with below in
+> **"What two adversarial reviews found"** — fourteen fixed, two narrowed and written down rather than fixed. The
+> app was rebuilt, re-run on the emulator in English and Arabic, and put through a font-scale change mid-flow, a
+> domestic-violence screen, a quick exit, and a key reset during a stalled outbox flush. Totals now:
+> **11 + 61 + 61 JUnit tests and 181 fixture cases, 0 failures.**
 
 ## What Kyle has to do next
 
@@ -48,15 +57,17 @@ Three Gradle modules:
 Everything in this section was run on 2026-09-20 and passed, the `:app` lines included. From `apps/android`:
 
 ```sh
-./gradlew :query:test             # 8 tests: every case in schema/fixtures, plus tz, phone and JSON checks
-./gradlew :query:runFixtures      # the same 111 cases with no test framework on the classpath
-./gradlew :core:test              # 32 tests: Ed25519 vs RFC 8032, the real bundle's signature, the report
+./gradlew :query:test             # 11 tests: every case in schema/fixtures, plus tz (and the pre-1987 clamp),
+                                  # phone, and the JSON reader including its depth and length caps
+./gradlew :query:runFixtures      # the same 181 cases with no test framework on the classpath
+./gradlew :core:test              # 61 tests: Ed25519 vs RFC 8032, small-order keys, the real bundle's signature,
+                                  # the network and path rules, the report queue, which screens are private, the report
                                   # hash and schema, what cannot be saved, and the needs parity test
 ./gradlew test                    # all of the above at once
 ```
 
 `:core:test` checks the real signed bundle when there is one, so build it from the repository root first;
-without one those two assertions print "no bundle built ... skipping" and the other 30 tests still run:
+without one those three assertions print "no bundle built ... skipping" and the other 58 tests still run:
 
 ```sh
 pnpm build:bundle                 # a store build uses pnpm build:bundle:release
@@ -65,7 +76,7 @@ pnpm build:bundle                 # a store build uses pnpm build:bundle:release
 The `:app` half needs the SDK, and all of these were run on 2026-09-20:
 
 ```sh
-./gradlew :app:testDebugUnitTest  # the same VerifyTest and ParityTest: 32 tests, 0 failures
+./gradlew :app:testDebugUnitTest  # the same VerifyTest, ParityTest and GuardsTest: 61 tests, 0 failures
 ./gradlew :app:assembleDebug      # the APK — the app packages a bundle snapshot, so build:bundle first
 ./gradlew :app:lintDebug          # 0 errors, 7 warnings (listed under "What the first compile found")
 adb install -r app/build/outputs/apk/debug/app-debug.apk
@@ -86,7 +97,8 @@ Without an SDK, `:app` is not in the build at all: `settings.gradle.kts` prints 
 Android Gradle Plugin stack trace. The release gate in `app/build.gradle.kts` — two real pinned keys and a real
 `bundleBase`, or no release build — is untouched by this and still fails a release that does not pin them
 (checked again on 2026-09-20 with the SDK present: `:app:assembleRelease` stops at `checkReleaseKeys` and names
-both missing things).
+both missing things — and, since the same day, refuses a small-order Ed25519 point offered as a key, in either of
+its encodings, while letting two ordinary keys through).
 
 **`HELP313_NO_ANDROID=1` leaves `:app` out even when an SDK is installed.** This is how the JDK-only build is
 tested on a laptop that has an SDK, and it is what CI sets. It matters more than it sounds: a GitHub ubuntu
@@ -174,6 +186,239 @@ Lint (`:app:lintDebug`, run for the first time) reports **0 errors and 7 warning
 a newer AGP being available (three times), two unused resources (`ic_launcher_round`, `app_tagline`) and a
 missing monochrome launcher icon. None of them is a bug; the icon ones are already release blocker 3.
 
+## What two adversarial reviews found
+
+Sixteen findings, 2026-09-20, after the app had compiled and run. Every one is listed, with the test that would
+catch it coming back. The three marked **HIGH** are the ones that mattered.
+
+**HIGH 1 — a crash loop before anything was authenticated.** `Verify.kt` parsed `index.json.sig` with the JSON
+reader in `packages/query`'s Kotlin twin **before checking any signature**, and that reader recursed once per
+nesting level with no cap. 40 KB of `[[[[[…` from whoever answered for the bundle origin was 40,000 stack frames
+and a `StackOverflowError` — an `Error`, which `catch (e: Exception)` in `BundleStore` did not catch. It ended the
+loader thread, so the app never loaded a list again, and it happened again at every start. Fixed in three places,
+because one would have been enough and three is the point: `Json.parse` now caps depth at 64 and length at 16 MiB
+and throws its own ordinary exception; `verifiedIndex` caps the signature file at 64 KiB and the index at 1 MiB and
+catches `Throwable`; and every task on the loader thread is wrapped so that nothing it throws can take the thread
+with it. A bad download can only ever mean "keep the copy we have".
+*Tests: `FixtureTest.deeplyNestedJsonIsRefusedAndDoesNotOverflowTheStack` (tried at 20,000 and 200,000 deep),
+`FixtureTest.theNestingCapLeavesTheBundleRoomToBreathe`,
+`GuardsTest.aDeeplyNestedSignatureFileIsRefusedAndNeverThrowsAnError`,
+`GuardsTest.theSignatureFileHasASizeCeilingOfItsOwn`.*
+
+**HIGH 2 — a key under which any bundle verified.** Eight points on Curve25519 have order 1, 2, 4 or 8. Under a
+public key that is one of them, `[h]A` is the neutral point whatever `h` is, so cofactorless verification reduces
+to `[0]B = O = R` and a signature of 64 zero bytes verifies **any** message. Neither the release key gate nor
+`Ed25519` refused them. Now both do, and by different means on purpose: `Ed25519.verify` refuses by arithmetic
+(`[8]A` must not be the neutral point), which needs no list to be complete and covers any encoding that decompresses
+at all; the gate in `app/build.gradle.kts`, which runs before anything is compiled and cannot call app code, reads
+the seven byte encodings out of `Ed25519.kt` between that file's markers and fails the build if it does not find
+the number that file says it has — so the gate cannot quietly end up checking against nothing. The two
+non-canonical encodings (`y = p`, `y = p + 1`) are refused at verify time as "not a point" and by the gate as bytes.
+*Tests: `GuardsTest.aSmallOrderPublicKeyVerifiesNothing` (all 8 points, both sign bits — 14 encodings — against
+three messages, with the reviewer's all-zero signature), `GuardsTest.anOrdinaryPublicKeyIsNotSmallOrder`,
+`GuardsTest.theReleaseGateRefusesASmallOrderKeyToo`. Also run by hand: `:app:assembleRelease` with a small-order key
+stops at `checkReleaseKeys` and says "key 1 is a small-order Ed25519 point, under which any message verifies; it is
+not a key", for the canonical and the sign-bit-set form alike, while two ordinary keys still get through.*
+
+**HIGH 3 — the platform verification path is gone.** `verify` asked the platform first and took a "yes" as final.
+Two things were wrong with that. The lookup returned the *first* provider offering `KeyFactory/Ed25519`, so
+something else installed on the device decided whether this repository's code ran at all; and when that provider had
+no `Signature`, it fell back to the **default** provider's `Signature`, initialised with a key object built by a
+different one. The path is removed entirely, and the measurement this repository already had is why: there is no
+software Ed25519 provider on Android to be fast with. The emulator's own provider list, printed again on
+2026-09-20, is exactly the trap —
+
+```
+provider AndroidOpenSSL has [ConscryptHpke/DHKEM_X25519_...]        (not used)
+provider AndroidKeyStoreBCWorkaround has [Signature/Ed25519]        (not used)
+provider AndroidKeyStore has [KeyPairGenerator/ED25519, KeyFactory/ED25519]  (not used)
+```
+
+— `AndroidKeyStore` offers the `KeyFactory` (and cannot load a public key from bytes), `AndroidKeyStoreBCWorkaround`
+offers the `Signature`, and the old code would have picked the first and then reached for the default provider's
+second. So: one strict RFC 8032 implementation, the same accept/reject set on API 24 and API 35. The agreement with
+a reference implementation is still checked — in the unit tests, against the JVM's own SunEC, which the tests run on
+and a phone does not have.
+*Tests: `GuardsTest.theSoftwareImplementationAgreesWithTheJvmsOwnEd25519` (the RFC vectors, four one-bit signature
+corruptions, `s = L`, an off-curve key and a changed message — 9 of 10 cases answered by SunEC on this JDK),
+`GuardsTest.thereIsOnlyOneVerificationPath`, `VerifyTest.oneImplementationAnswersEveryCaseTheSameWayHoweverItIsCalled`.*
+
+**MEDIUM 4 — the phone's own name was going out on every request.** Nothing set a `User-Agent`, so
+`HttpURLConnection` sent Android's default: `Dalvik/2.1.0 (Linux; U; Android 15; <model> Build/<id>)` — the Android
+version, the device model and the build id, on requests this README described as carrying nothing about the person.
+Every connection now goes through one door, `Http.kt`, which sets the fixed `313Help-Android/<versionName>` and
+nothing else, clears the process-wide `CookieHandler` and `ResponseCache`, turns off the connection's own cache and
+refuses redirects. The report POST now requires https like the bundle GET, and no longer derives its address with
+`substringBefore("/data/bundle/")` and uses whatever comes out: `Net.apiRoot` returns a bare `https://host[:port]`
+or nothing at all. The comments in `BundleStore.kt` and `AndroidManifest.xml` that said "no headers of our own" are
+corrected — that sentence was true and was the bug.
+*Tests: `GuardsTest.theOnlyHeaderWeSendNamesTheAppAndNothingAboutThePhone`,
+`GuardsTest.theReportPostGoesToABareHttpsOriginOrNowhere`, `GuardsTest.onlyHttpsIsFetchedOrOpened`,
+`GuardsTest.everyConnectionGoesThroughOneDoor`.*
+
+**MEDIUM 5 — a lock held across the network, and a privacy control on the main thread.** Every method on
+`ReportStore` was `@Synchronized` on the object and `submit`/`flush` called `post` from inside that, so one report
+with no signal held the monitor for a 15-second connect plus a 30-second read and everything else that touched the
+queue waited behind it. And "Make a new key" ran `SecureRandom` and a disk write on the main thread — the reviewer
+froze the UI for 3.6 seconds. Now a lock is held only while a file is read or written, never while anything is on
+the network, and the slow things run in the background. What is waiting is shown on the privacy screen with a
+"Delete what is waiting" control, as the web app does. And the queued reports are not orphaned by a new key: each
+one's one-day hash is worked out again, from the secret this phone holds at that moment, as it leaves — the web
+app's `withCurrentNonce`, mirrored exactly.
+*Tests: `GuardsTest.noLockIsHeldAcrossTheNetwork` (it walks every `synchronized` block in the file and fails if one
+calls `post`), `GuardsTest.theSlowThingsAreOffTheMainThread`,
+`GuardsTest.theOneDayHashIsWorkedOutAgainWhenAQueuedReportLeaves`, `GuardsTest.nothingLocalWaitsBehindTheNetwork`,
+`GuardsTest.aKeyResetPartWayThroughAFlushAppliesToWhatIsLeft`.*
+
+> **Two of these were found by running it, not by reading it, and both were in the fix rather than the original.**
+> The first version of the fix put all background work on one thread. A flush of four queued reports against a host
+> that does not answer holds that thread for four fifteen-second connect timeouts — so "Make a new key", queued
+> behind it, did nothing for a full minute. The UI never froze, which is exactly why watching for jank would have
+> passed it: a privacy control that appears to have worked and has not is worse than a slow one. `Work.kt` now has
+> two threads, one for the two calls that talk to a server and one for everything local, which is the "never let the
+> network hold up something local" rule of the locks, one level up. The second: the flush read the install secret
+> *once* before its loop, so a key reset halfway through a slow flush would still have sent everything behind it
+> under the old key. It reads the secret per report now, as the web app does.
+
+**MEDIUM 6 — a kill mid-write threw away a person's reports.** `outbox.json` and `saved.json` were written with
+`writeText`, which truncates and then writes; a phone killed in between left a half-written file, and `queue()`
+caught the parse error and returned an empty list, so the queue was silently gone and the next write flattened it.
+Both files are now written to a temp file, `fsync`ed and renamed, which is atomic on one file system. And an outbox
+that cannot be read is no longer read as "you had nothing waiting": the bytes are moved aside under a unique name
+for a steward to look at, and the person is told, in words, that some reports could not be read and that nothing was
+deleted (`privacy.queued_unreadable`, added to all four language files).
+*Tests: `GuardsTest.anUnreadableQueueIsNeverMistakenForAnEmptyOne` (the shapes a kill actually leaves, the nesting
+bomb among them), `GuardsTest.aQueueRoundTripsAndIsCappedAtFifty`, `GuardsTest.aReportQueuedDuringAFlushIsNotLost`,
+`GuardsTest.whatThePersonGaveUsIsWrittenAtomically`.*
+
+**MEDIUM 7 — "Out of supplies or food today" on an emergency room.** The web app and the iPhone app both filter
+that report kind to the food and harm-reduction categories; this app offered all six kinds on every listing, so a
+steward's queue would have filled with an unanswerable question about a hospital. `listingKinds(category)` in
+`ReportModel.kt` is now the same rule, and `ParityTest` reads the web app's line and the iPhone app's line as text
+so a change in either fails here.
+*Test: `ParityTest.theOutOfSuppliesButtonIsOnlyOfferedWhereThereAreSupplies`. Seen on the emulator: the six kinds on
+a food pantry, the five on Corewell Health Dearborn Hospital's emergency room.*
+
+**MEDIUM 8 — a configuration change threw the person back to Home.** Only `orientation|screenSize|keyboardHidden`
+were declared, so changing the font size, turning on dark mode, changing the phone's language or entering
+multi-window destroyed and rebuilt the activity: the back stack was cleared, the bundle was verified all over again,
+and another `Executor` was started and never stopped. Three changes. Every configuration the app can answer itself
+is declared and answered in `onConfigurationChanged`, which re-reads the words and redraws the screen the person is
+on. The verified bundle and the loader thread live in one process-level `BundleStore`, so a recreation never
+re-verifies and never starts a second thread, and the executors are stopped in `onDestroy` when the activity is
+really finishing. And the back stack is now data — `Route.kt` — rather than a list of closures, so it can survive a
+recreation.
+
+**What was chosen for the stack, and why.** An **in-process retained holder**, and deliberately *not*
+`savedInstanceState`. docs/08 is a non-negotiable: triage answers live in memory only and are cleared on exit, and
+which need somebody tapped *is* a triage answer. `savedInstanceState` is written to disk by the system on its own
+schedule, so it is not "memory only" — `onSaveInstanceState` is not overridden at all, and a test asserts it stays
+that way. `Route.Retained` is a field in this process: it dies with the process, and `onDestroy` clears it when the
+activity is finishing. It also keeps only the **public** part of the stack, truncated before the first private
+screen. A recreation is not a navigation: if the system rebuilds the activity while a domestic-violence screen is
+open, re-opening that screen is the app deciding to, and the person may not be the one holding the phone by then. So
+it lands on the last ordinary screen instead.
+*Tests: `GuardsTest.aRecreationNeverPutsAPrivateScreenBack`, `GuardsTest.nothingAboutTheJourneyIsEverPersisted`,
+`GuardsTest.thereIsOneBundleStorePerProcess`. Seen on the emulator: four screens deep in "I need food → Food today",
+the font scale changed to 1.5 and back to 1.0 — the screen stayed on "Food today" both times, the process id did not
+change, and no `verify.signature` appeared in logcat, so the bundle was not re-verified. And after
+`adb shell am kill`, the app opens on **Home**: there is no `shared_prefs` directory and no route file on disk, only
+`install-secret` and `outbox.json`.*
+
+**MEDIUM 9 — text fields, screenshots and a way out.** The search box and the report note are now set up so the
+rest of Android does not take a copy: `IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS` (API 26+), so an autofill
+service is not offered the chance to fill — and therefore to *save* — a search for a shelter;
+`IME_FLAG_NO_PERSONALIZED_LEARNING`, so a keyboard does not learn from it; and no suggestion strip on the search box,
+which is a street or the name of a clinic. The note keeps its suggestions, because it is prose somebody is writing.
+`FLAG_SECURE` keeps the domestic-violence, crisis, treatment and assault screens out of the recents thumbnail, out
+of screenshots and off an external display. And those screens carry **"Leave this page fast"**, the same button the
+web app has, going to the same address.
+
+**Per-screen, not app-wide, and that is a decision.** The recents thumbnail is the one that matters: it is drawn by
+the system, it outlives the app being closed, and it is what somebody else sees when they pick the phone up and
+press the square button. But making the whole app unphotographable would take away something people actually use —
+screenshotting an address or a phone number to send to someone who is helping them. The compromise only works
+because it cannot be forgotten: the flag is set *and cleared* on every draw, from the route, in
+`MainActivity.render`, so a screen added later inherits the rule instead of having to opt in, and a screen that set
+it on the way in cannot leave it set on the way out.
+*Tests: `GuardsTest.theScreensThatMustNotBePhotographedAreTheOnesDocsSay`,
+`ParityTest.theSameScreensOfferAQuickExitInEveryApp` (which reads `quickExit` out of `apps/web/src/needs.ts`).
+Seen on the emulator: on "I'm not safe at home", `dumpsys window` shows `fl=... SECURE ...` and `screencap` returns
+a blank 17 KB PNG for a 1080×2340 screen; going back to the Help screen, `SECURE` is gone. In Arabic the same screen
+reads `غادر هذه الصفحة بسرعة` and is equally secure. Tapping it opened `https://www.weather.gov/` and the app's task
+left the recents list (`dumpsys activity recents` puts it under `mHiddenTasks`, not under `Recent tasks`).*
+
+**MEDIUM 10 — a signed index still does not get to name a path.** The index is Ed25519-signed, but a signed
+`../../shared_prefs/x` is still a path escape out of `filesDir`, and a signed name carrying `://` appended to the
+bundle base is still a different server. Signed means "a steward published this", not "this is safe to
+concatenate" — and the signing key is the one thing a release cannot rotate quickly. `Net.safeBundlePath` is a
+strict relative-path rule, and an index naming anything else is refused **whole**, as part of accepting it at all,
+rather than throwing somewhere deeper; the check is repeated where the `File` and the URL are actually built,
+because that is the line a future edit would add a name to. `ACTION_VIEW` on a website from the bundle now goes
+through an https allow-list (`Net.webLink`), as `apps/web/src/url.ts` does, and the other three schemes the app
+opens — `tel:`, `geo:`, `transit:` — are built from parts and never taken from data.
+*Tests: `GuardsTest.theSignedIndexCannotNameAPathOutsideTheBundle` (every name the pipeline actually writes, and
+twenty shapes that escape), `GuardsTest.anIndexNamingABadPathIsRefusedWhole`, `GuardsTest.onlyOurOwnSchemesAreOpened`.*
+
+**LOW 11 — section headings are headings now.** `UI.sectionHead` set a `contentDescription` and a comment claimed a
+screen reader announced it as a heading. It did not: a description is *what* to read, not *what kind of thing* it
+is, so "jump to next heading" found nothing on any screen. `setAccessibilityHeading(true)` is called on API 28 and
+up; below that Android has no way to say it. **Not observable through `uiautomator dump`**, which does not serialise
+that attribute, so this one is verified by reading the code and not by a screen reader — the honest state of it.
+
+**LOW 12 — "Call Emergency, 9 1 1".** The digit-by-digit description sat on the inner `TextView`, which is not
+focusable and sits inside a container with its own description, so a screen reader never reached it and read "911"
+as nine hundred and eleven. The spoken form is on the focusable row now, and the two lines inside are excluded from
+the accessibility tree so nothing is said twice. *Checked on the emulator: the clickable, focusable row's
+`content-desc` is `Call Emergency, 9 1 1` and the inner `911` node has an empty one.*
+
+**LOW 13 — saved places are not read from disk on the main thread.** Every listing detail and every draw of the
+Saved tab opened and parsed `saved.json`. It is read once, on the loader thread at start-up, and kept in memory;
+writes go to disk in the background. *Test: `GuardsTest.theSlowThingsAreOffTheMainThread`.*
+
+**LOW 14 — the time zone rule is honest about 1987 now.** `Time.kt` claimed the 1987–2006 rule was "kept for older
+stored dates", as if dates before 1987 were handled. Detroit's real history is nothing like the rules in that file:
+the window was the last Sunday in April from 1976 to 1986, it started in January 1974 and February 1975 under the
+Emergency Daylight Saving Time Energy Conservation Act, and **Michigan did not observe daylight saving at all from
+1969 to 1972**. Rather than implement forty years of repealed federal law that nothing in this app can exercise —
+every date here is a schedule a place published, a day a steward wrote down, or the moment a bundle was built — the
+rule is **clamped and documented**: an instant before 1987 is answered as Eastern Standard Time, the year round.
+Defined, written down at the top of the file, and pinned by a test rather than left undefined.
+*Test: `FixtureTest.theZoneRuleIsClampedBefore1987`, with two probe instants. 1 July 1970 noon UTC comes out 07:00,
+which history agrees with by accident (Michigan was on EST that year); 1 July 1985 noon UTC comes out 07:00 where
+history says 08:00, and that disagreement is the documented behaviour. 1 July 1987 comes out 08:00, where the rule
+is the rule.*
+
+**LOW 15 — "am" and "pm" come from the strings files.** `Format.clock` wrote them out in English, which made it the
+one place in the app where a sentence was built from English fragments. It reads `clock.am` and `clock.pm` now, and a
+list is joined with `list.sep`; all four language files have had all three keys all along. *Seen on the emulator in
+Arabic: `مغلق الآن. التالي: 25‏/09‏/2026 2 م` and `... 10 ص`, and an address as
+`8330 E. Jefferson، Detroit، 48214` with the Arabic comma rather than a Latin one.*
+
+**LOW 16 — the words are outside the signed bundle, and this says so.** `Strings.kt` reads
+`assets/strings/{en,es,ar,bn}.json`, which the build copies out of `strings/` at package time. Those files are
+**not** in the Ed25519-signed bundle and are not checksummed against it. That is correct and is not a gap: they are
+part of the APK, so they are covered by the APK's own signature, which Android verifies at install and which the app
+cannot be made to ignore. The signed bundle exists to authenticate data that arrives **over the network** after the
+app is installed; the app's own words never do. What a *place* wrote about itself does come from the bundle, and is
+signed. The one thing to keep in mind: adding a new language is a new APK, not a new bundle.
+
+### CI: the rules are in `:core` now
+
+`:core` covered `Ed25519`, `Verify`, `ReportModel` and `SavedRules`, but the *rules* inside `BundleStore` and
+`ReportStore` were mixed in with the Android around them and so were checked by nothing CI ran. Four files were
+split out, with no `android.` import in any of them, and named in `core/build.gradle.kts`:
+
+| file | what CI now runs |
+| --- | --- |
+| `Net.kt` | the one header, https only, the api root, safe bundle paths, the link allow-list |
+| `Http.kt` | compiled, and asserted to be the only place a connection is opened |
+| `Outbox.kt` | the queue's caps, what an unreadable file means, the merge after a flush |
+| `Route.kt` | which screens are private, and what may survive a recreation |
+
+So `HELP313_NO_ANDROID=1 ./gradlew :query:test :core:test` — which is exactly what the `android-query` job runs —
+covers all of it on a plain JDK. Checked both ways on 2026-09-20.
+
 ## The choices, and why
 
 **The app's android-free half is compiled and tested without the SDK.** `:app` cannot be configured without an
@@ -206,7 +451,7 @@ declared library and it is test-only; it never reaches a phone. Everything Gradl
 2026-09-20 was Apache-2.0 (Gradle 8.11.1, the Kotlin 2.0.21 plugin and standard library, `org.jetbrains:annotations`)
 except two test-only jars: JUnit 4.13.2 under the Eclipse Public Licence 1.0 and its `hamcrest-core` 1.3 under
 BSD-3-Clause. EPL-1.0 is not permissive — flagged for Kyle, and already Open in `docs/DECISIONS.md`. It is not
-distributed, and `./gradlew :query:runFixtures` runs all 111 fixture cases with no test framework on the
+distributed, and `./gradlew :query:runFixtures` runs all 181 fixture cases with no test framework on the
 classpath at all (CI runs that too), so dropping JUnit would cost only the `:core` and `:app` unit tests.
 
 **minSdk 24 (Android 7.0, 2016).** Nothing in the app needs more. Going to 21 would reach a few more phones but
@@ -255,9 +500,22 @@ here. A new string key needs no Android change at all.
 - Triage answers (the need chosen, the refinement, a location) are fields on `MainActivity` and nowhere else.
 - Reports carry a listing id, a kind, an optional note, a UTC time at minute granularity, and
   `sha256(install_secret ‖ target_id ‖ detroit_day)`. Nothing else exists to send. The secret is random and is
-  reset from the privacy screen.
-- Bundle fetches are plain HTTPS GETs with no header of ours, no cookies, no query string and no referrer.
-- Domestic violence, mental-health crisis, treatment and sexual-assault listings cannot be saved (audit A8).
+  reset from the privacy screen — and a report that was waiting in the outbox when that happened has its hash
+  worked out again from the new key as it leaves, so "Make a new key" is true of what is queued as well as of what
+  is sent next.
+- Bundle fetches and report posts are https, with **one header of ours**: the fixed `313Help-Android/<versionName>`,
+  which names the app and nothing about the phone. No cookies (the process-wide `CookieHandler` is set to null), no
+  cache (nor a `ResponseCache`), no redirects, no query string and no referrer. One place opens every connection,
+  `Http.kt`, so this cannot drift between the GET and the POST. **There is no debug exception for cleartext**: no
+  `networkSecurityConfig`, no localhost alias, `usesCleartextTraffic="false"` in every build. An emulator can point
+  at an https address, and a debug-only hole is a hole somebody forgets to close.
+- Domestic violence, mental-health crisis, treatment and sexual-assault listings cannot be saved (audit A8), are
+  kept out of the recents thumbnail and out of screenshots (`FLAG_SECURE`, set from the route on every draw), are
+  never restored by an activity recreation, and carry "Leave this page fast".
+- The search box and the report note ask Android not to autofill them, not to let the keyboard learn from them, and
+  (the search box) not to offer suggestions.
+- Nothing about where a person has been is written anywhere: no `SharedPreferences`, no `onSaveInstanceState`, no
+  route file. The back stack is a field in this process and dies with it.
 
 ## Pinned keys and the release gate
 
@@ -326,16 +584,14 @@ that can never be compiled. No release build is debuggable, so most of what was 
    arithmetic. Measured warm, best of twelve, in one process on the emulator: **38 ms → 24 ms**; on the JVM,
    5.6 ms → 3.3 ms. About 1.7×, which is what the operation count predicts (roughly 6,800 field multiplications
    down to 3,700) — a real gain, and much smaller than the interpreter effect above.
-4. **The platform's Ed25519 is used when there is one** — and there is not one. `Ed25519.verify` now asks every
-   installed provider, and on an API 35 image the only Ed25519 services are in `AndroidKeyStore` and
-   `AndroidKeyStoreBCWorkaround`, which serve hardware-held keys and will not load a public key from bytes.
-   `KeyFactory.getInstance("Ed25519")` returns `AndroidKeyStore` and then throws, which is why the first attempt
-   at this silently never ran. So the software path is what runs on every Android, API 33 or not. The platform
-   path stays, because it costs one lookup and will light up by itself on a device whose provider does support
-   it, and because a "yes" from it is the only thing it is allowed to decide: anything else falls through to the
-   software path, so a missing or odd provider can never refuse a good bundle or accept what API 24 would not.
-   `VerifyTest` puts the RFC 8032 vectors, four one-bit signature corruptions, an out-of-range scalar, a key that
-   is not on the curve and a changed message through **both** paths and asserts they never disagree.
+4. ~~**The platform's Ed25519 is used when there is one**~~ — **removed on 2026-09-20, later the same day.** The
+   finding was that there is no software Ed25519 provider on Android to be fast with (an API 35 image has it only in
+   `AndroidKeyStore` and `AndroidKeyStoreBCWorkaround`, both for hardware-held keys), so the path never ran — and
+   that as written it could let an unrelated provider decide whether this repository's verification code ran at all,
+   and then verify with the *default* provider's `Signature` using another provider's key object. There is one
+   implementation now, on every API level, with one accept/reject set. See **HIGH 3** under "What two adversarial
+   reviews found". The agreement with a reference implementation is kept in the unit tests, against the JVM's own
+   SunEC.
 
 **Before and after, same emulator.** Times to the first listing, and the signature check inside them:
 
@@ -384,14 +640,14 @@ future rewrite of the field arithmetic cannot quietly put this back.
 ## What has actually been verified
 
 Compiled and run on 2026-09-20, on JDK 17 (Homebrew `openjdk@17` 17.0.20.1) and Gradle 8.11.1 through the
-committed wrapper, with the Android SDK added later the same day. **72 JUnit test runs (8 in :query, 32 in
-:core, and the same 32 again under :app against the real Android classes) and 111 fixture cases, 0 failures.**
+committed wrapper, with the Android SDK added later the same day. **133 JUnit test runs (11 in :query, 61 in
+:core, and the same 61 again under :app against the real Android classes) and 181 fixture cases, 0 failures.**
 Re-run on 2026-09-20 after the cold-start work, with two tests added: the two verification paths never disagree,
 and one software verification stays inside a one-second budget.
 
-`./gradlew :query:test` — 8 tests:
+`./gradlew :query:test` — 11 tests:
 
-- Every case in `schema/fixtures/*.json`: **111 of 111**, the same files and the same expectations
+- Every case in `schema/fixtures/*.json`: **181 of 181**, the same files and the same expectations
   `packages/query` and `apps/ios` are held to. Open-now, next occurrences, badges, ranking, search, bundle age,
   greenway distances.
 - The Detroit wall-clock rule in `Time.kt` compared field by field against the JVM's own tz database, 2024–2031
@@ -400,13 +656,28 @@ and one software verification stays inside a one-second budget.
 - Calendar arithmetic round-tripped at 1,103 dates spread over 40,800 days, `tel:` links with and without
   extensions, and the JSON reader on the shapes the bundle uses.
 
-`./gradlew :core:test` — 32 tests, against `:app`'s own source files:
+`./gradlew :core:test` — 61 tests, against `:app`'s own source files:
 
 - `Ed25519.verify` against the RFC 8032 section 7.1 vectors (**3 of 3**), against tampered signatures, tampered
-  messages and the wrong key (**all refused**), and against malformed input (**false, never a throw**). Every one
-  of those goes through the software path explicitly as well as through `verify`, and ten cases — the vectors,
-  four one-bit signature corruptions, `s` equal to the group order, a key that is not on the curve and a changed
-  message — through the platform path too, asserting the two **never disagree**.
+  messages and the wrong key (**all refused**), and against malformed input (**false, never a throw**). Ten cases —
+  the vectors, four one-bit signature corruptions, `s` equal to the group order, a key that is not on the curve and
+  a changed message — also go through the **JVM's own SunEC**, asserting this implementation and a reference one
+  never disagree (9 of the 10 answered by SunEC on this JDK; the tenth it will not take as input).
+- **Small-order public keys are refused.** All eight points whose order divides 8, in both sign-bit forms — fourteen
+  encodings — with the all-zero 64-byte signature that would otherwise verify every message, against three different
+  messages. The list the release gate reads out of `Ed25519.kt` is asserted to be the same one, so the arithmetic and
+  the gate cannot drift apart.
+- **The JSON reader cannot be made to overflow the stack**, and an `index.json.sig` — which is parsed before any
+  signature is checked — is refused as an ordinary error at 20,000 levels deep, at 200,000, and above 64 KiB.
+- **The network policy**: one fixed header that names no device, https only for the bundle GET *and* the report POST,
+  an api root that is a bare origin or nothing, an https allow-list before anything reaches `ACTION_VIEW`, and one
+  place in the app that opens a connection at all.
+- **A signed index still cannot name a file path**: every name the pipeline writes is accepted, and twenty shapes
+  that would escape `filesDir` or change the server are refused — and the whole index with them.
+- **The report queue**: a half-written file is kept and reported rather than read as empty, the cap is the web app's
+  fifty newest, a report queued while a flush is on the network is not lost, and a queued report's one-day hash is
+  worked out again from the current key as it leaves.
+- **Which screens are private**, and that an activity recreation never puts one of them back.
 - One software verification of the real signature finishes well inside a second (2 ms on the JVM the tests run
   on; the budget is 1,000 ms, so a slow rewrite of the field arithmetic fails the build).
 - The real `data/bundle/v1/index.json.sig` **verifies**, a changed index is **refused**, a build that pins no
@@ -423,7 +694,7 @@ and one software verification stays inside a one-second budget.
   same choices, categories, modes, `prefer` and `first`; every key the app asks for exists in `strings/en.json`
   and `strings/es.json`; the retired `tab.rec` and `tab.transit` are asked for nowhere.
 
-`./gradlew :app:testDebugUnitTest` — the same 24 tests again, this time compiled against the real Android
+`./gradlew :app:testDebugUnitTest` — the same 61 tests again, this time compiled against the real Android
 classes and run on the SDK's own JVM, so the files `:core` checks are checked a second time in their actual home.
 
 **And, on 2026-09-20, the app ran.** Emulator, AOSP `system-images;android-35;default;arm64-v8a` (no Google Play
@@ -447,9 +718,40 @@ insets fix. What was seen with human eyes, in this order:
   phone's language with no setting of its own, and the four strings files ship in the APK
   (`assets/strings/{en,es,ar,bn}.json`).
 
-The APK itself was unpacked and checked: **two permissions only**, `INTERNET` and `ACCESS_COARSE_LOCATION`;
+**And again, after the review fixes, on the same emulator.** What was checked by hand this time, in this order:
+
+- **A cold start** — Urgent help drawn in 12 ms, the signature 4.3 s (a plain debuggable build, so interpreted; see
+  "Cold start" above), the list up at 6.6 s. No exception in logcat.
+- **A font-scale change mid-flow** — four screens into "I need food → Food today", `font_scale` set to 1.5 and back
+  to 1.0. The screen **stayed on "Food today"** both times, the process id did not change, and no `verify.signature`
+  appeared, so the bundle was not re-verified. (Rapid tab-switching *can* skip frames — each screen is rebuilt in
+  code on every draw, and a 40-card Help screen is real work — but a configuration change no longer destroys and
+  rebuilds anything.)
+- **A domestic-violence screen** — "Leave this page fast" at the top, `dumpsys window` showing `fl=... SECURE ...`,
+  and `screencap` returning a blank 17 KB PNG for a 1080×2340 screen. Going back to the Help screen, `SECURE` is
+  gone. The same screen in Arabic: `غادر هذه الصفحة بسرعة`, equally secure.
+- **The quick exit** — opened `https://www.weather.gov/` and the app's task left the recents list entirely
+  (`dumpsys activity recents` puts it under `mHiddenTasks`, not under `Recent tasks`).
+- **Arabic** — am/pm as `ص` and `م` from the strings files (`... 25‏/09‏/2026 2 م`), and an address joined with the
+  Arabic comma (`8330 E. Jefferson، Detroit، 48214`) rather than a Latin one.
+- **The report buttons** — six kinds on a food pantry, five on Corewell Health Dearborn Hospital's emergency room:
+  no "Out of supplies or food today".
+- **Airplane mode, three reports queued, then "Make a new key" during a stalled flush.** The build was pointed at
+  `https://10.255.255.1/…` so every send really hangs for its full 15-second connect timeout. The privacy screen
+  read "4 waiting to send from this phone" with "Delete what is waiting"; the key changed within 4 seconds of the
+  tap; and **zero** `Choreographer: Skipped frames` lines came from the app's process across 24 taps during it. (The
+  first version of the fix failed exactly here — see the note under MEDIUM 5.)
+- **A killed process** — `adb shell am kill` while on "Food today"; the app reopens on **Home**, and
+  `/data/data/.../` holds no `shared_prefs` and no route file, only `install-secret` and `outbox.json`.
+
+The APK itself was unpacked and checked again: **two permissions only**, `INTERNET` and `ACCESS_COARSE_LOCATION`;
 `allowBackup="false"`; `usesCleartextTraffic="false"`; no AndroidX, no Play Services, no Firebase, no HTTP or
-JSON library — nothing under `androidx/`, `com/google/` or any third-party package at all.
+JSON library — nothing under `androidx/`, `com/google/` or any third-party package at all. 1,251,867 bytes
+(1.19 MiB) — about 60 KB more than before the review fixes.
+
+Two things in this round are **not** observable from outside and are verified by reading the code rather than by
+watching it: `setAccessibilityHeading(true)` and the text fields' autofill and IME flags. `uiautomator dump` does
+not serialise any of them, and confirming them properly needs a screen reader and an autofill service on the device.
 
 Still unverified: **a real phone**. Everything above is an emulator on a laptop. There are still no instrumented
 tests, nothing has run on hardware, and nothing below Android 15 has run the app at all — which matters, because
@@ -514,7 +816,10 @@ Not built:
 1. ~~The `:app` half has never been compiled.~~ Done on 2026-09-20: it compiles, its tests pass, it assembles and
    it runs. See the two sections above for the five errors that first compile and first run found.
 2. Two real pinned keys and a real `bundleBase` (the build refuses a release without them). Checked again with
-   the SDK present: `:app:assembleRelease` stops at `checkReleaseKeys` and names what is missing.
+   the SDK present: `:app:assembleRelease` stops at `checkReleaseKeys` and names what is missing. Since
+   2026-09-20 the gate also refuses a public key of order 1, 2, 4 or 8 — under such a key an all-zero signature
+   verifies any message — reading the eight points out of `Ed25519.kt` so the gate and the runtime check cannot
+   disagree (see HIGH 2 above).
 3. No app icon and no launch artwork: `res/drawable/ic_launcher_*.xml` is a placeholder mark. Lint also asks for
    a monochrome icon, and `ic_launcher_round` is unused.
 4. **Nothing has run on a real phone, and nothing has run below Android 15.** The emulator run on 2026-09-20 was
@@ -536,6 +841,16 @@ Not built:
 6. `MainActivity.onBackPressed` is the deprecated form. It still works at `targetSdk` 35 — it was used on the
    emulator and worked — but it should move to `OnBackInvokedCallback` before a store release. It is the only
    warning the Kotlin compiler emits.
+
+9. **Two things from the 2026-09-20 reviews are verified by reading, not by running**: the accessibility heading
+   (LOW 11) and the text fields' autofill and IME flags (MEDIUM 9). `uiautomator dump` serialises none of them.
+   Confirming them needs TalkBack and an autofill service on a device, which is the same session as release
+   blocker 4.
+10. **Rapid navigation can skip frames.** Every screen is rebuilt in code on every draw — there is no view recycling
+   and no `RecyclerView` — so tapping between tabs as fast as possible skipped 81 frames once on this emulator. It
+   is not a lock, a disk read or the network (all of those were moved off the main thread and measured at zero
+   skipped frames while a flush was stalled), and it is the same cost the app has always had for opening a screen.
+   A long list is the case to watch on a cheap phone.
 7. **Cold start, mostly fixed, but never measured on an old phone.** The twenty-second wait of 2026-09-20 was
    found and dealt with — see "Cold start, and where the twenty seconds went" for the measurements, what changed
    and why the verify-once-per-version cache was rejected. What is *not* done: every number is from an emulator

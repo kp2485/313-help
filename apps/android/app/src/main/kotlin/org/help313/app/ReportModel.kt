@@ -67,6 +67,17 @@ class Report(
 val LISTING_KINDS = listOf("closed_permanently", "moved", "wrong_hours", "wrong_phone", "out_of_stock", "wrong_info")
 const val CONFIRM_LISTING = "confirmed_ok"
 
+/**
+ * The report buttons one listing gets. "Out of supplies or food today" only makes sense where there are supplies:
+ * offering it on an emergency room, a legal-aid office or a job centre is a question nobody can answer, and a
+ * steward would get a queue of them (Android review, 2026-09-20 — this app offered it on every listing).
+ *
+ * Exactly the web app's rule, `LISTING_KINDS.filter((k) => k !== 'out_of_stock' || /^(food|harm)/.test(category))`
+ * in apps/web/src/main.ts, and the iPhone app's `ReportKinds.listing(for:)`. ParityTest holds the three together.
+ */
+fun listingKinds(category: String): List<String> =
+    LISTING_KINDS.filter { it != "out_of_stock" || category.startsWith("food") || category.startsWith("harm") }
+
 /** The rules a report follows. No file, no network, no Context: see ReportStore for those. */
 object Reports {
 
@@ -102,4 +113,21 @@ object Reports {
 
     /** Worth trying again later: the server was busy, rate-limited us, timed out, or could not be reached. */
     fun retryable(status: Int): Boolean = status >= 500 || status == 429 || status == 408
+
+    /**
+     * The report as it should actually leave the phone: its one-day hash worked out again, now, from the secret
+     * this phone holds now.
+     *
+     * "Make a new key" is a promise that nothing sent after it can be matched to anything sent before it. A report
+     * that sat in the outbox with no signal and then went out carrying the *old* key would have broken that
+     * promise silently, hours later — the web app found this first (apps/web/src/report.ts `withCurrentNonce`,
+     * web review 2026-09-20) and this is the same fix, so the two apps behave identically.
+     *
+     * The day is the one the report was *observed* on, not today, so a report queued yesterday still dedupes
+     * against yesterday's reports of the same listing rather than becoming a second one.
+     */
+    fun withCurrentNonce(secret: String, r: Report): Report {
+        val observed = org.help313.query.parseInstant(r.observedAt) ?: return r
+        return Report(r.targetId, r.kind, r.detail, r.observedAt, nonce(secret, r.targetId, observed))
+    }
 }

@@ -6,9 +6,26 @@
 //
 // Why the zone rule is written out here instead of java.time: java.time needs API 26, or core-library desugaring
 // and the dependency that comes with it. This module has no dependencies at all, so it runs on API 24 phones and in
-// a plain JVM test with nothing installed but Kotlin. The rule below is the United States rule in force since 2007
-// (Energy Policy Act of 2005), with the 1987-2006 rule kept for older stored dates. Michigan has observed it
-// without exception. If the rule ever changes, this file and schema/query-spec.md change together.
+// a plain JVM test with nothing installed but Kotlin.
+//
+// **The rule is correct from 1987 onwards, and not before.** Two rules are implemented: the United States rule in
+// force since 2007 (Energy Policy Act of 2005 — second Sunday in March to first Sunday in November) and the
+// 1987-2006 one (first Sunday in April to last Sunday in October). Michigan has observed both without exception.
+// An instant before 1987 is answered as Eastern Standard Time, the year round: the rule is clamped to the year it
+// is valid from, so no daylight window is ever found in an earlier year. That is a defined answer rather than a
+// correct one, and this file used to claim it was correct (Android review, 2026-09-20). Detroit's actual history is
+// nothing like the rules here: the window was the last
+// Sunday in April from 1976 to 1986, it started in January 1974 and in February 1975 under the Emergency Daylight
+// Saving Time Energy Conservation Act, and Michigan did not observe daylight saving at all from 1969 to 1972, when
+// the whole state sat on Eastern Standard Time the year round.
+//
+// Nothing in this app has a date before 1987 in it, and nothing ever will: every date here is a schedule a place
+// published, a day a steward wrote down, or the moment a bundle was built. So the clamp is deliberate rather than a
+// gap to fill — implementing forty years of repealed federal law would be code nobody can check against anything
+// this app reads. `FixtureTest.theZoneRuleIsClampedBefore1987` pins what the clamp actually does at two instants
+// where history and this file disagree, so the behaviour is documented rather than merely undefined.
+//
+// If the rule ever changes, this file and schema/query-spec.md change together.
 package org.help313.query
 
 /** Minutes past midnight 1970-01-01 on a floating Detroit wall clock (as if the wall time were UTC). */
@@ -63,8 +80,16 @@ private fun nthSunday(y: Int, m: Int, n: Int): Int {
  * (02:00 daylight time, which is 01:00 standard). That is what makes the 1:30am that happens twice on fall-back
  * night come out as 01:30 both times, which fixture 02-overnight.json checks.
  */
+/** The first year this file's rules are actually the rules Detroit kept. Before it, [isDaylight] clamps. */
+const val ZONE_RULE_FROM_YEAR = 1987
+
 private fun isDaylight(standardMinutes: Long): Boolean {
-    val y = civil(floorDivLong(standardMinutes, DAY.toLong()).toInt()).y
+    val actual = civil(floorDivLong(standardMinutes, DAY.toLong()).toInt()).y
+    // Clamped, and said out loud rather than implied. The window is computed for 1987 even for a 1970 instant, and
+    // a 1970 instant is never inside a 1987 window, so every pre-1987 moment comes out as Eastern Standard Time.
+    // Defined, documented, and not what Detroit did — see the top of this file. No date this app handles is that
+    // old, and FixtureTest.theZoneRuleIsClampedBefore1987 holds this behaviour still.
+    val y = if (actual < ZONE_RULE_FROM_YEAR) ZONE_RULE_FROM_YEAR else actual
     val start: Int
     val end: Int
     if (y >= 2007) {

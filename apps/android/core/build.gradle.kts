@@ -31,13 +31,24 @@ kotlin.sourceSets["test"].kotlin.setSrcDirs(listOf(appTest))
 // The android-free files, named one by one so that adding a screen never silently drags android.* in here.
 kotlin.sourceSets["main"].kotlin.include(
     "org/help313/app/Trace.kt",          // debug-only timing hook (see Trace.kt)
-    "org/help313/app/Ed25519.kt",        // RFC 8032 verification
+    "org/help313/app/Ed25519.kt",        // RFC 8032 verification, and the small-order keys it refuses
     "org/help313/app/Verify.kt",         // what makes a bundle acceptable
+    "org/help313/app/Net.kt",            // https, the one header, the api root, safe bundle paths, safe links
+    "org/help313/app/Http.kt",           // the one place a connection is opened (java.net only)
+    "org/help313/app/Outbox.kt",         // the report queue's own rules: caps, corruption, merge after a flush
+    "org/help313/app/Route.kt",          // which screens are private, and what survives a recreation
     "org/help313/app/Listing.kt",        // directions, call buttons, points with no address
     "org/help313/app/Needs.kt",          // the needs list, categories, the hardcoded numbers
-    "org/help313/app/ReportModel.kt",    // what a report is, and the daily hash
+    "org/help313/app/ReportModel.kt",    // what a report is, the daily hash, and which kinds a listing offers
     "org/help313/app/SavedRules.kt",     // what may not be saved at all
 )
+
+// Why the four new names above (Android review, 2026-09-20). :core used to cover Ed25519, Verify, ReportModel and
+// SavedRules, but the *rules* inside BundleStore and ReportStore were mixed in with the Android that surrounds them
+// and so were checked by nothing CI runs: which paths a signed index may name, what header goes out, where a report
+// is posted, what happens to the queue when a flush and a tap overlap, and whether a screen may be photographed.
+// Those are now Net.kt, Http.kt, Outbox.kt and Route.kt, with no android.* class in any of them, so
+// `HELP313_NO_ANDROID=1 ./gradlew :core:test` runs every one of them on a plain JDK.
 
 dependencies {
     api(project(":query"))

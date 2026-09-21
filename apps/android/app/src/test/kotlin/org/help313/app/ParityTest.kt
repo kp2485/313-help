@@ -127,6 +127,8 @@ class ParityTest {
             "quick.food", "quick.shelter", "quick.doctor", "quick.narcan",
             "report.sent", "report.queued", "about.sig_dev", "about.sig_ok",
             "home.no_data", "home.loading",
+            // Chosen inside an `if` in Format.clock, and asked for on a listing that has no street address.
+            "clock.am", "clock.pm", "detail.not_found",
         )
         for (key in built) if (!en.containsKey(key)) missing += "built: $key"
         assertEquals("string keys the app asks for that strings/en.json does not have", emptyList<String>(), missing)
@@ -141,6 +143,67 @@ class ParityTest {
                 assertFalse("${file.name} asks for the retired key $key", body.contains("\"$key\""))
             }
         }
+    }
+
+    // ---- which report buttons one listing gets ---------------------------------------------------------------
+
+    /**
+     * "Out of supplies or food today" is offered only where there are supplies. The Android app offered it on every
+     * listing, an emergency room included (Android review, 2026-09-20); the web app and the iPhone app both filter
+     * it. All three now use the same rule, so this test reads theirs and checks ours behaves the same way.
+     */
+    @Test
+    fun theOutOfSuppliesButtonIsOnlyOfferedWhereThereAreSupplies() {
+        // Ours.
+        for (category in listOf("food", "food.pantry", "food.meal", "harm", "harm.narcan", "harm.supplies")) {
+            assertTrue("$category should offer out_of_stock", listingKinds(category).contains("out_of_stock"))
+            assertEquals("no other kind may be dropped", LISTING_KINDS.size, listingKinds(category).size)
+        }
+        for (category in listOf("health.er", "health.urgent", "health.clinic", "shelter.emergency", "legal",
+            "jobs.find", "treatment.detox", "rec", "shelter.dv", "")) {
+            assertFalse("$category must not offer out_of_stock", listingKinds(category).contains("out_of_stock"))
+            assertEquals(LISTING_KINDS.size - 1, listingKinds(category).size)
+        }
+        // The order of the ones that stay is the order in LISTING_KINDS, which is the order all three apps show.
+        assertEquals(LISTING_KINDS.filter { it != "out_of_stock" }, listingKinds("legal"))
+
+        // The web app's rule, as text: a change there fails here rather than drifting quietly.
+        val web = text("apps/web/src/main.ts")
+        assertTrue(
+            "apps/web/src/main.ts no longer filters out_of_stock the way this app does",
+            web.contains("""LISTING_KINDS.filter((k) => k !== 'out_of_stock' || /^(food|harm)/.test(category))"""),
+        )
+        // And the iPhone app's. Its file has moved once already (HelpApp -> Sources/HelpCore), so it is found by
+        // what it declares rather than by where it happens to live.
+        val ios = swiftFileDeclaring("enum ReportKinds")
+        assertNotNull("no Swift file declares ReportKinds any more", ios)
+        assertTrue(
+            "${ios!!.path} no longer filters out_of_stock the way this app does",
+            ios.readText().contains(""" != "out_of_stock" || category.hasPrefix("food") || category.hasPrefix("harm")"""),
+        )
+        // The screen must actually use the filter rather than the raw list.
+        val screens = text("apps/android/app/src/main/kotlin/org/help313/app/Screens.kt")
+        assertTrue("Screens.kt loops over the unfiltered LISTING_KINDS again", screens.contains("listingKinds(row.category)"))
+        assertFalse("Screens.kt loops over the unfiltered LISTING_KINDS again", screens.contains("for (kind in LISTING_KINDS)"))
+    }
+
+    /**
+     * The screens that offer "Leave this page fast" are the screens the web app marks `quickExit` — checked by
+     * `needsMatchTheWebApp` above, which now carries the flag in the line it compares, and asserted here as the set
+     * the reviewer named so that a failure says which screen changed.
+     */
+    @Test
+    fun theSameScreensOfferAQuickExitInEveryApp() {
+        assertEquals(
+            listOf("unsafe", "talk", "drugs", "assault"),
+            NEEDS.filter { it.quickExit }.map { it.id },
+        )
+        val web = text("apps/web/src/needs.ts")
+        val webExit = Regex("\\{ id: '([a-z_]+)'[^\\n]*quickExit: true").findAll(web).map { it.groupValues[1] }.toList()
+        assertEquals("the two apps put the quick exit on different screens", webExit, NEEDS.filter { it.quickExit }.map { it.id })
+        // The address is the same in both apps, so what someone learns on one is true of the other.
+        assertTrue(text("apps/web/src/main.ts").contains("https://www.weather.gov/"))
+        assertEquals("https://www.weather.gov/", Net.QUICK_EXIT_URL)
     }
 
     /** The shelter screen's link card is a key into the strings files, not a name typed into the code. */
@@ -291,7 +354,8 @@ class ParityTest {
         // A need with choices carries no query of its own; without them, its query is on the need.
         val query = if (body == null) queryLine(head) else "cat=- mode=- prefer=-"
         val line = "$id group=$group first=${list(head, "first")} steps=${flag(head, "stepsOnly")} " +
-            "sensitive=${flag(head, "sensitive")} intro=${value(head, "intro") ?: "-"} " +
+            "sensitive=${flag(head, "sensitive")} exit=${flag(head, "quickExit")} " +
+            "intro=${value(head, "intro") ?: "-"} " +
             "empty=${value(head, "emptyKey") ?: "-"} $query"
         return Parsed(id, line, refine)
     }
@@ -404,6 +468,12 @@ class ParityTest {
         }
         return out
     }
+
+    /** The one Swift file in apps/ios that declares `what`, wherever the iPhone app keeps it today. */
+    private fun swiftFileDeclaring(what: String): File? =
+        File(root, "apps/ios").walkTopDown()
+            .filter { it.isFile && it.name.endsWith(".swift") }
+            .firstOrNull { it.readText().contains(what) }
 
     private fun kotlinSources(): List<File> =
         (File(root, "apps/android/app/src/main/kotlin/org/help313/app").listFiles() ?: emptyArray())

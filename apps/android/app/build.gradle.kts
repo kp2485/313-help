@@ -31,6 +31,51 @@ fun hexOfBase64(b64: String): String? = try {
     null
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// Small-order public keys, refused here as well as at verify time (Android review, 2026-09-20).
+//
+// A public key of order 1, 2, 4 or 8 makes [h]A the neutral point for every h, so in cofactorless Ed25519 an
+// all-zero 64-byte signature verifies *any* message under it. This gate is the moment those keys would be baked
+// into a store release and become unfixable without shipping a new app, so it is the moment to refuse them.
+//
+// The list is not written out twice. A build script cannot call the app's own code — it runs before anything is
+// compiled — so it reads the list out of Ed25519.kt as text, between that file's markers, and fails the build if
+// it does not find the number of entries that file says it has. One list, one file, and a gate that cannot
+// silently end up checking against nothing (which is the failure mode a duplicated constant would have).
+// ---------------------------------------------------------------------------------------------------------------
+
+/** The 32-byte encodings of the small-order points, lowercase hex with the sign bit cleared, read from Ed25519.kt. */
+val smallOrderKeys: Set<String> = run {
+    val source = File(repoRoot, "apps/android/app/src/main/kotlin/org/help313/app/Ed25519.kt")
+    val text = if (source.isFile) source.readText() else ""
+    val from = text.indexOf("SMALL-ORDER PUBLIC KEYS (begin)")
+    val to = text.indexOf("SMALL-ORDER PUBLIC KEYS (end)")
+    val expected = Regex("SMALL_ORDER_COUNT\\s*=\\s*(\\d+)").find(text)?.groupValues?.get(1)?.toIntOrNull()
+    if (from < 0 || to < from || expected == null) {
+        throw GradleException(
+            "313 Help: could not read the small-order key list out of ${source.absolutePath}. The release key gate " +
+                "refuses public keys of order 1, 2, 4 and 8, and it reads them from that file between its " +
+                "\"SMALL-ORDER PUBLIC KEYS\" markers. Do not delete either the markers or SMALL_ORDER_COUNT."
+        )
+    }
+    val found = Regex("\"([0-9a-f]{64})\"").findAll(text.substring(from, to)).map { it.groupValues[1] }.toSet()
+    if (found.size != expected) {
+        throw GradleException(
+            "313 Help: Ed25519.kt says SMALL_ORDER_COUNT = $expected small-order keys but the release gate found " +
+                "${found.size} between its markers. A gate that reads the wrong number of keys is a gate that is " +
+                "not checking, so this build stops here."
+        )
+    }
+    found
+}
+
+/** True for any encoding of a point whose order divides 8. The sign bit carries no information here. */
+fun isSmallOrderKey(rawHex: String): Boolean {
+    if (rawHex.length != 64) return false
+    val top = rawHex.substring(62).toIntOrNull(16) ?: return false
+    return smallOrderKeys.contains(rawHex.substring(0, 62) + "%02x".format(top and 0x7f))
+}
+
 /** Empty when there are exactly two different Ed25519 public keys (active + spare). Port of releaseKeyProblems. */
 fun releaseKeyProblems(keys: List<String>): List<String> {
     val out = mutableListOf<String>()
@@ -39,6 +84,9 @@ fun releaseKeyProblems(keys: List<String>): List<String> {
         val h = hexOfBase64(k)
         if (h == null || h.length != 88 || !h.startsWith(spkiEd25519)) {
             out += "key ${i + 1} is not a base64 SPKI Ed25519 public key"
+        } else if (isSmallOrderKey(h.substring(spkiEd25519.length))) {
+            // Under such a key an all-zero signature verifies every message, so this is not a typo to warn about.
+            out += "key ${i + 1} is a small-order Ed25519 point, under which any message verifies; it is not a key"
         }
     }
     if (keys.size == 2 && keys[0] == keys[1]) out += "the active and spare keys are the same key"

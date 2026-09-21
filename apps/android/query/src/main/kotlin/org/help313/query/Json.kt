@@ -6,6 +6,13 @@
 //
 // It is deliberately strict. Anything it cannot read throws, and every caller treats that as "refuse the file",
 // never as "guess".
+//
+// It is also bounded, which matters more than strictness. `value()` recurses once per nesting level, so 40 KB of
+// "[[[[[[…" is 40,000 stack frames and a StackOverflowError — an Error, not an Exception, which slips past
+// `catch (e: Exception)`. The app parses `index.json.sig` *before* any signature has been checked (Verify.kt), so
+// that input is whatever answered for the bundle origin: unbounded recursion there killed the loader thread and
+// did it again at every start (Android review, 2026-09-20). Depth and length are capped below, both failures are
+// an ordinary JsonException, and the caller refuses the file as it would any other malformed one.
 package org.help313.query
 
 sealed class Json {
@@ -35,11 +42,29 @@ sealed class Json {
     fun strings(key: String): List<String> = (get(key)?.arr ?: emptyList()).mapNotNull { it.str }
 
     companion object {
-        fun parse(text: String): Json = Parser(text).let { p ->
+        /**
+         * How deep a value may nest. The bundle's own deepest file is about six levels
+         * (`{files:{"category/food.json":{sha256:…}}}`, a schedule inside a listing inside an array), and the
+         * fixtures are shallower still, so 64 is more than an order of magnitude of headroom and still nowhere
+         * near a stack that a 2016 phone's loader thread would run out of.
+         */
+        const val MAX_DEPTH = 64
+
+        /**
+         * How much text will be read at all. The whole bundle is about 742 KB across twenty files and the largest
+         * single one is well under a megabyte; `index.json.sig` is a few hundred bytes. 16 MiB of characters is a
+         * ceiling nothing we publish can approach, and it means a hostile origin cannot make the app allocate
+         * without limit before the depth cap gets a chance to fire.
+         */
+        const val MAX_CHARS = 16 * 1024 * 1024
+
+        fun parse(text: String): Json {
+            if (text.length > MAX_CHARS) throw JsonException("JSON is ${text.length} characters; the limit is $MAX_CHARS")
+            val p = Parser(text)
             val v = p.value()
             p.skipWhitespace()
             if (!p.atEnd()) throw JsonException("trailing text at ${p.pos}")
-            v
+            return v
         }
     }
 }
@@ -48,6 +73,9 @@ class JsonException(message: String) : RuntimeException(message)
 
 private class Parser(private val s: String) {
     var pos = 0
+
+    /** How many objects and arrays are open at this point. One frame of `value()` per level, so it is the cap. */
+    private var depth = 0
 
     fun atEnd() = pos >= s.length
 
@@ -67,14 +95,27 @@ private class Parser(private val s: String) {
         skipWhitespace()
         if (atEnd()) throw JsonException("unexpected end of JSON")
         return when (s[pos]) {
-            '{' -> obj()
-            '[' -> arr()
+            '{' -> nested { obj() }
+            '[' -> nested { arr() }
             '"' -> Json.Str(string())
             't' -> literal("true", Json.Bool(true))
             'f' -> literal("false", Json.Bool(false))
             'n' -> literal("null", Json.Null)
             else -> number()
         }
+    }
+
+    /**
+     * One more level of nesting, refused past [Json.MAX_DEPTH]. The check is here rather than inside `obj()` and
+     * `arr()` so that there is exactly one place it can be forgotten, and it fires *before* the recursive call
+     * rather than after it — a cap that throws on the way out is a cap that has already overflowed the stack.
+     */
+    private inline fun <T> nested(body: () -> T): T {
+        if (depth >= Json.MAX_DEPTH) throw JsonException("JSON nested more than ${Json.MAX_DEPTH} deep at $pos")
+        depth++
+        val out = body()
+        depth--
+        return out
     }
 
     private fun literal(word: String, v: Json): Json {

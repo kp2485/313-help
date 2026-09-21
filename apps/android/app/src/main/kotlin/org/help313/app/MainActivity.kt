@@ -2,7 +2,16 @@
 //
 // Nothing about a person is kept here: the triage answers (the need and refinement chosen, and a location if one
 // was asked for) live in these fields and nowhere else, and are dropped when the activity goes away
-// (docs/08: triage answers live in memory only and are cleared on exit).
+// (docs/08: triage answers live in memory only and are cleared on exit). `onSaveInstanceState` is deliberately not
+// overridden — the system writes that Bundle to disk on its own schedule, so it is not "memory only".
+//
+// **Configuration changes are handled here, not by being recreated** (Android review, 2026-09-20). The manifest
+// used to declare only orientation|screenSize|keyboardHidden, so changing the font size, turning on dark mode,
+// changing the phone's language or entering multi-window destroyed and rebuilt the activity: the back stack was
+// cleared, the person was dropped back on Home, the bundle was verified again from scratch, and another Executor
+// was started and never stopped. All of those configurations are declared now and answered in
+// `onConfigurationChanged`, which re-reads the words and redraws the screen the person is on. If the activity is
+// recreated anyway, `Route.Retained` puts the public part of the stack back (see Route.kt for why only that part).
 package org.help313.app
 
 import android.Manifest
@@ -38,7 +47,7 @@ class MainActivity : Activity() {
     var near: LatLon? = null
     var locationRefused = false
 
-    private val stack = ArrayList<() -> View>()
+    private val stack = ArrayList<Route>()
     private lateinit var content: FrameLayout
     private lateinit var tabs: LinearLayout
 
@@ -68,11 +77,47 @@ class MainActivity : Activity() {
         // exist until the content is set, and asking for it early threw a NullPointerException on first run.
         keepClearOfSystemBars(root)
 
-        store = BundleStore(this)
+        // One store per process, not one per activity: a recreation does not re-verify the signature, does not
+        // re-read the bundle out of the APK, and does not start a second loader thread (BundleStore.of).
+        store = BundleStore.of(this)
         store.onChange = { render() }
-        store.start()
 
-        Trace.time("ui.first_render") { go { Screens.home(this) } }
+        // Back where the person was, if the system rebuilt this activity — and only the public part of the stack.
+        val restored = Route.Retained.take()
+        stack.clear()
+        stack.addAll(restored ?: listOf(Route.Home))
+        Trace.time("ui.first_render") { render() }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // A dead activity must not be called back into, whether it is finishing or being rebuilt.
+        if (store.onChange != null) store.onChange = null
+        if (isFinishing) {
+            // Really leaving: the route stack, the background thread and the loader all go. Nothing about this
+            // session outlives it (docs/08, "cleared on exit").
+            Route.Retained.clear()
+            Work.shutdown()
+            BundleStore.shutdown()
+        } else {
+            Route.Retained.put(stack)
+        }
+    }
+
+    /**
+     * Font scale, dark mode, language, multi-window, rotation, a keyboard being plugged in: all of these are
+     * declared in the manifest and answered here, so the activity is never rebuilt for them and the person stays on
+     * the screen they were on.
+     *
+     * The words and the colours both come from resources that have just changed, so the answer is to load the
+     * strings again and rebuild the current screen — which is cheap, because a screen is built in code from a route
+     * (Route.kt) and nothing is cached between draws.
+     */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        L.load(this)
+        rebuildTabs()
+        render()
     }
 
     /**
@@ -122,23 +167,29 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         // Anything a person reported while the phone had no signal goes now. Nothing else is ever sent.
-        Thread { ReportStore.flush(this) }.start()
+        // One shared background thread, not a new one per resume: a configuration change used to start another
+        // (Android review, 2026-09-20). ReportStore.flush refuses to run twice at once by itself.
+        val app = applicationContext
+        Work.net { ReportStore.flush(app) }
     }
 
     // ---- navigation ----------------------------------------------------------------------------------------
 
     /** Replaces the stack: used by the tab bar. */
-    fun go(build: () -> View) {
+    fun go(route: Route) {
         stack.clear()
-        stack.add(build)
+        stack.add(route)
         render()
     }
 
     /** Adds a screen on top. */
-    fun push(build: () -> View) {
-        stack.add(build)
+    fun push(route: Route) {
+        stack.add(route)
         render()
     }
+
+    /** The screen showing now, for the rules that depend on it (FLAG_SECURE, "Leave this page fast"). */
+    fun current(): Route = if (stack.isEmpty()) Route.Home else stack[stack.size - 1]
 
     override fun onBackPressed() {
         if (stack.size > 1) {
@@ -150,38 +201,79 @@ class MainActivity : Activity() {
     }
 
     fun render() {
-        if (stack.isEmpty()) return
-        content.removeAllViews()
+        if (stack.isEmpty()) stack.add(Route.Home)
         // Indexed on purpose, not `stack.last()`. At compileSdk 35 java.util.List has getLast() (SequencedCollection,
-        // new in API 35), which Kotlin reads as a synthetic property `stack.last`; because the elements are
-        // functions, `stack.last()` then means `getLast().invoke()` and is already a View. That is two things wrong:
-        // it made `stack.last()()` fail to compile (the first error the first :app compile found, 2026-09-20), and
-        // had it compiled it would have called a method that does not exist below API 35, so every phone from
-        // minSdk 24 up to Android 14 would have thrown NoSuchMethodError on the first screen. Indexing binds to
+        // new in API 35), which Kotlin reads as a synthetic property; had that bound, it would have called a method
+        // that does not exist below API 35, so every phone from minSdk 24 up to Android 14 would have thrown
+        // NoSuchMethodError on the first screen (found by the first :app compile, 2026-09-20). Indexing binds to
         // List.get, which has always been there.
-        val v = stack[stack.size - 1]()
-        content.addView(v, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        val route = stack[stack.size - 1]
+        // One place decides whether this screen may be photographed, so a screen added later cannot forget. See
+        // Route.isPrivate and apps/android/README.md for why this is per-screen rather than for the whole app.
+        keepOutOfScreenshots(Route.isPrivate(route))
+        content.removeAllViews()
+        content.addView(
+            Screens.view(this, route),
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT),
+        )
+    }
+
+    /**
+     * FLAG_SECURE on the domestic-violence, crisis, treatment and assault screens: no recents thumbnail, no
+     * screenshot, no screen recording, and nothing on an external display. The recents thumbnail is the one that
+     * matters most — it is drawn by the system, it survives the app being closed, and it is what somebody else
+     * sees when they pick the phone up and press the square button.
+     *
+     * Set and cleared on every draw, because the flag belongs to the window rather than the view: a screen that set
+     * it on the way in and did not clear it on the way out would silently make the whole app unphotographable.
+     */
+    private fun keepOutOfScreenshots(on: Boolean) {
+        if (on) window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        else window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+    }
+
+    /**
+     * "Leave this page fast", on the screens Route.isPrivate names — the same button the web app puts in its top bar
+     * on the same screens, going to the same address (Net.QUICK_EXIT_URL).
+     *
+     * It opens the weather in a browser and then takes this app's task away, so the back button does not come back
+     * here and the app is not sitting in recents either. The route stack goes with it.
+     */
+    fun quickExit() {
+        Route.Retained.clear()
+        stack.clear()
+        openWeb(Net.QUICK_EXIT_URL)
+        finishAndRemoveTask()
+    }
+
+    private fun rebuildTabs() {
+        tabs.removeAllViews()
+        fillTabs(tabs)
     }
 
     private fun buildTabs(): LinearLayout {
         val bar = LinearLayout(this)
         bar.orientation = LinearLayout.HORIZONTAL
         bar.setBackgroundColor(UI.color(this, R.color.surface))
+        fillTabs(bar)
+        return bar
+    }
+
+    private fun fillTabs(bar: LinearLayout) {
         bar.contentDescription = L.t("tabs.label")
         val items = listOf(
-            "tab.home" to { go { Screens.home(this) } },
-            "tab.help" to { go { Screens.help(this) } },
-            "search.title" to { go { Screens.search(this) } },
-            "saved.title" to { go { Screens.saved(this) } },
+            "tab.home" to Route.Home,
+            "tab.help" to Route.Help,
+            "search.title" to Route.Search,
+            "saved.title" to Route.Saved,
         )
-        for ((key, action) in items) {
-            val b = UI.button(this, L.t(key), backgroundId = 0, textColorId = R.color.brand, topDp = 0) { action() }
+        for ((key, route) in items) {
+            val b = UI.button(this, L.t(key), backgroundId = 0, textColorId = R.color.brand, topDp = 0) { go(route) }
             b.setBackgroundColor(UI.color(this, R.color.surface))
             b.layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
             b.gravity = Gravity.CENTER
             bar.addView(b)
         }
-        return bar
     }
 
     // ---- the things a screen needs -------------------------------------------------------------------------
@@ -225,8 +317,23 @@ class MainActivity : Activity() {
         openIntent(Intent(Intent.ACTION_DIAL, Uri.parse(telLink(number))))
     }
 
+    /**
+     * A website from the signed bundle, or one of our own link cards. **https only** (Net.webLink).
+     *
+     * ACTION_VIEW hands a string to whatever app claims the scheme in it. The bundle is signed, but signed is not
+     * the same as safe to hand over: a `content://` or an app-private scheme reaching ACTION_VIEW is a request made
+     * on this app's behalf to an app nobody chose, and the address a person taps should be the kind of thing they
+     * expect. So the schemes are an allow-list, as they are in apps/web/src/url.ts, and everything else is not a
+     * link. The other three schemes this app opens — tel:, geo:, transit: — are built here from parts and are never
+     * taken from data.
+     */
     fun openWeb(url: String) {
-        openIntent(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        val safe = Net.webLink(url)
+        if (safe == null) {
+            Toast.makeText(this, L.t("detail.not_found"), Toast.LENGTH_SHORT).show()
+            return
+        }
+        openIntent(Intent(Intent.ACTION_VIEW, Uri.parse(safe)))
     }
 
     /**

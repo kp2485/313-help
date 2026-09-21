@@ -117,6 +117,8 @@ internal fun opensOn(s: Schedule, day: Int): Boolean {
 
 internal fun occurrences(row: BundleRow, nowMin: WallMinutes, days: Int): List<Occurrence> {
     val today = Math.floorDiv(nowMin, DAY)
+    // A row a steward marked `open_holidays` is computed as though no day were a holiday (the owner's page says so).
+    val holidays = !row.flags.contains(OPEN_HOLIDAYS_FLAG)
     val out = ArrayList<Occurrence>()
     for (s in row.schedules) {
         if (!scheduleIsValid(s)) continue
@@ -132,7 +134,9 @@ internal fun occurrences(row: BundleRow, nowMin: WallMinutes, days: Int): List<O
             val start = d * DAY + o
             var end = d * DAY + c
             if (end <= start) end += DAY
-            out.add(Occurrence(dayString(d), s.opensAt, s.closesAt, start, end))
+            // The occurrence belongs to the date it opens, so that is the date the holiday rule asks about: a
+            // window that opened on Christmas Eve and runs to 2am is an ordinary evening's window.
+            out.add(Occurrence(dayString(d), s.opensAt, s.closesAt, start, end, holidays && isHoliday(d)))
         }
     }
     out.sortWith(compareBy({ it.start }, { it.end }))
@@ -194,6 +198,8 @@ fun openNow(row: BundleRow, nowMillis: Long, alerts: List<Alert> = emptyList()):
     }
     val cur = current
     if (cur != null) {
+        // A window that opens on a holiday tells us the usual hours and nothing about today. Never "open".
+        if (cur.holiday) return usualHours(cur)
         val left = cur.end - nowMin
         return OpenResult(
             state = if (left < CLOSES_SOON_MINUTES) OpenState.CLOSES_SOON else OpenState.OPEN,
@@ -202,9 +208,16 @@ fun openNow(row: BundleRow, nowMillis: Long, alerts: List<Alert> = emptyList()):
         )
     }
     val next = occ.firstOrNull { it.start > nowMin && !isCancelled(it, windows) }
+    // "Opens later today" on a holiday is the same guess as "open now" on a holiday. A next time on a *later* day
+    // stands as written: the date is a fact about the schedule, and the next-times list carries the holiday label.
+    if (next != null && next.holiday && next.date == dayString(Math.floorDiv(nowMin, DAY))) return usualHours(next)
     return OpenResult(
         state = OpenState.CLOSED,
         next = next?.let { NextTime(it.date, it.opensAt, it.closesAt) },
         cancelledNow = cancelledNow,
     )
 }
+
+/** The HOLIDAY result: the schedule's own times, offered as usual hours. No closesAt, nothing to count down to. */
+private fun usualHours(o: Occurrence) =
+    OpenResult(state = OpenState.HOLIDAY, usualHours = UsualHours(o.opensAt, o.closesAt))

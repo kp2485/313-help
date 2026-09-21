@@ -12,15 +12,29 @@ import java.text.DateFormat
 import java.util.Date
 import java.util.TimeZone
 
-/** "13:30" as a person reads it. */
+/**
+ * "13:30" as a person reads it: "1:30 pm".
+ *
+ * "am" and "pm" come from the strings files (`clock.am`, `clock.pm`), like every other word in the app. They were
+ * written out in English here, which was the one place a sentence *was* built out of English fragments (Android
+ * review, 2026-09-20): Arabic writes ص and م, Bengali writes পূর্বাহ্ণ and অপরাহ্ণ, and all four files have had
+ * both keys all along. The web app does this at apps/web/src/main.ts:100 and the iPhone app in Help.swift:152.
+ */
 fun clock(hhmm: String): String {
     val m = parseClock(hhmm) ?: return hhmm
     val h = m / 60
     val mm = m % 60
     val hour = (h + 11) % 12 + 1
-    val suffix = if (h < 12 || h == 24) "am" else "pm"
+    val suffix = L.t(if (h < 12 || h == 24) "clock.am" else "clock.pm")
     return if (mm > 0) "$hour:${if (mm < 10) "0$mm" else "$mm"} $suffix" else "$hour $suffix"
 }
+
+/**
+ * Parts of one line joined by the reader's own list separator (`list.sep`), not always a Latin comma and space.
+ * Empty parts are dropped, so a place with no ZIP code does not get a line ending in a separator.
+ */
+fun joinParts(parts: List<String?>): String =
+    parts.filter { !it.isNullOrBlank() }.joinToString(L.t("list.sep"))
 
 /** A YYYY-MM-DD shown in the reader's language. Dates are calendar days, so they are formatted in UTC. */
 fun dateText(day: String): String {
@@ -61,7 +75,16 @@ fun openText(o: OpenResult, today: String = ""): String = when (o.state) {
         }
     }
     OpenState.CALL_FIRST -> L.t("open.call_first")
+    // A holiday: the schedule's hours are the usual ones and say nothing about today (query-spec "Holidays").
+    OpenState.HOLIDAY -> L.t("open.holiday")
     else -> L.t("open.unknown")
+}
+
+/** The detail screen's holiday line: the usual hours, and a plain "call before you go". Null when it is not one. */
+fun holidayNote(o: OpenResult): String? {
+    val u = o.usualHours ?: return null
+    if (o.state != OpenState.HOLIDAY) return null
+    return L.t("detail.holiday", "hours" to (clock(u.opensAt) + " - " + clock(u.closesAt)))
 }
 
 /**

@@ -69,16 +69,17 @@ class VerifyTest {
     }
 
     /**
-     * There are two verification paths — the platform's Ed25519 where a device has one, and the RFC 8032 code in
-     * this repository, which is the only one below API 33 — and a bundle must not be acceptable to one and not the
-     * other. Everything the tests can put in front of them goes through both, including a signature that is one
-     * bit short of valid and one whose scalar is out of range.
+     * There is one verification path now, on every API level, so there is nothing left for it to disagree with at
+     * run time (see the header of Ed25519.kt for why the platform provider path was removed). The agreement with a
+     * reference implementation is still checked, in `GuardsTest.theSoftwareImplementationAgreesWithTheJvmsOwnEd25519`,
+     * against the JVM's own SunEC — which the tests run on and a phone does not have.
      *
-     * Where the platform has no Ed25519 for a public key held as bytes, `platformVerify` returns null and this
-     * test says so rather than pretending to have checked something. On the JDK the tests run on, it does not.
+     * What is left here is the one assertion that belongs on the app's own code: the RFC 8032 cases, the tampering
+     * cases, the out-of-range scalar and the off-curve key all come out the same however they are called, and
+     * nothing throws.
      */
     @Test
-    fun theTwoVerificationPathsNeverDisagree() {
+    fun oneImplementationAnswersEveryCaseTheSameWayHoweverItIsCalled() {
         val cases = ArrayList<Triple<ByteArray, ByteArray, ByteArray>>()
         for ((pub, msg, sig) in vectors) cases.add(Triple(hex(pub), hex(sig), hex(msg)))
 
@@ -97,18 +98,13 @@ class VerifyTest {
         cases.add(Triple(ByteArray(32) { 0x7f }, hex(sig), hex(msg)))
         cases.add(Triple(hex(pub), hex(sig), "not the signed message".toByteArray()))
 
-        var platformAnswered = 0
-        for ((key, signature, message) in cases) {
-            val software = Ed25519.softwareVerify(key, signature, message)
-            val platform = Ed25519.platformVerify(key, signature, message)
-            if (platform != null) {
-                platformAnswered++
-                assertEquals("the two paths disagree", software, platform)
-            }
-            // Whatever `verify` picks, it must come out the same as the software path.
-            assertEquals("verify() and softwareVerify() disagree", software, Ed25519.verify(key, signature, message))
+        // The first three are the vectors and must pass; everything after them must be refused.
+        for ((i, case) in cases.withIndex()) {
+            val (key, signature, message) = case
+            val answer = Ed25519.verify(key, signature, message)
+            assertEquals("case $i", i < vectors.size, answer)
+            assertEquals("softwareVerify is not the same function", answer, Ed25519.softwareVerify(key, signature, message))
         }
-        println("platform Ed25519 answered $platformAnswered of ${cases.size} cases on this JVM")
     }
 
     /**

@@ -3,9 +3,20 @@
 // ever), then a refresh in the background. A bundle whose signature does not match a pinned key, whose files do
 // not match their checksums, or that is older than the one held, is refused and the old one stays.
 //
-// Nothing is ever sent: these are plain GETs with no headers of ours, no cookies, no query string, no referrer.
-// There is no analytics, no crash reporting and no network library; this is java.net.HttpURLConnection, which is
-// in Android itself.
+// Nothing about the person is ever sent: these are plain https GETs with one header of ours — the fixed
+// "313Help-Android/<version>" — no cookies, no cache, no redirects, no query string and no referrer. Everything
+// about that is in Http.kt, which is the only place in this app that opens a connection. There is no analytics, no
+// crash reporting and no network library; this is java.net.HttpURLConnection, which is in Android itself.
+//
+// (It used to say "no headers of ours", which was true and was the bug: with no User-Agent set, Android sent its
+// own — "Dalvik/2.1.0 (Linux; U; Android 15; <model> Build/<id>)" — so the Android version, the phone model and
+// its build id went out on every bundle GET and every report POST. Android review, 2026-09-20.)
+//
+// **One store per process.** The verified bundle and the one background thread live in the companion object, not
+// in an activity: a configuration change used to build a second BundleStore, re-verify the signature and leak
+// another Executor every time (Android review, 2026-09-20). The bundle is public, signed data with nothing about
+// anyone in it, so holding it for the life of the process costs no privacy; the triage answers, which do, stay
+// where they were — fields on MainActivity, gone when it is (docs/08).
 package org.help313.app
 
 import android.content.Context
@@ -15,10 +26,7 @@ import org.help313.query.Alert
 import org.help313.query.BundleRow
 import org.help313.query.Json
 import org.help313.query.Segment
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.concurrent.Executors
 
 class EmergencyNumber(val id: String, val label: String, val number: String, val sms: String?, val hardcoded: Boolean)
@@ -37,12 +45,53 @@ class LoadedBundle(
     val events: List<CityEvent>,
 )
 
-class BundleStore(context: Context) {
+class BundleStore private constructor(context: Context) {
 
-    private val app = context.applicationContext
+    companion object {
+        private var instance: BundleStore? = null
+
+        /**
+         * The one store this process has. An activity asks for it in `onCreate` and gets the same object across a
+         * configuration change, a recreation or a second launch — so a font-scale change or a rotation does not
+         * re-verify a signature, re-read 742 KB from the APK, or start another thread that nobody stops.
+         */
+        @Synchronized
+        fun of(context: Context): BundleStore {
+            val existing = instance
+            if (existing != null) return existing
+            val made = BundleStore(context)
+            instance = made
+            made.start()
+            return made
+        }
+
+        /**
+         * Called when the last activity is really finishing (not being recreated), so a debug build that is force
+         * stopped does not leave a thread behind. The next launch builds a new store and re-verifies, which is the
+         * point: nothing about a verified bundle is remembered across a process (apps/android/README.md, "Verifying
+         * once per bundle version was considered and not done").
+         */
+        @Synchronized
+        fun shutdown() {
+            instance?.let {
+                it.onChange = null
+                it.worker.shutdownNow()
+            }
+            instance = null
+        }
+    }
+
+    /**
+     * The Application, not an Activity and not a plain Context. Typed as Application on purpose: this object is
+     * held for the life of the process, so holding an activity here would be a leak — and stating the type is how
+     * both a reader and `lint`'s StaticFieldLeak check can see that it is not one. The Application *is* the
+     * process, so there is nothing here to outlive.
+     */
+    private val app: android.app.Application = context.applicationContext as android.app.Application
     private val cacheDir = File(app.filesDir, "bundle")
     private val pinned: List<String> = BuildConfig.PINNED_KEYS.filter { it.isNotBlank() }
     private val base: String = BuildConfig.BUNDLE_BASE
+    private val userAgent: String = Net.userAgent(BuildConfig.VERSION_NAME)
     private val main = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor()
 
@@ -54,43 +103,67 @@ class BundleStore(context: Context) {
     var loadFailed = false
         private set
 
-    /** Called on the main thread whenever `bundle` changes. */
+    /** Called on the main thread whenever `bundle` changes. Set by whichever activity is on screen; cleared by it. */
     var onChange: (() -> Unit)? = null
 
+    /**
+     * Anything at all that runs on the one background thread, wrapped so that nothing it throws can kill that
+     * thread. `Throwable`, not `Exception`: a StackOverflowError from a hostile `index.json.sig` used to end the
+     * executor's only thread, after which the app never loaded a list again and repeated the whole thing at every
+     * start (Android review, 2026-09-20). A failure here can only ever mean "keep the copy we have".
+     */
+    private fun onWorker(what: String, body: () -> Unit) {
+        try {
+            worker.execute {
+                try {
+                    body()
+                } catch (t: Throwable) {
+                    if (!BuildConfig.IS_RELEASE) android.util.Log.w("Help313", "$what failed: $t")
+                    if (bundle == null) publish(null, failed = true)
+                }
+            }
+        } catch (_: java.util.concurrent.RejectedExecutionException) {
+            // The store was shut down between the tap and here. There is nothing to do and nothing to say.
+        }
+    }
+
     /** Reads what is already on the phone, then refreshes. Never blocks the first screen on the network. */
-    fun start() {
+    private fun start() {
         if (!BuildConfig.IS_RELEASE) {
             val launched = System.nanoTime()
             Trace.sink = { label, ms ->
                 android.util.Log.i("Help313Timing", "$label ${ms} ms (at +${(System.nanoTime() - launched) / 1_000_000L} ms)")
             }
         }
-        worker.execute {
+        onWorker("start") {
             Trace.time("start.total") {
                 val local = runCatching { Trace.time("start.cached") { load { name -> File(cacheDir, name).readBytes() } } }.getOrNull()
                 val loaded = local
                     ?: runCatching { Trace.time("start.snapshot") { load { name -> readAsset("bundle-snapshot/$name") } } }.getOrNull()
                 publish(loaded, failed = loaded == null)
             }
-            if (!BuildConfig.IS_RELEASE) timeBothVerifyPaths()
+            // Saved places are read from disk on the main thread otherwise; prime the cache here instead.
+            SavedStore.prime(app)
+            if (!BuildConfig.IS_RELEASE) timeVerification()
             refresh()
         }
     }
 
     /**
      * Debug builds only, and only after the screen already has its list, so it delays nothing: how long one
-     * signature check takes on *this* device, both ways, and which Ed25519 services the device actually has.
+     * signature check takes on *this* device.
      *
      * This is the tool for the question that is still open — "is it fast enough on a 2016 handset?". Plug the
      * phone in, install a debug build (`-PdebugLikeRelease=true`, or the numbers are meaningless: see
      * app/build.gradle.kts), and read `Help313Timing ed25519.software_path` out of logcat.
      *
-     * It also prints the providers, because that is how the surprise of 2026-09-20 was found: an API 35 image has
-     * Ed25519 only in AndroidKeyStore and AndroidKeyStoreBCWorkaround, both of which serve hardware-held keys and
-     * neither of which will load a public key from bytes. So `ed25519.platform_available` is 0 even on Android 15,
-     * the software path is what runs, and it is the only thing worth optimising.
+     * It still prints whichever Ed25519 services the device has, because that is a fact worth knowing and how the
+     * surprise of 2026-09-20 was found: an API 35 image has Ed25519 only in AndroidKeyStore and
+     * AndroidKeyStoreBCWorkaround, both of which serve hardware-held keys and neither of which will load a public
+     * key from bytes. There being no usable provider on any Android is why there is now one implementation and no
+     * platform path at all (see Ed25519.kt).
      */
-    private fun timeBothVerifyPaths() {
+    private fun timeVerification() {
         try {
             val index = readAsset("bundle-snapshot/index.json")
             val sigJson = Json.parse(String(readAsset("bundle-snapshot/index.json.sig"), Charsets.UTF_8))
@@ -100,45 +173,43 @@ class BundleStore(context: Context) {
             } ?: return
             for (p in java.security.Security.getProviders()) {
                 val ed = p.services.filter { it.algorithm.contains("25519", true) }.map { "${it.type}/${it.algorithm}" }
-                if (ed.isNotEmpty()) android.util.Log.i("Help313Timing", "provider ${p.name} has $ed")
+                if (ed.isNotEmpty()) android.util.Log.i("Help313Timing", "provider ${p.name} has $ed (not used)")
             }
-            val platform = Trace.time("ed25519.platform_path") { Ed25519.platformVerify(key, signature, index) }
-            Trace.say("ed25519.platform_available", if (platform == null) 0 else 1)
-            Trace.time("ed25519.software_path") { Ed25519.softwareVerify(key, signature, index) }
-        } catch (_: Exception) {
+            Trace.time("ed25519.software_path") { Ed25519.verify(key, signature, index) }
+        } catch (_: Throwable) {
             // A measurement is never allowed to matter.
         }
     }
 
     fun refresh() {
-        worker.execute {
-            if (base.contains("REPLACE-ME.invalid")) return@execute    // a build with no published home: snapshot only
-            try {
-                val fetched = LinkedHashMap<String, ByteArray>()
-                fun get(name: String): ByteArray = fetched.getOrPut(name) { httpGet(base.trimEnd('/') + "/" + name) }
+        onWorker("refresh") {
+            if (base.contains("REPLACE-ME.invalid")) return@onWorker   // a build with no published home: snapshot only
+            if (!Net.isHttps(base)) return@onWorker                    // and a build pointed anywhere else fetches nothing
+            val fetched = LinkedHashMap<String, ByteArray>()
+            fun get(name: String): ByteArray = fetched.getOrPut(name) { httpGet(base.trimEnd('/') + "/" + name) }
 
-                val indexBytes = get("index.json")
-                val index = BundleCheck.verifiedIndex(indexBytes, get("index.json.sig"), pinned)
-                val current = bundle?.index
-                if (current != null) {
-                    if (current.version == index.version) return@execute
-                    if (BundleCheck.refusesOlder(current, index)) throw BundleError.Older
-                }
-                for (name in index.files.keys) if (BundleCheck.loadedNow(name)) get(name)
-                val next = load { name -> fetched[name] ?: throw BundleError.Unreadable("$name was not fetched") }
-
-                // Only once every byte has been checked is anything written to the phone.
-                cacheDir.deleteRecursively()
-                for ((name, data) in fetched) {
-                    val f = File(cacheDir, name)
-                    f.parentFile?.mkdirs()
-                    f.writeBytes(data)
-                }
-                publish(next, failed = false)
-            } catch (_: Exception) {
-                // Keep what we have; say so only when we have nothing at all.
-                if (bundle == null) publish(null, failed = true)
+            val indexBytes = get("index.json")
+            // verifiedIndex refuses an index naming a path this app will not use, so every name below is already
+            // known to be a plain relative path. The check is repeated where the File and the URL are actually
+            // built, because that is the line a future edit would add a name to.
+            val index = BundleCheck.verifiedIndex(indexBytes, get("index.json.sig"), pinned)
+            val current = bundle?.index
+            if (current != null) {
+                if (current.version == index.version) return@onWorker
+                if (BundleCheck.refusesOlder(current, index)) throw BundleError.Older
             }
+            for (name in index.files.keys) if (BundleCheck.loadedNow(name)) get(name)
+            val next = load { name -> fetched[name] ?: throw BundleError.Unreadable("$name was not fetched") }
+
+            // Only once every byte has been checked is anything written to the phone.
+            cacheDir.deleteRecursively()
+            for ((name, data) in fetched) {
+                if (!Net.safeBundlePath(name)) throw BundleError.Unreadable("refusing to write $name")
+                val f = File(cacheDir, name)
+                f.parentFile?.mkdirs()
+                f.writeBytes(data)
+            }
+            publish(next, failed = false)
         }
     }
 
@@ -150,31 +221,16 @@ class BundleStore(context: Context) {
 
     private fun readAsset(name: String): ByteArray = app.assets.open(name).use { it.readBytes() }
 
+    /**
+     * One https GET. Everything about the request — the one honest header, no cookies, no cache, no redirects, the
+     * timeouts and the size ceiling — is Http.kt, so the bundle GET and the report POST cannot drift apart.
+     */
     private fun httpGet(url: String): ByteArray {
-        val u = URL(url)
-        if (u.protocol != "https") throw BundleError.Unreadable("the list must come over https")
-        val conn = u.openConnection() as HttpURLConnection
-        // No headers of our own: no user id, no device id, nothing that would tell a server who is asking.
+        val conn = Http.open(url, userAgent)
         conn.requestMethod = "GET"
-        conn.instanceFollowRedirects = false
-        conn.useCaches = false
-        conn.connectTimeout = 15_000
-        conn.readTimeout = 30_000
         try {
             if (conn.responseCode != 200) throw BundleError.Unreadable("server said ${conn.responseCode}")
-            val out = ByteArrayOutputStream()
-            conn.inputStream.use { input ->
-                val buf = ByteArray(16 * 1024)
-                var total = 0
-                while (true) {
-                    val n = input.read(buf)
-                    if (n < 0) break
-                    total += n
-                    if (total > 32 * 1024 * 1024) throw BundleError.Unreadable("file too large")
-                    out.write(buf, 0, n)
-                }
-            }
-            return out.toByteArray()
+            return Http.readBody(conn)
         } finally {
             conn.disconnect()
         }
@@ -195,6 +251,9 @@ class BundleStore(context: Context) {
         var parseMs = 0L
         for ((name, meta) in index.files) {
             if (!BundleCheck.loadedNow(name)) continue
+            // Belt and braces: verifiedIndex has already refused an index that names anything but a plain relative
+            // path, and this is where the name becomes a File or a URL.
+            if (!Net.safeBundlePath(name)) throw BundleError.Unreadable("refusing to read $name")
             var t = System.nanoTime()
             val data = read(name)
             readMs += (System.nanoTime() - t) / 1_000_000L

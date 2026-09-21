@@ -64,11 +64,29 @@ object BundleCheck {
      * `pinnedSpkiBase64` is what the build pinned: base64 SPKI DER Ed25519 public keys, active and spare.
      * The public key written inside the .sig file is never trusted; it is only a hint for a person reading it.
      */
+    /**
+     * The biggest an `index.json.sig` may be. The real one is a few hundred bytes: an algorithm name, a base64
+     * signature and a base64 public key. This is the *first* thing the app parses on a refresh and it is parsed
+     * before any signature has been checked, so its size is whatever answered for the bundle origin. 64 KiB is
+     * two orders of magnitude of headroom and still nothing.
+     */
+    const val MAX_SIG_BYTES = 64 * 1024
+
+    /** The biggest an `index.json` may be. It lists twenty-odd files with a hash each; the real one is about 4 KB. */
+    const val MAX_INDEX_BYTES = 1024 * 1024
+
     fun verifiedIndex(indexBytes: ByteArray, sigBytes: ByteArray, pinnedSpkiBase64: List<String>): BundleIndex {
         if (pinnedSpkiBase64.isEmpty()) throw BundleError.NoKeys
+        if (sigBytes.size > MAX_SIG_BYTES) throw BundleError.Unreadable("the signature file is ${sigBytes.size} bytes")
+        if (indexBytes.size > MAX_INDEX_BYTES) throw BundleError.Unreadable("the list index is ${indexBytes.size} bytes")
+        // Throwable, not Exception. This parse happens before anything has been verified, so the text is whatever
+        // answered for the bundle origin; 40 KB of "[[[[[[…" used to come back as a StackOverflowError, which is an
+        // Error and slipped straight past a `catch (e: Exception)` — up through the loader, out of the executor's
+        // thread, and round again at every start (Android review, 2026-09-20). Json.parse now caps depth and
+        // length itself, and this catches whatever a parser could still do. Refusing the file is the only outcome.
         val sigJson = try {
             Json.parse(String(sigBytes, Charsets.UTF_8))
-        } catch (e: Exception) {
+        } catch (_: Throwable) {
             throw BundleError.Unreadable("the signature file is not JSON")
         }
         if (sigJson["alg"]?.str != null && sigJson["alg"]?.str != "Ed25519") throw BundleError.BadSignature
@@ -82,11 +100,22 @@ object BundleCheck {
             }
         }
         if (!ok) throw BundleError.BadSignature
-        return try {
+        val index = try {
             BundleIndex.fromJson(Json.parse(String(indexBytes, Charsets.UTF_8)))
-        } catch (e: Exception) {
+        } catch (_: Throwable) {
             throw BundleError.Unreadable("the list index is not JSON")
         }
+        // A signed index still does not get to name a file path (Android review, 2026-09-20). Every key in it is
+        // used twice: as a path under the app's own storage, and as a suffix on the bundle URL. A name like
+        // "../../shared_prefs/x" escapes cacheDir, and one carrying "://" or "?" changes where the fetch goes.
+        // "Signed" means a steward published it, not that it is safe to concatenate — and the signing key is the
+        // one thing a release cannot rotate quickly, so the rule belongs here rather than at each use.
+        for (name in index.files.keys) {
+            if (!Net.safeBundlePath(name)) {
+                throw BundleError.Unreadable("the list index names a file this app will not read: $name")
+            }
+        }
+        return index
     }
 
     /** Standard base64 with optional padding; null for anything else. Written out so this file needs no android.util. */

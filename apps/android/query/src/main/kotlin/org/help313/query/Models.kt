@@ -220,13 +220,18 @@ data class Occurrence(
     val closesAt: String,
     val start: WallMinutes,
     val end: WallMinutes,
+    /** This window opens on a holiday, so its hours are the usual ones and not a promise. Labelled, never dropped. */
+    val holiday: Boolean = false,
 )
 
-enum class OpenState { OPEN, CLOSES_SOON, CLOSED, CALL_FIRST, UNKNOWN, NOT_LISTED;
+enum class OpenState { OPEN, CLOSES_SOON, CLOSED, CALL_FIRST, UNKNOWN, NOT_LISTED, HOLIDAY;
     val wire: String get() = name.lowercase()
 }
 
 data class NextTime(val date: String, val opensAt: String, val closesAt: String)
+
+/** `HOLIDAY` only: what the schedule says about today, offered as usual hours and never as "open". */
+data class UsualHours(val opensAt: String, val closesAt: String)
 
 data class OpenResult(
     val state: OpenState,
@@ -237,6 +242,8 @@ data class OpenResult(
     val next: NextTime? = null,
     /** True when a window that would be open right now was cancelled by an alert. */
     val cancelledNow: Boolean = false,
+    /** Set only for HOLIDAY: the schedule's own times for today, which are usual hours and not a promise. */
+    val usualHours: UsualHours? = null,
 )
 
 data class Badge(

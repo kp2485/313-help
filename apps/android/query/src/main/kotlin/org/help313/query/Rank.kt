@@ -57,13 +57,15 @@ private fun openKeyNow(o: OpenResult, today: String): Int = when (o.state) {
         val next = o.next
         if (next == null) 5 else if (next.date == today) 2 else 4
     }
-    OpenState.CALL_FIRST -> 3
+    // A holiday row ranks exactly where "call first" does: we do not know today's hours, so it never sorts above a
+    // row that is known to be open (schema/query-spec.md "Holidays").
+    OpenState.CALL_FIRST, OpenState.HOLIDAY -> 3
     else -> 6   // unknown sorts last: never implied open
 }
 
 private fun openKeyWeek(row: BundleRow, o: OpenResult, nowMillis: Long, alerts: List<Alert>): Int = when (o.state) {
     OpenState.OPEN, OpenState.CLOSES_SOON -> 0
-    OpenState.CALL_FIRST -> 1
+    OpenState.CALL_FIRST, OpenState.HOLIDAY -> 1
     OpenState.UNKNOWN, OpenState.NOT_LISTED -> 3
     else -> {
         val next = nextOccurrences(row, nowMillis, 1, alerts).firstOrNull()

@@ -33,10 +33,18 @@ jobs:
         working-directory: apps/ios
 
   # The Android app's copy of the query rules, held to the same fixtures as the web and the iPhone, plus the
-  # app's android-free half (:core) — the Ed25519 check, what a report is and its one-day hash, the maps/call
-  # rules, and the needs list held to apps/web/src/needs.ts.
+  # app's android-free half (:core) — the Ed25519 check and the small-order keys it refuses, what makes a bundle
+  # acceptable, what a report is and its one-day hash, the maps/call rules, and the needs list held to
+  # apps/web/src/needs.ts.
   #
-  # A JDK is all this needs: neither module touches an android.* class, and settings.gradle.kts leaves :app out
+  # Since 2026-09-20 :core also covers the *rules* that used to be tangled up in the two files that talk to the
+  # network and the disk, and so were checked by nothing this job ran: which file paths a signed index may name,
+  # what header goes out and where a report may be posted (Net.kt, Http.kt), what happens to the report queue when
+  # a flush and a tap overlap (Outbox.kt), and which screens are private and what may survive an activity being
+  # recreated (Route.kt). Those four files have no android.* class in them on purpose, and :core will stop
+  # compiling if one of them grows one.
+  #
+  # A JDK is all this needs: no module here touches an android.* class, and settings.gradle.kts leaves :app out
   # of the build when there is no Android SDK. The screens are still compiled by nothing anywhere; adding that
   # needs the SDK licence accepted on this repository's behalf (apps/android/README.md).
   #
@@ -59,7 +67,7 @@ jobs:
       # ./gradlew, so the Gradle version is the one pinned in gradle/wrapper/gradle-wrapper.properties.
       - run: ./gradlew --no-daemon :query:test :core:test
         working-directory: apps/android
-      # The same 111 fixture cases again with no test framework on the classpath at all, which is the route that
+      # The same 181 fixture cases again with no test framework on the classpath at all, which is the route that
       # still works if JUnit (EPL-1.0, test-only) is ever dropped.
       - run: ./gradlew --no-daemon :query:runFixtures
         working-directory: apps/android
