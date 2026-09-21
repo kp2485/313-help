@@ -6,8 +6,8 @@
 Top bar, every screen:  313 Help · [Urgent help]      (on DV and crisis screens: [Leave this page fast] instead)
 Tab bar, every screen:  Home · Help · Map · Events
 
+Top bar (every tab): 313 Help · language (English · Español · العربية · বাংলা) · Urgent help
 Home
-├─ Language switch: English · Español · العربية · বাংলা
 ├─ "What do you need today?" + tagline
 ├─ Search by name or street          →  Search
 ├─ Active alerts (cards, auto-expire)
@@ -40,7 +40,7 @@ Report a problem with the app: not built.
 
 **Revised 2026-09-20 (Kyle): four tabs — Home · Help · Map · Events.** The Recreation and Transit tabs are one **Map** tab; everything either of them offered is still on it. No profile tab; there is no profile.
 
-- **Home**: a calm landing page — the four-language switch, hero, a search button, active alerts, one "Find free help" card, six quick needs, tiles into the Map tab and the greenway. No red, no emergency strip.
+- **Home**: a calm landing page — hero, a search button, active alerts, one "Find free help" card, six quick needs, tiles into the Map tab and the greenway. No red, no emergency strip.
 - **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
 - **Map** (2026-09-20): one map of the city with a **layer switcher**, then everything Recreation and Transit used to carry. See "Map tab" below. Every listing with an address still gets a **Bus directions** button on its own screen.
 - **Events**: was the City calendar, grouped by day, with details linking out. **Dropped 2026-09-19** until the City publishes a real events feed, so the bundle carries no events and **the tab hides itself**; the code stays. (A tab bar that reserved a fifth column for it was a bug the 2026-09-20 audit found and fixed.)
@@ -50,7 +50,7 @@ The earlier "emergency strip" and needs-on-Home layout are superseded by this st
 
 ## Home
 
-- Top to bottom (**revised 2026-09-20**): the language switch, listing all four languages in their own names · "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · **six quick needs** (Food · A place to sleep · A doctor · Help with drugs or alcohol · A job · Free Narcan), one tap each · two tiles, **Map** and the greenway · a footer with "Updated {date}", About and Your privacy.
+- Top to bottom (**revised 2026-09-20**; the language control moved into the top bar 2026-09-21): "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · **six quick needs** (Food · A place to sleep · A doctor · Help with drugs or alcohol · A job · Free Narcan), one tap each · two tiles, **Map** and the greenway · a footer with "Updated {date}", About and Your privacy.
 - **Alerts**: cards with title, plain-language body, a call button for each phone number, when it ends ("Until {when}"), and a link to where it was announced. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
 - **"What do you need?"** now heads the Help tab (see above). Principle 3 path: Help → need (1) → refinement if any (2) → **Call** (3); from Home, a quick need skips the first tap.
 - **Browse by type** (Help tab chips): Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people.
@@ -97,7 +97,7 @@ Safety rules baked into the flow:
 - "I'm not safe at home" shows no distance and no map.
 - "I want help with drugs or alcohol" and "Help after sexual assault" (DECISIONS 2026-09-19): numbers first, a quick exit, and **private listings**: never saved, never in the browser history, but with an address, distance and map dot so a person can get there.
 
-## Map tab (2026-09-20)
+## Map tab (2026-09-20; styles, keyboard and native maps 2026-09-21)
 
 One tab replaces Recreation and Transit. Top to bottom:
 
@@ -109,6 +109,30 @@ One tab replaces Recreation and Transit. Top to bottom:
    The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. A first visit starts with the greenway, parks and DDOT routes.
 3. **"See this map as a list"** — everything switched on, in words: the help listings as cards, greenway stretches as rows, park names, and each transport layer's route and stop names with a count. Nothing on the map is reachable only by looking at it.
 4. Then the rest of what Recreation and Transit carried: the greenway, City parks, recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass. The trip-planner list names the **Transit app** ("live DDOT and SMART buses on your phone") beside DDOT's own planner, as a link-out to transitapp.com like every other; the same link appears in the **"Rides to the doctor or cheaper bus fare"** link-outs, where it leads, because it is the free thing that answers "when is my bus coming?". Neither says DDOT or SMART recommends it: SMART's own page lists Transit among third-party apps that receive SMART data, DDOT's pages could not be read (`docs/research/2026-09-20/transit-app.md`), and we state only what an owner page states.
+
+**Two map styles (2026-09-21).** The layers panel has a **Map style** choice: **Standard** (each kind of transport
+in one color — the default on every client) and **Subway lines** (bus and rail drawn like a subway map: route
+badges, shared-street runs side by side, interchanges, terminals, the People Mover as a loop, the QLINE line
+drawn through its stations and marked `derived`). The subway drawing code and each network's `.net.json` file
+are separate, signed downloads fetched only when the style is chosen; the standard files did not change by a
+byte. The text list is identical in both styles. [MAP-STYLE.md](MAP-STYLE.md) is the shared spec for all three
+clients; the choice is kept on the phone and never sent.
+
+**Keyboard and screen reader.** With the map focused, the arrows pan, **N** and **P** walk the features on screen
+(the greenway in route order, then places nearest the middle; in Subway style up to 40 route features are
+appended), **Enter** opens one, **Escape** steps back out, and Tab always leaves the map. Each step is announced
+through the map's live region with the card a tap would show.
+
+**The language control is in the top bar** (2026-09-21): one native `<select>` — a globe and the language in use,
+in its own name — between the app's name and Urgent help, on the four tabs and About. It is not drawn on pushed
+screens or in the full-screen map's bar (DECISIONS 2026-09-21).
+
+**iPhone:** the Map tab is a full-screen map, edge to edge, with the tab bar left in place; layers and the style
+choice are in a sheet; "See this map as a list" is a persistent control; no MapKit and no tiles
+([apps/ios/README.md](../apps/ios/README.md)). **Android** (2026-09-21): a Map tab drawn from the same signed files — the greenway, parks, listings by group, the
+eleven transport layers, a layer switcher, a text list, a card on tap, virtual accessibility nodes and a
+hardware-keyboard walk — in the Standard style; the Subway style is on the roadmap
+([apps/android/README.md](../apps/android/README.md)).
 
 Rules that do not change:
 - **Sensitive and private listings are never drawn.** Treatment and help after sexual assault are excluded from every layer (`PRIVATE_TOPS`), and inside a group a DV or mental-health-crisis listing is dropped row by row (`isSensitive`).
@@ -171,9 +195,9 @@ See 04. One screen, under Help → More. The address is typed. Days and times ar
 
 ## Language
 
-Four languages are built: English, Spanish, **Arabic** and **Bengali**. The app picks the first of the phone's own languages it has words for, and a switch on Home and About lists all four, each written in its own name (English · Español · العربية · বাংলা) with its own `lang` attribute; the choice stays on the phone and is never sent. **Each language other than English is a separate file, fetched only when it is chosen** (DECISIONS 2026-09-19), so an English reader downloads none of them; once fetched they are kept for offline use. With no signal and no saved copy the switch does nothing and the app stays in English. **Arabic reads right to left** and the whole interface mirrors — the stylesheet is written in logical properties, so there is no second stylesheet; the map itself never mirrors, because left is west in every language. Dates, times and numbers in Arabic and Bengali use Western digits, so a phone number reads as it is dialled (DECISIONS 2026-09-20). **Arabic and Bengali were drafted by machine on 2026-09-20 and no native speaker has read either one yet** (DECISIONS): no screen says they were checked, and a native reviewer is a condition of a public release, crisis screens first. What a place wrote about itself stays in English, marked as English, with the line "This place's own words are shown in English, the way they wrote them." We never machine-translate safety-critical text. Later: the bundle may carry an owner's own translation of a description.
+Four languages are built: English, Spanish, **Arabic** and **Bengali**. The app picks the first of the phone's own languages it has words for, and a control in the top bar (a native select, since 2026-09-21; before that a row of links on Home and About) lists all four, each written in its own name (English · Español · العربية · বাংলা) with its own `lang` attribute; the choice stays on the phone and is never sent. **Each language other than English is a separate file, fetched only when it is chosen** (DECISIONS 2026-09-19), so an English reader downloads none of them; once fetched they are kept for offline use. With no signal and no saved copy the switch does nothing and the app stays in English. **Arabic reads right to left** and the whole interface mirrors — the stylesheet is written in logical properties, so there is no second stylesheet; the map itself never mirrors, because left is west in every language. Dates, times and numbers in Arabic and Bengali use Western digits, so a phone number reads as it is dialled (DECISIONS 2026-09-20). **Arabic and Bengali were drafted by machine on 2026-09-20 and no native speaker has read either one yet** (DECISIONS): no screen says they were checked, and a native reviewer is a condition of a public release, crisis screens first. What a place wrote about itself stays in English, marked as English, with the line "This place's own words are shown in English, the way they wrote them." We never machine-translate safety-critical text. Later: the bundle may carry an owner's own translation of a description.
 
-**Details settled by the 2026-09-20 walk-through of every screen in Arabic and Bengali:** "am" and "pm" are translated strings (`clock.am`, `clock.pm`) while the digits beside them stay Western, and the list separator is a string (`list.sep`) — the iPhone and Android apps still hard-code am/pm and should not. Dollar amounts are written the way the record writes them (`$85,000`), falling back to `en-US` where a language's own `Intl` rules do not lead with the sign. The uppercase, letter-spaced section headings apply only under `:lang(en)` and `:lang(es)`, because letter-spacing breaks Arabic joining and Bengali conjuncts. A phone number and its extension sit inside **one** `<bdi>`, so nothing can reorder into a number a person would misdial. **Known limit: searching in Arabic or Bengali returns nothing**, because every listing is written in English; the empty state needs one honest line about that, and its wording waits on the native reviewer (CHECKS-2026-09-20 §7).
+**Details settled by the 2026-09-20 walk-through of every screen in Arabic and Bengali:** "am" and "pm" are translated strings (`clock.am`, `clock.pm`) while the digits beside them stay Western, and the list separator is a string (`list.sep`) — on all three clients. Dollar amounts are written the way the record writes them (`$85,000`), falling back to `en-US` where a language's own `Intl` rules do not lead with the sign. The uppercase, letter-spaced section headings apply only under `:lang(en)` and `:lang(es)`, because letter-spacing breaks Arabic joining and Bengali conjuncts. A phone number and its extension sit inside **one** `<bdi>`, so nothing can reorder into a number a person would misdial. **Known limit: searching in Arabic or Bengali returns nothing**, because every listing is written in English; the empty state needs one honest line about that, and its wording waits on the native reviewer (CHECKS-2026-09-20 §7).
 
 ## Accessibility
 

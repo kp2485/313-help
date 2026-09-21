@@ -45,6 +45,20 @@ What the phone does know is how old its own copy of the list is. That is a fact 
 ### 4. Forkable by another city
 Detroit-specific things live in data and config, not code: bbox, time zone, category labels, emergency numbers, source registry, the `x_detroit` extension name (document it as an HSDS Profile). "Grand Rapids forks it in a weekend" is a stronger open-source story for judges than the license alone.
 
+### 5. From one city to a state, then the country (added 2026-09-21)
+
+Rule 4 is the seed of the expansion plan in [docs/09](09-roadmap.md#beyond-detroit-michigan-then-national). A
+region is a signed bundle plus a service-area config — region id, bounding box, time zone, holiday calendar,
+taxonomy labels, emergency numbers, and the coarse-area reference points for DV lines (the closed list already has
+`statewide` and `national`). The data is HSDS, so it exchanges with 211s and state directories; SAMHSA, US DOT
+NTAD, Census TIGER and GTFS are national sources the pipeline already reads; and because there is no resident
+data, a new state needs no new privacy engineering. Each region brings its own stewards and gets the same queue.
+
+**Sustainability.** The gift stays a gift: code Apache-2.0, data CC BY 4.0, self-hosting fully documented. What
+pays for growth is an **optional hosted service** ("region in a box": we run the pipeline, signing, hosting and
+the steward queue; the city or nonprofit brings stewards) and **support contracts**, plus grants. **Never ads and
+never data** — there is nothing about residents to sell, by construction, and that sentence goes in every contract.
+
 ## Licenses (decided 2026-09-18)
 
 - Code: **Apache-2.0**. The patent grant matters when a city's vendor forks it. `LICENSE` and `NOTICE` are in the repo.
@@ -59,7 +73,7 @@ Detroit-specific things live in data and config, not code: bbox, time zone, cate
 | Apple Developer Program (organization) | $99 | Nonprofits and governments can get a fee waiver — relevant if an adopter takes over |
 | Google Play | $25 once | |
 | Domain | ~$12 | |
-| Cloudflare Pages / R2 / Workers / D1 / Access, GitHub Actions | $0 at expected traffic | Registering the domain and creating Cloudflare resources still need Kyle's go-ahead (CLAUDE.md) |
+| Cloudflare Pages / R2 / Workers / D1 / Access, GitHub Actions | $0 at expected traffic | Live since 2026-09-21; new paid resources still need Kyle's go-ahead (CLAUDE.md) |
 | **Total** | **~$110–135** | A modest hackathon prize covers several years of running costs |
 
 The real cost is time. Build time is a one-off. Running time under the exceptions-only model: about an hour a week plus twenty minutes a month.

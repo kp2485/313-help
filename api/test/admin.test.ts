@@ -25,6 +25,18 @@ describe('steward page: the reports queue', () => {
     const [g] = groupReports([r('rpt_1', 'moved'), r('rpt_2', 'wrong_hours'), r('rpt_3', 'moved', 'sal_other')], { sal_b: 1 });
     expect(settleBody(g!, 'rejected', 'spam')).toEqual({ target_id: 'sal_b', ids: ['rpt_1', 'rpt_2'], status: 'rejected', reason_code: 'spam' });
   });
+  it('1.4.1: "look at this one first" is a sentence, not only a thicker orange border', () => {
+    // `hot` used to be a border colour and nothing else, so a steward who cannot tell the two borders apart had
+    // no way at all to know which listing two different phones had reported closed.
+    const js = readFileSync(join(__dirname, '../../admin/admin.js'), 'utf8');
+    expect(js).toContain('Look at this one first:');
+    expect(js).toContain('different phones said it closed or moved');
+    expect(js).toContain('function reportGroup({ target_id: targetId, reports, hot, phones })');
+    // and the steward page answers a forced-colours desktop, where a border colour says nothing at all
+    const css = readFileSync(join(__dirname, '../../admin/admin.css'), 'utf8');
+    expect(css).toContain('@media (forced-colors: active)');
+    expect(css).toContain('@media (prefers-contrast: more)');
+  });
   it('the click handler works from what the page showed and never re-reads the queue', () => {
     const js = readFileSync(join(__dirname, '../../admin/admin.js'), 'utf8');
     const handler = js.slice(js.indexOf("app.addEventListener('click'"));
