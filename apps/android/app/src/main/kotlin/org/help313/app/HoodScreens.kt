@@ -298,6 +298,8 @@ object HoodScreens {
                 )
             }
             if (a.locateOutside) col.addView(UI.text(a, L.t("hood.mine_outside"), 15f, R.color.muted, topDp = 6))
+            // Or type a ZIP: its centre decides, and a ZIP covers more than one neighborhood, which the page says.
+            ZipBox.add(a, col)
             col.addView(UI.text(a, L.t("loc.note"), 14f, R.color.muted, topDp = 4))
             return
         }
@@ -314,7 +316,11 @@ object HoodScreens {
         } else {
             col.addView(nameCard(a, mine))
         }
+        // A ZIP covers more than one neighborhood and the bundle carries only its centre, so a page reached that
+        // way says as much rather than letting a person think the whole ZIP is this one place.
+        a.nearZip?.let { col.addView(UI.text(a, L.t("hood.mine_zip", "zip" to it), 14f, R.color.muted, topDp = 6)) }
         col.addView(UI.text(a, L.t("hood.mine_note"), 14f, R.color.muted, topDp = 6))
+        ZipBox.add(a, col)
     }
 
     /** One row of the index: the City's name for the place, and its district. */
@@ -330,7 +336,7 @@ object HoodScreens {
         val found = filterHoods(list, query)
         val count = UI.text(
             a,
-            if (found.size == 1) L.t("hood.find_one") else L.t("hood.find_count", "count" to hoodNumber(found.size, L.locale())),
+            if (found.size == 1) L.t("hood.find_one") else L.t("hood.find_count", "count" to hoodNumber(found.size)),
             15f, R.color.muted, topDp = 10,
         )
         out.addView(count)
@@ -409,6 +415,16 @@ object HoodScreens {
         if (!h.help.coverageChecked) {
             val card = UI.card(a)
             card.addView(UI.text(a, L.t("hood.thin"), 16f, R.color.ink))
+            // "Tell us what we're missing" is a button, as it is on the web: the weakest part of the data is the
+            // recruitment channel (docs/13 honesty rule 6).
+            if (!a.retired()) {
+                card.addView(
+                    UI.button(a, L.t("add.title"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                        AddScreen.reset()
+                        a.push(Route.Add)
+                    },
+                )
+            }
             col.addView(card)
         }
         val miles = hoodMiles(d.nearMiles)
@@ -416,13 +432,13 @@ object HoodScreens {
             UI.text(
                 a,
                 if (h.help.total == 1) L.t("hood.help_count_one", "miles" to miles)
-                else L.t("hood.help_count", "count" to hoodNumber(h.help.total, L.locale()), "miles" to miles),
+                else L.t("hood.help_count", "count" to hoodNumber(h.help.total), "miles" to miles),
                 16f, R.color.ink, topDp = 8,
             ),
         )
         for ((category, n) in h.help.by) {
             if (n <= 0) continue
-            col.addView(pairRow(a, L.t(hoodCategoryKey(category)), hoodNumber(n, L.locale())))
+            col.addView(pairRow(a, L.t(hoodCategoryKey(category)), hoodNumber(n)))
         }
         if (h.help.noneListedYet.isNotEmpty()) {
             val kinds = h.help.noneListedYet.joinToString(L.t("list.sep")) { L.t("hood.kind.$it") }
@@ -437,75 +453,51 @@ object HoodScreens {
                 col.addView(pairRow(a, label, L.t("hood.nearest_none")))
                 continue
             }
-            val value = L.t("miles", "miles" to String.format(L.locale(), "%.1f", mi))
-            // The row opens the listing that distance belongs to, when this phone can find it — the same
-            // arithmetic on the same signed data as the pipeline's (nearestListing). The number shown is always
-            // the bundle's, so a page never states a distance the web would not.
+            val value = L.t("miles", "miles" to hoodFixed(mi, 1))
+            // The row opens the very listing the bundle said that distance belongs to (`help.nearest_id`), so it
+            // can never lead somewhere the printed distance does not describe. Nothing is worked out on the phone,
+            // and a bundle without the field — or an id this phone's list does not have, or one naming a sensitive
+            // listing — gets the plain row instead ([hoodNearestListing]).
             val row = nearestListing(a, h, kind)
             if (row == null) {
                 col.addView(pairRow(a, label, value))
             } else {
-                val card = UI.tappableCard(a, joinParts(listOf(label, row.name, value))) {
-                    a.push(Route.Detail(row.id, row.category))
+                // One thing a screen reader reads, in the sentence the web uses: "Food: Exodus Food Pantry,
+                // 1.0 mi. Open this listing."
+                val spoken = L.t("hood.nearest_open", "kind" to label, "name" to row.name, "distance" to value)
+                val card = UI.tappableCard(a, spoken) { a.push(Route.Detail(row.id, row.category)) }
+                val kindLine = UI.text(a, label, 16f, R.color.muted)
+                val nameLine = UI.text(a, row.name, 17f, R.color.ink, bold = true, topDp = 2)
+                val milesLine = UI.text(a, value, 15f, R.color.muted, topDp = 2)
+                for (line in listOf(kindLine, nameLine, milesLine)) {
+                    line.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                    card.addView(line)
                 }
-                card.addView(UI.text(a, label, 16f, R.color.muted))
-                card.addView(UI.text(a, row.name, 17f, R.color.ink, bold = true, topDp = 2))
-                card.addView(UI.text(a, value, 15f, R.color.muted, topDp = 2))
                 col.addView(card)
             }
         }
 
         col.addView(sub(a, L.t("hood.places_head", "miles" to miles)))
-        col.addView(pairRow(a, L.t("hood.parks"), hoodNumber(h.places.parks, L.locale())))
-        col.addView(pairRow(a, L.t("hood.rec_centers"), hoodNumber(h.places.recCenters, L.locale())))
-        col.addView(pairRow(a, L.t("hood.greenway_open"), hoodNumber(h.places.greenwayOpen, L.locale())))
-        h.places.snapStores?.let { col.addView(pairRow(a, L.t("hood.snap_stores"), hoodNumber(it, L.locale()))) }
-        h.places.busStops?.let { col.addView(pairRow(a, L.t("hood.bus_stops"), hoodNumber(it, L.locale()))) }
+        col.addView(pairRow(a, L.t("hood.parks"), hoodNumber(h.places.parks)))
+        col.addView(pairRow(a, L.t("hood.rec_centers"), hoodNumber(h.places.recCenters)))
+        col.addView(pairRow(a, L.t("hood.greenway_open"), hoodNumber(h.places.greenwayOpen)))
+        h.places.snapStores?.let { col.addView(pairRow(a, L.t("hood.snap_stores"), hoodNumber(it))) }
+        h.places.busStops?.let { col.addView(pairRow(a, L.t("hood.bus_stops"), hoodNumber(it))) }
 
         val nc = h.nearestCity ?: return
         col.addView(sub(a, L.t("hood.city_near_head")))
         for ((key, mi) in listOf("snap" to nc.snap, "grocery" to nc.grocery, "bus" to nc.bus)) {
-            val value = if (mi == null) L.t("hood.none_found") else L.t("miles", "miles" to String.format(L.locale(), "%.1f", mi))
+            val value = if (mi == null) L.t("hood.none_found") else L.t("miles", "miles" to hoodFixed(mi, 1))
             col.addView(pairRow(a, L.t("hood.near.$key"), value))
         }
         col.addView(UI.text(a, L.t("hood.snap_note"), 14f, R.color.muted, topDp = 8))
     }
 
-    /**
-     * The listing the "nearest listed" row is about, found on this phone from the same signed list and the same
-     * straight-line distance the pipeline used (`NEAREST` in pipeline/src/indicators.ts).
-     *
-     * A row is offered only when what this phone finds rounds to the very number the bundle published, so a tap can
-     * never lead somewhere the printed distance does not describe. Sensitive and domestic-violence listings can
-     * never be found here — they carry no coordinates at all (docs/08) — and are refused by name as well, so a DV
-     * row can never appear on this panel and no distance to one can ever be drawn.
-     */
+    /** The listing a "nearest listed" row opens, from the id the bundle published. The rule is [hoodNearestListing]. */
     private fun nearestListing(a: MainActivity, h: Hood, kind: String): BundleRow? {
-        val want = h.help.nearestMiles[kind] ?: return null
-        val category = HOOD_NEAREST_CATEGORY[kind] ?: return null
         val rows = a.store.bundle?.rows ?: return null
-        var best: BundleRow? = null
-        var bestMiles = Double.MAX_VALUE
-        for (r in rows) {
-            if (r.status != "active") continue
-            if (isSensitive(r.category) || isPrivate(r.category)) continue
-            if (r.category != category && !r.category.startsWith("$category.")) continue
-            val lat = r.lat ?: continue
-            val lon = r.lon ?: continue
-            val mi = miles(h.center, LatLon(lat, lon))
-            if (mi < bestMiles) {
-                bestMiles = mi
-                best = r
-            }
-        }
-        if (best == null) return null
-        return if (Math.abs(Math.round(bestMiles * 10) / 10.0 - want) < 0.05) best else null
+        return hoodNearestListing(h, kind) { id -> rows.firstOrNull { it.id == id } }
     }
-
-    /** The categories the four "nearest listed" rows count, as pipeline/src/indicators.ts names them. */
-    private val HOOD_NEAREST_CATEGORY = mapOf(
-        "food" to "food", "clinic" to "health.clinic", "narcan" to "harm", "indoors" to "rec",
-    )
 
     // ---- "Building, and whether people can stay" ---------------------------------------------------------------
 
@@ -519,11 +511,11 @@ object HoodScreens {
         yearTable(
             a, col, L.t("hood.sales_caption"), L.t("hood.median"), L.t("hood.sales"), L.t("hood.too_few"),
             hoodYearRows(h, d, { it.medianPrice }, count = { it.sales }),
-        ) { hoodMoney(it, L.locale()) }
+        ) { hoodMoney(it) }
         yearTable(
             a, col, L.t("hood.permits_caption"), L.t("hood.permit_cost"), L.t("hood.permits"), L.t("hood.too_few_permits"),
             hoodYearRows(h, d, { it.permitCost }, count = { it.permits }),
-        ) { bigMoney(it) }
+        ) { hoodBigMoney(it) }
         col.addView(UI.text(a, L.t("hood.money_note"), 14f, R.color.muted, topDp = 10))
         if (d.sources["rentals"] != null) {
             col.addView(
@@ -545,23 +537,23 @@ object HoodScreens {
         yearTable(
             a, col, L.t("hood.blight_caption"), L.t("hood.blight_rate"), L.t("hood.blight"), L.t("hood.too_few_permits"),
             hoodYearRows(h, d, { hoodRate(it.blight, h.parcels) }, { hoodRate(it.blight, d.cityParcels) }, { it.blight }),
-        ) { String.format(L.locale(), "%.0f", it) }
+        ) { hoodFixed(it, 0) }
         col.addView(UI.text(a, L.t("hood.blight_note"), 14f, R.color.muted, topDp = 6))
         yearTable(
             a, col, L.t("hood.demo_caption"), L.t("hood.demolitions"), null, L.t("hood.lt5_or_none"),
             hoodYearRows(h, d, { it.demolitions?.value?.toDouble() }),
-        ) { hoodNumber(it, L.locale()) }
+        ) { hoodNumber(it) }
         yearTable(
             a, col, L.t("hood.issues_caption"), L.t("hood.issue_days"), L.t("hood.issues"), L.t("hood.too_few_permits"),
             hoodYearRows(h, d, { it.issueDays }, count = { it.issues }),
-        ) { L.t("hood.days", "n" to hoodNumber(it, L.locale())) }
+        ) { L.t("hood.days", "n" to hoodNumber(it)) }
         col.addView(UI.text(a, L.t("hood.issues_note", "types" to d.issueTypes.joinToString(L.t("list.sep"))), 14f, R.color.muted, topDp = 6))
 
         if (d.sources["fires"] != null) {
             yearTable(
                 a, col, L.t("hood.fire_caption"), L.t("hood.blight_rate"), L.t("hood.fires"), L.t("hood.too_few_permits"),
                 hoodYearRows(h, d, { hoodRate(it.fires, h.parcels) }, { hoodRate(it.fires, d.cityParcels) }, { it.fires }),
-            ) { String.format(L.locale(), "%.1f", it) }
+            ) { hoodFixed(it, 1) }
             col.addView(UI.text(a, L.t("hood.fire_note"), 14f, R.color.muted, topDp = 6))
             col.addView(UI.text(a, L.t("hood.fire_types"), 14f, R.color.muted, topDp = 6))
             col.addView(UI.text(a, d.fireTypes.joinToString(L.t("list.sep")), 14f, R.color.muted, topDp = 2))
@@ -582,8 +574,8 @@ object HoodScreens {
                 roads.poorPct == null -> L.t("hood.roads_few")
                 else -> L.t(
                     "hood.roads_pct",
-                    "pct" to hoodNumber(roads.poorPct, L.locale()),
-                    "miles" to String.format(L.locale(), "%.1f", roads.miles ?: 0.0),
+                    "pct" to hoodNumber(roads.poorPct),
+                    "miles" to hoodFixed(roads.miles ?: 0.0, 1),
                 )
             }
             val cityPct = d.cityNow?.roads?.poorPct
@@ -592,7 +584,7 @@ object HoodScreens {
                 "from" to (d.roadsYears?.first?.toString() ?: ""),
                 "to" to (d.roadsYears?.second?.toString() ?: ""),
             )
-            col.addView(pairRow(a, label, value, if (cityPct == null) "" else L.t("hood.city_pct", "pct" to hoodNumber(cityPct, L.locale()))))
+            col.addView(pairRow(a, label, value, if (cityPct == null) "" else L.t("hood.city_pct", "pct" to hoodNumber(cityPct))))
             col.addView(UI.text(a, L.t("hood.roads_note"), 14f, R.color.muted, topDp = 6))
         }
     }
@@ -621,8 +613,8 @@ object HoodScreens {
             "bike" to (crashes.bike to d.cityCrashes?.bike),
             "severe" to (crashes.severe to d.cityCrashes?.severe),
         )) {
-            val city = pair.second?.value?.let { L.t("hood.crash_city", "count" to hoodNumber(it, L.locale())) } ?: ""
-            col.addView(pairRow(a, L.t("hood.crash_$key"), hoodCountText(pair.first, L.locale()) { L.t(it) }, city))
+            val city = pair.second?.value?.let { L.t("hood.crash_city", "count" to hoodNumber(it)) } ?: ""
+            col.addView(pairRow(a, L.t("hood.crash_$key"), hoodCountText(pair.first) { L.t(it) }, city))
         }
         col.addView(UI.text(a, L.t("hood.crash_note"), 14f, R.color.muted, topDp = 8))
         col.addView(
@@ -663,43 +655,21 @@ object HoodScreens {
 
     // ---- the pieces a panel is made of ------------------------------------------------------------------------------
 
-    /** Half a mile, written as the reader's language writes a half. */
+    /** "0.5" of a mile, or a whole number of miles with no trailing zero. */
     private fun hoodMiles(n: Double): String =
-        if (n == Math.floor(n)) hoodNumber(n, L.locale()) else String.format(L.locale(), "%.1f", n)
-
-    /**
-     * "$1.2 million" — the same compact wording the web's `bigMoney` prints.
-     *
-     * Android's own ICU does this, and only Android's: `java.text` has no compact format on a JDK 17, so this one
-     * line lives here rather than in Hoods.kt, which `:core` compiles. The **rule** it follows is in `:core` and is
-     * tested there — [hoodMoneyLocale] decides which language writes the amount, so a language that would put the
-     * dollar sign at the far end gets the one that does not, exactly as on the web. Below Android 7 there is no
-     * compact format at all and the amount is written out in full, which is longer but never wrong.
-     */
-    private fun bigMoney(n: Double): String {
-        val locale = hoodMoneyLocale(L.locale())
-        return try {
-            val f = android.icu.text.CompactDecimalFormat.getInstance(
-                locale, android.icu.text.CompactDecimalFormat.CompactStyle.LONG,
-            )
-            f.maximumFractionDigits = 1
-            "$" + f.format(n)
-        } catch (_: Throwable) {
-            hoodMoney(n, L.locale())
-        }
-    }
+        if (n == Math.floor(n)) hoodNumber(n) else hoodFixed(n, 1)
 
     /** A count as of today, with its rate per 1,000 lots when the count can be shown and the base defended. */
     private fun per1000(c: HoodCount?, parcels: Int?): String {
         if (c == null) return L.t("hood.none_recorded")
         if (c.hidden) return L.t("hood.lt5")
-        val r = hoodRate(c, parcels) ?: return hoodNumber(c.value!!, L.locale())
-        return L.t("hood.per_1000", "count" to hoodNumber(c.value!!, L.locale()), "rate" to hoodRateText(r, L.locale()))
+        val r = hoodRate(c, parcels) ?: return hoodNumber(c.value!!)
+        return L.t("hood.per_1000", "count" to hoodNumber(c.value!!), "rate" to hoodRateText(r))
     }
 
     private fun cityPer1000(c: HoodCount?, parcels: Int?): String {
         val r = hoodRate(c, parcels) ?: return ""
-        return L.t("hood.city_per_1000", "rate" to hoodRateText(r, L.locale()))
+        return L.t("hood.city_per_1000", "rate" to hoodRateText(r))
     }
 
     /**
@@ -789,7 +759,7 @@ object HoodScreens {
         for (r in rows) {
             val year = if (r.soFar) L.t("hood.so_far", "year" to r.year) else r.year
             val value = r.value?.let { fmt(it) } ?: missing
-            val count = if (countHead == null) null else hoodCountText(r.count, L.locale()) { L.t(it) }
+            val count = if (countHead == null) null else hoodCountText(r.count) { L.t(it) }
             val city = r.cityValue?.let { fmt(it) } ?: ""
             val row = UI.column(a)
             row.setPaddingRelative(0, UI.dp(a, 8), 0, UI.dp(a, 8))

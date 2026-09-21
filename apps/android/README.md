@@ -1120,17 +1120,55 @@ Written, and now compiled and run (the five screens marked **seen** were looked 
 - **The Map tab** (2026-09-21): the city, the greenway, our own listings by group, the eleven transport layers,
   a layer switcher, a text list, a card on tap, virtual accessibility nodes and a keyboard walk. **Seen** on the
   emulator in light and dark, in English and Arabic, at font scale 2.0, and with all eighteen layers on.
+- **The Neighborhoods tab** (2026-09-22; Kyle, 2026-09-21: "not just on the web, in the apps too"). The index of
+  the City's 205 neighborhoods — a filter, A–Z or by council district, and "Your neighborhood" when this app
+  already holds a coarse fix or a typed ZIP — and a page per neighborhood with the web's panels in the web's
+  order: help nearby by kind and the four nearest listed places, home sales beside building permits, conditions,
+  the Safe streets crash panel with SEMCOG's notice in English, and the sources with their dates. The numbers,
+  the outline, where a point falls, the order of the index and every formatted number are in `Hoods.kt`, which
+  `:core` runs on a plain JDK; `HoodScreens.kt` only lays them out. The tab label is `tab.hoods` ("Areas") and a
+  screen reader is told the whole word (`tab.hoods_wide`). **Seen** on the emulator in light and dark, in English
+  and Arabic, at font scale 2.0, with a fix inside Detroit and one in Dearborn, and with a ZIP typed.
+  - `indicators/neighborhoods.json` now ships in the APK snapshot (about 105 KiB compressed), so the tab works
+    on first run with no signal; it stays lazy, read only when the tab is opened and checked against the signed
+    index before a byte of it is decoded.
+  - **"Your neighborhood" is a coarse answer.** This app only ever asks for `ACCESS_COARSE_LOCATION`, and Android
+    fuzzes a coarse fix onto a grid of a kilometre or two — so on the emulator a fix in Corktown named Hubbard
+    Richard, the neighborhood next door. That is the right trade (a neighborhood page is not worth a precise
+    location) and the screen says the answer was worked out on this phone, but it is worth knowing: the name is a
+    starting point, not a statement about where somebody is standing. Typing a ZIP is exact about what it is.
+  - **No neighborhood number is formatted by a locale-aware formatter.** Grouping, decimals and dollars are
+    arithmetic in `Hoods.kt` (`hoodDigits`, `hoodFixed`, `hoodMoney`, `hoodBigMoney`), so a phone, a laptop and a
+    CI runner with a German default locale all print "9.9" and "$85,000". The rounding is done on the exact
+    binary value with `BigDecimal`, which is what makes it agree with JavaScript's `toFixed` to the digit.
+- **"Type a ZIP code"** (2026-09-22), wherever this app offers "Use my location": the Home and category lists and
+  the Neighborhoods tab. The bundle carries one point per ZIP (`places/zips.json`, 37 of them) and the whole rule
+  — five digits, Latin or Arabic-Indic or Bengali, known, and inside the four cities — is `Zip.kt` in `:core`.
+  A typed ZIP is **memory only**: a field on the activity, never a file, never `savedInstanceState`, never a
+  Route, never sent. **Seen** on the emulator: 48226 opens Downtown, 90210 says we do not know it.
+- **"Add a place that helps"** (2026-09-22), from the Help screen and from a neighborhood page's "we haven't
+  listed much here yet" panel. The same form as the web's, field for field, with each error beside the field it
+  is about, said out loud and focused. The body is the closed eight-key schema `POST /v1/proposals` accepts
+  (`Propose.kt`, tested against `api/src/validate.ts`'s own key list) — **nothing about the person is in it**: no
+  install secret, no daily hash, no location, no identifier. With no signal it is queued in
+  `outbox-proposals.json`, written atomically, and flushed on the next resume. **Seen** on the emulator: the
+  queued path, the per-field errors, and the queue file holding exactly the four keys that were filled in.
 
 Not built:
 
-- Neighbourhood pages, transit *screens* (the Transit app link above is a link-out on a listing,
-  not a transit feature), City events, add-a-place, condition reports and photos.
+- Transit *screens* (the Transit app link above is a link-out on a listing, not a transit feature), City events,
+  condition reports and photos.
 - Link-outs (unemployment, Lifeline, child-care scholarships): the web app shows these on several need screens;
   Android lists places only, as the iPhone app does. The one exception is the 313SafeBeds card above the numbers
   on the shelter screen, whose words come from the strings files (`link.beds.safebeds.*`) like everything else.
   Two web refinements are link-outs and nothing else — "Help paying for food" and "I lost my job" — so they have
   no row here at all; `ParityTest` names them, so a new one cannot slip past unnoticed.
-- ZIP-code sorting (the web app's alternative to location).
+- A **lens** page for the Joe Louis Greenway neighborhoods. `Route.Hoods` carries the lens and the index filters
+  by it, but no screen offers the row yet, and a greenway stretch has no "About this area" link to the
+  neighborhoods it runs through as the web's does.
+- Three string keys that would close the last gap between the two apps' wording: a word for "thousand", "million"
+  and "billion". `hoodBigMoney` writes them in English in all four languages, which is what the web falls back to
+  for Arabic and Bengali and differs only in Spanish ("$107.8 millones").
 
 ## Release blockers
 

@@ -49,6 +49,35 @@ class MainActivity : Activity() {
     var locationRefused = false
 
     /**
+     * A ZIP somebody typed, and whether the field is open (docs/05 "Type a ZIP"; Zip.kt).
+     *
+     * Both are fields on this activity and nowhere else: not a file, not `savedInstanceState`, not a Route. A ZIP
+     * is not sensitive — it is a hundred thousand people — but it is still something a person typed about
+     * themselves, and in this app that stays on the phone and dies with the process.
+     */
+    var nearZip: String? = null
+    var zipWanted = false
+
+    /** A typed ZIP becomes the point the list is sorted from. The point is the middle of the ZIP, not a person. */
+    fun useZip(zip: String, point: LatLon) {
+        nearZip = zip
+        near = point
+        zipWanted = false
+        locationRefused = false
+        locateOutside = false
+        if (current() is Route.Map) MapModel.show(point)
+        render()
+    }
+
+    /** "Stop using this ZIP": back to the whole city, and nothing about it is left anywhere. */
+    fun clearZip() {
+        nearZip = null
+        near = null
+        zipWanted = false
+        render()
+    }
+
+    /**
      * The Map tab's first open (docs/05, DECISIONS 2026-09-21). All three are in memory: our own card waiting to
      * be answered, a fix that came from outside the four cities, and "the decision has already been made this
      * launch". The one thing that outlives the launch is the answered flag, in [locateFlags] — a boolean, and
@@ -89,7 +118,9 @@ class MainActivity : Activity() {
     fun mapTabOpened() {
         if (locateChecked) return
         locateChecked = true
-        when (firstOpenAction(locateFlags.answered, locatePermission(), near != null)) {
+        // "A typed ZIP wins over everything" (Locate.kt) means a ZIP, not any point at all: this used to pass
+        // `near != null`, which is also true of a fix the person had already given us.
+        when (firstOpenAction(locateFlags.answered, locatePermission(), nearZip != null)) {
             FirstOpenAction.SHOW_CARD -> locateCard = true
             FirstOpenAction.CENTRE_ON_PERSON -> content.post { askForLocation() }
             FirstOpenAction.CENTRE_ON_ZIP -> near?.let { MapModel.show(it) }
@@ -284,6 +315,8 @@ class MainActivity : Activity() {
         // (Android review, 2026-09-20). ReportStore.flush refuses to run twice at once by itself.
         val app = applicationContext
         Work.net { ReportStore.flush(app) }
+        // And any place somebody added while the phone had no signal (docs/05 "Offline").
+        Work.net { ProposeStore.flush(app) }
     }
 
     // ---- navigation ----------------------------------------------------------------------------------------

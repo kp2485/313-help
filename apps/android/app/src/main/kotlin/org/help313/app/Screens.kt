@@ -42,6 +42,7 @@ object Screens {
         is Route.MapList -> MapScreen.list(a)
         is Route.Hoods -> HoodScreens.index(a, route.lens)
         is Route.Hood -> HoodScreens.page(a, route.hoodId)
+        is Route.Add -> AddScreen.view(a)
         is Route.Stretch -> {
             // A route outlives a draw, so the stretch is looked up again: the bundle may have been refreshed since.
             val s = a.store.bundle?.segments?.firstOrNull { it.id == route.segmentId }
@@ -203,6 +204,19 @@ object Screens {
             card.addView(UI.text(a, label, 17f, R.color.ink))
             col.addView(card)
         }
+
+        // "Add a place that helps", where the web puts it (`help.more`) and on the same condition: a retired list
+        // takes no proposals, because nobody is left to check them (schema/query-spec.md "Bundle age").
+        if (!a.retired()) {
+            col.addView(UI.sectionHead(a, L.t("help.more")))
+            val add = UI.tappableCard(a, L.t("add.title")) {
+                AddScreen.reset()
+                a.push(Route.Add)
+            }
+            add.addView(UI.text(a, L.t("add.title"), 18f, R.color.ink, bold = true))
+            add.addView(UI.text(a, L.t("add.sub"), 16f, R.color.muted, topDp = 2))
+            col.addView(add)
+        }
         return UI.scroller(a, col)
     }
 
@@ -324,10 +338,21 @@ object Screens {
                 col.addView(UI.button(a, L.t("loc.use"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
                     a.askForLocation()
                 })
-                if (a.locationRefused) col.addView(UI.text(a, L.t("loc.denied"), 15f, R.color.muted, topDp = 6))
-            } else {
+                if (a.locationRefused) {
+                    col.addView(
+                        UI.text(a, L.t(if (a.locationPermanentlyDenied()) "loc.denied_settings" else "loc.denied"), 15f, R.color.muted, topDp = 6),
+                    )
+                }
+            } else if (a.nearZip == null) {
                 col.addView(UI.text(a, L.t("loc.using"), 15f, R.color.muted, topDp = 8))
+                col.addView(UI.button(a, L.t("loc.off"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                    a.near = null
+                    a.render()
+                })
             }
+            // The other way to say roughly where you are, for the person who will not hand over their location and
+            // for the phone that cannot give one (ZipBox.kt). Typed, not taken, and it stays on the phone.
+            ZipBox.add(a, col)
             col.addView(UI.text(a, L.t("loc.note"), 14f, R.color.muted, topDp = 4))
         }
 

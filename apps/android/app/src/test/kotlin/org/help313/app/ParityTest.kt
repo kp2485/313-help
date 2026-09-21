@@ -132,6 +132,12 @@ class ParityTest {
         for (key in listOf("walk", "bike", "severe")) built += "hood.crash_$key"
         for (key in listOf("snap", "grocery", "bus")) built += "hood.near.$key"
         built += listOf("hood.group_abc", "hood.group_district", "tab.hoods", "tab.hoods_wide")
+        // "Add a place that helps": the form's labels, hints, errors and choices (AddScreen.kt).
+        for (field in PROPOSAL_KEYS) built += "add.f.$field"
+        for (field in PROPOSAL_REQUIRED) built += "add.e.$field"
+        for (id in PROPOSE_CATEGORIES) built += "add.cat.$id"
+        for (id in HOW_KNOWN) built += "add.how.$id"
+        built += listOf("add.sent", "add.queued", "loc.denied", "loc.denied_settings", "hood.nearest_open")
         built += listOf(
             "tab.home", "tab.help", "search.title", "saved.title", "tabs.label",
             "help.now", "help.soon", "help.later", "results.none",

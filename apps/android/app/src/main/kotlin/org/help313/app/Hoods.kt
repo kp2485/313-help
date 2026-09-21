@@ -19,7 +19,6 @@ package org.help313.app
 
 import org.help313.query.Json
 import org.help313.query.LatLon
-import java.text.NumberFormat
 import java.text.Normalizer
 import java.util.Locale
 
@@ -127,6 +126,14 @@ class HoodHelp(
     val total: Int,
     val by: Map<String, Int>,
     val nearestMiles: Map<String, Double?>,
+    /**
+     * Which listing each "nearest listed" distance belongs to, when the bundle says (`help.nearest_id`).
+     *
+     * Optional on purpose: a bundle built before the field existed simply has none, and the page draws the same
+     * plain rows it drew then. It is never worked out on the phone — a distance the pipeline published and a
+     * listing this phone picked could disagree, and a row that opened the wrong place would be a wrong fact.
+     */
+    val nearestId: Map<String, String>,
     val noneListedYet: List<String>,
     val coverageChecked: Boolean,
 ) {
@@ -136,10 +143,14 @@ class HoodHelp(
             for ((k, v) in (j?.get("by")?.obj ?: emptyMap())) v.int?.let { by[k] = it }
             val near = LinkedHashMap<String, Double?>()
             for ((k, v) in (j?.get("nearest_miles")?.obj ?: emptyMap())) near[k] = v.num
+            val ids = LinkedHashMap<String, String>()
+            // A null id is the bundle saying "nothing of this kind is listed", which is the same as no entry.
+            for ((k, v) in (j?.get("nearest_id")?.obj ?: emptyMap())) v.str?.let { ids[k] = it }
             return HoodHelp(
                 total = j?.get("total")?.int ?: 0,
                 by = by,
                 nearestMiles = near,
+                nearestId = ids,
                 noneListedYet = j?.strings("none_listed_yet") ?: emptyList(),
                 coverageChecked = j?.get("coverage_checked")?.bool ?: false,
             )
@@ -535,48 +546,102 @@ fun hoodRate(c: HoodCount?, parcels: Int?): Double? {
     return n.toDouble() / parcels * 1000
 }
 
-/** A rate as the page writes it: one decimal below ten, none above, so "0.8" and "14" both read as numbers. */
-fun hoodRateText(r: Double, locale: Locale): String =
-    String.format(locale, if (r < 10) "%.1f" else "%.0f", r)
+// ---- every number written by hand ----------------------------------------------------------------------------------
+//
+// **No locale-dependent formatter anywhere below this line** (CI, 2026-09-22). `NumberFormat` and `String.format`
+// answer differently on different JDKs, different ICU versions and different Android releases: a rate that reads
+// "9.9" on a phone read "9,9" on a CI runner whose default locale was not English, and a test that passes on one
+// machine and fails on another teaches nobody anything. The arithmetic here is the whole of it — a long, a
+// remainder and a comma every three digits — so a number reads the same on a 2016 handset, on a reviewer's laptop
+// and in CI.
+//
+// It is also the rule the four languages need. Every digit is Latin and the dollar sign leads the amount in all of
+// them (DECISIONS 2026-09-20): a price is something a person may have to say out loud, write down, or type into a
+// search, and Arabic's own currency format puts the sign at the far end ("85,000 US$") while Bengali shortens the
+// word. This is the same decision `dollars` makes in apps/web/src/hoods.ts, taken once here rather than per
+// language.
+
+/** Digits with a comma every three, Latin, no matter the language. Negative numbers keep their sign. */
+fun hoodDigits(n: Long): String {
+    if (n < 0) return "-" + hoodDigits(-n)
+    val plain = n.toString()
+    val sb = StringBuilder(plain.length + plain.length / 3)
+    for ((i, c) in plain.withIndex()) {
+        if (i > 0 && (plain.length - i) % 3 == 0) sb.append(',')
+        sb.append(c)
+    }
+    return sb.toString()
+}
 
 /**
- * Dollars, written the way the sale record and the permit write them: **"$85,000", with the sign leading and every
- * digit Latin**, in all four languages.
+ * `n` rounded to `places` decimals, on the **exact** value the Double holds, half away from zero.
  *
- * This is the same rule as `dollars` in apps/web/src/hoods.ts, and it is there for the same reason: a currency
- * formatted in the reader's own language puts the sign at the far end in Arabic ("85,000 US$") and shortens the
- * word in Bengali, and a price a person may have to say out loud or type into a search should look like the price.
- * A language that already puts the sign first — English, Spanish — is untouched, so it keeps its own separators.
+ * `BigDecimal(double)` is the exact binary value rather than the decimal somebody typed, which is what makes this
+ * agree with JavaScript's `toFixed` to the digit: 9.95 is really 9.94999999999999928, so both write "9.9", while
+ * `Math.round(9.95 * 10)` writes "10.0" because the multiplication rounds up to 99.5 on the way. The web, the
+ * phone and CI all print the same number, and no locale is consulted at any point.
  */
-fun hoodMoneyLocale(locale: Locale): Locale =
-    if (currencySample(locale).startsWith("$")) locale else Locale.US
+private fun round(n: Double, places: Int): java.math.BigDecimal =
+    java.math.BigDecimal(n).setScale(places, java.math.RoundingMode.HALF_UP)
 
-private fun currencySample(locale: Locale): String = try {
-    NumberFormat.getCurrencyInstance(locale).format(1)
-} catch (_: Throwable) {
-    ""
+private fun rounded(n: Double): Long = round(n, 0).toLong()
+
+/** `n` to `places` decimals: 9.94 is "9.9", 9.96 is "10.0", 999.5 to no decimals is "1,000". */
+fun hoodFixed(n: Double, places: Int): String {
+    val value = round(n, places)
+    if (places == 0) return hoodDigits(value.toLong())
+    val plain = value.abs().toPlainString()
+    val dot = plain.indexOf('.')
+    val whole = if (dot < 0) plain else plain.substring(0, dot)
+    val rest = if (dot < 0) "" else plain.substring(dot + 1)
+    val sign = if (value.signum() < 0) "-" else ""
+    return sign + hoodDigits(whole.toLong()) + "." + rest.padEnd(places, '0')
 }
 
-fun hoodMoney(n: Double, locale: Locale): String {
-    val f = NumberFormat.getCurrencyInstance(hoodMoneyLocale(locale))
-    f.maximumFractionDigits = 0
-    f.minimumFractionDigits = 0
-    return f.format(n)
+/** A rate as the page writes it: one decimal below ten, none at ten and above, so "0.8" and "14" both read. */
+fun hoodRateText(r: Double): String = if (r < 10) hoodFixed(r, 1) else hoodFixed(r, 0)
+
+/** "$85,000": the amount the sale record and the permit wrote, to the dollar. */
+fun hoodMoney(n: Double): String = "$" + hoodDigits(rounded(n))
+
+/**
+ * "$107.8 million": a large amount in words a person can hold in their head, as the web's `bigMoney` writes it.
+ *
+ * The scale words are **English in every language**, which is a deliberate and stated exception, not an oversight:
+ * the strings files carry no word for "thousand", "million" or "billion", and inventing four translations in code
+ * would break the rule that no sentence in this app is built out of fragments. The web reaches the same English
+ * for Arabic and Bengali by its own fallback and differs only in Spanish ("$107.8 millones"). Noted for a steward:
+ * three string keys would close it.
+ */
+fun hoodBigMoney(n: Double): String {
+    val words = listOf(1_000.0 to "thousand", 1_000_000.0 to "million", 1_000_000_000.0 to "billion")
+    if (n < words[0].first) return hoodMoney(n)
+    var at = 0
+    while (at + 1 < words.size && n >= words[at + 1].first) at++
+    var value = round(n / words[at].first, 1)
+    // Rounded first, then the word is chosen again: $999,950,000 is "$1 billion", never "$1000 million".
+    if (value.toDouble() >= 1000 && at + 1 < words.size) {
+        at++
+        value = round(n / words[at].first, 1)
+    }
+    val whole = value.toDouble() == Math.floor(value.toDouble())
+    val written = if (whole) hoodDigits(value.toLong()) else hoodFixed(value.toDouble(), 1)
+    return "$" + written + " " + words[at].second
 }
 
-/** A plain count, in the reader's own language. Arabic and Bengali ask for Latin digits (L.locale). */
-fun hoodNumber(n: Int, locale: Locale): String = NumberFormat.getIntegerInstance(locale).format(n.toLong())
+/** A plain count. Latin digits, grouped with commas, in all four languages. */
+fun hoodNumber(n: Int): String = hoodDigits(n.toLong())
 
-fun hoodNumber(n: Double, locale: Locale): String = NumberFormat.getIntegerInstance(locale).format(n)
+fun hoodNumber(n: Double): String = hoodDigits(rounded(n))
 
 /**
  * A count as a screen says it: the number, "fewer than 5" for a suppressed one, or "none recorded" for one the
  * City never wrote down. The words come from the strings files; nothing here is built out of English fragments.
  */
-fun hoodCountText(c: HoodCount?, locale: Locale, words: (String) -> String): String = when {
+fun hoodCountText(c: HoodCount?, words: (String) -> String): String = when {
     c == null -> words("hood.none_recorded")
     c.hidden -> words("hood.lt5")
-    else -> hoodNumber(c.value!!, locale)
+    else -> hoodNumber(c.value!!)
 }
 
 // ---- a year table ---------------------------------------------------------------------------------------------------
@@ -648,6 +713,24 @@ val HOOD_PANELS: List<String> = listOf(
 
 /** The four kinds the "nearest listed" list names, in the order the web names them. */
 val HOOD_NEAREST: List<String> = listOf("food", "clinic", "narcan", "indoors")
+
+/**
+ * The listing a "nearest listed" row opens, or null for a plain row that opens nothing.
+ *
+ * Four ways to get null, and each of them is the safe answer:
+ *  - the bundle carries no `nearest_id` at all (an older one), or none for this kind;
+ *  - the id names a listing this phone's copy of the list does not have;
+ *  - the listing is **sensitive or private** — a domestic-violence or mental-health-crisis row. Those carry no
+ *    coordinates and so can never be the nearest anything, but the rule is written here rather than relied upon,
+ *    because a row of that kind must never appear on a public neighborhood page and must never carry a distance
+ *    (docs/08, CLAUDE.md).
+ */
+fun hoodNearestListing(h: Hood, kind: String, lookup: (String) -> org.help313.query.BundleRow?): org.help313.query.BundleRow? {
+    val id = h.help.nearestId[kind] ?: return null
+    val row = lookup(id) ?: return null
+    if (isSensitive(row.category) || isPrivate(row.category)) return null
+    return row
+}
 
 /**
  * The sources listed at the foot of a page, in the web's order, leaving out the ones this bundle has none of. The

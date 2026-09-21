@@ -74,9 +74,9 @@ class HoodsTest {
             d.neighborhoods.count { it.crashes?.bike?.hidden == true }
         assertTrue("the shipped file has no suppressed counts at all, which is not what docs/13 describes", hidden > 0)
         assertNull("a hidden count must have no value", HoodCount.HIDDEN.value)
-        assertEquals("fewer than 5", hoodCountText(HoodCount.HIDDEN, Locale.US) { "fewer than 5" })
-        assertEquals("none recorded", hoodCountText(null, Locale.US) { "none recorded" })
-        assertEquals("14", hoodCountText(HoodCount.of(14), Locale.US) { it })
+        assertEquals("fewer than 5", hoodCountText(HoodCount.HIDDEN) { "fewer than 5" })
+        assertEquals("none recorded", hoodCountText(null) { "none recorded" })
+        assertEquals("14", hoodCountText(HoodCount.of(14)) { it })
         // And a hidden count never becomes a rate, which would hand the number back.
         assertNull(hoodRate(HoodCount.HIDDEN, 10_000))
     }
@@ -165,7 +165,7 @@ class HoodsTest {
             Hood(
                 id = h.id, name = h.name, district = h.district, jlgStudyArea = h.jlgStudyArea,
                 center = h.center, rings = emptyList(),
-                help = HoodHelp(0, emptyMap(), emptyMap(), emptyList(), false),
+                help = HoodHelp(0, emptyMap(), emptyMap(), emptyMap(), emptyList(), false),
                 places = HoodPlaces(0, 0, 0, null, null), nearestCity = null, parcels = null,
                 years = emptyMap(), now = null, crashes = null,
             )
@@ -253,20 +253,65 @@ class HoodsTest {
 
     // ---- the numbers, in words -------------------------------------------------------------------------------------
 
+    /**
+     * **Every number on these screens is written by hand and reads the same everywhere.**
+     *
+     * This test runs under whatever default locale the machine happens to have, and passes: that is the point. A
+     * locale-dependent formatter gave a CI runner "9,9" where a phone said "9.9" and the iPhone PR went red on it
+     * (2026-09-22), so there is no formatter left in Hoods.kt to disagree with anybody.
+     */
     @Test
-    fun dollarsLeadWithTheSignInEveryLanguage() {
-        for (tag in listOf("en-US", "es-US", "ar-u-nu-latn", "bn-u-nu-latn")) {
-            val written = hoodMoney(85_000.0, Locale.forLanguageTag(tag))
-            assertTrue("$tag wrote $written", written.startsWith("$"))
-            // Latin digits, whatever the language: a price has to look like the price.
-            assertTrue("$tag wrote $written", written.contains("85"))
-            assertFalse("$tag wrote a fraction", written.contains(".0"))
+    fun everyNumberIsWrittenByHandAndReadsTheSameEverywhere() {
+        val was = Locale.getDefault()
+        try {
+            // A language that writes a comma for the decimal point and a dot for the thousands: the worst case.
+            Locale.setDefault(Locale.GERMANY)
+            assertEquals("$85,000", hoodMoney(85_000.0))
+            assertEquals("$1,250,000", hoodMoney(1_250_000.0))
+            assertEquals("$0", hoodMoney(0.0))
+            assertEquals("9.9", hoodRateText(9.94))
+            assertEquals("1,234,567", hoodNumber(1_234_567))
+            assertEquals("0.5", hoodFixed(0.5, 1))
+        } finally {
+            Locale.setDefault(was)
         }
-        assertEquals("$85,000", hoodMoney(85_000.0, Locale.US))
-        assertEquals("$1,250,000", hoodMoney(1_250_000.0, Locale.US))
-        // Arabic and Bengali write the sign at the far end, so they get the language that does not.
-        assertEquals(Locale.US, hoodMoneyLocale(Locale.forLanguageTag("ar-u-nu-latn")))
-        assertEquals(Locale.US, hoodMoneyLocale(Locale.US))
+    }
+
+    /** The boundaries: where a decimal appears, where it goes, and where a number rounds up into the next word. */
+    @Test
+    fun theRoundingBoundaries() {
+        // One decimal below ten, none at ten and above.
+        assertEquals("9.9", hoodRateText(9.94))
+        assertEquals("9.9", hoodRateText(9.95))   // 9.95 is not exactly 9.95 in binary; JavaScript agrees
+        assertEquals("10.0", hoodRateText(9.96))
+        assertEquals("10", hoodRateText(10.0))
+        assertEquals("1,000", hoodRateText(999.5))
+        assertEquals("0.0", hoodRateText(0.0))
+        assertEquals("0.8", hoodRateText(0.84))
+        assertEquals("14", hoodRateText(13.7))
+
+        // Dollars, to the dollar.
+        assertEquals("$1,234,567", hoodMoney(1_234_567.0))
+        assertEquals("$86,900", hoodMoney(86_899.5))
+
+        // Large amounts in words.
+        assertEquals("$1.2 million", hoodBigMoney(1_234_567.0))
+        assertEquals("$107.8 million", hoodBigMoney(107_800_000.0))
+        assertEquals("$136 million", hoodBigMoney(135_999_561.0))
+        assertEquals("$85 thousand", hoodBigMoney(85_000.0))
+        assertEquals("$950", hoodBigMoney(950.0))
+        assertEquals("$1.7 billion", hoodBigMoney(1_700_000_000.0))
+        // Rounded first, then the word is chosen again: never "$1000 million".
+        assertEquals("$1 billion", hoodBigMoney(999_950_000.0))
+        // Under a thousand there is no word to use, so it is written out.
+        assertEquals("$1,000", hoodBigMoney(999.5))
+
+        // Grouping, on its own.
+        assertEquals("0", hoodDigits(0))
+        assertEquals("999", hoodDigits(999))
+        assertEquals("1,000", hoodDigits(1000))
+        assertEquals("-1,000", hoodDigits(-1000))
+        assertEquals("1,234,567,890", hoodDigits(1_234_567_890))
     }
 
     @Test
@@ -275,9 +320,6 @@ class HoodsTest {
         assertNull("under a hundred lots there is no rate", hoodRate(HoodCount.of(4), 99))
         assertNull(hoodRate(HoodCount.of(4), null))
         assertNull(hoodRate(null, 10_000))
-        assertEquals("0.8", hoodRateText(0.84, Locale.US))
-        assertEquals("14", hoodRateText(13.7, Locale.US))
-        assertEquals("9.9", hoodRateText(9.94, Locale.US))
     }
 
     @Test
@@ -297,6 +339,75 @@ class HoodsTest {
         // A rate table asks the city column for the city's own base, not this neighborhood's.
         val blight = hoodYearRows(h, d, { hoodRate(it.blight, h.parcels) }, { hoodRate(it.blight, d.cityParcels) }, { it.blight })
         assertEquals(d.years.size, blight.size)
+    }
+
+    /**
+     * A "nearest listed" row opens the listing the **bundle** named, or it opens nothing.
+     *
+     * Four ways to open nothing, and each of them is the safe answer: no field at all (an older bundle), an id
+     * this phone's list does not have, and — the one that matters — an id naming a sensitive or private listing.
+     * A domestic-violence or mental-health-crisis row must never appear on a public neighborhood page and must
+     * never carry a distance (docs/08), so the rule is written down rather than left to the data.
+     */
+    @Test
+    fun aNearestRowOpensOnlyAListingTheBundleNamedAndMayName() {
+        val rows = listOf(
+            org.help313.query.BundleRow(id = "sal_pantry", name = "A pantry", category = "food.pantry"),
+            org.help313.query.BundleRow(id = "sal_dv", name = "A crisis line", category = "shelter.dv"),
+            org.help313.query.BundleRow(id = "sal_crisis", name = "A crisis line", category = "health.mental"),
+        )
+        val lookup = { id: String -> rows.firstOrNull { it.id == id } }
+        fun hood(ids: Map<String, String>) = Hood(
+            id = "nbh_x", name = "X", district = 1, jlgStudyArea = false, center = LatLon(42.33, -83.05),
+            rings = emptyList(),
+            help = HoodHelp(1, emptyMap(), mapOf("food" to 0.6), ids, emptyList(), false),
+            places = HoodPlaces(0, 0, 0, null, null), nearestCity = null, parcels = null,
+            years = emptyMap(), now = null, crashes = null,
+        )
+        assertEquals("sal_pantry", hoodNearestListing(hood(mapOf("food" to "sal_pantry")), "food", lookup)?.id)
+        // No field at all: an older bundle, and the row is the plain one it always was.
+        assertNull(hoodNearestListing(hood(emptyMap()), "food", lookup))
+        // A kind the bundle named nothing for.
+        assertNull(hoodNearestListing(hood(mapOf("food" to "sal_pantry")), "clinic", lookup))
+        // An id this phone's copy of the list does not have.
+        assertNull(hoodNearestListing(hood(mapOf("food" to "sal_gone")), "food", lookup))
+        // And the one that must never happen, refused by name as well as by the data.
+        assertNull(hoodNearestListing(hood(mapOf("food" to "sal_dv")), "food", lookup))
+        assertNull(hoodNearestListing(hood(mapOf("food" to "sal_crisis")), "food", lookup))
+    }
+
+    /**
+     * And in the file the app actually ships: every neighborhood names an id for each kind it has a distance for,
+     * every id is a listing this phone's list holds, and not one of them is a sensitive or private listing.
+     */
+    @Test
+    fun theShippedNearestIdsAllPointAtListingsThisAppMayShow() {
+        val d = real()
+        val rows = org.help313.query.Json
+            .parse(File(root, "data/bundle/v1/category/food.json").readBytes()).arr
+            .map { org.help313.query.BundleRow.fromJson(it) }
+            .associateBy { it.id }
+        var checked = 0
+        for (h in d.neighborhoods) {
+            for (kind in HOOD_NEAREST) {
+                val id = h.help.nearestId[kind]
+                // A distance and an id go together: null exactly where the distance is null.
+                if (h.help.nearestMiles[kind] == null) {
+                    assertNull("${h.id} names a $kind listing but no distance", id)
+                    continue
+                }
+                assertNotNull("${h.id} has a $kind distance but names no listing", id)
+                assertTrue("${h.id} $kind names ${id!!}", id.startsWith("sal_"))
+                // The food ones can be checked against a real category file; the rest are checked for shape.
+                if (kind == "food" && rows.containsKey(id)) {
+                    val row = rows.getValue(id)
+                    assertFalse("${h.id} names the sensitive listing $id", isSensitive(row.category))
+                    assertEquals(row, hoodNearestListing(h, kind) { rows[it] })
+                    checked++
+                }
+            }
+        }
+        assertTrue("no food listing was checked against the real bundle", checked > 100)
     }
 
     /** The four "nearest listed" kinds, and the order the page names them in, are the web's. */

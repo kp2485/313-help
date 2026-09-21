@@ -49,6 +49,12 @@ sealed class Route {
      */
     class Hood(val hoodId: String) : Route()
 
+    /**
+     * "Add a place that helps" (docs/04). Not private: what is typed here is about a place, never about the person
+     * typing it, and a form half filled in is worth having back after a rotation.
+     */
+    object Add : Route()
+
     /** One stretch of the Joe Louis Greenway. */
     class Stretch(val segmentId: String) : Route()
 
