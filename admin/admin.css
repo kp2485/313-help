@@ -17,3 +17,20 @@ button:focus-visible, a:focus-visible { outline:3px solid var(--focus); outline-
 pre { padding:.7rem 1rem; border-radius:.6rem; background:var(--surface); border:1px solid var(--line); overflow:auto; }
 
 .photo { display: grid; gap: .375rem; margin-top: .5rem; max-width: 24rem; } .photo img { max-width: 100%; border-radius: .5rem; border: 1px solid var(--line); } .photo small { color: var(--muted); }
+
+/* The queue is one long page of boxes and the only thing that separates them is a border, so a forced-colours
+   mode has to be told which borders matter. Nothing here is decoration: an outline IS the control (1.4.11). */
+@media (forced-colors: active) {
+  .item, button, pre, .empty { border:1px solid CanvasText; }
+  .item.hot, .breaker { border:2px solid CanvasText; }
+  button.good { forced-color-adjust:none; background:Highlight; color:HighlightText; border-color:Highlight; }
+  button:disabled { opacity:1; color:GrayText; border-color:GrayText; }
+  .tag, .flash { border:1px solid CanvasText; }
+}
+/* "Increase contrast": the greys a steward reads all day. */
+@media (prefers-contrast: more) {
+  :root { --muted:#26332c; --line:#8ea39a; --edge:#3c4a43; }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root { --muted:#d4e2d9; --line:#4c5f55; --edge:#9db3a7; }
+}

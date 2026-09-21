@@ -14,7 +14,7 @@
 const q = (s: string) => s.replace(/["\\]/g, '\\$&');
 
 /** The hooks the app already puts on the things a person clicks. An id wins over all of them. */
-const HOOKS = ['data-layer', 'data-layer-retry', 'data-go', 'data-save', 'data-share', 'data-loc', 'data-report', 'data-lang'];
+const HOOKS = ['data-layer', 'data-mapstyle', 'data-layer-retry', 'data-net-retry', 'data-go', 'data-save', 'data-share', 'data-loc', 'data-report', 'data-lang-select'];
 
 export interface FocusEl {
   id?: string;

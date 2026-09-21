@@ -12,21 +12,44 @@
   --warn-bg:#fdf1d8; --warn-ink:#6b4300; --danger:#8f1d1d; --danger-ink:#ffffff; --focus:#0a57c2;
   --r-sm:.625rem; --r:1rem; --r-lg:1.375rem; --shadow:0 1px 2px rgb(16 32 26 / .06), 0 6px 20px rgb(16 32 26 / .06);
   --tabs-h:4.25rem; color-scheme: light dark;
-  --map-out:#dfe6e1; --map-land:#f7f9f6; --map-park:#c4e3c9; --map-park-ink:#1d5a31; --map-road:#c9d1cb; --map-main:#7e8881; --map-fwy:#a87c18; --map-ink:#2b3a32;
+  /* The map's colours are all computed, never picked by eye: apps/web/test/web.test.ts walks every pair a frame
+     actually puts side by side, in both themes, and fails under 3:1 (a line or an area) or 4.5:1 (a name).
+     Every road clears 3:1 against the land AND against a park, because a street crosses a park. They are close
+     to each other on purpose: the hierarchy is carried by WIDTH and by the zoom a street first appears at
+     (map.ts), not by making the small streets fade away. --map-out-ink is the hatch over the ground outside the
+     four cities: a faint fill was 1.20:1 and could not be seen at all, so the area is drawn as a texture whose
+     own lines clear 3:1 instead (DECISIONS 2026-09-20). */
+  --map-out:#e2e9e4; --map-out-ink:#768079; --map-land:#f7f9f6; --map-park:#c4e3c9; --map-park-ink:#1d5a31; --map-road:#747d77; --map-main:#666f69; --map-fwy:#926c16; --map-ink:#2b3a32;
   /* The greenway is drawn like a transit line: one width, a casing, a colour and a dash per phase. */
   --gw-open:#0b6b43; --gw-build:#c2701a; --gw-fund:#2f6f9e; --gw-plan:#7d8c84; --gw-case:#ffffff;
   /* Map tab layers (Kyle, 2026-09-20). Colour never carries the meaning alone: every layer is named in the
      switcher, named again when you tap it, and listed in words under the map. */
   --lyr-bus:#1d4ed8; --lyr-smart:#0f766e; --lyr-rail:#7e22ce; --lyr-bike:#c2410c;
+  /* The optional "Subway lines" map style (docs/MAP-STYLE.md, section 4). Our own palette, not the agencies'
+     (Kyle, 2026-09-21): six bus tones the pipeline hands out so neighbours differ, fixed colours for the QLINE,
+     the People Mover, trunks, bikes, coaches and park-and-ride. Every one is 3:1 or better against the land, a
+     park AND its casing in both themes (web.test.ts holds the spec's own table). --tr-fill is the casing colour
+     on purpose: a station is read by its ring. No bus or rail line is green: green stays with walking and bikes.
+     --tr-sel is the stroke under a chosen route (the ring colour; Highlight under forced colours). */
+  --tr-0:#c8102e; --tr-1:#1d4ed8; --tr-2:#0f766e; --tr-3:#8a4b14; --tr-4:#be185d; --tr-5:#475569;
+  --tr-rail:#1f2937; --tr-dpm:#86198f; --tr-trunk:#334155; --tr-bike:#15803d; --tr-coach:#7c2d12; --tr-pr:#1e40af;
+  --tr-ring:#1b2a22; --tr-fill:#ffffff; --tr-sel:#1b2a22;
+  /* The quietened basemap under subway lines: paler streets that still clear 3:1 against the land, a paler park.
+     Never used with "increase contrast" or forced colours (subway.ts basemapTokens). */
+  --map-road-q:#818a84; --map-main-q:#7d8680; --map-fwy-q:#a2833d; --map-park-q:#e3f1e5; --map-park-ink-q:#3f6b4c; --map-ink-q:#5a6760;
   --grp-food:#a16207; --grp-shelter:#4338ca; --grp-health:#be185d; --grp-rec:#15803d; --grp-work:#0e7490; --grp-things:#7c2d12; --grp-paperwork:#475569;
 }
 @media (prefers-color-scheme: dark) { :root {
   --bg:#0b1410; --surface:#121e18; --sunken:#0f1a15; --ink:#e9f1ec; --muted:#a3b5aa; --line:#25362d; --edge:#5c7266;
   --brand:#4fcf93; --brand-ink:#04140c; --brand-strong:#86e6b6; --brand-soft:#15311f; --brand-soft-ink:#a6ebc8;
   --warn-bg:#33270a; --warn-ink:#ffd98a; --danger:#e26a6a; --danger-ink:#1a0505; --focus:#8ab8ff; --shadow:none;
-  --map-out:#0a110e; --map-land:#141f19; --map-park:#1c3b27; --map-park-ink:#9fdcb4; --map-road:#2c3b33; --map-main:#63796c; --map-fwy:#907640; --map-ink:#d5e2da;
+  --map-out:#060b09; --map-out-ink:#76827a; --map-land:#141f19; --map-park:#1c3b27; --map-park-ink:#9fdcb4; --map-road:#75827a; --map-main:#88968d; --map-fwy:#a3863a; --map-ink:#d5e2da;
   --gw-open:#4fcf93; --gw-build:#e3974a; --gw-fund:#6aa9d6; --gw-plan:#8ea79a; --gw-case:#0a110e;
   --lyr-bus:#7aa7ff; --lyr-smart:#4fd1c5; --lyr-rail:#c79bff; --lyr-bike:#fb923c;
+  --tr-0:#ff7a70; --tr-1:#7aa7ff; --tr-2:#4fd1c5; --tr-3:#e0a96d; --tr-4:#ff8ac2; --tr-5:#b6c2d2;
+  --tr-rail:#eef2f6; --tr-dpm:#e59bf0; --tr-trunk:#cbd5e1; --tr-bike:#6ee7a0; --tr-coach:#fdba74; --tr-pr:#93b4ff;
+  --tr-ring:#eef5f0; --tr-fill:#0a110e; --tr-sel:#eef5f0;
+  --map-road-q:#66756c; --map-main-q:#6c7b73; --map-fwy-q:#837039; --map-park-q:#182c20; --map-park-ink-q:#7fb394; --map-ink-q:#a3b2a9;
   --grp-food:#e3b341; --grp-shelter:#a5b4fc; --grp-health:#f9a8d4; --grp-rec:#4fcf93; --grp-work:#67e8f9; --grp-things:#fdba74; --grp-paperwork:#cbd5e1;
 } }
 * { box-sizing:border-box; }
@@ -74,10 +97,15 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 
 /* Top bar */
 .top { position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; padding:.625rem 1.125rem; padding-top:calc(.625rem + env(safe-area-inset-top)); background:color-mix(in srgb,var(--bg) 88%,transparent); backdrop-filter:saturate(1.4) blur(12px); -webkit-backdrop-filter:saturate(1.4) blur(12px); border-bottom:1px solid transparent; }
-.top.inner { border-bottom-color:var(--line); } .top h1 { flex:1 1 10rem; font-size:1.1875rem; }
+.top.inner { border-bottom-color:var(--line); } .top h1 { flex:1 1 6rem; min-width:0; font-size:1.1875rem; overflow-wrap:anywhere; }
 .top h1:lang(en),.top h1:lang(es) { letter-spacing:-.01em; }
 /* The brand is the Latin string "313 Help" in every language, so its tracking is not scoped. */
-.brand { flex:1 1 0; min-width:0; line-height:1.15; display:flex; align-items:center; gap:.625rem; font-weight:750; font-size:1.125rem; letter-spacing:-.01em; } .logo { color:var(--brand); border-radius:.6rem; }
+/* `flex:1 1 0` rather than `1 1 auto`: a wrapping flex row decides where to break on an item's CONTENT width,
+   so with `auto` the name's full width pushed Urgent help onto a second line at 375 px. With a basis of 0 the
+   three of them are always one line and the name is the one that gives way — which is the order Kyle asked
+   for: back or brand, then language, then Urgent help, and Urgent help never moves. `min-width` keeps the mark
+   itself on screen at 320 px, where there is genuinely no room for the word beside it. */
+.brand { flex:1 1 0; min-width:0; overflow:hidden; white-space:nowrap; line-height:1.15; display:flex; align-items:center; gap:.625rem; font-weight:750; font-size:1.125rem; letter-spacing:-.01em; } .brand > bdi { min-width:0; overflow:hidden; text-overflow:ellipsis; } .logo { color:var(--brand); border-radius:.6rem; }
 .urgent { flex:none; display:inline-flex; align-items:center; gap:.4rem; min-height:2.75rem; padding:.4rem .95rem; border-radius:99rem; background:var(--surface); border:1.5px solid var(--edge); font-weight:650; font-size:.9375rem; box-shadow:var(--shadow); }
 .urgent .ic { color:var(--brand); } .iconbtn { display:grid; place-items:center; width:2.75rem; height:2.75rem; border-radius:99rem; background:var(--surface); border:1px solid var(--edge); }
 .exit { min-height:2.75rem; padding:.4rem 1rem; border-radius:99rem; background:var(--danger); color:var(--danger-ink); font-weight:700; font-size:.9375rem; }
@@ -140,8 +168,27 @@ table.years { width:100%; border-collapse:collapse; margin-top:1rem; font-size:.
 .bar { display:block; height:.5rem; border-radius:99rem; background:var(--brand); margin-bottom:.125rem; } h3.sub { margin-top:1.25rem; font-size:1rem; } .srcs { display:grid; gap:.375rem; } .banner.plain { background:var(--sunken); color:var(--ink); }
 .report input[type=file] { font:inherit; font-size:.9375rem; max-width:100%; min-height:2.75rem; color:var(--ink); }
 .report input[type=file]::file-selector-button { font:inherit; min-height:2.75rem; padding:.25rem .875rem; margin-inline-end:.625rem; border-radius:var(--r-sm); border:1.5px solid var(--edge); background:var(--surface); color:var(--ink); }
-.langrow { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:.25rem .875rem; margin:.5rem 0 -.25rem; } .langrow .link { min-height:2.75rem; padding:0 .25rem; font-weight:650; }
-.langnow { min-height:2.75rem; display:inline-flex; align-items:center; padding:0 .25rem; font-weight:650; color:var(--muted); }
+/* The language control: a small pill in the top bar, with the platform's own picker inside it. It comes after
+   the name (or the page title) and before Urgent help, and it is the piece that gives way first — `flex:none`
+   on Urgent help, `min-width:0` and an ellipsis on the title, and a hard cap on the select itself — so on a
+   320 px screen the order that survives is back, title, language, Urgent help, on one line.
+   Everything here is logical, so in Arabic the row mirrors and the globe stays beside its own name. */
+.langpick { flex:none; display:inline-flex; align-items:center; gap:.3rem; min-height:2.75rem; padding:.25rem .5rem; border-radius:99rem; background:var(--surface); border:1px solid var(--edge); }
+.langpick .ic { flex:none; color:var(--brand); }
+.langpick select { font:inherit; font-size:.9375rem; font-weight:650; color:var(--ink); background:none; border:0; padding:.25rem 0; max-width:7.5rem; min-height:2.25rem; cursor:pointer; }
+.langpick:has(select:focus-visible) { border-color:var(--focus); }
+@media (max-width:23.5rem) { .langpick select { max-width:5.5rem; font-size:.875rem; } .langpick { padding-inline:.375rem; } .top { gap:.5rem; } }
+/* On a phone the bar is the language control and Urgent help, and the app's mark is not drawn at all: three
+   things do not fit on one 320 px line, Urgent help may not give way, and the name is the piece Kyle ranked
+   last. It is hidden the way everything else in this app is hidden from eyes but not from a screen reader —
+   never `display:none` — so the name is still announced, and it is still the window's title. From a large
+   phone up (30 rem) there is room and the mark comes back. Half a logo peeking out of a squeezed box is not
+   a smaller version of the mark; it is a defect, so there is no in-between state. */
+@media (max-width:29.99rem) {
+  .top > .brand { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip-path:inset(50%); }
+  .top { justify-content:flex-end; }
+}
+@media (min-width:30rem) { .brand { min-width:2.25rem; } }
 .searchbtn { display:flex; align-items:center; gap:.625rem; width:100%; min-height:3rem; margin:.75rem 0; padding:.625rem 1rem; border-radius:99rem; background:var(--surface); border:1.5px solid var(--edge); color:var(--muted); font-size:1rem; text-align:start; } .searchbtn:hover { border-color:var(--brand); } .searchbtn .ic { color:var(--brand); }
 .searchbox { display:grid; gap:.375rem; margin:.75rem 0; font-size:.9375rem; color:var(--muted); } .searchbox input { width:100%; min-height:3rem; font-size:1.0625rem; }
 .cards + .btn { margin-top:.75rem; }
@@ -180,8 +227,14 @@ address { font-style:normal; font-size:1.0625rem; }
 .when span:lang(en),.when span:lang(es) { text-transform:uppercase; letter-spacing:.06em; }
 /* Map (map.ts): one canvas. It takes drags and pinches itself, so it never fills the whole screen unless asked:
    there is always page left to scroll with. */
-.mapbox { margin-top:.75rem; } .mapframe { position:relative; height:min(58vh,24rem); border-radius:var(--r); overflow:hidden; border:1px solid var(--line); background:var(--map-land); }
-.mapbox.small .mapframe { height:min(40vh,15rem); } .mapframe canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; } .mapframe canvas:active { cursor:grabbing; }
+.mapbox { margin-top:.75rem; } .mapframe { position:relative; height:min(58vh,24rem); border-radius:var(--r); overflow:hidden; border:1px solid var(--line); background:var(--map-land); overscroll-behavior:contain; }
+/* The canvas takes the whole gesture itself (map.ts), so the page must not also act on it: no rubber-banding out
+   of the frame, no text selection from a drag, no magnifier from a press-and-hold on iOS. */
+.mapbox.small .mapframe { height:min(40vh,15rem); } .mapframe canvas { display:block; width:100%; height:100%; touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; cursor:grab; } .mapframe canvas:active { cursor:grabbing; }
+/* A small inline map sits in a page people scroll. One finger there scrolls the page (`pan-y` hands that back to
+   the browser); two fingers pinch and pan the map, and map.ts turns one-finger drags on it into nothing. Full
+   screen is not small however it started, so it keeps one-finger panning. */
+.mapbox.small:not(.big) .mapframe canvas { touch-action:pan-y; }
 .mapframe canvas:focus-visible { outline:3px solid var(--focus); outline-offset:-3px; }
 .maptools { position:absolute; inset-block-start:.5rem; inset-inline-end:.5rem; display:grid; gap:.375rem; }
 /* Moving the map without dragging (WCAG 2.5.7): four arrows, low on the map so they never cover the zoom keys. */
@@ -225,6 +278,24 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
 .layers legend:lang(en),.layers legend:lang(es) { text-transform:uppercase; letter-spacing:.06em; }
 .layers .kinds { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:0; }
 .layers .pick span { display:inline-flex; flex-wrap:wrap; align-items:baseline; gap:.375rem; }
+/* The map style: two radio buttons, one under the other, each with a line that says what it does. */
+.layers .mapstyle .kinds { flex-direction:column; align-items:stretch; } .layers .mapstyle .pick { border-radius:var(--r-sm); } .layers .mapstyle small { font-weight:500; color:var(--muted); }
+/* The subway style's key: what each line means, in words, with a small drawn sample (colour is never the only
+   carrier). The samples are painted from the same --tr-* tokens as the map, so they follow dark mode, "increase
+   contrast" and forced colours — which is why forced colours must leave them alone. */
+.keyh { margin-top:1rem; font-size:1rem; } .trkey { flex-direction:column; flex-wrap:nowrap; gap:.375rem; margin-top:.375rem; }
+.trkey li { align-items:center; } .trkey i { forced-color-adjust:none; background:var(--tr-1); position:relative; }
+.trkey i.freq { height:.375rem; } .trkey i.local { height:.1875rem; }
+.trkey i.smart { height:.4375rem; background:linear-gradient(var(--tr-2) 0 34%,var(--tr-fill) 34% 66%,var(--tr-2) 66%); }
+.trkey i.trunk { height:.5625rem; background:var(--tr-trunk); }
+.trkey i.stop { width:.75rem; height:.75rem; margin-inline:.625rem; background:var(--tr-fill); border:2px solid var(--tr-ring); }
+.trkey i.change { width:1.5rem; height:.6875rem; margin-inline:.25rem; background:var(--tr-fill); border:2px solid var(--tr-ring); }
+.trkey i.end { width:.9375rem; height:.9375rem; margin-inline:.53rem; background:var(--tr-fill); border:3px solid var(--tr-0); }
+.trkey i.qline { height:.4375rem; border-radius:.25rem; border-block:2px solid var(--tr-rail); background:repeating-linear-gradient(90deg,var(--tr-rail) 0 .3125rem,var(--tr-fill) .3125rem .5625rem); }
+.trkey i.dpm { height:.5rem; background:var(--tr-dpm); } .trkey i.dpm::after { content:"\203A\2002\203A\2002\203A"; position:absolute; inset:0; display:grid; place-items:center; font:700 .625rem/1 system-ui,sans-serif; color:var(--tr-fill); direction:ltr; unicode-bidi:isolate; }
+.trkey i.bike { height:.3125rem; border-radius:0; background:none; border-block:1.5px solid var(--tr-bike); }
+/* A route named on a map card is a button that chooses it: 44 px tall, Latin names left to right in every language. */
+.mappick.route { align-items:flex-start; } .routebtns { display:flex; flex-wrap:wrap; gap:.375rem; width:100%; } .routebtns .chip { min-height:2.75rem; }
 .maplist { margin-top:.25rem; } .maplistbody { margin-top:.875rem; } .maplistbody h3 { margin-top:1.25rem; } .maplistbody h3:first-child { margin-top:0; }
 /* On a phone the Map tab is one column, exactly as before: these two wrappers are not boxes, they only give the
    wide layout below something to put side by side. */
@@ -288,14 +359,65 @@ main:focus { outline:none; }
   a[href^="tel:"] strong { user-select:text; }
 }
 
+/* ---------------------------------------------------------------------------------------------------
+   Two system settings the map has to answer to. The canvas is painted by hand, so neither reaches it on
+   its own: map.ts reads these very custom properties every frame (`css()`), which is why they are set
+   here as tokens rather than as rules on elements.
+   --------------------------------------------------------------------------------------------------- */
+/* "Increase contrast" (iOS, macOS, Windows). Every map colour is pushed to the far side of its own
+   requirement — roads past 4.5:1, the out-of-area hatch past 4.5:1 — and the park fill steps back towards
+   the land so the things drawn ON it keep their distance. Text tokens follow: black on white, white on black. */
+@media (prefers-contrast: more) {
+  :root {
+    --ink:#000000; --muted:#26332c; --edge:#3c4a43; --line:#8ea39a;
+    --map-out:#e8eeea; --map-out-ink:#4e5853; --map-land:#ffffff; --map-park:#d8efdc; --map-park-ink:#0d3f1f;
+    --map-road:#4f5a54; --map-main:#333c37; --map-fwy:#6a4d08; --map-ink:#101a15;
+    --tr-0:#9b0c23; --tr-1:#1e3a8a; --tr-2:#0b4f4a; --tr-3:#5f330d; --tr-4:#831843; --tr-5:#1e293b; --tr-dpm:#581c5f; --tr-bike:#14532d;
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root {
+    --ink:#ffffff; --muted:#d4e2d9; --edge:#9db3a7; --line:#4c5f55;
+    --map-out:#000000; --map-out-ink:#a9b8b0; --map-land:#0c1512; --map-park:#123020; --map-park-ink:#cdf0da;
+    --map-road:#a4b3aa; --map-main:#c9d8ce; --map-fwy:#dcc079; --map-ink:#f2f8f4;
+    --tr-0:#ffa099; --tr-1:#a8c5ff; --tr-2:#8be6dd; --tr-3:#f0c596; --tr-4:#ffb3d7; --tr-5:#dbe3ee; --tr-dpm:#f0c0f7; --tr-bike:#a7f3c5;
+  }
+}
+/* Forced colours (Windows high contrast, and "Smart Invert"-style modes). A canvas is not a set of elements,
+   so the system never repaints it: the browser hands it whatever colours the page asked for. These tokens ARE
+   what the page asks for, so pointing them at the system's own keywords is what makes the map obey. Colour is
+   down to five or six values there, which is why every line on this map also has a dash pattern and a name in
+   the list below it (1.4.1). */
+@media (forced-colors: active) {
+  :root {
+    --map-out:Canvas; --map-out-ink:GrayText; --map-land:Canvas; --map-park:Canvas; --map-park-ink:GrayText;
+    --map-road:GrayText; --map-main:CanvasText; --map-fwy:LinkText; --map-ink:CanvasText;
+    --gw-open:Highlight; --gw-build:CanvasText; --gw-fund:LinkText; --gw-plan:GrayText; --gw-case:Canvas;
+    --lyr-bus:LinkText; --lyr-smart:CanvasText; --lyr-rail:Highlight; --lyr-bike:GrayText;
+    /* Subway style: every route is one colour here, which is fine — badges, stripes, ties, chevrons and the
+       double line still tell them apart. The quiet basemap is never used, so its tokens are the plain ones. */
+    --tr-0:LinkText; --tr-1:LinkText; --tr-2:LinkText; --tr-3:LinkText; --tr-4:LinkText; --tr-5:LinkText;
+    --tr-dpm:LinkText; --tr-coach:LinkText; --tr-pr:LinkText; --tr-rail:CanvasText; --tr-trunk:CanvasText; --tr-ring:CanvasText;
+    --tr-bike:GrayText; --tr-fill:Canvas; --tr-sel:Highlight;
+    --map-road-q:GrayText; --map-main-q:CanvasText; --map-fwy-q:LinkText; --map-park-q:Canvas; --map-park-ink-q:GrayText; --map-ink-q:CanvasText;
+    --grp-food:CanvasText; --grp-shelter:LinkText; --grp-health:Highlight; --grp-rec:CanvasText;
+    --grp-work:LinkText; --grp-things:Highlight; --grp-paperwork:CanvasText;
+    --focus:Highlight; --surface:Canvas; --brand:LinkText;
+  }
+}
+
 /* Printing (people print at a library). Ink on white, no app furniture, and every link's address spelled out. */
 @media print {
   :root { --bg:#fff; --surface:#fff; --sunken:#fff; --ink:#000; --muted:#333; --line:#999; --brand:#000; --brand-soft:#fff; --brand-soft-ink:#000; --warn-bg:#fff; --warn-ink:#000; --shadow:none; color-scheme:light; }
-  .tabs,.skip,.maptools,.mappan,.mapbar,.report,.searchbtn,.langrow,.browse>summary,.top>.urgent,.top>.iconbtn,.top>.exit,.stackbtns .btn.ghost { display:none !important; }
+  .tabs,.skip,.maptools,.mappan,.mapbar,.report,.searchbtn,.langpick,.browse>summary,.top>.urgent,.top>.iconbtn,.top>.exit,.stackbtns .btn.ghost { display:none !important; }
   #app { padding:0; } main,main.wide { max-width:none; padding:0 1rem 1rem; }
   .top { position:static; background:none; backdrop-filter:none; border:0; padding-inline:1rem; }
   .btn,.callrow { background:none !important; color:#000 !important; border:1px solid #999; }
   .card,.row,.panel,.hours,.event,.alert,ol.steps li { break-inside:avoid; box-shadow:none; }
   .cards,.duo,.events,.quick.tiles { grid-template-columns:1fr; }
-  a[href^="http"]::after { content:" (" attr(href) ")"; font-size:.85em; word-break:break-all; }
+  /* A printed link spells its address out. An address is a left-to-right run, and on an Arabic or Bengali page
+     the brackets around it used to take the paragraph's direction instead: the opening bracket came out at the
+     far end of the line and the address read backwards through it. `unicode-bidi:isolate` on the generated run
+     keeps the whole "(https://…)" together and the right way round, in every language. */
+  a[href^="http"]::after { content:" (" attr(href) ")"; font-size:.85em; word-break:break-all; direction:ltr; unicode-bidi:isolate; }
 }

@@ -42,6 +42,8 @@ const PATHS: Record<string, string> = {
   shirt: 'M8 4L3 7l2 4 3-1v10h8V10l3 1 2-4-5-3c-.6 1.5-2.1 2.5-4 2.5S8.6 5.5 8 4z',
   wifi: 'M2.5 9a14 14 0 0 1 19 0 M5.5 12.5a9.5 9.5 0 0 1 13 0 M8.8 16a5 5 0 0 1 6.4 0 M12 19.5h.01',
   paw: 'M12 13c-3 0-5 3-5 5a2 2 0 0 0 2 2c1.2 0 2-.5 3-.5s1.8.5 3 .5a2 2 0 0 0 2-2c0-2-2-5-5-5z M5.5 11a1.5 2 0 1 0 3 0 1.5 2 0 1 0-3 0z M9.5 7a1.5 2 0 1 0 3 0 1.5 2 0 1 0-3 0z M13.5 7a1.5 2 0 1 0 3 0 1.5 2 0 1 0-3 0z M17.5 11a1.5 2 0 1 0 3 0 1.5 2 0 1 0-3 0z',
+  // A globe, for the language control in the top bar. Round in every direction, so it never needs mirroring.
+  globe: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M3 12h18 M12 3c2.5 2.6 2.5 15.4 0 18 M12 3c-2.5 2.6-2.5 15.4 0 18',
 };
 
 export function icon(name: string, cls = ''): string {
