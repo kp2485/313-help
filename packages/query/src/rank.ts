@@ -48,14 +48,16 @@ function openKeyNow(o: OpenResult, today: string): number {
     case 'open': return 0;
     case 'closes_soon': return 1;
     case 'closed': return o.next?.date === today ? 2 : o.next ? 4 : 5;
-    case 'call_first': return 3;
+    // A holiday row ranks exactly where "call first" does: we do not know today's hours, so it never sorts above a
+    // row that is known to be open (schema/query-spec.md "Holidays").
+    case 'call_first': case 'holiday': return 3;
     default: return 6; // unknown sorts last: never implied open
   }
 }
 
 function openKeyWeek(row: BundleRow, o: OpenResult, now: Date, alerts: Alert[]): number {
   if (o.state === 'open' || o.state === 'closes_soon') return 0;
-  if (o.state === 'call_first') return 1;
+  if (o.state === 'call_first' || o.state === 'holiday') return 1;
   if (o.state === 'unknown') return 3;
   const next = nextOccurrences(row, now, 1, alerts)[0];
   return next && next.start - nowWallMinutes(now) <= 7 * 1440 ? 0 : 2;

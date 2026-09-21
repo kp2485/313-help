@@ -51,7 +51,8 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
           case 'openNow':
             expect(openNow(find(c.row), now, alerts)).toMatchObject(c.expect as object); break;
           case 'nextOccurrences':
-            expect(nextOccurrences(find(c.row), now, c.n ?? 3, alerts).map((o) => `${o.date} ${o.opens_at}-${o.closes_at}`)).toEqual(c.expect); break;
+            // " holiday" marks an occurrence that opens on a holiday: labelled, never dropped (query-spec "Holidays").
+            expect(nextOccurrences(find(c.row), now, c.n ?? 3, alerts).map((o) => `${o.date} ${o.opens_at}-${o.closes_at}${o.holiday ? ' holiday' : ''}`)).toEqual(c.expect); break;
           case 'badge':
             expect(badge(find(c.row), now)).toMatchObject(c.expect as object); break;
           case 'rank':

@@ -95,9 +95,11 @@ export interface Occurrence {
   closes_at: string;
   start: WallMinutes;
   end: WallMinutes;
+  /** This window opens on a holiday, so its hours are the usual ones and not a promise. Labelled, never dropped. */
+  holiday?: boolean;
 }
 
-export type OpenState = 'open' | 'closes_soon' | 'closed' | 'call_first' | 'unknown' | 'not_listed';
+export type OpenState = 'open' | 'closes_soon' | 'closed' | 'call_first' | 'unknown' | 'not_listed' | 'holiday';
 
 export interface OpenResult {
   state: OpenState;
@@ -107,6 +109,8 @@ export interface OpenResult {
   next?: { date: string; opens_at: string; closes_at: string } | null;
   /** True when a window that would be open right now was cancelled by an alert. */
   cancelled_now?: boolean;
+  /** `holiday` only: what the schedule says about today, offered as usual hours and never as "open". */
+  usual_hours?: { opens_at: string; closes_at: string };
 }
 
 export type BadgeLevel =
