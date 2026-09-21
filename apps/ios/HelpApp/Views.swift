@@ -13,6 +13,7 @@ struct Help313App: App {
     @StateObject private var here = Here()
     @StateObject private var saved = Saved.shared
     @StateObject private var reporter = Reporter.shared
+    @StateObject private var proposer = Proposer.shared
     @StateObject private var nav = AppNav()
     /// The Map tab's camera, layers and decoded shapes. It lives here rather than in the tab so that the city is
     /// decoded once per launch instead of every time the tab comes back.
@@ -21,7 +22,7 @@ struct Help313App: App {
     var body: some Scene {
         WindowGroup {
             RootView().environmentObject(store).environmentObject(here).environmentObject(saved)
-                .environmentObject(reporter).environmentObject(nav).environment(map)
+                .environmentObject(reporter).environmentObject(proposer).environmentObject(nav).environment(map)
                 // The direction follows the words, not the phone's region: Arabic mirrors every screen, and
                 // every layout is already written in leading/trailing terms (docs/ACCESSIBILITY-AUDIT-2026-09-20).
                 .environment(\.layoutDirection, L.rightToLeft ? .rightToLeft : .leftToRight)
@@ -41,9 +42,12 @@ struct Help313App: App {
                     #endif
                     await store.start()
                     await reporter.flush()
+                    await proposer.flush()
                 }
-                // Back to the front: look for a newer list, and try anything the outbox is still holding.
-                .onChange(of: phase) { _, p in if p == .active { Task { await store.refresh(); await reporter.flush() } } }
+                // Back to the front: look for a newer list, and try anything either outbox is still holding.
+                .onChange(of: phase) { _, p in
+                    if p == .active { Task { await store.refresh(); await reporter.flush(); await proposer.flush() } }
+                }
         }
     }
 }
@@ -82,6 +86,25 @@ struct PrivacyShield: View {
     @Published var point: LatLon?
     @Published var asking = false
     @Published var denied = false
+    /// The ZIP a person typed, when the point above is the middle of that ZIP rather than where they are. It is
+    /// five digits in memory and nothing more: never written to a file, never sent, never put in a route. The
+    /// screen says "Sorted by distance from ZIP 48226" so nobody mistakes it for a fix (docs/08).
+    @Published var zip: String?
+    /// The last thing typed was five digits we do not carry. The chip says so; the list stays on the whole city.
+    @Published var zipUnknown = false
+
+    /// Use the middle of a typed ZIP. Anything that is not a ZIP we carry leaves the list as it was and says so.
+    func use(zip typed: String, from zips: ZipCenters) {
+        switch lookUpZip(typed, in: zips) {
+        case .found(let code, let center):
+            point = center
+            zip = code
+            zipUnknown = false
+            denied = false
+        case .unknown, .notAZip:
+            zipUnknown = true
+        }
+    }
     private let manager = CLLocationManager()
     private var wantsFix = false
     /// A hundred metres is as close as this app ever needs: the list sorts in bands of a mile and the map draws a
@@ -104,13 +127,14 @@ struct PrivacyShield: View {
 
     func ask() {
         denied = false
+        zipUnknown = false
         switch manager.authorizationStatus {
         case .notDetermined: wantsFix = true; asking = true; manager.requestWhenInUseAuthorization()
         case .authorizedWhenInUse, .authorizedAlways: asking = true; manager.requestLocation()
         default: denied = true
         }
     }
-    func forget() { point = nil; denied = false }
+    func forget() { point = nil; zip = nil; zipUnknown = false; denied = false }
 
     nonisolated func locationManagerDidChangeAuthorization(_ m: CLLocationManager) {
         Task { @MainActor in
@@ -123,7 +147,11 @@ struct PrivacyShield: View {
     }
     nonisolated func locationManager(_ m: CLLocationManager, didUpdateLocations l: [CLLocation]) {
         guard let c = l.last?.coordinate else { return }
-        Task { @MainActor in self.asking = false; self.denied = false; self.point = LatLon(lat: c.latitude, lon: c.longitude) }
+        // A real fix replaces a typed ZIP: the ZIP was a stand-in for exactly this.
+        Task { @MainActor in
+            self.asking = false; self.denied = false; self.zip = nil; self.zipUnknown = false
+            self.point = LatLon(lat: c.latitude, lon: c.longitude)
+        }
     }
     nonisolated func locationManager(_ m: CLLocationManager, didFailWithError e: Error) {
         Task { @MainActor in self.asking = false; self.denied = true }
@@ -366,6 +394,10 @@ struct HelpView: View {
                     }
                 }
             }
+            // "More", where the web app keeps saved places and "Add a place that helps" (docs/04).
+            SectionHead(text: L.t("help.more"))
+            NavRow(title: L.t("saved.title"), symbol: "bookmark", subtitle: L.t("saved.sub")) { SavedView() }
+            NavRow(title: L.t("add.title"), symbol: "plus", subtitle: L.t("add.sub")) { AddPlaceView() }
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea())
         .navigationTitle(L.t("home.needs")).urgentHelp()
@@ -447,33 +479,108 @@ struct ResultsView: View {
     }
 }
 
-/// "Use my location", in the app's own words and colours (docs/05: asked on the tap, never at launch).
+/**
+ "Use my location", in the app's own words and colours (docs/05: asked on the tap, never at launch) — and, beside
+ it, "Type a ZIP code", for everyone that first button is not an answer for: a phone with location switched off,
+ a borrowed phone, or simply a person who would rather not hand over where they are standing. The web has offered
+ both since the first list screen (`locChip` in apps/web/src/main.ts).
+
+ A typed ZIP becomes the middle of that ZIP area and nothing more, and the words say so. It lives in memory for as
+ long as the app is open, like a position, and goes nowhere: no file, no request, no route (docs/08).
+ */
 struct LocationChip: View {
     @EnvironmentObject var here: Here
+    @EnvironmentObject var store: BundleStore
+    /// Whether the field is showing. Tapping "Type a ZIP code" opens it, exactly as on the web, so the common
+    /// case stays one button.
+    @State private var typing = false
+    /// What has been typed, this screen, this moment. Never stored.
+    @State private var typed = ""
+    @FocusState private var focused: Bool
+
+    private var zips: ZipCenters { store.bundle?.zips ?? ZipCenters(points: [:]) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if here.point == nil {
-                Button { here.ask() } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "location.fill")
-                        Text(L.t("loc.use")).fontWeight(.semibold)
+                HStack(spacing: 10) {
+                    Button { here.ask() } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "location.fill")
+                            Text(L.t("loc.use")).fontWeight(.semibold)
+                        }
+                        .font(.subheadline).foregroundStyle(Color.brandInk)
+                        .padding(.horizontal, 16).padding(.vertical, 11)
+                        .background(Color.brand, in: Capsule())
                     }
-                    .font(.subheadline).foregroundStyle(Color.brandInk)
-                    .padding(.horizontal, 16).padding(.vertical, 11)
-                    .background(Color.brand, in: Capsule())
+                    .buttonStyle(.plain)
+                    .disabled(here.asking)
+                    .opacity(here.asking ? 0.6 : 1)
+                    // Only when this bundle carries the ZIP centres to look one up in.
+                    if !zips.isEmpty && !typing {
+                        Button { typing = true; focused = true } label: {
+                            Text(L.t("loc.zip")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand)
+                                .padding(.horizontal, 14).padding(.vertical, 11)
+                                .background(Color.surface, in: Capsule())
+                                .overlay(Capsule().strokeBorder(Color.line, lineWidth: 1))
+                        }.buttonStyle(.plain)
+                    }
                 }
-                .buttonStyle(.plain)
-                .disabled(here.asking)
-                .opacity(here.asking ? 0.6 : 1)
-                if here.denied { Text(L.t("loc.denied")).font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true) }
-                Text(L.t("loc.note")).font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                if typing { zipField }
+                if here.denied {
+                    Text(L.t(here.permanentlyDenied ? "loc.denied_settings" : "loc.denied"))
+                        .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                }
+                Text(L.t(here.zipUnknown ? "loc.zip_unknown" : "loc.note"))
+                    .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
             } else {
                 HStack(spacing: 10) {
-                    Text(L.t("loc.using")).font(.footnote).foregroundStyle(Color.muted)
-                    Button(L.t("loc.off")) { here.forget() }.font(.footnote.weight(.semibold)).foregroundStyle(Color.brand)
+                    Text(here.zip.map { L.t("loc.zip_using", ["zip": $0]) } ?? L.t("loc.using"))
+                        .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                    Button(L.t(here.zip == nil ? "loc.off" : "loc.zip_off")) { here.forget(); typed = "" }
+                        .font(.footnote.weight(.semibold)).foregroundStyle(Color.brand)
                 }
             }
         }
+        // The chip's state is a sentence, not a colour: a screen reader is told when a ZIP was not recognised.
+        .animation(nil, value: typing)
+    }
+
+    /// Five digits and a "Sort" button. The keyboard is the number pad, and the field offers **no autofill**:
+    /// `.postalCode` would have iOS offer the ZIP on this person's own contact card above the keyboard, which is
+    /// their home address appearing on a screen they did not put it on — on a borrowed or overlooked phone that
+    /// is exactly the thing this app is careful about. Five digits are quick to type (Kyle's rule: we never ask
+    /// who you are, and we do not let the phone answer for them either).
+    private var zipField: some View {
+        HStack(spacing: 8) {
+            TextField("", text: $typed)
+                .keyboardType(.numberPad)
+                .textContentType(nil)
+                .autocorrectionDisabled()
+                .focused($focused)
+                .accessibilityLabel(L.t("loc.zip_label"))
+                .onChange(of: typed) { _, v in
+                    let digits = v.filter(\.isNumber)
+                    if digits != v || digits.count > 5 { typed = String(digits.prefix(5)) }
+                    if here.zipUnknown { here.zipUnknown = false }
+                }
+                .onSubmit(sort)
+                .padding(.horizontal, 12).padding(.vertical, 10)
+                .background(Color.surface, in: RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(here.zipUnknown ? Color.warnInk : Color.line, lineWidth: 1))
+            Button(L.t("loc.zip_go"), action: sort)
+                .font(.subheadline.weight(.semibold)).foregroundStyle(Color.brandInk)
+                .padding(.horizontal, 16).padding(.vertical, 11)
+                .background(Color.brand, in: Capsule())
+                .buttonStyle(.plain)
+                .disabled(normalizedZip(typed) == nil)
+                .opacity(normalizedZip(typed) == nil ? 0.6 : 1)
+        }
+    }
+
+    private func sort() {
+        here.use(zip: typed, from: zips)
+        if here.point != nil { typing = false; focused = false }
     }
 }
 

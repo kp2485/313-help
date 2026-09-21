@@ -50,4 +50,6 @@ enum Config {
     }
     static var bundleBaseURL: URL? { url(bundleBase) }
     static var reportsURL: URL? { url(apiBase, "v1/reports") }
+    /// "Add a place that helps" (docs/04). The same Worker, its own closed schema.
+    static var proposalsURL: URL? { url(apiBase, "v1/proposals") }
 }

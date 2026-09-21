@@ -178,6 +178,12 @@ struct MyHoodCard: View {
             if let p = here.point {
                 if let h = d.neighborhood(containing: p) {
                     HoodRowLink(hood: h)
+                    // A ZIP is not a neighborhood: it is one point for a whole area, and it usually covers
+                    // several. The screen says which it looked in rather than calling it "yours".
+                    if let zip = here.zip {
+                        Text(L.t("hood.mine_zip", ["zip": zip])).font(.footnote).foregroundStyle(Color.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 } else {
                     Text(L.t("hood.mine_outside")).font(.subheadline).foregroundStyle(Color.ink)
                         .fixedSize(horizontal: false, vertical: true)
@@ -203,7 +209,7 @@ struct MyHoodCard: View {
             if here.point == nil {
                 LocationChip()
             } else {
-                Button(L.t("loc.off")) { here.forget() }
+                Button(L.t(here.zip == nil ? "loc.off" : "loc.zip_off")) { here.forget() }
                     .font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand)
                 Text(L.t("hood.mine_note")).font(.footnote).foregroundStyle(Color.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -254,12 +260,29 @@ struct HoodPageView: View {
 private struct HoodHelpPanel: View {
     let hood: Hood
     let d: Indicators
+    @EnvironmentObject private var store: BundleStore
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HoodHead(L.t("hood.help_head"))
             if !hood.help.coverageChecked {
-                Text(L.t("hood.thin")).font(.subheadline).foregroundStyle(Color.ink)
-                    .fixedSize(horizontal: false, vertical: true).card()
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L.t("hood.thin")).font(.subheadline).foregroundStyle(Color.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                    // "Tell us what we're missing" is a sentence with nothing behind it unless it leads
+                    // somewhere. It leads to the same form the Help tab offers (docs/04).
+                    NavigationLink { AddPlaceView() } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "plus")
+                            Text(L.t("add.title")).fontWeight(.semibold).multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 0)
+                        }
+                        .font(.subheadline).foregroundStyle(Color.brandSoftInk)
+                        .padding(.horizontal, 14).padding(.vertical, 11)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.brandSoft, in: RoundedRectangle(cornerRadius: 12))
+                    }.buttonStyle(.plain)
+                }.card()
             }
             Text(L.t(hood.help.total == 1 ? "hood.help_count_one" : "hood.help_count",
                      ["count": String(hood.help.total), "miles": HoodFormat.loose(d.nearMiles)]))
@@ -274,12 +297,11 @@ private struct HoodHelpPanel: View {
                     .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
             }
             HoodSubHead(L.t("hood.nearest_head"))
-            HoodRows(hoodNearestKinds.map { k in
-                let mi = hood.help.nearestMiles[k] ?? nil
-                return (L.t("hood.nearest." + k),
-                        mi.map { L.t("miles", ["miles": HoodFormat.number($0, decimals: 1)]) } ?? L.t("hood.nearest_none"),
-                        "")
-            })
+            VStack(spacing: 8) {
+                ForEach(hoodNearestKinds, id: \.self) { kind in
+                    NearestHelpRow(kind: kind, help: hood.help, rows: store.bundle?.rows ?? [])
+                }
+            }
             HoodSubHead(L.t("hood.places_head", ["miles": HoodFormat.loose(d.nearMiles)]))
             HoodRows([(L.t("hood.parks"), plain(hood.places.parks), ""),
                       (L.t("hood.rec_centers"), plain(hood.places.recCenters), ""),
@@ -298,6 +320,76 @@ private struct HoodHelpPanel: View {
     private func plain(_ n: Int) -> String { String(n) }
     private func miles(_ m: Double?) -> String {
         m.map { L.t("miles", ["miles": HoodFormat.number($0, decimals: 1)]) } ?? L.t("hood.none_found")
+    }
+}
+
+/**
+ One "nearest listed food / clinic / Narcan / library" row.
+
+ When the bundle says which listing it is, and that listing is still here, and it is not one of the private kinds
+ (HelpCore, `nearestListing`), the row names it and opens it — the distance stops being a fact with nowhere to go.
+ Otherwise it is the plain row the web has always drawn: the kind, and how far away.
+ */
+private struct NearestHelpRow: View {
+    let kind: String
+    let help: HoodHelp
+    let rows: [BundleRow]
+    @Environment(\.dynamicTypeSize) private var textSize
+
+    private var milesText: String {
+        (help.nearestMiles[kind] ?? nil).map { L.t("miles", ["miles": HoodFormat.number($0, decimals: 1)]) }
+            ?? L.t("hood.nearest_none")
+    }
+
+    var body: some View {
+        if let row = help.nearestListing(kind: kind, in: rows) {
+            NavigationLink { DetailView(row: row) } label: { line(name: row.name, chevron: true) }
+                .buttonStyle(.plain)
+                // One control, read as one sentence, in the web's own words for it: "Food: Gleaners Community
+                // Food Bank, 0.6 mi. Open this listing."
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(L.t("hood.nearest_open", ["kind": L.t("hood.nearest." + kind),
+                                                              "name": row.name, "distance": milesText]))
+                .accessibilityAddTraits(.isButton)
+        } else {
+            line(name: nil, chevron: false)
+        }
+    }
+
+    /// The label, laid out the way every other row on this page is — and stacked instead of side by side at the
+    /// accessibility text sizes, so a distance is never cut short.
+    @ViewBuilder private func line(name: String?, chevron: Bool) -> some View {
+        let label = VStack(alignment: .leading, spacing: 3) {
+            Text(L.t("hood.nearest." + kind)).font(.subheadline).foregroundStyle(Color.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            if let name {
+                // The place's own name, as its owner wrote it: one left-to-right run inside an Arabic screen.
+                Text(L.rightToLeft ? ltr(name) : name).font(.body.weight(.semibold)).foregroundStyle(Color.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        if textSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 4) {
+                label
+                Text(milesText).font(.body.weight(.semibold)).foregroundStyle(Color.ink)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14).padding(.vertical, 10)
+            .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+        } else {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                label.frame(maxWidth: .infinity, alignment: .leading)
+                Text(milesText).font(.body.weight(.semibold)).foregroundStyle(Color.ink).fixedSize()
+                if chevron {
+                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.muted)
+                }
+            }
+            .padding(.horizontal, 14).padding(.vertical, 10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+        }
     }
 }
 

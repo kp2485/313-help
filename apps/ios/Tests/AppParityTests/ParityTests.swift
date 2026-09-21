@@ -124,6 +124,18 @@ final class ParityTests: XCTestCase {
         XCTAssertFalse(nearest.isEmpty, "could not read hoodNearestKinds from Hoods.swift")
         built += nearest.map { "hood.nearest.\($0)" }
         built += ["food", "health", "harm"].map { "hood.kind.\($0)" }
+        // "Add a place that helps": the kinds of help offered, the ways of knowing, and every field's own label,
+        // error and hint (the hints are passed to the field as a key, so they are built rather than written out).
+        let proposals = try text("apps/ios/Sources/HelpCore/Proposals.swift")
+        let categories = quoted(bracketed(proposals, after: "public let proposalCategories = "))
+        XCTAssertFalse(categories.isEmpty, "could not read proposalCategories from Proposals.swift")
+        built += categories.map { "add.cat.\($0)" }
+        let how = quoted(bracketed(proposals, after: "public let proposalHowKnown = "))
+        XCTAssertFalse(how.isEmpty, "could not read proposalHowKnown from Proposals.swift")
+        built += how.map { "add.how.\($0)" }
+        built += ["name", "category", "what", "address", "schedule_text", "phone", "how_known", "notes"].map { "add.f.\($0)" }
+        built += quoted(bracketed(proposals, after: "public let proposalRequired = ")).map { "add.e.\($0)" }
+        built += ["add.h.what", "add.h.address", "add.h.schedule", "add.h.phone", "add.h.notes"]
         for key in built where en[key] == nil { missing.append("built: \(key)") }
         XCTAssertEqual(missing, [], "string keys the app asks for that strings/en.json does not have")
     }
@@ -256,6 +268,45 @@ final class ParityTests: XCTestCase {
             i = source.index(after: i)
         }
         return out
+    }
+
+    /**
+     A proposal carries exactly the field names the Worker's closed schema accepts.
+
+     `parseProposal` in api/src/validate.ts calls `closed(body, [...])`: a name that is not in that list is a 400,
+     not something stored. The iPhone builds its own body, so the two lists have to be the same list — and the
+     failure mode if they are not is a person filling in a form, tapping Send, and being told nothing happened.
+     */
+    func testAProposalsFieldsAreTheOnesTheWorkerAccepts() throws {
+        let api = try text("api/src/validate.ts")
+        guard let r = api.range(of: "export function parseProposal("),
+              let call = api.range(of: "closed(body, [", range: r.upperBound..<api.endIndex),
+              let end = api[call.upperBound...].firstIndex(of: "]")
+        else { return XCTFail("parseProposal's closed() list moved") }
+        let worker = quoted(String(api[call.upperBound..<end]))
+        XCTAssertEqual(worker.sorted(), ["address", "category", "how_known", "name", "notes", "phone", "schedule_text", "what"])
+        // The Swift side names them in its CodingKeys, which is what the encoder writes.
+        let keys = try text("apps/ios/Sources/HelpCore/Proposals.swift")
+        guard let start = keys.range(of: "public enum CodingKeys: String, CodingKey {"),
+              let stop = keys[start.upperBound...].firstIndex(of: "}")
+        else { return XCTFail("Proposal.CodingKeys moved") }
+        let block = String(keys[start.upperBound..<stop])
+        for name in worker {
+            XCTAssertTrue(block.contains(name) || block.contains(camel(name)),
+                          "a proposal from the iPhone has no \(name), which the Worker expects")
+        }
+        // And nothing about the person can be sent with it: a proposal is not deduplicated, so unlike a report it
+        // carries no per-day hash, and there is nothing else it could carry either.
+        for forbidden in ["client_nonce", "observed_at", "install", "lat", "lon"] {
+            XCTAssertFalse(worker.contains(forbidden), "the Worker would accept \(forbidden) on a proposal")
+            XCTAssertFalse(block.contains(forbidden), "the iPhone's proposal carries \(forbidden)")
+        }
+    }
+
+    /// "schedule_text" as Swift spells it in a property name.
+    private func camel(_ snake: String) -> String {
+        let parts = snake.split(separator: "_")
+        return (parts.first.map(String.init) ?? "") + parts.dropFirst().map { $0.capitalized }.joined()
     }
 
     /// The kinds of help counted for a neighborhood are the pipeline's `HELP_TOPS`, in its order. A JSON object's

@@ -146,7 +146,7 @@ More: [iPhone](apps/ios/README.md) · [Android](apps/android/README.md) · [desi
   today," warming centers open — in a small signed signals file.
 - Partner feeds: Gleaners and Forgotten Harvest schedules, and an HSDS exchange with 211.
 - Richer transit: stops in travel order, GTFS-based trip hints — still no tracking.
-- Client parity: neighborhood pages on Android, and add-a-place in both native apps.
+- Client parity: neighborhood pages and add-a-place on Android.
 - A steward mobile mode for outreach workers, and coverage passes for thin neighborhoods.
 
 **Later** — photos on condition reports after legal review; local notifications for saved places and alerts;

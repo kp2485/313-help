@@ -96,12 +96,17 @@ public struct HoodHelp: Decodable, Equatable, Sendable {
     public var by: [String: Int]
     /// Miles from the middle of the neighborhood to the nearest listed one of each kind; `nil` for none listed.
     public var nearestMiles: [String: Double?]
+    /// Which listing that nearest one IS, when the bundle says (`help.nearest_id`, added 2026-09-21). Older
+    /// bundles do not carry it, so it is optional and the row is then a distance and nothing more — a screen
+    /// never invents a listing to link to.
+    public var nearestId: [String: String?]?
     /// The kinds we have nothing listed for. That describes OUR list, never the neighborhood.
     public var noneListedYet: [String]
     public var coverageChecked: Bool
     enum CodingKeys: String, CodingKey {
         case total, by
-        case nearestMiles = "nearest_miles", noneListedYet = "none_listed_yet", coverageChecked = "coverage_checked"
+        case nearestMiles = "nearest_miles", nearestId = "nearest_id"
+        case noneListedYet = "none_listed_yet", coverageChecked = "coverage_checked"
     }
 }
 
@@ -418,6 +423,23 @@ extension HoodHelp {
     /// The kinds this neighborhood has something listed for, in the panel's order and never re-sorted by count.
     public var kindsWithSomething: [(kind: String, count: Int)] {
         hoodHelpKinds.compactMap { k in (by[k] ?? 0) > 0 ? (k, by[k]!) : nil }
+    }
+
+    /**
+     The listing the "nearest {kind}" row is about, when the row may open it.
+
+     Four things have to be true, and any one of them failing leaves the row a plain distance:
+     - the bundle says which listing it is (an older bundle does not),
+     - that listing is still in the list this phone holds (a row is never a dead end),
+     - it is not private or sensitive — a domestic-violence shelter, a crisis line, treatment, help after an
+       assault. Those never appear on a neighborhood page at all: a page about a place must not tell anyone who
+       reads it over a person's shoulder which of those they may have been looking at (docs/08),
+     - and it is a listing id, not something else that happens to be in the file.
+     */
+    public func nearestListing(kind: String, in rows: [BundleRow]) -> BundleRow? {
+        guard let id = (nearestId?[kind] ?? nil), id.hasPrefix("sal_") else { return nil }
+        guard let row = rows.first(where: { $0.id == id }) else { return nil }
+        return isPrivate(row.category) ? nil : row
     }
 }
 

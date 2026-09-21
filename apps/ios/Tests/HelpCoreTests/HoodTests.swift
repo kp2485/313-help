@@ -148,6 +148,60 @@ final class HoodTests: XCTestCase {
         XCTAssertEqual(names.first, "Airport Sub")
     }
 
+    // MARK: - the nearest listed place, when the bundle says which one it is
+
+    private func help(nearestId: [String: String?]?) -> HoodHelp {
+        HoodHelp(total: 1, by: [:], nearestMiles: ["food": 0.6], nearestId: nearestId,
+                 noneListedYet: [], coverageChecked: true)
+    }
+
+    private func row(_ id: String, _ category: String) -> BundleRow {
+        let json = """
+        {"id":"\(id)","name":"A place","org":"An org","category":"\(category)","what":"Food","phones":[],
+         "availability":"unknown","schedules":[],"flags":[],"status":"active",
+         "facts":{"reports":{"closed_open":0,"wrong_open":0},"source":{"type":"steward","name":"Someone"}}}
+        """
+        return try! bundleDecoder().decode(BundleRow.self, from: Data(json.utf8))
+    }
+
+    /**
+     A "nearest listed food" row becomes a way into that listing only when the bundle says which listing it is,
+     that listing is still here, and it is not one of the private kinds. Anything else leaves the row exactly as
+     it was: a distance, and no link.
+     */
+    func testTheNearestRowOpensAListingOnlyWhenItSafelyCan() {
+        let rows = [row("sal_a_pantry", "food"), row("sal_a_shelter", "shelter.dv"),
+                    row("sal_a_clinic", "health.mental"), row("sal_a_detox", "treatment.detox")]
+        XCTAssertEqual(help(nearestId: ["food": "sal_a_pantry"]).nearestListing(kind: "food", in: rows)?.id, "sal_a_pantry")
+        // An older bundle carries no ids at all.
+        XCTAssertNil(help(nearestId: nil).nearestListing(kind: "food", in: rows))
+        // The file says there is nothing listed of that kind.
+        XCTAssertNil(help(nearestId: ["food": nil]).nearestListing(kind: "food", in: rows))
+        // A kind this neighborhood has no entry for.
+        XCTAssertNil(help(nearestId: ["food": "sal_a_pantry"]).nearestListing(kind: "clinic", in: rows))
+        // An id this phone's list does not have — a row must never be a dead end.
+        XCTAssertNil(help(nearestId: ["food": "sal_gone_away"]).nearestListing(kind: "food", in: rows))
+        // Something that is not a listing id at all.
+        XCTAssertNil(help(nearestId: ["food": "seg_a_path"]).nearestListing(kind: "food", in: rows))
+        // And the kinds that never appear on a page about a neighborhood (docs/08).
+        for id in ["sal_a_shelter", "sal_a_clinic", "sal_a_detox"] {
+            XCTAssertNil(help(nearestId: ["food": id]).nearestListing(kind: "food", in: rows),
+                         "\(id) is private and must not be named here")
+        }
+    }
+
+    /// The field is additive: a bundle built before it existed still decodes, and one built after it carries it.
+    func testTheRealFileDecodesWithOrWithoutTheNearestIds() throws {
+        XCTAssertNoThrow(try realIndicators(), "the pipeline's copy has no nearest_id yet and must still decode")
+        let d = try realIndicators()
+        for h in d.neighborhoods where h.help.nearestId != nil {
+            for (kind, id) in h.help.nearestId! {
+                XCTAssertTrue(hoodNearestKinds.contains(kind), "\(h.id) has a nearest_id for an unknown kind: \(kind)")
+                if let id { XCTAssertTrue(id.hasPrefix("sal_"), "\(h.id) \(kind) is not a listing id: \(id)") }
+            }
+        }
+    }
+
     // MARK: - the numbers, as they are written
 
     func testACountUnderFiveIsWordsAndNeverADigit() {

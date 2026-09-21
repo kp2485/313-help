@@ -16,7 +16,22 @@ Public numbers about each of Detroit's 205 neighborhoods (docs/13), in a tab of 
 - The numbers file is fetched and decoded the way a map file is (`MapLoader.indicators`): lazily, off the main actor, checksum first, and kept for one bundle at a time.
 - **Location** reuses the existing on-device flow (`Here`, `LocationChip`) and its refusal handling. The point stays in memory, is never written down and is never sent; a point outside Detroit's 205 — Dearborn, Hamtramck, Highland Park, the river — is answered in words with the Map tab offered, never by naming the nearest neighborhood.
 - **Held to the web**: `Tests/HelpCoreTests/HoodTests.swift` runs the shared coordinates in `schema/neighborhoods/points.json` case for case, and `AppParityTests` fails when the panels of `apps/web/src/hoods.ts` and of this screen fall out of order, when the SEMCOG notice differs by a byte, or when the kinds of help drift from the pipeline's `HELP_TOPS`.
-- **Not here**: there is no ZIP entry on iPhone, so `hood.mine_zip` has no screen; the "tell us what we're missing" button on the thin-coverage note is web-only until add-a-place is built here; and the "nearest listed" rows are distances, as on the web, because the bundle carries a distance for each kind and not a listing id.
+- **"Your neighborhood" from a typed ZIP** as well as from a location (`hood.mine_zip`): the bundle carries one point per ZIP, so the screen says which ZIP it looked in rather than calling the answer "yours". The shared `zip_cases` run in `ZipProposalTests`.
+- **The nearest food, clinic, Narcan and indoor place open their listing** when the bundle says which one it is (`help.nearest_id`, 2026-09-21). The id has to be in the list this phone holds and the listing must not be private or sensitive, or the row stays a plain distance — the numbers and the listings are two files under one signature, so the category is checked again here (`HoodHelp.nearestListing`, HelpCore).
+- **"Tell us what we're missing"** on the thin-coverage note opens the add-a-place form below.
+
+## Add a place that helps (2026-09-21)
+
+The Swift half of the web's add form and `apps/web/src/propose.ts`, reached from the Help tab's "More" and from a thin neighborhood page.
+
+- **`Sources/HelpCore/Proposals.swift`**: the proposal, its closed JSON encoding, the four required answers, the size caps, and the two closed lists — the kinds of help offered (no domestic-violence shelter: that address must never be collected, docs/08) and the four ways of knowing. `swift test` holds the encoded body to exactly the eight names `parseProposal` accepts in api/src/validate.ts, and proves nothing about the person can be in it.
+- **`HelpApp/AddPlace.swift`**: the form, and `Proposer` — the same outbox actor the reports use, in a file of its own, so a proposal made with no signal is kept and sent later. A proposal carries **no dedupe hash**: it is not deduplicated, so there is nothing to work out again when it goes, and the reports' re-nonce-at-flush rule does not apply.
+- A missing required answer is marked on the field itself, announced, and the cursor goes to the first one — everything already typed stays.
+- Checked against a stub Worker on localhost (2026-09-21): the body was `{name, category, what, how_known}` and nothing else, no cookie header, `User-Agent: 313Help-iOS/0.1`.
+
+## Typing a ZIP instead of sharing a location (2026-09-21)
+
+`LocationChip` now offers "Type a ZIP code" beside "Use my location", wherever the chip appears — the same pair the web has always had. `Sources/HelpCore/Zips.swift` decodes `places/zips.json` (checksum first), validates five digits, and answers `found` / `unknown` / `notAZip`; the ZIP and the point it stands for live in memory only, like a location, and go nowhere. The field deliberately sets **no** `textContentType`: postal-code autofill would have iOS offer this person's own home ZIP above the keyboard, which is their address appearing on a screen they did not put it on.
 
 All of `Tests/` runs with `swift test` from `apps/ios`, which is what the `ios-query` job in CI runs. Two small groups are compiled out where they cannot run: the Ed25519 signature maths (CryptoKit is Apple-only, and this package takes no third-party dependency to get Ed25519 on Linux) and the backup flag (an Apple file attribute). Everything around both — the shape a pinned key may take, the eight small-order points, an all-zero signature, the downgrade floor, the dedupe hash, the report schema, the outbox, the saved rules — runs on Linux as well. **Run `swift test` on a Mac before shipping**; CI on its own does not exercise the signature maths.
 
@@ -130,7 +145,7 @@ It does:
 - **About and Your privacy** (2026-09-20), reachable from the bottom of Home. About shows the list version, its date and whether it was signed with the release key or a test key; Your privacy has the plain-language table from docs/08, **how many reports are still waiting** with a control to delete them unsent, and **"Make a new key"**, which throws the install key away and makes a new random one.
 - English, Spanish, Arabic and Bengali, following the phone's language. am/pm come from `clock.am` / `clock.pm` and list separators from `list.sep`, so an Arabic time reads "2 م" rather than "2 pm".
 
-Not yet: add-a-place (proposals), neighborhood pages, link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, a typed ZIP, a parks list screen, photos on condition reports. The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
+Not yet: link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, a parks list screen, photos on condition reports. (Neighborhood pages, add-a-place and a typed ZIP arrived on 2026-09-21 and have sections of their own below.) The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
 
 ## The Map tab
 
