@@ -21,6 +21,27 @@ stores nothing about you, works with no signal, and never sends you to a pantry 
 | **People using a screen reader, keyboard, switch or large text** | Audited against WCAG 2.2 AA; every map is also a text list |
 | **The City, DHD, 211 and anyone who wants the data** | An open HSDS 3.2 dataset in [`data/hsds/`](data/hsds/), CC BY 4.0 |
 
+## Screenshots
+
+<table>
+<tr>
+<td><img src="docs/img/home.png" width="220" alt="Home screen on a phone. A language picker reading English and an Urgent help button sit at the top; a green panel asks What do you need today?; below it a search box and tiles for Food, A place to sleep, A doctor, Help with drugs or alcohol, A job or training and Free Narcan."></td>
+<td><img src="docs/img/results-food.png" width="220" alt="Food results. Buttons offer Use my location or Type a ZIP code above the line Your location stays on this phone. We never save or send it. Each listing shows a badge reading Closed now, next Friday Sep 25 2 pm, a dated note saying a program matched this to their website, and a large green Call button with the phone number."></td>
+<td><img src="docs/img/listing-detail.png" width="220" alt="A food pantry listing. Under the name is the badge Closed now, next Saturday Sep 26 10 am and the line A program matched this to their website on Sep 19, 2026, then Call with the number, Directions, Bus directions, Save and Share, then What you get, Hours and the next three dates."></td>
+<td><img src="docs/img/home-arabic.png" width="220" alt="The same home screen in Arabic, laid out right to left. The heading reads ماذا تحتاج اليوم؟ and the tiles, tab bar and chevrons are all mirrored."></td>
+</tr>
+<tr>
+<td><img src="docs/img/map-standard.jpg" width="220" alt="The Map tab in the Standard style on a phone. Coloured dots mark food, shelter, health and recreation places over Detroit streets, with bus routes in blue and the Joe Louis Greenway in dark green."></td>
+<td><img src="docs/img/map-subway.jpg" width="220" alt="The Map tab in the Subway style, downtown. Bus and rail are drawn as coloured trunk lines with white stop circles, route-number badges such as 3 4 5 6 9 16, and the People Mover loop in purple with direction arrows."></td>
+<td><img src="docs/img/iphone-map.jpg" width="220" alt="The iPhone app's full-screen Map tab. A stretch of the Joe Louis Greenway is selected in dark green and a card below reads Dequindre Cut slash Detroit Riverwalk, Open to walk and bike, the streets it runs along, and a See details button."></td>
+<td></td>
+</tr>
+</table>
+
+<img src="docs/img/map-desktop.jpg" width="900" alt="The web app on a laptop. A side rail holds Urgent help, Home, Help and Map; the map fills the middle in the Subway style; a right-hand column explains what the lines mean, offers Use my location or Type a ZIP code, and lists the layers to show.">
+
+Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the device from the signed bundle.
+
 ## What makes it different
 
 - **It stores nothing.** No accounts, no intake, no analytics — there is no resident data to secure.
