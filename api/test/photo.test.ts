@@ -46,7 +46,7 @@ const app = createApp({ now: () => NOW });
 const upload = (bytes: Uint8Array, headers: Record<string, string> = {}, e: Env = env) => app.request('/v1/photos', { method: 'POST', body: bytes as unknown as BodyInit, headers: { 'content-type': 'image/jpeg', ...headers } }, e);
 const report = (body: object) => app.request('/v1/reports', { method: 'POST', body: JSON.stringify(body), headers: { 'content-type': 'application/json' } }, env);
 const steward = (path: string, init: RequestInit = {}) =>
-  app.request(`http://localhost${path}`, { ...init, headers: { 'content-type': 'application/json', origin: 'http://localhost', ...(init.headers as Record<string, string>) } }, { ...env, DEV_STEWARD: 'kyle' });
+  app.request(`http://localhost${path}`, { ...init, headers: { 'content-type': 'application/json', origin: 'http://localhost', ...(init.headers as Record<string, string>) } }, { ...env, DEV_STEWARD: 'local' });
 beforeEach(() => {
   db = fakeD1(); bucket = fakeBucket(); env = { DB: db, PHOTOS: bucket, PHOTOS_ENABLED: 'true' };
   db.raw.exec("INSERT INTO targets VALUES ('sal_b', 'listing'), ('seg_conrail_warren_to_joy', 'place')");
@@ -152,7 +152,7 @@ describe('a photo belongs to one report about a place', () => {
     expect((await steward(`/v1/steward/photos/${photo}/discard`, { method: 'POST' })).status).toBe(200);
     expect(bucket.files.size).toBe(0);
     expect(db.raw.prepare('SELECT photo_key FROM reports').get()).toEqual({ photo_key: null });
-    expect(db.raw.prepare('SELECT steward, action FROM steward_actions').get()).toEqual({ steward: 'dev:kyle', action: 'discard_photo' });
+    expect(db.raw.prepare('SELECT steward, action FROM steward_actions').get()).toEqual({ steward: 'dev:local', action: 'discard_photo' });
   });
 });
 

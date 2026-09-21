@@ -138,6 +138,58 @@ export function parseTasks(body: unknown): Result<TaskInput[]> {
   return { ok: true, value: out };
 }
 
+// ---- steward writes ----------------------------------------------------------------------------
+// These three used to read the body by hand, which meant an unknown key was silently ignored and one of them had no
+// size cap at all (review 2026-09-20). They are closed schemas now, like everything a resident sends.
+
+const STATUSES = ['accepted', 'rejected', 'duplicate'];
+/** A steward's own note on a decision. Kept as typed (it is their words, not a resident's), capped at 500. */
+const note = (v: unknown): Result<string | null> => (v == null ? { ok: true, value: null } : typeof v === 'string' ? { ok: true, value: v.slice(0, 500) } : fail('note must be text'));
+
+export interface ResolveInput { status: string; reason_code: string; note: string | null }
+
+/** Settle one report or proposal. */
+export function parseResolve(body: unknown, reasons: string[]): Result<ResolveInput> {
+  const b = closed(body, ['status', 'reason_code', 'note']);
+  if (!b.ok) return b;
+  const { status, reason_code } = b.value;
+  if (!STATUSES.includes(status as string) || !reasons.includes(reason_code as string)) return fail('status and a known reason_code are required');
+  const n = note(b.value.note);
+  if (!n.ok) return n;
+  return { ok: true, value: { status: status as string, reason_code: reason_code as string, note: n.value } };
+}
+
+export interface ListingStatusInput { status: string; reason: string; replacement_id: string | null; note: string | null; report_ids: string[] }
+
+/** Archive, pause, or restore one listing, settling the closure reports the page showed. */
+export function parseListingStatus(body: unknown): Result<ListingStatusInput> {
+  const b = closed(body, ['status', 'reason_code', 'replacement_id', 'note', 'report_ids']);
+  if (!b.ok) return b;
+  const { status, reason_code } = b.value;
+  if (!['archived', 'suspended', 'active'].includes(status as string)) return fail('status must be archived, suspended, or active');
+  if (reason_code != null && typeof reason_code !== 'string') return fail('status must be archived, suspended, or active');
+  const shown = reportIds(b.value.report_ids);
+  if (!shown) return fail('report_ids must be a list of at most 500 report ids');
+  // Restoring is always `restored`: a steward cannot slip a phone check nobody made through this call (review 10b).
+  const reason = status === 'archived' ? (reason_code as string | undefined) : status === 'active' ? 'restored' : (reason_code as string | undefined) ?? 'seasonal';
+  if (status === 'archived' && !ARCHIVE_REASONS.includes(reason ?? '')) return fail(`archiving needs a reason: ${ARCHIVE_REASONS.join(', ')}`);
+  if (status === 'active' && reason_code != null && reason_code !== 'restored') return fail('restoring takes no reason_code');
+  if (b.value.replacement_id != null && !isListingId(b.value.replacement_id)) return fail('bad replacement_id');
+  const n = note(b.value.note);
+  if (!n.ok) return n;
+  return { ok: true, value: { status: status as string, reason: reason as string, replacement_id: (b.value.replacement_id as string | undefined) ?? null, note: n.value, report_ids: shown } };
+}
+
+/** The ids that exist at a publish. Unknown-looking ids are dropped by the caller; nothing is ever deleted. */
+export function parseTargets(body: unknown): Result<{ listings: string[]; places: string[] }> {
+  const b = closed(body, ['listings', 'places']);
+  if (!b.ok) return b;
+  const { listings, places } = b.value;
+  if (!Array.isArray(listings) || !Array.isArray(places) || ![...listings, ...places].every((x) => typeof x === 'string')) return fail('listings and places arrays are required');
+  if (listings.length + places.length > 20000) return fail('too many ids');
+  return { ok: true, value: { listings: listings as string[], places: places as string[] } };
+}
+
 export function parseDismiss(body: unknown): Result<{ reason: string }> {
   const b = closed(body, ['reason']);
   if (!b.ok) return b;

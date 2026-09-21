@@ -38,7 +38,7 @@ let db: ReturnType<typeof fakeD1>;
 let env: Env;
 const rows = (sql: string) => db.raw.prepare(sql).all();
 const steward = (path: string, init: RequestInit = {}) =>
-  app.request(`http://localhost${path}`, { ...init, headers: { 'content-type': 'application/json', origin: 'http://localhost', ...(init.headers as Record<string, string>) } }, { ...env, DEV_STEWARD: 'kyle' });
+  app.request(`http://localhost${path}`, { ...init, headers: { 'content-type': 'application/json', origin: 'http://localhost', ...(init.headers as Record<string, string>) } }, { ...env, DEV_STEWARD: 'local' });
 
 beforeEach(() => {
   db = fakeD1(); env = { DB: db };
