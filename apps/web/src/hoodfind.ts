@@ -7,7 +7,7 @@
 // person taps the row.
 //
 // It is a module of its own so the iPhone and Android apps can be held to the same answers, case for case:
-// the coordinates in `schema/fixtures/14-neighborhood-point.json` are run by all three clients.
+// the coordinates in `schema/neighborhoods/points.json` are run by all three clients.
 //
 // Nothing here may order a list by an indicator (docs/13, honesty rule 1: no league tables). The only orders
 // this file knows are the neighborhood's own name and the council district it is in.

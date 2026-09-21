@@ -3,7 +3,7 @@
 // anything, find one by name, walk all 205 in an order that is never a ranking — and to the rules docs/13 sets
 // for anything that shows neighborhood numbers at all.
 //
-// The point-in-polygon cases are the ones in schema/fixtures/14-neighborhood-point.json, which the iPhone and
+// The point-in-polygon cases are the ones in schema/neighborhoods/points.json, which the iPhone and
 // Android apps run too: if the three ever disagree about which neighborhood a coordinate is in, one is wrong.
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -237,9 +237,9 @@ describe('which neighborhood a point is in', () => {
 });
 
 // The same coordinates the iPhone and Android apps are held to, against the outlines the pipeline really builds.
-describe('the shared point-in-polygon cases (schema/fixtures/14-neighborhood-point.json)', () => {
+describe('the shared point-in-polygon cases (schema/neighborhoods/points.json)', () => {
   const file = join(root, 'data/bundle/v1/indicators/neighborhoods.json');
-  const fixture = JSON.parse(readFileSync(join(root, 'schema/fixtures/14-neighborhood-point.json'), 'utf8')) as
+  const fixture = JSON.parse(readFileSync(join(root, 'schema/neighborhoods/points.json'), 'utf8')) as
     { cases: { name: string; lat: number; lon: number; expect: string | null }[]; zip_cases: { zip: string; expect: string[] }[] };
 
   it('the table names real places and says "none" outside Detroit', () => {
