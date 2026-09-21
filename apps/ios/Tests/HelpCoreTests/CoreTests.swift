@@ -323,6 +323,25 @@ final class SavedTests: XCTestCase {
         }
     }
 
+    /// The sensitive pair is matched whole, or as a parent of a child kind — never as a run of letters. It is
+    /// what lets `health.support` (a daytime clubhouse, category audit 2026-09-22 K3) be an ordinary listing
+    /// while `health.mental` keeps every protection. If this loosened, a crisis line would gain an address; if
+    /// it widened, a clubhouse would lose one.
+    func testTheSensitiveSetIsExactlyTheDvAndCrisisPairMatchedWholeOrAsAPrefix() {
+        XCTAssertEqual(sensitiveCategories, ["shelter.dv", "health.mental"])
+        XCTAssertEqual(privateCategories, ["treatment", "assault"])
+        for category in ["shelter.dv", "shelter.dv.transitional", "health.mental", "health.mental.crisis"] {
+            XCTAssertTrue(isSensitive(category), category)
+            XCTAssertFalse(canSave(category), category)
+        }
+        // Siblings that merely start with the same letters are their own kinds, and are saved like any listing.
+        for category in ["health.support", "health.supported", "health.mentalhealth", "shelter.dvx", "health", "shelter"] {
+            XCTAssertFalse(isSensitive(category), category)
+            XCTAssertFalse(isPrivate(category), category)
+            XCTAssertTrue(canSave(category), category)
+        }
+    }
+
     func testSavingIsOnThisPhoneNewestFirstAndCapped() {
         let dir = tempDir()
         let saved = SavedStore(dir: dir)
@@ -461,6 +480,21 @@ final class ListingTests: XCTestCase {
         let pantry = row(address: "2424 W Grand Blvd", point: (42.1, -83.1), category: "food.pantry")
         XCTAssertEqual(mapsDestination(pantry), "2424 W Grand Blvd, Detroit, MI 48208")
         XCTAssertFalse(showsPointWithoutAddress(pantry))
+    }
+
+    /// The clubhouse (`health.support`) is an ordinary listing: it keeps its address, its directions and its
+    /// map, because its owner prints the address and it is not a crisis service (category audit 2026-09-22, K3).
+    func testAnOngoingMentalHealthProgramKeepsItsAddressAndDirections() {
+        let club = row(address: "1401 Ash St", point: (42.340442, -83.070889), phone: "313-931-0901", category: "health.support")
+        XCTAssertEqual(mapsDestination(club), "1401 Ash St, Detroit, MI 48208")
+        XCTAssertNotNil(mapsURL(club))
+        XCTAssertNotNil(transitAppDestination(club))
+        XCTAssertTrue(hasPhone(club))
+        XCTAssertTrue(canSave("health.support"))
+        XCTAssertFalse(listingHasQuickExit("health.support"))
+        // And a crisis line beside it still has none of that.
+        let crisis = row(point: (42.3, -83.1), category: "health.mental")
+        XCTAssertNil(mapsDestination(crisis)); XCTAssertFalse(canSave("health.mental"))
     }
 
     /// A DV or crisis listing never hands a maps app anything, with or without a coordinate.

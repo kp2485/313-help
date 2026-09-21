@@ -578,8 +578,14 @@ function need(view: Extract<View, { v: 'need' }>): string {
   const dv = n.id === 'unsafe';
   // A link that comes before the phone numbers (313SafeBeds on the shelter screen): the same panel, at the top.
   const topLinks = n.firstLinks && !view.refine ? linkPanels(n.firstLinks, true) : '';
+  // A second list under its own heading, after the need's own (docs/05: on "I need to talk to someone" the
+  // hotlines and the crisis places stay first, and the daytime places come below them). Only on the need
+  // itself, never on a refinement, and its rows are ordinary rows — `results` decides nothing by the screen.
+  const also = n.also && !view.refine
+    ? `<h2>${T(`also.${n.id}.${n.also.id}`)}</h2>${results(n.also.query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true } })}` : '';
   return `<main>${n.intro && !view.refine ? `<p class="lede">${T(n.intro)}</p>` : ''}${topLinks}${first ? `<div class="stackbtns">${first}</div>` : ''}${dv ? `<p class="foot">${T('safe.dv_no_address')}</p><p class="foot">${T('safe.calls_note')}</p>` : ''}
     ${refine}${query ? results(query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true }, emptyKey: n.emptyKey, noDistance: dv, linksBelow: !!links }) : ''}
+    ${also}
     ${links && query ? `<h2>${T('links.more')}</h2>${linkPanels(links)}` : ''}</main>`;
 }
 /** Link-outs to a program's own site. The words are in strings/*.json (link.<set>.<id>.title|body|label).

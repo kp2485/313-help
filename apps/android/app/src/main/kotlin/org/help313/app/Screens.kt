@@ -201,6 +201,7 @@ object Screens {
         val col = UI.column(a, 16)
         val title = L.t("need.${need.id}")
         col.addView(UI.text(a, title, 24f, R.color.ink, bold = true))
+        noteBar(a, col)
         need.intro?.let { col.addView(UI.text(a, L.t(it), 17f, R.color.ink, topDp = 8)) }
 
         // A link above even the numbers: today only 313SafeBeds on the shelter screen. It is someone else's tool,
@@ -247,8 +248,18 @@ object Screens {
             return UI.scroller(a, col)
         }
 
+        // The list goes into the column this screen has already built, so the intro and the emergency numbers
+        // above it stay above it. Building a fresh column here dropped both, which on "I need to talk to someone"
+        // meant 988 was not on the screen at all (found while adding the daytime places, 2026-09-22).
         need.query?.let { q ->
-            return results(a, title, q, need.emptyKey, need.sensitive)
+            listBody(a, col, q, need.emptyKey, need.sensitive)
+            // The second list, under its own heading, after the first (docs/05 ordering). Its rows are ordinary
+            // rows: `sensitive` belongs to the first list, and a row's own category decides the rest.
+            need.also?.let { al ->
+                col.addView(UI.sectionHead(a, L.t("also.${need.id}.${al.id}")))
+                listBody(a, col, al.query, null, sensitive = false, locationChip = false)
+            }
+            return UI.scroller(a, col)
         }
         return UI.scroller(a, col)
     }
@@ -272,16 +283,32 @@ object Screens {
             val e = a.emergency(id) ?: continue
             col.addView(UI.callButton(a, e.first, e.second, emergency = id == "emg_911") { a.dial(e.second) })
         }
+        listBody(a, col, query, emptyKey, sensitive)
+        return UI.scroller(a, col)
+    }
 
+    /**
+     * The list itself, appended to a column a screen has already started: the location chip, then the ranked
+     * rows, or one plain line when nothing is listed. Kept apart from [results] so that a need screen can put
+     * its intro and its emergency numbers above the same list rather than around a second one.
+     */
+    private fun listBody(
+        a: MainActivity,
+        col: LinearLayout,
+        query: Query,
+        emptyKey: String? = null,
+        sensitive: Boolean = false,
+        locationChip: Boolean = true,
+    ) {
         val bundle = a.store.bundle
         if (bundle == null) {
             col.addView(UI.text(a, L.t("home.loading"), 17f, R.color.muted, topDp = 12))
-            return UI.scroller(a, col)
+            return
         }
 
         // Distance sorts the list; a sensitive listing never gets one (docs/08), which the ranking rule already
         // guarantees because those rows carry no coordinates.
-        if (!sensitive) {
+        if (!sensitive && locationChip) {
             if (a.near == null) {
                 col.addView(UI.button(a, L.t("loc.use"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
                     a.askForLocation()
@@ -301,10 +328,9 @@ object Screens {
         val ranked = rank(bundle.rows, q, a.now(), bundle.alerts)
         if (ranked.isEmpty()) {
             col.addView(UI.text(a, L.t(emptyKey ?: "results.none"), 17f, R.color.muted, topDp = 16))
-            return UI.scroller(a, col)
+            return
         }
         for (r in ranked) col.addView(listingCard(a, r, showDistance = !sensitive))
-        return UI.scroller(a, col)
     }
 
     /** The open-now pill. A holiday is never the open colour: the words say "Call first" and the colour agrees. */

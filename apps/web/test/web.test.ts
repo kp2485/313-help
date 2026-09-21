@@ -90,7 +90,7 @@ describe('needs list', () => {
   });
   it('an emergency room and urgent care are their own kinds of help, the emergency room first and led by 911', () => {
     const doctor = NEEDS.find((n) => n.id === 'doctor')!;
-    expect(doctor.refine!.map((r) => r.id)).toEqual(['er', 'urgent', 'doctor', 'dhd', 'dentist', 'eyes']);
+    expect(doctor.refine!.map((r) => r.id)).toEqual(['er', 'urgent', 'doctor', 'dhd', 'dentist', 'eyes', 'support']);
     expect(doctor.refine![0]!.query).toEqual({ category: 'health.er' });
     expect(doctor.refine![1]!.query).toEqual({ category: 'health.urgent' });
     // 911 sits above the emergency-room list, and only there: the plain "a doctor or nurse" screen has no 911 row.
@@ -658,9 +658,9 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     const src = readFileSync(join(root, 'pipeline/src/validate.ts'), 'utf8');
     const block = src.slice(src.indexOf('export const KNOWN_CATEGORIES = ['), src.indexOf('] as const;'));
     const known = [...block.matchAll(/'([a-z_.]+)'/g)].map((m) => m[1]!);
-    expect(known.length).toBe(46);
+    expect(known.length).toBe(47);
     const hits = (q: string | undefined, c: string) => !!q && (c === q || c.startsWith(q + '.'));
-    const needQueries = NEEDS.flatMap((n) => [n.query?.category, ...(n.refine ?? []).map((r) => r.query?.category)]);
+    const needQueries = NEEDS.flatMap((n) => [n.query?.category, n.also?.query.category, ...(n.refine ?? []).map((r) => r.query?.category)]);
     const chipQueries = CATEGORIES.map((c) => c.query.category);
     const fromNeed = (c: string) => needQueries.some((q) => hits(q, c));
     const unreachable = known.filter((c) => !fromNeed(c) && !chipQueries.some((q) => hits(q, c)));

@@ -7913,7 +7913,7 @@
   ],
   "x_detroit": {
    "id": "svc_dearborn_department_free_narcan_and_test_strips_at_the_w",
-   "category": "harm.narcan"
+   "category": "harm.supplies"
   },
   "assured_date": "2026-09-19"
  },
@@ -25636,7 +25636,7 @@
   ],
   "x_detroit": {
    "id": "svc_goodwill_industries_a_place_of_our_own_clubhouse",
-   "category": "health.mental"
+   "category": "health.support"
   },
   "assured_date": "2026-09-20"
  },

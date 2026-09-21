@@ -46,7 +46,7 @@ location, several services, and the seed already works that way (Pope Francis Ce
 | Property-tax hardship | Detroit + Dearborn `housing.owner`, Hamtramck + Highland Park `money.tax` | `housing.owner`. **Applied.** |
 | Recovery coaching | same door in `.outpatient` and `.recovery` | `.recovery`. **Applied.** |
 | WIC | 6 × `health.dhd`; docs/03 names WIC under `food.benefits` | Deliberate (coordinator, 2026-09-20). **Kyle** (K2). |
-| Narcan vs supplies | 27 `harm.supplies` rows all stock Narcan; Dearborn's Wagner deck box has test strips but is `harm.narcan` | Categories follow DECISIONS 2026-09-20; the *need screen* is the gap. **Kyle** (K1). |
+| Narcan vs supplies | 27 `harm.supplies` rows all stock Narcan; Dearborn's Wagner deck box has test strips but is `harm.narcan` | Categories follow DECISIONS 2026-09-20; the *need screen* was the gap. **K1 done** (Kyle, 2026-09-22): the screen queries `harm`. |
 | Day centers / showers | Pope Francis has three rows (meal, shower, day center); NOAH two; Ruth Ellis drop-in is `youth` plus a shower row | One row per service holds. Ruth Ellis drop-in: **Kyle** (K4). |
 | Tax help at libraries | Accounting Aid rows at Main and Henry Ford Centennial are `money.tax` at the library's address | Correct: the service is tax help; the library is only the room. |
 | `jobs.find` / `jobs.training` / `learn.*` | TLC Center (computer classes + résumé help), small-business classes × 3 in `jobs.training`, Enter-Great 313 support group in `jobs.find` (found through "I have a record") | Defensible, kept. |
@@ -111,12 +111,92 @@ files, and the tests that pin the groups on each platform. The new colour passes
 
 | # | Rows | Question | Recommendation |
 |---|---|---|---|
-| K1 | 27 `harm.supplies` + `sal_dearborn_department_free_narcan_and_test_strips_at_the_w` | "I want free Narcan" lists only `harm.narcan`, so none of the 27 Wayne County stations (Hamtramck, Dearborn, Highland Park) appear, though every one stocks Narcan. The Dearborn Wagner box has test strips but is `harm.narcan`, and looks like the same door as `sal_wws_dearborn_wagner_place_parking_garage`. | Make the Narcan need query `harm`; then re-file the Wagner row as `harm.supplies` and have a steward check the duplicate. Do both together or the Dearborn box drops off the Narcan screen. |
+| K1 | 27 `harm.supplies` + `sal_dearborn_department_free_narcan_and_test_strips_at_the_w` | "I want free Narcan" lists only `harm.narcan`, so none of the 27 Wayne County stations (Hamtramck, Dearborn, Highland Park) appear, though every one stocks Narcan. The Dearborn Wagner box has test strips but is `harm.narcan`, and looks like the same door as `sal_wws_dearborn_wagner_place_parking_garage`. | Make the Narcan need query `harm`; then re-file the Wagner row as `harm.supplies` and have a steward check the duplicate. Do both together or the Dearborn box drops off the Narcan screen. **DONE 2026-09-22 — see below.** |
 | K2 | 6 WIC rows | `health.dhd` (coordinator, 2026-09-20) or `food.benefits` (docs/03)? | Move to `food.benefits` and give "Help paying for food" a list as well as its links; today that screen has no listings and the category is empty. |
-| K3 | `sal_goodwill_industries_a_place_of_our_own_clubhouse` | A daytime clubhouse under `health.mental`, which is *sensitive*: no address shown, no dot, listed after 988 on "I need to talk to someone". | Needs a non-crisis slug (e.g. `health.mental` split into `.crisis` / `.support`); until then keep. |
+| K3 | `sal_goodwill_industries_a_place_of_our_own_clubhouse` | A daytime clubhouse under `health.mental`, which is *sensitive*: no address shown, no dot, listed after 988 on "I need to talk to someone". | Needs a non-crisis slug (e.g. `health.mental` split into `.crisis` / `.support`); until then keep. **DONE 2026-09-22 — see below.** |
 | K4 | `youth` (19), incl. `sal_ruth_ellis_drop_in`, `sal_the_guidance_kids_talk_children_s_advocacy_center`, `sal_national_runaway_safeline` | Split the drawer? | `kids.programs` for after-school, tutoring and Brilliant Detroit with a need tile ("Something for my kids"); Ruth Ellis drop-in → `shelter.day` with the `youth` flag; decide whether Kids-TALK should be private like `assault`. |
 | K5 | `hygiene.shower` (5) | No need screen. | Add a "shower or laundry" choice to "I need clothes, diapers, or baby things", or to the day-center need. |
 | K6 | `sal_detroit_health_vision_and_hearing_checks_for_kids` | The only `health.vision` row says "They do not give glasses"; every other DHD program is `health.dhd`. | Keep (it is an eye check, and it keeps the screen from being empty); look for a real glasses program. |
 | K7 | proposed `sal_ser_metro_detroit_youth_reengagement_center` | "Help getting back into school" filed `jobs.training`. | `learn.school` when a steward approves it. |
 | K8 | Libraries | After the fix the "phone, internet, or a computer" screen lists 2 places. | Import `connect` rows for Main and Bowen (pages support it), rather than let that need also list `rec.library`. |
 | K9 | Layer count | 8 help layers instead of 7. | Keep 8; the alternative was "Jobs, school, and kids", which hides after-school programs behind jobs. |
+
+## Kyle's two answers, applied 2026-09-22
+
+> *"add all the wayne county narcan stations and get the goodwill clubhouse out of the hidden address directory"*
+
+### K1 — "I want free Narcan" now lists every place that stocks naloxone
+
+The need queries the **whole `harm` top-level** on web, iPhone and Android — the only two slugs under it are
+`harm.narcan` and `harm.supplies`, and every row under either says it gives out naloxone, so the top-level is the
+right question rather than two queries stitched together. (The query layer treats a category as a prefix:
+`r.category === q.category || r.category.startsWith(q.category + '.')`, which is what `hot_cold` already relies on
+with `rec`.) Ranking is untouched: open now, then distance. Home's "Free Narcan" shortcut and the Help tab's tile
+open the same need, so all three list the same places. The map's "Health and Narcan" layer already drew both.
+
+**What the screen lists now: 91 places** (it listed 64 before), all four cities —
+
+| | `harm.narcan` | `harm.supplies` | total |
+|---|---|---|---|
+| Detroit | 61 | 14 | **75** |
+| Dearborn | 2 | 7 | **9** |
+| Hamtramck | 0 | 5 | **5** |
+| Highland Park | 0 | 2 | **2** |
+| | 63 | 28 | **91** |
+
+The 26 `sal_wws_*` rows carry a publisher's coordinate and **no street address and no phone**: they draw a map
+dot, they get directions from the point (`directions.ts`), and they show no Call button and never print the
+coordinate as an address. A behavioural test holds exactly that.
+
+`sal_dearborn_department_free_narcan_and_test_strips_at_the_w` moved `harm.narcan` → `harm.supplies` with a dated
+`internal_note` — it carries test strips as well as Narcan — which drops it from nothing, because the screen now
+asks for `harm`. Whether it is the same box as `sal_wws_dearborn_wagner_place_parking_garage` is **not** ours to
+settle: it is a steward item, `docs/CHECKS-2026-09-20.md` § 1.17. Nothing was merged and nothing deleted.
+
+Also changed so the app cannot contradict itself: the neighbourhood panel's "nearest free Narcan"
+(`pipeline/src/indicators.ts`) measures the same `harm` kind the screen lists.
+
+**New words** (`narcan.intro`, above the list): *"These places give out free Narcan. Some also have test strips for
+fentanyl and xylazine."* "Narcan" stays, because it is the word residents use. `need.narcan`, `tile.narcan`,
+`quick.narcan` and `cat.harm` were already true of both kinds of place and are unchanged.
+
+### K3 — the clubhouse is an ordinary listing again
+
+New category **`health.support`**, label **"Mental health support"**: ongoing mental-health support that is not a
+crisis service. It is deliberately **not** in the sensitive set (docs/08), and
+`sal_goodwill_industries_a_place_of_our_own_clubhouse` moved into it with a dated `internal_note`.
+
+Goodwill's own locations page was re-read on 2026-09-21 before the move: it still prints
+**"1401 Ash Street, Detroit, MI 48208"** and **313.931.0901** beside the clubhouse's name. No block, no workaround.
+
+**What a resident sees now**, where before there was a name, a phone and nothing else: the street address, a dot on
+the map inside "Health and Narcan", the distance, Directions and Bus directions, a Save button, a Share button and
+its own URL — an ordinary listing in every way.
+
+**Where it is reachable from:** "I need a doctor, dentist, or eye care" → *Mental health support*; and "I need to
+talk to someone", where it is a second list under its own heading **"Places to go during the day"**, drawn **after**
+988, the DWIHN crisis line and the crisis places (docs/05 ordering — nothing comes between a person in crisis and a
+number they can call). That screen itself stays traceless and keeps its quick exit; the listing opened from it does
+not, because it is not a crisis service.
+
+**The sensitive set did not widen or shrink.** It is still exactly `shelter.dv` and `health.mental`, matched whole
+or as a parent (`c === s || c.startsWith(s + '.')`) — never as a run of letters, which is why `health.support`
+cannot inherit the hiding and `health.mental.crisis` cannot escape it. Tests on all three platforms pin both
+halves: a `health.mental` row still has no address, no dot, no Save, no Share and no URL, and the clubhouse row has
+all of them.
+
+**The other `health.mental` rows, for Kyle, not moved:** there are only two left, `sal_dwihn_crisis_line` (DWIHN's
+24-hour crisis line) and `sal_dwihn_care_center` (walk in any time, 707 W Milwaukee). Both are crisis services and
+both belong where they are. Nothing else in the directory is filed under `health.mental`.
+
+`KNOWN_CATEGORIES` is now **47** slugs, 44 of them with a live listing.
+
+**Native-review queue (machine drafts, es / ar / bn):** `narcan.intro`, `refine.doctor.support`, `also.talk.support`.
+
+### One thing found on the way
+
+Android's need screen built its list in a **new** column, throwing away the one that already held the screen's
+intro and its emergency numbers. On "I need to talk to someone" that meant **988 was not on the screen at all** —
+an ordering rule from docs/05 that the data tests could not see, because the data was right and the drawing was
+not. Fixed with the rest of K3: the list is appended to the column the screen has already built
+(`Screens.listBody`), and a test pins the order.

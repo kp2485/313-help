@@ -6,7 +6,9 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CATEGORIES, MAP_GROUPS, NEEDS, PRIVATE_TOPS, SENSITIVE, TABS, isPrivate, mapDrawable } from '../src/needs.js';
+import { CATEGORIES, MAP_GROUPS, NEEDS, PRIVATE_TOPS, SENSITIVE, TABS, isPrivate, isSensitive, mapDrawable } from '../src/needs.js';
+import { hashFor, isPrivateCat } from '../src/router.js';
+import { rank, type BundleRow } from '@313help/query';
 import { LINKS } from '../src/links.js';
 import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES } from '../src/propose.js';
@@ -632,5 +634,159 @@ describe('a badge says which of a person and a program did the checking', () => 
     }
     expect(table('en')['badge.entry_checked.auto_check']).toMatch(/^A program matched/);
     expect(table('en')['badge.confirmed.web']).not.toMatch(/^We checked/);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// The category audit of 2026-09-22, items K1 and K3 (Kyle's two decisions).
+// ---------------------------------------------------------------------------------------------------
+
+const main = readFileSync(join(root, 'apps/web/src/main.ts'), 'utf8');
+
+/** A listing, with only the fields these tests care about filled in. */
+const listing = (r: Partial<BundleRow> & { id: string; category: string }): BundleRow => ({
+  name: r.id, org: 'An org', what: 'Free Narcan.', phones: [], availability: 'always', schedules: [],
+  flags: [], status: 'active',
+  facts: { checked_at_entry: null, entry_method: null, last_confirmed_at: null, last_confirm_method: null,
+    reports: { closed_open: 0, closed_last_at: null, wrong_open: 0 }, source: { type: 'open_data', name: 'A source' } },
+  ...r,
+} as BundleRow);
+
+describe('"I want free Narcan" lists every harm-reduction place that stocks naloxone (audit K1)', () => {
+  const narcan = NEEDS.find((n) => n.id === 'narcan')!;
+  const now = new Date('2026-09-22T15:00:00-04:00');
+  // A Health Department box, a Wayne County station with a coordinate and no address at all, and a row from
+  // another kind of help that must not be dragged in.
+  const rows = [
+    listing({ id: 'sal_dhd_box', category: 'harm.narcan', address: { line1: '1 Main St', city: 'Detroit' }, lat: 42.33, lon: -83.05, phones: [{ number: '313-555-0100' }] }),
+    listing({ id: 'sal_wws_hamtramck_city_hall', category: 'harm.supplies', lat: 42.3928, lon: -83.0496 }),
+    listing({ id: 'sal_dearborn_wagner', category: 'harm.supplies', lat: 42.3059, lon: -83.244 }),
+    listing({ id: 'sal_clinic', category: 'health.clinic', lat: 42.36, lon: -83.07 }),
+  ];
+
+  it('asks for the whole `harm` kind, which the ranker reads as a prefix, and both kinds of place come back', () => {
+    expect(narcan.query).toEqual({ category: 'harm' });
+    const got = rank(rows, narcan.query!, now).map((r) => r.row.id);
+    expect(got).toContain('sal_dhd_box');                                   // harm.narcan
+    expect(got).toContain('sal_wws_hamtramck_city_hall');                   // harm.supplies, a County station
+    expect(got).toContain('sal_dearborn_wagner');
+    expect(got).not.toContain('sal_clinic');
+    // Ranking is untouched by this change: open now first, then distance (schema/query-spec.md).
+    const near = rank(rows, { ...narcan.query!, near: { lat: 42.3928, lon: -83.0496 } }, now);
+    expect(near[0]!.row.id).toBe('sal_wws_hamtramck_city_hall');
+    // Every row on this screen keeps a distance: none of them is sensitive, station or box alike.
+    for (const r of near) expect(r.miles, r.row.id).toBeTypeOf('number');
+  });
+
+  it('a County station with a coordinate and no address renders with no Call button and no coordinate as text', () => {
+    const station = rank(rows, narcan.query!, now).find((r) => r.row.id === 'sal_wws_hamtramck_city_hall')!;
+    expect(station.row.address).toBeUndefined();
+    expect(station.row.phones).toEqual([]);                                 // so there is nothing to dial
+    // The card's Call button exists only when the row has a number, and the "Where" block prints the source's
+    // words rather than the point. Neither depends on the screen a row was reached from.
+    expect(main).toContain("${ph ? `<a class=\"btn\" href=\"${telHref(ph.number)}\"");
+    expect(main).toContain("T('detail.where_no_address', { source: r.facts.source.name })");
+    expect(main).not.toMatch(/`\$\{r\.lat\}, *\$\{r\.lon\}`/);              // a coordinate is never printed as an address
+    // Directions still work from the point alone (directions.ts), which is why the row is worth listing at all.
+    expect(main).toContain('const goHere = (r: BundleRow) => directionsHref(r, navigator.userAgent);');
+  });
+
+  it('the Home shortcut and the Help tile open that same need, so all three list the same places', () => {
+    expect(main).toContain("const quick = ['food', 'shelter', 'doctor', 'drugs', 'job', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);");
+    expect(main).toContain("<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>");
+    // And the neighborhood panel measures the same thing the screen lists, or it would name a different place.
+    const indicators = readFileSync(join(root, 'pipeline/src/indicators.ts'), 'utf8');
+    expect(indicators).toContain("narcan: 'harm'");
+  });
+
+  it('the Dearborn Wagner box is filed with the test-strip stations, and is still on the Narcan screen', () => {
+    const seed = readFileSync(join(root, 'data/seed/resources.csv'), 'utf8');
+    expect(seed).toMatch(/^sal_dearborn_department_free_narcan_and_test_strips_at_the_w,[^\n]*,harm\.supplies,/m);
+    // The screen queries `harm`, so re-filing it did not drop it: that is the whole reason both were done together.
+    expect(rank([listing({ id: 'sal_dearborn_wagner', category: 'harm.supplies', lat: 42.3059, lon: -83.244 })], narcan.query!, now)).toHaveLength(1);
+    // The possible duplicate is a steward's job, not ours: nothing was merged and nothing deleted.
+    expect(readFileSync(join(root, 'docs/CHECKS-2026-09-20.md'), 'utf8')).toContain('sal_wws_dearborn_wagner_place_parking_garage');
+  });
+
+  it('the words on the screen name the test strips too, in all four languages', () => {
+    expect(narcan.intro).toBe('narcan.intro');
+    for (const l of LANGS) expect(table(l)['narcan.intro'], l).toBeTypeOf('string');
+    expect(table('en')['narcan.intro']).toMatch(/Narcan/);
+    expect(table('en')['narcan.intro']).toMatch(/test strips/i);
+    for (const l of ['es', 'ar', 'bn']) expect(table(l)['narcan.intro'], l).not.toBe(table('en')['narcan.intro']);
+  });
+});
+
+describe('a daytime clubhouse is not a crisis line: `health.support` (audit K3)', () => {
+  const now = new Date('2026-09-22T15:00:00-04:00');
+
+  it('the sensitive set is exactly the DV and crisis pair, matched whole or as a prefix — nothing wider', () => {
+    expect(SENSITIVE).toEqual(['shelter.dv', 'health.mental']);
+    // Whole, and any child of one: still hidden.
+    for (const c of ['shelter.dv', 'shelter.dv.transitional', 'health.mental', 'health.mental.crisis']) {
+      expect(isSensitive(c), c).toBe(true);
+      expect(canSave(c), c).toBe(false);
+      expect(canShare(c), c).toBe(false);
+    }
+    // A sibling that merely starts with the same letters is NOT a child: `health.support` and `health.mentalx`
+    // are their own kinds. This is the line the new category depends on.
+    for (const c of ['health.support', 'health.supported', 'health.mentalhealth', 'shelter.dvx', 'health', 'shelter']) {
+      expect(isSensitive(c), c).toBe(false);
+      expect(isPrivate(c), c).toBe(false);
+    }
+    // And the set did not grow either: the four private kinds are the same four.
+    expect(PRIVATE_TOPS).toEqual(['treatment', 'assault']);
+  });
+
+  it('a crisis listing keeps every protection; the clubhouse gets an address, a dot, Save, Share and a URL', () => {
+    const crisis = listing({ id: 'sal_dwihn_crisis_line', category: 'health.mental' });
+    const club = listing({ id: 'sal_goodwill_industries_a_place_of_our_own_clubhouse', category: 'health.support',
+      address: { line1: '1401 Ash St', city: 'Detroit', zip: '48208' }, lat: 42.340442, lon: -83.070889,
+      phones: [{ number: '313-931-0901', label: 'Clubhouse' }] });
+    // The crisis row: no dot, not saveable, not shareable, no hash in the URL.
+    expect(mapDrawable([crisis, club], ['health'])).toHaveLength(1);
+    expect(mapDrawable([crisis, club], ['health'])[0]!.id).toBe(club.id);
+    expect(canSave(crisis.category)).toBe(false); expect(canShare(crisis.category)).toBe(false);
+    expect(isPrivateCat(crisis.category)).toBe(true);
+    const priv = (id: string) => isPrivate([crisis, club].find((r) => r.id === id)!.category);
+    // The clubhouse: an ordinary listing in every way.
+    expect(canSave(club.category)).toBe(true); expect(canShare(club.category)).toBe(true);
+    expect(isPrivateCat(club.category)).toBe(false);
+    expect(hashFor({ v: 'detail', id: club.id }, priv)).toBe(`#/r/${club.id}`);
+    expect(hashFor({ v: 'detail', id: crisis.id }, priv)).toBeNull();
+    expect(club.address).toBeDefined();
+    expect(rank([crisis, club], { category: 'health.support' }, now).map((r) => r.row.id)).toEqual([club.id]);
+  });
+
+  it('it is reachable where a person would look: under the doctor need, and below the crisis numbers on "talk"', () => {
+    const talk = NEEDS.find((n) => n.id === 'talk')!;
+    // The crisis screen is unchanged where it matters: 988 first, its own list is still the crisis one, it is
+    // still sensitive and still has the quick exit.
+    expect(talk.first).toEqual(['emg_988', 'emg_dwihn_crisis']);
+    expect(talk.query).toEqual({ category: 'health.mental' });
+    expect(talk).toMatchObject({ sensitive: true, quickExit: true });
+    // And the daytime places come after that list, under their own heading, never mixed into it.
+    expect(talk.also).toEqual({ id: 'support', query: { category: 'health.support' } });
+    expect(main).toContain('${refine}${query ? results(query,');
+    expect(main.indexOf('${also}')).toBeGreaterThan(main.indexOf('${refine}${query ? results(query,'));
+    expect(main).toContain('const also = n.also && !view.refine');
+    const doctor = NEEDS.find((n) => n.id === 'doctor')!;
+    expect(doctor.refine!.find((r) => r.id === 'support')!.query).toEqual({ category: 'health.support' });
+    for (const l of LANGS) {
+      expect(table(l)['also.talk.support'], l).toBeTypeOf('string');
+      expect(table(l)['refine.doctor.support'], l).toBeTypeOf('string');
+    }
+  });
+
+  it('the row moved, with a dated note, and the two crisis rows stayed put', () => {
+    const seed = readFileSync(join(root, 'data/seed/resources.csv'), 'utf8');
+    const row = seed.split('\n').find((l) => l.startsWith('sal_goodwill_industries_a_place_of_our_own_clubhouse,'))!;
+    expect(row).toContain(',health.support,');
+    expect(row).toContain('2026-09-22 category audit K3');
+    expect(row).toContain('1401 Ash St');
+    // The DWIHN crisis line and the DWIHN Care Center are crisis services and keep health.mental.
+    for (const id of ['sal_dwihn_care_center', 'sal_dwihn_crisis_line']) {
+      expect(seed.split('\n').find((l) => l.startsWith(id + ','))!, id).toContain(',health.mental,');
+    }
   });
 });

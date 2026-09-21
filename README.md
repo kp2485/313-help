@@ -51,7 +51,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **531 listings** in 44 categories across four cities: 144 food, 91 harm reduction, 79 health (including **9
+- **531 listings** in 44 categories across four cities: 141 food, 91 harm reduction, 79 health (including **9
   emergency rooms and 13 urgent care centers**), 37 jobs, 27 treatment, 27 learning, and 15 more groups.
 - **A Map tab drawn on the phone** from City open data and Census TIGER files inside the signed bundle — no tile
   server, no map company, works offline — on web, iPhone and Android. Layers: help by category, 52 greenway

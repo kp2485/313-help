@@ -128,9 +128,12 @@ describe('row validation', () => {
     expect(errs({ what: 'Contact Jane Smith for a food box' })).toMatch(/personal contact/);
     expect(errs({ eligibility: 'Email jane@example.org first' })).toMatch(/personal contact/);
   });
-  it('knows 46 categories, each once (docs/03)', () => {
-    expect(KNOWN_CATEGORIES.length).toBe(46);
-    expect(new Set(KNOWN_CATEGORIES).size).toBe(46);
+  it('knows 47 categories, each once (docs/03)', () => {
+    expect(KNOWN_CATEGORIES.length).toBe(47);
+    expect(new Set(KNOWN_CATEGORIES).size).toBe(47);
+    // Added 2026-09-22 (category audit K3): ongoing mental-health support that is not a crisis service. It is a
+    // kind of its own precisely so that it is NOT health.mental, which is sensitive and hides its address.
+    expect(KNOWN_CATEGORIES).toContain('health.support');
   });
   it('rejects an unknown category', () => expect(errs({ category: 'food.pantries' })).toMatch(/unknown category/));
   // Emergency rooms and urgent care are their own kinds (DECISIONS 2026-09-20): neither says it is free or

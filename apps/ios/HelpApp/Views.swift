@@ -387,7 +387,8 @@ struct NeedView: View {
             .urgentHelp(quickExit: need.quickExit)
         } else {
             ResultsView(query: need.query ?? Query(), sensitive: need.sensitive, first: need.first, intro: need.intro,
-                        firstLink: need.firstLink, emptyKey: need.emptyKey, quickExit: need.quickExit)
+                        firstLink: need.firstLink, emptyKey: need.emptyKey, quickExit: need.quickExit,
+                        also: need.also.map { (L.t("also.\(need.id).\($0.id)"), $0.query) })
                 .navigationTitle(L.t("need." + need.id))
         }
     }
@@ -405,6 +406,10 @@ struct ResultsView: View {
     var emptyKey: String? = nil
     /// "Leave this page fast" in the top bar instead of "Urgent help" (docs/08): the need's own setting.
     var quickExit = false
+    /// A second list under its own heading, below the first one ("I need to talk to someone": 988 and the crisis
+    /// places first, then the daytime places). Its rows are ordinary rows — the `sensitive` screen setting above
+    /// belongs to the first list, and a row's own category decides everything else (Saved.isSensitive).
+    var also: (title: String, query: Query)? = nil
     var body: some View {
         let now = effectiveNow(.now, bundleGeneratedAt: store.bundle?.index.generatedAt)
         // The location goes into the ranker even on a sensitive screen: a DV row's `miles` comes back nil from the
@@ -412,6 +417,8 @@ struct ResultsView: View {
         // Nothing about the person leaves the device either way (docs/08).
         var q = query; q.near = here.point
         let ranked = rank(store.bundle?.rows ?? [], q, now: now, alerts: store.bundle?.alerts ?? [])
+        var alsoQ = also?.query ?? Query(); alsoQ.near = here.point
+        let alsoRanked = also == nil ? [] : rank(store.bundle?.rows ?? [], alsoQ, now: now, alerts: store.bundle?.alerts ?? [])
         return ScrollView { VStack(alignment: .leading, spacing: 10) {
             if let intro { Text(L.t(intro)).font(.body).foregroundStyle(Color.muted) }
             if let firstLink { LinkCard(key: firstLink.key, url: firstLink.url) }
@@ -421,6 +428,12 @@ struct ResultsView: View {
             if ranked.isEmpty { Text(L.t(emptyKey ?? "results.none") + " 211").foregroundStyle(Color.muted).card() }
             ForEach(ranked, id: \.row.id) { r in
                 CardLink(r: r, showMiles: !sensitive) { DetailView(row: r.row) }
+            }
+            if let also, !alsoRanked.isEmpty {
+                Text(also.title).font(.title3.bold()).padding(.top, 8)
+                ForEach(alsoRanked, id: \.row.id) { r in
+                    CardLink(r: r, showMiles: true) { DetailView(row: r.row) }
+                }
             }
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea()).urgentHelp(quickExit: quickExit)

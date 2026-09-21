@@ -16,7 +16,10 @@ export const KNOWN_CATEGORIES = [
   'food.pantry', 'food.meal', 'food.mobile', 'food.benefits',
   'shelter.emergency', 'shelter.warming', 'shelter.cooling', 'shelter.dv', 'shelter.day',
   'harm.narcan', 'harm.supplies',
-  'health.clinic', 'health.mental', 'health.dhd', 'health.dental', 'health.vision', 'health.er', 'health.urgent',
+  // `health.mental` is the crisis one and is *sensitive* (no address, no dot, no Save, no Share: docs/08).
+  // `health.support` is ongoing mental-health support that is not a crisis service — a daytime clubhouse whose
+  // owner prints its address — and is an ordinary category (category audit 2026-09-22, K3).
+  'health.clinic', 'health.mental', 'health.support', 'health.dhd', 'health.dental', 'health.vision', 'health.er', 'health.urgent',
   'utilities', 'housing.rent', 'housing.owner', 'hygiene.shower', 'transport', 'youth',
   'rec.center', 'rec.library', 'jobs.find', 'jobs.training', 'learn.school', 'learn.english',
   'treatment.crisis', 'treatment.detox', 'treatment.residential', 'treatment.outpatient', 'treatment.meds', 'treatment.recovery',

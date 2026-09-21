@@ -138,10 +138,11 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 | `shelter.emergency` | Emergency shelter (CAM) | "I need a safe place tonight" |
 | `shelter.warming` / `shelter.cooling` | Warming / cooling centers | (alert-driven) |
 | `shelter.dv` | Domestic violence shelter | "I'm not safe at home" |
-| `harm.narcan` | Free Narcan | "I want free Narcan to carry" |
-| `harm.supplies` | Test strips, safer-use supplies | |
+| `harm.narcan` | Free Narcan | "I want free Narcan to carry" — which lists the whole `harm` kind, both slugs, because every place under either one says it gives out naloxone (Kyle, 2026-09-22; audit K1) |
+| `harm.supplies` | Test strips, safer-use supplies | The same screen, and "I want help with drugs or alcohol" → *Safer-use supplies* |
 | `health.clinic` | Free/low-cost clinic | "I need to see a doctor" |
-| `health.mental` | Mental health / crisis | "I need to talk to someone" |
+| `health.mental` | Mental health / crisis | "I need to talk to someone" (988 and the crisis lines first). **Sensitive**: no address, no map dot, no distance, no Save, no Share, no URL (docs/08) |
+| `health.support` | Mental health support | "I need to talk to someone" → *Places to go during the day*, below the crisis numbers and the crisis places; and "I need a doctor, dentist, or eye care" → *Mental health support*. Ongoing, non-crisis support a person can walk into — a daytime clubhouse, a day program — and **not** sensitive: its owner publishes its address, and a person has to get there. Added 2026-09-22 (audit K3) |
 | `health.dhd` | Health Department programs | |
 | `utilities` | Utility shutoff help | "My lights/heat/water are being shut off" |
 | `housing.rent` | Rent / eviction help | "I'm behind on rent" |
@@ -166,8 +167,8 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 | `pets` | Pet care and food | "Help with my pet" |
 | `seniors` / `veterans` / `lgbtq` / `youth` / `women` / `men` / `reentry` / `disability` / `immigrants` / `pregnant` / `paid_training` / `referral_only` / language (`spanish`, `arabic`, `bengali`) / access (`walk_in`, `appointment_required`, `no_id_required`, `sliding_fee`, `medicaid`) | Flags, not categories. `reentry` = for people with a record or coming home from prison; "I have a record" lists jobs with it first |
 
-**46 slugs in all; 44 of them had at least one live listing on 2026-09-20.** The two that do not are
-`shelter.warming` and `shelter.cooling`, which are alert-driven and empty on purpose.
+**47 slugs in all; 44 of them had a live listing on 2026-09-22.** `shelter.warming` and `shelter.cooling` are
+alert-driven and empty on purpose; `food.benefits` was emptied by the category audit.
 
 *Category audit, 2026-09-22 (DECISIONS; `docs/CATEGORY-AUDIT-2026-09-22.md`):* **a row has exactly one category, and it
 says what that row offers.** A door with two kinds of help gets **two rows** under one `org_id` at one address (HSDS:
@@ -175,7 +176,8 @@ one organization, one location, several services), as Pope Francis Center has fo
 Rows of one family share a category: a library building is `rec.library` (its computers are in its `what`), a
 Neighborhood Wellness Center is `health.dhd`, help signing up for benefits is `money.benefits`, a property-tax hardship
 exemption is `housing.owner`, recovery coaching is `treatment.recovery`. Since that audit `food.benefits` has no rows
-(the three that carried it were benefits sign-up offices), so 43 of the 46 slugs have a live listing. The 46 slugs are
+(the three that carried it were benefits sign-up offices). `health.support` was added on 2026-09-22 (K3) and has one,
+so 44 of the 47 slugs have a live listing. The 47 slugs are
 `KNOWN_CATEGORIES` in `pipeline/src/validate.ts`. Map layers (`MAP_GROUPS`, eight of them) are listed in docs/05.
 
 *Added 2026-09-20 (DECISIONS):* `health.er` and `health.urgent`. A row may now carry a **city and a point but no

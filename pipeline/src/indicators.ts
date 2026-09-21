@@ -10,7 +10,10 @@ import type { CrashCounts, CrashRow } from './ingest-crashes.js';
 export const NEAR_MILES = 0.5;                       // "inside or within half a mile" (docs/13)
 export const HELP_TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec', 'jobs', 'learn', 'treatment', 'housing', 'legal', 'ids', 'money', 'goods', 'kids', 'connect', 'transport', 'pets'] as const;
 /** Walk distance from the middle of the neighborhood to the nearest listing of each kind. */
-const NEAREST: Record<string, string> = { food: 'food', clinic: 'health.clinic', narcan: 'harm.narcan', indoors: 'rec' };
+// `narcan` is the whole `harm` top-level, the same query the "I want free Narcan" screen makes since the
+// category audit of 2026-09-22: `harm.narcan` plus `harm.supplies`, every one of which says it gives out
+// naloxone. A neighborhood panel that named a different nearest place than the screen would be a wrong fact.
+const NEAREST: Record<string, string> = { food: 'food', clinic: 'health.clinic', narcan: 'harm', indoors: 'rec' };
 
 type Pt = [number, number];
 export interface NeighborhoodIndicators {
