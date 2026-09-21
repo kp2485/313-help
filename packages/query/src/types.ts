@@ -54,6 +54,9 @@ export interface BundleRow {
   address?: { line1: string; city: string; zip?: string };
   lat?: number;
   lon?: number;
+  /** Domestic-violence rows only: one id from SERVICE_AREAS (areas.ts). A whole city or bigger, and the only
+   *  thing a DV row ever says about where it is. Never an address, a ZIP, a neighbourhood or a coordinate. */
+  service_area?: string;
   phones: { number: string; label?: string }[];
   website?: string;
   availability: Availability;

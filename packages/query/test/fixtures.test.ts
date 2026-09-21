@@ -9,7 +9,7 @@ const dir = join(__dirname, '../../../schema/fixtures');
 
 interface Case {
   name: string;
-  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment' | 'search';
+  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'rankDetail' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment' | 'search';
   segment?: string; openOnly?: boolean; maxMiles?: number; tolerance?: number;
   now: string;
   text?: string;
@@ -57,6 +57,11 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
             expect(badge(find(c.row), now)).toMatchObject(c.expect as object); break;
           case 'rank':
             expect(rank(rows, c.query ?? {}, now, alerts).map((r) => r.row.id)).toEqual(c.expect); break;
+          // "<id> band<n> <no-distance|distance>": the band a row landed in, and whether the result object carries
+          // a distance at all. A domestic-violence row must always read "no-distance" (schema/query-spec.md).
+          case 'rankDetail':
+            expect(rank(rows, c.query ?? {}, now, alerts)
+              .map((r) => `${r.row.id} band${r.band} ${r.miles === null ? 'no-distance' : 'distance'}`)).toEqual(c.expect); break;
           case 'search':
             expect(search(rows, c.text ?? '', c.query ?? {}, now, alerts).map((r) => r.row.id)).toEqual(c.expect); break;
           case 'bundleAge':

@@ -2,6 +2,7 @@
 // (public, no key). Runs by hand, results are committed; the build never calls the network.
 // DV rows are skipped: they must never carry an address or coordinates.
 
+import { isDvCategory } from '@313help/query';
 import { inBbox } from './util.js';
 import { readResources, writeResources } from './seed-io.js';
 
@@ -15,7 +16,9 @@ async function geocode(line: string): Promise<{ lat: number; lon: number; zip?: 
 
 const rows = readResources();
 for (const r of rows) {
-  if (!r.address_1 || (r.lat && r.lon) || r.category === 'shelter.dv') continue;
+  // A domestic-violence row is skipped even if someone typed an address into it: this script never turns one
+  // into a coordinate, and validate.ts fails the build for the typed address itself (docs/08).
+  if (!r.address_1 || (r.lat && r.lon) || isDvCategory(r.category ?? '')) continue;
   // "Suite 100", "Ste. 4-450", "Suite G 7", "#2": the Census geocoder matches the building, not the unit.
   const street = r.address_1.replace(/,?\s*(suite|ste\.?|unit|#)\s*[\w-]+(\s+\w{1,3})?$/i, '');
   const hit = await geocode(`${street}, ${r.city || 'Detroit'}, MI ${r.zip ?? ''}`);

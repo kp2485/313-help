@@ -36,6 +36,8 @@ export function fromSeed(resources: CsvRow[], schedules: CsvRow[]): Normalized {
       ...(r.eligibility ? { eligibility: r.eligibility } : {}),
       ...(r.address_1 ? { address: { line1: r.address_1, city: r.city || 'Detroit', ...(r.zip ? { zip: r.zip } : {}) } } : {}),
       ...(hasCoords ? { lat: Number(r.lat), lon: Number(r.lon) } : {}),
+      // A domestic-violence row's only statement about where it is: a coarse area, never a place (docs/08).
+      ...(r.service_area ? { service_area: r.service_area } : {}),
       phones: phones(r),
       ...(r.website ? { website: r.website } : {}),
       availability: (r.availability || 'unknown') as Availability,
@@ -186,11 +188,11 @@ export function toHsds(all: Normalized[]) {
           id: uuid5(locSlug), name: row.name, location_type: row.address || row.lat !== undefined ? 'physical' : 'virtual',
           ...(row.lat !== undefined ? { latitude: row.lat, longitude: row.lon } : {}),
           ...(row.address ? { addresses: [{ id: uuid5(`${locSlug}#address`), address_1: row.address.line1, city: row.address.city, state_province: 'MI', postal_code: row.address.zip ?? '', country: 'US', address_type: 'physical' }] } : {}),
-          x_detroit: { id: locSlug },
+          x_detroit: { id: locSlug, ...(row.service_area ? { service_area: row.service_area } : {}) },
         },
         phones: row.phones.map((ph, i) => ({ id: uuid5(`${row.id}#phone${i}`), number: ph.number, ...(ph.label ? { description: ph.label } : {}) })),
         schedules: row.schedules.map((s, i) => hsdsSchedule(row.id, s, i)),
-        x_detroit: { id: row.id, status: row.status, hsds_status: HSDS_STATUS[row.status], availability: row.availability, flags: row.flags,
+        x_detroit: { id: row.id, status: row.status, hsds_status: HSDS_STATUS[row.status], availability: row.availability, flags: row.flags, ...(row.service_area ? { service_area: row.service_area } : {}),
           ...(row.hours_text ? { hours_text: row.hours_text } : {}), ...(row.notice ? { notice: row.notice } : {}), ...row.facts, archived: row.archived ?? null },
       });
     }

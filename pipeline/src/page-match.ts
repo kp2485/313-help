@@ -116,11 +116,20 @@ export function addressOnPage(html: string, line1: string): boolean {
 
 /** `phone2_source_url`: the second number is published on another owner's page (e.g. the food bank's office for a
  *  truck stop at a church); it is checked there, not on the listing's own page (Kyle, 2026-09-19). */
-export interface ListingFacts { phone?: string; phone2?: string; phone2_source_url?: string; address_1?: string }
+export interface ListingFacts { phone?: string; phone2?: string; phone2_source_url?: string; address_1?: string; category?: string }
+
+/**
+ * A domestic-violence row publishes on its **phone alone**, by rule. Every other listing with no phone has to
+ * show its house number on its own page, but a `shelter.dv` row is never allowed to carry a street address in
+ * the first place (docs/04, docs/08, validate.ts), so asking for one would hold every such row for ever. What
+ * is checked is what the row actually claims: the number a survivor will dial.
+ */
+const phoneOnlyByRule = (category?: string) => category === 'shelter.dv' || (category ?? '').startsWith('shelter.dv.');
 
 /**
  * Does the page show this listing? Every listed phone must be on it; a listing with no phone must show its
- * street address (house number and street). A listing with an address must show that too.
+ * street address (house number and street) — except a domestic-violence row, which publishes on its phone
+ * alone by rule. A listing with an address must show that too.
  */
 export function listingOnPage(html: string, r: ListingFacts): { ok: boolean; missing: string[] } {
   // A data file (the JSON behind a map, like Gleaners'): the listing's facts must all be in ONE entry, so one
@@ -160,6 +169,9 @@ function onPage(html: string, r: ListingFacts): { ok: boolean; missing: string[]
   const phone2Here = r.phone2 && !r.phone2_source_url ? r.phone2 : undefined;
   for (const [k, v] of [['phone', r.phone], ['phone2', phone2Here]] as const) if (v && !phoneOnPage(html, v)) missing.push(`${k} ${v}`);
   if (r.address_1 && streetKey(r.address_1) && !addressOnPage(html, r.address_1)) missing.push(`street address "${r.address_1}"`);
-  if (!r.phone && !r.phone2 && !(r.address_1 && streetKey(r.address_1))) missing.push('a phone or a street address with a house number to look for');
+  if (!r.phone && !r.phone2) {
+    if (phoneOnlyByRule(r.category)) missing.push('a phone number: a domestic violence row publishes on its phone alone, and may never carry a street address');
+    else if (!(r.address_1 && streetKey(r.address_1))) missing.push('a phone or a street address with a house number to look for');
+  }
   return { ok: missing.length === 0, missing };
 }
