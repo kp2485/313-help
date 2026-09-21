@@ -6,6 +6,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import YAML from 'yaml';
+import { assertNoMovedIds, assignIds, NO_PRIOR, oneRowPerRecord, readPrior, recordKey, RETIRED_COLUMNS, retiredPath, retiredRows, type IdRequest, type PriorIds, type Retired } from './ingest-ids.js';
 import { p, readCsv, writeCsv, slug, inBbox, type CsvRow, today } from './util.js';
 
 export interface Source {
@@ -63,48 +64,49 @@ export async function fetchLayer(src: Source): Promise<{ lastEdited: string | nu
 /** A layer that lost more than half its rows since the last good file is more likely broken than emptied. */
 export const sharpDrop = (before: number, after: number) => before >= 10 && after < before / 2;
 
-export function toRows(src: Source, lastEdited: string | null, features: any[], fetchedAt: string): { rows: CsvRow[]; warnings: string[] } {
+export function toRows(src: Source, lastEdited: string | null, features: any[], fetchedAt: string, prior: PriorIds = NO_PRIOR): { rows: CsvRow[]; warnings: string[]; retired: Retired[] } {
   const f = src.fields ?? {};
   const warnings: string[] = [];
-  const seen = new Map<string, number>();
-  const rows: CsvRow[] = [];
+  const all: CsvRow[] = [];
   const get = (props: any, key?: string) => (key && props[key] != null ? String(props[key]).replace(/\s+/g, ' ').trim() : '');
-  // Features in a fixed order (address, then name), so which one keeps the plain id at a shared address never
-  // depends on the order the server happened to return them.
-  const ordered = [...features].sort((x, y) => {
-    const k = (ft: any) => `${slug(get(ft.properties ?? {}, f.address))}|${get(ft.properties ?? {}, f.name).toLowerCase()}|${get(ft.properties ?? {}, f.ref)}`;
-    return k(x) < k(y) ? -1 : k(x) > k(y) ? 1 : 0;
-  });
 
-  for (const feat of ordered) {
+  for (const feat of features) {
     const props = feat.properties ?? {};
     const [lon, lat] = feat.geometry?.coordinates ?? [];
     const name = get(props, f.name), address = get(props, f.address);
     if (!name || !address) { warnings.push(`${src.id}: skipped a feature with no name or address`); continue; }
     if (typeof lat !== 'number' || !inBbox(lat, lon)) { warnings.push(`${src.id}: "${name}" is outside the service area; skipped`); continue; }
 
-    // Stable id from the address. If two features share an address, the second gets the name too.
-    let id = `sal_${src.id_prefix ?? src.id}_${slug(address)}`;
-    const n = (seen.get(id) ?? 0) + 1;
-    seen.set(id, n);
-    if (n > 1) { warnings.push(`${src.id}: duplicate address "${address}" ("${name}")`); id = `${id}_${slug(name).slice(0, 20)}`; }
-
     const extra = (src.extra ?? []).map((k) => `${k}=${get(props, k)}`).filter((s) => !s.endsWith('=')).join('; ');
-    rows.push({
-      sal_id: id, record_ref: get(props, f.ref), name, address_1: address, zip: get(props, f.zip),
+    all.push({
+      sal_id: '', record_ref: get(props, f.ref), name, address_1: address, zip: get(props, f.zip),
       lat: lat.toFixed(6), lon: lon.toFixed(6), phone: get(props, f.phone), website: get(props, f.website),
       hours_text: get(props, f.hours), extra, source_id: src.id, source_last_edited: lastEdited ?? '', fetched_at: fetchedAt,
     });
   }
+
+  // Ids come from the layer's own record references, never from the order it answered in (ingest-ids.ts).
+  const one = oneRowPerRecord(all);
+  const rows = one.rows;
+  warnings.push(...one.warnings.map((w) => `${src.id}: ${w}`));
+  const requests: IdRequest[] = rows.map((r) => ({ key: recordKey(r), base: slug(r.address_1!), alt: slug(r.name!).slice(0, 20) }));
+  const assigned = assignIds(`sal_${src.id_prefix ?? src.id}_`, requests, prior, fetchedAt);
+  for (const r of rows) r.sal_id = assigned.ids.get(recordKey(r))!;
+  warnings.push(...assigned.warnings.map((w) => `${src.id}: ${w}`));
+  assertNoMovedIds(src.id, prior, rows);
+
   rows.sort((a, b) => a.sal_id!.localeCompare(b.sal_id!));
-  return { rows, warnings };
+  return { rows, warnings, retired: assigned.retired };
 }
 
 async function main() {
   const fetchedAt = today();
   for (const src of loadSources().filter((s) => s.kind === 'arcgis')) {
     const { lastEdited, features } = await fetchLayer(src);
-    const { rows, warnings } = toRows(src, lastEdited, features, fetchedAt);
+    // What this layer committed last time: every record it has already been given an id for, and every id it
+    // has retired. Both decide the ids below, so this read happens before anything is minted.
+    const prior = readPrior(src.id);
+    const { rows, warnings, retired } = toRows(src, lastEdited, features, fetchedAt, prior);
     const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
     // A layer its publisher hasn't edited in max_age_days publishes nothing new: fresh rows go to staging for a person,
     // and the last published file stays live. Nothing disappears on a timer.
@@ -121,6 +123,8 @@ async function main() {
       continue;
     }
     writeCsv(out, rows, INGESTED_COLUMNS);
+    // Tombstones ride with the file whose ids they retire, and are committed with it: nothing is deleted.
+    if (retired.length) writeCsv(retiredPath(mode === 'publish' ? 'data/ingested' : 'data/staging', src.id), retiredRows(retired), RETIRED_COLUMNS);
     console.log(`${src.id}: ${rows.length} rows, layer last edited ${lastEdited ?? 'unknown'} -> ${mode} (${out})`);
     for (const w of warnings) console.warn('  warn:', w);
   }

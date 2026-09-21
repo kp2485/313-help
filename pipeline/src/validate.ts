@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { assertScheduleValid, isDvCategory, isServiceArea, SERVICE_AREA_IDS, type Alert, type BundleRow } from '@313help/query';
+import { recordKey } from './ingest-ids.js';
 import { inBbox, p, parsePhone, type CsvRow } from './util.js';
 
 export interface Issues { errors: string[]; warnings: string[] }
@@ -214,6 +215,27 @@ export async function hsdsSchema(offline = false): Promise<object | null> {
     writeFileSync(cached, text);
     return JSON.parse(text);
   } catch { return null; }
+}
+
+/**
+ * Ids for open-data rows are keyed to the publisher's permanent record reference and are never reused
+ * (DECISIONS 2026-09-22, pipeline/src/ingest-ids.ts). Two things are checkable from what is committed, and
+ * both of them are the bug that swapped the two Narcan boxes at 13601 W. McNichols: one id must never stand
+ * for two different records, and an id retired from a record must never come back on a different one.
+ */
+export function validateIngestedIds(srcId: string, live: CsvRow[], retired: CsvRow[]): Issues {
+  const errors: string[] = [];
+  const recordOf = new Map<string, string>();
+  for (const r of live) {
+    const id = r.sal_id ?? '', key = recordKey(r), had = recordOf.get(id);
+    if (had !== undefined && had !== key) errors.push(`${srcId}: ${id} stands for two different records ("${had}" and "${key}")`);
+    recordOf.set(id, key);
+  }
+  for (const t of retired) {
+    const now = recordOf.get(t.sal_id ?? '');
+    if (now !== undefined && now !== (t.record_ref ?? '')) errors.push(`${srcId}: ${t.sal_id} was retired from "${t.record_ref}" and now belongs to "${now}"; a retired id is never reused`);
+  }
+  return { errors, warnings: [] };
 }
 
 export function validateHsds(services: unknown[], schema: object): Issues {
