@@ -10,22 +10,38 @@ export type PageResult = { ok: true; html: string } | { ok: false; why: string }
 
 const UA = { 'user-agent': 'Mozilla/5.0 (compatible; 313help-sourcecheck; open-source civic directory)' };
 
-/** Fetch a page once. Bot-protection challenges and error answers come back as unreadable, with the reason. */
+/**
+ * Below this many visible characters, a 200 answer is not a page a person could have read: an empty shell, a
+ * redirect stub, a one-line error. It is "could not be read", never a match — a listing with no phone is asked
+ * only for its house number, and a house number is easy to find in almost nothing.
+ */
+export const MIN_PAGE_TEXT = 200;
+
+/**
+ * Fetch a page once. A non-2xx answer, a bot-protection challenge and a body with almost no text in it all come
+ * back as unreadable, with the reason. Nothing else is ever treated as the page: the body of a refusal is not a
+ * page, and a row is never matched against the row's own `website` or against a copy from an earlier run.
+ */
 export async function fetchPage(url: string): Promise<PageResult> {
   try {
     const res = await fetch(url, { redirect: 'follow', headers: UA });
     if (res.headers.get('cf-mitigated') === 'challenge') return { ok: false, why: 'bot protection' };
     if (!res.ok) return { ok: false, why: `HTTP ${res.status}` };
     const html = await res.text();
-    return isChallenge(html) ? { ok: false, why: 'bot protection' } : { ok: true, html };
+    if (isChallenge(html)) return { ok: false, why: 'bot protection' };
+    // A data file (the JSON behind a map) is short on purpose and is read entry by entry, not as prose.
+    const seen = jsonEntries(html) ? Infinity : pageText(html).length;
+    if (seen < MIN_PAGE_TEXT) return { ok: false, why: `page has almost no text (${seen} characters)` };
+    return { ok: true, html };
   } catch (e) { return { ok: false, why: `fetch failed: ${(e as Error).message}` }; }
 }
 
 /**
- * A bot-protection challenge page, not the real page. Only the challenge's own markers count: ordinary pages
- * behind Cloudflare also load a "challenge-platform" script, and those are real pages.
+ * A bot-protection or access-denied page, not the real page. Only a block page's own markers count: ordinary
+ * pages behind Cloudflare also load a "challenge-platform" script, and those are real pages.
  */
-export const isChallenge = (html: string) => /<title>\s*Just a moment|window\._cf_chl_opt|cf-chl-widget|id="challenge-form"/i.test(html);
+export const isChallenge = (html: string) =>
+  /<title>\s*(?:Just a moment|Attention Required|Access denied|Access to this page has been denied|Pardon Our Interruption)|window\._cf_chl_opt|cf-chl-widget|id="challenge-form"|Checking your browser before accessing|Request unsuccessful\. Incapsula incident/i.test(html);
 
 const ENTITIES: Record<string, string> = { amp: '&', nbsp: ' ', quot: '"', apos: "'", lt: '<', gt: '>', ndash: '-', mdash: '-', hyphen: '-' };
 

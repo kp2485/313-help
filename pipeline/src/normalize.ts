@@ -69,6 +69,10 @@ const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
  *  - supplies_station: Wayne County's Well Wayne Stations, which name naloxone (Narcan) *and* fentanyl and
  *    xylazine test strips, and whose own map adds that supplies can run out ("*Supplies are subject to change
  *    based on availability and may not always be available"). That is why they are harm.supplies, not harm.narcan.
+ *    The County says "free" and nothing more: its page offers "free naloxone (Narcan®), fentanyl test strips,
+ *    and xylazine test strips" and says nothing about ID or questions, so neither do we, and these rows do not
+ *    carry the no_id_required flag (2026-09-20). The Health Department's own list does say "No ID, no cost, no
+ *    questions", which is why narcan_box still does.
  */
 const WORDING = {
   narcan_box: {
@@ -77,6 +81,8 @@ const WORDING = {
       const where = extra.Box_Location ? ` The box is ${extra.Box_Location.toLowerCase()}.` : '';
       return `Free Narcan from a ${deviceWord(extra.Distribution_Device_Type ?? '')}. No ID, no cost, no questions.${where}`;
     },
+    /** The Health Department's own list says "No ID, no cost, no questions". */
+    flags: ['walk_in', 'no_id_required'],
   },
   supplies_station: {
     service_name: 'Free naloxone and test strips',
@@ -84,8 +90,10 @@ const WORDING = {
       const spots = Object.keys(extra).filter((k) => /^Box_Location\d*$/.test(k)).sort().map((k) => lowerFirst(extra[k]!.replace(/\.$/, '')));
       const where = spots.length === 1 ? ` The station is ${spots[0]}.`
         : spots.length > 1 ? ` There are ${spots.length} stations here: ${spots.join('; ')}.` : '';
-      return `Free naloxone (Narcan), fentanyl test strips and xylazine test strips from a ${deviceWord(extra.Station_Type ?? '')}. No cost, no ID, no questions.${where} What is in stock can change, so supplies may not always be there.`;
+      return `Free naloxone (Narcan), fentanyl test strips and xylazine test strips from a ${deviceWord(extra.Station_Type ?? '')}.${where} What is in stock can change, so supplies may not always be there.`;
     },
+    /** The County says only "free": no claim about ID or questions, so no no_id_required flag on these rows. */
+    flags: ['walk_in'],
   },
 } as const;
 
@@ -115,7 +123,8 @@ export function fromIngested(src: Source, ingested: CsvRow[]): Normalized {
       // Hours text from a list is shown as written; only an unambiguous "24 hours" becomes open-now.
       availability: always ? 'always' : 'unknown',
       ...(!always && r.hours_text ? { hours_text: r.hours_text } : {}),
-      schedules: [], flags: ['walk_in', 'no_id_required'], status: 'active',
+      // The flags a layer's rows carry are the ones its owner's words support (see WORDING).
+      schedules: [], flags: [...wording.flags], status: 'active',
       facts: {
         checked_at_entry: null, entry_method: null, last_confirmed_at: null, last_confirm_method: null,
         reports: { closed_open: 0, closed_last_at: null, wrong_open: 0 },

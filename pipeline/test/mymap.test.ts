@@ -156,7 +156,13 @@ describe('the Wayne County stations as listings', () => {
 
   it('says what the County says it stocks: naloxone and fentanyl and xylazine test strips', () => {
     const hall = rows.find((r) => r.id === 'sal_wws_hamtramck_hamtramck_city_hall')!;
-    expect(hall.what).toBe('Free naloxone (Narcan), fentanyl test strips and xylazine test strips from a vending machine. No cost, no ID, no questions. The station is indoors, in the main lobby. What is in stock can change, so supplies may not always be there.');
+    // The County says only "free": its page offers "free naloxone (Narcan®), fentanyl test strips, and
+    // xylazine test strips" and says nothing about ID or questions, so neither do we (2026-09-20).
+    expect(hall.what).toBe('Free naloxone (Narcan), fentanyl test strips and xylazine test strips from a vending machine. The station is indoors, in the main lobby. What is in stock can change, so supplies may not always be there.');
+    for (const r of rows) {
+      expect(r.what).not.toMatch(/no ID|no questions/i);
+      expect(r.flags).toEqual(['walk_in']);                 // no no_id_required: the County makes no such promise
+    }
     expect([...svcOf.values()][0]!.service_name).toBe('Free naloxone and test strips');
     for (const r of rows) {
       expect(r.what).toContain('fentanyl test strips');

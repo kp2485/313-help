@@ -68,7 +68,10 @@
   "crashes": {
    "name": "SEMCOG — Crash Locations, 2015-2024",
    "url": "https://maps-semcog.opendata.arcgis.com/datasets/SEMCOG::crash-locations-2015-2024",
-   "last_edited": "2025-10-08"
+   "last_edited": "2025-10-08",
+   "license": "SEMCOG Copyright License Agreement",
+   "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+   "notice": "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited."
   }
  },
  "stats_fetched_at": "2026-09-19",

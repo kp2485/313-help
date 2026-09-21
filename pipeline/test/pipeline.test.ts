@@ -7,7 +7,8 @@ import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, today, uuid5, type CsvRow } from '../src/util.js';
-import { validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
+import { scriptRefusingHosts, validateAlerts, validateEmergency, validateRows } from '../src/validate.js';
+import { readScriptRefusingHosts } from '../src/seed-io.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
@@ -16,7 +17,7 @@ import { buildIndicators, milesToArea, nearestMiles } from '../src/indicators.js
 import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
-import { addressOnPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
+import { addressOnPage, fetchPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
 import { GRID, crossings, encodeLine, insideRings, mergeChains, packRoads, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
@@ -303,6 +304,86 @@ describe('does the page still show this listing (one strict matcher)', () => {
   });
   it('reads the page as text: entities decoded, dashes normalized', () => {
     expect(pageText('<p>313&#8209;555&ndash;0100 &amp; more</p>')).toBe('313-555-0100 & more');
+  });
+});
+
+// Two listings shipped the badge "Matched their website when added" for DMC emergency-room pages that dmc.org
+// has never let this pipeline read (2026-09-20). check-sources.ts had not promoted them — it cannot — but
+// nothing checked the claim, so a hand-written row published it. These fix both halves: what "could not be
+// read" means, and a build check that fails on the claim itself.
+describe('a page the fetcher could not read is never a match', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const answer = (status: number, body: string, headers: Record<string, string> = {}) =>
+    vi.stubGlobal('fetch', async () => new Response(body, { status, headers }));
+  const REAL_PAGE = `<html><body><h1>Clinic</h1><p>${'Open to everyone in the neighborhood, walk in any weekday. '.repeat(6)}</p><p>1 Main St, Detroit</p><p>313-555-0100</p></body></html>`;
+  // Cloudflare's own refusal for https://www.dmc.org/locations/detail/... , shortened.
+  const CHALLENGE = '<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title></head><body><div id="challenge-error-text">3990 John R Street</div><script>window._cf_chl_opt={cvId:"3"}</script></body></html>';
+
+  it('reads a real page', async () => {
+    answer(200, REAL_PAGE);
+    expect((await fetchPage('https://example.org/clinic')).ok).toBe(true);
+  });
+  it('a 403 body is a refusal, not a page, even when the listing\'s facts appear in it', async () => {
+    answer(403, CHALLENGE);
+    const got = await fetchPage('https://www.dmc.org/locations/detail/dmc-harper-university-hospital---emergency');
+    expect(got.ok).toBe(false);
+    expect(got.ok === false && got.why).toBe('HTTP 403');
+    answer(403, CHALLENGE, { 'cf-mitigated': 'challenge' });
+    expect((await fetchPage('https://www.dmc.org/z')).ok).toBe(false);
+  });
+  it('a bot-challenge page answered with 200 is still a refusal', async () => {
+    answer(200, CHALLENGE);
+    expect((await fetchPage('https://www.dmc.org/x')).ok).toBe(false);
+    answer(200, '<html><head><title>Attention Required! | Cloudflare</title></head><body>3901 Beaubien Boulevard</body></html>');
+    expect((await fetchPage('https://www.dmc.org/y')).ok).toBe(false);
+  });
+  it('an empty or near-empty 200 body could not be read either (a house number is easy to find in nothing)', async () => {
+    answer(200, '');
+    const empty = await fetchPage('https://example.org/gone');
+    expect(empty.ok).toBe(false);
+    expect(empty.ok === false && empty.why).toMatch(/almost no text/);
+    answer(200, '<html><body><p>3901 Beaubien Boulevard</p></body></html>');
+    expect((await fetchPage('https://example.org/stub')).ok).toBe(false);
+    // A data file is short on purpose and is read entry by entry, so it is still a page.
+    answer(200, JSON.stringify([{ name: 'Pantry', address: '1 Main St', phone: '313-555-0100' }]));
+    expect((await fetchPage('https://example.org/food.json')).ok).toBe(true);
+  });
+  it('a 404, a 500 and a failed connection are all "could not be read"', async () => {
+    for (const s of [404, 500]) { answer(s, REAL_PAGE); expect((await fetchPage('https://example.org/x')).ok, String(s)).toBe(false); }
+    vi.stubGlobal('fetch', async () => { throw new Error('getaddrinfo ENOTFOUND'); });
+    expect((await fetchPage('https://example.org/x')).ok).toBe(false);
+  });
+
+  const REFUSING = scriptRefusingHosts([
+    { host: 'dmc.org', refusing_since: '2026-09-20', refusal: 'HTTP 403 with a Cloudflare challenge page' },
+    { host: 'www.detroitmi.gov', refusing_since: '2026-09-20', refusal: 'HTTP 403 with a Cloudflare challenge page' },
+  ]);
+  const auto = (over: Partial<BundleRow['facts']>) => validateRows([row({ facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'DMC', url: 'https://www.dmc.org/locations/detail/dmc-harper-university-hospital---emergency' }, entry_method: 'auto_check', checked_at_entry: '2026-09-20', ...over } })], '2026-09-20', REFUSING).errors.join(' | ');
+
+  it('fails the build when an active row claims a machine match on a host that was already refusing', () => {
+    expect(auto({})).toMatch(/entry_method is "auto_check".*dmc\.org has refused this pipeline's fetcher since 2026-09-20/);
+    // The list is read with "www." dropped, like every other host check here.
+    expect(auto({ source: { type: 'seed_list', name: 'City', url: 'https://detroitmi.gov/departments/x' } })).toMatch(/detroitmi\.gov has refused/);
+  });
+  it('a person read it in a browser: entry_method "web" is fine on the same page', () => {
+    expect(auto({ entry_method: 'web' })).toBe('');
+  });
+  it('keeps the badge for a row added while the host still answered: it was true that day', () => {
+    expect(auto({ checked_at_entry: '2026-09-18' })).toBe('');
+  });
+  it('a machine match needs a page and a date to point at', () => {
+    expect(auto({ source: { type: 'seed_list', name: 'DMC' } })).toMatch(/no source url/);
+    expect(auto({ checked_at_entry: null })).toMatch(/no checked_at_entry/);
+  });
+  it('the committed list is a data file a steward can edit, and every host on it parses', () => {
+    const list = scriptRefusingHosts(readScriptRefusingHosts());
+    expect(list.size).toBeGreaterThan(0);
+    for (const [h, r] of list) {
+      expect(h, h).toBe(h.toLowerCase().replace(/^www\./, ''));
+      expect(r.refusing_since, h).toMatch(/^\d{4}-\d\d-\d\d$/);
+      expect(r.refusal, h).toBeTruthy();
+      expect(r.note, h).toBeTruthy();                                    // why it is on the list, for the next person
+    }
   });
 });
 

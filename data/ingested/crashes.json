@@ -3,14 +3,23 @@
   "name": "SEMCOG — Crash Locations, 2015-2024",
   "url": "https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/crash2024_10year/FeatureServer/0",
   "page": "https://maps-semcog.opendata.arcgis.com/datasets/SEMCOG::crash-locations-2015-2024",
-  "license": "unstated",
+  "license": "SEMCOG Copyright License Agreement",
+  "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+  "license_notice": "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.",
   "records_from": "Michigan State Police (CJIC) police-reported crashes, published by SEMCOG",
   "last_edited": "2025-10-08",
-  "review": "No terms are published for this layer and the records are the Michigan State Police's. Accepted by Kyle for the hackathon (DECISIONS 2026-09-20); ask SEMCOG and MSP about terms and attribution, and remove the layer if either objects."
+  "review": "SEMCOG's Copyright License Agreement (license_url, read 2026-09-20) grants a perpetual royalty-free licence to use and publish its data, on the condition that license_notice is stated prominently; it also disclaims all warranties and, in section 8(a), asks the licensee to indemnify SEMCOG against third-party claims arising from the licensee's own breach. Section 1(b) grants no third-party rights, and the records are the Michigan State Police's (CJIC): MSP has not been asked about its terms or attribution. Open in docs/DECISIONS.md — a person accepts or declines the indemnity, asks MSP, and the layer comes out if either owner objects."
  },
  "fetched_at": "2026-09-20",
  "years": [
   2020,
+  2024
+ ],
+ "years_covered": [
+  2020,
+  2021,
+  2022,
+  2023,
   2024
  ],
  "cities": [
@@ -19,35 +28,8 @@
   "Highland Park",
   "Dearborn"
  ],
- "kept": "Counts only: crashes involving a person walking or biking, per neighborhood and year, and how many of those crashes killed or seriously hurt someone. Nothing else from the layer is kept.",
+ "kept": "Counts only: crashes involving a person walking or biking, added up over the years in years_covered, per neighborhood and per city, and how many of those crashes killed or seriously hurt someone. Nothing per year and nothing else from the layer is kept, so a hidden \"fewer than 5\" cannot be recovered by subtracting published numbers from a total.",
  "city": {
-  "years": {
-   "2020": {
-    "walk": 399,
-    "bike": 129,
-    "severe": 143
-   },
-   "2021": {
-    "walk": 369,
-    "bike": 118,
-    "severe": 123
-   },
-   "2022": {
-    "walk": 391,
-    "bike": 125,
-    "severe": 119
-   },
-   "2023": {
-    "walk": 445,
-    "bike": 141,
-    "severe": 132
-   },
-   "2024": {
-    "walk": 420,
-    "bike": 151,
-    "severe": 113
-   }
-  },
   "window": {
    "walk": 2024,
    "bike": 664,
@@ -56,33 +38,6 @@
  },
  "city_by_name": {
   "Detroit": {
-   "years": {
-    "2020": {
-     "walk": 399,
-     "bike": 129,
-     "severe": 143
-    },
-    "2021": {
-     "walk": 369,
-     "bike": 118,
-     "severe": 123
-    },
-    "2022": {
-     "walk": 391,
-     "bike": 125,
-     "severe": 119
-    },
-    "2023": {
-     "walk": 445,
-     "bike": 141,
-     "severe": 132
-    },
-    "2024": {
-     "walk": 420,
-     "bike": 151,
-     "severe": 113
-    }
-   },
    "window": {
     "walk": 2024,
     "bike": 664,
@@ -90,33 +45,6 @@
    }
   },
   "Hamtramck": {
-   "years": {
-    "2020": {
-     "walk": 10,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 14,
-     "bike": 9,
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 13,
-     "bike": 5,
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 15,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 17,
-     "bike": 7,
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 69,
     "bike": 29,
@@ -124,33 +52,6 @@
    }
   },
   "Highland Park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 28,
     "bike": 12,
@@ -158,33 +59,6 @@
    }
   },
   "Dearborn": {
-   "years": {
-    "2020": {
-     "walk": 18,
-     "bike": 25,
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 28,
-     "bike": 18,
-     "severe": 8
-    },
-    "2022": {
-     "walk": 31,
-     "bike": 21,
-     "severe": 7
-    },
-    "2023": {
-     "walk": 37,
-     "bike": 33,
-     "severe": 12
-    },
-    "2024": {
-     "walk": 33,
-     "bike": 25,
-     "severe": 11
-    }
-   },
    "window": {
     "walk": 147,
     "bike": 122,
@@ -194,33 +68,6 @@
  },
  "neighborhoods": {
   "nbh_airport_sub": {
-   "years": {
-    "2020": {
-     "walk": 12,
-     "bike": "lt5",
-     "severe": 5
-    },
-    "2021": {
-     "walk": 12,
-     "bike": "lt5",
-     "severe": 5
-    },
-    "2022": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 10,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 7,
-     "bike": 5,
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 49,
     "bike": 9,
@@ -228,33 +75,6 @@
    }
   },
   "nbh_arden_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -262,33 +82,6 @@
    }
   },
   "nbh_aviation_sub": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -296,33 +89,6 @@
    }
   },
   "nbh_bagley": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 10,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 22,
     "bike": 5,
@@ -330,33 +96,6 @@
    }
   },
   "nbh_barton_mcfarland": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 23,
     "bike": 7,
@@ -364,33 +103,6 @@
    }
   },
   "nbh_belle_isle": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -398,33 +110,6 @@
    }
   },
   "nbh_belmont": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -432,33 +117,6 @@
    }
   },
   "nbh_berg_lahser": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -466,33 +124,6 @@
    }
   },
   "nbh_bethune_community": {
-   "years": {
-    "2020": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 27,
     "bike": 9,
@@ -500,33 +131,6 @@
    }
   },
   "nbh_blackstone_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -534,33 +138,6 @@
    }
   },
   "nbh_boston_edison": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -568,33 +145,6 @@
    }
   },
   "nbh_boynton": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -602,33 +152,6 @@
    }
   },
   "nbh_brewster_homes": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -636,33 +159,6 @@
    }
   },
   "nbh_brightmoor": {
-   "years": {
-    "2020": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 19,
     "bike": 5,
@@ -670,33 +166,6 @@
    }
   },
   "nbh_brush_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -704,33 +173,6 @@
    }
   },
   "nbh_buffalo_charles": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 15,
     "bike": "lt5",
@@ -738,33 +180,6 @@
    }
   },
   "nbh_butler": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -772,33 +187,6 @@
    }
   },
   "nbh_cadillac_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -806,33 +194,6 @@
    }
   },
   "nbh_cadillac_heights": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -840,33 +201,6 @@
    }
   },
   "nbh_campau_banglatown": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": "lt5",
@@ -874,33 +208,6 @@
    }
   },
   "nbh_carbon_works": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -908,33 +215,6 @@
    }
   },
   "nbh_castle_rouge": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -942,33 +222,6 @@
    }
   },
   "nbh_central_southwest": {
-   "years": {
-    "2020": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 6,
-     "bike": 6,
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 11,
-     "bike": "lt5",
-     "severe": 6
-    },
-    "2024": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 34,
     "bike": 16,
@@ -976,33 +229,6 @@
    }
   },
   "nbh_chadsey_condon": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": 7,
@@ -1010,33 +236,6 @@
    }
   },
   "nbh_chalfonte": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 9,
     "bike": "lt5",
@@ -1044,33 +243,6 @@
    }
   },
   "nbh_chandler_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1078,33 +250,6 @@
    }
   },
   "nbh_chandler_park_chalmers": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -1112,33 +257,6 @@
    }
   },
   "nbh_claytown": {
-   "years": {
-    "2020": {
-     "walk": 6,
-     "bike": 5,
-     "severe": 5
-    },
-    "2021": {
-     "walk": 10,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 11,
-     "bike": "lt5",
-     "severe": 5
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 33,
     "bike": 17,
@@ -1146,33 +264,6 @@
    }
   },
   "nbh_college_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 12,
     "bike": 6,
@@ -1180,33 +271,6 @@
    }
   },
   "nbh_conant_gardens": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1214,33 +278,6 @@
    }
   },
   "nbh_conner_creek": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -1248,33 +285,6 @@
    }
   },
   "nbh_conner_creek_industrial": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1282,33 +292,6 @@
    }
   },
   "nbh_core_city": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": "lt5",
@@ -1316,33 +299,6 @@
    }
   },
   "nbh_corktown": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": 9,
@@ -1350,33 +306,6 @@
    }
   },
   "nbh_cornerstone_village": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 15,
     "bike": 8,
@@ -1384,33 +313,6 @@
    }
   },
   "nbh_crary_st_marys": {
-   "years": {
-    "2020": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 21,
     "bike": "lt5",
@@ -1418,33 +320,6 @@
    }
   },
   "nbh_cultural_center": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": 10,
@@ -1452,33 +327,6 @@
    }
   },
   "nbh_davison": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -1486,33 +334,6 @@
    }
   },
   "nbh_davison_schoolcraft": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -1520,33 +341,6 @@
    }
   },
   "nbh_delray": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1554,33 +348,6 @@
    }
   },
   "nbh_denby": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": "lt5",
@@ -1588,33 +355,6 @@
    }
   },
   "nbh_detroit_golf": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1622,33 +362,6 @@
    }
   },
   "nbh_dexter_fenkell": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -1656,33 +369,6 @@
    }
   },
   "nbh_dexter_linwood": {
-   "years": {
-    "2020": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": 5,
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 24,
     "bike": 9,
@@ -1690,33 +376,6 @@
    }
   },
   "nbh_douglass": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1724,33 +383,6 @@
    }
   },
   "nbh_downtown": {
-   "years": {
-    "2020": {
-     "walk": 9,
-     "bike": 6,
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 19,
-     "bike": 6,
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 19,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 32,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 22,
-     "bike": 7,
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 101,
     "bike": 26,
@@ -1758,33 +390,6 @@
    }
   },
   "nbh_east_canfield": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1792,33 +397,6 @@
    }
   },
   "nbh_east_english_village": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 15,
     "bike": "lt5",
@@ -1826,33 +404,6 @@
    }
   },
   "nbh_east_village": {
-   "years": {
-    "2020": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 15,
     "bike": 8,
@@ -1860,33 +411,6 @@
    }
   },
   "nbh_eastern_market": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -1894,33 +418,6 @@
    }
   },
   "nbh_eden_gardens": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 9,
     "bike": "lt5",
@@ -1928,33 +425,6 @@
    }
   },
   "nbh_elijah_mccoy": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1962,33 +432,6 @@
    }
   },
   "nbh_eliza_howell": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -1996,33 +439,6 @@
    }
   },
   "nbh_elmwood_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": 6,
@@ -2030,33 +446,6 @@
    }
   },
   "nbh_evergreen_lahser_7_8": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": "lt5",
@@ -2064,33 +453,6 @@
    }
   },
   "nbh_evergreen_outer_drive": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -2098,33 +460,6 @@
    }
   },
   "nbh_far_west_detroit": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2132,33 +467,6 @@
    }
   },
   "nbh_farwell": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": 5,
@@ -2166,33 +474,6 @@
    }
   },
   "nbh_fiskhorn": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -2200,33 +481,6 @@
    }
   },
   "nbh_fitzgerald_marygrove": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 18,
     "bike": 9,
@@ -2234,33 +488,6 @@
    }
   },
   "nbh_five_points": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 11,
     "bike": "lt5",
@@ -2268,33 +495,6 @@
    }
   },
   "nbh_forest_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2302,33 +502,6 @@
    }
   },
   "nbh_fox_creek": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": 7,
@@ -2336,33 +509,6 @@
    }
   },
   "nbh_franklin": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 11,
     "bike": "lt5",
@@ -2370,33 +516,6 @@
    }
   },
   "nbh_franklin_park": {
-   "years": {
-    "2020": {
-     "walk": 9,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 36,
     "bike": 11,
@@ -2404,33 +523,6 @@
    }
   },
   "nbh_garden_homes": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2438,33 +530,6 @@
    }
   },
   "nbh_garden_view": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2472,33 +537,6 @@
    }
   },
   "nbh_gateway_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2506,33 +544,6 @@
    }
   },
   "nbh_gold_coast": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2540,33 +551,6 @@
    }
   },
   "nbh_grand_river_i96": {
-   "years": {
-    "2020": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 16,
     "bike": "lt5",
@@ -2574,33 +558,6 @@
    }
   },
   "nbh_grand_river_st_marys": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -2608,33 +565,6 @@
    }
   },
   "nbh_grandmont": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2642,33 +572,6 @@
    }
   },
   "nbh_grandmont_1": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2676,33 +579,6 @@
    }
   },
   "nbh_grant": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -2710,33 +586,6 @@
    }
   },
   "nbh_gratiot_findlay": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 14,
     "bike": "lt5",
@@ -2744,33 +593,6 @@
    }
   },
   "nbh_gratiot_grand": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 9,
     "bike": "lt5",
@@ -2778,33 +600,6 @@
    }
   },
   "nbh_gratiot_town_kettering": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": 6,
@@ -2812,33 +607,6 @@
    }
   },
   "nbh_gratiot_woods": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2846,33 +614,6 @@
    }
   },
   "nbh_greektown": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": "lt5",
@@ -2880,33 +621,6 @@
    }
   },
   "nbh_green_acres": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -2914,33 +628,6 @@
    }
   },
   "nbh_greenfield": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 12,
     "bike": 5,
@@ -2948,33 +635,6 @@
    }
   },
   "nbh_greenfield_grand_river": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 9,
     "bike": "lt5",
@@ -2982,33 +642,6 @@
    }
   },
   "nbh_greenfield_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -3016,33 +649,6 @@
    }
   },
   "nbh_greenwich": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -3050,33 +656,6 @@
    }
   },
   "nbh_grixdale_farms": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3084,33 +663,6 @@
    }
   },
   "nbh_happy_homes": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3118,33 +670,6 @@
    }
   },
   "nbh_harmony_village": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 15,
     "bike": "lt5",
@@ -3152,33 +677,6 @@
    }
   },
   "nbh_hawthorne_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3186,33 +684,6 @@
    }
   },
   "nbh_historic_atkinson": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3220,33 +691,6 @@
    }
   },
   "nbh_holcomb_community": {
-   "years": {
-    "2020": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 20,
     "bike": 6,
@@ -3254,33 +698,6 @@
    }
   },
   "nbh_hubbard_farms": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3288,33 +705,6 @@
    }
   },
   "nbh_hubbard_richard": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3322,33 +712,6 @@
    }
   },
   "nbh_hubbell_lyndon": {
-   "years": {
-    "2020": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 11,
     "bike": "lt5",
@@ -3356,33 +719,6 @@
    }
   },
   "nbh_hubbell_puritan": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 11,
     "bike": "lt5",
@@ -3390,33 +726,6 @@
    }
   },
   "nbh_indian_village": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3424,33 +733,6 @@
    }
   },
   "nbh_islandview": {
-   "years": {
-    "2020": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 19,
     "bike": "lt5",
@@ -3458,33 +740,6 @@
    }
   },
   "nbh_jamison": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3492,33 +747,6 @@
    }
   },
   "nbh_jefferson_chalmers": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -3526,33 +754,6 @@
    }
   },
   "nbh_jeffries": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3560,33 +761,6 @@
    }
   },
   "nbh_joseph_berry_sub": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3594,33 +768,6 @@
    }
   },
   "nbh_joy_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 20,
     "bike": "lt5",
@@ -3628,33 +775,6 @@
    }
   },
   "nbh_joy_schaefer": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3662,33 +782,6 @@
    }
   },
   "nbh_krainz_woods": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 9,
     "bike": "lt5",
@@ -3696,33 +789,6 @@
    }
   },
   "nbh_lafayette_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -3730,33 +796,6 @@
    }
   },
   "nbh_lasalle_college_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -3764,33 +803,6 @@
    }
   },
   "nbh_lasalle_gardens": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3798,33 +810,6 @@
    }
   },
   "nbh_littlefield_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3832,33 +817,6 @@
    }
   },
   "nbh_mapleridge": {
-   "years": {
-    "2020": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 23,
     "bike": "lt5",
@@ -3866,33 +824,6 @@
    }
   },
   "nbh_marina_district": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3900,33 +831,6 @@
    }
   },
   "nbh_martin_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -3934,33 +838,6 @@
    }
   },
   "nbh_mcdougall_hunt": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 17,
     "bike": 5,
@@ -3968,33 +845,6 @@
    }
   },
   "nbh_mcdowell": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4002,33 +852,6 @@
    }
   },
   "nbh_mcnichols_evergreen": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -4036,33 +859,6 @@
    }
   },
   "nbh_medbury_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4070,33 +866,6 @@
    }
   },
   "nbh_medical_center": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 9,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": 9,
@@ -4104,33 +873,6 @@
    }
   },
   "nbh_melvern_hill": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4138,33 +880,6 @@
    }
   },
   "nbh_mexicantown": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4172,33 +887,6 @@
    }
   },
   "nbh_michigan_martin": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -4206,33 +894,6 @@
    }
   },
   "nbh_midtown": {
-   "years": {
-    "2020": {
-     "walk": 8,
-     "bike": 6,
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 6,
-     "bike": 14,
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 14,
-     "bike": "lt5",
-     "severe": 5
-    },
-    "2023": {
-     "walk": 9,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 11,
-     "bike": 5,
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 48,
     "bike": 32,
@@ -4240,33 +901,6 @@
    }
   },
   "nbh_midwest": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": 6,
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 17,
     "bike": 17,
@@ -4274,33 +908,6 @@
    }
   },
   "nbh_miller_grove": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -4308,33 +915,6 @@
    }
   },
   "nbh_milwaukee_junction": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4342,33 +922,6 @@
    }
   },
   "nbh_minock_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4376,33 +929,6 @@
    }
   },
   "nbh_mohican_regent": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 18,
     "bike": "lt5",
@@ -4410,33 +936,6 @@
    }
   },
   "nbh_morningside": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": 6,
@@ -4444,33 +943,6 @@
    }
   },
   "nbh_moross_morang": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 19,
     "bike": "lt5",
@@ -4478,33 +950,6 @@
    }
   },
   "nbh_mount_olivet": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": "lt5",
@@ -4512,33 +957,6 @@
    }
   },
   "nbh_nardin_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 18,
     "bike": "lt5",
@@ -4546,33 +964,6 @@
    }
   },
   "nbh_new_center": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 18,
     "bike": "lt5",
@@ -4580,33 +971,6 @@
    }
   },
   "nbh_new_center_commons": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 11,
     "bike": "lt5",
@@ -4614,33 +978,6 @@
    }
   },
   "nbh_nolan": {
-   "years": {
-    "2020": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 19,
     "bike": 8,
@@ -4648,33 +985,6 @@
    }
   },
   "nbh_north_campau": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4682,33 +992,6 @@
    }
   },
   "nbh_north_corktown": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4716,33 +999,6 @@
    }
   },
   "nbh_north_end": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 12,
     "bike": "lt5",
@@ -4750,33 +1006,6 @@
    }
   },
   "nbh_north_rosedale_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 16,
     "bike": "lt5",
@@ -4784,33 +1013,6 @@
    }
   },
   "nbh_northeast_central_district": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -4818,33 +1020,6 @@
    }
   },
   "nbh_northwest_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -4852,33 +1027,6 @@
    }
   },
   "nbh_nortown": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -4886,33 +1034,6 @@
    }
   },
   "nbh_nw_goldberg": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -4920,33 +1041,6 @@
    }
   },
   "nbh_o_hair_park": {
-   "years": {
-    "2020": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 17,
     "bike": "lt5",
@@ -4954,33 +1048,6 @@
    }
   },
   "nbh_oak_grove_district_1": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -4988,33 +1055,6 @@
    }
   },
   "nbh_oak_grove_district_2": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5022,33 +1062,6 @@
    }
   },
   "nbh_oakman_blvd_community": {
-   "years": {
-    "2020": {
-     "walk": 11,
-     "bike": "lt5",
-     "severe": 5
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 9,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 38,
     "bike": 7,
@@ -5056,33 +1069,6 @@
    }
   },
   "nbh_oakwood_heights": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5090,33 +1076,6 @@
    }
   },
   "nbh_old_redford": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5124,33 +1083,6 @@
    }
   },
   "nbh_outer_drive_hayes": {
-   "years": {
-    "2020": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 24,
     "bike": "lt5",
@@ -5158,33 +1090,6 @@
    }
   },
   "nbh_palmer_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -5192,33 +1097,6 @@
    }
   },
   "nbh_palmer_woods": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5226,33 +1104,6 @@
    }
   },
   "nbh_paveway": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5260,33 +1111,6 @@
    }
   },
   "nbh_pembroke": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5294,33 +1118,6 @@
    }
   },
   "nbh_penrose": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": "lt5",
@@ -5328,33 +1125,6 @@
    }
   },
   "nbh_pershing": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5362,33 +1132,6 @@
    }
   },
   "nbh_petoskey_otsego": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": "lt5",
@@ -5396,33 +1139,6 @@
    }
   },
   "nbh_piety_hill": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5430,33 +1146,6 @@
    }
   },
   "nbh_pilgrim_village": {
-   "years": {
-    "2020": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": "lt5",
@@ -5464,33 +1153,6 @@
    }
   },
   "nbh_pingree_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5498,33 +1160,6 @@
    }
   },
   "nbh_plymouth_hubbell": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 21,
     "bike": "lt5",
@@ -5532,33 +1167,6 @@
    }
   },
   "nbh_plymouth_i96": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": "lt5",
@@ -5566,33 +1174,6 @@
    }
   },
   "nbh_poletown_east": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 9,
     "bike": "lt5",
@@ -5600,33 +1181,6 @@
    }
   },
   "nbh_pride_area_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5634,33 +1188,6 @@
    }
   },
   "nbh_pulaski": {
-   "years": {
-    "2020": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 20,
     "bike": "lt5",
@@ -5668,33 +1195,6 @@
    }
   },
   "nbh_ravendale": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -5702,33 +1202,6 @@
    }
   },
   "nbh_regent_park": {
-   "years": {
-    "2020": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 11,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 9,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 35,
     "bike": 5,
@@ -5736,33 +1209,6 @@
    }
   },
   "nbh_riverbend": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 15,
     "bike": "lt5",
@@ -5770,33 +1216,6 @@
    }
   },
   "nbh_riverdale": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5804,33 +1223,6 @@
    }
   },
   "nbh_rivertown": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": 8,
@@ -5838,33 +1230,6 @@
    }
   },
   "nbh_rosedale_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5872,33 +1237,6 @@
    }
   },
   "nbh_rouge_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 7,
     "bike": "lt5",
@@ -5906,33 +1244,6 @@
    }
   },
   "nbh_russell_industrial": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -5940,33 +1251,6 @@
    }
   },
   "nbh_russell_woods": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -5974,33 +1258,6 @@
    }
   },
   "nbh_san_bernardo": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6008,33 +1265,6 @@
    }
   },
   "nbh_schaefer_7_8_lodge": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 14,
     "bike": "lt5",
@@ -6042,33 +1272,6 @@
    }
   },
   "nbh_schoolcraft_southfield": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": "lt5",
@@ -6076,33 +1279,6 @@
    }
   },
   "nbh_schulze": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -6110,33 +1286,6 @@
    }
   },
   "nbh_seven_mile_lodge": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6144,33 +1293,6 @@
    }
   },
   "nbh_seven_mile_rouge": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 8,
     "bike": "lt5",
@@ -6178,33 +1300,6 @@
    }
   },
   "nbh_sherwood": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -6212,33 +1307,6 @@
    }
   },
   "nbh_sherwood_forest": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6246,33 +1314,6 @@
    }
   },
   "nbh_south_of_six": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6280,33 +1321,6 @@
    }
   },
   "nbh_southfield_plymouth": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6314,33 +1328,6 @@
    }
   },
   "nbh_springwells": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 26,
     "bike": 12,
@@ -6348,33 +1335,6 @@
    }
   },
   "nbh_state_fair": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -6382,33 +1342,6 @@
    }
   },
   "nbh_tech_town": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6416,33 +1349,6 @@
    }
   },
   "nbh_the_eye": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6450,33 +1356,6 @@
    }
   },
   "nbh_tri_point": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6484,33 +1363,6 @@
    }
   },
   "nbh_university_district": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6518,33 +1370,6 @@
    }
   },
   "nbh_virginia_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6552,33 +1377,6 @@
    }
   },
   "nbh_virginia_park_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 13,
     "bike": "lt5",
@@ -6586,33 +1384,6 @@
    }
   },
   "nbh_von_steuben": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -6620,33 +1391,6 @@
    }
   },
   "nbh_wade": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 5,
     "bike": "lt5",
@@ -6654,33 +1398,6 @@
    }
   },
   "nbh_warren_ave_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 18,
     "bike": 7,
@@ -6688,33 +1405,6 @@
    }
   },
   "nbh_warrendale": {
-   "years": {
-    "2020": {
-     "walk": 13,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 8,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 8,
-     "bike": 5,
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": 17,
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 46,
     "bike": 14,
@@ -6722,33 +1412,6 @@
    }
   },
   "nbh_waterworks_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6756,33 +1419,6 @@
    }
   },
   "nbh_wayne_state": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 10,
     "bike": 9,
@@ -6790,33 +1426,6 @@
    }
   },
   "nbh_we_care_community": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 16,
     "bike": "lt5",
@@ -6824,33 +1433,6 @@
    }
   },
   "nbh_weatherby": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6858,33 +1440,6 @@
    }
   },
   "nbh_west_end": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 11,
     "bike": "lt5",
@@ -6892,33 +1447,6 @@
    }
   },
   "nbh_west_outer_drive": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6926,33 +1454,6 @@
    }
   },
   "nbh_west_side_industrial": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -6960,33 +1461,6 @@
    }
   },
   "nbh_west_village": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -6994,33 +1468,6 @@
    }
   },
   "nbh_westwood_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -7028,33 +1475,6 @@
    }
   },
   "nbh_wildemere_park": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",
@@ -7062,33 +1482,6 @@
    }
   },
   "nbh_winship": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": 7,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": 5,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": 6,
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 23,
     "bike": 6,
@@ -7096,33 +1489,6 @@
    }
   },
   "nbh_woodbridge": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": 6,
     "bike": "lt5",
@@ -7130,33 +1496,6 @@
    }
   },
   "nbh_yorkshire_woods": {
-   "years": {
-    "2020": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2021": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2022": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2023": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    },
-    "2024": {
-     "walk": "lt5",
-     "bike": "lt5",
-     "severe": "lt5"
-    }
-   },
    "window": {
     "walk": "lt5",
     "bike": "lt5",

@@ -18,7 +18,24 @@ const CONTACT_NAME = /\b(?:[Cc]ontact|[Aa]sk for)\s+(?:(?:Mr|Ms|Mrs|Dr|Sister|Pa
 const host = (u?: string) => { try { return u ? new URL(u).hostname.replace(/^www\./, '') : null; } catch { return null; } };
 const sameSite = (a?: string, b?: string) => { const x = host(a), y = host(b); return !!x && x === y; };
 
-export function validateRows(rows: BundleRow[], todayStr: string): Issues {
+/**
+ * One row of data/seed/script-refusing-hosts.csv: a host that refuses this pipeline's fetcher, and the first
+ * day on which every attempt was refused. Kept as data so a steward can add a host without touching code.
+ */
+export interface RefusingHost { host: string; refusing_since: string; refusal: string; note?: string }
+
+/** The list, keyed by host with any leading "www." dropped, the way `host()` reads a url. */
+export function scriptRefusingHosts(rows: CsvRow[]): Map<string, RefusingHost> {
+  const out = new Map<string, RefusingHost>();
+  for (const r of rows) {
+    const h = (r.host ?? '').trim().toLowerCase().replace(/^www\./, '');
+    if (!h || !/^\d{4}-\d\d-\d\d$/.test(r.refusing_since ?? '')) continue;
+    out.set(h, { host: h, refusing_since: r.refusing_since!, refusal: r.refusal ?? 'refuses our fetcher', ...(r.note ? { note: r.note } : {}) });
+  }
+  return out;
+}
+
+export function validateRows(rows: BundleRow[], todayStr: string, refusing: Map<string, RefusingHost> = new Map()): Issues {
   const errors: string[] = [], warnings: string[] = [];
   const seen = new Set<string>();
   for (const r of rows) {
@@ -59,6 +76,21 @@ export function validateRows(rows: BundleRow[], todayStr: string): Issues {
 
     if (r.status === 'archived' && !r.archived) e('archived rows need an archive record (date and reason)');
     if (!r.facts.source?.name) e('source name is required');
+
+    // "Matched their website when added" is a claim that a machine read a page. A host that refuses our fetcher
+    // cannot have been read by it, so a row entered on or after the day that host started refusing cannot
+    // honestly carry entry_method "auto_check": a person read it in a browser, which is entry_method "web".
+    // Two rows shipped that badge for pages dmc.org has never let us read (2026-09-20), which is why this is a
+    // build error and not a note. A row entered while the host still answered keeps auto_check: the badge is
+    // about the day it was added, and that day it was true.
+    if (r.status === 'active' && r.facts.entry_method === 'auto_check') {
+      const url = r.facts.source?.url;
+      const ref = url ? refusing.get(host(url) ?? '') : undefined;
+      if (!url) e('entry_method is "auto_check" but there is no source url, so no machine can have matched a page');
+      else if (!r.facts.checked_at_entry) e('entry_method is "auto_check" but there is no checked_at_entry saying when');
+      else if (ref && r.facts.checked_at_entry >= ref.refusing_since)
+        e(`entry_method is "auto_check" (badge: "Matched their website when added") for ${url}, but ${ref.host} has refused this pipeline's fetcher since ${ref.refusing_since} (${ref.refusal}) and the row was entered on ${r.facts.checked_at_entry}. Read the page in a browser and set entry_method "web", or correct data/seed/script-refusing-hosts.csv`);
+    }
   }
   return { errors, warnings };
 }

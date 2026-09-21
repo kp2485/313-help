@@ -5813,29 +5813,17 @@
       "description": "Clinic"
      }
     ],
-    "schedules": [
-     {
-      "id": "84173080-88fa-5a58-ba30-565edffae77c",
-      "freq": "WEEKLY",
-      "byday": "MO,TU,WE,TH,FR,SA,SU",
-      "dtstart": "2026-09-14",
-      "opens_at": "07:00",
-      "closes_at": "22:00",
-      "x_detroit": {
-       "timezone": "America/Detroit",
-       "wall_clock": true
-      }
-     }
-    ],
+    "schedules": [],
     "x_detroit": {
      "id": "sal_community_urgent_care",
      "status": "active",
      "hsds_status": "active",
-     "availability": "scheduled",
+     "availability": "call_first",
      "flags": [
       "walk_in"
      ],
-     "notice": "On big holidays the page says 10am-4pm. Closed Thanksgiving and Christmas.",
+     "hours_text": "The clinic's own pages give two different sets of hours: its Hours & Location page says Open Daily 7 AM - 10 PM; its home page says Monday through Friday 8am - 8pm",
+     "notice": "Call first: the clinic prints two different sets of hours. On major holidays the page says 10am-4pm, and it is closed Thanksgiving and Christmas.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -6103,7 +6091,7 @@
   "id": "930e476d-5435-5cc2-aeb1-1c005fc5d20b",
   "name": "Emergency room",
   "status": "active",
-  "description": "Open all day and night for a bad injury or illness. If someone could die, call 911 first.",
+  "description": "Open all day and night for a bad injury or illness.",
   "url": "https://corewellhealth.org/",
   "organization": {
    "id": "314d4113-2aee-5ded-a81e-861b95a6e5a4",
@@ -6151,6 +6139,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "notice": "If someone could die, call 911 first.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -11344,7 +11333,7 @@
      "addresses": [
       {
        "id": "54b541fc-a7fa-50c5-ad4a-756eade6de8f",
-       "address_1": "5555 Connor Street, Suite 2224",
+       "address_1": "5555 Conner Street, Suite 2224",
        "city": "Detroit",
        "state_province": "MI",
        "postal_code": "48213",
@@ -12604,53 +12593,17 @@
       "description": "Church office"
      }
     ],
-    "schedules": [
-     {
-      "id": "b77a7ee3-5881-5af8-88ca-c94401ffb567",
-      "freq": "WEEKLY",
-      "byday": "TU",
-      "dtstart": "2026-09-14",
-      "opens_at": "10:00",
-      "closes_at": "18:00",
-      "x_detroit": {
-       "timezone": "America/Detroit",
-       "wall_clock": true
-      }
-     },
-     {
-      "id": "044bb2c7-c9ea-5a4b-bf38-15a50b46648f",
-      "freq": "WEEKLY",
-      "byday": "WE",
-      "dtstart": "2026-09-14",
-      "opens_at": "10:00",
-      "closes_at": "18:00",
-      "x_detroit": {
-       "timezone": "America/Detroit",
-       "wall_clock": true
-      }
-     },
-     {
-      "id": "758e3daf-fe99-5afc-aa53-9372889701aa",
-      "freq": "WEEKLY",
-      "byday": "TH",
-      "dtstart": "2026-09-14",
-      "opens_at": "10:00",
-      "closes_at": "18:00",
-      "x_detroit": {
-       "timezone": "America/Detroit",
-       "wall_clock": true
-      }
-     }
-    ],
+    "schedules": [],
     "x_detroit": {
      "id": "sal_detroit_health_neighborhood_wellness_center_at_the_open_",
      "status": "active",
      "hsds_status": "active",
-     "availability": "scheduled",
+     "availability": "call_first",
      "flags": [
       "walk_in"
      ],
-     "notice": "This is the church's phone number. The City's page prints the wellness center's number wrong.",
+     "hours_text": "The City's Health Department page lists this site for Tuesday, Wednesday and Thursday, 10 a.m. to 6 p.m.",
+     "notice": "Call first. This is the church's phone number, taken from the church's own page; the City's page prints the wellness center's number wrong. The days and times come from the City's page, not the church's.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -13031,7 +12984,7 @@
       "byday": "MO,TU,WE,TH,FR",
       "dtstart": "2026-09-14",
       "opens_at": "08:30",
-      "closes_at": "16:30",
+      "closes_at": "15:45",
       "x_detroit": {
        "timezone": "America/Detroit",
        "wall_clock": true
@@ -13046,7 +12999,7 @@
      "flags": [
       "walk_in"
      ],
-     "notice": "The page says walk-ins are welcome and that appointments can be made on the same number.",
+     "notice": "The page says walk-ins are welcome and that appointments can be made on the same number. The clinic is open until 4:30pm, but the last client is taken at 3:45pm, so the hours above end there.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "web",
      "last_confirmed_at": null,
@@ -14312,7 +14265,7 @@
      ],
      "notice": "In an emergency call 911. The hospital's own page prints its number only as (313) 745-KIDS, so no number is listed here yet.",
      "checked_at_entry": "2026-09-20",
-     "entry_method": "auto_check",
+     "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
      "reports": {
@@ -14470,7 +14423,7 @@
      ],
      "notice": "In an emergency call 911.",
      "checked_at_entry": "2026-09-20",
-     "entry_method": "auto_check",
+     "entry_method": "web",
      "last_confirmed_at": null,
      "last_confirm_method": null,
      "reports": {
@@ -21833,6 +21786,7 @@
       "walk_in"
      ],
      "hours_text": "Admissions and staffing available 24/7",
+     "notice": "The centre's own page says engagement centers are not homeless shelters and do not work as mental health crisis centers: they are for people who are intoxicated from alcohol or other drugs.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -26505,7 +26459,7 @@
   "id": "dcad4b76-b2b6-55a9-9847-a0e97fb1862a",
   "name": "Children's emergency room at St. John",
   "status": "active",
-  "description": "An emergency room just for babies, kids and teens. Open all day and night. If a child could die, call 911 first.",
+  "description": "An emergency room just for babies, kids and teens. Open all day and night.",
   "eligibility_description": "Babies, children and teens.",
   "url": "https://www.henryford.com/",
   "organization": {
@@ -26554,6 +26508,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "notice": "If someone could die, call 911 first.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -26582,7 +26537,7 @@
   "id": "397c0b19-4e58-5846-a09f-d90f2638265b",
   "name": "Emergency room",
   "status": "active",
-  "description": "Open all day and night for a bad injury or illness. If someone could die, call 911 first.",
+  "description": "Open all day and night for a bad injury or illness.",
   "url": "https://www.henryford.com/",
   "organization": {
    "id": "fbd7c664-f391-57d6-8315-132ae7790278",
@@ -26635,6 +26590,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "notice": "If someone could die, call 911 first.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -26663,7 +26619,7 @@
   "id": "c4735abb-0025-563f-9c2c-50b6b286a036",
   "name": "Emergency room at Fairlane",
   "status": "active",
-  "description": "Open all day and night for a bad injury or illness. If someone could die, call 911 first.",
+  "description": "Open all day and night for a bad injury or illness.",
   "url": "https://www.henryford.com/",
   "organization": {
    "id": "fbd7c664-f391-57d6-8315-132ae7790278",
@@ -26716,6 +26672,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "notice": "If someone could die, call 911 first.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -26744,7 +26701,7 @@
   "id": "2eee8db3-7907-5cde-9437-fd4c9fa4f437",
   "name": "Emergency room at St. John",
   "status": "active",
-  "description": "Open all day and night for a bad injury or illness. If someone could die, call 911 first.",
+  "description": "Open all day and night for a bad injury or illness.",
   "url": "https://www.henryford.com/",
   "organization": {
    "id": "fbd7c664-f391-57d6-8315-132ae7790278",
@@ -26792,6 +26749,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [],
+     "notice": "If someone could die, call 911 first.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -26923,7 +26881,7 @@
   "id": "8426441b-cfa5-529b-ac14-46190af0f794",
   "name": "HMC Urgent Care",
   "status": "active",
-  "description": "Walk in for a small illness or injury. They have a lab and X-ray. The page says \"No insurance? No problem - we still see you.\"",
+  "description": "Walk in for a small illness or injury. They have a lab and X-ray. The page says they will still see you if you have no insurance.",
   "url": "https://www.hmcurgentcare.com/",
   "organization": {
    "id": "f82cc4d6-f300-53bc-953d-3c414817d8ba",
@@ -30756,7 +30714,7 @@
   "name": "Court self-help center",
   "status": "active",
   "description": "Free help using court forms and finding legal information, on the 19th floor of the court. Staff can explain things but cannot give legal advice.",
-  "eligibility_description": "Free. The last person must sign in by 1:30pm. Closed on court holidays.",
+  "eligibility_description": "Free.",
   "url": "https://michiganlegalhelp.org",
   "organization": {
    "id": "47125a70-5e79-5d54-a3d9-004a37379319",
@@ -30798,7 +30756,19 @@
       "byday": "MO,TU,WE,TH,FR",
       "dtstart": "2026-09-14",
       "opens_at": "09:00",
-      "closes_at": "15:00",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "e84fbea0-634a-503f-a110-d433515c897e",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "13:30",
       "x_detroit": {
        "timezone": "America/Detroit",
        "wall_clock": true
@@ -30813,6 +30783,7 @@
      "flags": [
       "walk_in"
      ],
+     "notice": "The office is open 9:00am-12:00pm and 1:00pm-3:00pm, but the last visitor must sign in by 1:30pm, so the hours above end there. Closed on all court holidays.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -33766,7 +33737,7 @@
   "id": "8c241107-b878-5728-ac16-1f86c6108b13",
   "name": "Free recovery coaching, Hamtramck centre",
   "status": "active",
-  "description": "Free recovery coaching and peer support, and meetings (AA, NA, SMART Recovery, Recovery Dharma). Walk in for coaching Wednesday to Friday, 2pm to 4pm. They can translate most Hamtramck languages and help Deaf and hard-of-hearing people.",
+  "description": "Free recovery coaching and peer support, and meetings (AA, NA, SMART Recovery, Recovery Dharma). Walk in during opening hours, or book a time ahead. They can translate most Hamtramck languages and help Deaf and hard-of-hearing people.",
   "eligibility_description": "Free.",
   "url": "https://passengerrecovery.com",
   "organization": {
@@ -33869,7 +33840,7 @@
   "id": "6f431d2e-4517-5b6a-9cdd-42e629df604a",
   "name": "Recovery Community Center",
   "status": "active",
-  "description": "A sober place built around music and art: support groups, recovery coaching, a meeting finder, coffee, wi-fi and studio space.",
+  "description": "A sober place built around music and art: support groups, recovery coaching, a meeting finder, coffee, wi-fi and studio space. Walk in during opening hours, or book a time ahead.",
   "url": "https://passengerrecovery.com",
   "organization": {
    "id": "b6a8de62-9a88-5609-b767-05e26591d2d5",
@@ -33910,14 +33881,38 @@
       "description": "Main line"
      }
     ],
-    "schedules": [],
+    "schedules": [
+     {
+      "id": "4d146cb7-042c-5206-9646-b2b3b8e11d19",
+      "freq": "WEEKLY",
+      "byday": "WE,TH,FR,SA",
+      "dtstart": "2026-09-14",
+      "opens_at": "12:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "f92a55a6-a35c-5646-8ad6-784af708d2ad",
+      "freq": "WEEKLY",
+      "byday": "SU",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "20:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
     "x_detroit": {
      "id": "sal_passenger_recovery_recovery_community_center",
      "status": "active",
      "hsds_status": "active",
-     "availability": "call_first",
+     "availability": "scheduled",
      "flags": [],
-     "hours_text": "Open Wednesday - Sunday; times not stated",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -33930,7 +33925,7 @@
      "source": {
       "type": "seed_list",
       "name": "Passenger Recovery website",
-      "url": "https://passengerrecovery.com/contact"
+      "url": "https://passengerrecovery.com/services/hamtramck-center"
      },
      "archived": null
     }
@@ -37133,7 +37128,7 @@
       "medicaid",
       "spanish"
      ],
-     "hours_text": "The page prints two different sets of hours: Monday - Saturday 9:00 AM - 6:00 PM, closed Sundays; and Monday through Sunday 8:00 am - 8:00 pm",
+     "hours_text": "The page prints three different sets of hours: Monday - Saturday 9:00 AM - 6:00 PM, closed Sundays; extended hours including weekends 8 a.m. - 8 p.m.; and, at the foot of the page, Monday through Sunday 8:00 am - 8:00 pm",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,
@@ -38445,7 +38440,7 @@
   "id": "47c66d4c-903d-5fed-8150-e2d3bb865717",
   "name": "Treatment for drug or alcohol use",
   "status": "active",
-  "description": "Treatment for drug or alcohol use while you live at home. Team Wellness offers buprenorphine (Suboxone) and naltrexone (Vivitrol), and takes Medicaid. Call this clinic first to check it has what you need.",
+  "description": "Treatment for drug or alcohol use while you live at home. Team Wellness calls it a Suboxone clinic. Call this clinic first to check it has what you need.",
   "url": "https://teamwellnesscenter.com",
   "organization": {
    "id": "0c60c151-02dc-5270-9223-c94fefae4fe6",
@@ -38505,9 +38500,7 @@
      "status": "active",
      "hsds_status": "active",
      "availability": "scheduled",
-     "flags": [
-      "medicaid"
-     ],
+     "flags": [],
      "notice": "Team Wellness lists its services for the whole organisation, not clinic by clinic, so call before you go. Their site that is open all day and night is Team East Clinic, 6309 Mack Ave., (313) 331-3435.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "web",
@@ -38537,7 +38530,7 @@
   "id": "1636f235-dbd0-5a4e-823f-8d14ad3404d1",
   "name": "Treatment for drug or alcohol use",
   "status": "active",
-  "description": "Treatment for drug or alcohol use while you live at home. Team Wellness offers buprenorphine (Suboxone) and naltrexone (Vivitrol), and takes Medicaid. Call this clinic first to check it has what you need.",
+  "description": "Treatment for drug or alcohol use while you live at home. Team Wellness calls it a Suboxone clinic. Call this clinic first to check it has what you need.",
   "url": "https://teamwellnesscenter.com",
   "organization": {
    "id": "0c60c151-02dc-5270-9223-c94fefae4fe6",
@@ -38596,9 +38589,7 @@
      "status": "active",
      "hsds_status": "active",
      "availability": "scheduled",
-     "flags": [
-      "medicaid"
-     ],
+     "flags": [],
      "notice": "Team Wellness lists its services for the whole organisation, not clinic by clinic, so call before you go. Their site that is open all day and night is Team East Clinic, 6309 Mack Ave., (313) 331-3435.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "web",
@@ -41029,7 +41020,7 @@
   "id": "43f49d5a-5cc3-5259-bbb5-5855a0662fe7",
   "name": "Free naloxone and test strips",
   "status": "active",
-  "description": "Free naloxone (Narcan), fentanyl test strips and xylazine test strips from a newsstand box. No cost, no ID, no questions. The station is outdoors, to the left of the entrance directly off Schaefer Rd. What is in stock can change, so supplies may not always be there.",
+  "description": "Free naloxone (Narcan), fentanyl test strips and xylazine test strips from a newsstand box. The station is outdoors, to the left of the entrance directly off Schaefer Rd. What is in stock can change, so supplies may not always be there.",
   "url": "https://www.accesscommunity.org/",
   "organization": {
    "id": "c8b86485-1344-5d7f-baed-53c95047f41c",
@@ -41060,8 +41051,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41101,8 +41091,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41142,8 +41131,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41183,8 +41171,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41224,8 +41211,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41265,8 +41251,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41306,8 +41291,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41347,8 +41331,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41388,8 +41371,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41430,8 +41412,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41472,8 +41453,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41514,8 +41494,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41556,8 +41535,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41598,8 +41576,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41639,8 +41616,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41681,8 +41657,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41723,8 +41698,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41764,8 +41738,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41805,8 +41778,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41847,8 +41819,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41888,8 +41859,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -41930,8 +41900,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -41971,8 +41940,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -42012,8 +41980,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -42054,8 +42021,7 @@
      "hsds_status": "active",
      "availability": "unknown",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "hours_text": "Not open 24 hours; the County's map says usually Monday-Friday during normal business hours",
      "checked_at_entry": null,
@@ -42096,8 +42062,7 @@
      "hsds_status": "active",
      "availability": "always",
      "flags": [
-      "walk_in",
-      "no_id_required"
+      "walk_in"
      ],
      "checked_at_entry": null,
      "entry_method": null,
@@ -42203,7 +42168,7 @@
   "id": "7bdaf669-693b-5be8-bfb5-d7f4f50fa7e3",
   "name": "West Dearborn Urgent Care",
   "status": "active",
-  "description": "Walk in for a small illness or injury. No appointment needed. The page says they have prices for people paying on their own.",
+  "description": "Walk in for a small illness or injury. No appointment needed. The page says they provide affordable care for people who pay for themselves.",
   "url": "https://wdearbornuc.com/",
   "organization": {
    "id": "068bd746-fd92-5459-a630-e5e776de9267",
@@ -42266,6 +42231,7 @@
      "flags": [
       "walk_in"
      ],
+     "notice": "The page says holiday hours may vary.",
      "checked_at_entry": "2026-09-20",
      "entry_method": "auto_check",
      "last_confirmed_at": null,

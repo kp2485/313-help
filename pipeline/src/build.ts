@@ -11,7 +11,8 @@ import { loadSources } from './ingest-arcgis.js';
 import { buildIndicators, NEAR_MILES } from './indicators.js';
 import { GRID } from './ingest-basemap.js';
 import { fromIngested, fromSeed, toHsds, type Normalized } from './normalize.js';
-import { hsdsSchema, validateAlerts, validateEmergency, validateHsds, validateRows } from './validate.js';
+import { hsdsSchema, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsds, validateRows } from './validate.js';
+import { readScriptRefusingHosts } from './seed-io.js';
 import { loadSigningKey, publicKeyB64, signBytes } from './sign.js';
 import { applyAggregates, fetchAggregates, pushTargets, type Aggregates } from './reports-sync.js';
 
@@ -56,7 +57,7 @@ export async function build(opts: BuildOptions = {}) {
   const alerts = JSON.parse(readFileSync(p('data/seed/alerts.json'), 'utf8')) as Alert[];
 
   // 2. Validate
-  const issues = [validateRows(rows, todayStr), validateAlerts(alerts, new Set(rows.map((r) => r.id)))];
+  const issues = [validateRows(rows, todayStr, scriptRefusingHosts(readScriptRefusingHosts())), validateAlerts(alerts, new Set(rows.map((r) => r.id)))];
   const emg = validateEmergency(emergency, todayStr, !!opts.release);
   issues.push(emg);
   const services = toHsds(parts);
@@ -146,7 +147,10 @@ export async function build(opts: BuildOptions = {}) {
       ...(pts ? { snap: pts.snap, busStops: pts.bus_stops } : {}),
       ...(cr ? { crashes: cr.neighborhoods } : {}),
     });
-    const doc = { sources: { neighborhoods: h.source, ...st.sources, ...(pts?.sources ?? {}), ...(cr ? { crashes: { name: cr.source.name, url: cr.source.page, last_edited: cr.source.last_edited } } : {}) }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types,
+    // The crash layer's licence makes its notice a condition of use wherever the data appears, so the notice
+    // travels with the numbers into the bundle and no app has to hard-code it (pipeline/src/ingest-crashes.ts).
+    const crashSource = cr ? { crashes: { name: cr.source.name, url: cr.source.page, last_edited: cr.source.last_edited, license: cr.source.license, license_url: cr.source.license_url, notice: cr.source.license_notice } } : {};
+    const doc = { sources: { neighborhoods: h.source, ...st.sources, ...(pts?.sources ?? {}), ...crashSource }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types,
       ...(cr ? { crash_years: cr.years, city_crashes: cr.city.window, crash_records_from: cr.source.records_from } : {}),
       ...(st.current ? { city_now: st.current.city, fire_types: st.fire_types, roads_years: st.roads_years, vacant_period: st.vacant_period } : {}), ...ind };
     putCompact('indicators/neighborhoods.json', doc);
