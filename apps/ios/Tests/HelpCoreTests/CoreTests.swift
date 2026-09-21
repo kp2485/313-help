@@ -378,7 +378,9 @@ final class DeviceStateTests: XCTestCase {
     /// The verified copy of the list is a cache: it belongs in Caches, which is not backed up and can be
     /// reclaimed, not in Application Support beside the key.
     func testTheBundleCacheLivesInCaches() {
-        XCTAssertTrue(DeviceState.cacheDir.path.contains("Caches"), DeviceState.cacheDir.path)
+        // The platform's own caches directory: Library/Caches on an iPhone or a Mac, ~/.cache on the Linux CI runner.
+        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].standardizedFileURL.path
+        XCTAssertTrue(DeviceState.cacheDir.standardizedFileURL.path.hasPrefix(caches), DeviceState.cacheDir.path)
         XCTAssertFalse(DeviceState.cacheDir.path.contains("Application Support"), DeviceState.cacheDir.path)
     }
 
