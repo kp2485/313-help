@@ -68,8 +68,21 @@ actor MapLoader {
         return decoded
     }
 
+    /// The neighborhood numbers (`indicators/neighborhoods.json`, docs/13). It is not a map file, but it is read
+    /// exactly like one and for the same reasons: a quarter of a megabyte of JSON, wanted only when one tab is
+    /// opened, and believed only once its bytes match the checksum in the **signed** index. Decoding it here
+    /// keeps it off the main actor, so the tab does not stutter while 205 neighborhoods arrive.
+    private var indicatorFiles: [String: Indicators] = [:]
+    func indicators(_ src: MapFileSource) async throws -> Indicators {
+        let key = src.name + ":" + src.sha256
+        if let held = indicatorFiles[key] { return held }
+        let decoded = try HoodsFile.decode(try await bytes(src), sha256: src.sha256)
+        indicatorFiles = [key: decoded]             // one bundle's numbers at a time
+        return decoded
+    }
+
     /// Frees everything but what is still switched on, when iOS says memory is short.
-    func forgetEverything() { baseMaps = [:]; layers = [:]; nets = [:]; servesFiles = [:] }
+    func forgetEverything() { baseMaps = [:]; layers = [:]; nets = [:]; servesFiles = [:]; indicatorFiles = [:] }
 
     private func readLocal(_ src: MapFileSource) throws -> Data {
         for url in [src.cache, src.snapshot].compactMap({ $0 }) {

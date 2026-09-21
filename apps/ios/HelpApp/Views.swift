@@ -52,7 +52,7 @@ struct Help313App: App {
 /// the stacks are thrown away, Home comes up, and a neutral page opens in the browser, so the app behind the
 /// browser shows nothing about why it was open (the same thing `location.replace` does on the web).
 @MainActor final class AppNav: ObservableObject {
-    enum Tab: Hashable { case home, help, map, events }
+    enum Tab: Hashable { case home, help, map, hoods, events }
     @Published var tab: Tab = .home
     /// Changing this rebuilds the navigation stacks, which pops every screen off them.
     @Published var rootID = UUID()
@@ -143,6 +143,13 @@ struct RootView: View {
             // carries its own NavigationStack, so it is not wrapped in another one here.
             // Everything on it is also a list: "See this map as a list", and the greenway list under it.
             MapTabView().tabItem { Label(L.t("tab.map"), systemImage: "map") }.tag(AppNav.Tab.map)
+            // Neighborhoods: public numbers about each of Detroit's 205, with its own tab because Kyle asked for
+            // one (2026-09-21, "not just on the web, in the apps too"). The tab label is the SHORT word
+            // (`tab.hoods`, "Areas"): "Neighborhoods" does not fit a phone's tab bar at the accessibility text
+            // sizes, and the screen itself is titled with the full word. It is never in the crisis path.
+            HoodsTabView().tabItem { Label(L.t("tab.hoods"), systemImage: "square.grid.2x2") }
+                .accessibilityLabel(L.t("tab.hoods_wide"))
+                .tag(AppNav.Tab.hoods)
             // Only when the list carries events (none today: DECISIONS 2026-09-19).
             if !(store.bundle?.events.isEmpty ?? true) {
                 NavigationStack { EventsView() }.tabItem { Label(L.t("tab.events"), systemImage: "calendar") }.tag(AppNav.Tab.events)

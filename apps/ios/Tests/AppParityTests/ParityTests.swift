@@ -113,6 +113,17 @@ final class ParityTests: XCTestCase {
             XCTAssertFalse(kinds.isEmpty, "could not read ReportKinds.\(name) from Reports.swift")
             built += kinds.map { "report.kind.\($0)" }
         }
+        // The Neighborhoods tab finishes three prefixes from lists in HelpCore/Hoods.swift: the kinds of help
+        // counted for a neighborhood, the four "nearest listed" rows, and the kinds we may have nothing listed
+        // for. `shelter` is spelled `shelter.emergency` in the category words, as it is on the web.
+        let hoods = try text("apps/ios/Sources/HelpCore/Hoods.swift")
+        let helpKinds = quoted(bracketed(hoods, after: "public let hoodHelpKinds = "))
+        XCTAssertFalse(helpKinds.isEmpty, "could not read hoodHelpKinds from Hoods.swift")
+        built += helpKinds.map { "add.cat.\($0 == "shelter" ? "shelter.emergency" : $0)" }
+        let nearest = quoted(bracketed(hoods, after: "public let hoodNearestKinds = "))
+        XCTAssertFalse(nearest.isEmpty, "could not read hoodNearestKinds from Hoods.swift")
+        built += nearest.map { "hood.nearest.\($0)" }
+        built += ["food", "health", "harm"].map { "hood.kind.\($0)" }
         for key in built where en[key] == nil { missing.append("built: \(key)") }
         XCTAssertEqual(missing, [], "string keys the app asks for that strings/en.json does not have")
     }
@@ -158,6 +169,68 @@ final class ParityTests: XCTestCase {
         // And the sensitive pair did not change while a new health kind was added (HelpCore owns the rule).
         XCTAssertTrue(try text("apps/ios/Sources/HelpCore/Saved.swift")
             .contains("public let sensitiveCategories = [\"shelter.dv\", \"health.mental\"]"))
+    }
+
+    // MARK: - the Neighborhoods tab (docs/13)
+
+    /**
+     A neighborhood page says the same things in the same order on the iPhone as on the web.
+
+     `hoodPage` in apps/web/src/hoods.ts is the source of truth for the panels: help, then building and staying,
+     then conditions, then safe streets, then the sources. The order is not decoration — the money panel draws
+     home prices and building permits together on purpose, and the crash panel carries SEMCOG's notice — so a
+     panel that moved or went missing on one client and not the other is a bug worth a failing test.
+     */
+    func testTheNeighborhoodPagePanelsMatchTheWebApp() throws {
+        let web = try text("apps/web/src/hoods.ts")
+        guard let start = web.range(of: "export function hoodPage(") else { return XCTFail("hoodPage moved") }
+        let webBody = String(web[start.upperBound...])
+        var webPanels = headKeys(in: webBody)
+        // The crash panel is drawn by a function of its own, called from inside `hoodPage`.
+        if let at = webBody.range(of: "crashPanel(h, d, ui)") {
+            let before = headKeys(in: String(webBody[..<at.lowerBound])).count
+            webPanels.insert("hood.crash_head", at: before)
+        }
+        XCTAssertEqual(webPanels, ["hood.help_head", "hood.nearest_head", "hood.places_head", "hood.city_near_head",
+                                   "hood.money_head", "hood.cond_head", "hood.crash_head", "hood.sources_head"],
+                       "the web page's headings changed; the iPhone's have to change with them")
+
+        let ios = try text("apps/ios/HelpApp/HoodsScreen.swift")
+        guard let panelStart = ios.range(of: "// MARK: - the panels, in the web page's order"),
+              let panelEnd = ios.range(of: "// MARK: - the pieces a panel is built from")
+        else { return XCTFail("the panel section of HoodsScreen.swift moved") }
+        XCTAssertEqual(headKeys(in: String(ios[panelStart.upperBound..<panelEnd.lowerBound])), webPanels,
+                       "the iPhone's panels are in a different order from the web page's")
+
+        // And the one sentence that is not ours to translate is byte for byte the web's.
+        let notice = "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited."
+        XCTAssertTrue(web.contains("export const SEMCOG_NOTICE = '\(notice)'"), "the web's SEMCOG notice changed")
+        XCTAssertTrue(try text("apps/ios/Sources/HelpCore/Hoods.swift").contains("\"\(notice)\""),
+                      "the iPhone's SEMCOG notice differs from the web's, or is no longer written out in full")
+    }
+
+    /// The kinds of help counted for a neighborhood are the pipeline's `HELP_TOPS`, in its order. A JSON object's
+    /// order does not survive being decoded into a Swift dictionary, so the iPhone keeps its own copy of the list
+    /// — and a copy drifts unless something holds it (HelpCore/Hoods.swift says as much).
+    func testTheNeighborhoodHelpKindsMatchThePipeline() throws {
+        let pipeline = quoted(bracketed(try text("pipeline/src/indicators.ts"), after: "export const HELP_TOPS = "))
+        XCTAssertFalse(pipeline.isEmpty, "could not read HELP_TOPS from pipeline/src/indicators.ts")
+        let swift = quoted(bracketed(try text("apps/ios/Sources/HelpCore/Hoods.swift"), after: "public let hoodHelpKinds = "))
+        XCTAssertEqual(swift, pipeline, "HelpCore.hoodHelpKinds and the pipeline's HELP_TOPS disagree")
+    }
+
+    /// The `hood.*_head` keys a body asks for, in the order it asks for them.
+    private func headKeys(in body: String) -> [String] {
+        var out: [String] = [], rest = Substring(body)
+        while let r = rest.range(of: "'hood.") ?? rest.range(of: "\"hood.") {
+            let quote = rest[r.lowerBound]
+            rest = rest[rest.index(after: r.lowerBound)...]
+            guard let end = rest.firstIndex(of: quote) else { break }
+            let key = String(rest[..<end])
+            if key.hasSuffix("_head") { out.append(key) }
+            rest = rest[end...]
+        }
+        return out
     }
 
     /// Keys retired on 2026-09-20, when the web app folded Recreation and Transit into one Map tab.
