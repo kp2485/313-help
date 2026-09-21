@@ -51,7 +51,7 @@ The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme
 
 ### How the project is wired
 
-- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
+- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, `AddPlace.swift`, and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
 - `HelpApp/Assets.xcassets` (the app icon) and `HelpApp/PrivacyInfo.xcprivacy` are referenced in place too and are copied in by the Resources phase.
 - `DetroitQuery` and `HelpCore` are local Swift package products from `apps/ios` (the `Package.swift` beside this README), linked into the app target.
 - `strings/en.json`, `es.json`, `ar.json` and `bn.json` are referenced in place from the repo root (`../../../strings/…`) and land flat in the app bundle, which is what `L.table(_:)` expects. `Info.plist` lists the same four under `CFBundleLocalizations`, so iOS offers them in `Locale.preferredLanguages`.
