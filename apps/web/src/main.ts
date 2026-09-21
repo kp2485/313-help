@@ -836,6 +836,10 @@ function addScreen(): string {
 const hoodUi = (d: Indicators): Ui => ({
   t, esc, own: owner, date: prettyDate, icon: (name: string) => icon(name), link: (url: string, label: string) => ext(url, label, 'link'), go: (view: object) => go(view as View),
   map: (h: Hood) => mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), quiet: false, outline: outline(h, d.origin), fit: outline(h, d.origin).flat(), minMeters: 900 }),
+  // The "nearest" rows name and open the listing their distance belongs to. The numbers file and the listings
+  // are two files under one signature, so an id from the older of the two may name a row that has since been
+  // archived: the row then says the distance and nothing more, rather than offering a page that is not there.
+  listing: (id: string) => bundle?.rows.find((r) => r.id === id) ?? null,
 });
 /** The numbers, or a screen that says why there are none yet. */
 function hoodsReady(): Indicators | null {

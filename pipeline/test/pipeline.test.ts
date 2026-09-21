@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { badge, openNow, rank, SERVICE_AREAS, SERVICE_AREA_IDS, type BundleRow } from '@313help/query';
+import { badge, miles as milesBetween, openNow, rank, SERVICE_AREAS, SERVICE_AREA_IDS, type BundleRow } from '@313help/query';
 import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
@@ -13,7 +13,7 @@ import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
 import { importInto, lineToRows, parseSchedule } from '../src/import-lines.js';
-import { buildIndicators, milesToArea, nearestMiles } from '../src/indicators.js';
+import { buildIndicators, canBeNearest, milesToArea, nearestMiles, nearestPicks } from '../src/indicators.js';
 import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
@@ -773,6 +773,39 @@ describe('neighborhood indicators (docs/13)', () => {
     expect(out.segments).toEqual({ seg_a: ['nbh_bagley'] });
     expect(JSON.stringify(out)).not.toMatch(/rank|score|worst|best/i);
   });
+  it('"nearest" names the listing the miles were measured to, so a neighborhood page can open it', () => {
+    const out = buildIndicators({
+      hoods, parks: [], segments: [], stats: { neighborhoods: {} },
+      // Two pantries at exactly the same distance from the middle of the square: the tie goes to the lower id,
+      // on every machine and every build, so the page never changes its mind between two builds of one bundle.
+      rows: [row({ id: 'sal_b_pantry', category: 'food.pantry', lat: 42.424, lon: -83.156 }), row({ id: 'sal_a_pantry', category: 'food.pantry', lat: 42.404, lon: -83.156 }),
+        row({ id: 'sal_narcan', category: 'harm.supplies', lat: 42.415, lon: -83.155 }), row({ id: 'sal_no_coords', category: 'rec.center' }),
+        row({ id: 'sal_dv', category: 'shelter.dv' })],
+    });
+    const h = out.neighborhoods[0]!.help;
+    expect(h.nearest_id).toEqual({ food: 'sal_a_pantry', clinic: null, narcan: 'sal_narcan', indoors: null });
+    // The distances did not move: an older client that knows nothing of the ids prints exactly what it did.
+    expect(h.nearest_miles).toEqual({ food: 0.7, clinic: null, narcan: 0.1, indoors: null });
+    expect(h.nearest_miles.food).toBe(out.neighborhoods[0]!.help.nearest_miles.food);
+    // A listing with no coordinate is nothing to measure to, so it is never the nearest anything.
+    expect(h.nearest_id.indoors).toBeNull();
+  });
+  it('a sensitive or private listing is never the nearest anything, whatever the categories map to', () => {
+    for (const c of ['shelter.dv', 'shelter.dv.hotline', 'health.mental', 'treatment', 'treatment.detox', 'assault']) expect(canBeNearest(c), c).toBe(false);
+    for (const c of ['food.pantry', 'health.clinic', 'health.support', 'harm.narcan', 'rec.library', 'shelter.emergency', 'treatments']) expect(canBeNearest(c), c).toBe(true);
+    // The guard does not depend on today's mapping: point the kinds straight at the categories it protects and
+    // the answer is still "none", with the ordinary listing beside them still found.
+    const center = { lat: 42.414, lon: -83.156 };
+    const picks = nearestPicks(center, [
+      row({ id: 'sal_dv_bed', category: 'shelter.dv', lat: 42.4141, lon: -83.1561 }),
+      row({ id: 'sal_crisis', category: 'health.mental', lat: 42.4141, lon: -83.1561 }),
+      row({ id: 'sal_detox', category: 'treatment.detox', lat: 42.4141, lon: -83.1561 }),
+      row({ id: 'sal_rape_crisis', category: 'assault', lat: 42.4141, lon: -83.1561 }),
+      row({ id: 'sal_clinic', category: 'health.clinic', lat: 42.4142, lon: -83.1562 }),
+    ], { beds: 'shelter', crisis: 'health.mental', rehab: 'treatment', after: 'assault', clinic: 'health.clinic' });
+    expect(picks.ids).toEqual({ beds: null, crisis: null, rehab: null, after: null, clinic: 'sal_clinic' });
+    expect(picks.miles).toMatchObject({ beds: null, crisis: null, rehab: null, after: null });
+  });
   it('conditions count things the City recorded, never reports about people, and never ask for an owner name', () => {
     expect(ISSUE_TYPES.join(' ')).not.toMatch(/squat|person|people|homeless|encamp|loiter|vehicle/i);
     const src = readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8');
@@ -871,6 +904,24 @@ describe('the real bundle', () => {
     expect(Object.keys(d.sources)).toEqual(expect.arrayContaining(['snap', 'bus_stops', 'rentals', 'fires', 'pavement', 'vacant']));
     expect(d.city_now.rental_certs).toBeGreaterThan(5000); expect(d.fire_types.length).toBeGreaterThan(10);
     expect(d.neighborhoods.filter((n: any) => typeof n.nearest_city?.bus === 'number').length).toBe(205);
+    // Every "nearest" id is a listing in this very bundle, with a coordinate, that a resident may open from a
+    // public page — and it is the listing the miles beside it were measured to.
+    let linked = 0;
+    for (const n of d.neighborhoods) {
+      expect(Object.keys(n.help.nearest_id).sort()).toEqual(['clinic', 'food', 'indoors', 'narcan']);
+      for (const [kind, id] of Object.entries<string | null>(n.help.nearest_id)) {
+        expect(id === null, kind).toBe(n.help.nearest_miles[kind] === null);
+        if (id === null) continue;
+        linked++;
+        const r = rows.find((x) => x.id === id);
+        expect(r, id).toBeDefined();
+        expect(canBeNearest(r!.category), `${id} ${r!.category}`).toBe(true);
+        expect(r!.lat, id).toBeTypeOf('number');
+        const centre = { lat: n.center[0], lon: n.center[1] };
+        expect(Number(milesBetween(centre, { lat: r!.lat!, lon: r!.lon! }).toFixed(1)), id).toBe(n.help.nearest_miles[kind]);
+      }
+    }
+    expect(linked).toBeGreaterThan(600);
   });
   it('is signed, and the signature covers every file through its checksum', () => {
     const bytes = readFileSync(join(out, 'index.json'));

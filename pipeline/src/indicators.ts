@@ -14,13 +14,51 @@ export const HELP_TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hyg
 // category audit of 2026-09-22: `harm.narcan` plus `harm.supplies`, every one of which says it gives out
 // naloxone. A neighborhood panel that named a different nearest place than the screen would be a wrong fact.
 const NEAREST: Record<string, string> = { food: 'food', clinic: 'health.clinic', narcan: 'harm', indoors: 'rec' };
+/**
+ * A "nearest" row is named and linked on a public neighborhood page, so it can only ever be a row a resident
+ * may open from one: never a sensitive listing (`shelter.dv`, `health.mental` — no URL, no dot, no distance,
+ * docs/08) and never a private one (`treatment`, `assault` — traceless, never on a map, DECISIONS 2026-09-19).
+ * None of the four kinds above maps to one of these today; the guard is here so that a later edit to NEAREST,
+ * or a new child category, cannot quietly put one of them on a neighborhood page. Held by a test.
+ */
+const NEVER_NEAREST = ['shelter.dv', 'health.mental', 'treatment', 'assault'];
+export const canBeNearest = (category: string): boolean =>
+  !NEVER_NEAREST.some((c) => category === c || category.startsWith(c + '.'));
+
+/**
+ * The nearest openable listing of each kind, and the miles to it: ONE pick, so the number on the page and the
+ * listing it links to can never be two different places. A row needs a coordinate (there is nothing to measure
+ * otherwise) and must pass `canBeNearest`. Ties are settled by the miles as the page prints them and then by
+ * `sal_` id, so the same bundle always names the same place. Rounding is monotone, so the smallest rounded
+ * distance is the rounding of the smallest distance: `nearest_miles` is the number it always was.
+ */
+export function nearestPicks(
+  center: { lat: number; lon: number },
+  rows: BundleRow[],
+  mapping: Record<string, string> = NEAREST,
+): { miles: Record<string, number | null>; ids: Record<string, string | null> } {
+  const picks = Object.entries(mapping).map(([kind, cat]) => {
+    const hit = rows
+      .filter((r) => r.lat !== undefined && r.lon !== undefined && canBeNearest(r.category) && (r.category === cat || r.category.startsWith(cat + '.')))
+      .map((r) => ({ id: r.id, mi: Number(miles(center, { lat: r.lat!, lon: r.lon! }).toFixed(1)) }))
+      .sort((a, b) => a.mi - b.mi || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))[0];
+    return [kind, hit ?? null] as const;
+  });
+  return {
+    miles: Object.fromEntries(picks.map(([k, hit]) => [k, hit ? hit.mi : null])),
+    ids: Object.fromEntries(picks.map(([k, hit]) => [k, hit ? hit.id : null])),
+  };
+}
 
 type Pt = [number, number];
 export interface NeighborhoodIndicators {
   id: string; name: string; district: number | null; jlg_study_area?: boolean;
   center: [number, number];                          // [lat, lon]
   rings: number[][];                                 // outline, same compact encoding as the street map
-  help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; none_listed_yet: string[]; coverage_checked: boolean };
+  /** `nearest_id` is the `sal_` id of the very listing each `nearest_miles` number was measured to, so a
+   *  neighborhood page can open it. Added 2026-09-22 beside `nearest_miles`, which did not change: an older
+   *  client that knows nothing of the ids keeps printing the same distances. */
+  help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; nearest_id: Record<string, string | null>; none_listed_yet: string[]; coverage_checked: boolean };
   places: { parks: number; rec_centers: number; greenway_open: number; snap_stores?: number; bus_stops?: number };
   /** Straight-line miles from the middle to the nearest store that takes a Bridge card, such a grocery store, and bus stop (City data, not our list). */
   nearest_city?: { snap: number | null; grocery: number | null; bus: number | null };
@@ -65,10 +103,7 @@ export function buildIndicators(input: {
     const help = located.filter((r) => near({ lat: r.lat!, lon: r.lon! }));
     const by = Object.fromEntries(HELP_TOPS.map((t) => [t, help.filter((r) => r.category === t || r.category.startsWith(t + '.')).length]));
     const center = { lat: n.center[1], lon: n.center[0] };
-    const nearest = Object.fromEntries(Object.entries(NEAREST).map(([k, cat]) => {
-      const d = located.filter((r) => r.category === cat || r.category.startsWith(cat + '.')).map((r) => miles(center, { lat: r.lat!, lon: r.lon! }));
-      return [k, d.length ? Number(Math.min(...d).toFixed(1)) : null];
-    }));
+    const nearest = nearestPicks(center, located);
     // A segment belongs to every neighborhood it passes through (any point of the path inside the outline).
     for (const s of input.segments) if (s.lines.some((l) => l.some(([lon, lat]) => maybe({ lat, lon }) && n.rings.some((r) => pointInRing([lon, lat], r))))) (segHoods[s.id] ??= []).push(n.id);
     return {
@@ -76,7 +111,7 @@ export function buildIndicators(input: {
       center: [n.center[1], n.center[0]] as [number, number],
       rings: n.rings.map((r) => encodeLine(r, [GRID.lon0, GRID.lat0])),
       help: {
-        total: help.length, by, nearest_miles: nearest,
+        total: help.length, by, nearest_miles: nearest.miles, nearest_id: nearest.ids,
         // "None listed yet" describes OUR directory, not the neighborhood (honesty rule 6).
         none_listed_yet: ['food', 'health', 'harm'].filter((t) => by[t] === 0),
         coverage_checked: input.coverageChecked?.has(n.id) ?? false,
