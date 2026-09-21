@@ -246,6 +246,16 @@ address { font-style:normal; font-size:1.0625rem; }
 [dir="rtl"] .mappan { flex-direction:row-reverse; }
 .mappan button { width:2.25rem; height:2.25rem; border-radius:.6rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1rem; line-height:1; text-align:center; }
 .maptools button { width:2.75rem; height:2.75rem; border-radius:.75rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); font-size:1.375rem; font-weight:700; line-height:1; text-align:center; }
+/* "See what is near you?" — our own card, the first time the Map tab is opened (locate.ts, DECISIONS 2026-09-21).
+   It sits over the map and never across it: it starts below the zoom keys' row, keeps clear of the end edge where
+   they are, and leaves the arrow pad in the opposite corner alone, so the map is still drawn, still dragged and
+   still tapped around it. It is laid out in start/end terms, so it mirrors for Arabic on its own, and the buttons
+   wrap under each other rather than shrink when the text is large. */
+.locard { position:absolute; inset-block-start:.5rem; inset-inline-start:.5rem; max-inline-size:min(20rem, calc(100% - 4.5rem)); padding:.75rem .875rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); }
+.locard h2 { margin:0; font-size:1rem; } .locard h2:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+.locard p { margin:.375rem 0 0; font-size:.875rem; }
+.locardbtns { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.625rem !important; }
+.locardbtns .btn,.locardbtns .chip { width:auto; margin:0; }
 .mapnote .foot { margin-top:.5rem; } .mappick { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem .75rem; margin-top:.5rem; padding:.75rem 1rem; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); }
 .mappick span { display:grid; } .mappick .btn { width:auto; margin:0; }
 /* Full screen really is full screen: fixed to the whole viewport, over the rail and the top bar, never inside the

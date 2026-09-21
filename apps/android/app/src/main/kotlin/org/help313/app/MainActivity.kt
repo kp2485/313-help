@@ -47,6 +47,63 @@ class MainActivity : Activity() {
     var near: LatLon? = null
     var locationRefused = false
 
+    /**
+     * The Map tab's first open (docs/05, DECISIONS 2026-09-21). All three are in memory: our own card waiting to
+     * be answered, a fix that came from outside the four cities, and "the decision has already been made this
+     * launch". The one thing that outlives the launch is the answered flag, in [locateFlags] — a boolean, and
+     * nothing else. The position itself is [near] and is never written down.
+     */
+    var locateCard = false
+    var locateOutside = false
+    private var locateChecked = false
+    val locateFlags: LocateFlagStore by lazy { LocateFlagStore(filesDir) }
+
+    /** What Android already knows, before anybody is asked anything. Coarse only; fine is never requested. */
+    fun locatePermission(): LocatePermission = when {
+        checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ->
+            LocatePermission.GRANTED
+        // Android says nothing about "never asked" directly. A permission that is not granted and whose rationale
+        // is not wanted is one the system will no longer put a dialog up for: for us that is the same as refused,
+        // because the card's one button would do nothing.
+        !shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) && locateFlags.answered ->
+            LocatePermission.DENIED
+        else -> LocatePermission.PROMPT
+    }
+
+    /** True when Android will not put the dialog up again, so the answer is Settings rather than another tap. */
+    fun locationPermanentlyDenied(): Boolean =
+        checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            locateFlags.answered && !shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
+
+    /**
+     * What the Map tab does when it opens. Once per launch. [firstOpenAction] is the whole decision and is the
+     * same function on the web and on the iPhone, held to the same table of cases (Locate.kt).
+     *
+     * Called from the **top** of `MapScreen.tab()`, while that screen is still being built, and it therefore does
+     * not draw anything itself: it sets [locateCard] and lets the controls below it read the flag on the way past.
+     * Calling [render] from in here instead put the card on a view that the half-finished `tab()` then replaced,
+     * so the card never reached the screen (found on the first emulator run, 2026-09-21). Anything that has to
+     * happen after the screen exists — the permission dialog — is posted.
+     */
+    fun mapTabOpened() {
+        if (locateChecked) return
+        locateChecked = true
+        when (firstOpenAction(locateFlags.answered, locatePermission(), near != null)) {
+            FirstOpenAction.SHOW_CARD -> locateCard = true
+            FirstOpenAction.CENTRE_ON_PERSON -> content.post { askForLocation() }
+            FirstOpenAction.CENTRE_ON_ZIP -> near?.let { MapModel.show(it) }
+            FirstOpenAction.NONE -> Unit
+        }
+    }
+
+    /** "Not now", Back, or the card answered some other way: closed, and never opened again on this phone. */
+    fun closeLocateCard() {
+        if (!locateCard) return
+        locateCard = false
+        locateFlags.markAnswered()
+        render()
+    }
+
     private val stack = ArrayList<Route>()
     private lateinit var content: FrameLayout
     private lateinit var tabs: LinearLayout
@@ -245,6 +302,11 @@ class MainActivity : Activity() {
     override fun onBackPressed() {
         // A card open over the map is the innermost thing on screen, so Back closes that first — one Back, one
         // thing, the same rule Escape follows inside the map itself (MapView.onKeyDown).
+        if (current() is Route.Map && locateCard) {
+            // Back is "Not now", the same answer Escape gives on the web.
+            closeLocateCard()
+            return
+        }
         if (current() is Route.Map && MapModel.selection != null) {
             MapModel.selection = null
             render()
@@ -460,7 +522,9 @@ class MainActivity : Activity() {
      * sent, and never asked for at launch. Refusing it costs nothing but the sort order (docs/08).
      */
     fun askForLocation() {
+        locateOutside = false
         if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // ACCESS_COARSE_LOCATION only, here and nowhere else: fine location is deliberately never requested.
             requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_REQUEST)
             return
         }
@@ -469,9 +533,13 @@ class MainActivity : Activity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == LOCATION_REQUEST) {
+            locateCard = false
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 useLastKnownLocation()
             } else {
+                // Refused. The map stays exactly where it was, and nothing asks again on its own: the
+                // "Use my location" button is the way to try, and says where the switch is once Android has
+                // stopped putting the dialog up (docs/08: never nag).
                 locationRefused = true
                 render()
             }
@@ -480,25 +548,87 @@ class MainActivity : Activity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    /**
+     * A fix this phone already had, or — when it has none — **one** fix asked for and then stopped.
+     *
+     * The last-known fix alone was not enough: a phone that has not been asked for its location lately has none
+     * at all, and the first thing a person saw after granting the permission was "We couldn't get your location"
+     * (found on the first emulator run, 2026-09-21). So when there is nothing to hand we ask for a single
+     * update, give up after ten seconds like the web does, and remove the listener either way. The request is
+     * coarse: the permission is `ACCESS_COARSE_LOCATION` and nothing else is ever asked for, so whatever a
+     * provider hands back has already been coarsened by Android.
+     */
     private fun useLastKnownLocation() {
         val lm = getSystemService(LOCATION_SERVICE) as LocationManager?
         var best: Location? = null
         try {
-            for (provider in listOf(LocationManager.NETWORK_PROVIDER, LocationManager.PASSIVE_PROVIDER)) {
+            for (provider in listOf(LocationManager.NETWORK_PROVIDER, LocationManager.PASSIVE_PROVIDER, LocationManager.GPS_PROVIDER)) {
                 val l = lm?.getLastKnownLocation(provider) ?: continue
                 if (best == null || l.time > best!!.time) best = l
             }
         } catch (_: SecurityException) {
             best = null
         }
-        val found = best
+        if (best == null && lm != null && askOneFix(lm)) return
+        arrived(best)
+    }
+
+    /** True when a single update was asked for and [arrived] will be called later — once, whatever happens. */
+    private fun askOneFix(lm: LocationManager): Boolean {
+        val provider = listOf(LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER)
+            .firstOrNull { runCatching { lm.isProviderEnabled(it) }.getOrDefault(false) } ?: return false
+        var done = false
+        lateinit var listener: android.location.LocationListener
+        val giveUp = Runnable {
+            if (done) return@Runnable
+            done = true
+            runCatching { lm.removeUpdates(listener) }
+            arrived(null)
+        }
+        listener = object : android.location.LocationListener {
+            override fun onLocationChanged(location: Location) {
+                if (done) return
+                done = true
+                content.removeCallbacks(giveUp)
+                runCatching { lm.removeUpdates(this) }
+                arrived(location)
+            }
+
+            // Required on API 24–28; a provider going away is simply no fix.
+            override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) = Unit
+            override fun onProviderEnabled(provider: String) = Unit
+            override fun onProviderDisabled(provider: String) = Unit
+        }
+        return try {
+            lm.requestLocationUpdates(provider, 0L, 0f, listener, mainLooper)
+            content.postDelayed(giveUp, 10_000)
+            true
+        } catch (_: SecurityException) {
+            false
+        } catch (_: IllegalArgumentException) {
+            false
+        }
+    }
+
+    /** What to do with a fix, or with the absence of one. The one place any of that is decided. */
+    private fun arrived(found: Location?) {
+        locateCard = false
         if (found == null) {
             locationRefused = true
+        } else if (!inServiceArea(found.latitude, found.longitude)) {
+            // Outside Detroit, Hamtramck, Highland Park and Dearborn: the map does not move, and the words say
+            // why. The point is not kept either — sorting a Detroit list by distance from another state is a
+            // worse answer than not sorting it at all.
+            near = null
+            locationRefused = false
+            locateOutside = true
         } else {
             near = LatLon(found.latitude, found.longitude)
             locationRefused = false
+            locateOutside = false
             // In memory only, as everywhere else: the map moves there, and nothing is written down or sent.
-            if (current() is Route.Map) MapModel.center(near!!)
+            // Two miles in every direction, which is the whole of what "near me" means here.
+            if (current() is Route.Map) MapModel.show(near!!)
         }
         render()
     }

@@ -7,7 +7,8 @@ import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
 import { hoodList, hoodPage, loadIndicators, outline, type Hood, type Indicators } from './hoods.js';
 import { icon } from './icons.js';
-import { MapView, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
+import { MapView, focusRadius, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
+import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, positionOutcome, rememberLocateAnswered, requestPosition } from './locate.js';
 import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
 import { loadLayers, loadStyle, mapStyle, saveStyle, toggleLayer, type MapStyle } from './layers.js';
 import { LAYER_STYLE } from './layerstyle.js';
@@ -30,6 +31,11 @@ let loadError = false;
 let here: { lat: number; lon: number } | null = null;   // device location, or a ZIP's center: this variable only, never stored
 let hereZip = '';                                        // the ZIP a person typed, when `here` came from one
 let locDenied = false, zipOpen = false, zipUnknown = false;
+// The Map tab's first open (docs/05, DECISIONS 2026-09-21). `locateCard` is our own card, on the map, waiting to
+// be answered; `locateOutside` is a fix that arrived from somewhere that is not one of the four cities, which
+// moves nothing and says so; `locateChecked` is "the decision has already been made this visit", so coming back
+// to the tab does not re-open anything. The position itself is `here`, above, and lives nowhere else.
+let locateCard = false, locateOutside = false, locateChecked = false;
 let savedIds: string[] = [];                             // listing ids saved on this phone (saved.ts); never sent
 let proposed: { state: 'sent' | 'queued'; ref?: string } | null = null, proposeError = false;
 let missing: string[] = [];                              // which "Add a place" fields were left empty, for the error text
@@ -229,7 +235,10 @@ function locChip(): string {
     // browser (or a person's own autofill) finish it. Nothing is stored or sent by us either way (DECISIONS).
     ? `<form class="zipform" data-zip><label>${T('loc.zip_label')} <input name="zip" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}" maxlength="5" required aria-describedby="locnote"${zipUnknown ? ' aria-invalid="true"' : ''}></label><button class="chip" type="submit">${T('loc.zip_go')}</button></form>`
     : `<button class="chip" data-loc="zip">${T('loc.zip')}</button>`;
-  return `<div class="loc"><button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button>${zip}<small id="locnote">${T(zipUnknown ? 'loc.zip_unknown' : locDenied ? 'loc.denied' : 'loc.note')}</small></div>`;
+  // A fix from outside the four cities is not a refusal and must not read like one: the map stays on the city,
+  // and the ZIP entry beside this is the way to look at a part of it (docs/05, "Map tab").
+  const note = locateOutside ? 'map.locate_outside' : zipUnknown ? 'loc.zip_unknown' : locDenied ? 'loc.denied' : 'loc.note';
+  return `<div class="loc"><button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button>${zip}<small id="locnote">${T(note)}</small></div>`;
 }
 const searchBtn = () => `<button class="searchbtn" ${go({ v: 'search' })}>${icon('search', 'sm')}<span>${T('search.open')}</span></button>`;
 // `own` marks a title a place or a city dataset wrote (a park, a greenway stretch, a listing): it is never
@@ -650,6 +659,96 @@ function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapS
 function mountMaps(): void {
   if (!bundle) return;
   for (const el of app.querySelectorAll<HTMLElement>('.mapbox[data-map]')) mapViews.push(new MapView(el, mapSpecs[Number(el.dataset.map)]!, bundle.index));
+  // Our own card, over the Map tab's map. It goes inside the map's frame, which the view builds, so it is put
+  // there after the view exists rather than written into the page: the frame is the only box on the screen that
+  // is certainly the map, at every width and in both layouts.
+  if (locateCard) {
+    const frame = app.querySelector<HTMLElement>('.maptop .mapbox .mapframe');
+    if (frame) frame.insertAdjacentHTML('beforeend', locateCardHtml({ title: t('map.locate_title'), body: t('map.locate_body'), yes: t('map.locate_yes'), no: t('map.locate_no') }, esc));
+    else locateCard = false;
+  }
+}
+
+// ---- where a person is, if they ask us to look (docs/08; DECISIONS 2026-09-21) -----------------------------
+// One path for every way of asking — the chip on a list, the chip beside the map, and the card the Map tab opens
+// the first time. They behave identically, because they are the same four lines.
+
+/** True when the screen on top is the Map tab, which is the only screen whose map is moved by a fix. */
+const onMapTab = (): boolean => { const v = stack[stack.length - 1]; return !!v && v.v === 'tab' && v.tab === 'map'; };
+
+/** Show two miles around a point on the Map tab's map, if that map is on the screen. */
+function centreMapOn(p: { lat: number; lon: number }): boolean {
+  return onMapTab() && focusRadius('maptab', p.lat, p.lon, LOCATE_RADIUS_M);
+}
+
+/**
+ * Ask the browser. Called straight from a click — a real gesture — every time, so a browser never has to decide
+ * what to do with a prompt nobody asked for. Nothing here is stored: the position goes into `here` and the map,
+ * and `here` is a variable that dies with the page.
+ */
+function askForLocation(): void {
+  requestPosition(navigator.geolocation, locationArrived, locationFailed);
+}
+
+function locationArrived(pos: GeolocationPosition): void {
+  const lat = pos.coords.latitude, lon = pos.coords.longitude;
+  locateCard = false;
+  // Outside Detroit, Hamtramck, Highland Park and Dearborn: the map does not move, and the words say why. The
+  // point is not kept either — sorting a Detroit list by distance from another state is a worse answer than
+  // not sorting it at all.
+  if (positionOutcome(lat, lon) === 'outside') {
+    here = null; hereZip = ''; locDenied = zipUnknown = false; locateOutside = true;
+    zipOpen = !!bundle?.zips;
+    refocusSel = zipOpen ? '.zipform input' : '[data-loc="on"]';
+    redraw(); announce(t('map.locate_outside'));
+    return;
+  }
+  const moving = onMapTab();
+  here = { lat, lon }; hereZip = '';
+  locDenied = zipUnknown = zipOpen = locateOutside = false;
+  refocusSel = '[data-loc="off"]';
+  redraw();
+  const moved = centreMapOn(here);
+  announce(t(moved && moving ? 'map.locate_centered' : 'loc.on_say'));
+}
+
+/** Refused, or no fix in ten seconds, or no geolocation at all: the card goes, the map stays where it was. */
+function locationFailed(): void {
+  locateCard = false; locDenied = true; zipUnknown = locateOutside = false;
+  refocusSel = '[data-loc="on"]';
+  redraw(); announce(t('loc.denied'));
+}
+
+/**
+ * The Map tab has been opened. Once per visit: the card, a move to where the person already is, or nothing at
+ * all. `firstOpenAction` is the whole decision and is the same function on all three clients.
+ */
+function mapTabOpened(): void {
+  if (locateChecked || !bundle) return;
+  locateChecked = true;
+  void (async () => {
+    const act = firstOpenAction(await locateAnswered(), await locatePermission(), !!hereZip);
+    if (!onMapTab()) return;                                   // the person moved on while we were asking
+    if (act === 'centreOnZip' || act === 'centreOnPerson') {
+      // A ZIP is already a point; a permission already given needs no card, only a fix.
+      if (here) { const p = here; if (centreMapOn(p)) announce(t(hereZip ? 'loc.zip_using' : 'map.locate_centered', { zip: hereZip })); }
+      else if (act === 'centreOnPerson') askForLocation();
+      return;
+    }
+    if (act !== 'showCard') return;
+    locateCard = true;
+    refocusSel = '#locardh';                                   // the cursor lands on the card's heading
+    redraw();
+  })();
+}
+
+/** "Not now", Escape, or the card answered some other way: it is closed, and never opened again on this phone. */
+function closeLocateCard(focusBack = true): void {
+  if (!locateCard) return;
+  locateCard = false;
+  if (focusBack) refocusSel = '[data-loc="on"]';
+  void rememberLocateAnswered();
+  redraw();
 }
 function greenway(): string {
   const g = bundle!.greenway;
@@ -831,6 +930,7 @@ function render(focus = true): void {
   const named = traceable(v) ? docTitle : t(PURPOSE[v.v] ?? 'title.find');
   document.title = named ? `${named} · ${t('app.name')}` : t('app.name');
   mountMaps();
+  if (v.v === 'tab' && v.tab === 'map') mapTabOpened();
   if (focus) {
     window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true });
     // On a traceless screen the window's title says only what the screen is for, so the live region says which
@@ -863,7 +963,7 @@ function navigate(view: View): void {
 }
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-locate],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry]');
   if (!el) return;
   if ('skip' in el.dataset) { app.querySelector<HTMLElement>('main')?.focus(); }   // past the bar and the tabs, into the page
   else if ('resetKey' in el.dataset) {
@@ -921,13 +1021,17 @@ app.addEventListener('click', async (ev) => {
   }
   else if ('back' in el.dataset) { if (stack.length > 1) history.back(); else navigate({ v: 'tab', tab: TAB_OF[stack[0]!.v] ?? 'home' }); }
   else if ('exit' in el.dataset) { stack.length = 0; location.replace('https://www.weather.gov/'); }   // replace(): this page leaves the back button too
-  else if (el.dataset.loc === 'off') { here = null; hereZip = ''; refocusSel = '[data-loc="on"]'; redraw(); announce(t('loc.off_say')); }
-  else if (el.dataset.loc === 'zip') { zipOpen = true; zipUnknown = false; redraw(); app.querySelector<HTMLInputElement>('.zipform input')?.focus(); }
-  else if (el.dataset.loc === 'on') {
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => { here = { lat: pos.coords.latitude, lon: pos.coords.longitude }; hereZip = ''; locDenied = zipUnknown = zipOpen = false; refocusSel = '[data-loc="off"]'; redraw(); announce(t('loc.on_say')); },
-      () => { locDenied = true; zipUnknown = false; refocusSel = '[data-loc="on"]'; redraw(); announce(t('loc.denied')); }, { maximumAge: 60000, timeout: 10000 });
-  } else if (el.dataset.share) {
+  else if (el.dataset.loc === 'off') { here = null; hereZip = ''; locateOutside = false; refocusSel = '[data-loc="on"]'; redraw(); announce(t('loc.off_say')); }
+  else if (el.dataset.loc === 'zip') { zipOpen = true; zipUnknown = locateOutside = false; redraw(); app.querySelector<HTMLInputElement>('.zipform input')?.focus(); }
+  else if (el.dataset.loc === 'on') { locateOutside = false; askForLocation(); }
+  // The Map tab's card. "Use my location" asks the browser FIRST, inside the click, because that is what makes it
+  // a gesture — remembering that the card was answered is a write to IndexedDB, and awaiting it here would hand
+  // the browser a prompt with no gesture behind it.
+  else if (el.dataset.locate === 'yes' || el.dataset.locate === 'no') {
+    locateOutside = false;
+    locateCardClick(el.dataset.locate, { ask: askForLocation, remember: () => void rememberLocateAnswered(), close: () => { locateCard = false; refocusSel = '[data-loc="on"]'; redraw(); } });
+  }
+  else if (el.dataset.share) {
     const url = `${location.origin}/#/r/${el.dataset.share}`;   // a listing id only; nothing about the person
     try { if (navigator.share) await navigator.share({ url }); else await navigator.clipboard.writeText(url); } catch { /* cancelled */ }
   }
@@ -941,6 +1045,15 @@ function redraw(): void {
   const say = app.querySelector('#searchsay');
   if (say) say.textContent = searchCount;                // the same element every time, so it is really announced
 }
+// Escape is "Not now" on the Map tab's card. The card takes nothing away, so this is the only key it needs: Tab
+// walks past it as it walks past anything else on the screen, and the map's own Escape (leave full screen) is
+// untouched, because that listener answers only while the map IS full screen.
+document.addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Escape' || !locateCard) return;
+  ev.preventDefault();
+  closeLocateCard();
+});
+
 // Map layers: a real checkbox, so the keyboard and a screen reader already work. The choice is kept on this
 // phone (layers.ts) and the cursor goes back to the switch that was just used.
 // The language control in the top bar. A select changes on `change`, not on `click`, and the cursor goes back

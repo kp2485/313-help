@@ -246,6 +246,16 @@ object MapModel {
         camera = MapCamera.fitting(cityCorners, camera.width, camera.height, cover = true)
     }
 
+    /**
+     * Show a radius around a point — two miles, the first time the Map tab is opened with a location to hand
+     * (docs/05, DECISIONS 2026-09-21). [MapCamera.forRadius] is the whole of it, and it is tested in `:core`.
+     * The point is not kept: the camera is a few numbers in memory, and they are numbers about a view.
+     */
+    fun show(p: LatLon, radiusMeters: Double = LOCATE_RADIUS_METERS) {
+        everMoved = true
+        camera = MapCamera.forRadius(p, radiusMeters, camera.width, camera.height)
+    }
+
     /** Centre on a point without changing the zoom — "my location", and following a row from the list. */
     fun center(p: LatLon, metersAcross: Double = 1200.0) {
         everMoved = true

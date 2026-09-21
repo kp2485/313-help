@@ -158,6 +158,14 @@ struct MapSurface: View {
     /// True only once the person has tapped "Use my location". A phone that has never been asked must not be told
     /// its location was refused: the map has nothing to do with where anybody is until they ask it to.
     @State private var askedForLocation = false
+    /// Our own card, over the map, the first time this tab is opened on this phone (DECISIONS 2026-09-21).
+    @State private var locateCard = false
+    /// A fix that arrived from somewhere that is not one of the four cities. The map does not move, and says so.
+    @State private var locateOutside = false
+    /// The decision has already been made this launch, so coming back to the tab does not re-open anything.
+    @State private var locateChecked = false
+    /// The one thing this phone remembers about all of it: that the card was answered. Never the answer.
+    @State private var flags = LocateFlagStore(dir: DeviceState.dir)
 
     var body: some View {
         ZStack {
@@ -169,8 +177,97 @@ struct MapSurface: View {
         }
         .safeAreaInset(edge: .top, spacing: 0) { topControls }
         .safeAreaInset(edge: .bottom, spacing: 0) { bottomControls }
+        .overlay(alignment: .top) { locateCardView }
         .background(Color.appBg)
         .sensoryFeedback(.selection, trigger: model.selectionCount)
+        .onAppear { firstOpen() }
+    }
+
+    // MARK: "See what is near you?"
+
+    /**
+     Our own card, before any permission sheet. It sits over the map and never across it: the map keeps drawing
+     and answering fingers behind it, "Urgent help" stays where it was, and it is deliberately **not** marked
+     `.isModal` — it takes nothing away, so nothing behind it is hidden from VoiceOver. Its own elements are
+     ordered first (`.accessibilitySortPriority`), so a reader meets it before the map, which is the order a
+     sighted person meets it in too.
+     */
+    @ViewBuilder private var locateCardView: some View {
+        if locateCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(L.t("map.locate_title")).font(.headline)
+                Text(L.t("map.locate_body")).font(.subheadline).foregroundStyle(Color.muted)
+                // A row that becomes a column when the words are large: at the biggest text sizes two buttons
+                // side by side cut each other in half.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 10) { locateYes; locateNo }
+                    VStack(alignment: .leading, spacing: 10) { locateYes; locateNo }
+                }
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(14)
+            .frame(maxWidth: 380, alignment: .leading)
+            .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.line))
+            .padding(.horizontal, 16)
+            .padding(.top, 64)                       // clear of the row of controls along the top
+            .accessibilityElement(children: .contain)
+            .accessibilitySortPriority(10)
+            .transition(.opacity)
+        }
+    }
+
+    private var locateYes: some View {
+        Button(L.t("map.locate_yes")) {
+            // The tap is the gesture: the sheet is asked for here and nowhere else.
+            askedForLocation = true
+            locateCard = false
+            here.ask()
+            flags.markAnswered()
+        }
+        .buttonStyle(.borderedProminent)
+    }
+
+    private var locateNo: some View {
+        Button(L.t("map.locate_no")) {
+            locateCard = false
+            flags.markAnswered()
+        }
+        .buttonStyle(.bordered)
+    }
+
+    /// What this tab does when it opens. `firstOpenAction` is the whole decision and is the same function on the
+    /// web and on Android, held to the same table of cases (HelpCore/Locate.swift).
+    private func firstOpen() {
+        guard !locateChecked else { return }
+        locateChecked = true
+        switch firstOpenAction(flagAnswered: flags.answered, permission: here.permission, hasNearFromZip: false) {
+        case .showCard:
+            locateCard = true
+        case .centreOnPerson:
+            // Permission is already given, so there is nothing to explain and nothing to ask: just the fix.
+            askedForLocation = true
+            here.ask()
+        case .centreOnZip, .none:
+            break                                    // the city, as before. iPhone has no ZIP entry yet (i-list).
+        }
+    }
+
+    /// A fix has arrived. Inside the four cities the map moves to a two-mile view around it and says so; outside
+    /// them nothing moves, and the words say why rather than leaving a person staring at an unchanged map.
+    private func locationArrived(_ p: LatLon) {
+        locateCard = false
+        guard inServiceArea(p) else {
+            locateOutside = true
+            // The point is not kept either: sorting a Detroit list by distance from another state is a worse
+            // answer than not sorting it at all. The web and Android drop it here too.
+            here.forget()
+            UIAccessibility.post(notification: .announcement, argument: L.t("map.locate_outside"))
+            return
+        }
+        locateOutside = false
+        if reduceMotion { model.show(p) } else { withAnimation(.easeOut(duration: 0.25)) { model.show(p) } }
+        UIAccessibility.post(notification: .announcement, argument: L.t("map.locate_centered"))
     }
 
     // MARK: the canvas
@@ -416,7 +513,15 @@ struct MapSurface: View {
             }
             if askedForLocation, here.denied {
                 // iOS has no "type a ZIP" screen yet, so a refusal is answered in plain words rather than silence.
-                Text(L.t("loc.denied")).font(.footnote).foregroundStyle(Color.ink)
+                // Once iOS has been told no it will not ask again, so the words say where the switch is — said
+                // once, on the screen, with no link and no second prompt (docs/08: never nag).
+                Text(L.t(here.permanentlyDenied ? "loc.denied_settings" : "loc.denied"))
+                    .font(.footnote).foregroundStyle(Color.ink)
+                    .padding(10).background(Color.surface, in: RoundedRectangle(cornerRadius: 10))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if locateOutside {
+                Text(L.t("map.locate_outside")).font(.footnote).foregroundStyle(Color.ink)
                     .padding(10).background(Color.surface, in: RoundedRectangle(cornerRadius: 10))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -424,8 +529,9 @@ struct MapSurface: View {
         .padding(.horizontal, 16).padding(.bottom, 8)
         .onChange(of: here.point) { _, p in
             guard let p else { return }
-            if reduceMotion { model.center(on: p) } else { withAnimation(.easeOut(duration: 0.25)) { model.center(on: p) } }
+            locationArrived(p)
         }
+        .onChange(of: here.denied) { _, no in if no { locateCard = false } }
     }
 
     /// Plus and minus, and the same two steps offered to a screen reader as one adjustable control, so zooming

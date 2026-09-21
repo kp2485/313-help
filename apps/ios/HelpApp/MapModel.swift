@@ -367,6 +367,15 @@ final class MapModel {
         camera = next.clamped()
         band = zoomBand(metersPerPoint: camera.metersPerPoint, previous: band)
     }
+    /// Show a radius around a point — two miles, the first time the Map tab is opened with a location to hand
+    /// (docs/05, DECISIONS 2026-09-21). `MapCamera.forRadius` is the whole of it, and it is tested in HelpCore.
+    /// The point is not kept: the camera is a few numbers in memory, and they are numbers about a view.
+    func show(_ p: LatLon, radiusMeters: Double = locateRadiusMeters) {
+        everMoved = true
+        camera = MapCamera.forRadius(p, radiusMeters: radiusMeters, width: camera.width, height: camera.height)
+        band = zoomBand(metersPerPoint: camera.metersPerPoint, previous: band)
+    }
+
     /// The four corners of the service area (CLAUDE.md: Detroit, Hamtramck, Highland Park and Dearborn).
     private let cityCorners = [LatLon(lat: 42.255, lon: -83.29), LatLon(lat: 42.45, lon: -82.91)]
 

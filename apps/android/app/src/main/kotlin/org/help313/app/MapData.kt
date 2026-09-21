@@ -368,6 +368,28 @@ data class MapCamera(
             val fit = if (cover) max(width / spanX, height / spanY) else min(width / spanX, height / spanY)
             return MapCamera(box.centerX, box.centerY, fit, width, height).clamped()
         }
+
+        /**
+         * A camera that shows [radiusMeters] in every direction around [center]: the SHORTER side of the screen
+         * spans the whole diameter, so the circle fits whichever way the phone is held (Map tab, first open,
+         * 2026-09-21). Pure, and the same three lines as `cameraForRadius` in apps/web/src/map.ts and
+         * `MapCamera.forRadius` in apps/ios/Sources/HelpCore/MapData.swift, so "two miles" is two miles on all
+         * three.
+         *
+         * The result goes through [clamped] like every other camera, which is what stops a wrong — or a spoofed —
+         * fix from throwing the map off Detroit.
+         */
+        fun forRadius(center: LatLon, radiusMeters: Double, width: Double, height: Double): MapCamera {
+            val side = max(1.0, min(width, height))
+            val across = max(1.0, radiusMeters * 2)
+            return MapCamera(
+                MapProjection.pointX(center),
+                MapProjection.pointY(center),
+                side * MapProjection.METERS_PER_UNIT / across,
+                max(width, 1.0),
+                max(height, 1.0),
+            ).clamped()
+        }
     }
 }
 

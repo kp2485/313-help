@@ -10,9 +10,11 @@ export const p = (...parts: string[]) => join(ROOT, ...parts);
 
 // Detroit bbox sanity (CLAUDE.md).
 // Detroit, Hamtramck, Highland Park and Dearborn (Kyle, 2026-09-19). Dearborn reaches west to about -83.32.
-export const BBOX = { latMin: 42.25, latMax: 42.46, lonMin: -83.33, lonMax: -82.91 };
-export const inBbox = (lat: number, lon: number, slack = 0) =>
-  lat >= BBOX.latMin - slack && lat <= BBOX.latMax + slack && lon >= BBOX.lonMin - slack && lon <= BBOX.lonMax + slack;
+//
+// The numbers live in packages/query (`SERVICE_BBOX`) since 2026-09-21, because the clients ask the same
+// question of a phone's own location — "is this person in the city at all?" — and two copies of a boundary is
+// one copy too many. The two names here are what the ingest scripts have always called it.
+export { SERVICE_BBOX as BBOX, inServiceArea as inBbox } from '@313help/query';
 
 export type CsvRow = Record<string, string>;
 

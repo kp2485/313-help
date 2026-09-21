@@ -128,6 +128,19 @@ person is looking** (DECISIONS 2026-09-18, "The app draws its own street map fro
 MapKit is not used for the map: its tiles are somebody else's server. The map works with no signal at all, from
 the snapshot shipped inside the app.
 
+**The first open** (2026-09-21): the tab draws **our own card** over the map — "See what is near you?", "Your
+location stays on this phone. We never send it or save it.", **Use my location** · **Not now** — before iOS is
+asked anything. Only that button calls `requestWhenInUseAuthorization`, and only ever coarsely
+(`kCLLocationAccuracyHundredMeters`; reduced accuracy is accepted and `requestTemporaryFullAccuracy` is never
+called). A fix inside the four cities moves the camera to a **two-mile radius** (`MapCamera.forRadius`, tested
+in HelpCore), instantly under Reduce Motion; a fix outside them moves nothing and says so. The card is not
+`.isModal` — the map keeps working behind it — and its elements are read first. The decision is
+`firstOpenAction` in `HelpCore/Locate.swift`, shared word for word with the web and Android; the only thing
+stored is a boolean in `LocateFlagStore` (`map-locate.json`, in the excluded-from-backup state directory).
+**The Info.plist purpose string** (`NSLocationWhenInUseUsageDescription`, in the git-ignored `Xcode/` folder)
+should read: *"Your location stays on this phone. It sorts the list by distance and centres the map near you,
+and is never saved or sent."*
+
 **What it draws**, in the web app's order and style (`apps/web/src/map.ts` is the original):
 
 - the four cities' outlines — a change of shade **and** a stroked line, because two pale fills a step apart are
