@@ -24,6 +24,9 @@ object MapScreen {
     // ---- the tab ---------------------------------------------------------------------------------------------
 
     fun tab(a: MainActivity): View {
+        // Before anything is built: the first open may want our own card over the map, and `controls` below reads
+        // the flag it sets. Nothing is drawn from in there (MainActivity.mapTabOpened).
+        a.mapTabOpened()
         val root = FrameLayout(a)
         root.setBackgroundColor(UI.color(a, R.color.app_bg))
 
@@ -68,6 +71,45 @@ object MapScreen {
         }
         MapModel.load(a, a.store)
         return root
+    }
+
+    /**
+     * "See what is near you?" — our own card, over the map, the first time this tab is opened on this phone
+     * (Locate.kt, DECISIONS 2026-09-21).
+     *
+     * It sits over the map and never across it: the map keeps drawing and answering fingers behind it, and
+     * "Urgent help" along the top is untouched. It is a focusable region, announced when it appears, and both
+     * buttons are real 48 dp buttons with their own descriptions. Nothing here is written in left or right, so it
+     * mirrors for Arabic on its own, and nothing is ellipsized, so it grows at the largest text sizes.
+     */
+    private fun locateCard(a: MainActivity): View {
+        val card = UI.card(a, padding = 14, topDp = 8)
+        card.isFocusable = true
+        card.addView(UI.text(a, L.t("map.locate_title"), 17f, R.color.ink, bold = true))
+        card.addView(UI.text(a, L.t("map.locate_body"), 15f, R.color.muted, topDp = 6))
+        val row = LinearLayout(a)
+        // A column, not a row: two buttons side by side do not fit at font scale 2.0 on a 320 dp screen.
+        row.orientation = LinearLayout.VERTICAL
+        row.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+        )
+        row.addView(
+            UI.button(a, L.t("map.locate_yes")) {
+                // The tap is the gesture: the system dialog is asked for here and nowhere else.
+                a.locateCard = false
+                a.locateFlags.markAnswered()
+                a.askForLocation()
+            },
+        )
+        row.addView(
+            UI.button(a, L.t("map.locate_no"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                a.closeLocateCard()
+            },
+        )
+        card.addView(row)
+        card.contentDescription = L.t("map.locate_title") + " " + L.t("map.locate_body")
+        card.post { card.announceForAccessibility(card.contentDescription) }
+        return card
     }
 
     /**
@@ -161,8 +203,16 @@ object MapScreen {
             note.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
             column.addView(note)
         }
+        // Our own card, before any system dialog: below the top row of controls, so "Urgent help" stays reachable.
+        if (a.locateCard) column.addView(locateCard(a))
         if (a.locationRefused) {
-            column.addView(UI.pill(a, L.t("loc.denied"), R.drawable.pill_warn, R.color.warn_ink))
+            // Once Android has stopped putting the dialog up, the words say where the switch is — said once, on
+            // the screen, with no deep link and no second prompt (docs/08: never nag).
+            val key = if (a.locationPermanentlyDenied()) "loc.denied_settings" else "loc.denied"
+            column.addView(UI.pill(a, L.t(key), R.drawable.pill_warn, R.color.warn_ink))
+        }
+        if (a.locateOutside) {
+            column.addView(UI.pill(a, L.t("map.locate_outside"), R.drawable.pill_warn, R.color.warn_ink))
         }
 
         val bottom = LinearLayout(a)

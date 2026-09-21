@@ -110,6 +110,31 @@ One tab replaces Recreation and Transit. Top to bottom:
 3. **"See this map as a list"** — everything switched on, in words: the help listings as cards, greenway stretches as rows, park names, and each transport layer's route and stop names with a count. Nothing on the map is reachable only by looking at it.
 4. Then the rest of what Recreation and Transit carried: the greenway, City parks, recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass. The trip-planner list names the **Transit app** ("live DDOT and SMART buses on your phone") beside DDOT's own planner, as a link-out to transitapp.com like every other; the same link appears in the **"Rides to the doctor or cheaper bus fare"** link-outs, where it leads, because it is the free thing that answers "when is my bus coming?". Neither says DDOT or SMART recommends it: SMART's own page lists Transit among third-party apps that receive SMART data, DDOT's pages could not be read (`docs/research/2026-09-20/transit-app.md`), and we state only what an owner page states.
 
+**The first time the Map tab is opened (2026-09-21).** Before any permission prompt, the map shows **our own
+small card**: "See what is near you?" — "Your location stays on this phone. We never send it or save it." —
+with **Use my location** and **Not now**. The card never covers the map (it is usable behind and around it),
+Urgent help stays one tap away, Escape (web), Back (Android) and "Not now" all mean the same thing, and it works
+at 320 px, in Arabic and at the largest text sizes. A cold system prompt is what gets refused; ours is the
+sentence a person can read first, and on the web it is also what makes the prompt follow a real gesture.
+
+Only **Use my location** asks the platform, and only ever **coarse** location: `getCurrentPosition` with
+`enableHighAccuracy: false` on the web, `requestWhenInUseAuthorization` with hundred-metre accuracy on iPhone
+(reduced accuracy is accepted; full accuracy is never requested), `ACCESS_COARSE_LOCATION` on Android (fine is
+never requested). When a fix arrives **inside** the service area the map animates — instantly under Reduce
+Motion — to a **two-mile radius** around the person: the shorter side of the screen spans four miles, clamped to
+the map's existing zoom and pan limits, with the "you are here" dot and "Map centred near you" through the live
+region. **Outside** Detroit, Hamtramck, Highland Park and Dearborn nothing moves and the screen says so, with
+the ZIP entry beside it. A refusal, an error or a timeout dismisses the card, leaves the map where it was, and
+shows the refused message; nothing ever asks again on its own — the "Use my location" button is the way to try,
+and once the platform has stopped offering its prompt the words say where the switch is in Settings.
+
+The **only** thing remembered is a boolean: that the card was answered (web: the same IndexedDB the layer
+choices use; iPhone: the excluded-from-backup state file; Android: the atomic app-private file). The position is
+never written anywhere — see [08-privacy-safety.md](08-privacy-safety.md). If permission was already given, the
+first open skips the card and goes straight to the two-mile view; if a ZIP has already been typed, the map
+centres on the ZIP's point and the card is not shown. The card never appears on a private or sensitive screen,
+the map still never draws sensitive rows, and DV rows still show no distance. DECISIONS 2026-09-21.
+
 **Two map styles (2026-09-21).** The layers panel has a **Map style** choice: **Standard** (each kind of transport
 in one color — the default on every client) and **Subway lines** (bus and rail drawn like a subway map: route
 badges, shared-street runs side by side, interchanges, terminals, the People Mover as a loop, the QLINE line

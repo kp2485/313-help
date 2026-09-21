@@ -341,6 +341,23 @@ public struct MapCamera: Equatable, Sendable {
         return MapCamera(centerX: box.centerX, centerY: box.centerY, scale: fit, width: width, height: height).clamped()
     }
 
+    /// A camera that shows `radiusMeters` in every direction around `center`: the SHORTER side of the screen
+    /// spans the whole diameter, so the circle fits whichever way the phone is held (Map tab, first open,
+    /// 2026-09-21). Pure, and the same three lines as `cameraForRadius` in apps/web/src/map.ts and
+    /// `MapCamera.forRadius` in apps/android/.../MapData.kt, so "two miles" is two miles on all three.
+    ///
+    /// The result goes through `clamped()` like every other camera, which is what stops a wrong — or a spoofed —
+    /// fix from throwing the map off Detroit.
+    public static func forRadius(_ center: LatLon, radiusMeters: Double,
+                                 width: Double, height: Double) -> MapCamera {
+        let side = max(1, min(width, height))
+        let across = max(1, radiusMeters * 2)
+        let q = MapProjection.point(center)
+        return MapCamera(centerX: q.x, centerY: q.y,
+                         scale: side * MapProjection.metersPerUnit / across,
+                         width: max(width, 1), height: max(height, 1)).clamped()
+    }
+
     /// One step of a two-finger gesture: zoom about where the fingers' middle WAS, then follow it to where it is
     /// NOW. In that order, the map point under the middle when the gesture began stays under it however the hand
     /// spreads and slides — which is what makes panning DURING a pinch feel like one gesture and not two. The web

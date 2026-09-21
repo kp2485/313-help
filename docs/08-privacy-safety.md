@@ -10,7 +10,8 @@ We can't leak what we never collect. Every design choice below is downstream of 
 |---|---|---|---|
 | Resource bundle | Yes (cache) | CDN (public) | Versioned, public forever |
 | Triage answers | RAM only during the flow | Never | Gone on exit |
-| Location | Used in-memory for sorting; never written | Never | — |
+| Location | Used in-memory for sorting and for where the Map tab is pointed; **never written** — not to IndexedDB or a file, not to the URL or the history, not to a log, a report or the map's remembered camera | Never | Gone when the tab or app is closed |
+| "The Map tab's first-open card was answered" | Yes (local only): one boolean, and nothing else. Web IndexedDB, iPhone state file (excluded from backup), Android app-private file | Never | Until site data is cleared / the app is removed |
 | Saved resources | Yes (local only). DV and crisis listings can't be saved | Never | Until user clears |
 | Language choice | Yes (local only) | Never | Until user changes it or clears site data |
 | Reports | Queued until sent | Yes, minus IP, minus device ID | 180 days raw, then aggregate counts only |
@@ -100,7 +101,7 @@ Publishing the dataset (CC BY 4.0) and code (Apache-2.0, decided 2026-09-18) is 
 
 ## Maps
 
-The street map is part of the signed bundle and is drawn on the phone (docs/06). No map company, tile server, or third party is contacted, so nobody learns where a person is looking. The map files are downloaded whole, the same two files for everyone, the first time a person opens a map. The map does not move to the person's location on its own; the location dot is drawn on the phone only after "Use my location," and a typed ZIP is never drawn as a location. **Directions** and **Bus directions** still hand the destination address to the maps app the person chooses; the screen says so.
+The street map is part of the signed bundle and is drawn on the phone (docs/06). No map company, tile server, or third party is contacted, so nobody learns where a person is looking. The map files are downloaded whole, the same two files for everyone, the first time a person opens a map. The map moves to a person's location only after they have asked it to: on a first open the Map tab shows **our own card** and the platform is asked only if "Use my location" is tapped; on a later open it centres again only where permission is still granted (docs/05, DECISIONS 2026-09-21). Only coarse location is ever requested. The location dot is drawn on the phone, a typed ZIP is never drawn as a location, and a position outside the four cities moves nothing. **The position itself is never stored** — including in the camera the map remembers between screens, which is a few numbers in memory that die with the page and are written to no store on any client. The one thing kept is the boolean above. **Directions** and **Bus directions** still hand the destination address to the maps app the person chooses; the screen says so.
 
 ## Handing a place to another app (maps, and the Transit app)
 

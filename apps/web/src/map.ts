@@ -210,6 +210,13 @@ export function placeCamera(key: string, lat: number, lon: number, metersPerPixe
   cameras.set(key, cam);
   live.get(key)?.moveTo(cam);
 }
+/** Show a radius around a point on a map that is on screen now. Nothing is stored; there is nothing to store. */
+export function focusRadius(key: string, lat: number, lon: number, radiusMeters: number): boolean {
+  const view = live.get(key);
+  if (!view) return false;
+  view.radiusTo(lat, lon, radiusMeters);
+  return true;
+}
 let mapNo = 0;                                          // one id per map on the screen, for aria-describedby
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 /** The app's one live region. It sits outside #app precisely so a redraw cannot destroy it; making it inert
@@ -248,6 +255,22 @@ export function zoomAbout(cam: Cam, f: number, px: number, py: number, w: number
   const X = cam.cx + (px - w / 2) / cam.s, Y = cam.cy + (py - h / 2) / cam.s;
   return { cx: X - (px - w / 2) / s, cy: Y - (py - h / 2) / s, s };
 }
+/**
+ * A camera that shows `radiusMeters` in every direction around `center`: the SHORTER side of the box spans the
+ * whole diameter, so the circle fits whichever way the phone is held (2026-09-21, the Map tab's first open).
+ *
+ * Pure, and the same three lines on all three clients (`MapCamera.forRadius` in
+ * apps/ios/Sources/HelpCore/MapData.swift and apps/android/.../MapData.kt), so "two miles" is two miles
+ * everywhere. The result goes through the map's own limits — the zoom stops at 0.6 m per pixel and the middle
+ * never leaves the city — which is what keeps a wrong or spoofed fix from throwing the map off Detroit.
+ */
+export function cameraForRadius(center: { lat: number; lon: number }, radiusMeters: number, w: number, h: number): Cam {
+  const side = Math.max(1, Math.min(w, h));
+  const across = Math.max(1, radiusMeters * 2);
+  const s = Math.max(S_MIN, Math.min(S_MAX, (side * M_PER_UNIT) / across));
+  return { cx: Math.max(-PAN_X, Math.min(PAN_X, wx(center.lon))), cy: Math.max(-PAN_Y, Math.min(PAN_Y, wy(center.lat))), s };
+}
+
 /** Drag: the map follows the finger, and the middle never leaves the four cities by more than a screen or two. */
 export function panCam(cam: Cam, dx: number, dy: number): Cam {
   return { cx: Math.max(-PAN_X, Math.min(PAN_X, cam.cx - dx / cam.s)), cy: Math.max(-PAN_Y, Math.min(PAN_Y, cam.cy - dy / cam.s)), s: cam.s };
@@ -372,7 +395,33 @@ export class MapView {
     void loadMap(index).then((m) => { this.map = m; if (!m) this.say(`<p class="foot">${esc(S.noStreets)}</p>`); else if (!this.note.innerHTML) this.say(`<p class="foot">${esc(S.source(m.edited))}</p>`); this.redraw(); });
   }
   moveTo(cam: { cx: number; cy: number; s: number }): void { Object.assign(this, cam); this.touched = true; this.redraw(); }
-  destroy(): void { this.release(); this.stopMotion(); this.cancelPick(); if (live.get(this.spec.key) === this) live.delete(this.spec.key); this.bar?.remove(); this.bar = null; this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); this.mqc.removeEventListener('change', this.onScheme); window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
+  /**
+   * Show `radiusMeters` around a point, eased over a fifth of a second — and simply done, under Reduce Motion.
+   *
+   * `goal` is where the move is headed, and it is remembered until the move lands. The page redraws itself for
+   * reasons that have nothing to do with the map — a newer bundle arriving is the usual one — and a redraw
+   * throws every map away and builds it again. Without `goal`, a redraw that landed inside those two hundred
+   * milliseconds froze the camera one frame into the journey: the map ended up showing the whole city with a
+   * dot on it, which is exactly what a person had just asked it not to do (found on the first headless run,
+   * 2026-09-21). A move in flight now survives the rebuild, and the new map opens where the old one was going.
+   */
+  private goal: Cam | null = null;
+  radiusTo(lat: number, lon: number, radiusMeters: number): void {
+    const to = cameraForRadius({ lat, lon }, radiusMeters, this.w, this.h);
+    if (this.slow.matches) { this.goal = null; this.put(to); return; }
+    this.goal = to;
+    const from = this.cam(); let u = 0;
+    this.run((dt) => {
+      u = Math.min(1, u + dt / ZOOM_MS);
+      const e = ease(u);
+      // The middle moves in a straight line; the zoom moves in equal steps of scale, which is what the eye reads
+      // as one smooth movement rather than a lurch at the end.
+      this.put({ cx: from.cx + (to.cx - from.cx) * e, cy: from.cy + (to.cy - from.cy) * e, s: from.s * Math.pow(to.s / from.s, e) });
+      if (u >= 1) this.goal = null;
+      return u < 1;
+    });
+  }
+  destroy(): void { this.release(); this.stopMotion(); this.cancelPick(); if (live.get(this.spec.key) === this) live.delete(this.spec.key); this.bar?.remove(); this.bar = null; this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); this.mqc.removeEventListener('change', this.onScheme); window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); if (this.goal) cameras.set(this.spec.key, this.goal); else if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
 
   // -- camera
   private resize(first = false): void {

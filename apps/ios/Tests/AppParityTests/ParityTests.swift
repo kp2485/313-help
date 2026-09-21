@@ -139,6 +139,32 @@ final class ParityTests: XCTestCase {
         }
     }
 
+    /**
+     A day is never shown to a person as "2026-09-26". `DayWords` decides the words and is tested in HelpCore;
+     what this checks is that every screen that prints a day actually goes through it.
+
+     It is here because the bug it catches is not a wrong rule but an unused one: the status pill on a listing
+     had said "Today" / "Tomorrow" / "Saturday, Sep 26" since DayWords landed, while the "Next times" list
+     underneath it went on printing the raw ISO day straight off the occurrence (found 2026-09-21). The web app
+     and Android both call their own `dayName` / `dayText` there; the iPhone now does too.
+     */
+    func testEveryDayShownToAPersonGoesThroughDayWords() throws {
+        let views = try text("apps/ios/HelpApp/Views.swift")
+        // The "Next times" list on a listing. `o` is one occurrence; its `date` is a calendar day, "YYYY-MM-DD".
+        XCTAssertTrue(views.contains("dayName(o.date"),
+                      "the \"Next times\" list must print dayName(o.date …), not the raw ISO day")
+        for file in try swiftSources() {
+            let body = try text("apps/ios/HelpApp/\(file)")
+            // A bare `Text(x.date)` is a raw ISO day on a screen. Every day goes through `dayName` first.
+            for raw in ["Text(o.date)", "Text(occurrence.date)", "Text(n.date)"] {
+                XCTAssertFalse(body.contains(raw), "\(file) shows a raw ISO day: \(raw)")
+            }
+        }
+        // And all three clients name the same helper, so a reader can follow one to the others.
+        XCTAssertTrue(try text("apps/web/src/main.ts").contains("dayName(n.date)"))
+        XCTAssertTrue(try text("apps/android/app/src/main/kotlin/org/help313/app/Screens.kt").contains("dayText(o.date"))
+    }
+
     // MARK: - what one need looks like, once both files are read
 
     private struct Refined { var id: String; var line: String }

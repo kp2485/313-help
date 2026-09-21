@@ -84,7 +84,23 @@ struct PrivacyShield: View {
     @Published var denied = false
     private let manager = CLLocationManager()
     private var wantsFix = false
+    /// A hundred metres is as close as this app ever needs: the list sorts in bands of a mile and the map draws a
+    /// dot. Reduced accuracy is accepted as it comes — `requestTemporaryFullAccuracy` is never called, here or
+    /// anywhere (HelpCore/Locate.swift, docs/08).
     override init() { super.init(); manager.delegate = self; manager.desiredAccuracy = kCLLocationAccuracyHundredMeters }
+
+    /// What iOS already knows, before anybody is asked anything. The Map tab's first open reads this and nothing
+    /// else: `firstOpenAction` in HelpCore turns it into what the screen does.
+    var permission: LocatePermission {
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways: return .granted
+        case .denied, .restricted: return .denied
+        case .notDetermined: return .prompt
+        @unknown default: return .unknown
+        }
+    }
+    /// True when iOS will not show the sheet again, so the answer is Settings rather than another tap here.
+    var permanentlyDenied: Bool { permission == .denied }
 
     func ask() {
         denied = false
@@ -598,7 +614,10 @@ struct DetailView: View {
                         ForEach(next, id: \.start) { o in
                             // A holiday occurrence is labelled, never dropped (query-spec "Holidays").
                             HStack {
-                                Text(o.date)
+                                // "Today" / "Tomorrow" / "Saturday, Sep 26", never "2026-09-26". The pill above
+                                // has said it that way since DayWords landed; this list was still printing the
+                                // raw ISO day, which is not a date most people read (2026-09-21).
+                                Text(dayName(o.date, now: now))
                                 Spacer()
                                 Text("\(clock(o.opensAt)) – \(clock(o.closesAt))" + (o.holiday ? " · " + L.t("hours.holiday") : ""))
                                     .foregroundStyle(o.holiday ? Color.warnInk : Color.muted)
