@@ -222,6 +222,7 @@
   "hood.nearest.narcan": "Free Narcan",
   "hood.nearest.indoors": "Library or recreation center",
   "hood.nearest_none": "none listed",
+  "hood.nearest_open": "{kind}: {name}, {distance}. Open this listing.",
   "hood.places_head": "Inside or within {miles} mile",
   "hood.parks": "City parks",
   "hood.rec_centers": "Recreation centers and libraries we list",

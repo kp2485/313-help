@@ -222,6 +222,7 @@
   "hood.nearest.narcan": "ফ্রি Narcan",
   "hood.nearest.indoors": "লাইব্রেরি বা রিক্রিয়েশন সেন্টার",
   "hood.nearest_none": "তালিকায় কিছু নেই",
+  "hood.nearest_open": "{kind}: {name}, {distance}. এই তালিকাটি খুলুন।",
   "hood.places_head": "ভিতরে বা {miles} মাইলের মধ্যে",
   "hood.parks": "শহরের পার্ক",
   "hood.rec_centers": "আমাদের তালিকার রিক্রিয়েশন সেন্টার আর লাইব্রেরি",

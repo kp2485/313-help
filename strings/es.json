@@ -222,6 +222,7 @@
   "hood.nearest.narcan": "Narcan gratis",
   "hood.nearest.indoors": "Biblioteca o centro recreativo",
   "hood.nearest_none": "ninguno en la lista",
+  "hood.nearest_open": "{kind}: {name}, {distance}. Abrir esta ficha.",
   "hood.places_head": "Adentro o a menos de {miles} milla",
   "hood.parks": "Parques de la ciudad",
   "hood.rec_centers": "Centros recreativos y bibliotecas en nuestra lista",

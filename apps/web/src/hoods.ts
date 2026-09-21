@@ -8,6 +8,7 @@
 
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
 import { groupHoods, matchHoods, type HoodOrder } from './hoodfind.js';
+import { isPrivate } from './needs.js';
 import { locale } from './i18n.js';
 
 type Count = number | 'lt5';
@@ -19,7 +20,10 @@ export interface NowStats { rental_certs?: Count; vacant_reg?: Count; roads?: { 
 export interface CrashCounts { walk: Count; bike: Count; severe: Count }
 export interface Hood {
   id: string; name: string; district: number | null; jlg_study_area?: boolean; center: [number, number]; rings: number[][];
-  help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; none_listed_yet: string[]; coverage_checked: boolean };
+  /** `nearest_id` names the listing each `nearest_miles` number was measured to (pipeline/src/indicators.ts,
+   *  2026-09-22). Optional: a bundle built before that date carries the distances and no ids, and the rows are
+   *  then drawn exactly as they were. */
+  help: { total: number; by: Record<string, number>; nearest_miles: Record<string, number | null>; nearest_id?: Record<string, string | null>; none_listed_yet: string[]; coverage_checked: boolean };
   places: { parks: number; rec_centers: number; greenway_open: number; snap_stores?: number; bus_stops?: number };
   nearest_city?: { snap: number | null; grocery: number | null; bus: number | null };
   parcels?: number;
@@ -58,7 +62,13 @@ export function outline(h: Hood, origin: [number, number]): { lat: number; lon: 
   return h.rings.map((enc) => { const out: { lat: number; lon: number }[] = []; let x = 0, y = 0; for (let i = 0; i + 1 < enc.length; i += 2) { x += enc[i]!; y += enc[i + 1]!; out.push({ lon: origin[0] + x / 1e5, lat: origin[1] + y / 1e5 }); } return out; });
 }
 
-export interface Ui { t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; own: (s: unknown) => string; date: (d: string) => string; link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string; icon: (name: string) => string }
+export interface Ui {
+  t: (key: string, p?: Record<string, string | number>) => string; esc: (s: unknown) => string; own: (s: unknown) => string; date: (d: string) => string;
+  link: (url: string, label: string) => string; go: (view: object) => string; map: (h: Hood) => string; icon: (name: string) => string;
+  /** A listing from the bundle this page is drawn beside, or null when the bundle has not loaded or no longer
+   *  carries that id. Only the "nearest" rows use it, to name and open the place the distance belongs to. */
+  listing?: (id: string) => { id: string; name: string; category: string } | null;
+}
 /** Per 1,000 parcels. No rate without a count we can show and a base we can defend (honesty rules 2 and 3). */
 /**
  * One of our sentences with a run the City wrote dropped into it: the sentence is escaped, the run is marked
@@ -183,9 +193,38 @@ export function crashPanel(h: Hood, d: Indicators, ui: Ui): string {
     <p class="foot" lang="en">${SEMCOG_NOTICE}</p></div>`;
 }
 
+/**
+ * One row of "From the middle of the neighborhood to the nearest listed…". It says a distance, and when the
+ * numbers name the listing that distance was measured to, and this bundle still carries that listing, the row
+ * opens it and says whose it is: "Free food — Capuchin Soup Kitchen · 0.6 mi". A distance you cannot act on was
+ * the gap this closes.
+ *
+ * It falls back to the plain row it has always been in three cases: the numbers were built before the ids
+ * existed (`nearest_id` missing); the id names a listing this bundle no longer has (a row archived since the
+ * numbers were built); or the listing is one no public page may point at. The pipeline already refuses to pick
+ * a sensitive or private row, so the last case should be impossible — it is checked again here because the
+ * numbers and the listings are two files, and a page that linked a DV shelter would break a promise (docs/08).
+ *
+ * The name is the place's own words, so it is marked English inside a translated page, like every owner-written
+ * name in the app. The button's accessible name is the whole fact — kind, place and distance — because "Food"
+ * and "0.6 mi" in two separate spans is not a name a screen reader can act on (WCAG 2.4.4).
+ */
+export function nearestRow(h: Hood, ui: Ui, k: string): string {
+  const T = (key: string, p?: Record<string, string | number>) => ui.esc(ui.t(key, p));
+  const mi = h.help.nearest_miles[k], kind = 'hood.nearest.' + k;
+  if (mi === null || mi === undefined) return `<li><span>${T(kind)}</span><span>${T('hood.nearest_none')}</span></li>`;
+  const distance = ui.t('miles', { miles: mi.toFixed(1) });
+  const plain = `<li><span>${T(kind)}</span><span>${ui.esc(distance)}</span></li>`;
+  const id = h.help.nearest_id?.[k];
+  const r = id ? ui.listing?.(id) ?? null : null;
+  if (!r || isPrivate(r.category)) return plain;
+  const label = ui.esc(ui.t('hood.nearest_open', { kind: ui.t(kind), name: r.name, distance }));
+  return `<li class="golink"><button ${ui.go({ v: 'detail', id: r.id })} aria-label="${label}"><span>${T(kind)}</span><span class="goto">${ui.own(r.name)} · ${ui.esc(distance)}</span></button></li>`;
+}
+
 export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
-  const near = (k: string) => { const mi = h.help.nearest_miles[k]; return `<li><span>${T('hood.nearest.' + k)}</span><span>${mi === null || mi === undefined ? T('hood.nearest_none') : T('miles', { miles: mi.toFixed(1) })}</span></li>`; };
+  const near = (k: string) => nearestRow(h, ui, k);
   const cats = Object.entries(h.help.by).filter(([, n]) => n > 0);
   const src = (s: Source) => `<li>${ui.link(s.url, s.name)} <small>${T('hood.updated', { date: ui.date(s.last_edited) })}</small></li>`;
   const row = (label: string, value: string, city = '') => `<ul class="hours"><li><span>${label}</span><span>${value}${city ? ` <small>${city}</small>` : ''}</span></li></ul>`;

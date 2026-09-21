@@ -24,7 +24,7 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 | Group | Indicator | Source *(all on data.detroitmi.gov unless noted; existence checked 2026-09-18, fields not yet)* | Shown as |
 |---|---|---|---|
 | **Help access** *(ours)* | Help listings inside or within ½ mile of the neighborhood, by category; "none listed yet" flags | Our bundle | Counts + list. Labeled as **directory coverage** until the directory is reasonably complete (see "Honesty rules") |
-| | Distance from the neighborhood's center to the nearest listed food, clinic, Narcan and indoor place (rec center or library), in a straight line | Our bundle | Miles |
+| | Distance from the neighborhood's center to the nearest listed food, clinic, Narcan and indoor place (rec center or library), in a straight line, **and which listing that is** (`help.nearest_id`, 2026-09-22) | Our bundle | Miles, on a row that opens that listing |
 | | Parks, open greenway segments, rec centers within ½ mile | City parks / JLG / rec layers | Counts |
 | | Stores that take a Bridge card (SNAP) inside or within ½ mile; straight-line miles from the center to the nearest one, and to the nearest grocery store / supermarket / super store among them. Restaurant Meals Program places left out (only some people can use them) | `SNAP_Retailer_Locations` (points: coordinates + a grocery flag only; 893 of 921) | Count + miles, with "most are corner stores and gas stations" |
 | | DDOT bus stops inside or within ½ mile; miles to the nearest | `DDOT_Bus_Stops` (5,098 points, coordinates only; not the older `_102023` copy) | Count + miles, with "a stop nearby does not mean the bus comes often" |
@@ -59,6 +59,21 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 - `pipeline/src/ingest-neighborhoods.ts` (`pnpm ingest:neighborhoods`) reads the neighborhood outlines and asks the City's server for per-neighborhood, per-year statistics (and today's rental, vacant-registration and street-rating numbers), into `data/ingested/neighborhoods.json` and `data/ingested/city_stats.json`, and the SNAP-store and bus-stop points into `data/ingested/city_points.json`. All layer URLs are at the top of that file. The nightly job re-reads them on the 1st of each month; a change comes as a pull request. `pipeline/src/indicators.ts` joins them with our listings, parks and the greenway at each bundle build.
 - `pipeline/src/ingest-crashes.ts` (`pnpm ingest:crashes`) reads SEMCOG's crash layer once a year, by hand, and writes counts per neighborhood and year into `data/ingested/crashes.json`. It is **not** in the nightly job: the layer gains a year at a time, and the indemnification clause in SEMCOG's Copyright License Agreement is unsettled (docs/OPERATIONS, DECISIONS 2026-09-20).
 - Output: one bundle file, `indicators/neighborhoods.json` (citywide numbers, lenses and all 205 neighborhoods). Each build also commits a copy without the outlines to `data/indicators/neighborhoods.json`, so every number's history is in git.
+- **`help.nearest_id` (2026-09-22): which listing each "nearest" distance belongs to**, so a neighborhood page can open it instead of stating a distance nobody can act on. Same four keys as `help.nearest_miles`, each the `sal_` id of the very listing that number was measured to, or `null` exactly where the distance is `null`:
+
+  ```json
+  "help": {
+    "nearest_miles": { "food": 1, "clinic": 1.6, "narcan": 1.1, "indoors": 2 },
+    "nearest_id": {
+      "food": "sal_exodus_food_pantry",
+      "clinic": "sal_wayne_county_hamtramck_health_center",
+      "narcan": "sal_wws_detroit_passenger_recovery",
+      "indoors": "sal_detroit_parks_lasky_recreation_center"
+    }
+  }
+  ```
+
+  `nearest_miles` is unchanged and stays: a client that knows nothing of the ids prints exactly the distances it always did. A pick needs a coordinate, and **can never be a sensitive (`shelter.dv`, `health.mental`) or private (`treatment`, `assault`) listing** — `canBeNearest` in `pipeline/src/indicators.ts` refuses one whatever the kinds are mapped to, and the web checks the category again before it draws a link, because the numbers and the listings are two files. Ties are settled by miles, then `sal_` id, so one bundle always names the same place. Cost: the bundle file goes from 66.7 to 75.8 KB gz, and it is downloaded only when a neighborhood screen opens.
 - Heavy layers (blight tickets, permits) are added up by the City's server; raw records are never downloaded, let alone shipped to the browser.
 - The pages are screens inside the app, `#/n` and `#/n/nbh_…`, drawn from that one signed file, which is downloaded only when a neighborhood screen opens. **Since 2026-09-22 `#/n` is a tab of its own** (docs/05): the same address, now the fourth tab, with an index that finds the person's own neighborhood on the device (`apps/web/src/hoodfind.ts`, cases in `schema/neighborhoods/points.json`), a search over the 205 names, and the list A–Z or by council district — never in an order any number could set. Charts follow one small, accessible chart style (large type, labeled directly, works without color).
 - In the app: neighborhood pages are **not** in the crisis path — no need screen, no urgent sheet and no listing leads to one, and the numbers are still downloaded only when one of these screens opens. They are reachable from the **Neighborhoods tab** (2026-09-22; before that only from About, which is where Kyle found them buried), from Home's third tile, from one line on About, from a greenway segment ("About this neighborhood"), and by URL for partners. The web app and the iPhone app both have them, each with a Neighborhoods tab of its own (iPhone, 2026-09-21: the same panels, in the same order, with the same numbers and the same words; the rules are `apps/ios/Sources/HelpCore/Hoods.swift` and the screens are `apps/ios/HelpApp/HoodsScreen.swift`). The Android app has no neighborhood pages yet, so it has no tab. `data/indicators/greenway_access.json` comes from `pipeline/src/access-report.ts`: after a bundle build, run `npx tsx src/access-report.ts` from `pipeline/` (there is no pnpm script for it).
