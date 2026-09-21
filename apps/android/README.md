@@ -8,9 +8,11 @@ Three Gradle modules:
   into the app. **Compiled and green.**
 - **`core/`** — no sources of its own. It compiles the app's *android-free* files (`Ed25519.kt`, `Verify.kt`,
   `Net.kt`, `Http.kt`, `Outbox.kt`, `Route.kt`, `Trace.kt`, `Listing.kt`, `Needs.kt`, `ReportModel.kt`,
-  `SavedRules.kt`) and runs the app's own unit tests against them on a plain JVM, so the signature check, the daily
-  report hash, the needs list, the network policy, the report queue's rules and which screens are private are
-  checked on every build whether or not anyone has an Android SDK. **Compiled and green.**
+  `SavedRules.kt`, and since 2026-09-21 `MapData.kt`, `MapLayers.kt` and `Language.kt`) and runs the app's own unit
+  tests against them on a plain JVM, so the signature check, the daily report hash, the needs list, the network
+  policy, the report queue's rules, which screens are private, **the map's whole arithmetic and the one rule that
+  says a listing is never a dot** are checked on every build whether or not anyone has an Android SDK.
+  **Compiled and green.**
 - **`app/`** — the screens, the signed-bundle loader and the report queue. Platform Android views (no Jetpack
   Compose, no AndroidX), minSdk 24. **Compiled, tested, built and run** for the first time on 2026-09-20.
 
@@ -30,6 +32,26 @@ Three Gradle modules:
 > listing detail, Urgent help and Home in Arabic, all screenshotted. Five real errors were found and fixed; they
 > are listed under "What the first compile found", and two of them would have broken the app on every phone
 > below Android 15.
+>
+> **State on 2026-09-21 (second entry).** The optional **"subway" map style** of `docs/MAP-STYLE.md` is built, as
+> the third client after the web and the iPhone: one line per route in the tone the pipeline gave it, badges,
+> stations, interchange and hub pills, terminals, trunks with stacked badges, the QLINE's ties, the People Mover's
+> loop with chevrons, a route card, a key, and the same reading order appended to. **`standard` is still the default
+> and draws exactly as it did**; the choice is two radio buttons on the layers screen. See **"The Map tab"** below,
+> which now covers both styles. Also fixed: the status pill reads "Friday, Sep 25" like the web and the iPhone (no
+> short weekday, no year), and the system bars take their icon colour from the theme, so the navigation bar is
+> readable in dark mode. Totals now: **16 + 174 + 174 JUnit tests and 190 fixture cases, 0 failures** (the shared
+> fixtures grew from 181 to 190 on 2026-09-21; the older entries below keep the number that was true when they were
+> written). The debug APK is **1,927,566 bytes (1.84 MiB)** on a clean build, up from 1.60 MiB: the six network
+> files of the subway style, 330 KB raw, now travel in the snapshot so the style works with no signal.
+>
+> **State on 2026-09-21.** The **Map tab** was built: the city drawn on this phone from the signed bundle, with
+> the greenway, our own listings by group, the eleven transport layers, a layer switcher, a text list, a card on
+> tap, virtual accessibility nodes, and a hardware-keyboard walk. See **"The Map tab"** below. Totals now:
+> **16 + 111 + 111 JUnit tests and 181 fixture cases, 0 failures**, of which 47 are the map's and the language
+> choice's. The debug APK is
+> **1,675,641 bytes (1.60 MiB)** on a clean build, up from 1.22 MiB, almost all of it the map files now shipped
+> inside the APK so the map works on first run with no signal.
 >
 > **State on 2026-09-20 (third entry).** Two adversarial reviews went through this app and found sixteen defects,
 > three of them serious enough to have shipped as bugs: a crash loop reachable before any signature was checked, a
@@ -59,10 +81,11 @@ Everything in this section was run on 2026-09-20 and passed, the `:app` lines in
 ```sh
 ./gradlew :query:test             # 16 tests: every case in schema/fixtures, plus tz (and the pre-1987 clamp),
                                   # phone, and the JSON reader including its depth and length caps
-./gradlew :query:runFixtures      # the same 181 cases with no test framework on the classpath
-./gradlew :core:test              # 61 tests: Ed25519 vs RFC 8032, small-order keys, the real bundle's signature,
+./gradlew :query:runFixtures      # the same 190 cases with no test framework on the classpath
+./gradlew :core:test              # 174 tests: Ed25519 vs RFC 8032, small-order keys, the real bundle's signature,
                                   # the network and path rules, the report queue, which screens are private, the report
-                                  # hash and schema, what cannot be saved, and the needs parity test
+                                  # hash and schema, what cannot be saved, the needs parity test, the map's arithmetic,
+                                  # and the two map styles (MapStyleTest: 63 tests)
 ./gradlew test                    # all of the above at once
 ```
 
@@ -118,6 +141,197 @@ and not re-run since Gradle arrived):
 kotlinc query/src/main/kotlin query/src/test/kotlin -include-runtime -d /tmp/query.jar
 java -cp /tmp/query.jar org.help313.query.FixturesKt
 ```
+
+## The Map tab
+
+Built 2026-09-21, as the Android mirror of the iPhone Map tab (`apps/ios/Sources/HelpCore/MapData.swift`,
+`MapLayers.swift`, `apps/ios/HelpApp/Map*.swift`) and of the web original (`apps/web/src/map.ts`). One map of
+the city, edge to edge under the status bar, drawn on this phone from the signed bundle: **no tile server, no map
+company, nothing sent, and it works with no signal at all** (DECISIONS 2026-09-18 and 2026-09-20).
+
+### Where the pieces are
+
+| file | what it is |
+|---|---|
+| `MapData.kt` (`:core`) | The projection, the delta decoder for `map/base.json`, `map/streets.json` and the eleven `map/transit/*.json` layers, the camera with its clamps, the flick, and hit testing. No `android.*` class. |
+| `MapLayers.kt` (`:core`) | What may be drawn and what never may: the seven help groups, `mapDrawable`, the per-layer styles by **token name**, the zoom rules, the greenway phase dashes, the reading order, and the layer store. |
+| `Language.kt` (`:core`) | `pickLanguage`: the first of the phone's own languages this app carries words for. |
+| `MapStyle.kt` (`:core`) | The `subway` style, everything that is not pixels: zoom bands with hysteresis, the `--tr-*` palette and the quiet basemap **as numbers**, `resolveTransitStyle`, the network-file decoders, per-run simplification, offsets, corner rounding, badge anchors, the round-robin badge claim with the trunk-badge nudge, 48 dp hit testing, the reading-order caps, `netFilesWanted`. A port of `apps/ios/Sources/HelpCore/MapStyle.swift`. |
+| `MapList.kt` (`:core`) | The transport part of "See this map as a list". It is never told the style, which is why the list is identical in both. |
+| `DayWords.kt` (`:core`) | "Today" / "Tomorrow" / "Friday, Sep 25". |
+| `MapSubway.kt` | The `subway` painter: cached geometry per route per band × scale bucket, the glyph plan, the tap board, and the key's drawn samples. A port of `apps/ios/HelpApp/MapSubway.swift`. |
+| `MapPalette.kt` | The only place a token name becomes a colour. `res/values/colors.xml` and `values-night/` hold the values, so dark mode is Android's own. |
+| `MapView.kt` | One `android.view.View` on an `android.graphics.Canvas`: the painter, the gestures, the keyboard, and the virtual accessibility nodes. |
+| `MapModel.kt` | One model per process: the camera, what has been decoded, what is switched on, what is selected. |
+| `MapScreen.kt` | The tab, the floating controls, the card a tap opens, the layer switcher, the text list, and one stretch of the greenway. |
+
+`Route.Map`, `Route.MapLayers`, `Route.MapList` and `Route.Stretch` are ordinary routes, so Back works, none of
+them is private, and `Route.keepable` still cuts a restored stack at the first private screen.
+
+### Drawing
+
+Everything is in dp: the canvas is scaled by the display density once, so every width and tolerance is the same
+physical size as the iPhone's points and the web's CSS pixels. Everything is **batched per layer** — one `Path`
+for all the class-3 streets, one `drawPoints` for five thousand bus stops, one `Path` per help group for about
+fifteen hundred listing dots. **No colour is written in the painter**; the rules carry a token name.
+
+Three things follow the web's 2026-09-21 accessibility pass rather than the iPhone's older numbers, because the
+colours and the widths are one decision and cannot be taken apart:
+
+- every street clears 3:1 against the land and against a park, and a small street is a **hairline**;
+- a small street waits for 6 m/dp rather than 9, and the next class for 11 rather than 16;
+- the ground outside the four cities is a **hatch** whose own lines clear 3:1, not a second pale fill (1.20:1);
+- every transport line gets a **casing** under it, as the greenway has, which is what its contrast is measured
+  against where it crosses a street.
+
+`apps/ios` still has the older street numbers and the older `--map-road` / `--map-main` / `--map-fwy` values. The
+ported tests pass either way, so this is written down rather than hidden: **the iPhone palette and street ladder
+want the same pass.**
+
+### The two styles
+
+`docs/MAP-STYLE.md` is the spec, settled after the web and the iPhone had both built it; this is the third
+implementation of it. **`standard`** is the drawing described above and is the default. **`subway`** redraws the
+eleven transport layers — and nothing else — as a metro diagram on the same geographic map.
+
+*Choosing.* "Map style" on the layers screen, above "Getting around": two real `RadioButton`s in a `RadioGroup`
+under a heading, each with a one-line description, 48 dp tall. It is hidden when the bundle carries no network
+files. The choice applies at once, is announced (`announceForAccessibility`, `map.style_say`), and is written to
+the same atomic `map-layers.json` as the layer choices — now `{"on":[…],"style":"subway"}`; yesterday's bare list
+still reads, and anything that is not the word `subway` is `standard`. Under the radios, in `subway` only, a key in
+words with a small drawn sample beside each line, listing only what is switched on.
+
+*Data.* Each network layer has a second file, `map/transit/<id>.net.json` (format 2): routes with their tone, runs
+with their sideways offsets, trunks, interchanges, terminals, and which routes serve each stop. They are in the
+APK snapshot and in the signed index, and they go through the same door as every layer: looked up in the signed
+index, read, **checked against their SHA-256, and only then parsed** (`BundleStore.verifiedBytes`), off the main
+thread, where the three bands are simplified too (`PreparedNet`). Nothing asks for one in `standard`
+(`netFilesWanted` is empty — a test). While a file is on the way, or if it fails (not in the index, a bad hash, no
+network, not format 2, malformed), **that layer goes on drawing `standard`** beside the ones that arrived, and the
+"Map style" card says "could not load" with a "Try again" per layer. Rail network files carry no points: stations
+are the standard layer's, and the QLINE's two platforms per station draw two discs and print one name. Hubs are
+placed from `origin` + `at` + `span` in `places/transit.json`; stations are matched by name only for a bundle old
+enough to have no `origin`.
+
+*Drawing*, in the spec's order: bike lanes (one path stroked wide, then the middle taken out with
+`PorterDuff.Mode.DST_OUT` inside a `saveLayer`), SMART under DDOT (one casing pass, then each route in its tone,
+local before frequent, SMART's centre stripe), trunks once per network, the QLINE with its ties, the People Mover
+as a closed loop started mid-segment with direction chevrons, the selected route, **then the greenway above all
+transit**, street names, stops, interchange and hub pills, terminal rings, the point markers (MoGo rounded square,
+Amtrak square with a bar, intercity dashed diamond, park-and-ride "P"), badges, listing dots, station names. A
+selected route dims everything else in transit as **one** `saveLayerAlpha` at 35 %, lies on a `--tr-sel`
+under-stroke, is drawn through its trunk stretches, and shows its stops (which asks for its network's stops layer
+and stops file if they are not held). The basemap is quietened — paler but still 3:1 streets at 0.8 width, a paler
+park, one class fewer street names, no big-road casing — only in `subway`, only while a network layer is on, and
+**never with high contrast**.
+
+*Geometry is never rebuilt per frame.* Each route's geometry is built once per zoom band × scale bucket (a ladder
+of 2^(1/8), a 9 % step, inside the spec's 15 %) in dp at the bucket's scale, and drawn through the canvas matrix
+with every width and dash divided by what is left of the scale. A drag builds nothing; a pinch builds once per
+step; the debug frame log counts the builds. **One deviation, measured:** the solid passes are drawn with
+`Canvas.drawLines` from the cached path *flattened to segments* (a quad corner becomes one to three chords, a third
+of a dp from the curve at most; round caps make a run of segments the same shape as a round-joined line), not with
+`drawPath`. A long stroked `Path` under a matrix that changes every frame is rasterised on the CPU and uploaded as
+a mask per path per frame, and with 79 routes `dumpsys gfxinfo` on the emulator showed a median frame of **800 ms
+against 250 ms for `standard`**; from segments it is **550 ms**. The cached `Path` is still what the QLINE's dashed
+ties are stroked from. The emulator's translated GPU is a poor guide to a phone's — the *CPU* side of a frame is
+about 1 to 9 ms in `standard` and 4 to 17 ms in `subway` with both bus networks on, of which the subway passes are
+2 to 12 ms against the spec's budget of 8 (`adb logcat -s Help313Timing`, non-debuggable build) — so **this wants measuring on a real cheap phone
+before anyone calls it fast.** Putting every route of a network into one path was tried and was far worse.
+
+*High contrast.* `UiModeManager.getContrast()` (Android 14 and up) is the one public, reflection-free answer the
+platform gives; `AccessibilityManager.isHighTextContrastEnabled` is hidden until API 36 and this app does not call
+hidden methods. So on Android 14+ a raised contrast setting gives the spec's high-contrast tones, casing + 1, rings
++ 0.5 and no quiet basemap; on Android 7 to 13 the answer is "no" and the plain tones — which already clear 3:1
+everywhere — are used. `standard` had no high-contrast variant before and still has none.
+
+*Cards.* A route: name and agency, "Frequent route" when the owner says so, the owner's own weekday headway worded
+as theirs, the number of stops, where it ends, the `map.key_qline` sentence wherever the data marks a line
+`derived`, and **one** link — the owner's trip planner, the same link `apps/web/src/transit.ts` marks for that
+system (a test reads that file), opened by the app's one https-only opener. DDOT's planner is plain `http` today
+and its file has no `agency_url`, so **a DDOT route card has no link on Android**, rather than an exception to the
+https rule. A station, an interchange, a trunk: the routes as real buttons, 48 dp, each selecting its route. A hub:
+the stations a short walk apart. Route and station names are Latin and stay left to right inside an Arabic card;
+badges are horizontal, Latin and left to right; the map never mirrors. Nothing is live: no arrival times, ever.
+
+*Held to the web.* The `--tr-*` tokens and the six quiet-basemap tokens are numbers in `MapStyle.kt`, and
+`StyleSheetTest` **parses `apps/web/src/style.css`** and fails on any token that differs, in all four values
+(light, dark, and each with more contrast); the same test holds `res/values*/colors.xml` to it for `standard`.
+`TransitPaletteTest` computes the spec's own tables: all 78 ratios of table 4.1 to two decimals and ≥ 3:1, the 16
+high-contrast ratios, and 22 quiet-basemap pairs — every quiet street against the land **and** the quiet park.
+
+### Gestures
+
+Everything a person expects of a phone map, out of `GestureDetector` and `ScaleGestureDetector` and nothing else
+(Kyle, 2026-09-21). No rotation and no tilt on purpose: north stays up, so the city on the screen matches the
+city outside, the street names stay the right way up, and the N/P walk and the TalkBack order stay the plain
+south-to-north order they are.
+
+- **Drag** pans, and a flick carries on and settles (`MapFling`, constant deceleration, stopped by the camera's
+  own clamp and by nothing else).
+- **Pinch** zooms about the point between the fingers **and pans with it**: `MapCamera.pinched` applies the
+  focal point's own movement and then the span change, so a hand that spreads and slides does both.
+- **Double tap** zooms in about the tap over about 200 ms. It fires on the second tap's *lift*, and only when
+  that touch did not become a drag, so it never swallows the one below.
+- **Double tap and drag** ("quick scale") zooms with one thumb; `isQuickScaleEnabled` is set explicitly.
+- **Two fingers tapped once** zooms out.
+- **A tap** selects what is under it — only a touch that moved less than the system's own slop and was never
+  part of a two-finger gesture.
+- Nothing animates when the phone is set to do without motion (animator duration scale 0): a flick lands where
+  the finger left it and a zoom happens in one step.
+- The view takes the gesture from whatever is underneath on touch-down and gives it back on the way up.
+
+### Accessibility
+
+A custom `View` is one opaque picture to TalkBack, so the things on the map are offered as **virtual nodes**
+through a platform `AccessibilityNodeProvider` — not AndroidX's `ExploreByTouchHelper`, because this app has no
+libraries at all. One node per greenway stretch in route order (south to north), then the places on screen
+nearest the middle first, each a real `Button` with its own words, its own bounds on screen, `ACTION_CLICK` wired
+to the same selection a tap makes, accessibility-focus events, and `TYPE_VIEW_HOVER_ENTER` for explore by touch.
+`uiautomator dump` serialises them, which is how they were checked.
+
+A hardware keyboard walks the same order: arrows pan, `+`/`-` zoom, `N`/`P` step through what is on screen,
+Enter opens, Escape steps out. Tab is deliberately not bound, so it still leaves the map (WCAG 2.1.2).
+
+In `subway` the same order is **only ever appended to**: after the greenway and the listings come every hub, at
+most 8 route ends and at most 20 interchanges (each nearest the middle first), then the routes in view in rider
+order — 40 added at most, so routes are always reached, never fewer than 8 (`featureOrder`). What the cap left out
+is said with the map's own name ("and 97 more"); the list has them all. A route's ring goes round its nearest
+placed badge, or the place on its line nearest the middle of the view. Every station, pill, terminal, marker and
+badge answers a tap inside a **48 × 48 dp** box, by the spec's label priority, and a second tap in the same place
+moves on to the next thing under the finger; a route line answers within 22 dp. The map's own buttons, the status
+bar and the open card are entered as taken space, so no badge or name is drawn under a control.
+
+The map is never the only way to reach a fact: **"See this map as a list"** shows everything switched on in
+words, in the same order the map is read in — and it is **the same list in both styles**, because the code that
+builds it is never told the style (`MapList.kt`; a test, and a `uiautomator dump` of the screen in each style).
+
+### What is never drawn
+
+`mapDrawable` is the one rule the whole tab hangs on, and dots, the tap test, the virtual nodes and the list all
+go through it: help with drugs or alcohol and help after sexual assault are dropped as whole top-level kinds, and
+a domestic-violence or mental-health-crisis listing is dropped row by row — **on its category, never on whether a
+coordinate happens to be there**. A test hands it a `shelter.dv` row with a coordinate on it and it is refused.
+
+### The map inside the APK
+
+`map/**` now travels in the APK snapshot (`copyBundleSnapshot`), because a map that needs a network the first
+time is not the offline map docs/05 promises — the six `.net.json` files of the subway style included, since a
+style a person can pick has to work the first time with no signal too. Left out: `indicators/`. Every file is checked against the sha256 in the
+**signed** index before a byte of it is decoded, wherever it came from — the verified copy on this phone, the
+APK snapshot, or the published origin, in that order (`BundleStore.verifiedBytes`). A clean debug APK went from
+1,282,907 bytes (1.22 MiB) to 1,675,641 bytes (1.60 MiB): 846 KB of map JSON, compressed; with the network files
+and the subway code it is **1,927,566 bytes (1.84 MiB)**.
+
+### Still to do on this tab
+
+- **Measure the subway style on a real, cheap phone** (see "The two styles"): the emulator cannot say whether a
+  frame is fast.
+- A DDOT route card has no trip-planner link, because DDOT's planner is `http`. If DDOT publishes an https
+  address, it goes in `apps/web/src/transit.ts` and `transitPlanners`, and a test keeps the two the same.
+- After the map style changes, the layers screen is rebuilt and TalkBack's focus starts again from the top of it;
+  the change itself is announced.
+- `standard` has no high-contrast variant on Android (the web and the iPhone have one).
 
 ## What the first compile found
 
@@ -451,7 +665,7 @@ declared library and it is test-only; it never reaches a phone. Everything Gradl
 2026-09-20 was Apache-2.0 (Gradle 8.11.1, the Kotlin 2.0.21 plugin and standard library, `org.jetbrains:annotations`)
 except two test-only jars: JUnit 4.13.2 under the Eclipse Public Licence 1.0 and its `hamcrest-core` 1.3 under
 BSD-3-Clause. EPL-1.0 is not permissive — flagged for Kyle, and already Open in `docs/DECISIONS.md`. It is not
-distributed, and `./gradlew :query:runFixtures` runs all 181 fixture cases with no test framework on the
+distributed, and `./gradlew :query:runFixtures` runs all 190 fixture cases with no test framework on the
 classpath at all (CI runs that too), so dropping JUnit would cost only the `:core` and `:app` unit tests.
 
 **minSdk 24 (Android 7.0, 2016).** Nothing in the app needs more. Going to 21 would reach a few more phones but
@@ -900,11 +1114,15 @@ Written, and now compiled and run (the five screens marked **seen** were looked 
 - Search over the bundle, on the device.
 - Saved places, and reports with the daily hash and an outbox for when there is no signal.
 - English, Spanish, Arabic and Bengali, following the phone's language, right-to-left layout included.
-  All four ship in the APK as `assets/strings/<lang>.json`; Arabic was **seen** on the emulator.
+  All four ship in the APK as `assets/strings/<lang>.json`; Arabic was **seen** on the emulator, on the Map tab
+  too — where the controls mirror and **the map itself does not**, because a mirrored Detroit is the wrong city.
+- **The Map tab** (2026-09-21): the city, the greenway, our own listings by group, the eleven transport layers,
+  a layer switcher, a text list, a card on tap, virtual accessibility nodes and a keyboard walk. **Seen** on the
+  emulator in light and dark, in English and Arabic, at font scale 2.0, and with all eighteen layers on.
 
 Not built:
 
-- The street map, neighbourhood pages, transit *screens* (the Transit app link above is a link-out on a listing,
+- Neighbourhood pages, transit *screens* (the Transit app link above is a link-out on a listing,
   not a transit feature), City events, add-a-place, condition reports and photos.
 - Link-outs (unemployment, Lifeline, child-care scholarships): the web app shows these on several need screens;
   Android lists places only, as the iPhone app does. The one exception is the 313SafeBeds card above the numbers

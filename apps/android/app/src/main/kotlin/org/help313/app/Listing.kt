@@ -8,6 +8,8 @@
 package org.help313.app
 
 import org.help313.query.BundleRow
+import org.help313.query.isDvCategory
+import org.help313.query.serviceAreaKey
 
 /**
  * What a maps app is asked for: the written address when the place publishes one, otherwise its point.
@@ -48,6 +50,21 @@ fun transitAppDestination(row: BundleRow): String? {
 
 /** A listing with no published phone number shows no Call button at all, rather than one that does nothing. */
 fun hasPhone(row: BundleRow): Boolean = row.phones.isNotEmpty()
+
+/**
+ * The string key naming the coarse area a domestic-violence row serves ("area.detroit"), or null when the row
+ * is not a DV row or a steward has recorded no area. It is the only thing such a row ever says about where it
+ * is: no address, no ZIP, no coordinate, no distance, no map and no directions (docs/08).
+ * A screen puts it into `safe.dv_serves` ("Serves {area}").
+ */
+fun serviceAreaStringKey(row: BundleRow): String? =
+    if (isDvCategory(row.category)) serviceAreaKey(row.serviceArea) else null
+
+/**
+ * Every domestic-violence listing carries the one sentence `safe.dv_no_address`: the shelter does not share
+ * its address, call and they will say where to go. True whatever area is recorded, and true when none is.
+ */
+fun saysNoAddress(row: BundleRow): Boolean = isDvCategory(row.category)
 
 /**
  * A place that is somewhere real but publishes no street address. The screen says so in the source's own name

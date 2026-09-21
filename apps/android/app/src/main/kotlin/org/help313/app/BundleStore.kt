@@ -226,6 +226,54 @@ class BundleStore private constructor(context: Context) {
     private fun readAsset(name: String): ByteArray = app.assets.open(name).use { it.readBytes() }
 
     /**
+     * One file of the signed bundle that is **not** read at start (`BundleCheck.loadedNow` is false for it): the map
+     * of the city, the transport layers, the park list. Its bytes, checked against the sha256 in the **signed**
+     * index before a byte of them is decoded, wherever they came from:
+     *
+     *  1. the verified copy in this app's own storage,
+     *  2. the snapshot shipped inside the APK, so the map works on first run with no signal ever,
+     *  3. the published origin, if this build has one.
+     *
+     * A file that does not match its checksum is not used — it is never "close enough". Throws on anything that is
+     * not right, and the caller treats that as "this layer could not be read", never as "this layer is empty".
+     *
+     * **Never called on the main thread.** MapRepo runs it on the shared io thread; a third of a megabyte of JSON
+     * and a SHA-256 over it is a dropped frame on a cheap phone.
+     */
+    fun verifiedBytes(name: String): ByteArray {
+        if (!Net.safeBundlePath(name)) throw BundleError.Unreadable("refusing to read $name")
+        val want = bundle?.index?.files?.get(name)?.sha256
+            ?: throw BundleError.Unreadable("$name is not in the signed index")
+
+        val cached = File(cacheDir, name)
+        if (cached.isFile) {
+            val data = runCatching { cached.readBytes() }.getOrNull()
+            if (data != null && BundleCheck.sha256Hex(data) == want) return data
+        }
+        val snapshot = runCatching { readAsset("bundle-snapshot/$name") }.getOrNull()
+        if (snapshot != null && BundleCheck.sha256Hex(snapshot) == want) return snapshot
+
+        if (base.contains("REPLACE-ME.invalid") || !Net.isHttps(base)) {
+            throw BundleError.Unreadable("$name is not on this phone and this build has nowhere to fetch it from")
+        }
+        val fetched = httpGet(base.trimEnd('/') + "/" + name)
+        if (BundleCheck.sha256Hex(fetched) != want) throw BundleError.BadChecksum(name)
+        // Kept beside the rest of the verified copy, so the next open needs no signal. Written to a temporary name
+        // and renamed, so a phone that loses power mid-write comes back with no file rather than half of one; a
+        // refresh that clears the cache at the same moment costs at worst one re-read, never a bad file.
+        runCatching {
+            cached.parentFile?.mkdirs()
+            val temp = File(cached.parentFile, cached.name + ".new")
+            temp.writeBytes(fetched)
+            if (!temp.renameTo(cached)) {
+                cached.delete()
+                temp.renameTo(cached)
+            }
+        }
+        return fetched
+    }
+
+    /**
      * One https GET. Everything about the request — the one honest header, no cookies, no cache, no redirects, the
      * timeouts and the size ceiling — is Http.kt, so the bundle GET and the report POST cannot drift apart.
      */

@@ -37,6 +37,21 @@ jobs:
   # acceptable, what a report is and its one-day hash, the maps/call rules, and the needs list held to
   # apps/web/src/needs.ts.
   #
+  # Since 2026-09-21 :core also covers the **Map tab's** whole arithmetic, which is the part of that screen where
+  # a mistake is worst: the projection and the delta decoder for the bundle's map files (the real shipped files
+  # are decoded here, so a change to the pipeline's encoding is caught in CI rather than on a phone), the camera
+  # and its clamps, hit testing, the flick, and — above all — `mapDrawable`, the one predicate that decides that a
+  # domestic-violence, crisis, treatment or sexual-assault listing is never a dot, never a row and never a spoken
+  # node. Those tests are a case-for-case port of apps/ios/Tests/HelpCoreTests/MapTests.swift, so the two apps
+  # cannot drift apart without one of them going red.
+  #
+  # And the optional **subway map style** (docs/MAP-STYLE.md), all of it that is not pixels: the zoom bands, the
+  # network-file decoders, the geometry, the settled badge claim and reading-order caps — a case-for-case port of
+  # apps/ios/Tests/HelpCoreTests/MapStyleTests.swift — and the palette as numbers, which this job holds to
+  # apps/web/src/style.css by PARSING it (a token that differs fails here) and to the spec's contrast tables by
+  # computing them. The tests that decode the real network files skip here, as the other shipped-bundle tests do,
+  # because data/bundle is built, never committed.
+  #
   # Since 2026-09-20 :core also covers the *rules* that used to be tangled up in the two files that talk to the
   # network and the disk, and so were checked by nothing this job ran: which file paths a signed index may name,
   # what header goes out and where a report may be posted (Net.kt, Http.kt), what happens to the report queue when
@@ -67,7 +82,7 @@ jobs:
       # ./gradlew, so the Gradle version is the one pinned in gradle/wrapper/gradle-wrapper.properties.
       - run: ./gradlew --no-daemon :query:test :core:test
         working-directory: apps/android
-      # The same 181 fixture cases again with no test framework on the classpath at all, which is the route that
+      # The same 190 fixture cases again with no test framework on the classpath at all, which is the route that
       # still works if JUnit (EPL-1.0, test-only) is ever dropped.
       - run: ./gradlew --no-daemon :query:runFixtures
         working-directory: apps/android

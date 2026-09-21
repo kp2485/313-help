@@ -50,6 +50,17 @@ class MainActivity : Activity() {
     private val stack = ArrayList<Route>()
     private lateinit var content: FrameLayout
     private lateinit var tabs: LinearLayout
+    private lateinit var root: LinearLayout
+
+    /**
+     * The status bar, the navigation bar and any display cutout, as the system last reported them. Every screen but
+     * the Map tab is padded clear of all of it; the map is drawn under the status bar and pads its own floating
+     * controls by [barTop] instead (Route.isFullBleedTop).
+     */
+    private val bars = android.graphics.Rect()
+
+    /** How far down the status bar and any cutout reach, in pixels. Read by the Map tab's controls. */
+    val barTop: Int get() = bars.top
 
     private companion object {
         const val LOCATION_REQUEST = 41
@@ -60,7 +71,7 @@ class MainActivity : Activity() {
         setTheme(R.style.Theme_Help313)
         L.load(this)
 
-        val root = LinearLayout(this)
+        root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
         root.setBackgroundColor(UI.color(this, R.color.app_bg))
 
@@ -93,6 +104,7 @@ class MainActivity : Activity() {
         super.onDestroy()
         // A dead activity must not be called back into, whether it is finishing or being rebuilt.
         if (store.onChange != null) store.onChange = null
+        MapModel.onChange = null
         if (isFinishing) {
             // Really leaving: the route stack, the background thread and the loader all go. Nothing about this
             // session outlives it (docs/08, "cleared on exit").
@@ -116,6 +128,8 @@ class MainActivity : Activity() {
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
         super.onConfigurationChanged(newConfig)
         L.load(this)
+        applyBarIcons()
+        root.setBackgroundColor(UI.color(this, R.color.app_bg))
         rebuildTabs()
         render()
     }
@@ -133,35 +147,72 @@ class MainActivity : Activity() {
      * systemWindowInset* getters on 7.0 to 10, which is what minSdk 24 still has to work on.
      */
     private fun keepClearOfSystemBars(root: View) {
-        root.setOnApplyWindowInsetsListener { v, insets ->
+        root.setOnApplyWindowInsetsListener { _, insets ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val bars = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
-                v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+                val system = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
+                bars.set(system.left, system.top, system.right, system.bottom)
             } else {
                 @Suppress("DEPRECATION")
-                v.setPadding(
+                bars.set(
                     insets.systemWindowInsetLeft,
                     insets.systemWindowInsetTop,
                     insets.systemWindowInsetRight,
                     insets.systemWindowInsetBottom,
                 )
             }
+            applyBarPadding()
             insets
         }
-        // Dark icons in the status bar: the background behind them is @color/app_bg, which is nearly white, and
-        // the default light icons were all but invisible on it.
+        applyBarIcons()
+    }
+
+    /**
+     * Dark icons on the system bars in the light theme, light icons in the dark one — **from the theme, both bars**.
+     * The background behind them is @color/app_bg: nearly white by day, where the default light icons were all but
+     * invisible, and nearly black at night, where the "light bar" flags this used to set unconditionally left dark
+     * icons on a dark navigation bar (seen on the emulator, 2026-09-21). Asked again whenever the configuration
+     * changes, because the activity handles dark mode itself and is not rebuilt for it.
+     */
+    private fun applyBarIcons() {
+        val night = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+        // With three-button navigation the system lays a scrim behind the buttons, in a colour it works out once from
+        // the theme the activity STARTED with — so after a switch to dark it stayed pale, under icons that had just
+        // turned light. This app pads itself clear of the bar and paints @color/app_bg behind it, so the scrim is
+        // not needed: the icons' contrast is against our own background, by day and by night.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.setSystemBarsAppearance(
-                android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
-                    android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
-                android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
-                    android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
-            )
+            val both = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
+                android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+            window.insetsController?.setSystemBarsAppearance(if (night) 0 else both, both)
         } else {
             @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or
-                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            var flags = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                @Suppress("DEPRECATION")
+                flags = flags and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+            }
+            if (!night) {
+                @Suppress("DEPRECATION")
+                flags = flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    @Suppress("DEPRECATION")
+                    flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                }
+            }
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = flags
         }
+    }
+
+    /**
+     * Pads the whole screen clear of the system bars — except on the Map tab, where the map runs under the status
+     * bar and the controls carry the inset themselves. Called whenever the insets change and on every draw, because
+     * the answer depends on which screen is open.
+     */
+    private fun applyBarPadding() {
+        val top = if (Route.isFullBleedTop(current())) 0 else bars.top
+        root.setPadding(bars.left, top, bars.right, bars.bottom)
     }
 
     override fun onResume() {
@@ -192,6 +243,13 @@ class MainActivity : Activity() {
     fun current(): Route = if (stack.isEmpty()) Route.Home else stack[stack.size - 1]
 
     override fun onBackPressed() {
+        // A card open over the map is the innermost thing on screen, so Back closes that first — one Back, one
+        // thing, the same rule Escape follows inside the map itself (MapView.onKeyDown).
+        if (current() is Route.Map && MapModel.selection != null) {
+            MapModel.selection = null
+            render()
+            return
+        }
         if (stack.size > 1) {
             stack.removeAt(stack.size - 1)
             render()
@@ -211,6 +269,10 @@ class MainActivity : Activity() {
         // One place decides whether this screen may be photographed, so a screen added later cannot forget. See
         // Route.isPrivate and apps/android/README.md for why this is per-screen rather than for the whole app.
         keepOutOfScreenshots(Route.isPrivate(route))
+        applyBarPadding()
+        // The map hands its redraws to whatever view is on screen; a view that has been thrown away must not be
+        // called back into. The Map tab sets this again as it is built.
+        if (route !is Route.Map) MapModel.onChange = null
         content.removeAllViews()
         content.addView(
             Screens.view(this, route),
@@ -248,6 +310,7 @@ class MainActivity : Activity() {
 
     private fun rebuildTabs() {
         tabs.removeAllViews()
+        tabs.setBackgroundColor(UI.color(this, R.color.surface))
         fillTabs(tabs)
     }
 
@@ -264,6 +327,7 @@ class MainActivity : Activity() {
         val items = listOf(
             "tab.home" to Route.Home,
             "tab.help" to Route.Help,
+            "tab.map" to Route.Map,
             "search.title" to Route.Search,
             "saved.title" to Route.Saved,
         )
@@ -272,6 +336,12 @@ class MainActivity : Activity() {
             b.setBackgroundColor(UI.color(this, R.color.surface))
             b.layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
             b.gravity = Gravity.CENTER
+            // Five tabs, not four, since the Map tab arrived (2026-09-21). At 17 sp with 16 dp of padding each
+            // side, "Saved places" was broken in the middle of a word ("Saved place / s"). The bar is the one
+            // place in this app that has a fixed width to share, so it gets its own smaller size and thinner
+            // padding; nothing is ellipsized and the words still grow with the phone's text size.
+            b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12f)
+            b.setPaddingRelative(UI.dp(this, 2), UI.dp(this, 10), UI.dp(this, 2), UI.dp(this, 10))
             bar.addView(b)
         }
     }
@@ -427,6 +497,8 @@ class MainActivity : Activity() {
         } else {
             near = LatLon(found.latitude, found.longitude)
             locationRefused = false
+            // In memory only, as everywhere else: the map moves there, and nothing is written down or sent.
+            if (current() is Route.Map) MapModel.center(near!!)
         }
         render()
     }

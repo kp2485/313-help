@@ -112,6 +112,9 @@ data class BundleRow(
     val address: Address? = null,
     val lat: Double? = null,
     val lon: Double? = null,
+    /** Domestic-violence rows only: one id from SERVICE_AREAS (Areas.kt). A whole city or bigger, and the only
+     *  thing a DV row ever says about where it is. Never an address, a ZIP, a neighbourhood or a coordinate. */
+    val serviceArea: String? = null,
     val phones: List<Phone> = emptyList(),
     val website: String? = null,
     val availability: String = "scheduled",   // scheduled | always | call_first | unknown
@@ -138,6 +141,7 @@ data class BundleRow(
                 address = j["address"]?.let { Address.fromJson(it) },
                 lat = j["lat"]?.num,
                 lon = j["lon"]?.num,
+                serviceArea = j["service_area"]?.str,
                 phones = (j["phones"]?.arr ?: emptyList()).map { Phone.fromJson(it) },
                 website = j["website"]?.str,
                 availability = j["availability"]?.str ?: "scheduled",

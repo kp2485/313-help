@@ -13,4 +13,31 @@
     <color name="warn_bg">#33270A</color>
     <color name="warn_ink">#FFD98A</color>
     <color name="danger">#E26A6A</color>
+    <!-- The map in the dark theme (apps/web/src/style.css, 2026-09-21). -->
+    <color name="map_out">#060B09</color>
+    <color name="map_out_ink">#76827A</color>
+    <color name="map_land">#141F19</color>
+    <color name="map_park">#1C3B27</color>
+    <color name="map_park_ink">#9FDCB4</color>
+    <color name="map_road">#75827A</color>
+    <color name="map_main">#88968D</color>
+    <color name="map_fwy">#A3863A</color>
+    <color name="map_ink">#D5E2DA</color>
+    <color name="map_me">#8AB8FF</color>
+    <color name="gw_open">#4FCF93</color>
+    <color name="gw_build">#E3974A</color>
+    <color name="gw_fund">#6AA9D6</color>
+    <color name="gw_plan">#8EA79A</color>
+    <color name="gw_case">#0A110E</color>
+    <color name="lyr_bus">#7AA7FF</color>
+    <color name="lyr_smart">#4FD1C5</color>
+    <color name="lyr_rail">#C79BFF</color>
+    <color name="lyr_bike">#FB923C</color>
+    <color name="grp_food">#E3B341</color>
+    <color name="grp_shelter">#A5B4FC</color>
+    <color name="grp_health">#F9A8D4</color>
+    <color name="grp_rec">#4FCF93</color>
+    <color name="grp_work">#67E8F9</color>
+    <color name="grp_things">#FDBA74</color>
+    <color name="grp_paperwork">#CBD5E1</color>
 </resources>

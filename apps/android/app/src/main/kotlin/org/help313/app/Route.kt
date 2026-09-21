@@ -28,6 +28,18 @@ sealed class Route {
     object About : Route()
     object Urgent : Route()
 
+    /** The Map tab: the city itself, edge to edge (docs/05 "Map tab", DECISIONS 2026-09-20). */
+    object Map : Route()
+
+    /** What to show on the map. A preference about a map, kept on this phone (MapLayerStore). */
+    object MapLayers : Route()
+
+    /** "See this map as a list": the text alternative the whole tab depends on. */
+    object MapList : Route()
+
+    /** One stretch of the Joe Louis Greenway. */
+    class Stretch(val segmentId: String) : Route()
+
     /** One need's screen: its numbers, and either its choices or its list. */
     class Need(val needId: String) : Route()
 
@@ -60,6 +72,13 @@ sealed class Route {
             is Detail -> isPrivate(route.category)
             else -> false
         }
+
+        /**
+         * True for the one screen that is drawn under the status bar. Every other screen is padded clear of the
+         * system bars by MainActivity; the map runs behind them and pads its own floating controls instead, so the
+         * city fills the phone and no control is ever under the clock (docs/05 "Map tab").
+         */
+        fun isFullBleedTop(route: Route): Boolean = route is Map
 
         private fun needOf(id: String): org.help313.app.Need? = NEEDS.firstOrNull { it.id == id }
 

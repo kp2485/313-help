@@ -14,7 +14,10 @@ package org.help313.app
 
 import org.help313.query.Address
 import org.help313.query.BundleRow
+import org.help313.query.LatLon
 import org.help313.query.Phone
+import org.help313.query.Query
+import org.help313.query.rank
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -243,6 +246,55 @@ class ParityTest {
             val row = BundleRow(id = "sal_x", name = "x", category = category, lat = 42.33, lon = -83.05)
             assertNull(mapsDestination(row))
             assertFalse(showsPointWithoutAddress(row))
+        }
+    }
+
+    /**
+     * Kyle, 2026-09-20: a domestic-violence row's only statement about where it is, is the coarse area it
+     * serves, in words. No address, no ZIP, no coordinate, no distance, no map, no directions.
+     */
+    @Test
+    fun aDvListingNamesAnAreaAndNothingElse() {
+        val dv = BundleRow(id = "sal_dv", name = "Crisis line", category = "shelter.dv",
+            serviceArea = "detroit", phones = listOf(Phone("313-555-0100")))
+        assertEquals("area.detroit", serviceAreaStringKey(dv))
+        assertTrue(saysNoAddress(dv))
+        assertNull(mapsDestination(dv))
+        assertNull(transitAppDestination(dv))
+        assertFalse(showsPointWithoutAddress(dv))
+        // A DV row with no area recorded still carries the sentence, and still names no key.
+        val noArea = BundleRow(id = "sal_dv2", name = "x", category = "shelter.dv")
+        assertNull(serviceAreaStringKey(noArea))
+        assertTrue(saysNoAddress(noArea))
+        // An ordinary listing is untouched by all of this.
+        val pantry = BundleRow(id = "sal_p", name = "x", category = "food.pantry", address = Address("1 Main St", "Detroit", "48226"))
+        assertNull(serviceAreaStringKey(pantry))
+        assertFalse(saysNoAddress(pantry))
+    }
+
+    /**
+     * The band is a function of the area alone: two shelters serving one area always tie, and neither ever
+     * carries a distance, so nothing about the order can be read back as a place.
+     */
+    @Test
+    fun dvRowsBandByTheirAreaAndNeverCarryADistance() {
+        fun dv(id: String, area: String?) = BundleRow(id = id, name = id, category = "shelter.dv",
+            availability = "always", serviceArea = area, phones = listOf(Phone("313-555-0100")))
+        val rows = listOf(dv("a", "detroit"), dv("b", "detroit"), dv("c", "dearborn"), dv("d", "national"))
+        val q = Query(category = "shelter.dv", near = LatLon(42.35, -83.06))
+        val out = rank(rows, q, 1789753500000L)
+        assertEquals(listOf("a", "b", "c", "d"), out.map { it.row.id })
+        assertEquals(listOf(0, 0, 1, 2), out.map { it.band })
+        assertTrue(out.all { it.miles == null })
+    }
+
+    /** Every area in the closed list has a word for it in all four languages. */
+    @Test
+    fun everyServiceAreaHasItsWords() {
+        for (lang in LANGS) {
+            val s = strings("strings/$lang.json")
+            for (id in org.help313.query.SERVICE_AREAS.keys) assertNotNull("strings/$lang.json has no area.$id", s["area.$id"])
+            for (k in listOf("safe.dv_serves", "safe.dv_no_address")) assertNotNull("strings/$lang.json has no $k", s[k])
         }
     }
 

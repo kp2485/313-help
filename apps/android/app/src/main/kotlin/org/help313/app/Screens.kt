@@ -37,6 +37,20 @@ object Screens {
         is Route.Saved -> saved(a)
         is Route.About -> about(a)
         is Route.Urgent -> urgent(a)
+        is Route.Map -> MapScreen.tab(a)
+        is Route.MapLayers -> MapScreen.layers(a)
+        is Route.MapList -> MapScreen.list(a)
+        is Route.Stretch -> {
+            // A route outlives a draw, so the stretch is looked up again: the bundle may have been refreshed since.
+            val s = a.store.bundle?.segments?.firstOrNull { it.id == route.segmentId }
+            if (s == null) {
+                val col = UI.column(a, 16)
+                col.addView(UI.text(a, L.t(if (a.store.bundle == null) "home.loading" else "detail.not_found"), 17f, R.color.muted))
+                UI.scroller(a, col)
+            } else {
+                MapScreen.stretch(a, s)
+            }
+        }
         is Route.Need -> {
             val need = NEEDS.firstOrNull { it.id == route.needId }
             if (need == null) home(a) else needScreen(a, need)
@@ -279,7 +293,11 @@ object Screens {
             col.addView(UI.text(a, L.t("loc.note"), 14f, R.color.muted, topDp = 4))
         }
 
-        val q = if (sensitive) query else query.copy(near = a.near)
+        // The location still goes to `rank` on a sensitive screen: a domestic-violence row uses it only to work
+        // out which coarse area is nearest (org.help313.query.SERVICE_AREAS) and its `miles` comes back null
+        // regardless, so nothing below can print a distance. What `sensitive` turns off is the screen: the
+        // location button, the "using your location" line and the mileage.
+        val q = query.copy(near = a.near)
         val ranked = rank(bundle.rows, q, a.now(), bundle.alerts)
         if (ranked.isEmpty()) {
             col.addView(UI.text(a, L.t(emptyKey ?: "results.none"), 17f, R.color.muted, topDp = 16))
@@ -300,6 +318,10 @@ object Screens {
         card.addView(UI.text(a, r.row.name, 18f, R.color.ink, bold = true))
         if (r.row.what.isNotEmpty()) card.addView(UI.text(a, r.row.what, 16f, R.color.muted, topDp = 2))
         card.addView(openPill(a, r.open))
+        // A domestic-violence row's one statement about where it is: the coarse area, in words. Never a distance.
+        serviceAreaStringKey(r.row)?.let { key ->
+            card.addView(UI.text(a, L.t("safe.dv_serves", "area" to L.t(key)), 14f, R.color.muted, topDp = 2))
+        }
         card.addView(UI.text(a, badgeText(r.badge), 14f, R.color.muted, topDp = 6))
         if (showDistance) r.miles?.let {
             card.addView(UI.text(a, L.t("miles", "miles" to String.format(L.locale(), "%.1f", it)), 14f, R.color.muted, topDp = 2))
@@ -339,6 +361,13 @@ object Screens {
             col.addView(UI.sectionHead(a, L.t("detail.who")))
             col.addView(UI.text(a, it, 17f, R.color.ink))
         }
+
+        // A domestic-violence row says where it is in words and nothing else: the coarse area it serves, then the
+        // one sentence about why there is no address. No map, no dot, no distance, no directions (docs/08).
+        serviceAreaStringKey(row)?.let { key ->
+            col.addView(UI.text(a, L.t("safe.dv_serves", "area" to L.t(key)), 17f, R.color.ink))
+        }
+        if (saysNoAddress(row)) col.addView(UI.text(a, L.t("safe.dv_no_address"), 15f, R.color.muted))
 
         // Addresses and distances are shown for everything except the sensitive categories, whose rows carry no
         // coordinates at all (docs/08).
