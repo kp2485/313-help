@@ -39,6 +39,9 @@ public struct BundleRow: Codable, Equatable, Sendable, Identifiable {
     public var address: Address?
     public var lat: Double?
     public var lon: Double?
+    /// Domestic-violence rows only: one id from `serviceAreas` (Areas.swift). A whole city or bigger, and the only
+    /// thing a DV row ever says about where it is. Never an address, a ZIP, a neighbourhood or a coordinate.
+    public var serviceArea: String?
     public var phones: [Phone]
     public var website: String?
     public var availability: String   // scheduled | always | call_first | unknown

@@ -90,6 +90,12 @@ final class FixtureTests: XCTestCase {
                 case "rank":
                     let got = rank(rows, query(c["query"] as? [String: Any]), now: now, alerts: alerts).map(\.row.id)
                     ok = got == expect as? [String]; if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
+                // "<id> band<n> <no-distance|distance>": the band a row landed in, and whether the result object
+                // carries a distance at all. A domestic-violence row must always read "no-distance".
+                case "rankDetail":
+                    let got = rank(rows, query(c["query"] as? [String: Any]), now: now, alerts: alerts)
+                        .map { "\($0.row.id) band\($0.band) \($0.miles == nil ? "no-distance" : "distance")" }
+                    ok = got == expect as? [String]; if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
                 case "search":
                     let got = search(rows, c["text"] as? String ?? "", query(c["query"] as? [String: Any]), now: now, alerts: alerts).map(\.row.id)
                     ok = got == expect as? [String]; if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
