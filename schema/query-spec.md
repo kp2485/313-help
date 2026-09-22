@@ -220,7 +220,15 @@ the Rouge crossings, a service drive over a sunken street — still becomes a ju
    node numbering from the same files.
 6. **Edges**: consecutive nodes along each polyline, with the metre length and the polyline's way (name, class,
    safety byte). Undirected: each edge appears once from each end, in CSR (`head`, `edgeTo`, `edgeLen`,
-   `edgeWay`).
+   `edgeWay`), with `twinHalf` pointing at the same edge walked the other way.
+
+**An edge is a piece of a real street, not a straight chord between two junctions.** Each way keeps its own
+vertices (`wayPts`, flat metres) and each edge records where it starts and ends along that way
+(`edgeSegA`/`edgeTA` → `edgeSegB`/`edgeTB`). `edgeGeometry(g, half)` returns the vertices actually walked, in
+travel order, with the two ends forced to the node coordinates — which also hides the up-to-12 m step a
+snapped dangling end would otherwise draw. `sliceByFraction(pts, t0, t1)` cuts a part of that list by fraction
+of its own length, which is how a route that starts or ends part-way along an edge is drawn. Snapping measures
+against this geometry too, so `EdgePoint.t` is a fraction of the edge's **length**, not of a chord.
 
 ### The safety byte
 
@@ -295,12 +303,23 @@ itself marks as where people get hurt. That is the City's judgement, not ours.
 **When it does not** (an older bundle, or an ingest the City refused), the penalty is by street class alone:
 `CLASS_PENALTY = [0, 0.15, 0.10, 0.05, 0]` for classes 0–4.
 
+**A turn costs `TURN_PENALTY_M = 40` metres of walking** when the street's name changes. On Detroit's grid
+every route between two corners is exactly the same length, so with no turn penalty the tie is broken
+arbitrarily and a person is handed a staircase of fifteen turns instead of three streets — measured: the
+study's sample route went from 14 steps to 8. It never changes the distance that is **reported**; it decides
+which of several equally long routes is the one described.
+
 ### Search
 
-Both ends are snapped with `nearestEdgePoint` and the edge is split *for the search only*: node ids
-`nodeCount` and `nodeCount + 1` are the virtual start and goal, and the case where both ends sit on one edge is
-handled directly. Returns `null` when either end is further than `maxSnapMetres` (default 2000) from any
-street, or when the two ends are in different pieces of the graph (0.5% of nodes are).
+The state is a **half-edge** — "walking along this edge, in this direction" — not a node, because that is what
+makes a turn cost anything. Both ends are snapped with `nearestEdgePoint`; state `2 × edgeCount` is the virtual
+start and `2 × edgeCount + 1` the goal. From the start, both directions of the start edge are entered, and the
+goal is entered directly when both ends sit on one edge. Turning round in the middle of a street
+(`twinHalf`) is not allowed. The heuristic is the straight line from where a state leaves you standing to the
+goal, which stays admissible because no cost is negative.
+
+Returns `null` when either end is further than `maxSnapMetres` (default 2000) from any street, or when the two
+ends are in different pieces of the graph (0.5% of nodes are).
 
 ### Steps and wording
 
@@ -405,3 +424,32 @@ Itinerary = { legs: PlanLeg[], changes, walk_metres, ride_metres, minutes, range
 
 `plan()` returns `[]` when nothing works — nothing within walking distance, and no route within one change. A
 client says so; it never invents a leg.
+
+## Fixtures for the directions
+
+`schema/fixtures/14-streets-walk.json` and `15-trip-plans.json`. Two new keys at the top of a fixture file:
+`streets` (an array of `PackedStreets`, exactly the bundle's own shape) and `transit` (an array of
+`TransitLayer`). Three new `fn` kinds, and a case may carry `from` / `to` (`{lat, lon}`) and `no_safety`
+(build the graph as though the files carried no `safety` array — what an older bundle looks like).
+
+| `fn` | what it compares |
+|---|---|
+| `streetGraph` | `{ nodes, edges, crossings, snapped, components, largest, dead_ends, skipped }`, exactly |
+| `walk` | one string, or `null` when there is no route |
+| `plan` | one string per itinerary, in rank order |
+
+The strings, which are the contract between the three implementations:
+
+```
+walk   "<turn|start> <street> <bearing> <metres/10>  >  … | <metres/10> m, off <start>/<end>"
+plan   "<leg> > <leg> > … [<lo>-<hi>]"
+leg    "walk <metres/10>m"  |  "ride <route_id> <n>st every <headway>"  |  "ride <route_id> <n>st no-headway"
+```
+
+Metres are rounded to the nearest 10 so a port never fails on a last digit; the two off-street distances are
+rounded to the metre, because they are what a person is told ("then about 40 m to the building").
+
+**The native runners skip an `fn` they do not implement yet**, count it, and print the count
+(`fixtures: N cases, 0 failed, 13 skipped`). That is what lets the rules land in TypeScript first and the Swift
+and Kotlin ports follow in their own pull requests — but a skipped case is never a passed one, and the
+TypeScript suite runs every case in every file.

@@ -14,7 +14,7 @@
 
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import type { Segment } from '@313help/query';
+import { safetyByte, type Segment } from '@313help/query';
 import { p, today } from './util.js';
 
 const ORG = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services';
@@ -28,7 +28,19 @@ const UA = { 'user-agent': '313help-pipeline (open-source civic directory; one p
 export const GRID = { lon0: -83.32, lat0: 42.22, dLon: 0.04, dLat: 0.03 };
 export const SCALE = 1e5;
 type Pt = [number, number];                       // [lon, lat]
-export interface Road { cls: number; name: string; line: Pt[] }
+export interface Road { cls: number; name: string; line: Pt[]; safety?: number }
+
+// The City's own safety fields on the same Roads layer, packed one byte per polyline (schema/query-spec.md
+// "The safety byte"). Same source, same licence, nothing new fetched from anywhere else. They are what lets a
+// walking route prefer a calmer street using the City's own judgement rather than ours.
+export const SAFETY_FIELDS = ['HIN_2021', 'HighSeverity', 'LANES', 'POSTED_SPE', 'AADT'] as const;
+
+/** The layer writes yes/no as text and the three numbers as integers, with 0 and null both meaning "unknown". */
+export function roadSafety(a: Record<string, unknown>): number {
+  const yes = (v: unknown) => /^y(es)?$/i.test(String(v ?? '').trim());
+  const num = (v: unknown) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+  return safetyByte({ hin: yes(a.HIN_2021), highSeverity: yes(a.HighSeverity), lanes: num(a.LANES), speed: num(a.POSTED_SPE), aadt: num(a.AADT) });
+}
 
 const NFC: Record<string, number> = {
   Interstate: 0, 'Other Freeways': 0, 'Other freeway': 0, OPA: 1, 'Other principal arterial': 1,
@@ -64,34 +76,46 @@ export function simplify(line: Pt[], tol: number): Pt[] {
   return line.filter((_, i) => keep[i]);
 }
 
+/**
+ * The worst of two safety bytes, field by field: on the High Injury Network if either piece is, the higher
+ * lane, speed and traffic bucket of the two. Pieces of one street are joined end to end below, so the byte a
+ * merged line carries is the worst of the pieces inside it — a route is warned by the worst block of a street,
+ * never let through by the calmest one.
+ */
+export function worstSafety(a: number, b: number): number {
+  const bucket = (shift: number) => Math.max((a >> shift) & 3, (b >> shift) & 3) << shift;
+  return ((a | b) & 3) | bucket(2) | bucket(4) | bucket(6);
+}
+
 /** Join block-long pieces of the same street end to end, so there are fewer lines and better labels. */
 export function mergeChains(roads: Road[]): Road[] {
   const key = (pt: Pt) => `${Math.round(pt[0] * SCALE)},${Math.round(pt[1] * SCALE)}`;
-  const groups = new Map<string, Pt[][]>();
-  for (const r of roads) { const k = `${r.cls}|${r.name}`; (groups.get(k) ?? groups.set(k, []).get(k)!).push(r.line); }
+  const groups = new Map<string, Road[]>();
+  for (const r of roads) { const k = `${r.cls}|${r.name}`; (groups.get(k) ?? groups.set(k, []).get(k)!).push(r); }
   const out: Road[] = [];
-  for (const [k, lines] of groups) {
+  for (const [k, pieces] of groups) {
     const cls = Number(k.slice(0, k.indexOf('|'))), name = k.slice(k.indexOf('|') + 1);
+    const lines = pieces.map((r) => r.line);
     const ends = new Map<string, Set<number>>();
     const add = (pt: Pt, i: number) => (ends.get(key(pt)) ?? ends.set(key(pt), new Set()).get(key(pt))!).add(i);
     const drop = (pt: Pt, i: number) => ends.get(key(pt))?.delete(i);
     lines.forEach((l, i) => { add(l[0]!, i); add(l[l.length - 1]!, i); });
     const used = new Uint8Array(lines.length);
-    const take = (pt: Pt): Pt[] | null => {
+    const take = (pt: Pt): { line: Pt[]; safety: number } | null => {
       for (const j of ends.get(key(pt)) ?? []) {
         if (used[j]) continue;
         const l = lines[j]!; used[j] = 1; drop(l[0]!, j); drop(l[l.length - 1]!, j);
-        return key(l[0]!) === key(pt) ? l : [...l].reverse();
+        return { line: key(l[0]!) === key(pt) ? l : [...l].reverse(), safety: pieces[j]!.safety ?? 0 };
       }
       return null;
     };
     lines.forEach((l, i) => {
       if (used[i]) return;
       used[i] = 1; drop(l[0]!, i); drop(l[l.length - 1]!, i);
-      let chain = [...l];
-      for (let nx = take(chain[chain.length - 1]!); nx; nx = take(chain[chain.length - 1]!)) chain.push(...nx.slice(1));
-      for (let nx = take(chain[0]!); nx; nx = take(chain[0]!)) chain = [...[...nx].reverse().slice(0, -1), ...chain];
-      out.push({ cls, name, line: chain });
+      let chain = [...l], safety = pieces[i]!.safety ?? 0;
+      for (let nx = take(chain[chain.length - 1]!); nx; nx = take(chain[chain.length - 1]!)) { chain.push(...nx.line.slice(1)); safety = worstSafety(safety, nx.safety); }
+      for (let nx = take(chain[0]!); nx; nx = take(chain[0]!)) { chain = [...[...nx.line].reverse().slice(0, -1), ...chain]; safety = worstSafety(safety, nx.safety); }
+      out.push({ cls, name, line: chain, safety });
     });
   }
   return out;
@@ -229,23 +253,31 @@ async function neighbors(): Promise<{ outlines: Pt[][]; roads: Road[] }> {
   return { outlines, roads };
 }
 
-/** Turn a list of roads into the compact file shape. */
-export function packRoads(roads: Road[], origin: Pt, tol: number): { names: string[]; roads: [number, number, number[]][] } {
+/**
+ * Turn a list of roads into the compact file shape.
+ *
+ * `safety` is one small whole number per entry of `roads`, in the same order — additive, so a client that does
+ * not know the key draws exactly what it drew before. It is left out entirely when every byte is 0, which is
+ * what an older basemap, or a City layer that refused the fields, produces.
+ */
+export function packRoads(roads: Road[], origin: Pt, tol: number): { names: string[]; roads: [number, number, number[]][]; safety?: number[] } {
   const names: string[] = [], idx = new Map<string, number>();
   const nameIdx = (n: string) => (n ? idx.get(n) ?? (idx.set(n, names.push(n) - 1), names.length - 1) : -1);
-  const packed = mergeChains(roads).map((r) => [r.cls, nameIdx(r.name), encodeLine(simplify(r.line, tol), origin)] as [number, number, number[]])
+  const packed = mergeChains(roads).map((r) => [r.cls, nameIdx(r.name), encodeLine(simplify(r.line, tol), origin), r.safety ?? 0] as [number, number, number[], number])
     .filter((r) => r[2].length >= 4).sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2][0]! - b[2][0]! || a[2][1]! - b[2][1]!);
-  return { names, roads: packed };
+  const safety = packed.map((r) => r[3]);
+  return { names, roads: packed.map((r) => [r[0], r[1], r[2]] as [number, number, number[]]), ...(safety.some((s) => s > 0) ? { safety } : {}) };
 }
 
 async function main() {
   const dir = p('data/ingested/basemap');
-  const [roadFeats, parkFeats, cityFeats] = [await geojson(ROADS, 'OBJECTID,RDNAME,NFC,FCC', 2000), await geojson(PARKS, 'ObjectId,park_name', 1000), await geojson(BOUNDARY, 'FID', 10)];
+  const [roadFeats, parkFeats, cityFeats] = [await geojson(ROADS, `OBJECTID,RDNAME,NFC,FCC,${SAFETY_FIELDS.join(',')}`, 2000), await geojson(PARKS, 'ObjectId,park_name', 1000), await geojson(BOUNDARY, 'FID', 10)];
   const roads: Road[] = [];
   for (const f of roadFeats) {
     const a = f.properties ?? {}, cls = NFC[String(a.NFC ?? '0').trim()] ?? 4, name = roadName(a.RDNAME);
     if (!name && cls !== 0) continue;                        // unnamed alleys and turn lanes; freeway ramps stay
-    for (const line of linesOf(f.geometry)) if (line.length > 1) roads.push({ cls, name, line });
+    const safety = roadSafety(a);
+    for (const line of linesOf(f.geometry)) if (line.length > 1) roads.push({ cls, name, line, safety });
   }
   if (roads.length < 20000) throw new Error(`basemap: only ${roads.length} roads parsed. Not overwriting the last good files.`);
   const near = await neighbors();
@@ -264,7 +296,7 @@ async function main() {
   void cityFeats;
   const boundary = near.outlines.map((ring) => encodeLine(simplify(ring, 15), origin)).filter((r) => r.length >= 8);
   const sources = { roads: await lastEdited(ROADS), parks: await lastEdited(PARKS), boundary: await lastEdited(BOUNDARY), neighbors: today() };
-  compact(`${dir}/base.json`, { origin, names: big.names, roads: big.roads, park_names: parkNames, parks, boundary });
+  compact(`${dir}/base.json`, { origin, names: big.names, roads: big.roads, ...(big.safety ? { safety: big.safety } : {}), park_names: parkNames, parks, boundary });
 
   const byCell = new Map<string, Road[]>();
   for (const r of roads.filter((x) => x.cls > 2)) {
@@ -281,8 +313,12 @@ async function main() {
   const cross: Record<string, string[]> = {};
   if (existsSync(jlg)) for (const s of (JSON.parse(readFileSync(jlg, 'utf8')).segments as Segment[])) cross[s.id] = crossings(s.lines, roads);
   compact(`${dir}/crossings.json`, cross);
-  compact(`${dir}/source.json`, { name: 'City of Detroit open data (Detroit roads and parks); US Census Bureau TIGER (city outlines; Hamtramck, Highland Park and Dearborn streets)', urls: { roads: ROADS, parks: PARKS, boundary: BOUNDARY, tiger_places: TIGER_PLACES, tiger_roads: TIGER_ROADS }, last_edited: sources, grid: GRID, scale: SCALE });
-  console.log(`basemap: ${roads.length} road pieces -> ${big.roads.length} main-road lines in base.json, ${byCell.size} cells; ${parks.length} parks; crossings for ${Object.keys(cross).length} greenway segments`);
+  // `safety_fields` says which fields of the City's Roads layer the one byte per polyline was packed from, so a
+  // reader of the file never has to guess. TIGER publishes none of them, so the three neighbour cities' streets
+  // carry a byte of 0 — "this file told us nothing" — and the graph falls back to street class there.
+  compact(`${dir}/source.json`, { name: 'City of Detroit open data (Detroit roads and parks); US Census Bureau TIGER (city outlines; Hamtramck, Highland Park and Dearborn streets)', urls: { roads: ROADS, parks: PARKS, boundary: BOUNDARY, tiger_places: TIGER_PLACES, tiger_roads: TIGER_ROADS }, last_edited: sources, grid: GRID, scale: SCALE, safety_fields: [...SAFETY_FIELDS] });
+  const withSafety = roads.filter((r) => (r.safety ?? 0) > 0).length;
+  console.log(`basemap: ${roads.length} road pieces -> ${big.roads.length} main-road lines in base.json, ${byCell.size} cells; ${parks.length} parks; crossings for ${Object.keys(cross).length} greenway segments; ${withSafety} pieces carry the City's safety fields`);
 }
 
 if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/ingest-basemap.ts')) {

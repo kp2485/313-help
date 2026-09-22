@@ -1,0 +1,438 @@
+{
+ "description": "Whole trip plans: walking, a direct ride and one change, ranked together (schema/query-spec.md \"Trip plans\"). One long street with two routes on it — one every 10 minutes, one every 60 — a cross street whose route publishes no headway at all, and one road with no stop near it.",
+ "streets": [
+  {
+   "origin": [
+    -83.1,
+    42.36
+   ],
+   "names": [
+    "Grand Ave",
+    "Mid St",
+    "Home St",
+    "Far St",
+    "Lone Rd"
+   ],
+   "roads": [
+    [
+     2,
+     0,
+     [
+      0,
+      0,
+      7293,
+      0
+     ]
+    ],
+    [
+     4,
+     1,
+     [
+      3646,
+      0,
+      0,
+      1800
+     ]
+    ],
+    [
+     4,
+     2,
+     [
+      0,
+      0,
+      0,
+      360
+     ]
+    ],
+    [
+     4,
+     3,
+     [
+      7293,
+      0,
+      0,
+      360
+     ]
+    ],
+    [
+     4,
+     4,
+     [
+      6077,
+      1800,
+      0,
+      540
+     ]
+    ]
+   ],
+   "safety": [
+    253,
+    84,
+    84,
+    84,
+    84
+   ]
+  }
+ ],
+ "transit": [
+  {
+   "stops": {
+    "origin": [
+     -83.1,
+     42.36
+    ],
+    "names": [
+     "Grand & 0",
+     "Grand & 500",
+     "Grand & 1000",
+     "Grand & 1500",
+     "Grand & 2000",
+     "Grand & 2500",
+     "Grand & 3000",
+     "Grand & 3500",
+     "Grand & 4000",
+     "Grand & 4500",
+     "Grand & 5000",
+     "Grand & 5500",
+     "Grand & 6000",
+     "Mid & 120",
+     "Mid & 700",
+     "Mid & 1300",
+     "Mid & 1900"
+    ],
+    "points": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      608,
+      0
+     ],
+     [
+      2,
+      1215,
+      0
+     ],
+     [
+      3,
+      1823,
+      0
+     ],
+     [
+      4,
+      2431,
+      0
+     ],
+     [
+      5,
+      3039,
+      0
+     ],
+     [
+      6,
+      3646,
+      0
+     ],
+     [
+      7,
+      4254,
+      0
+     ],
+     [
+      8,
+      4862,
+      0
+     ],
+     [
+      9,
+      5470,
+      0
+     ],
+     [
+      10,
+      6077,
+      0
+     ],
+     [
+      11,
+      6685,
+      0
+     ],
+     [
+      12,
+      7293,
+      0
+     ],
+     [
+      13,
+      3646,
+      108
+     ],
+     [
+      14,
+      3646,
+      630
+     ],
+     [
+      15,
+      3646,
+      1170
+     ],
+     [
+      16,
+      3646,
+      1710
+     ]
+    ]
+   },
+   "routes": {
+    "origin": [
+     -83.1,
+     42.36
+    ],
+    "names": [
+     "Grand Ave line",
+     "Mid St line"
+    ],
+    "agency": "Test Transit",
+    "system": "test",
+    "lines": [
+     [
+      0,
+      [
+       0,
+       0,
+       7293,
+       0
+      ]
+     ],
+     [
+      1,
+      [
+       3646,
+       0,
+       0,
+       1800
+      ]
+     ]
+    ],
+    "routes": [
+     {
+      "id": "rt_test_fast",
+      "short": "1",
+      "long": "Grand",
+      "headway": 10,
+      "frequent": true,
+      "lines": [
+       0
+      ],
+      "stops": [
+       [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ]
+      ]
+     },
+     {
+      "id": "rt_test_slow",
+      "short": "2",
+      "long": "Grand Local",
+      "headway": 60,
+      "lines": [
+       0
+      ],
+      "stops": [
+       [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ]
+      ]
+     },
+     {
+      "id": "rt_test_mid",
+      "short": "3",
+      "long": "Mid",
+      "lines": [
+       1
+      ],
+      "stops": [
+       [
+        13,
+        14,
+        15,
+        16
+       ]
+      ]
+     }
+    ],
+    "route_ids": [
+     "rt_test_fast",
+     "rt_test_slow",
+     "rt_test_mid"
+    ],
+    "serves": [
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ]
+    ]
+   }
+  }
+ ],
+ "cases": [
+  {
+   "name": "four blocks: walking wins, because half a headway is a real wait",
+   "fn": "plan",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.099392
+   },
+   "to": {
+    "lat": 42.36027,
+    "lon": -83.093922
+   },
+   "expect": [
+    "walk 450m [5-10]",
+    "walk 50m > ride rt_test_fast 1st every 10 > walk 0m [5-10]",
+    "walk 50m > ride rt_test_slow 1st every 60 > walk 0m [25-45]"
+   ]
+  },
+  {
+   "name": "across the city: the bus wins, and the frequent route is offered first",
+   "fn": "plan",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.099392
+   },
+   "to": {
+    "lat": 42.36027,
+    "lon": -83.027677
+   },
+   "expect": [
+    "walk 50m > ride rt_test_fast 12st every 10 > walk 50m [20-35]",
+    "walk 50m > ride rt_test_slow 12st every 60 > walk 50m [40-70]"
+   ]
+  },
+  {
+   "name": "one change, from the long street onto the cross street",
+   "fn": "plan",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.099392
+   },
+   "to": {
+    "lat": 42.376827,
+    "lon": -83.063535
+   },
+   "expect": [
+    "walk 50m > ride rt_test_fast 6st every 10 > walk 120m > ride rt_test_mid 3st no-headway > walk 30m [35-60]",
+    "walk 4820m [50-80]",
+    "walk 50m > ride rt_test_slow 6st every 60 > walk 120m > ride rt_test_mid 3st no-headway > walk 30m [55-90]"
+   ]
+  },
+  {
+   "name": "no stop within 400 m of either end: walking, or nothing",
+   "fn": "plan",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.378447,
+    "lon": -83.039225
+   },
+   "to": {
+    "lat": 42.382946,
+    "lon": -83.039225
+   },
+   "expect": [
+    "walk 500m [5-10]"
+   ]
+  }
+ ]
+}

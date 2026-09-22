@@ -9,8 +9,8 @@
 // the building still is, so a screen can say "then about 40 m to the building".
 
 import {
-  type EdgePoint, type StreetGraph, nearestEdgePoint, safetyAadt, safetyHighSeverity, safetyHin, safetyLanes,
-  safetySpeed, toLonLat,
+  type EdgePoint, type StreetGraph, edgeGeometry, nearestEdgePoint, safetyAadt, safetyHighSeverity, safetyHin,
+  safetyLanes, safetySpeed, sliceByFraction, toLonLat,
 } from './streets.js';
 
 /** A person walking, for the estimates. 1.33 m/s is 80 m per minute — the number the plan's cost model uses. */
@@ -37,6 +37,14 @@ export const SAFETY_PENALTY = {
  * Indexed by street class: 0 freeway (never walked), 1 main road, 2 arterial, 3 collector, 4 local street.
  */
 export const CLASS_PENALTY = [0, 0.15, 0.10, 0.05, 0] as const;
+
+/**
+ * What a turn costs, in metres of walking. On Detroit's grid every route between two corners is the same
+ * length, so with no turn penalty the tie is broken arbitrarily and a person is handed a staircase of fifteen
+ * turns instead of three streets. It never changes the distance that is reported — only which of several
+ * equally long routes is the one described.
+ */
+export const TURN_PENALTY_M = 40;
 
 /** The penalty for one way of the graph. */
 export function wayPenalty(g: StreetGraph, way: number): number {
@@ -146,74 +154,111 @@ export function routeBetween(
   g: StreetGraph, a: EdgePoint, b: EdgePoint,
   from?: { lat: number; lon: number }, to?: { lat: number; lon: number },
 ): WalkRoute | null {
-  const N = g.nodeCount, S = N, T = N + 1;
-  const total = N + 2;
-  const px = (n: number) => (n === S ? a.x : n === T ? b.x : g.nodeX[n]!);
-  const py = (n: number) => (n === S ? a.y : n === T ? b.y : g.nodeY[n]!);
-  const aLen = Math.hypot(g.nodeX[a.to]! - g.nodeX[a.from]!, g.nodeY[a.to]! - g.nodeY[a.from]!);
-  const bLen = Math.hypot(g.nodeX[b.to]! - g.nodeX[b.from]!, g.nodeY[b.to]! - g.nodeY[b.from]!);
-  const aWay = g.edgeWay[a.half]!, bWay = g.edgeWay[b.half]!;
-  const aPen = 1 + wayPenalty(g, aWay), bPen = 1 + wayPenalty(g, bWay);
+  // The search is over HALF-EDGES, not nodes: a state is "walking along this edge in this direction", which is
+  // what makes a turn cost something. On a grid every route between two corners is the same length, so without
+  // a turn penalty the tie is broken arbitrarily and a person is handed a staircase of fifteen turns instead of
+  // two streets. The penalty is small (TURN_PENALTY_M metres of walking) and never changes the reported
+  // distance — it only decides which of several equally long routes a person is told to walk.
+  const M = 2 * g.edgeCount, S = M, T = M + 1, total = M + 2;
+  const aLen = g.edgeLen[a.half]!, bLen = g.edgeLen[b.half]!;
+  const bTwin = g.twinHalf[b.half]!;
+  /** The fraction of the goal edge already walked when arriving along half-edge `h`. */
+  const goalRemaining = (h: number): number => (h === b.half ? b.t * bLen : (1 - b.t) * bLen);
 
   const dist = new Float64Array(total).fill(Infinity);
   const cost = new Float64Array(total).fill(Infinity);
   const prev = new Int32Array(total).fill(-1);
-  const prevWay = new Int32Array(total).fill(-1);
   const closed = new Uint8Array(total);
   const hk = new Float64Array(total + 8), hv = new Int32Array(total + 8);
   let hn = 0, settled = 0;
-  const h = (n: number) => Math.hypot(px(n) - b.x, py(n) - b.y);
-
-  // the goal's two half-edges, so a route can end part-way along the destination's own street
-  const goalOn = (n: number): number => (n === b.from ? b.t * bLen : n === b.to ? (1 - b.t) * bLen : -1);
+  /** Straight line to the goal from where a state leaves you standing. Admissible: no cost is negative. */
+  const h = (s: number) => {
+    if (s === T) return 0;
+    if (s === S) return Math.hypot(a.x - b.x, a.y - b.y);
+    const n = g.edgeTo[s]!;
+    return Math.hypot(g.nodeX[n]! - b.x, g.nodeY[n]! - b.y);
+  };
+  const push = (s: number, c: number, d: number, from_: number) => {
+    if (c >= cost[s]!) return;
+    cost[s] = c; dist[s] = d; prev[s] = from_;
+    hn = heapPush(hk, hv, hn, c + h(s), s);
+  };
 
   cost[S] = 0; dist[S] = 0;
   hn = heapPush(hk, hv, hn, h(S), S);
+  const aFor = a.half, aBack = g.twinHalf[a.half]!;
+  const aPen = 1 + wayPenalty(g, g.edgeWay[a.half]!);
+  push(aFor, (1 - a.t) * aLen * aPen, (1 - a.t) * aLen, S);
+  push(aBack, a.t * aLen * aPen, a.t * aLen, S);
+  if (g.halfEdge[a.half]! === g.halfEdge[b.half]!) {
+    const bt = b.half === a.half ? b.t : 1 - b.t;
+    push(T, Math.abs(bt - a.t) * aLen * aPen, Math.abs(bt - a.t) * aLen, S);
+  }
+
   while (hn > 0) {
-    const [u, next] = heapPop(hk, hv, hn); hn = next;
-    if (closed[u]) continue;
-    closed[u] = 1; settled++;
-    if (u === T) break;
-    const relax = (v: number, metres: number, way: number, pen: number) => {
-      const c = cost[u]! + metres * pen;
-      if (c < cost[v]!) { cost[v] = c; dist[v] = dist[u]! + metres; prev[v] = u; prevWay[v] = way; hn = heapPush(hk, hv, hn, c + h(v), v); }
-    };
-    if (u === S) {
-      // the start's own edge, both ways, and the goal if it is on the same edge
-      relax(a.from, a.t * aLen, aWay, aPen);
-      relax(a.to, (1 - a.t) * aLen, aWay, aPen);
-      if (g.edgeWay[b.half] === aWay && ((b.from === a.from && b.to === a.to) || (b.from === a.to && b.to === a.from))) {
-        const bt = b.from === a.from ? b.t : 1 - b.t;
-        relax(T, Math.abs(bt - a.t) * aLen, aWay, aPen);
-      }
-      continue;
+    const [s, next] = heapPop(hk, hv, hn); hn = next;
+    if (closed[s]) continue;
+    closed[s] = 1; settled++;
+    if (s === T) break;
+    if (s === S) continue;
+    const u = g.edgeTo[s]!, name = g.wayName[g.edgeWay[s]!] ?? '';
+    for (let e = g.head[u]!; e < g.head[u + 1]!; e++) {
+      if (e === g.twinHalf[s]!) continue;                      // no turning round in the middle of a street
+      const turn = (g.wayName[g.edgeWay[e]!] ?? '') === name ? 0 : TURN_PENALTY_M;
+      const pen = 1 + wayPenalty(g, g.edgeWay[e]!);
+      if (e === b.half || e === bTwin) push(T, cost[s]! + turn + goalRemaining(e) * pen, dist[s]! + goalRemaining(e), s);
+      push(e, cost[s]! + turn + g.edgeLen[e]! * pen, dist[s]! + g.edgeLen[e]!, s);
     }
-    for (let e = g.head[u]!; e < g.head[u + 1]!; e++) relax(g.edgeTo[e]!, g.edgeLen[e]!, g.edgeWay[e]!, 1 + wayPenalty(g, g.edgeWay[e]!));
-    const on = goalOn(u);
-    if (on >= 0) relax(T, on, bWay, bPen);
   }
   if (!Number.isFinite(cost[T]!)) return null;
 
-  // walk the path back, then turn it into steps and a polyline
+  // walk the path back, then turn it into steps and a polyline along the streets' real shape
   const path: number[] = [];
-  for (let v: number = T; v !== -1; v = prev[v]!) path.push(v);
-  path.reverse();
-  const polyline: [number, number][] = path.map((n) => toLonLat(px(n), py(n)) as [number, number]);
+  for (let s: number = T; s !== -1; s = prev[s]!) path.push(s);
+  path.reverse();                                              // S, half-edge, half-edge, …, T
+
+  /**
+   * What was walked in one step of the path: the vertices in travel order and the street's name.
+   * The goal is reached part-way along an edge that is never itself a state, so `T` renders that partial edge.
+   */
+  const piece = (i: number): { geom: number[]; way: number } => {
+    const s = path[i]!, before = path[i - 1]!;
+    if (s === T) {
+      if (before === S) {                                      // start and goal on one edge
+        const bt = b.half === a.half ? b.t : 1 - b.t;
+        return { geom: sliceByFraction(edgeGeometry(g, a.half), a.t, bt), way: g.edgeWay[a.half]! };
+      }
+      const u = g.edgeTo[before]!;
+      const e = u === b.from ? b.half : bTwin;
+      const ft = e === b.half ? b.t : 1 - b.t;
+      return { geom: sliceByFraction(edgeGeometry(g, e), 0, ft), way: g.edgeWay[e]! };
+    }
+    const geom = edgeGeometry(g, s);
+    return { geom: before === S ? sliceByFraction(geom, s === aFor ? a.t : 1 - a.t, 1) : geom, way: g.edgeWay[s]! };
+  };
+
+  const polyline: [number, number][] = [];
+  const pushPt = (x: number, y: number) => {
+    const p = toLonLat(x, y) as [number, number];
+    const last = polyline[polyline.length - 1];
+    if (!last || last[0] !== p[0] || last[1] !== p[1]) polyline.push(p);
+  };
   const steps: WalkStep[] = [];
   let lastHeading: number | null = null;
   for (let i = 1; i < path.length; i++) {
-    const u = path[i - 1]!, v = path[i]!;
-    const dx = px(v) - px(u), dy = py(v) - py(u);
-    const metres = Math.hypot(dx, dy);
-    if (metres <= 0) continue;
-    const name = g.wayName[prevWay[v]!] ?? '';
-    const heading = (Math.atan2(dx, dy) * 180) / Math.PI;
+    const metres = dist[path[i]!]! - dist[path[i - 1]!]!;
+    const { geom, way } = piece(i);
+    for (let k = 0; k + 1 < geom.length; k += 2) pushPt(geom[k]!, geom[k + 1]!);
+    if (metres <= 0 || geom.length < 4) continue;
+    const name = g.wayName[way] ?? '';
+    const dx0 = geom[2]! - geom[0]!, dy0 = geom[3]! - geom[1]!;
+    const n = geom.length;
+    const heading0 = (Math.atan2(dx0, dy0) * 180) / Math.PI;
+    const headingEnd = (Math.atan2(geom[n - 2]! - geom[n - 4]!, geom[n - 1]! - geom[n - 3]!) * 180) / Math.PI;
     const last = steps[steps.length - 1];
-    if (last && last.street === name) { last.metres += metres; }
-    else {
-      steps.push({ street: name, bearing: bearingWord(dx, dy), turn: lastHeading === null ? null : turnWord(heading - lastHeading), metres });
-    }
-    lastHeading = heading;
+    if (last && last.street === name) last.metres += metres;
+    else steps.push({ street: name, bearing: bearingWord(dx0, dy0), turn: lastHeading === null ? null : turnWord(heading0 - lastHeading), metres });
+    lastHeading = headingEnd;
   }
   const startPt = from ?? { lon: polyline[0]![0], lat: polyline[0]![1] };
   const endPt = to ?? { lon: polyline[polyline.length - 1]![0], lat: polyline[polyline.length - 1]![1] };

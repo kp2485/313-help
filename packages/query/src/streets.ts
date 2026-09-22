@@ -118,10 +118,25 @@ export interface StreetGraph {
   head: Int32Array;                  // nodeCount + 1
   edgeTo: Int32Array;
   edgeLen: Float32Array;
-  edgeWay: Int32Array;               // into wayName / wayCls / waySafety
+  edgeWay: Int32Array;               // into wayName / wayCls / waySafety / wayPts
+  /** Which undirected edge each half-edge belongs to, for the geometry below. */
+  halfEdge: Int32Array;
+  /** The same edge walked the other way. `twin[twin[h]] === h`. */
+  twinHalf: Int32Array;
   wayName: string[];
   wayCls: Uint8Array;
   waySafety: Uint8Array;
+  /** Each way's own vertices, flat [x, y, x, y, …] in metres. An edge runs along a part of one of these. */
+  wayPts: Float64Array[];
+  // Where each undirected edge starts and ends along its way: vertex `seg` plus a fraction `t` towards
+  // `seg + 1`. This is what keeps a curved street curved when the route is drawn — an edge between two
+  // junctions is NOT a straight chord.
+  edgeSegA: Int32Array;
+  edgeTA: Float32Array;
+  edgeSegB: Int32Array;
+  edgeTB: Float32Array;
+  edgeNodeA: Int32Array;
+  edgeNodeB: Int32Array;
   /** True when at least one source file carried a `safety` array. Decides which penalty table walk.ts uses. */
   hasSafety: boolean;
   /** Counts a person never sees; the real-data tests do. */
@@ -245,12 +260,21 @@ export function buildStreetGraph(files: PackedStreets[], key = ''): StreetGraph 
   };
 
   const eA: number[] = [], eB: number[] = [], eLen: number[] = [], eWay: number[] = [];
-  const wayName: string[] = [], wayCls: number[] = [], waySafety: number[] = [];
+  const eSegA: number[] = [], eTA: number[] = [], eSegB: number[] = [], eTB: number[] = [];
+  const wayName: string[] = [], wayCls: number[] = [], waySafety: number[] = [], wayPts: Float64Array[] = [];
   streets.forEach((r, ri) => {
     const way = wayName.length;
     wayName.push(r.name); wayCls.push(r.cls); waySafety.push(r.safety);
+    const flat = new Float64Array(r.pts.length * 2);
+    r.pts.forEach((p, i) => { flat[2 * i] = p[0]; flat[2 * i + 1] = p[1]; });
+    wayPts.push(flat);
     const sp = (splits.get(ri) ?? []).slice().sort((x, y) => x.seg - y.seg || x.t - y.t);
-    let prev = nodeOf(r.pts[0]![0], r.pts[0]![1]), acc = 0, k = 0;
+    let prev = nodeOf(r.pts[0]![0], r.pts[0]![1]), acc = 0, k = 0, segA = 0, tA = 0;
+    const emit = (n: number, segB: number, tB: number) => {
+      eA.push(prev); eB.push(n); eLen.push(acc); eWay.push(way);
+      eSegA.push(segA); eTA.push(tA); eSegB.push(segB); eTB.push(tB);
+      prev = n; acc = 0; segA = segB; tA = tB;
+    };
     for (let i = 0; i + 1 < r.pts.length; i++) {
       const a = r.pts[i]!, b = r.pts[i + 1]!;
       const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
@@ -258,13 +282,13 @@ export function buildStreetGraph(files: PackedStreets[], key = ''): StreetGraph 
       while (k < sp.length && sp[k]!.seg === i) {
         const s = sp[k]!, n = nodeOf(s.x, s.y);
         acc += len * (s.t - last); last = s.t;
-        if (n !== prev && acc > MIN_EDGE_M) { eA.push(prev); eB.push(n); eLen.push(acc); eWay.push(way); prev = n; acc = 0; }
+        if (n !== prev && acc > MIN_EDGE_M) emit(n, i, s.t);
         k++;
       }
       acc += len * (1 - last);
     }
     const end = nodeOf(r.pts[r.pts.length - 1]![0], r.pts[r.pts.length - 1]![1]);
-    if (end !== prev && acc > MIN_EDGE_M) { eA.push(prev); eB.push(end); eLen.push(acc); eWay.push(way); }
+    if (end !== prev && acc > MIN_EDGE_M) emit(end, Math.max(0, r.pts.length - 2), 1);
   });
 
   // 5. CSR
@@ -274,11 +298,16 @@ export function buildStreetGraph(files: PackedStreets[], key = ''): StreetGraph 
   for (let i = 0; i < N; i++) head[i + 1] = head[i + 1]! + head[i]!;
   const fill = Int32Array.from(head.subarray(0, N));
   const edgeTo = new Int32Array(2 * E), edgeLen = new Float32Array(2 * E), edgeWay = new Int32Array(2 * E);
-  const place = (from: number, to: number, len: number, way: number) => {
+  const halfEdge = new Int32Array(2 * E), twinHalf = new Int32Array(2 * E);
+  const place = (from: number, to: number, i: number): number => {
     const at = fill[from]!; fill[from] = at + 1;
-    edgeTo[at] = to; edgeLen[at] = len; edgeWay[at] = way;
+    edgeTo[at] = to; edgeLen[at] = eLen[i]!; edgeWay[at] = eWay[i]!; halfEdge[at] = i;
+    return at;
   };
-  for (let i = 0; i < E; i++) { place(eA[i]!, eB[i]!, eLen[i]!, eWay[i]!); place(eB[i]!, eA[i]!, eLen[i]!, eWay[i]!); }
+  for (let i = 0; i < E; i++) {
+    const f = place(eA[i]!, eB[i]!, i), b = place(eB[i]!, eA[i]!, i);
+    twinHalf[f] = b; twinHalf[b] = f;
+  }
 
   // 6. components and dead ends, for the honesty tests
   const parent = new Int32Array(N); for (let i = 0; i < N; i++) parent[i] = i;
@@ -293,8 +322,11 @@ export function buildStreetGraph(files: PackedStreets[], key = ''): StreetGraph 
     version: STREET_GRAPH_VERSION, key: key ? `${STREET_GRAPH_VERSION}:${key}` : '',
     nodeCount: N, edgeCount: E,
     nodeX: Float64Array.from(nodeX), nodeY: Float64Array.from(nodeY),
-    head, edgeTo, edgeLen, edgeWay,
-    wayName, wayCls: Uint8Array.from(wayCls), waySafety: Uint8Array.from(waySafety), hasSafety,
+    head, edgeTo, edgeLen, edgeWay, halfEdge, twinHalf,
+    wayName, wayCls: Uint8Array.from(wayCls), waySafety: Uint8Array.from(waySafety), wayPts, hasSafety,
+    edgeSegA: Int32Array.from(eSegA), edgeTA: Float32Array.from(eTA),
+    edgeSegB: Int32Array.from(eSegB), edgeTB: Float32Array.from(eTB),
+    edgeNodeA: Int32Array.from(eA), edgeNodeB: Int32Array.from(eB),
     stats: { polylines: streets.length, skipped, crossings, snapped, components: sizes.size, largestComponent: largest, deadEnds, buildMs: Date.now() - t0 },
   };
 }
@@ -321,13 +353,86 @@ export function clearStreetGraphCache(): void { graphs.clear(); }
 
 // ---- lookup ---------------------------------------------------------------------------------
 
+// ---- edge geometry --------------------------------------------------------------------------
+// An edge between two junctions is a piece of a real street, bends and all. These two functions are what a
+// client draws and what the snapping measures against; nothing anywhere treats an edge as a straight chord.
+
+/** The metre vertices of a half-edge, from its start node to its end node: flat [x, y, x, y, …]. */
+export function edgeGeometry(g: StreetGraph, half: number): number[] {
+  const e = g.halfEdge[half]!, pts = g.wayPts[g.edgeWay[half]!]!;
+  const at = (seg: number, t: number): [number, number] => {
+    const i = 2 * seg, j = i + 2;
+    if (j + 1 >= pts.length) return [pts[i]!, pts[i + 1]!];
+    return [pts[i]! + t * (pts[j]! - pts[i]!), pts[i + 1]! + t * (pts[j + 1]! - pts[i + 1]!)];
+  };
+  const segA = g.edgeSegA[e]!, segB = g.edgeSegB[e]!;
+  const out: number[] = [];
+  const start = at(segA, g.edgeTA[e]!);
+  out.push(start[0], start[1]);
+  for (let v = segA + 1; v <= segB; v++) out.push(pts[2 * v]!, pts[2 * v + 1]!);
+  const end = at(segB, g.edgeTB[e]!);
+  out.push(end[0], end[1]);
+  const to = g.edgeTo[half]!;
+  if (to === g.edgeNodeA[e]!) {                  // this half runs B -> A, so the way's order is reversed
+    const flipped: number[] = [];
+    for (let i = out.length - 2; i >= 0; i -= 2) flipped.push(out[i]!, out[i + 1]!);
+    out.length = 0; out.push(...flipped);
+  }
+  // The two ends are the nodes themselves: a node made by a 12 m end-snap sits slightly off its own line, and
+  // a drawn route must not show a gap there.
+  out[0] = g.nodeX[edgeFrom(g, half)]!; out[1] = g.nodeY[edgeFrom(g, half)]!;
+  out[out.length - 2] = g.nodeX[to]!; out[out.length - 1] = g.nodeY[to]!;
+  return out;
+}
+
+/** The node a half-edge leaves. Its other end is `edgeTo[half]`. */
+export function edgeFrom(g: StreetGraph, half: number): number {
+  const e = g.halfEdge[half]!;
+  return g.edgeTo[half]! === g.edgeNodeA[e]! ? g.edgeNodeB[e]! : g.edgeNodeA[e]!;
+}
+
+/** The part of a flat point list between two fractions of its own length. */
+export function sliceByFraction(pts: number[], t0: number, t1: number): number[] {
+  const n = pts.length / 2;
+  if (n < 2) return pts.slice();
+  const lens: number[] = []; let total = 0;
+  for (let i = 0; i + 1 < n; i++) { const d = Math.hypot(pts[2 * i + 2]! - pts[2 * i]!, pts[2 * i + 3]! - pts[2 * i + 1]!); lens.push(d); total += d; }
+  if (total <= 0) return [pts[0]!, pts[1]!];
+  const lo = Math.min(t0, t1) * total, hi = Math.max(t0, t1) * total;
+  const point = (d: number): [number, number] => {
+    let acc = 0;
+    for (let i = 0; i < lens.length; i++) {
+      if (acc + lens[i]! >= d || i === lens.length - 1) {
+        const u = lens[i]! > 0 ? Math.max(0, Math.min(1, (d - acc) / lens[i]!)) : 0;
+        return [pts[2 * i]! + u * (pts[2 * i + 2]! - pts[2 * i]!), pts[2 * i + 1]! + u * (pts[2 * i + 3]! - pts[2 * i + 1]!)];
+      }
+      acc += lens[i]!;
+    }
+    return [pts[pts.length - 2]!, pts[pts.length - 1]!];
+  };
+  const out: number[] = [];
+  const a = point(lo); out.push(a[0], a[1]);
+  let acc = 0;
+  for (let i = 0; i < lens.length; i++) {
+    acc += lens[i]!;
+    if (acc > lo && acc < hi) out.push(pts[2 * i + 2]!, pts[2 * i + 3]!);
+  }
+  const b = point(hi); out.push(b[0], b[1]);
+  if (t1 < t0) {
+    const flipped: number[] = [];
+    for (let i = out.length - 2; i >= 0; i -= 2) flipped.push(out[i]!, out[i + 1]!);
+    return flipped;
+  }
+  return out;
+}
+
 /** A point on the graph: which edge, how far along it, and how far off the graph the original point was. */
 export interface EdgePoint {
   /** Index into `edgeTo`/`edgeLen`/`edgeWay` (a directed half-edge), and the node it leaves. */
   half: number;
   from: number;
   to: number;
-  /** 0..1 along `from` -> `to`. */
+  /** 0..1 of the edge's own LENGTH along `from` -> `to`, measured on the real geometry. */
   t: number;
   x: number;
   y: number;
@@ -343,18 +448,26 @@ export function nearestEdgePoint(g: StreetGraph, pt: { lat: number; lon: number 
   const cx = Math.floor(px / CELL_M), cy = Math.floor(py / CELL_M);
   const nodeCells = new Map<number, number[]>();
   if (!nodeCellsFor(g, nodeCells)) return null;
-  for (let r = 1; r <= 12; r++) {
+  // Rings outwards from the point's own cell (r = 0 IS that cell), stopping as soon as a further ring could
+  // not hold anything nearer.
+  for (let r = 0; r <= 12; r++) {
     for (let a = -r; a <= r; a++) for (let b = -r; b <= r; b++) {
       if (Math.max(Math.abs(a), Math.abs(b)) !== r) continue;
       const l = nodeCells.get((cx + a) * 100000 + (cy + b)); if (!l) continue;
       for (const n of l) {
         for (let h = g.head[n]!; h < g.head[n + 1]!; h++) {
-          const m = g.edgeTo[h]!;
-          const ax = g.nodeX[n]!, ay = g.nodeY[n]!, bx = g.nodeX[m]!, by = g.nodeY[m]!;
-          const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
-          const t = len2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2)) : 0;
-          const x = ax + t * dx, y = ay + t * dy, d = Math.hypot(px - x, py - y);
-          if (d < bestD) { bestD = d; best = { half: h, from: n, to: m, t, x, y, offMetres: d }; }
+          // measured against the street's real shape, not a chord between its junctions
+          const geom = edgeGeometry(g, h);
+          let acc = 0, total = 0, bt = 0, bx2 = 0, by2 = 0, bd = Infinity;
+          for (let i = 0; i + 3 < geom.length; i += 2) {
+            const ax = geom[i]!, ay = geom[i + 1]!, dx = geom[i + 2]! - ax, dy = geom[i + 3]! - ay;
+            const len = Math.hypot(dx, dy), len2 = dx * dx + dy * dy;
+            const u = len2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2)) : 0;
+            const x = ax + u * dx, y = ay + u * dy, d = Math.hypot(px - x, py - y);
+            if (d < bd) { bd = d; bt = acc + u * len; bx2 = x; by2 = y; }
+            acc += len; total += len;
+          }
+          if (bd < bestD) { bestD = bd; best = { half: h, from: n, to: g.edgeTo[h]!, t: total > 0 ? bt / total : 0, x: bx2, y: by2, offMetres: bd }; }
         }
       }
     }

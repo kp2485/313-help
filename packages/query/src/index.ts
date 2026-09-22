@@ -11,6 +11,7 @@ export { helpAlong, nearestSegment, milesToSegment, milesToLine, WALK_MILES, typ
 // "Walking directions", "Trip plans".
 export {
   buildStreetGraph, cachedStreetGraph, clearStreetGraphCache, decodeStreets, nearestEdgePoint, mayJoin, isWalkable,
+  edgeGeometry, edgeFrom, sliceByFraction,
   safetyByte, safetyHin, safetyHighSeverity, safetyLanes, safetySpeed, safetyAadt, lanesBucket, speedBucket, aadtBucket,
   toMetres, toLonLat, CELL_M, NODE_TOL_M, SNAP_M, MIN_EDGE_M, STREET_GRAPH_VERSION, STREET_SCALE, FREEWAY_CLASS,
   REF_LAT, M_PER_DEG_LAT, M_PER_DEG_LON, SAFETY_HIN, SAFETY_HIGH_SEVERITY,
@@ -18,7 +19,7 @@ export {
 } from './streets.js';
 export {
   walkRoute, routeBetween, metresBetween, bearingWord, turnWord, wayPenalty,
-  WALK_M_PER_S, WALK_M_PER_MIN, SAFETY_PENALTY, CLASS_PENALTY,
+  WALK_M_PER_S, WALK_M_PER_MIN, SAFETY_PENALTY, CLASS_PENALTY, TURN_PENALTY_M,
   type WalkRoute, type WalkStep, type Bearing, type Turn,
 } from './walk.js';
 export {

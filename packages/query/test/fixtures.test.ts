@@ -1,15 +1,19 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { badge, bundleAge, effectiveNow, helpAlong, milesToSegment, nearestSegment, nextOccurrences, openNow, rank, search } from '../src/index.js';
-import type { Alert, BundleRow, Segment } from '../src/index.js';
+import {
+  badge, bundleAge, buildStreetGraph, buildTransitNetwork, effectiveNow, helpAlong, milesToSegment, nearestSegment,
+  nextOccurrences, openNow, plan, rank, search, walkRoute,
+} from '../src/index.js';
+import type { Alert, BundleRow, PackedStreets, Segment, TransitLayer, WalkRoute } from '../src/index.js';
 
 // Fixtures are plain JSON so the iOS implementation can run the same cases.
 const dir = join(__dirname, '../../../schema/fixtures');
 
 interface Case {
   name: string;
-  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'rankDetail' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment' | 'search';
+  fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'rankDetail' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment' | 'search'
+  | 'streetGraph' | 'walk' | 'plan';
   segment?: string; openOnly?: boolean; maxMiles?: number; tolerance?: number;
   now: string;
   text?: string;
@@ -17,10 +21,24 @@ interface Case {
   n?: number;
   query?: Record<string, unknown>;
   index?: { generated_at: string; retired?: boolean };
+  // Directions (schema/query-spec.md). `no_safety` drops the street files' safety array, which is what an
+  // older bundle looks like; `from`/`to` are the two ends of a walk or a whole trip.
+  from?: { lat: number; lon: number };
+  to?: { lat: number; lon: number };
+  no_safety?: boolean;
   expect: unknown;
 }
 type FixtureRow = Partial<BundleRow> & { id: string };
-interface Fixture { description: string; segments?: Segment[]; rows?: FixtureRow[]; alerts?: Alert[]; cases: Case[] }
+interface Fixture {
+  description: string; segments?: Segment[]; rows?: FixtureRow[]; alerts?: Alert[]; cases: Case[];
+  streets?: PackedStreets[]; transit?: TransitLayer[];
+}
+
+// The one wording of a result that all three runners compare. Metres are rounded to 10 so a port never fails on
+// a last-digit difference, and the distances that a person is told ("about 40 m to the building") to the metre.
+const r10 = (m: number) => Math.round(m / 10) * 10;
+export const walkSummary = (r: WalkRoute | null): string | null => r === null ? null
+  : `${r.steps.map((s) => `${s.turn ?? 'start'} ${s.street} ${s.bearing} ${r10(s.metres)}`).join(' > ')} | ${r10(r.metres)} m, off ${Math.round(r.startOffMetres)}/${Math.round(r.endOffMetres)}`;
 
 const DEFAULTS = {
   org: 'Test Org', category: 'food.pantry', what: 'Free groceries', phones: [], flags: [],
@@ -42,6 +60,12 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
     if (!r) throw new Error(`${file}: no row ${id}`);
     return r;
   };
+
+  // Directions: one graph per fixture file, built once with and once without the City's safety fields.
+  const streets = fx.streets ?? [];
+  const bare = streets.map((s) => ({ origin: s.origin, names: s.names, roads: s.roads }));
+  const graphOf = (noSafety?: boolean) => buildStreetGraph(noSafety ? bare : streets, `${file}${noSafety ? ':bare' : ''}`);
+  const network = fx.transit?.length ? buildTransitNetwork(fx.transit) : null;
 
   describe(`${file} — ${fx.description}`, () => {
     for (const c of fx.cases) {
@@ -79,6 +103,21 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
           }
           case 'effectiveNow':
             expect(effectiveNow(now, c.index!.generated_at).toISOString()).toBe(c.expect); break;
+          case 'streetGraph': {
+            const g = graphOf(c.no_safety);
+            expect({
+              nodes: g.nodeCount, edges: g.edgeCount, crossings: g.stats.crossings, snapped: g.stats.snapped,
+              components: g.stats.components, largest: g.stats.largestComponent, dead_ends: g.stats.deadEnds, skipped: g.stats.skipped,
+            }).toEqual(c.expect); break;
+          }
+          case 'walk':
+            expect(walkSummary(walkRoute(graphOf(c.no_safety), c.from!, c.to!))).toEqual(c.expect); break;
+          case 'plan': {
+            const got = plan(graphOf(c.no_safety), network!, c.from!, c.to!).map((p) => `${p.legs.map((l) => l.kind === 'walk'
+              ? `walk ${r10(l.metres)}m`
+              : `ride ${l.route_id} ${l.stops}st ${l.headway_minutes === null ? 'no-headway' : `every ${l.headway_minutes}`}`).join(' > ')} [${p.range[0]}-${p.range[1]}]`);
+            expect(got).toEqual(c.expect); break;
+          }
         }
       });
     }
