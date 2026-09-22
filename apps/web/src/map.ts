@@ -132,7 +132,29 @@ export function loadNet(index: BundleIndex, file: string): Promise<object | null
 export interface Overlay extends LayerData { id: string; label: string; css: string; width?: number; dash?: number[]; ring?: boolean; dense?: boolean }
 
 // ---- the view -----------------------------------------------------------------
-export interface MapDot { lat: number; lon: number; label: string; go?: string; css?: string; sub?: string; category?: string }
+/** `dir` is the `data-dir` payload for the bottom card's "Directions" button: the destination, and nothing
+ *  about the person. Absent where a row has no coordinate or must never be routed to (docs/08). */
+export interface MapDot { lat: number; lon: number; label: string; go?: string; dir?: string; css?: string; sub?: string; category?: string }
+
+/**
+ * One chosen itinerary, drawn (DECISIONS 2026-09-22). The map is the extra here as everywhere: the numbered
+ * steps below it are the source of truth, `text` is what this line says in words, and nothing on it is ever
+ * called safe, lit or accessible.
+ *
+ * A walking leg is a solid line in its own tone; a ride wears the tone of the agency's own layer and its dash,
+ * so the map and the layer switcher never disagree about what a colour means. Both sit on the same casing
+ * every other line in this file uses, which is what their 3:1 is measured against (1.4.11).
+ */
+export interface MapRouteLeg { kind: 'walk' | 'ride'; polyline: [number, number][]; css?: string; dash?: number[] }
+export interface MapRouteMark { lat: number; lon: number; kind: 'start' | 'end' | 'board' | 'alight'; label: string; sub?: string }
+export interface MapRoute {
+  legs: MapRouteLeg[];
+  marks: MapRouteMark[];
+  /** The overlay's text equivalent (1.1.1), read out with the picture's own label. */
+  text: string;
+  /** The leg the current step belongs to, drawn heavier. -1 for none. */
+  active?: number;
+}
 
 // ---- the features a keyboard can walk ------------------------------------------------------------------
 // The picture is an extra: every map in the app is also a list of the same places (docs/05). But "there is a
@@ -148,26 +170,31 @@ export interface MapArea { id: string; name: string; sub: string; rings: { lat: 
 
 /** What is under a point on the map: a card to show, a subway glyph to choose, an area to select — or nothing. */
 type Hit =
-  | { kind: 'card'; title: string; sub: string; go?: string }
+  | { kind: 'card'; title: string; sub: string; go?: string; dir?: string }
   | { kind: 'area'; id: string; title: string; sub: string; go?: string }
   | { kind: 'glyph'; glyph: string; sel: string };
 
 export interface MapFeature {
-  kind: 'segment' | 'dot' | 'area' | 'hub' | 'terminal' | 'interchange' | 'route';   // the last four: subway style only, always after the first two
+  // `stop` is a marker on a drawn route (start, end, and where a bus is boarded or left). The last four are
+  // subway style only, and always after the first three.
+  kind: 'stop' | 'segment' | 'dot' | 'area' | 'hub' | 'terminal' | 'interchange' | 'route';
   id: string;                 // stable across a pan, so the ring stays on the same thing
   route: number;              // a greenway stretch's place in the route
   d: number;                  // a place's distance from the middle of the screen, in pixels
   label: string; sub: string; go?: string;
+  dir?: string;               // the `data-dir` payload: open OUR directions to this place
   sel?: string;               // subway style: what Enter chooses (a route, an interchange…), instead of a screen to go to
   box: [number, number, number, number];   // on screen: what the ring is drawn round
 }
-/** A stable, meaningful order: the greenway first, stretch by stretch along the route; then the areas, the one
- *  nearest the middle of the screen first; then the places, likewise. An area comes before the dots because it
- *  is the ground they stand on, and a keyboard that walks the ground first reads the map the way an eye does
- *  (audit §3.4). Pure, so the order is held to a fixture rather than to a map. */
-const KIND_ORDER: Record<string, number> = { segment: 0, area: 1, dot: 2 };
-export function orderFeatures<T extends { kind: 'segment' | 'dot' | 'area'; route: number; d: number }>(list: readonly T[]): T[] {
-  return [...list].sort((a, b) => (a.kind === b.kind ? (a.kind === 'segment' ? a.route - b.route : a.d - b.d) : (KIND_ORDER[a.kind] ?? 9) - (KIND_ORDER[b.kind] ?? 9)));
+/** A stable, meaningful order: a drawn route's own markers first, in the order they are walked, because a map
+ *  that is about one trip is about nothing else; then the greenway, stretch by stretch along the route; then
+ *  the areas, the one nearest the middle of the screen first; then the places, likewise. An area comes before
+ *  the dots because it is the ground they stand on, and a keyboard that walks the ground first reads the map
+ *  the way an eye does (audit §3.4). Pure, so the order is held to a fixture rather than to a map. */
+const KIND_ORDER: Record<string, number> = { stop: 0, segment: 1, area: 2, dot: 3 };
+export function orderFeatures<T extends { kind: 'stop' | 'segment' | 'dot' | 'area'; route: number; d: number }>(list: readonly T[]): T[] {
+  // `route` is a place in a sequence: a greenway stretch's along the path, a route marker's along the trip.
+  return [...list].sort((a, b) => (a.kind === b.kind ? (a.kind === 'segment' || a.kind === 'stop' ? a.route - b.route : a.d - b.d) : (KIND_ORDER[a.kind] ?? 9) - (KIND_ORDER[b.kind] ?? 9)));
 }
 export type MapAction = 'in' | 'out' | 'left' | 'right' | 'up' | 'down' | 'next' | 'prev' | 'open' | 'escape' | null;
 /** What one key press means to the map — the whole of it, as a plain function, so the choice of keys can be
@@ -211,6 +238,8 @@ export interface MapSpec {
   areas?: MapArea[];
   selected?: string;
   overlays?: Overlay[];                         // switched-on transport layers, already loaded (Map tab)
+  /** One chosen itinerary, drawn over everything else (the Directions screen). */
+  route?: MapRoute;
   dots?: MapDot[]; me?: { lat: number; lon: number } | null;
   fit: { lat: number; lon: number }[];          // the "whole area" view: the reset button, and the start when there is no `open`
   /** Where this map OPENS, when it opens on a radius rather than on a bounding box (the Map tab, 2026-09-22).
@@ -227,7 +256,7 @@ export interface MapSpec {
    *  there, and for any network whose data has not arrived, the map keeps drawing `standard`. */
   style?: MapStyle;
   subway?: { Painter: new (data: SubwayData) => SubwayPainter; order: typeof import('./subway.js').featureOrder; data: SubwayData; more: (count: number) => string };
-  strings: { zoomIn: string; zoomOut: string; reset: string; bigger: string; smaller: string; details: string; park: string; noStreets: string; keys: string; panUp: string; panDown: string; panLeft: string; panRight: string; focusHint: string; focusNone: string; focusOff: string; source: (date: string) => string; phase: Record<string, string> };
+  strings: { zoomIn: string; zoomOut: string; reset: string; bigger: string; smaller: string; details: string; park: string; noStreets: string; keys: string; panUp: string; panDown: string; panLeft: string; panRight: string; focusHint: string; focusNone: string; focusOff: string; directions?: string; source: (date: string) => string; phase: Record<string, string> };
   segGo?: (id: string) => string;               // data-go value for a greenway segment
 }
 const cameras = new Map<string, { cx: number; cy: number; s: number }>();
@@ -271,6 +300,10 @@ export function coverTargets(el: Element, root: Element): Element[] {
 /** Our own words go into `innerHTML` and into `aria-label` here; they come from strings/*.json, where an
  *  apostrophe or an ampersand is ordinary punctuation. Escaped, always: a label is markup once it is set. */
 export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+/** The bottom card's "Directions" button. Only when the caller gave this thing a destination to route to AND
+ *  the screen handed down the word for it: a map on a screen with no Directions handling never grows one. */
+export const dirBtn = (dir: string | undefined, S: { directions?: string }): string =>
+  (dir && S.directions ? `<button class="btn" data-dir="${esc(dir)}">${esc(S.directions)}</button>` : '');
 
 // ---- gestures: the maths, as plain functions ---------------------------------------------------------------
 // A phone map is judged on how it moves, and how it moves is arithmetic: what stays under the fingers, how far a
@@ -408,7 +441,10 @@ export class MapView {
     this.areaSel = spec.selected ?? '';
     this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', spec.label); this.canvas.tabIndex = 0;
     // The picture answers to the keyboard, so it says how, and the description is read out with the label.
-    const help = document.createElement('p'); help.className = 'vh'; help.id = 'mapkeys' + ++mapNo; help.textContent = S.keys;
+    // A drawn route says what its line is, in words, in the same breath: the coloured line is a picture, and
+    // 1.1.1 asks for its text equivalent, not for a longer label.
+    const help = document.createElement('p'); help.className = 'vh'; help.id = 'mapkeys' + ++mapNo;
+    help.textContent = spec.route?.text ? `${spec.route.text} ${S.keys}` : S.keys;
     this.canvas.setAttribute('aria-describedby', help.id);
     const btn = (act: string, text: string, label: string, cls = '') => `<button type="button" class="${cls}" data-map-act="${act}" aria-label="${esc(label)}">${text}</button>`;
     const tools = document.createElement('div'); tools.className = 'maptools';
@@ -663,7 +699,14 @@ export class MapView {
   /** Everything on screen right now that a keyboard may land on, in order. Recomputed on every step, because
    *  panning and zooming change what is there — the ring stays on its own feature by id, not by position. */
   private features(): MapFeature[] {
-    const view = this.viewBox(), out: (MapFeature & { kind: 'segment' | 'dot' | 'area' })[] = [], S = this.spec.strings;
+    const view = this.viewBox(), out: (MapFeature & { kind: 'stop' | 'segment' | 'dot' | 'area' })[] = [], S = this.spec.strings;
+    // A drawn route's own markers, in the order they are walked: start, every boarding and alighting, end.
+    // `route` is the place in the trip, so N steps along the journey rather than round the screen.
+    (this.spec.route?.marks ?? []).forEach((m, i) => {
+      const x = this.X(wx(m.lon)), y = this.Y(wy(m.lat));
+      if (x < 0 || y < 0 || x > this.w || y > this.h) return;
+      out.push({ kind: 'stop', id: 'stop:' + i, route: i, d: 0, label: m.label, sub: m.sub ?? '', box: [x - 12, y - 12, x + 12, y + 12] });
+    });
     this.segs.forEach((g, i) => {
       if (!touches(g.box, view)) return;
       const xs = [this.X(g.box[0]), this.X(g.box[2])], ys = [this.Y(g.box[1]), this.Y(g.box[3])];
@@ -685,7 +728,7 @@ export class MapView {
       const x = this.X(wx(dot.lon)), y = this.Y(wy(dot.lat));
       if (x < 0 || y < 0 || x > this.w || y > this.h) continue;
       out.push({ kind: 'dot', id: `dot:${dot.lat},${dot.lon},${dot.label}`, route: 0, d: Math.hypot(x - this.w / 2, y - this.h / 2),
-        label: dot.label, sub: dot.sub ?? '', go: dot.go, box: [x - 11, y - 11, x + 11, y + 11] });
+        label: dot.label, sub: dot.sub ?? '', go: dot.go, dir: dot.dir, box: [x - 11, y - 11, x + 11, y + 11] });
     }
     const base = orderFeatures(out);
     if (!this.sub || !this.spec.subway) return base;
@@ -714,7 +757,7 @@ export class MapView {
     // What the keyboard could not be given (the caps of section 9) and what the painter left out: the list has them all.
     const added = list.filter((x) => x.kind !== 'segment' && x.kind !== 'dot').length;
     const more = this.sub && f === list[list.length - 1] ? Math.max(0, this.sub.features().length - added) + this.sub.more : 0;
-    this.say(`<div class="mappick"><span><strong>${esc(f.label)}</strong>${f.sub ? `<small>${esc(f.sub)}</small>` : ''}</span>${f.go ? `<button class="btn ghost" data-go="${esc(f.go)}">${esc(S.details)}</button>` : ''}</div><p class="vh">${esc(S.focusHint)}</p>${more && this.spec.subway ? `<p class="foot">${esc(this.spec.subway.more(more))}</p>` : ''}`);
+    this.say(`<div class="mappick"><span><strong>${esc(f.label)}</strong>${f.sub ? `<small>${esc(f.sub)}</small>` : ''}</span>${dirBtn(f.dir, S)}${f.go ? `<button class="btn ghost" data-go="${esc(f.go)}">${esc(S.details)}</button>` : ''}</div><p class="vh">${esc(S.focusHint)}</p>${more && this.spec.subway ? `<p class="foot">${esc(this.spec.subway.more(more))}</p>` : ''}`);
   }
   /** Enter on the ring opens the same screen the card's own button opens — the app's `data-go` handling, not a
    *  second copy of it. A feature with nowhere to go (the stretch you are already on) simply stays put. */
@@ -757,7 +800,7 @@ export class MapView {
     const S = this.spec.strings;
     let best: { d: number; dot: MapDot } | undefined;
     for (const dot of this.spec.dots ?? []) { const d = Math.hypot(this.X(wx(dot.lon)) - q.x, this.Y(wy(dot.lat)) - q.y); if (d < 24 && (!best || d < best.d)) best = { d, dot }; }
-    if (best) return { kind: 'card', title: best.dot.label, sub: best.dot.sub ?? '', go: best.dot.go };
+    if (best) return { kind: 'card', title: best.dot.label, sub: best.dot.sub ?? '', go: best.dot.go, dir: best.dot.dir };
     // Subway style: a station, a pill, a terminal, a marker or a badge, each with a 44-unit box of its own.
     const std = this.sub ? this.sub.rest : this.spec.overlays ?? [];
     const glyph = this.sub?.hit(q, this.lastGlyph);
@@ -807,7 +850,9 @@ export class MapView {
   }
   private pick(q: { x: number; y: number }): void {
     const S = this.spec.strings;
-    const card = (title: string, sub: string, go?: string) => this.say(`<div class="mappick"><span><strong>${esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${go ? `<button class="btn ghost" data-go="${esc(go)}">${esc(S.details)}</button>` : ''}</div>`);
+    // "Directions" comes FIRST on the card: on the Map tab it is the thing a person came for, and "See details"
+    // is the longer road to the same place. It opens our own directions, on this phone (DECISIONS 2026-09-22).
+    const card = (title: string, sub: string, go?: string, dir?: string) => this.say(`<div class="mappick"><span><strong>${esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${dirBtn(dir, S)}${go ? `<button class="btn ghost" data-go="${esc(go)}">${esc(S.details)}</button>` : ''}</div>`);
     const hit = this.probe(q);
     if (hit?.kind === 'glyph') { this.lastGlyph = hit.glyph; return this.choose(hit.sel); }
     // A tap on the empty map, or on something that is not a route, lets a chosen route go.
@@ -816,7 +861,7 @@ export class MapView {
     // A tapped outline stays highlighted, and the highlight lives HERE rather than in the page: telling the page
     // would redraw it, and a redraw throws the map away — taking the card that was just opened with it.
     if (hit.kind === 'area') { this.areaSel = hit.id; this.redraw(); return card(hit.title, hit.sub, hit.go); }
-    card(hit.title, hit.sub, hit.go);
+    card(hit.title, hit.sub, hit.go, hit.dir);
   }
   /**
    * The mouse cursor (Kyle, 2026-09-22): a hand over anything a click would open or name, and the grab hand
@@ -849,7 +894,7 @@ export class MapView {
   private draw(): void {
     const c = this.ctx, { w, h } = this, mpp = M_PER_UNIT / this.s;                        // meters per pixel
     const view: Box = this.viewBox();
-    const col = { out: css('--map-out'), outInk: css('--map-out-ink'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus'), gwOpen: css('--gw-open'), gwBuild: css('--gw-build'), gwFund: css('--gw-fund'), gwPlan: css('--gw-plan'), gwCase: css('--gw-case') };
+    const col = { out: css('--map-out'), outInk: css('--map-out-ink'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus'), gwOpen: css('--gw-open'), gwBuild: css('--gw-build'), gwFund: css('--gw-fund'), gwPlan: css('--gw-plan'), gwCase: css('--gw-case'), routeWalk: css('--route-walk'), routeRide: css('--route-ride') };
     // Subway style (docs/MAP-STYLE.md): the painter works the frame out first, because its badges and names
     // outrank street names and because the basemap under it is quietened. `sub` is null in `standard`, and
     // every line below that mentions it then does exactly what it did before there was a second style.
@@ -996,6 +1041,26 @@ export class MapView {
       }
     }
 
+    // The one chosen itinerary, over the basemap, the layers and the greenway alike: on this screen the map is
+    // about this trip and nothing else. A casing under every leg, exactly as a greenway stretch and a bus route
+    // have one, so the line keeps its 3:1 over the land, over a park and over the streets it crosses (1.4.11).
+    // Colour never carries the meaning alone: a ride is dashed in its agency's own tone, and every leg is also
+    // a sentence in the numbered list below the map.
+    const route = this.spec.route;
+    if (route?.legs.length) {
+      const rw = Math.max(4, Math.min(9, 20 / mpp));
+      const traceLine = (line: readonly [number, number][]) => { c.beginPath(); line.forEach((p, i) => { const x = this.X(wx(p[0])), y = this.Y(wy(p[1])); if (i) c.lineTo(x, y); else c.moveTo(x, y); }); };
+      c.setLineDash([]); c.strokeStyle = col.gwCase;
+      for (const leg of route.legs) { c.lineWidth = rw + 4; traceLine(leg.polyline); c.stroke(); }
+      route.legs.forEach((leg, i) => {
+        const on = route.active === i;
+        c.strokeStyle = (leg.css && css(leg.css)) || (leg.kind === 'ride' ? col.routeRide : col.routeWalk) || col.focus;
+        c.lineWidth = on ? rw + 2.5 : rw;
+        c.setLineDash((leg.dash ?? []).map((d) => d * c.lineWidth));
+        traceLine(leg.polyline); c.stroke();
+      });
+      c.setLineDash([]);
+    }
     // Names. Bigger roads first, so they win when two names would overlap.
     // A name is a row of small circles along its text, so a slanted name only blocks the space it really covers.
     const placed: [number, number, number][] = [...blocks], named: { n: string; x: number; y: number }[] = [];
@@ -1054,6 +1119,20 @@ export class MapView {
     if (sub) sub.marks();                               // stops, interchanges, terminals, hubs, markers, badges
     const dot = (d: { lat: number; lon: number; css?: string }, fill: string, r: number) => { c.beginPath(); c.arc(this.X(wx(d.lon)), this.Y(wy(d.lat)), r, 0, 6.2832); c.fillStyle = (d.css && css(d.css)) || fill; c.fill(); c.lineWidth = 2.5; c.strokeStyle = col.surface; c.stroke(); };
     for (const d of this.spec.dots ?? []) dot(d, col.brand, 7);
+    // Where the trip begins and ends, and every place a bus is got on or off. A boarding marker is a RING and
+    // an end marker is solid, so the two are told apart without colour; both are named in the step list, and
+    // N and P walk them in the order they happen.
+    if (route?.marks.length) {
+      const r = Math.max(5, Math.min(9, 30 / mpp));
+      for (const m of route.marks) {
+        const x = this.X(wx(m.lon)), y = this.Y(wy(m.lat));
+        if (x < -12 || y < -12 || x > w + 12 || y > h + 12) continue;
+        c.beginPath(); c.arc(x, y, r, 0, 6.2832);
+        c.fillStyle = (m.kind === 'board' || m.kind === 'alight' ? col.routeRide : col.routeWalk) || col.focus;
+        c.fill(); c.lineWidth = 2.5; c.strokeStyle = col.surface; c.stroke();
+        if (m.kind === 'board' || m.kind === 'alight') { c.beginPath(); c.arc(x, y, r * 0.45, 0, 6.2832); c.fillStyle = col.surface; c.fill(); }
+      }
+    }
     if (sub) {
       sub.labels();
       // The card of whatever is chosen, shown again after the page was redrawn; a choice whose layer is gone is let go.

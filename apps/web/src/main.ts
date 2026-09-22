@@ -8,7 +8,7 @@ import { cached, refresh, type Bundle } from './data.js';
 import { areaById, areaPage, hoodIndex, hoodList, hoodRows, hoodView, loadHoodView, loadIndicators, outline, saveHoodView, type Area, type Hood, type HoodView, type Indicators, type Ui } from './hoods.js';
 import { hoodAt, hoodOrder as hoodOrderOf, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
 import { icon } from './icons.js';
-import { MapView, focusRadius, loadLayer, loadMap, loadNet, loadedBase, type LayerData, type MapArea, type MapDot, type MapSpec, type Overlay } from './map.js';
+import { MapView, focusRadius, loadLayer, loadMap, loadNet, loadedBase, type LayerData, type MapArea, type MapDot, type MapRoute, type MapSpec, type Overlay } from './map.js';
 import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, rememberLocateAnswered, requestPosition, type LocateAsk } from './locate.js';
 import { forgetCrossings, resolveCrossing, type CrossOutcome } from './intersections.js';
 import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, inCategories, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
@@ -86,6 +86,12 @@ const netFiles = new Map<string, NetHeld | 'loading' | 'failed'>();
 const wantedStops = new Set<string>();                    // stops layers a chosen route asked for, this visit only
 let refocusSel = '';
 let refocus = '';                                        // a layer switch to put the cursor back on after redrawing
+// Our own directions (DECISIONS 2026-09-22). The whole screen — the planner, the street graph, the Worker — is
+// one lazily loaded chunk: a person who never taps Directions never downloads a byte of it. `dirMod` is that
+// chunk once it has arrived; `dirWanted` is the destination waiting for it.
+let dirMod: typeof import('./dirscreen.js') | null = null;
+let dirState: '' | 'loading' | 'failed' = '';
+let dirWanted: { lat: number; lon: number; name: string } | null = null;
 // Where the cursor goes after a redraw that is not a new screen (a report sent, a place saved, the map opened on a
 // list). Without this the whole page is replaced under the person's feet and the keyboard starts again at the top.
 type ReportOutcome = 'sent' | 'queued' | 'sent_no_photo' | 'failed';
@@ -291,7 +297,13 @@ function crossBox(): string {
     : '';
   return `${field}${said}${choices}`;
 }
-function locChip(): string {
+/**
+ * The three ways in, in one place. `crossFirst` is the Directions screen and nothing else: there the
+ * cross-street field is opened and put ahead of "Use my location", because it is the only one of the three
+ * that works with no satellite and no signal at all, and that screen is the one a person with neither is on
+ * (DECISIONS 2026-09-22). The buttons, the handlers and the words are the same three everywhere.
+ */
+function locChip(crossFirst = false): string {
   if (here) return `<p class="loc">${icon('pin', 'sm')}<span>${T(hereZip ? 'loc.zip_using' : hereCross ? 'loc.cross_using' : 'loc.using', { zip: hereZip, where: hereCross })}</span> <button class="chip" data-loc="off">${T(hereZip ? 'loc.zip_off' : hereCross ? 'loc.cross_off' : 'loc.off')}</button></p>`;
   // "Type a ZIP" (docs/05): for a person who would rather not share a location. The ZIP is looked up in the bundle, on the phone.
   const zip = !bundle?.zips ? '' : zipOpen
@@ -302,7 +314,9 @@ function locChip(): string {
   // A fix from outside the four cities is not a refusal and must not read like one: the map stays on the city,
   // and the ZIP entry beside this is the way to look at a part of it (docs/05, "Map tab").
   const note = locateOutside ? 'map.locate_outside' : zipUnknown ? 'loc.zip_unknown' : locDenied ? 'loc.denied' : 'loc.note';
-  return `<div class="loc">${slowBanner()}<button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button>${crossBox()}${zip}<small id="locnote">${T(note)}</small></div>`;
+  const use = `<button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button>`;
+  const ways = crossFirst ? `${crossBox()}${use}${zip}` : `${use}${crossBox()}${zip}`;
+  return `<div class="loc">${slowBanner()}${ways}<small id="locnote">${T(note)}</small></div>`;
 }
 const searchBtn = () => `<button class="searchbtn" ${go({ v: 'search' })}>${icon('search', 'sm')}<span>${T('search.open')}</span></button>`;
 // `own` marks a title a place or a city dataset wrote (a park, a greenway stretch, a listing): it is never
@@ -326,7 +340,8 @@ function card(r: Ranked, showDistance = true): string {
       <h3>${owner(r.row.name)}</h3><p class="what">${owner(r.row.what)}</p>
       <p class="meta"><span class="pill ${r.open.state}">${esc(openText(r.open))}</span>${areaPill(r.row)}${showDistance && r.miles !== null ? `<span class="pill plain">${T('miles', { miles: r.miles.toFixed(1) })}</span>` : ''}</p>
       ${r.row.notice ? `<p class="notice">${owner(r.row.notice)}</p>` : ''}<p class="fresh ${b.level}">${esc(b.text)}</p></a>
-    ${ph ? `<a class="btn" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.row.name })}">${icon('phone', 'sm')}${T('detail.call')} <strong>${phoneHtml(ph.number)}</strong></a>` : ''}</li>`;
+    ${ph ? `<a class="btn" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.row.name })}">${icon('phone', 'sm')}${T('detail.call')} <strong>${phoneHtml(ph.number)}</strong></a>` : ''}
+    ${dirButton(r.row.name, r.row.lat, r.row.lon, r.row.category)}</li>`;
 }
 function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?: string; noDistance?: boolean; linksBelow?: boolean; only?: string[] }): string {
   // The location still goes to `rank` on a no-distance screen: a domestic-violence row uses it only to work out
@@ -344,7 +359,7 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
   // screen, and never a dot for a sensitive listing (those carry no coordinates in the first place).
   const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && !isSensitive(r.row.category));
   const map = !pins.length ? '' : listMap
-    ? `${mapBox({ key: 'list:' + JSON.stringify([query, opts.only ?? null]), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: openText(r.open), category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id }) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
+    ? `${mapBox({ key: 'list:' + JSON.stringify([query, opts.only ?? null]), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: openText(r.open), category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id }), dir: dirValue(r.row.name, r.row.lat, r.row.lon, r.row.category) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
     : `<button class="chip" data-listmap>${icon('pin', 'sm')}${T('map.show', { count: pins.length })}</button>`;
   return `${opts.noDistance ? '' : locChip()}${map}<h2 class="vh">${T('results.head')}</h2><ul class="cards">${shown.map((r) => card(r, !opts.noDistance)).join('')}</ul>
     ${opts.seeAll && ranked.length > shown.length ? `<button class="btn ghost" ${go(opts.seeAll)}>${T('results.see_all', { count: ranked.length })}</button>` : ''}`;
@@ -631,7 +646,7 @@ function mapTab(): string {
   // `sub` is what a tap card says under the name, and what the keyboard's ring reads out: the kind of help, and
   // whether it is open now. `category` is what lets map.ts run every dot through `mapDrawable` again before the
   // keyboard is allowed to land on it.
-  const dots: MapDot[] = rows.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: `${layerName('help:' + groupOf(r.row.category))} · ${openText(r.open)}`, category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id } satisfies View), css: '--grp-' + groupOf(r.row.category) }));
+  const dots: MapDot[] = rows.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: `${layerName('help:' + groupOf(r.row.category))} · ${openText(r.open)}`, category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id } satisfies View), dir: dirValue(r.row.name, r.row.lat, r.row.lon, r.row.category), css: '--grp-' + groupOf(r.row.category) }));
   const nearParks = here ? [...parks].map((p) => ({ p, mi: milesBetween(here!, p) })).sort((a, b) => a.mi - b.mi).slice(0, 5) : [];
   const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now(), bundle?.alerts ?? []);
   const sources = (bundle?.transit?.layers ?? []).filter((l) => layerOn('go:' + l.id));
@@ -719,8 +734,11 @@ function parkPage(id: string): { title: string; html: string; ownTitle: true } {
   return { title: p.name, ownTitle: true, html: `<main class="detail"><p class="org">${owner(p.type)}${p.acres ? ` · ${T('rec.acres', { acres: p.acres })}` : ''}</p>
     ${p.address ? `<address lang="en"><bdi>${esc(p.address)}</bdi><br><bdi>Detroit, MI</bdi></address>` : `<p>${T('rec.no_address')}</p>`}
     ${mapBox({ key: 'park:' + p.id, label: t('map.label_park', { name: p.name }), small: true, quiet: false, segments: !!gw, fit: [at], minMeters: 700, dots: [{ lat: p.lat, lon: p.lon, label: p.name }] })}
-    <div class="stackbtns"><div class="two"><a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${q}" target="_blank" rel="noopener noreferrer" aria-label="${T('detail.directions_label', { name: p.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
-      <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=transit" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>
+    <div class="stackbtns">${dirButton(p.name, p.lat, p.lon, '', true)}
+      <details class="browse otherapps"><summary>${icon('out', 'sm')}<span>${T('dir.other_apps')}</span>${icon('chevron', 'sm turn dim')}</summary>
+        <div class="two"><a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${q}" target="_blank" rel="noopener noreferrer" aria-label="${T('detail.directions_label', { name: p.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
+        <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=transit" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>
+        <p class="foot">${T('dir.other_apps_note')}</p></details>
       <button class="btn ghost" ${go({ v: 'tab', tab: 'map' })}>${T('rec.on_the_map')}</button></div>
     ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
     <h2>${T('rec.help_near')}</h2>${near.length ? `<ul class="cards">${near.map((r) => card(r)).join('')}</ul>` : `<p class="empty">${T('rec.help_near_none')}</p>`}
@@ -818,9 +836,12 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
   return { title: r.name, exit: priv, ownTitle: true, html: `<main class="detail"><p class="org">${owner(r.org)}</p>
     <p class="meta"><span class="pill ${o.state}">${esc(openText(o))}</span>${areaPill(r)}</p><p class="fresh ${b.level}">${esc(b.text)}</p>${holidayNote(o)}${r.notice ? `<p class="notice">${owner(r.notice)}</p>` : ''}${own.map(alertBox).join('')}
     <div class="stackbtns">${r.phones.map((ph) => `<a class="callrow" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.name })}">${icon('phone')}<span>${T('detail.call')}${ph.label ? ` · ${owner(ph.label)}` : ''}</span><strong>${phoneHtml(ph.number)}</strong></a>`).join('')}
-      ${goHere(r) ? `<div class="two"><a class="btn ghost" href="${esc(goHere(r)!)}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
+      ${dirButton(r.name, r.lat, r.lon, r.category, true)}
+      ${goHere(r) ? `<details class="browse otherapps"><summary>${icon('out', 'sm')}<span>${T('dir.other_apps')}</span>${icon('chevron', 'sm turn dim')}</summary>
+        <div class="two"><a class="btn ghost" href="${esc(goHere(r)!)}" aria-label="${T('detail.directions_label', { name: r.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
         <a class="btn ghost" href="${esc(transitHref(r)!)}" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>
-        ${busApp(r) ? `<a class="btn ghost" href="${esc(busApp(r)!)}" aria-label="${T('detail.bus_app_label', { name: r.name })}">${icon('transit', 'sm')}${T('detail.bus_app')} ${icon('out', 'sm')}</a>` : ''}` : ''}
+        ${busApp(r) ? `<a class="btn ghost" href="${esc(busApp(r)!)}" aria-label="${T('detail.bus_app_label', { name: r.name })}">${icon('transit', 'sm')}${T('detail.bus_app')} ${icon('out', 'sm')}</a>` : ''}
+        <p class="foot">${T('dir.other_apps_note')}</p></details>` : ''}
       <div class="two">${canSave(r.category) ? `<button class="btn ghost" data-save="${esc(r.id)}">${icon('bookmark', 'sm')}${T(savedIds.includes(r.id) ? 'saved.remove' : 'saved.add')}</button>` : ''}${canShare(r.category) ? `<button class="btn ghost" data-share="${esc(r.id)}">${T('detail.share')}</button>` : ''}</div>
       ${savedIds.includes(r.id) ? `<p class="foot">${T('saved.note')}</p>` : ''}</div>
     ${isDvCategory(r.category) ? `<p class="foot">${T('safe.dv_no_address')}</p>` : ''}
@@ -833,12 +854,59 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
     ${r.website ? `<p>${ext(r.website, t('detail.website'), 'link')}</p>` : ''}
     <h2>${T('detail.source')}</h2><p>${owner(r.facts.source.name)}</p>${reportBox(r.id, false, r.category)}</main>` };
 }
+// ---- our own directions (DECISIONS 2026-09-22) ---------------------------------------------------------
+// Everything below is glue. The screen, the planner and the Worker live in `dirscreen.ts`, which is asked for
+// the first time somebody taps Directions and is a chunk of its own; `packages/query` does the routing and is
+// not forked here. What main.ts owns is the one thing it must: `here`, the origin, which is a variable that
+// dies with the page and is handed to the planner and to nothing else.
+/** The `data-dir` payload: a destination, and never anything about the person. Null where a row must not be
+ *  routed to at all — a DV or crisis listing carries no coordinate in the first place. */
+const dirValue = (name: string, lat?: number, lon?: number, category = ''): string | undefined =>
+  (lat === undefined || lon === undefined || isSensitive(category) ? undefined : JSON.stringify({ lat, lon, name }));
+/** The button, wherever a row or a card offers one. `primary` is the big green one on a listing's own screen. */
+function dirButton(name: string, lat?: number, lon?: number, category = '', primary = false): string {
+  const p = dirValue(name, lat, lon, category);
+  if (!p) return '';
+  return `<button class="btn${primary ? '' : ' ghost'}" data-dir="${esc(p)}" aria-label="${T('dir.open_label', { name })}">${icon('pin', 'sm')}${T('dir.open')}</button>`;
+}
+const dirDeps = (): import('./dirscreen.js').DirDeps => ({
+  t, esc, icon, mapBox, announce, rerender: () => render(false),
+  origin: () => here,
+  originKind: () => (!here ? 'none' : hereZip ? 'zip' : hereCross ? 'cross' : 'me'),
+  originWords: () => hereZip || hereCross,
+  originHtml: () => locChip(true),
+  index: bundle!.index,
+  transit: bundle?.transit,
+  centre: (key, lat, lon, metres) => focusRadius(key, lat, lon, metres),
+});
+/** Ask for the chunk, once, and open the screen when it lands. Offline and never downloaded: it says so. */
+function wantDirections(to: { lat: number; lon: number; name: string }): void {
+  dirWanted = to;
+  if (dirMod) { dirMod.open(to, dirDeps()); return; }
+  if (dirState === 'loading') return;
+  dirState = 'loading';
+  void import('./dirscreen.js').then((m) => {
+    dirMod = m; dirState = '';
+    // The service worker is told about the chunk and the Worker it just fetched, so the SECOND time — the time
+    // that matters, on a phone with no signal — they are already on the device (public/sw.js's `cache` message).
+    precacheNow();
+    if (dirWanted) m.open(dirWanted, dirDeps());
+    render(false);
+  }, () => { dirState = 'failed'; render(false); announce(t('dir.chunk_failed')); });
+}
+const directionsScreen = (): string =>
+  (dirMod ? dirMod.html(dirDeps())
+    // No live region of its own: the app has exactly one, outside the part of the page a redraw replaces, and a
+    // region built by the very redraw that fills it is a region a screen reader never announces. `announce()`
+    // says this sentence there — the same rule the "Still looking…" banner follows.
+    : `<main class="dir"><p class="banner ${dirState === 'failed' ? 'warn' : 'plain'}" tabindex="-1">${T(dirState === 'failed' ? 'dir.chunk_failed' : 'dir.building')}</p></main>`);
+
 // Maps (map.ts): streets, parks and the greenway, drawn on the phone from the signed bundle. No third party.
 // A screen asks for a map here; the views are attached after the screen is drawn.
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; areas?: MapArea[]; selected?: string; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
+function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; route?: MapRoute; me?: boolean; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; areas?: MapArea[]; selected?: string; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
   // The greenway is drawn when a map is ASKED to draw it, and not otherwise (Kyle, 2026-09-22; audit §6).
   //
   // It used to be the other way round: every map in the app drew it unless a caller opted out, and only the
@@ -849,13 +917,15 @@ function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapS
   const segments = o.segments ? bundle?.greenway?.segments ?? [] : [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, open: o.open, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, areas: o.areas, selected: o.selected, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, route: o.route, open: o.open, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, areas: o.areas, selected: o.selected, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
     strings: { zoomIn: t('map.zoom_in'), zoomOut: t('map.zoom_out'), reset: t('map.reset'), bigger: t('map.bigger'), smaller: t('map.smaller'), details: t('map.details'), park: t('map.park'), noStreets: t('map.no_streets'),
       keys: t('map.keys'), panUp: t('map.pan_up'), panDown: t('map.pan_down'), panLeft: t('map.pan_left'), panRight: t('map.pan_right'),
       focusHint: t('map.focus_hint'), focusNone: t('map.focus_none'), focusOff: t('map.focus_off'),
+      // The word on the bottom card's own Directions button. Our directions, on this phone.
+      directions: t('dir.open'),
       source: (date) => t('map.source', { date: prettyDate(date) }), phase },
   });
   return `<div class="mapbox${o.small ? ' small' : ''}" data-map="${mapSpecs.length - 1}"></div>`;
@@ -1016,7 +1086,7 @@ function segment(s: Segment): string {
   const near = helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s);
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `<main><p class="meta"><span class="pill ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}</span></p>${s.phase === 'open' ? '' : `<p class="lede">${T('gw.not_open')}</p>`}
-    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), segments: true, focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, category: n.row.category, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
+    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), segments: true, focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, category: n.row.category, go: JSON.stringify({ v: 'detail', id: n.row.id }), dir: dirValue(n.row.name, n.row.lat, n.row.lon, n.row.category) })) })}
     ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${owner(s.cross_streets.join(' · '))}</p>` : ''}
     <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
     ${s.phase === 'open' ? reportBox(s.id, true) : ''}
@@ -1168,8 +1238,11 @@ function credits(): string {
  *  table narrows down what a person needs, which is the whole point (docs/08; WCAG 2.4.2). */
 const PURPOSE: Partial<Record<View['v'], string>> = {
   need: 'title.find', list: 'title.find', search: 'title.search', saved: 'title.saved', detail: 'title.listing', urgent: 'title.urgent',
+  // "Directions" and nothing more: the window's own title, the browser's history list and the task switcher
+  // never learn where somebody is going, and never learn where they are.
+  directions: 'title.directions',
 };
-const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'hoods', hood: 'hoods', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map', park: 'map' };
+const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'hoods', hood: 'hoods', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map', park: 'map', directions: 'map' };
 /** Where the cursor is now, named so it can be found again after the page is drawn (focus.ts). */
 const whereIsTheCursor = () => focusSelector(document.activeElement as unknown as FocusEl | null, (n) => n !== (document.body as unknown as FocusEl) && app.contains(n as unknown as Node));
 function render(focus = true): void {
@@ -1177,6 +1250,9 @@ function render(focus = true): void {
   // still in flight can redraw into an empty stack. There is nothing to draw then: leave the page as it is.
   if (!stack.length) return;
   const v = stack[stack.length - 1]!;
+  // Leaving Directions ends the trip: the plan, the chosen way, the current step and any position watch all go.
+  // The street graph stays — it belongs to the bundle, not to the trip, and it cost a second to build.
+  if (v.v !== 'directions') { dirMod?.close(); dirWanted = null; }
   // Where the cursor was, so a redraw that is not a new screen can hand it back (2.4.3). A caller that already
   // knows where it wants the cursor (refocusSel) wins.
   const wasFocused = focus ? '' : whereIsTheCursor();
@@ -1197,6 +1273,7 @@ function render(focus = true): void {
   else if (v.v === 'need') { const n = NEEDS.find((x) => x.id === v.id)!; title = t(n.stepsOnly ? 'od.title' : 'need.' + n.id); exit = !!n.quickExit; body = need(v); }
   else if (v.v === 'list') { title = t('cat.' + v.cat); body = `<main>${results(CATEGORIES.find((c) => c.id === v.cat)?.query ?? {}, {})}</main>`; }
   else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; ownTitle = d.ownTitle; body = d.html; }
+  else if (v.v === 'directions') { title = t('dir.title'); body = directionsScreen(); }
   else if (v.v === 'greenway') { title = t('gw.title'); body = greenway(); }
   else if (v.v === 'parks') { title = t('rec.title'); body = parksList(); }
   else if (v.v === 'park') { const p = parkPage(v.id); title = p.title; ownTitle = p.ownTitle; body = p.html; }
@@ -1230,6 +1307,10 @@ function render(focus = true): void {
   const named = traceable(v) ? docTitle : t(PURPOSE[v.v] ?? 'title.find');
   document.title = named ? `${named} · ${t('app.name')}` : t('app.name');
   mountMaps();
+  // The Directions screen says where its own cursor goes (a chosen itinerary, the current step, the field it
+  // just reopened). A caller who already asked for somewhere still wins.
+  const dirSel = dirMod?.takeRefocus();
+  if (dirSel && !refocusSel) refocusSel = dirSel;
   if (v.v === 'tab' && v.tab === 'map') mapTabOpened();
   if (focus) {
     window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true });
@@ -1263,8 +1344,17 @@ function navigate(view: View): void {
 }
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-locate],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry],[data-cross-pick],[data-hoodview-map]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-locate],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry],[data-cross-pick],[data-hoodview-map],[data-dir],[data-dir-pick],[data-dir-act]');
   if (!el) return;
+  // Directions: one entry point for every affordance in the app — a listing, a results row, the urgent sheet's
+  // "Get somewhere safe now" list, the map's bottom card. The payload is the destination and nothing else.
+  if (el.dataset.dir) {
+    const to = JSON.parse(el.dataset.dir) as { lat: number; lon: number; name: string };
+    wantDirections(to);                                    // the destination first, so the screen draws the right trip
+    navigate({ v: 'directions', to: { lat: to.lat, lon: to.lon }, name: to.name });
+    return;
+  }
+  if ((el.dataset.dirPick !== undefined || el.dataset.dirAct) && bundle && dirMod) { dirMod.onClick(el, dirDeps()); return; }
   if ('skip' in el.dataset) { app.querySelector<HTMLElement>('main')?.focus(); }   // past the bar and the tabs, into the page
   else if ('resetKey' in el.dataset) {
     // The new key is what every waiting report will be hashed with when it goes (report.ts recomputes the
@@ -1350,6 +1440,9 @@ app.addEventListener('click', async (ev) => {
 });
 // On the search screen only the results are re-drawn, so the keyboard and the cursor stay put.
 function redraw(): void {
+  // Anything that changes where a person is — a fix arriving, a junction typed, "Use my location" switched off —
+  // reaches the Directions screen through this one line. It is idempotent: the same origin plans nothing again.
+  if (dirMod && bundle && stack[stack.length - 1]?.v === 'directions') dirMod.originChanged(dirDeps());
   const out = stack[stack.length - 1]!.v === 'search' ? app.querySelector('#searchout') : null;
   if (!out) { render(false); return; }
   refocusSel = '';                                       // the cursor stays in the search box; nothing else moves
@@ -1364,6 +1457,14 @@ document.addEventListener('keydown', (ev) => {
   if (ev.key !== 'Escape' || !locateCard) return;
   ev.preventDefault();
   closeLocateCard();
+});
+// N and P step through the directions, the same two keys the map's own features answer to, and only while the
+// step list itself has the cursor — which is the exception 2.1.4 makes for a single-character shortcut. A
+// letter with Ctrl, Cmd or Alt belongs to the browser or to a screen reader and is left alone.
+app.addEventListener('keydown', (ev) => {
+  if (ev.metaKey || ev.ctrlKey || ev.altKey || !dirMod || !bundle) return;
+  if (!(ev.target as HTMLElement | null)?.closest?.('.dirsteps')) return;
+  if (dirMod.onKey(ev.key, dirDeps())) ev.preventDefault();
 });
 
 // Map layers: a real checkbox, so the keyboard and a screen reader already work. The choice is kept on this
@@ -1559,11 +1660,23 @@ async function start(): Promise<void> {
   // says `serviceWorker` in navigator) used to throw out of `start` and take everything after it with it.
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     try {
-      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.register('/sw.js');
       await navigator.serviceWorker.ready;
-      reg.active?.postMessage({ type: 'cache', urls: performance.getEntriesByType('resource').map((r) => r.name) });
+      precacheNow();
     } catch (e) { console.warn('the app will not work offline: the service worker did not register', e); }
   }
+}
+/**
+ * "Keep everything this page has fetched so far" (public/sw.js's one `cache` message). Called at start, and
+ * again the moment a lazily loaded chunk lands — the Directions screen and the Worker inside it, which are
+ * fetched on the first tap and must be on the device before the second one, because the second one is the one
+ * that happens on a phone with no signal. The service worker ignores every origin but ours and never touches
+ * `/data` (the bundle keeps its own verified copy in IndexedDB), so this is only ever the app's own code.
+ */
+function precacheNow(): void {
+  if (!import.meta.env.PROD || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+  const urls = performance.getEntriesByType('resource').map((r) => r.name);
+  navigator.serviceWorker.ready.then((reg) => reg.active?.postMessage({ type: 'cache', urls })).catch(() => { /* no worker: the app still runs */ });
 }
 /** Send what is waiting, then say what is left: the thank-you on a listing, and the count on Your privacy, both
  *  come from the queue itself rather than from what happened to be clicked this visit. */

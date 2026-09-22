@@ -22,6 +22,10 @@
   --map-out:#e2e9e4; --map-out-ink:#768079; --map-land:#f7f9f6; --map-park:#c4e3c9; --map-park-ink:#1d5a31; --map-road:#747d77; --map-main:#666f69; --map-fwy:#926c16; --map-ink:#2b3a32;
   /* The greenway is drawn like a transit line: one width, a casing, a colour and a dash per phase. */
   --gw-open:#0b6b43; --gw-build:#c2701a; --gw-fund:#2f6f9e; --gw-plan:#7d8c84; --gw-case:#ffffff;
+  /* One chosen trip, drawn on the Directions screen (DECISIONS 2026-09-22). A walking leg is solid in its own
+     tone; a ride wears its agency's layer tone and a dash, and falls back to this one. Both sit on --gw-case,
+     which is what their 3:1 is measured against, and neither is ever the same line as the greenway. */
+  --route-walk:#9d1b6a; --route-ride:#00558f;
   /* Map tab layers (Kyle, 2026-09-20). Colour never carries the meaning alone: every layer is named in the
      switcher, named again when you tap it, and listed in words under the map. */
   --lyr-bus:#1d4ed8; --lyr-smart:#0f766e; --lyr-rail:#7e22ce; --lyr-bike:#c2410c;
@@ -45,6 +49,7 @@
   --warn-bg:#33270a; --warn-ink:#ffd98a; --danger:#e26a6a; --danger-ink:#1a0505; --focus:#8ab8ff; --shadow:none;
   --map-out:#060b09; --map-out-ink:#76827a; --map-land:#141f19; --map-park:#1c3b27; --map-park-ink:#9fdcb4; --map-road:#75827a; --map-main:#88968d; --map-fwy:#a3863a; --map-ink:#d5e2da;
   --gw-open:#4fcf93; --gw-build:#e3974a; --gw-fund:#6aa9d6; --gw-plan:#8ea79a; --gw-case:#0a110e;
+  --route-walk:#ff8ad4; --route-ride:#73c2ff;
   --lyr-bus:#7aa7ff; --lyr-smart:#4fd1c5; --lyr-rail:#c79bff; --lyr-bike:#fb923c;
   --tr-0:#ff7a70; --tr-1:#7aa7ff; --tr-2:#4fd1c5; --tr-3:#e0a96d; --tr-4:#ff8ac2; --tr-5:#b6c2d2;
   --tr-rail:#eef2f6; --tr-dpm:#e59bf0; --tr-trunk:#cbd5e1; --tr-bike:#6ee7a0; --tr-coach:#fdba74; --tr-pr:#93b4ff;
@@ -336,6 +341,24 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
    wide layout below something to put side by side. */
 .maptop,.mapside { display:contents; }
 
+/* ---- Directions, computed on this phone (DECISIONS 2026-09-22) -------------------------------------------
+   The numbered step list is the source of truth and is styled as one: a plain ordered list of sentences, at
+   the page's own reading size, that grows with Dynamic Type and never truncates. A street name is written as
+   its owner writes it, in English, so on an Arabic screen each step is a `<bdi lang="en">` run: the name keeps
+   its own direction and its own punctuation instead of being thrown to the end of the line. There are no
+   arrow glyphs anywhere here — a turn is the WORD "Turn left", which needs no mirroring. */
+.dir .dircaveat { margin-top:.5rem; }
+.dirfrom { margin-block:.875rem; }
+.dirways { display:grid; gap:.5rem; margin-block:.75rem 1rem; list-style:none; padding:0; }
+.dirways .row { width:100%; }
+.dirways .row .chip { flex:none; pointer-events:none; }
+.dirsteps { margin:.75rem 0 1.25rem; padding-inline-start:1.75rem; display:grid; gap:.625rem; }
+.dirsteps li { line-height:1.5; }
+/* The step a person is on. A left bar AND a weight change, so it is not colour alone (1.4.1). */
+.dirsteps li.now { font-weight:650; padding-inline-start:.625rem; margin-inline-start:-.625rem; border-inline-start:4px solid var(--route-walk); }
+.otherapps { margin-top:1rem; }
+.otherapps .two,.otherapps .btn { margin-top:.5rem; }
+
 /* Skip link: the first thing the keyboard reaches, off-screen until it is focused. */
 .skip { position:absolute; z-index:30; inset-block-start:0; inset-inline-start:-100vw; }
 .skip:focus-visible { inset-block-start:.5rem; inset-inline-start:.75rem; padding:.625rem 1rem; border-radius:var(--r-sm); background:var(--surface); border:1.5px solid var(--brand); font-weight:650; }
@@ -407,6 +430,7 @@ main:focus { outline:none; }
     --ink:#000000; --muted:#26332c; --edge:#3c4a43; --line:#8ea39a;
     --map-out:#e8eeea; --map-out-ink:#4e5853; --map-land:#ffffff; --map-park:#d8efdc; --map-park-ink:#0d3f1f;
     --map-road:#4f5a54; --map-main:#333c37; --map-fwy:#6a4d08; --map-ink:#101a15;
+    --route-walk:#7a0f52; --route-ride:#003e6b;
     --tr-0:#9b0c23; --tr-1:#1e3a8a; --tr-2:#0b4f4a; --tr-3:#5f330d; --tr-4:#831843; --tr-5:#1e293b; --tr-dpm:#581c5f; --tr-bike:#14532d;
   }
 }
@@ -415,6 +439,7 @@ main:focus { outline:none; }
     --ink:#ffffff; --muted:#d4e2d9; --edge:#9db3a7; --line:#4c5f55;
     --map-out:#000000; --map-out-ink:#a9b8b0; --map-land:#0c1512; --map-park:#123020; --map-park-ink:#cdf0da;
     --map-road:#a4b3aa; --map-main:#c9d8ce; --map-fwy:#dcc079; --map-ink:#f2f8f4;
+    --route-walk:#ffb3e2; --route-ride:#a8d4ff;
     --tr-0:#ffa099; --tr-1:#a8c5ff; --tr-2:#8be6dd; --tr-3:#f0c596; --tr-4:#ffb3d7; --tr-5:#dbe3ee; --tr-dpm:#f0c0f7; --tr-bike:#a7f3c5;
   }
 }
@@ -429,6 +454,7 @@ main:focus { outline:none; }
     --map-road:GrayText; --map-main:CanvasText; --map-fwy:LinkText; --map-ink:CanvasText;
     --gw-open:Highlight; --gw-build:CanvasText; --gw-fund:LinkText; --gw-plan:GrayText; --gw-case:Canvas;
     --lyr-bus:LinkText; --lyr-smart:CanvasText; --lyr-rail:Highlight; --lyr-bike:GrayText;
+    --route-walk:Highlight; --route-ride:LinkText;
     /* Subway style: every route is one colour here, which is fine — badges, stripes, ties, chevrons and the
        double line still tell them apart. The quiet basemap is never used, so its tokens are the plain ones. */
     --tr-0:LinkText; --tr-1:LinkText; --tr-2:LinkText; --tr-3:LinkText; --tr-4:LinkText; --tr-5:LinkText;

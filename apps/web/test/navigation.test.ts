@@ -284,10 +284,12 @@ describe('what a map that opens on "where you are" does', () => {
   });
 
   it('the slow state leaves both the ways in that need no satellite on the screen', () => {
-    // `locChip` draws the banner, then "Use my location", then the cross-street box, then the ZIP box.
-    const chip = main.slice(main.indexOf('function locChip()'), main.indexOf('const searchBtn'));
-    expect(chip.indexOf('slowBanner()')).toBeLessThan(chip.indexOf('crossBox()'));
-    expect(chip.indexOf('crossBox()')).toBeLessThan(chip.indexOf('${zip}'));
+    // `locChip` draws the banner, then "Use my location", then the cross-street box, then the ZIP box — and,
+    // on the Directions screen alone (`crossFirst`, 2026-09-22), the cross street ahead of "Use my location",
+    // because it is the only one of the three that works with no satellite and no signal at all.
+    const chip = main.slice(main.indexOf('function locChip('), main.indexOf('const searchBtn'));
+    expect(chip.indexOf('slowBanner()')).toBeLessThan(chip.indexOf('${ways}'));
+    expect(chip).toContain('crossFirst ? `${crossBox()}${use}${zip}` : `${use}${crossBox()}${zip}`');
   });
 });
 

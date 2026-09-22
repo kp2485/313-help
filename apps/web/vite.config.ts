@@ -62,5 +62,9 @@ export default defineConfig({
   // In dev, /v1 goes to `pnpm --filter @313help/api dev` if it is running. In production the Worker is routed on the same origin.
   server: { fs: { allow: [root] }, proxy: { '/v1': { target: 'http://127.0.0.1:8787', changeOrigin: false } } },
   build: { target: 'es2020', sourcemap: false },
+  // The directions Worker (apps/web/src/dirworker.ts) is a CLASSIC worker on purpose: a module worker needs
+  // Firefox 114, and the only other way to cover an older browser would be to keep a same-thread copy of the
+  // routing rules in the main script — 20 KB gzipped that nobody who never taps Directions should download.
+  worker: { format: 'iife' },
   test: { environment: 'node' },
 } as Parameters<typeof defineConfig>[0]);

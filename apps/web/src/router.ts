@@ -17,6 +17,10 @@ export type View =
   // Neighborhoods tab itself, at the same `#/n` it has always had.
   | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'privacy' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' } | { v: 'park'; id: string }
   | { v: 'need'; id: string; refine?: string; all?: boolean }
+  // Our own directions (DECISIONS 2026-09-22). The destination is a public place and rides in memory like any
+  // other screen's subject; the ORIGIN is never in this object, never in a URL and never written down. The
+  // screen is traceless — `hashFor` answers null — like the urgent sheet and every private listing.
+  | { v: 'directions'; to: { lat: number; lon: number }; name: string }
   | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
 
 const HOME: View = { v: 'tab', tab: 'home' };
@@ -39,7 +43,9 @@ export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/')
   if (v.v === 'add') return '#/add';
   if (v.v === 'hoods') return `#/n/lens-${v.lens}`;
   if (v.v === 'hood') return `#/n/${v.id}`;
-  return null; // the urgent sheet, search, saved places, and every "need" screen: no trace
+  // The urgent sheet, search, saved places, every "need" screen — and Directions, which is the one screen that
+  // knows both where somebody is going AND, for as long as it is open, where they are standing: no trace.
+  return null;
 }
 
 /** The screen for a URL hash. Anything it doesn't know opens Home, never a half-built screen. */

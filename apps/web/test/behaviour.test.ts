@@ -574,7 +574,7 @@ describe('what the app does when something cannot be fetched', () => {
   });
   it('a service worker that will not register does not take the rest of the start-up with it', () => {
     const start = main.slice(main.indexOf('async function start()'));
-    expect(start).toMatch(/try \{\s*const reg = await navigator\.serviceWorker\.register/);
+    expect(start).toMatch(/try \{\s*await navigator\.serviceWorker\.register/);
     expect(start).toMatch(/\} catch \(e\) \{ console\.warn\('the app will not work offline/);
   });
   it('a quick exit that empties the stack cannot be drawn into', () => {
