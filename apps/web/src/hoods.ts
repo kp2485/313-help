@@ -138,12 +138,13 @@ const bigMoney = (n: number) => dollars(n, { notation: 'compact', compactDisplay
 /** One row of the index: the neighborhood's name and nothing else. No count, no number, nothing that could be
  *  read as a score — an index row carries no indicator at all, so the list cannot become a league table by the
  *  back door (docs/13, rule 1). The name is the City's, marked English so it is read in the right voice. */
-const indexRow = (ui: Ui, n: Hood) => `<li><button class="row" ${ui.go({ v: 'hood', id: n.id })}><span class="rowtx"><strong>${ui.own(n.name)}</strong></span></button></li>`;
+const indexRow = (ui: Ui, n: Hood, pick = '') =>
+  `<li><button class="row${n.id === pick ? ' on' : ''}"${n.id === pick ? ' aria-current="true"' : ''} ${ui.go({ v: 'hood', id: n.id })}><span class="rowtx"><strong>${ui.own(n.name)}</strong></span></button></li>`;
 
 /** The groups of the index list, in the order asked for: A to Z, or by council district. `matchHoods` narrows
  *  the list by what has been typed and leaves the order alone. Drawn on its own so typing a letter can replace
  *  this one piece of the screen instead of the whole page: the keyboard stays up and nothing jumps. */
-export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; near?: { lat: number; lon: number } | null }): string {
+export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; near?: { lat: number; lon: number } | null; pick?: string }): string {
   const found = matchHoods(d.neighborhoods, o.query);
   if (!found.length) return `<p class="empty">${ui.esc(ui.t('hood.find_none'))}</p>`;
   const head = (key: string | number) =>
@@ -151,7 +152,7 @@ export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: st
   return groupHoods(found, o.order, o.near).map((g) => {
     // Nearest first has one group and no heading: see `groupHoods`.
     const h = o.order === 'near' ? '' : `<h3 class="sub">${ui.esc(head(g.key))}</h3>`;
-    return `${h}<ul class="rows">${g.items.map((n) => indexRow(ui, n)).join('')}</ul>`;
+    return `${h}<ul class="rows">${g.items.map((n) => indexRow(ui, n, o.pick ?? '')).join('')}</ul>`;
   }).join('');
 }
 
@@ -164,20 +165,19 @@ export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: st
  * same one every list screen uses, so there is no second way of asking for a location anywhere in the app.
  */
 /**
- * The Areas tab's landing (Kyle, 2026-09-22: "the most intuitive way for people to reach their neighborhood is
- * through a map … offer the initial neighborhood selection on a map layer"; audit §3).
+ * The Areas tab's **list**: on a phone it is the whole screen behind the Map/List switch; on a laptop it is the
+ * right-hand column beside the map, and then it is drawn with `view: 'column'` — no heading of its own to
+ * repeat the page's, and no switch, because a laptop is shown both things at once (main.ts, `areasTab`).
  *
- * **One screen, two views, one control.** The map is the landing: the four city outlines and the 205
- * neighbourhood outlines, nothing else on it — no dot, no listing, no number, and never a fill that carries a
- * value (docs/13, rule 1). "See this map as a list" swaps to the index that used to be the whole screen, and
- * "See this list as a map" swaps back. Everything else on the tab — what these pages are, where the outlines
- * come from, "Your neighborhood", the search box, the order — is page content and sits under whichever view is
- * showing, because it belongs to the screen rather than to the picture.
+ * What the list is FOR has not changed: what these pages are and that we do not rank neighborhoods · "Your
+ * area" · the ordinary location chip · find one by name · all 205, Nearest first / A to Z / by council district
+ * and never by any number (docs/13, rule 1) · the other three cities as rows · where the numbers come from.
  *
  * `mine` is the answer the device worked out from a location or a typed ZIP (hoodfind.ts): handed in already
- * decided, used to draw one row and to pre-select one outline, and kept nowhere.
+ * decided, used to draw one row, and kept nowhere. `pick` is the area whose page was last opened — the row for
+ * it is marked `aria-current` and scrolled to, which is the list half of the one selection the tab keeps.
  */
-export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; located: boolean; zip: string; mine: Hood | null; locHtml: string; view: 'map' | 'list'; mapHtml: string; near?: { lat: number; lon: number } | null }): string {
+export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; located: boolean; zip: string; mine: Hood | null; locHtml: string; view: 'map' | 'list' | 'column'; mapHtml: string; switchHtml?: string; pick?: string; near?: { lat: number; lon: number } | null }): string {
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
   const src = d.sources.neighborhoods;
   const mine = !o.located
@@ -189,10 +189,7 @@ export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: s
       : `<p class="banner plain">${T('hood.mine_outside')}</p><div class="stackbtns"><button class="btn ghost" ${ui.go({ v: 'tab', tab: 'map' })}>${T('hood.mine_map')}</button></div>`;
   const radio = (value: HoodOrder, label: string) =>
     `<label class="pick"><input type="radio" name="hoodorder" value="${value}" data-hoodorder="${value}"${o.order === value ? ' checked' : ''}><span>${T(label)}</span></label>`;
-  // The switch is a button, not a tab set: there are two views of one thing and the wording says which one you
-  // are about to get, which is what the Map tab's own disclosure already says.
-  const swap = `<button class="chip" data-hoodview-map="${o.view === 'map' ? 'list' : 'map'}">${T(o.view === 'map' ? 'map.list_title' : 'map.list_as_map')}</button>`;
-  const list = `<label class="searchbox">${T('hood.find_label')}<input id="hoodq" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" maxlength="40" value="${ui.esc(o.query)}" aria-describedby="hoodsay"></label>
+  const list = `<h2>${T('hood.list_head')}</h2><label class="searchbox">${T('hood.find_label')}<input id="hoodq" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" maxlength="40" value="${ui.esc(o.query)}" aria-describedby="hoodsay"></label>
     <p class="vh" id="hoodsay" role="status" aria-live="polite"></p>
     <fieldset class="hoodorder"><legend>${T('hood.group_label')}</legend><div class="kinds">${o.near ? radio('near', 'hood.order_near') : ''}${radio('abc', 'hood.group_abc')}${radio('district', 'hood.group_district')}</div></fieldset>
     <div id="hoodlist">${hoodRows(d, ui, o)}</div>`;
@@ -203,14 +200,15 @@ export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: s
     ? `<h2>${T('city.list_head')}</h2><p class="foot">${T('city.list_note')}</p>
       <ul class="rows">${(d.cities ?? []).map((c) => `<li><button class="row" ${ui.go({ v: 'hood', id: c.id })}><span class="rowic">${ui.icon('district')}</span><span class="rowtx"><strong>${ui.own(c.name)}</strong></span></button></li>`).join('')}</ul>`
     : `<p class="foot">${T('hood.only_detroit')}</p>`;
-  return `<main><h1 class="page" tabindex="-1">${T('hood.title')}</h1><p class="lede">${T('hood.index_intro')}</p>
-    ${o.view === 'map' ? `${o.mapHtml}<p class="foot">${T('hood.map_note')}</p>` : ''}
-    <p class="loc">${swap}</p>
+  const body = `<p class="lede">${T('hood.index_intro')}</p>
     <h2>${T('hood.mine_head')}</h2>${mine}${o.locHtml}
-    ${o.view === 'list' ? list : ''}
+    ${list}
     ${cities}
     <p class="foot">${T('hood.index_sources')} ${ui.link(src.url, src.name)} <small>${T('hood.updated', { date: ui.date(src.last_edited) })}</small></p>
-    <p class="foot">${T('hood.describe')}</p></main>`;
+    <p class="foot">${T('hood.describe')}</p>`;
+  // The column beside the map on a laptop: no `<main>`, no `<h1>`, no switch — the page around it has all three.
+  if (o.view === 'column') return `<div class="arealist">${body}</div>`;
+  return `<main><h1 class="page" tabindex="-1">${T('hood.title')}</h1>${o.switchHtml ?? ''}${body}</main>`;
 }
 
 /** Alphabetical inside each council district. Never sorted by a number: no league tables (rule 1). */

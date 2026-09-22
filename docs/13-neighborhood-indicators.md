@@ -19,6 +19,17 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
   - Later: Strategic Neighborhood Fund areas, a rec-center or park walkshed.
 - City point data (sales, permits, blight tickets, demolitions, Improve Detroit issues, parcels) is counted by the City's own server: we ask for statistics grouped by each layer's own `neighborhood` field, so no record is downloaded and there is no point-in-polygon step. (Only our own listings, parks and greenway segments are matched to a neighborhood by its outline.) Tract-based data (Census, CDC PLACES) is shown **at tract level on a map, not re-apportioned** into neighborhoods; splitting modeled tract estimates across neighborhood lines manufactures precision that isn't there.
 
+**How a person reaches one of these pages (2026-09-22).** The Areas tab is a map, not a list: it opens full
+screen on the outline of the area the device has worked out for itself — a Detroit neighborhood, or one of the
+four cities when no neighborhood holds the point — fitted with an 8 % margin and clamped so a small
+neighborhood is never opened closer than 4 m per pixel and a whole city never wider than the map's own limit
+(DECISIONS 2026-09-22; docs/05, "Neighborhoods"). Tapping an outline opens that area's page beneath a shrunken
+strip of the same map. None of this touches the honesty rules below and none of it could: the layer is handed
+**no indicator at all** — only ids, names, districts and outlines — so there is nothing on the map that could be
+shaded by a number, and the only fill any outline ever gets is the wash that means "this one". The order of the
+list beside the map is still a name, a council district, or a distance from a point the device worked out and
+never sent, which is a fact about where somebody is standing and not a judgement about the place.
+
 ## Indicators
 
 | Group | Indicator | Source *(all on data.detroitmi.gov unless noted; existence checked 2026-09-18, fields not yet)* | Shown as |

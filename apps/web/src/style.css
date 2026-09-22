@@ -341,6 +341,75 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
    wide layout below something to put side by side. */
 .maptop,.mapside { display:contents; }
 
+/* ---- the Areas tab (Kyle, 2026-09-22) ---------------------------------------------------------------------
+   "The Neighborhood home should be a map view by default showing the full screen map zoomed into the polygon of
+   the neighborhood that the user is in, with a list option up in the top right for mobile users and next to the
+   map for laptop web users."
+
+   Full screen here means the TAB's screen, not the `.big` dialog: the map fills everything between the top bar
+   and the tab bar, so Urgent help, the language control and the tabs are all still there and nothing is made
+   inert. `100dvh` minus the tab bar is the whole of the arithmetic; the top bar is above the map in the flow and
+   takes its own room, so the frame is measured from what is left with `flex:1`.
+   The numbers below are named in apps/web/src/areas.ts for the iPhone and Android ports. */
+:root { --areas-strip-h:38dvh; --areas-bar-h:3rem; --areas-shrink:240ms; }
+/* Flex the whole way down, never a percentage height: the page is as tall as the viewport, the map's stage
+   takes what the top bar leaves, and the frame takes what the source line leaves. A `height:100%` anywhere in
+   this chain resolves against an auto height and the frame grows without end (found on the first live run). */
+#app.areasmap { display:flex; flex-direction:column; min-height:100dvh; }
+main.areasfull { flex:1; min-height:0; display:flex; flex-direction:column; padding:0; }
+main.areasfull > .areasstage { flex:1; min-height:0; }
+.areasstage { position:relative; display:flex; flex-direction:column; min-height:0; }
+.areasstage > .mapbox:not(.big) { flex:1; min-height:0; margin:0; display:flex; flex-direction:column; }
+.areasstage > .mapbox:not(.big) .mapframe { flex:1; min-height:8rem; height:auto; border-radius:0; border-inline:0; }
+/* The canvas comes OUT of the flow here. It is sized in device pixels by map.ts, so inside a frame whose height
+   is decided by flex rather than stated outright, its own intrinsic height is what the frame measures — and the
+   next resize makes the canvas bigger again. One frame of that is a 6,000 px map (found on the first live run).
+   Absolute and inset, and the frame's height is the flex answer and nothing else. */
+.areasstage > .mapbox:not(.big) .mapframe > canvas { position:absolute; inset:0; }
+/* Where the streets came from, kept to two lines so it never eats the map it is about. */
+.areasstage > .mapbox:not(.big) .mapnote { flex:none; margin:0; padding:.25rem .75rem calc(.25rem + env(safe-area-inset-bottom)); font-size:.6875rem; max-height:2.8em; overflow:hidden; }
+.areasstage > .mapbox:not(.big) .mapnote .foot { margin:0; }
+/* The Map/List switch: the head of the map's own control stack, so it is top-right on an English screen and
+   top-left on an Arabic one — the corner each reader starts from — and it is visually first above the zoom keys.
+   `justify-items:end` keeps the two-button group from stretching the zoom keys to its own width. */
+.maptools { justify-items:end; }
+.areaswitch { display:flex; width:max-content; gap:.25rem; padding:.1875rem; border-radius:.875rem; background:var(--surface); border:1px solid var(--edge); box-shadow:var(--shadow); }
+/* On the list face there is no map to sit on, so it sits at the same corner of the page: the end of the line,
+   which is the top right in English and the top left in Arabic — the same corner the map's stack mirrors to. */
+main > .areaswitch { margin-block:.5rem .75rem; margin-inline-start:auto; }
+.areasw { min-width:3.25rem; min-height:2.5rem; padding:.25rem .625rem; border-radius:.7rem; font-size:.9375rem; font-weight:650; color:var(--muted); }
+.areasw[aria-pressed="true"] { background:var(--brand-soft); color:var(--brand-soft-ink); }
+/* What the map says about itself: the area a person is in, or the one sentence for a spot outside the four
+   cities. Over the map, never across it — it keeps clear of the control stack's corner. */
+.areasnote { position:absolute; inset-block-end:3.25rem; inset-inline:.5rem; margin:0; display:flex; align-items:center; gap:.375rem; padding:.5rem .75rem; border-radius:var(--r); background:color-mix(in srgb,var(--surface) 94%,transparent); border:1px solid var(--edge); box-shadow:var(--shadow); font-weight:650; }
+.areasnote.plain { font-weight:400; }
+/* The three ways in, under the map, until one of them has been answered: never more than a third of the screen,
+   and scrolling inside itself when the cross-street field is open, so the map is never squeezed to nothing. */
+.areasask { flex:none; max-height:36dvh; overflow-y:auto; overscroll-behavior:contain; padding:.5rem 1rem; border-block-start:1px solid var(--line); }
+.areasask .loc { margin-top:0; }
+.areasnote .ic { flex:none; color:var(--brand); }
+/* The list face, and the list column on a laptop: a plain page, with its rows able to say which one is current. */
+.rows .row.on,.rows .row[aria-current] { border-color:var(--brand); background:var(--brand-soft); }
+
+/* An area page: the map shrinks to a strip at the top and the page scrolls under it (Kyle, 2026-09-22). The
+   strip is sticky rather than fixed, so it takes its own room at the top of the page and then holds the top of
+   the viewport once the top bar has scrolled away — no JavaScript decides where it sits, and nothing ever moves
+   the page's scroll position. As a person reads DOWN it collapses to the compact bar, which is `--areas-bar-h`
+   tall and holds Back and the area's name; the moment they turn round it comes back (main.ts `watchStrip`,
+   apps/web/src/areas.ts `stripAt`). The collapse is height only, and the map stays in the page and in the
+   accessibility tree the whole time: it is hidden from eyes, not from a screen reader. */
+.areastrip { position:sticky; inset-block-start:0; z-index:20; height:var(--areas-strip-h); overflow:hidden; margin-inline:-1rem; background:var(--bg); border-block-end:1px solid var(--line); transition:height var(--areas-shrink) ease; }
+main.areapage.shut .areastrip { height:var(--areas-bar-h); }
+.areastrip .mapbox { margin:0; height:100%; }
+.areastrip .mapframe { height:100%; border-radius:0; border:0; }
+/* The zoom keys and the arrow pad keep out from under the bar. */
+.areastrip .maptools { inset-block-start:calc(var(--areas-bar-h) + .5rem); }
+.areabar { position:absolute; inset-block-start:0; inset-inline:0; z-index:3; display:flex; align-items:center; gap:.5rem; height:var(--areas-bar-h); padding-inline:.5rem; background:color-mix(in srgb,var(--surface) 92%,transparent); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-block-end:1px solid var(--edge); }
+.areabarname { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* The keyboard never lands on something hidden under the pinned bar (WCAG 2.4.11). */
+main.areapage :focus-visible { scroll-margin-block-start:calc(var(--areas-bar-h) + .75rem); }
+@media (prefers-reduced-motion:reduce) { .areastrip { transition:none; } }
+
 /* ---- Directions, computed on this phone (DECISIONS 2026-09-22) -------------------------------------------
    The numbered step list is the source of truth and is styled as one: a plain ordered list of sentences, at
    the page's own reading size, that grows with Dynamic Type and never truncates. A street name is written as
@@ -405,6 +474,33 @@ main:focus { outline:none; }
   .mapside { display:block; min-width:0; }
   .mapside .layers,.mapside .loc { margin-top:0; }
   .mapside .maplist { margin-top:.75rem; }
+  /* The Areas tab at this width: the map on the left filling the height, the list on the right scrolling on its
+     own, and no toggle at all — a laptop is shown both at once, so there is nothing to ask for. The column
+     widths are the Map tab's, above; what is added here is the stage the map's own note sits over and a column
+     that scrolls by itself, so the map never leaves the screen while the 205 names go past.
+     The keyboard's order is the reading order: map controls, then the list. */
+  .areas .maptop > .areasstage { position:sticky; top:5rem; }
+  /* `flex:none` at both levels: on a phone the map takes what the viewport leaves, here it is a stated height
+     in its own column, and a flex-basis of 0 would collapse it to a strip. */
+  .areas .areasstage > .mapbox:not(.big) { flex:none; }
+  .areas .areasstage > .mapbox:not(.big) .mapframe { flex:none; height:min(74vh,40rem); border-radius:var(--r); border:1px solid var(--line); }
+  .areas .areasstage > .mapbox:not(.big) .mapnote { max-height:none; padding-inline:0; font-size:.8125rem; }
+  /* The name of the area a person is in goes back into the flow here. Floated over the map it would land on the
+     source line below it, because the stage is taller than the map once that line wraps. */
+  .areas .areasnote { position:static; margin-top:.5rem; }
+  .areas .arealist { max-height:min(74vh,40rem); overflow-y:auto; overscroll-behavior:contain; padding-inline-end:.5rem; }
+  .areas .arealist > :first-child { margin-top:0; }
+  /* A laptop gets no strip: the two-column layout keeps the tall map in its own column and the area page takes
+     the column the list was in. Shrinking a map to a 38 % strip here would throw away the width that is the
+     whole reason this layout exists. */
+  main.areapage { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:1.5rem; align-items:start; max-width:74rem; }
+  main.areapage > * { grid-column:2; }
+  main.areapage > .areastrip { grid-column:1; grid-row:1 / span 99; position:sticky; top:5rem; height:min(74vh,40rem); margin-inline:0; border:1px solid var(--line); border-radius:var(--r); }
+  main.areapage.shut > .areastrip { height:min(74vh,40rem); }
+  /* And no bar on it: nothing collapses here, and the page's own top bar already carries the area's name and a
+     Back button two inches away. Two Back buttons that do the same thing is one too many. */
+  main.areapage > .areastrip > .areabar { display:none; }
+  main.areapage > .areastrip .maptools { inset-block-start:.5rem; }
 }
 @media (min-width:100rem) { #app { padding-inline-start:17rem; } .tabs { width:17rem; } .skip:focus-visible { inset-inline-start:calc(17rem + .75rem); } }
 
