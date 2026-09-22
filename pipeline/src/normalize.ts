@@ -76,7 +76,22 @@ const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
  *    carry the no_id_required flag (2026-09-20). The Health Department's own list does say "No ID, no cost, no
  *    questions", which is why narcan_box still does.
  */
-const WORDING = {
+/**
+ * One layer's wording. `what` and `service_name` are ours; every fact inside them is the source's.
+ * `availability` is what the row claims about hours — `always` only where a person has decided the building
+ * really is open all day and night — and `notice` is the heads-up printed above the Call button.
+ */
+interface Wording {
+  service_name: string;
+  what: (extra: Record<string, string>) => string;
+  flags: readonly string[];
+  availability?: BundleRow['availability'];
+  notice?: string;
+  /** What the layer's phone number is. Never "the number to call for help": that is 911. */
+  phone_label?: string;
+}
+
+const WORDING: Record<string, Wording> = {
   narcan_box: {
     service_name: 'Free Narcan and harm reduction supplies',
     what: (extra: Record<string, string>) => {
@@ -97,11 +112,32 @@ const WORDING = {
     /** The County says only "free": no claim about ID or questions, so no no_id_required flag on these rows. */
     flags: ['walk_in'],
   },
-} as const;
+  // "Get somewhere safe now" (DECISIONS 2026-09-22). Both of these say the same two things and nothing more:
+  // where the building is, and that 911 is still the number if someone is in danger. Neither claims anyone
+  // inside will do anything in particular, because neither department's list says so.
+  police_station: {
+    service_name: 'Police station',
+    what: () => 'A police station. Someone is there all day and night, and there is a phone you can use.',
+    flags: ['walk_in'],
+    availability: 'always',
+    notice: 'If you are in danger, call 911.',
+    /** The number the City prints beside the building. Not a dispatch line, and never the way to reach 911. */
+    phone_label: 'Station desk',
+  },
+  fire_station: {
+    service_name: 'Fire station',
+    what: () => 'A fire station. Firefighters are there all day and night, but they go out on calls.',
+    flags: ['walk_in'],
+    availability: 'always',
+    // A fire station is staffed but the crew may be out, so the way in is said plainly instead of pretending
+    // a locked door means nobody is coming.
+    notice: 'Ring the bell. If no one answers, call 911.',
+  },
+};
 
 export function fromIngested(src: Source, ingested: CsvRow[]): Normalized {
   const orgs = new Map([[src.org!.id, src.org!.name]]), svcOf: Normalized['svcOf'] = new Map();
-  const wording = WORDING[src.wording ?? 'narcan_box'];
+  const wording = WORDING[src.wording ?? 'narcan_box']!;
   const rows = ingested.map((r): BundleRow => {
     const extra = Object.fromEntries((r.extra ?? '').split('; ').filter(Boolean).map((kv) => {
       const at = kv.indexOf('=');
@@ -120,10 +156,12 @@ export function fromIngested(src: Source, ingested: CsvRow[]): Normalized {
       ...(r.address_1 ? { address: { line1: r.address_1, city: r.city || 'Detroit', ...(r.zip ? { zip: r.zip } : {}) } } : {}),
       ...(hasCoords ? { lat: Number(r.lat), lon: Number(r.lon) } : {}),
       // This is the host's number (the store, the center), not a Narcan line. Label it so.
-      phones: ph ? [{ number: formatPhone(ph.number), label: 'Host site' }] : [],
+      phones: ph ? [{ number: formatPhone(ph.number), label: wording.phone_label ?? 'Host site' }] : [],
       ...(r.website ? { website: r.website } : {}),
-      // Hours text from a list is shown as written; only an unambiguous "24 hours" becomes open-now.
-      availability: always ? 'always' : 'unknown',
+      ...(wording.notice ? { notice: wording.notice } : {}),
+      // Hours text from a list is shown as written; only an unambiguous "24 hours" becomes open-now — unless
+      // the layer's wording states the hours itself (a fire station and a precinct are open all day and night).
+      availability: wording.availability ?? (always ? 'always' : 'unknown'),
       ...(!always && r.hours_text ? { hours_text: r.hours_text } : {}),
       // The flags a layer's rows carry are the ones its owner's words support (see WORDING).
       schedules: [], flags: [...wording.flags], status: 'active',

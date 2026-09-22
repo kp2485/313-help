@@ -1,0 +1,12 @@
+sal_id,record_ref,name,address_1,city,zip,lat,lon,phone,website,hours_text,extra,source_id,source_last_edited,fetched_at
+sal_dpd_detroit_police_10th_precinct,10th,Detroit Police 10th Precinct,12000 Livernois Avenue,Detroit,48206,42.376565,-83.138559,(313) 596-1000,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_11th_precinct,11th,Detroit Police 11th Precinct,5100 E. Nevada Avenue,Detroit,48234,42.425554,-83.051314,(313) 596-1100,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_12th_precinct,12th,Detroit Police 12th Precinct,1441 W. Seven Mile Road,Detroit,48203,42.431508,-83.118652,(313) 596-1200,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_2nd_precinct,2nd,Detroit Police 2nd Precinct,13530 Lesure Street,Detroit,48227,42.385556,-83.180016,(313) 596-5200,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_3rd_precinct,3rd,Detroit Police 3rd Precinct,2875 W. Grand Boulevard,Detroit,48202,42.367778,-83.081327,(313) 596-5300,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_4th_precinct,4th,Detroit Police 4th Precinct,4700 W. Fort Street,Detroit,48209,42.311537,-83.093059,(313) 596-5400,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_5th_precinct,5th,Detroit Police 5th Precinct,3500 Conner Avenue,Detroit,48215,42.381781,-82.966019,(313) 596-5500,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_6th_precinct,6th,Detroit Police 6th Precinct,11450 Warwick Street,Detroit,48228,42.371820,-83.226872,(313) 596-5600,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_7th_precinct,7th,Detroit Police 7th Precinct,3501 Chene Street,Detroit,48207,42.355286,-83.034884,(313) 596-5700,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_8th_precinct,8th,Detroit Police 8th Precinct,21555 W. McNichols Road,Detroit,48219,42.414260,-83.254774,(313) 596-5800,,,,detroit_police_precincts,2018-07-19,2026-09-22
+sal_dpd_detroit_police_9th_precinct,9th,Detroit Police 9th Precinct,11187 Gratiot Avenue,Detroit,48213,42.409465,-82.995107,(313) 596-5900,,,,detroit_police_precincts,2018-07-19,2026-09-22

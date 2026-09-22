@@ -52,6 +52,27 @@ This app is separate from CommunityChest specifically so youth-meetup safety que
 - "I'm not safe at home" results show hotline + 911 before any location — a shelter address can be dangerous to display to the wrong person; DV shelters are listed by intake phone only, never by address, map dot or distance, even when a shelter publishes its own address (DECISIONS 2026-09-19).
 - **Any other shelter's address is published only if the shelter publishes it itself**, on its own site. An address found anywhere else (a federal roster, a directory, a news story, a partner's page) is never used; the shelter is listed by its intake phone instead (DECISIONS 2026-09-19). **This rule does not apply to `shelter.dv`, which is stricter: there is no case in which a DV shelter's address is published, not even its own.**
 
+### "Get somewhere safe now" says nothing about why (2026-09-22)
+
+The new last row of the urgent sheet (docs/05) lists police stations, fire stations and emergency rooms. A person
+who is being watched may open it, so it is written to give a watcher nothing:
+
+- **The screen names no reason.** "Get somewhere safe now" and "These places are open all night and have a phone
+  you can use." are true of a person locked out, a person hurt, a person with nowhere to sleep and a person
+  fleeing a violent house. The one line about home — *"If it is not safe at home, a police station or a hospital
+  can help you call a shelter."* — is the only mention of home on the screen, and it names **no** kind of danger.
+  The words "domestic violence", "abuse" and "shelter for women" appear nowhere on it, in any of the four
+  languages; a test holds all four to that.
+- **It is traceless like the rest of the sheet.** It writes no hash (`hashFor` returns `null` for every `need`
+  view and for the sheet itself), so Back, history and a shared screen show nothing; the window title is the
+  same "Find help" every list gets (`PURPOSE` in `apps/web/src/main.ts`), which is true of anybody.
+- **The listings on it are ordinary listings**, not sensitive ones: a police station, a fire station and an
+  emergency room all publish where they are, and a person has to get there, so they keep an address, a distance,
+  a map dot, directions, Save and Share. Nothing about this screen loosens what `shelter.dv` or `health.mental`
+  may carry — that set is unchanged, and the DV rule above is untouched.
+- **Nothing about the choice leaves the device.** The list is ranked in memory from the location already held in
+  memory; no category, no tap and no distance is written or sent, exactly as on every other need screen.
+
 ### A DV shelter sorts by proximity without any fact that locates it (Kyle, 2026-09-20)
 
 Kyle's ask was both halves at once: never publish a DV shelter's address, and still let a person see which shelters are near them, because people must call and the nearest line is the one to call first. The bundle is public and signed, so anything in it is published; proximity therefore has to work from something that is not about the shelter.

@@ -10,7 +10,7 @@ import { hoodAt, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
 import { icon } from './icons.js';
 import { MapView, focusRadius, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
 import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, rememberLocateAnswered, requestPosition } from './locate.js';
-import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
+import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, inCategories, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
 import { loadLayers, loadStyle, mapStyle, saveStyle, toggleLayer, type MapStyle } from './layers.js';
 import { LAYER_STYLE } from './layerstyle.js';
 import { styleSwitchHtml, subwayKeyHtml } from './stylepanel.js';
@@ -277,12 +277,15 @@ function card(r: Ranked, showDistance = true): string {
       ${r.row.notice ? `<p class="notice">${owner(r.row.notice)}</p>` : ''}<p class="fresh ${b.level}">${esc(b.text)}</p></a>
     ${ph ? `<a class="btn" href="${telHref(ph.number)}" aria-label="${T('detail.call_label', { name: r.row.name })}">${icon('phone', 'sm')}${T('detail.call')} <strong>${phoneHtml(ph.number)}</strong></a>` : ''}</li>`;
 }
-function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?: string; noDistance?: boolean; linksBelow?: boolean }): string {
+function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?: string; noDistance?: boolean; linksBelow?: boolean; only?: string[] }): string {
   // The location still goes to `rank` on a no-distance screen: a domestic-violence row uses it only to work out
   // which coarse area is nearest (packages/query/src/areas.ts) and its `miles` comes back null regardless, so
   // nothing below can print a distance. What `noDistance` turns off is the screen: the location chip, the map,
   // the dots and the mileage pill.
-  const ranked = rank(bundle!.rows, { ...query, ...(here ? { near: here } : {}) }, now(), bundle!.alerts);
+  // A screen that mixes categories (needs.ts `categories`: "Get somewhere safe now") narrows the rows here and
+  // leaves `Query.category` empty, so one `rank` call orders the whole mixed list by the ordinary rules.
+  const pool = opts.only ? inCategories(bundle!.rows, opts.only) : bundle!.rows;
+  const ranked = rank(pool, { ...query, ...(here ? { near: here } : {}) }, now(), bundle!.alerts);
   // Nothing listed: say so plainly. When the screen has links to programs below, point there instead of to 211.
   if (!ranked.length) return opts.linksBelow ? `<p class="empty">${T('results.none_links')}</p>` : `<p class="empty">${T(opts.emptyKey ?? 'results.none')} <a href="tel:211">211</a></p>`;
   const shown = opts.limit ? ranked.slice(0, opts.limit) : ranked;
@@ -290,7 +293,7 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
   // screen, and never a dot for a sensitive listing (those carry no coordinates in the first place).
   const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && !isSensitive(r.row.category));
   const map = !pins.length ? '' : listMap
-    ? `${mapBox({ key: 'list:' + JSON.stringify(query), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: openText(r.open), category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id }) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
+    ? `${mapBox({ key: 'list:' + JSON.stringify([query, opts.only ?? null]), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: openText(r.open), category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id }) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
     : `<button class="chip" data-listmap>${icon('pin', 'sm')}${T('map.show', { count: pins.length })}</button>`;
   return `${opts.noDistance ? '' : locChip()}${map}<h2 class="vh">${T('results.head')}</h2><ul class="cards">${shown.map((r) => card(r, !opts.noDistance)).join('')}</ul>
     ${opts.seeAll && ranked.length > shown.length ? `<button class="btn ghost" ${go(opts.seeAll)}>${T('results.see_all', { count: ranked.length })}</button>` : ''}`;
@@ -578,9 +581,12 @@ function eventsTab(): string {
 }
 
 // ---- pushed screens ---------------------------------------------------------
+// The urgent sheet's order is docs/05's and does not move: 911, then 988, then the hotlines, then the rows
+// below them. "Get somewhere safe now" (DECISIONS 2026-09-22) is a new row under all of it, never above any
+// number. Like the rest of this sheet it writes nothing to the URL, so it leaves no trace in history.
 function urgent(): string {
   return `<main><p class="lede">${T('urgent.lede')}</p><div class="stackbtns">${['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_avalon', 'emg_211'].map(callButton).join('')}</div>
-    <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}</ul></main>`;
+    <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}${rowLink({ v: 'need', id: 'safe_now' }, 'shield', t('need.safe_now'), t('urgent.safe_sub'))}</ul></main>`;
 }
 function need(view: Extract<View, { v: 'need' }>): string {
   const n = NEEDS.find((x) => x.id === view.id) as Need;
@@ -589,7 +595,9 @@ function need(view: Extract<View, { v: 'need' }>): string {
   const first = ((chosen?.first ?? n.first) ?? []).map(callButton).join('');
   if (n.stepsOnly) return `<main><div class="stackbtns">${first}</div><ol class="steps">${[1, 2, 3, 4, 5, 6].map((i) => `<li>${T('od.s' + i)}</li>`).join('')}</ol><p class="foot">${T('od.review_note')}</p></main>`;
   const refine = n.refine && !view.refine ? `<ul class="rows">${n.refine.map((r) => rowLink({ v: 'need', id: n.id, refine: r.id }, n.icon, t(`refine.${n.id}.${r.id}`))).join('')}</ul>` : '';
-  const query = n.refine ? chosen?.query : n.query;
+  // A need with `categories` draws one list from several of them; `query` then carries only the ranking options.
+  const only = n.refine ? undefined : n.categories;
+  const query = n.refine ? chosen?.query : n.query ?? (only ? {} : undefined);
   const links = n.refine ? chosen?.links : n.links;
   // Programs that are not places: only the links, with their own lede (docs/05, "Help paying for food").
   if (links && !query) return `<main><p class="lede">${T(LINKS[links]!.lede ?? 'links.lede')}</p>${linkPanels(links)}</main>`;
@@ -602,7 +610,8 @@ function need(view: Extract<View, { v: 'need' }>): string {
   const also = n.also && !view.refine
     ? `<h2>${T(`also.${n.id}.${n.also.id}`)}</h2>${results(n.also.query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true } })}` : '';
   return `<main>${n.intro && !view.refine ? `<p class="lede">${T(n.intro)}</p>` : ''}${topLinks}${first ? `<div class="stackbtns">${first}</div>` : ''}${dv ? `<p class="foot">${T('safe.dv_no_address')}</p><p class="foot">${T('safe.calls_note')}</p>` : ''}
-    ${refine}${query ? results(query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true }, emptyKey: n.emptyKey, noDistance: dv, linksBelow: !!links }) : ''}
+    ${refine}${query ? results(query, { limit: view.all ? undefined : 3, seeAll: { ...view, all: true }, emptyKey: n.emptyKey, noDistance: dv, linksBelow: !!links, only }) : ''}
+    ${n.id === 'safe_now' ? `<p class="foot">${T('safe_now.home')}</p>` : ''}
     ${also}
     ${links && query ? `<h2>${T('links.more')}</h2>${linkPanels(links)}` : ''}</main>`;
 }

@@ -25,6 +25,9 @@ export const KNOWN_CATEGORIES = [
   'rec.center', 'rec.library', 'jobs.find', 'jobs.training', 'learn.school', 'learn.english',
   'treatment.crisis', 'treatment.detox', 'treatment.residential', 'treatment.outpatient', 'treatment.meds', 'treatment.recovery',
   'legal', 'ids', 'assault', 'money.tax', 'money.benefits', 'goods.clothes', 'goods.baby', 'kids.care', 'connect', 'pets',
+  // Somewhere open all night with a phone a person can use (DECISIONS 2026-09-22, Kyle's plan decision 3).
+  // A category says what the row offers, not who runs it: both of these offer a door that is never locked.
+  'safe.police', 'safe.fire',
 ] as const;
 const CATEGORY = { test: (c: string) => (KNOWN_CATEGORIES as readonly string[]).includes(c) };
 // Patterns that suggest a person's contact details leaked into public text.

@@ -40,6 +40,53 @@ sources:
     org: { id: org_wayne_hhvs, name: "Wayne County Department of Health, Human and Veterans Services" }
     id_prefix: wws
 
+  # "Get somewhere safe now" (DECISIONS 2026-09-22, Kyle's plan decision 3): police and fire stations are
+  # ingested from City open data as 24-hour destinations beside the emergency rooms. Read by
+  # pipeline/src/ingest-safe.ts (pnpm ingest:safe), which keeps the public-facing buildings and drops the rest:
+  # a training academy, a radio shop and an aviation hangar are not places to walk into at 3am.
+  #
+  # The City's own pages (detroitmi.gov) have refused this pipeline's fetcher since 2026-09-20
+  # (data/seed/script-refusing-hosts.csv), so these rows claim no page read: their badge is the plain
+  # "from the City's list, last updated ..." one, and confirming the lobby wording by eye is a steward job
+  # (docs/CHECKS-2026-09-22.md).
+  - id: detroit_police_precincts
+    name: City of Detroit Police Precinct Buildings layer
+    tier: A
+    kind: arcgis_safe
+    url: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Precinct_Buildings/FeatureServer/0
+    page: https://detroitmi.gov/departments/police-department
+    license: unstated   # City portal states no license; ask (10-B12). Facts only; attributed.
+    mode: publish
+    # The City last edited this layer on 2018-07-19. A precinct building is not a pop-up: the twelve numbered
+    # precincts have been at these addresses for years, and the same twelve addresses appear again in the City's
+    # separate Public Safety Locations layer (edited 2021-01). The date is not hidden — it is what the badge on
+    # every one of these rows prints — so the reader can judge it (DECISIONS 2026-09-22).
+    max_age_days: 4000
+    category: safe.police
+    wording: police_station
+    org: { id: org_detroit_police, name: Detroit Police Department }
+    # `Leadership` and `NPO` are staff names and officers' mobile numbers. They are deliberately not mapped and
+    # must never be added: a listing names a place, never a person (docs/08).
+    fields: { name: Precinct, address: Address, city: City, zip: Zip, phone: Phone }
+    id_prefix: dpd
+
+  - id: detroit_fire_stations
+    name: Detroit Fire Department Fire Stations layer
+    tier: A
+    kind: arcgis_safe
+    url: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/DFD_Fire_Station_Locations/FeatureServer/0
+    page: https://detroitmi.gov/departments/detroit-fire-department
+    license: unstated
+    mode: publish
+    max_age_days: 4000   # data last edited 2024-02-24; same reasoning as the precincts above
+    category: safe.fire
+    wording: fire_station
+    org: { id: org_detroit_fire, name: Detroit Fire Department }
+    # The layer publishes no phone number, so these rows carry none: a fire station's own bell is the way in,
+    # and 911 is the number. `Lat`/`Long` in this layer are swapped, so the ingest reads the geometry instead.
+    fields: { name: Firehouse, address: Address, ref: FH_Short }
+    id_prefix: dfd
+
   - id: rec_centers
     name: City of Detroit Recreation Centers layer
     tier: A

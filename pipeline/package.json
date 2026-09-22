@@ -22,6 +22,7 @@
     "ingest:transit": "tsx src/ingest-transit.ts",
     "ingest:crashes": "tsx src/ingest-crashes.ts",
     "ingest:mymap": "tsx src/ingest-mymap.ts",
+    "ingest:safe": "tsx src/ingest-safe.ts",
     "alert:new": "tsx src/alert-new.ts",
     "import:lines": "tsx src/import-lines.ts",
     "ingest:treatment": "tsx src/ingest-treatment.ts"
