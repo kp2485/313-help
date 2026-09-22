@@ -92,21 +92,45 @@ struct PrivacyShield: View {
     @Published var zip: String?
     /// The last thing typed was five digits we do not carry. The chip says so; the list stays on the whole city.
     @Published var zipUnknown = false
+    /// The junction a person typed, when the point above is where two streets cross rather than a fix. Like the
+    /// ZIP, it is words in memory and nothing more: never written to a file, never sent, never put in a route.
+    /// It is what the screen says instead of "you" — "Sorted by distance from Woodward & Warren".
+    @Published var cross: String?
+    /// The ask has been running for ten seconds and nothing has come back (Kyle, 2026-09-22). The screen says
+    /// what is taking the time and what would help, and offers a **Stop** that really stops the manager.
+    @Published var slow = false
 
     /// Use the middle of a typed ZIP. Anything that is not a ZIP we carry leaves the list as it was and says so.
     func use(zip typed: String, from zips: ZipCenters) {
         switch lookUpZip(typed, in: zips) {
         case .found(let code, let center):
+            stopAsking()
             point = center
             zip = code
+            cross = nil
             zipUnknown = false
             denied = false
         case .unknown, .notAZip:
             zipUnknown = true
         }
     }
+
+    /// Use a junction this phone worked out from the streets in the signed bundle (HelpCore/Intersections.swift).
+    /// Nothing was asked of anybody and nothing was sent: the words and the point both die with the app.
+    func use(cross words: String, at p: LatLon) {
+        stopAsking()
+        point = p
+        cross = words
+        zip = nil
+        zipUnknown = false
+        denied = false
+    }
     private let manager = CLLocationManager()
     private var wantsFix = false
+    /// The ten-second "Still looking…" timer and the five-minute cut-off. Both are cancelled by a fix, by a
+    /// refusal, and by Stop.
+    private var slowTask: Task<Void, Never>?
+    private var giveUpTask: Task<Void, Never>?
     /// A hundred metres is as close as this app ever needs: the list sorts in bands of a mile and the map draws a
     /// dot. Reduced accuracy is accepted as it comes — `requestTemporaryFullAccuracy` is never called, here or
     /// anywhere (HelpCore/Locate.swift, docs/08).
@@ -125,37 +149,94 @@ struct PrivacyShield: View {
     /// True when iOS will not show the sheet again, so the answer is Settings rather than another tap here.
     var permanentlyDenied: Bool { permission == .denied }
 
+    /**
+     Ask for a fix, and keep listening.
+
+     **The ten-second give-up is gone** (Kyle, 2026-09-22; `locateSlowSeconds` in HelpCore/Locate.swift). On a
+     phone with no network a cold GPS fix is a walk outside and a few minutes of sky, and `requestLocation()`
+     gives up on its own long before that — so this uses `startUpdatingLocation()` and stops at the first fix,
+     at five minutes, or when a person taps Stop. After ten seconds the screen says what is happening and what
+     would help, with the cross-street and ZIP ways in beside it the whole time.
+     */
     func ask() {
         denied = false
         zipUnknown = false
+        slow = false
         switch manager.authorizationStatus {
         case .notDetermined: wantsFix = true; asking = true; manager.requestWhenInUseAuthorization()
-        case .authorizedWhenInUse, .authorizedAlways: asking = true; manager.requestLocation()
+        case .authorizedWhenInUse, .authorizedAlways: beginListening()
         default: denied = true
         }
     }
-    func forget() { point = nil; zip = nil; zipUnknown = false; denied = false }
+
+    private func beginListening() {
+        asking = true
+        manager.startUpdatingLocation()
+        slowTask?.cancel()
+        slowTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(locateSlowSeconds))
+            guard !Task.isCancelled, let self, self.asking else { return }
+            self.slow = true
+        }
+        giveUpTask?.cancel()
+        giveUpTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(locateGiveUpSeconds))
+            guard !Task.isCancelled, let self, self.asking else { return }
+            self.stopAsking()
+            self.denied = true
+        }
+    }
+
+    /// Stop really stops: the manager is told to stop, both timers are cancelled, and a fix that lands after
+    /// this is dropped on the floor — so it can never move the map out from under somebody who has since typed
+    /// a cross street.
+    func stopAsking() {
+        manager.stopUpdatingLocation()
+        wantsFix = false
+        asking = false
+        slow = false
+        slowTask?.cancel(); slowTask = nil
+        giveUpTask?.cancel(); giveUpTask = nil
+    }
+
+    func forget() {
+        stopAsking()
+        point = nil; zip = nil; cross = nil; zipUnknown = false; denied = false
+    }
 
     nonisolated func locationManagerDidChangeAuthorization(_ m: CLLocationManager) {
         Task { @MainActor in
             switch m.authorizationStatus {
-            case .authorizedWhenInUse, .authorizedAlways: if self.wantsFix { self.wantsFix = false; m.requestLocation() }
-            case .denied, .restricted: self.wantsFix = false; self.asking = false; self.denied = true
+            case .authorizedWhenInUse, .authorizedAlways: if self.wantsFix { self.wantsFix = false; self.beginListening() }
+            case .denied, .restricted: self.stopAsking(); self.denied = true
             default: break
             }
         }
     }
     nonisolated func locationManager(_ m: CLLocationManager, didUpdateLocations l: [CLLocation]) {
         guard let c = l.last?.coordinate else { return }
-        // A real fix replaces a typed ZIP: the ZIP was a stand-in for exactly this.
+        // A real fix replaces a typed ZIP or a typed junction: both were stands-in for exactly this.
         Task { @MainActor in
-            self.asking = false; self.denied = false; self.zip = nil; self.zipUnknown = false
+            guard self.asking else { return }                 // a fix after Stop is dropped on the floor
+            self.stopAsking()
+            self.denied = false; self.zip = nil; self.cross = nil; self.zipUnknown = false
             self.point = LatLon(lat: c.latitude, lon: c.longitude)
         }
     }
     nonisolated func locationManager(_ m: CLLocationManager, didFailWithError e: Error) {
-        Task { @MainActor in self.asking = false; self.denied = true }
+        Task { @MainActor in
+            guard self.asking else { return }
+            // A momentary failure while the receiver is still warming up is not a refusal: keep listening, and
+            // let the five-minute cut-off be the thing that gives up.
+            if (e as? CLError)?.code == .locationUnknown { return }
+            self.stopAsking()
+            self.denied = true
+        }
     }
+
+    /// How the screen names where a list is sorted from, and what the Directions screen calls its start.
+    var originKind: DirOriginKind { dirOriginKind(hasPoint: point != nil, zip: zip, cross: cross) }
+    var originWords: String { zip ?? cross ?? "" }
 }
 
 struct RootView: View {
@@ -516,111 +597,6 @@ struct ResultsView: View {
     }
 }
 
-/**
- "Use my location", in the app's own words and colours (docs/05: asked on the tap, never at launch) — and, beside
- it, "Type a ZIP code", for everyone that first button is not an answer for: a phone with location switched off,
- a borrowed phone, or simply a person who would rather not hand over where they are standing. The web has offered
- both since the first list screen (`locChip` in apps/web/src/main.ts).
-
- A typed ZIP becomes the middle of that ZIP area and nothing more, and the words say so. It lives in memory for as
- long as the app is open, like a position, and goes nowhere: no file, no request, no route (docs/08).
- */
-struct LocationChip: View {
-    @EnvironmentObject var here: Here
-    @EnvironmentObject var store: BundleStore
-    /// Whether the field is showing. Tapping "Type a ZIP code" opens it, exactly as on the web, so the common
-    /// case stays one button.
-    @State private var typing = false
-    /// What has been typed, this screen, this moment. Never stored.
-    @State private var typed = ""
-    @FocusState private var focused: Bool
-
-    private var zips: ZipCenters { store.bundle?.zips ?? ZipCenters(points: [:]) }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if here.point == nil {
-                HStack(spacing: 10) {
-                    Button { here.ask() } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "location.fill")
-                            Text(L.t("loc.use")).fontWeight(.semibold)
-                        }
-                        .font(.subheadline).foregroundStyle(Color.brandInk)
-                        .padding(.horizontal, 16).padding(.vertical, 11)
-                        .background(Color.brand, in: Capsule())
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(here.asking)
-                    .opacity(here.asking ? 0.6 : 1)
-                    // Only when this bundle carries the ZIP centres to look one up in.
-                    if !zips.isEmpty && !typing {
-                        Button { typing = true; focused = true } label: {
-                            Text(L.t("loc.zip")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand)
-                                .padding(.horizontal, 14).padding(.vertical, 11)
-                                .background(Color.surface, in: Capsule())
-                                .overlay(Capsule().strokeBorder(Color.line, lineWidth: 1))
-                        }.buttonStyle(.plain)
-                    }
-                }
-                if typing { zipField }
-                if here.denied {
-                    Text(L.t(here.permanentlyDenied ? "loc.denied_settings" : "loc.denied"))
-                        .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
-                }
-                Text(L.t(here.zipUnknown ? "loc.zip_unknown" : "loc.note"))
-                    .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
-            } else {
-                HStack(spacing: 10) {
-                    Text(here.zip.map { L.t("loc.zip_using", ["zip": $0]) } ?? L.t("loc.using"))
-                        .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
-                    Button(L.t(here.zip == nil ? "loc.off" : "loc.zip_off")) { here.forget(); typed = "" }
-                        .font(.footnote.weight(.semibold)).foregroundStyle(Color.brand)
-                }
-            }
-        }
-        // The chip's state is a sentence, not a colour: a screen reader is told when a ZIP was not recognised.
-        .animation(nil, value: typing)
-    }
-
-    /// Five digits and a "Sort" button. The keyboard is the number pad, and the field offers **no autofill**:
-    /// `.postalCode` would have iOS offer the ZIP on this person's own contact card above the keyboard, which is
-    /// their home address appearing on a screen they did not put it on — on a borrowed or overlooked phone that
-    /// is exactly the thing this app is careful about. Five digits are quick to type (Kyle's rule: we never ask
-    /// who you are, and we do not let the phone answer for them either).
-    private var zipField: some View {
-        HStack(spacing: 8) {
-            TextField("", text: $typed)
-                .keyboardType(.numberPad)
-                .textContentType(nil)
-                .autocorrectionDisabled()
-                .focused($focused)
-                .accessibilityLabel(L.t("loc.zip_label"))
-                .onChange(of: typed) { _, v in
-                    let digits = v.filter(\.isNumber)
-                    if digits != v || digits.count > 5 { typed = String(digits.prefix(5)) }
-                    if here.zipUnknown { here.zipUnknown = false }
-                }
-                .onSubmit(sort)
-                .padding(.horizontal, 12).padding(.vertical, 10)
-                .background(Color.surface, in: RoundedRectangle(cornerRadius: 12))
-                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(here.zipUnknown ? Color.warnInk : Color.line, lineWidth: 1))
-            Button(L.t("loc.zip_go"), action: sort)
-                .font(.subheadline.weight(.semibold)).foregroundStyle(Color.brandInk)
-                .padding(.horizontal, 16).padding(.vertical, 11)
-                .background(Color.brand, in: Capsule())
-                .buttonStyle(.plain)
-                .disabled(normalizedZip(typed) == nil)
-                .opacity(normalizedZip(typed) == nil ? 0.6 : 1)
-        }
-    }
-
-    private func sort() {
-        here.use(zip: typed, from: zips)
-        if here.point != nil { typing = false; focused = false }
-    }
-}
-
 /// One listing on a list: the card leads to the listing, and the Call button under it is its own control, outside
 /// the link. A link inside a link is dead on iOS — "Call" did nothing — and a screen reader reads two controls here,
 /// "Crossroads of Michigan, open until 2 pm…" and "Call Crossroads of Michigan", in that order.
@@ -661,6 +637,9 @@ struct CardLink<Destination: View>: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel(L.t("detail.call_label", ["name": r.row.name]) + ", " + phone.number)
             }
+            // Our own directions, from the row itself, exactly as the web's `card()` offers them: a results
+            // list, a safe-now list, the map's own list. A sensitive row has no coordinate and gets no button.
+            DirectionsButton(name: r.row.name, lat: r.row.lat, lon: r.row.lon, category: r.row.category)
         }.card()
     }
 }
@@ -726,35 +705,47 @@ struct DetailView: View {
             // to the maps app as a coordinate; it is never printed as if it were an address.
             // The destination is escaped strictly (HelpCore/Listing), so an address that reads "…&from=42.3,-83.0"
             // cannot put a second parameter — an origin — into the link.
+            // **Our own directions come first** and are the primary button (DECISIONS 2026-09-22): they are
+            // computed on this phone, work with no signal, and tell nobody where the person is going. The links
+            // that hand the place to somebody else's app are kept, under "Other apps", where the screen says
+            // plainly that the app will see the place.
+            DirectionsButton(name: row.name, lat: row.lat, lon: row.lon, category: row.category, primary: true)
             if let url = mapsURL(row) {
-                Link(destination: url) {
-                    HStack(spacing: 10) { Image(systemName: "mappin.and.ellipse"); Text(L.t("detail.directions")).fontWeight(.semibold); Spacer() }
-                        .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
-                        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L.t("detail.directions_label", ["name": row.name]))
-                // The same trip in the Transit app, when this phone has it: Transit's own documented scheme, the
-                // destination and nothing else (Listing.swift). An addition — "Directions" above needs no other
-                // app and stays first — and not an endorsement or a partnership.
-                if let turl = transitAppURL(row, canOpen: { UIApplication.shared.canOpenURL($0) }) {
-                    Button { openURL(turl) } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "bus")
-                            Text(L.t("detail.bus_app")).fontWeight(.semibold).multilineTextAlignment(.leading)
-                            Spacer()
-                            Image(systemName: "arrow.up.forward.square")
+                DisclosureGroup(L.t("dir.other_apps")) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Link(destination: url) {
+                            HStack(spacing: 10) { Image(systemName: "mappin.and.ellipse"); Text(L.t("detail.directions")).fontWeight(.semibold); Spacer() }
+                                .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
+                                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
                         }
-                        .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
-                        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(L.t("detail.directions_label", ["name": row.name]))
+                        // The same trip in the Transit app, when this phone has it: Transit's own documented
+                        // scheme, the destination and nothing else (Listing.swift). An addition, not an
+                        // endorsement and not a partnership.
+                        if let turl = transitAppURL(row, canOpen: { UIApplication.shared.canOpenURL($0) }) {
+                            Button { openURL(turl) } label: {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "bus")
+                                    Text(L.t("detail.bus_app")).fontWeight(.semibold).multilineTextAlignment(.leading)
+                                    Spacer()
+                                    Image(systemName: "arrow.up.forward.square")
+                                }
+                                .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
+                                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(L.t("detail.bus_app_label", ["name": row.name]))
+                        }
+                        Text(L.t("dir.other_apps_note")).font(.footnote).foregroundStyle(Color.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(L.t("detail.bus_app_label", ["name": row.name]))
                 }
+                .font(.subheadline.weight(.semibold)).tint(Color.brand)
                 Text(L.t("detail.directions_note")).font(.footnote).foregroundStyle(Color.muted)
             }
             // Saved places are kept on this phone only, and a private listing has no Save button at all (docs/08).

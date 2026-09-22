@@ -437,7 +437,7 @@ describe('the Safe streets panel prints what SEMCOG requires, beside its source 
   const src = { name: 'City data', url: 'https://example.org/x', last_edited: '2026-09-17' };
   const hood: Hood = { id: 'nbh_zug', name: 'Zug', district: 1, center: [42.4, -83.1], rings: [], years: {},
     help: { total: 1, by: {}, nearest_miles: {}, none_listed_yet: [], coverage_checked: false }, places: { parks: 1, rec_centers: 0, greenway_open: 0 },
-    crashes: { walk: 49, bike: 'lt5', severe: 22 } };
+    crashes: { walk: 49, bike: 2, severe: 22 } };
   const d: Indicators = { sources: { neighborhoods: src, sales: src, permits: src, crashes: { ...src, name: 'SEMCOG — Crash Locations, 2015-2024' } },
     stats_fetched_at: '2026-09-18', first_year: 2024, partial_year: 2026, near_miles: 0.5, origin: [-83.32, 42.22], segments: {},
     city: {}, neighborhoods: [hood], crash_years: [2020, 2024], city_crashes: { walk: 2024, bike: 664, severe: 630 },

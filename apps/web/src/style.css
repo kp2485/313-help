@@ -588,22 +588,25 @@ main:focus { outline:none; }
    no script. The table is still in the page in chart view — `.vh` only hides it from the eye — so a screen
    reader has every number whichever view is chosen.
 
-   The two fills are two IDENTITIES (homes sold, permits), never two ends of a scale: nothing here says good or
-   bad. They are told apart by three things at once, so colour is never the only carrier (WCAG 1.4.1): each
-   small multiple has its own caption over it, the second fill carries a hatch, and both are in the key. */
+   The three lines are three IDENTITIES (homes sold, permits; walking, biking, badly hurt), never ends of a
+   scale: nothing here says good or bad. They are told apart by three things at once, so colour is never the only
+   carrier (WCAG 1.4.1): a colour, a marker shape (circle, diamond, square) and a line pattern (solid, dashed,
+   dash-dot), and all of them are in the key. */
 :root {
-  /* Validated against the surface in both themes with the categorical checks (green ΔE 26.7 normal / 24.4
-     deutan from the blue, both over 3:1 on the card). */
-  --chart-a:#0b6b43; --chart-b:#1d4ed8; --chart-lt5:#47584f; --chart-grid:#d9e3dc; --chart-ink:#47584f;
+  /* Validated with the dataviz palette checks against the card in both themes (2026-09-22, `--pairs all`):
+     light green/blue/magenta, worst CVD pair ΔE 7.9 (deutan) — inside the 6–8 band that is legal only with a
+     second encoding, which the shapes and dashes are — normal-vision worst 20.2, every one over 3:1 on white. */
+  --chart-a:#0b6b43; --chart-b:#1d4ed8; --chart-c:#b5177a; --chart-grid:#d9e3dc; --chart-ink:#47584f;
 }
 @media (prefers-color-scheme: dark) { :root {
-  --chart-a:#35a870; --chart-b:#5b8de0; --chart-lt5:#a3b5aa; --chart-grid:#25362d; --chart-ink:#a3b5aa;
+  /* Its own steps for the dark card (L 0.48–0.67), not a flip: worst CVD pair ΔE 6.4, all over 3:1 on #121e18. */
+  --chart-a:#35a870; --chart-b:#5b8de0; --chart-c:#c86aa0; --chart-grid:#25362d; --chart-ink:#a3b5aa;
 } }
 /* "Increase contrast" deliberately steps outside the categorical lightness band: at this setting contrast with
-   the card wins over the even-lightness rule, and the hatch and the captions still carry identity. */
-@media (prefers-contrast: more) { :root { --chart-a:#064e31; --chart-b:#142f9e; --chart-lt5:#26332c; --chart-grid:#8ea39a; --chart-ink:#26332c; } }
-@media (prefers-contrast: more) and (prefers-color-scheme: dark) { :root { --chart-a:#57c894; --chart-b:#7fb0ff; --chart-lt5:#d4e2d9; --chart-grid:#4c5f55; --chart-ink:#d4e2d9; } }
-@media (forced-colors: active) { :root { --chart-a:CanvasText; --chart-b:LinkText; --chart-lt5:GrayText; --chart-grid:GrayText; --chart-ink:CanvasText; } }
+   the card wins over the even-lightness rule, and the shapes and dashes still carry identity. */
+@media (prefers-contrast: more) { :root { --chart-a:#064e31; --chart-b:#142f9e; --chart-c:#8a0f5c; --chart-grid:#8ea39a; --chart-ink:#26332c; } }
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) { :root { --chart-a:#57c894; --chart-b:#7fb0ff; --chart-c:#f0a0d0; --chart-grid:#4c5f55; --chart-ink:#d4e2d9; } }
+@media (forced-colors: active) { :root { --chart-a:CanvasText; --chart-b:LinkText; --chart-c:Highlight; --chart-grid:GrayText; --chart-ink:CanvasText; } }
 
 .viewpick { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0 .25rem; }
 .viewpick .pick { font-size:.9375rem; }
@@ -613,21 +616,15 @@ main:focus { outline:none; }
 .hoodsvg .gl,.hoodsvg .ax { stroke:var(--chart-grid); stroke-width:1; fill:none; }
 .hoodsvg .ax { stroke:var(--chart-ink); }
 .hoodsvg .tk,.hoodsvg .yr { fill:var(--chart-ink); font-size:11px; font-family:inherit; font-variant-numeric:tabular-nums; }
-/* Each series has a colour, a line pattern AND a marker shape, so the two are still two with no colour at all
-   (WCAG 1.4.1): a solid line with round points, and a dashed line with diamonds. */
+/* Each series has a colour, a line pattern AND a marker shape, so the lines are still distinct with no colour at
+   all (WCAG 1.4.1): a solid line with round points, a dashed line with diamonds, a dash-dot line with squares. */
 .hoodsvg .ln { fill:none; stroke-width:2; stroke-linecap:round; }
 .hoodsvg .ln.ta { stroke:var(--chart-a); }
 .hoodsvg .ln.tb { stroke:var(--chart-b); stroke-dasharray:7 4; }
-/* The piece of a line that runs to or from a year whose count is hidden: it is drawn, because the year happened
-   and a gap would read as a zero, and it is drawn DIFFERENTLY, because nobody knows where it really goes. */
-.hoodsvg .ln.unsure { stroke-dasharray:1 3; stroke-width:1.5; }
+.hoodsvg .ln.tc { stroke:var(--chart-c); stroke-dasharray:7 3 1.5 3; }
 .hoodsvg .mk.ta { fill:var(--chart-a); }
 .hoodsvg .mk.tb { fill:var(--chart-b); }
-/* A count the pipeline hid: the series' own shape, hollow, at a FIXED height. There is no value to measure and
-   no number to read off it (docs/13, honesty rule 2). */
-.hoodsvg .mk.hollow { fill:var(--surface); stroke-width:1.5; }
-.hoodsvg .mk.hollow.ta { stroke:var(--chart-a); }
-.hoodsvg .mk.hollow.tb { stroke:var(--chart-b); }
+.hoodsvg .mk.tc { fill:var(--chart-c); }
 /* The number at a point, on hover and on keyboard focus. It is decoration: the same words are in the point's own
    accessible name, in its `<title>`, and in the table. */
 .hoodsvg .pt { outline:none; }
@@ -648,18 +645,26 @@ main:focus { outline:none; }
 .keybox:has(input:disabled) { cursor:default; color:var(--muted); }
 .chartkey .sw { width:1rem; height:1rem; border-radius:99rem; forced-color-adjust:none; }
 .chartkey .sw.ta { background:var(--chart-a); }
-/* The second series' key sample is its own shape, turned on its point, not a second circle. */
+/* The second and third series' key samples are their own shapes, not more circles. */
 .chartkey .sw.tb { background:var(--chart-b); border-radius:2px; rotate:45deg; width:.875rem; height:.875rem; }
-.chartkey .sw.hollow { background:none; border:1.5px solid var(--chart-lt5); }
-/* Forced colours and print keep the two lines apart by their dash and their shape, which survive both. */
+.chartkey .sw.tc { background:var(--chart-c); border-radius:2px; width:.875rem; height:.875rem; }
+/* Forced colours and print keep the lines apart by their dash and their shape, which survive both. */
 @media (forced-colors: active) {
-  .hoodsvg .mk.hollow { fill:Canvas; }
   .hoodsvg .tip rect { fill:CanvasText; }
   .chartkey .sw { border:1px solid CanvasText; }
 }
 @media print {
   .hoodsvg .ln.ta,.hoodsvg .mk.ta { stroke:#000; fill:#000; }
   .hoodsvg .ln.tb,.hoodsvg .mk.tb { stroke:#000; fill:#fff; }
+  .hoodsvg .ln.tc,.hoodsvg .mk.tc { stroke:#000; fill:#888; }
   .hoodsvg .mk { stroke:#000; stroke-width:1.5; }
   .hoodsvg .tip { display:none; }
 }
+/* "At a glance": the latest year's figure per Conditions series, one stat tile each. Label over value, the value
+   in the text ink (never a series colour), and nothing coloured by size: no tile is a score. */
+.glance { display:grid; grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr)); gap:.5rem; margin:.5rem 0 .25rem; }
+.glance .tile { display:grid; gap:.125rem; align-content:start; padding:.75rem .875rem; border-radius:var(--r); background:var(--sunken); border:1px solid var(--line); box-shadow:none; }
+.glance .tile:hover { border-color:var(--line); }
+.glance dt { font-size:.8125rem; color:var(--muted); line-height:1.3; }
+.glance dt small { display:block; font-size:.75rem; }
+.glance dd { margin:0; font-size:1.25rem; font-weight:600; color:var(--ink); font-variant-numeric:proportional-nums; overflow-wrap:anywhere; }

@@ -647,11 +647,23 @@ class MapLayerStoreTest {
         return d
     }
 
+    /**
+     * **A first open shows help** (audit H2; DECISIONS 2026-09-22). The tab used to open as a street map with a
+     * green line on it and not one place that helps, so a person who tapped Map to find food had to open the
+     * switcher before the tab did anything the app is for.
+     */
     @Test
-    fun aFirstOpenShowsTheGreenwayParksAndTheBuses() {
+    fun aFirstOpenShowsEveryHelpLayerAndTheParks() {
         val store = MapLayerStore(tempDir())
         assertEquals(defaultMapLayers, store.on)
-        assertTrue(store.isOn("place:greenway"))
+        assertEquals("all eight help groups, and parks", 9, store.on.size)
+        for (g in mapGroups) assertTrue("${g.id} is not on at a first open", store.isOn("help:${g.id}"))
+        assertTrue(store.isOn("place:parks"))
+        // Off: the greenway is one path inside a 302-park system, the outlines are the Areas tab's job, and a bus
+        // route line over eight kinds of dot is the busiest thing on the screen.
+        assertFalse("the greenway comes off the default", store.isOn("place:greenway"))
+        assertFalse("so do the outlines", store.isOn(AREAS_LAYER))
+        assertFalse("and the bus routes", store.isOn("go:ddot_routes"))
         assertFalse(store.isOn("go:ddot_stops"))
     }
 
@@ -659,10 +671,10 @@ class MapLayerStoreTest {
     fun theChoiceIsRememberedOnThisPhoneAndNowhereElse() {
         val dir = tempDir()
         val first = MapLayerStore(dir)
-        assertTrue(first.toggle("help:food"))
+        assertTrue(first.toggle("place:greenway"))
         assertTrue(first.toggle("place:parks"))
         val again = MapLayerStore(dir)
-        assertTrue(again.isOn("help:food"))
+        assertTrue("a remembered choice still wins over the defaults", again.isOn("place:greenway"))
         assertFalse(again.isOn("place:parks"))
         assertTrue(
             "the choice is a file in the app's own private storage, never SharedPreferences",

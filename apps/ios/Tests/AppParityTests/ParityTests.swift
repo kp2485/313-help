@@ -203,15 +203,21 @@ final class ParityTests: XCTestCase {
         // where this function ends, which is structure rather than a guess at a comment.
         let afterStart = String(web[start.upperBound...])
         guard let end = afterStart.range(of: "\nexport ") else { return XCTFail("hoodPage is no longer followed by another export; the bound this test uses is gone") }
-        let webBody = String(afterStart[..<end.lowerBound])
-        var webPanels = headKeys(in: webBody)
-        // The crash panel is drawn by a function of its own, called from inside `hoodPage`.
-        if let at = webBody.range(of: "crashPanel(h, d, ui)") {
-            let before = headKeys(in: String(webBody[..<at.lowerBound])).count
-            webPanels.insert("hood.crash_head", at: before)
+        var webBody = String(afterStart[..<end.lowerBound])
+        // The Conditions and Safe-streets panels are functions of their own, called from inside `hoodPage`
+        // (Conditions since 2026-09-22, when it grew its four chart groups): each body is spliced in where it
+        // is called, so its own headings are counted in place.
+        func body(of name: String, upTo bound: String) -> String {
+            guard let s = web.range(of: "export function \(name)(") else { return "" }
+            let rest = String(web[s.upperBound...])
+            return String(rest[..<(rest.range(of: bound)?.lowerBound ?? rest.endIndex)])
         }
+        webBody = webBody.replacingOccurrences(of: "${conditionsPanel(h, d, ui, view, off)}", with: body(of: "conditionsPanel", upTo: "\nfunction crashYears"))
+        webBody = webBody.replacingOccurrences(of: "${crashPanel(h, d, ui, view, off)}", with: body(of: "crashPanel", upTo: "\nexport "))
+        let webPanels = headKeys(in: webBody)
         XCTAssertEqual(webPanels, ["hood.help_head", "hood.nearest_head", "hood.places_head", "hood.city_near_head",
-                                   "hood.money_head", "hood.cond_head", "hood.crash_head", "hood.sources_head"],
+                                   "hood.money_head", "hood.cond_head", "hood.cond_blight_head", "hood.cond_issues_head",
+                                   "hood.cond_days_head", "hood.cond_fires_head", "hood.crash_head", "hood.sources_head"],
                        "the web page's headings changed; the iPhone's have to change with them")
 
         let ios = try text("apps/ios/HelpApp/HoodsScreen.swift")

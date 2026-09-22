@@ -138,6 +138,11 @@ class ParityTest {
         for (id in PROPOSE_CATEGORIES) built += "add.cat.$id"
         for (id in HOW_KNOWN) built += "add.how.$id"
         built += listOf("add.sent", "add.queued", "loc.denied", "loc.denied_settings", "hood.nearest_open")
+        // Directions (DECISIONS 2026-09-22): the keys DirWords.kt builds from a fact `:query` hands over — a
+        // compass word, a turn word — and the ones the cross-street field builds from the end of a street.
+        for (b in org.help313.query.BEARINGS) built += "dir.bearing.$b"
+        for (turn in DIR_TURNS) built += "dir.turn.$turn"
+        for (where in listOf("north", "south", "east", "west")) built += "loc.where_$where"
         built += listOf(
             "tab.home", "tab.help", "search.title", "saved.title", "tabs.label",
             "help.now", "help.soon", "help.later", "results.none",
@@ -149,6 +154,60 @@ class ParityTest {
         )
         for (key in built) if (!en.containsKey(key)) missing += "built: $key"
         assertEquals("string keys the app asks for that strings/en.json does not have", emptyList<String>(), missing)
+    }
+
+    /**
+     * Every `dir.*` key the web app's Directions screen uses exists here too, in all four languages, with the same
+     * placeholders — because the Android screen is a line-for-line copy of it and a missing key would put a raw
+     * string in front of somebody walking somewhere at night.
+     *
+     * The set is read out of apps/web/src/dirwords.ts, dirscreen.ts and main.ts rather than typed here, so a
+     * sentence added to the web and not to Android fails this test instead of quietly going missing.
+     */
+    @Test
+    fun everyDirectionsKeyTheWebUsesIsHereInEveryLanguage() {
+        val web = text("apps/web/src/dirwords.ts") + text("apps/web/src/dirscreen.ts") + text("apps/web/src/main.ts")
+        val used = Regex("'(dir\\.[a-z_.]+)'").findAll(web).map { it.groupValues[1] }
+            // The two keys built from a fact rather than written out; their members are checked below.
+            .filter { it != "dir.bearing." && it != "dir.turn." }
+            .toSortedSet()
+        assertTrue("apps/web/src/dirwords.ts could not be read", used.size > 30)
+        for (lang in LANGS) {
+            val words = strings("strings/$lang.json")
+            for (key in used) assertNotNull("strings/$lang.json has no $key", words[key])
+        }
+        // The two built families, in full: eight compass words and eight turn words, in every language.
+        for (lang in LANGS) {
+            val words = strings("strings/$lang.json")
+            for (b in org.help313.query.BEARINGS) assertNotNull("strings/$lang.json has no dir.bearing.$b", words["dir.bearing.$b"])
+            for (turn in DIR_TURNS) assertNotNull("strings/$lang.json has no dir.turn.$turn", words["dir.turn.$turn"])
+        }
+    }
+
+    /** The turn words `:query` can produce (Walk.turnWord). A ninth would have no sentence to go in. */
+    private val DIR_TURNS = listOf(
+        "straight", "slight_left", "left", "sharp_left", "slight_right", "right", "sharp_right", "around",
+    )
+
+    /**
+     * A trip is never put back after a recreation, and one reached from "Get somewhere safe now" is a private
+     * screen: no recents thumbnail, no screenshot, and "Leave this page fast" above it (Route.kt).
+     */
+    @Test
+    fun aTripIsNeverPutBackAfterARecreation() {
+        val trip = Route.Directions(42.35, -83.05, "Somewhere")
+        val secret = Route.Directions(42.35, -83.05, "Somewhere", secure = true)
+        assertFalse("an ordinary trip is not a private screen", Route.isPrivate(trip))
+        assertTrue("a trip from the safe-now list is", Route.isPrivate(secret))
+        assertTrue(Route.isTraceless(trip))
+        assertTrue(Route.isTraceless(secret))
+        // Everything before it is public and comes back; the trip itself does not, secure or not.
+        assertEquals(listOf<Route>(Route.Home), Route.keepable(listOf(Route.Home, trip)))
+        assertEquals(listOf<Route>(Route.Home, Route.Help), Route.keepable(listOf(Route.Home, Route.Help, secret)))
+        assertEquals(
+            "a stack that is only a trip falls back to Home",
+            listOf<Route>(Route.Home), Route.keepable(listOf(trip)),
+        )
     }
 
     /** Keys retired on 2026-09-20, when the web app folded Recreation and Transit into one Map tab. */
@@ -177,7 +236,10 @@ class ParityTest {
     @Test
     fun theNeighborhoodPageHasTheWebsPanelsInTheWebsOrder() {
         val web = text("apps/web/src/hoods.ts")
-        val crash = web.substringAfter("export function crashPanel").substringBefore("export function hoodPage")
+        // The Conditions and Safe-streets panels are functions of their own since 2026-09-22 (the Conditions
+        // panel grew charts and a glance row), so each one's body is spliced in where `hoodPage` calls it.
+        val cond = web.substringAfter("export function conditionsPanel").substringBefore("\nfunction crashYears")
+        val crash = web.substringAfter("export function crashPanel").substringBefore("\nexport ")
         // `hoodPage`'s OWN body, and nothing after it. Since 2026-09-22 the same file also holds `cityPage`,
         // which reuses several of these headings for the four city pages — and this phone has no city page yet
         // (docs/13, "The four cities"). Reading to the end of the file would add the city page's panels to the
@@ -185,7 +247,7 @@ class ParityTest {
         // function ends, so the bound is structure rather than a guess at a comment. The crash panel is spliced
         // in afterwards, because the text being spliced carries exports of its own.
         val hoodBody = web.substringAfter("export function hoodPage").substringBefore("\nexport ")
-        val page = hoodBody.replace("\${crashPanel(h, d, ui)}", crash)
+        val page = hoodBody.replace("\${conditionsPanel(h, d, ui, view, off)}", cond).replace("\${crashPanel(h, d, ui, view, off)}", crash)
         fun keysAfter(marker: String, body: String) =
             Regex(Regex.escape(marker) + "\\$\\{T\\('(hood\\.[a-z_.]+)'").findAll(body).map { it.groupValues[1] }.toList()
 
@@ -198,10 +260,15 @@ class ParityTest {
             .findAll(screens).map { it.groupValues[1] }.toList()
         assertEquals("the Android neighborhood page draws its panels in a different order", webPanels, androidPanels)
 
-        // The three lists inside the help panel, under their own smaller headings, in the same order too.
+        // The lists inside the help panel and the four chart groups of the Conditions panel, under their own
+        // smaller headings, in the same order too (the glance row's heading is drawn from a variable on the web).
         val webSubs = keysAfter("<h3 class=\"sub\">", page)
-        assertEquals(listOf("hood.nearest_head", "hood.places_head", "hood.city_near_head"), webSubs)
-        for (key in webSubs) assertTrue("HoodScreens.kt never draws $key", screens.contains("L.t(\"$key\""))
+        assertEquals(
+            listOf("hood.nearest_head", "hood.places_head", "hood.city_near_head",
+                "hood.cond_blight_head", "hood.cond_issues_head", "hood.cond_days_head", "hood.cond_fires_head"),
+            webSubs,
+        )
+        for (key in webSubs + "hood.glance") assertTrue("HoodScreens.kt never draws $key", screens.contains("L.t(\"$key\""))
     }
 
     /** SEMCOG asks for their notice wherever their data is reproduced. Both apps print the same sentence. */
@@ -394,6 +461,224 @@ class ParityTest {
         assertTrue(screens.contains("""col.addView(UI.sectionHead(a, L.t("also.${'$'}{need.id}.${'$'}{al.id}")))"""))
         assertTrue("the need's own list comes before its second one",
             screens.indexOf("listBody(a, col, q,") < screens.indexOf("listBody(a, col, al.query,"))
+    }
+
+    // ---- the navigation rebuild of 2026-09-22 (docs/NAVIGATION-AUDIT-2026-09-22.md) ------------------------------
+
+    /**
+     * **Four tabs: Home · Help · Map · Areas**, the one tab set on all three clients (audit H5, §4.1).
+     *
+     * Search and Saved were tabs on Android and on neither of the other two. Six 11-sp words sharing one line was
+     * already tight at ordinary Arabic text, and neither is a front door.
+     */
+    @Test
+    fun theTabBarIsTheSameFourTabsAsTheOtherTwoClients() {
+        val main = text("apps/android/app/src/main/kotlin/org/help313/app/MainActivity.kt")
+        val bar = main.substringAfter("private fun fillTabs").substringBefore("// ---- the things a screen needs")
+        val tabs = Regex("Triple\\(\"([\\w.]+)\"").findAll(bar).map { it.groupValues[1] }.toList()
+        assertEquals(listOf("tab.home", "tab.help", "tab.map", "tab.hoods"), tabs)
+        // The web's router has the same four (plus Events, which hides itself when the bundle carries none).
+        val web = text("apps/web/src/router.ts") + text("apps/web/src/main.ts")
+        for (tab in listOf("home", "help", "map", "hoods")) {
+            assertTrue("the web has no $tab tab", web.contains("'$tab'") || web.contains("\"$tab\""))
+        }
+        // The spoken label is the whole phrase, so nothing is abbreviated for somebody who cannot see the bar.
+        assertTrue(bar.contains("\"tab.hoods_wide\""))
+    }
+
+    /**
+     * **Urgent help is reachable on every screen** (audit H6; docs/05 and Principle 3, "one tap from anywhere").
+     * It had exactly two entry points on Android — Home's page body and the Map tab's chip — so from Help, a need,
+     * a listing or an area it took a trip back to Home.
+     */
+    @Test
+    fun urgentHelpIsInTheAppBarOnEveryScreenThatHasOne() {
+        val main = text("apps/android/app/src/main/kotlin/org/help313/app/MainActivity.kt")
+        assertTrue("there is no app bar", main.contains("private fun rebuildTopBar"))
+        val bar = main.substringAfter("private fun rebuildTopBar").substringBefore("// ---- the things a screen needs")
+        assertTrue("the app bar does not carry Urgent help", bar.contains("L.t(\"strip.more\")"))
+        assertTrue("the app bar does not carry Search", bar.contains("Route.Search"))
+        // Built once, from the route, on every draw — not remembered screen by screen.
+        assertTrue("the app bar is not rebuilt on every draw", main.contains("rebuildTopBar()"))
+        // The two screens that do not get it, and why, are stated in the code rather than left to be re-found.
+        assertTrue(bar.contains("route !is Route.Map"))
+        assertTrue(bar.contains("Route.isPrivate(route)"))
+        // The Map tab carries the same control as a floating chip of its own, so it is not a gap.
+        assertTrue(
+            "the Map tab lost its own Urgent help chip",
+            text("apps/android/app/src/main/kotlin/org/help313/app/MapScreen.kt").contains("chip(a, L.t(\"strip.more\"))"),
+        )
+    }
+
+    /** Home's six shortcuts, in docs/05's order: **Food first** (audit M2 and M4; Android had four). */
+    @Test
+    fun homesSixQuickNeedsAreTheWebsSixInTheWebsOrder() {
+        assertEquals(
+            listOf("food", "shelter", "doctor", "drugs", "narcan", "job"),
+            QUICK_NEEDS.map { it.second },
+        )
+        assertEquals(
+            listOf("quick.food", "quick.shelter", "quick.doctor", "quick.drugs", "quick.narcan", "quick.job"),
+            QUICK_NEEDS.map { it.first },
+        )
+        // Every one of them is a need this app actually has, so a tile can never open nothing.
+        val ids = kotlinNeeds().map { it.id }
+        for ((_, need) in QUICK_NEEDS) assertTrue("Home offers \"$need\", which is not a need", ids.contains(need))
+        // And the web leads with the same one.
+        val web = text("apps/web/src/main.ts")
+        val quick = web.substringAfter("quick.food")
+        assertTrue("the web no longer leads with food", quick.isNotEmpty())
+    }
+
+    /**
+     * Home's three tiles: Map, Your area, **Parks and paths** — which replaced the Joe Louis Greenway's own tile
+     * and its live count of open stretches (Kyle, 2026-09-22, direction b).
+     */
+    @Test
+    fun homesTilesAreMapAreasAndParksAndPaths() {
+        val screens = text("apps/android/app/src/main/kotlin/org/help313/app/Screens.kt")
+        val home = screens.substringAfter("fun home(a: MainActivity)").substringBefore("val QUICK_NEEDS")
+        val order = listOf("L.t(\"tab.map\")", "L.t(\"home.hoods_title\")", "L.t(\"rec.title\")")
+        var at = -1
+        for (tile in order) {
+            val found = home.indexOf(tile)
+            assertTrue("Home has no $tile tile", found >= 0)
+            assertTrue("Home's tiles are in the wrong order at $tile", found > at)
+            at = found
+        }
+        // The count that made the greenway read as the app's headline is gone from every language file.
+        for (lang in LANGS) assertFalse("rec.gw_sub is still in strings/$lang.json", strings("strings/$lang.json").containsKey("rec.gw_sub"))
+        // The tiles sit below the six needs, never above them: none of them is in the crisis path.
+        assertTrue(home.indexOf("QUICK_NEEDS") < home.indexOf("L.t(\"tab.map\")"))
+    }
+
+    /** **The Map tab opens with help on it** (audit H2), and the greenway, the outlines and the buses are off. */
+    @Test
+    fun theFirstOpenLayersAreEveryHelpGroupAndTheParks() {
+        val web = text("apps/web/src/layers.ts")
+        val wanted = Regex("DEFAULT_LAYERS = \\[([^\\]]*)\\]").find(web)?.groupValues?.get(1)
+        assertNotNull("could not read DEFAULT_LAYERS from apps/web/src/layers.ts", wanted)
+        val webIds = Regex("'([\\w:]+)'").findAll(wanted!!).map { it.groupValues[1] }.toList()
+        assertEquals("the two apps open on different layers", webIds, defaultMapLayers)
+        assertTrue(defaultMapLayers.contains("place:parks"))
+        assertFalse(defaultMapLayers.contains("place:greenway"))
+        assertFalse(defaultMapLayers.contains(AREAS_LAYER))
+        assertFalse(defaultMapLayers.contains("go:ddot_routes"))
+    }
+
+    /**
+     * The eight help layers, including the one the category audit added — `safe`, the police and fire stations,
+     * which ride with the emergency rooms rather than getting a colour of their own.
+     */
+    @Test
+    fun theMapsEightHelpGroupsAreTheWebsEight() {
+        val web = text("apps/web/src/needs.ts")
+        val block = web.substringAfter("MAP_GROUPS").substringBefore("];")
+        val ids = Regex("id: '(\\w+)'").findAll(block).map { it.groupValues[1] }.toList()
+        assertEquals("the two apps group the map's listings differently", ids, mapGroups.map { it.id })
+        assertEquals(8, mapGroups.size)
+        assertTrue("police and fire stations are not on the map", mapGroups.first { it.id == "health" }.tops.contains("safe"))
+        assertEquals("safe.police belongs to the health layer", "health", mapGroupId("safe.police"))
+        assertEquals("health", mapGroupId("safe.fire"))
+        // And the outlines layer is a place layer with a name of its own, handed no listing at all.
+        for (lang in LANGS) assertNotNull("strings/$lang.json has no name for the outlines layer",
+            strings("strings/$lang.json")["layer.place.areas"])
+    }
+
+    /** A city page's panels, in the web's fixed order, from the web's own allow-list. */
+    @Test
+    fun theCityPageDrawsTheWebsSixPanelsInTheWebsOrder() {
+        val web = text("apps/web/src/hoods.ts")
+        val block = Regex("CITY_PANELS = \\[([^\\]]*)\\]").find(web)?.groupValues?.get(1)
+        assertNotNull("could not read CITY_PANELS from apps/web/src/hoods.ts", block)
+        val ids = Regex("'(\\w+)'").findAll(block!!).map { it.groupValues[1] }.toList()
+        assertEquals("the two apps draw a city page's panels differently", ids, CITY_PANELS)
+        // The screen draws them from the allow-list and from nothing else.
+        val areas = text("apps/android/app/src/main/kotlin/org/help313/app/AreaScreens.kt")
+        assertTrue("the city page does not go through the allow-list", areas.contains("for (panel in cityPanels(area))"))
+        for (lang in LANGS) {
+            val s = strings("strings/$lang.json")
+            for (k in listOf("city.kind", "city.regional", "city.no_neighborhoods", "city.missing")) {
+                assertNotNull("strings/$lang.json has no $k", s[k])
+            }
+        }
+    }
+
+    /**
+     * **"Woodward and Warren" means the same thing on all three clients.** The table is the web's own
+     * (apps/web/src/intersections.ts and its tests); a disagreement here is a client that has drifted.
+     */
+    @Test
+    fun theCrossStreetParserAnswersTheWebsCases() {
+        // The suffix, direction and number-word tables are the same sets, read out of the web's source.
+        val web = text("apps/web/src/intersections.ts")
+        for (word in listOf("ave", "boulevard", "parkway", "trail")) {
+            assertTrue("the web's SUFFIXES has no \"$word\"", web.contains("'$word'"))
+        }
+        for ((typed, want) in listOf(
+            "Woodward Ave" to "woodward",
+            "W. Warren Ave" to "warren",
+            "Seven Mile" to "7 mile",
+            "seven mile road" to "7 mile",
+            "St. Aubin St" to "st aubin",
+            "Way" to "way",
+        )) {
+            assertEquals("\"$typed\" folds differently here", want, Intersections.normStreet(typed).name)
+        }
+        assertEquals("w", Intersections.normStreet("W. Warren Ave").dir)
+        assertEquals("e", Intersections.normStreet("East Warren").dir)
+        for (typed in listOf("Woodward and Warren", "Woodward & Warren", "Woodward/Warren", "Woodward @ Warren", "Woodward x Warren")) {
+            val parsed = Intersections.parseCrossing(typed)
+            assertNotNull("\"$typed\" is not read as a junction", parsed)
+            assertEquals("Woodward", parsed!!.first)
+            assertEquals("Warren", parsed.second)
+        }
+        assertEquals("Warren at Woodward puts Warren first", "Warren", Intersections.parseCrossing("Warren at Woodward")!!.first)
+        assertEquals("one name on its own", "", Intersections.parseCrossing("Woodward")!!.second)
+        // The two numbers the web pins, pinned here too.
+        assertTrue(web.contains("SAME_JUNCTION_M = 120"))
+        assertEquals(120.0, Intersections.SAME_JUNCTION_M, 0.0)
+        assertTrue(web.contains("MAX_CHOICES = 6"))
+        assertEquals(6, Intersections.MAX_CHOICES)
+        // And the sentences it says are in every language.
+        for (lang in LANGS) {
+            val s = strings("strings/$lang.json")
+            for (k in listOf("loc.cross", "loc.cross_label", "loc.cross_unknown", "loc.cross_no_crossing", "loc.cross_one_street", "loc.slow", "loc.slow_stop")) {
+                assertNotNull("strings/$lang.json has no $k", s[k])
+            }
+        }
+    }
+
+    /** One anchor and one radius, the same three numbers on all three clients. */
+    @Test
+    fun theOpeningViewIsTheSameAnchorAndRadiusAsTheWebs() {
+        val web = text("apps/web/src/locate.ts")
+        assertTrue("the web's anchor moved", web.contains("lat: 42.3366") && web.contains("lon: -83.0514"))
+        assertEquals(42.3366, MAP_ANCHOR.lat, 1e-9)
+        assertEquals(-83.0514, MAP_ANCHOR.lon, 1e-9)
+        assertTrue("the web's radius moved", web.contains("LOCATE_RADIUS_M = 3218.688"))
+        assertEquals(3218.688, LOCATE_RADIUS_METERS, 1e-9)
+        assertEquals("one radius, not two", LOCATE_RADIUS_METERS, ANCHOR_RADIUS_METERS, 0.0)
+        assertTrue("the web gave up at ten seconds again", web.contains("LOCATE_SLOW_MS = 10000"))
+        assertEquals(10_000L, LOCATE_SLOW_MS)
+    }
+
+    /** The parks list is never ordered by a number about a park (docs/13, honesty rule 1). */
+    @Test
+    fun theParksScreenNeverOrdersByAnIndicator() {
+        val parks = text("apps/android/app/src/main/kotlin/org/help313/app/Parks.kt")
+        val body = parks.substringAfter("fun parksInOrder")
+        for (forbidden in listOf("acres", "type")) {
+            assertFalse("parksInOrder reads $forbidden", body.substringBefore("fun parkById").contains(".$forbidden"))
+        }
+        val screens = text("apps/android/app/src/main/kotlin/org/help313/app/ParkScreens.kt")
+        assertTrue("the parks screen does not use the shared order", screens.contains("parksInOrder(parks, a.near)"))
+        for (lang in LANGS) {
+            val s = strings("strings/$lang.json")
+            for (k in listOf("rec.title", "rec.parks_near", "rec.parks_abc", "rec.gw_row", "rec.paths_gap")) {
+                assertNotNull("strings/$lang.json has no $k", s[k])
+            }
+        }
     }
 
     @Test

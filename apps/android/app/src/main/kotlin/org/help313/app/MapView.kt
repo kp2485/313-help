@@ -55,6 +55,9 @@ class MapScene {
     var focus: String? = null
     var dots: List<DrawnDot> = emptyList()
     var me: org.help313.query.LatLon? = null
+
+    /** One chosen trip, drawn over everything else on the map (DirWords.dirRoute). Null on every other screen. */
+    var route: DirRoute? = null
 }
 
 /** One thing on the map a TalkBack user, a keyboard or a switch can reach. The picture is what the eye gets. */
@@ -85,7 +88,50 @@ class MapView(context: Context) : View(context) {
     var overlays: List<MapOverlay> = emptyList()
     var greenwayOn = true
     var parksOn = true
+
+    /** Our own listing dots. Off on a map that is about one trip: the trip's own markers are what it shows. */
+    var dotsOn = true
     var here: org.help313.query.LatLon? = null
+
+    /**
+     * One chosen trip, drawn over the basemap, the layers and the greenway alike: on the Directions screen the map
+     * is about this trip and nothing else. Null everywhere else, and then not one line of the route passes below
+     * runs (DECISIONS 2026-09-22).
+     */
+    var route: DirRoute? = null
+
+    /**
+     * A camera of this view's own, instead of the Map tab's shared one.
+     *
+     * The Map tab keeps its camera in [MapModel] so that the city is where the person left it when they come back.
+     * A trip is not that: it is one picture of one route, it has to open showing the whole of it, and moving it
+     * must not move the Map tab out from under the person. So the Directions screen sets this, and then this view
+     * reads and writes only this field. It also stops answering fingers: the trip's map is a picture beside the
+     * numbered steps, which are the source of truth, and a map that can be dragged off the route is worse than one
+     * that cannot be dragged at all.
+     */
+    var localCamera: MapCamera? = null
+
+    /** The camera in force: this view's own if it has one, else the Map tab's. */
+    private fun cameraNow(): MapCamera = localCamera ?: MapModel.camera
+
+    /** Open on the whole of these points, with at least [minMetres] across, in this view's own camera. */
+    fun fitLocally(points: List<org.help313.query.LatLon>, minMetres: Double) {
+        val cam = localCamera ?: return
+        if (points.isEmpty()) return
+        val box = MapBox.aroundPoints(points)
+        val across = max(box.width * MapProjection.METERS_PER_UNIT, minMetres)
+        val centre = org.help313.query.LatLon(MapProjection.lat(box.centerY), MapProjection.lon(box.centerX))
+        localCamera = MapCamera.forRadius(centre, across / 2, cam.width, cam.height)
+        invalidate()
+    }
+
+    /** Keep a point in view while somebody walks, in this view's own camera. Nothing about it is written down. */
+    fun centreLocally(at: org.help313.query.LatLon, metres: Double) {
+        val cam = localCamera ?: return
+        localCamera = MapCamera.forRadius(at, metres, cam.width, cam.height)
+        invalidate()
+    }
 
     /**
      * The `subway` style's networks, hubs and selected route — or null, which is `standard`, and then not one line
@@ -147,8 +193,17 @@ class MapView(context: Context) : View(context) {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        val own = localCamera
+        if (own != null) {
+            localCamera = own.resized(w / density.toDouble(), h / density.toDouble()).clamped()
+            onLocalSized()
+            return
+        }
         MapModel.resize(w / density.toDouble(), h / density.toDouble())
     }
+
+    /** Called after this view's own camera learns its size, so the Directions screen can fit the trip into it. */
+    var onLocalSized: () -> Unit = {}
 
     private fun moved() {
         invalidate()
@@ -316,6 +371,11 @@ class MapView(context: Context) : View(context) {
     // has to tell a tap from a drag. Lint cannot see through the detector, so the check is answered here in words.
     @Suppress("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        // A trip's map is a picture beside the numbered steps, which are the source of truth. It does not pan, it
+        // does not zoom and it opens no card: every gesture below drives the Map tab's shared camera, and a map
+        // that can be dragged off the route would be worse than one that cannot be dragged at all. The scrolling
+        // screen it sits in keeps the gesture instead.
+        if (localCamera != null) return false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 // Whatever is underneath — a scroller today, a pager tomorrow — does not get this gesture. Given
@@ -466,6 +526,8 @@ class MapView(context: Context) : View(context) {
     private var ring: String? = null
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        // A trip's map does not move (see onTouchEvent), so the keys that move one belong to the screen around it.
+        if (localCamera != null) return super.onKeyDown(keyCode, event)
         val step = 60.0
         when (keyCode) {
             KeyEvent.KEYCODE_DPAD_LEFT -> MapModel.pan(step, 0.0)
@@ -532,7 +594,11 @@ class MapView(context: Context) : View(context) {
      * not in this list, cannot be hit-tested and cannot be read out, because it was never a dot to begin with.
      */
     fun features(): List<MapFeature> {
-        val cam = MapModel.camera
+        val cam = cameraNow()
+        // A map that is about one trip reads out that trip: where it starts, every place a bus is got on or off,
+        // and where it ends, in the order they happen. Nothing else on this map is a node, because nothing else
+        // on it is what the screen is about (DECISIONS 2026-09-22).
+        route?.let { return routeFeatures(it, cam) }
         val key = "${MapModel.version}|${cam.centerX}|${cam.centerY}|${cam.scale}|${cam.width}|${cam.height}|" +
             "$greenwayOn|${MapModel.selection?.key}|${subway != null}|${L.current()}"
         if (key == featuresKey) return featuresHeld
@@ -550,6 +616,19 @@ class MapView(context: Context) : View(context) {
         featuresHeld = all
         return all
     }
+
+    /** The markers of one trip, in the order they happen: start, board, get off, board, get off, end. */
+    private fun routeFeatures(r: DirRoute, cam: MapCamera): List<MapFeature> =
+        r.marks.mapIndexed { i, m ->
+            MapFeature(
+                id = "trip:$i",
+                label = joinParts(listOf(m.label, m.sub)),
+                selection = MapSelection.TripStop(i, m.label),
+                cx = cam.screenX(MapProjection.x(m.lon)),
+                cy = cam.screenY(MapProjection.y(m.lat)),
+                halfWidth = 22.0, halfHeight = 22.0,
+            )
+        }
 
     /** One walk of the map per camera position, not one per accessibility node: TalkBack asks node by node. */
     private var featuresKey = ""
@@ -681,14 +760,15 @@ class MapView(context: Context) : View(context) {
         val started = System.nanoTime()
         canvas.save()
         canvas.scale(density, density)
-        scene.camera = MapModel.camera
+        scene.camera = cameraNow()
         scene.base = MapModel.base
         scene.drawParks = parksOn
         scene.overlays = overlays
         scene.segments = if (greenwayOn) MapModel.segments else emptyList()
         scene.focus = (MapModel.selection as? MapSelection.Stretch)?.id
-        scene.dots = MapModel.dots
+        scene.dots = if (dotsOn) MapModel.dots else emptyList()
         scene.me = here
+        scene.route = route
         draw(scene, canvas)
         canvas.restore()
         MapFrameClock.frame(System.nanoTime() - started, if (subway == null) "standard" else "subway", painter.builds)
@@ -841,6 +921,7 @@ class MapView(context: Context) : View(context) {
         val t1 = System.nanoTime()
         drawGreenway(s, cam, view, mpp, w, h, c)
         // Worked out before the street names are placed: badges, pills and terminals outrank them.
+        drawRoute(s.route, cam, mpp, c)
         val t2 = System.nanoTime()
         val plan = if (sub != null && band != null) painter.plan(s.overlays, sub, cam, band, textScale, controlBoxes) else null
         MapFrameClock.transit(t1 - t0 + System.nanoTime() - t2)
@@ -909,6 +990,8 @@ class MapView(context: Context) : View(context) {
             MapFrameClock.transit(System.nanoTime() - t4)
         }
 
+        drawRouteMarks(s.route, cam, mpp, w, h, c)
+
         s.me?.let { me ->
             val px = cam.screenX(MapProjection.pointX(me)).toFloat()
             val py = cam.screenY(MapProjection.pointY(me)).toFloat()
@@ -968,6 +1051,68 @@ class MapView(context: Context) : View(context) {
         }
         hatchTile = paint
         paint
+    }
+
+    // ---- one chosen trip ---------------------------------------------------------------------------------------
+    // The map is the extra here as everywhere: the numbered steps beside it are the source of truth, `route.text`
+    // is what this line says in words, and nothing on it is ever called safe, lit or accessible.
+    //
+    // A casing under every leg, exactly as a greenway stretch and a bus route have one, so the line keeps its 3:1
+    // over the land, over a park and over the streets it crosses (WCAG 1.4.11). Colour never carries the meaning:
+    // a ride is DASHED in its agency's own tone, a walk is solid, and every leg is also a sentence in the list.
+
+    private fun routeWidth(mpp: Double): Double = max(4.0, min(9.0, 20.0 / mpp))
+
+    private fun drawRoute(route: DirRoute?, cam: MapCamera, mpp: Double, c: Canvas) {
+        if (route == null || route.legs.isEmpty()) return
+        val rw = routeWidth(mpp)
+        val paths = route.legs.map { leg ->
+            val p = Path()
+            leg.polyline.forEachIndexed { i, q ->
+                val x = cam.screenX(MapProjection.x(q[0])).toFloat()
+                val y = cam.screenY(MapProjection.y(q[1])).toFloat()
+                if (i == 0) p.moveTo(x, y) else p.lineTo(x, y)
+            }
+            p
+        }
+        stroke.pathEffect = null
+        stroke.color = palette.greenwayCase
+        stroke.strokeWidth = (rw + 4).toFloat()
+        for (p in paths) c.drawPath(p, stroke)
+        route.legs.forEachIndexed { i, leg ->
+            val on = route.active == i
+            stroke.color = palette.named(leg.colour)
+            stroke.strokeWidth = (if (on) rw + 2.5 else rw).toFloat()
+            stroke.pathEffect = dash(leg.dash, if (on) rw + 2.5 else rw)
+            c.drawPath(paths[i], stroke)
+            stroke.pathEffect = null
+        }
+    }
+
+    /**
+     * Where the trip begins and ends, and every place a bus is got on or off. A boarding or alighting marker has an
+     * INNER RING in the surface colour and an end marker is solid, so the two are told apart without colour; every
+     * one of them is also named in the step list, and TalkBack reaches each as its own node ([features]).
+     */
+    private fun drawRouteMarks(route: DirRoute?, cam: MapCamera, mpp: Double, w: Float, h: Float, c: Canvas) {
+        if (route == null || route.marks.isEmpty()) return
+        val r = max(5.0, min(9.0, 30.0 / mpp)).toFloat()
+        stroke.pathEffect = null
+        for (m in route.marks) {
+            val x = cam.screenX(MapProjection.x(m.lon)).toFloat()
+            val y = cam.screenY(MapProjection.y(m.lat)).toFloat()
+            if (x < -12 || y < -12 || x > w + 12 || y > h + 12) continue
+            val bus = m.kind == "board" || m.kind == "alight"
+            fill.color = palette.named(if (bus) "routeRide" else "routeWalk")
+            c.drawCircle(x, y, r, fill)
+            stroke.color = palette.surface
+            stroke.strokeWidth = 2.5f
+            c.drawCircle(x, y, r, stroke)
+            if (bus) {
+                fill.color = palette.surface
+                c.drawCircle(x, y, r * 0.45f, fill)
+            }
+        }
     }
 
     // ---- the greenway, drawn like a transit line ---------------------------------------------------------------

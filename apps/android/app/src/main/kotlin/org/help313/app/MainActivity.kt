@@ -61,11 +61,47 @@ class MainActivity : Activity() {
     /** A typed ZIP becomes the point the list is sorted from. The point is the middle of the ZIP, not a person. */
     fun useZip(zip: String, point: LatLon) {
         nearZip = zip
+        // A ZIP and a junction are two answers to one question, so the newer one is the answer.
+        crossText = null
+        crossWanted = false
         near = point
         zipWanted = false
         locationRefused = false
         locateOutside = false
         if (current() is Route.Map) MapModel.show(point)
+        render()
+    }
+
+    /**
+     * A junction somebody typed, in their own words ("Woodward and Warren"), and whether the field is open.
+     *
+     * **Memory only, and nowhere else** — not a file, not `savedInstanceState`, not a Route (docs/08). It is the
+     * most precise thing anybody tells this app about where they are, and it dies with the process. The point it
+     * resolved to goes into [near] like any other, and is never written down either.
+     */
+    var crossText: String? = null
+    var crossWanted = false
+
+    /** A typed junction becomes the point the map opens on and the list is sorted from. */
+    fun useCrossing(p: LatLonPoint, words: String) {
+        near = LatLon(p.lat, p.lon)
+        crossText = words
+        crossWanted = false
+        nearZip = null
+        locationRefused = false
+        locateOutside = false
+        locateCard = false
+        locateFlags.markAnswered()
+        stopLookingForLocation()
+        if (current() is Route.Map) MapModel.show(near!!)
+        render()
+    }
+
+    /** "Stop using this cross street": back to the whole city, and nothing about it is left anywhere. */
+    fun clearCrossing() {
+        crossText = null
+        crossWanted = false
+        near = null
         render()
     }
 
@@ -137,8 +173,14 @@ class MainActivity : Activity() {
     }
 
     private val stack = ArrayList<Route>()
+
+    /** The kind of screen drawn last, so that "left Directions" is a thing this activity can know. */
+    private var lastDrawn: Route? = null
     private lateinit var content: FrameLayout
     private lateinit var tabs: LinearLayout
+
+    /** The app bar: Urgent help, and the way into Search. Above every screen that has one (audit H6). */
+    private lateinit var topBar: LinearLayout
     /** Holds the tab row, or the sideways scroller around it at the largest text sizes. See rebuildTabs. */
     private lateinit var tabBar: FrameLayout
     private lateinit var root: LinearLayout
@@ -165,6 +207,12 @@ class MainActivity : Activity() {
         root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
         root.setBackgroundColor(UI.color(this, R.color.app_bg))
+
+        // The app bar comes first in the column, so Urgent help is above the screen rather than inside it and is
+        // on every screen that has one (audit H6). See [rebuildTopBar].
+        topBar = LinearLayout(this)
+        topBar.orientation = LinearLayout.HORIZONTAL
+        root.addView(topBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
 
         content = FrameLayout(this)
         content.layoutParams = LinearLayout.LayoutParams(
@@ -198,6 +246,9 @@ class MainActivity : Activity() {
         if (store.onChange != null) store.onChange = null
         MapModel.onChange = null
         HoodRepo.onChange = null
+        // A trip is never carried over an activity's death, finishing or not: the plan, the steps, the position
+        // watch and the view the follow-along was drawing into all go now.
+        DirectionsScreen.close(this)
         if (isFinishing) {
             // Really leaving: the route stack, the background thread and the loader all go. Nothing about this
             // session outlives it (docs/08, "cleared on exit").
@@ -366,10 +417,16 @@ class MainActivity : Activity() {
         // NoSuchMethodError on the first screen (found by the first :app compile, 2026-09-20). Indexing binds to
         // List.get, which has always been there.
         val route = stack[stack.size - 1]
+        // Leaving Directions ends the trip: the plan, the chosen way, the current step and the position watch all
+        // go. "Leaving" is a screen that WAS Directions and now is not, which is why the last one drawn is
+        // remembered rather than the stack being asked — opening Directions draws the screen behind it first.
+        if (lastDrawn is Route.Directions && route !is Route.Directions) DirectionsScreen.close(this)
+        lastDrawn = route
         // One place decides whether this screen may be photographed, so a screen added later cannot forget. See
         // Route.isPrivate and apps/android/README.md for why this is per-screen rather than for the whole app.
         keepOutOfScreenshots(Route.isPrivate(route))
         applyBarPadding()
+        rebuildTopBar()
         // The map hands its redraws to whatever view is on screen; a view that has been thrown away must not be
         // called back into. The Map tab sets this again as it is built.
         if (route !is Route.Map) MapModel.onChange = null
@@ -452,22 +509,71 @@ class MainActivity : Activity() {
 
     private fun tabsScroll(): Boolean = resources.configuration.fontScale > 1.3f
 
+    /**
+     * **Urgent help, on every screen** (audit H6; docs/05 and Principle 3: "one tap from anywhere").
+     *
+     * It used to have exactly two entry points on Android — a button in Home's page body and a chip on the Map tab
+     * — so from Help, Search, Saved, Areas, any need, refinement, category, listing or area screen it took a trip
+     * back to Home. The web puts it in the top bar and the side rail and the iPhone puts it in the toolbar; this is
+     * the same control in the same place, built once here rather than remembered screen by screen.
+     *
+     * Two screens do not get it, for reasons of their own:
+     *  - the **Map tab**, which is drawn edge to edge under the status bar and carries the same control as a
+     *    floating chip of its own (MapScreen.controls). A bar above it would take the city's own space and put two
+     *    Urgent help buttons on one screen.
+     *  - a **private screen** (Route.isPrivate), where the pinned control is "Leave this page fast" and a second
+     *    row above it would push the one thing that has to be reachable without scrolling further down.
+     *
+     * Search rides beside it, which is where the web keeps it now that it is not a tab.
+     */
+    private fun rebuildTopBar() {
+        topBar.removeAllViews()
+        val route = current()
+        val wanted = route !is Route.Map && !Route.isPrivate(route)
+        topBar.visibility = if (wanted) View.VISIBLE else View.GONE
+        if (!wanted) return
+        topBar.setBackgroundColor(UI.color(this, R.color.surface))
+        topBar.setPaddingRelative(UI.dp(this, 12), UI.dp(this, 6), UI.dp(this, 12), UI.dp(this, 6))
+
+        val urgent = UI.button(
+            this, L.t("strip.more"),
+            backgroundId = R.drawable.pill_danger, textColorId = R.color.brand_ink, topDp = 0,
+        ) { push(Route.Urgent) }
+        urgent.layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+        urgent.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15f)
+        topBar.addView(urgent)
+
+        // The search control is short, because the bar has one line to share; the whole sentence is what a screen
+        // reader is told, and the same words are a full-width row on Home.
+        val search = UI.button(
+            this, L.t("search.title"), description = L.t("search.open"),
+            backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink, topDp = 0,
+        ) { push(Route.Search) }
+        val p = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        p.marginStart = UI.dp(this, 8)
+        search.layoutParams = p
+        search.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15f)
+        topBar.addView(search)
+    }
+
     private fun fillTabs(bar: LinearLayout) {
         bar.contentDescription = L.t("tabs.label")
-        // Home · Help · Map · Neighborhoods, then the two that were already here (Kyle, 2026-09-21: neighborhood
-        // information gets its own tab, "not just on the web, in the apps too").
+        // **Home · Help · Map · Areas**, the one tab set on all three clients (audit H5 and §4.1, 2026-09-22).
         //
-        // The bar shows `tab.hoods` — "Areas", the short variant the strings files carry — because six words have
-        // to share one line at any text size and "Neighborhoods" is the longest word in the app. A screen reader is
-        // told the whole word instead (`tab.hoods_wide`), so nothing is abbreviated for the person who cannot see
-        // that the bar is narrow.
+        // Search and Saved used to be tabs here and are not on the web or the iPhone. Six 11-sp words sharing one
+        // line was already tight at ordinary Arabic text — the comment in rebuildTabs conceded it — and neither is
+        // a front door: a helper arrives with a name and Search is the first control on Home and in this bar, and
+        // Saved is a return visit, which is why it lives under Help. Four labels fit at 320 px in all four
+        // languages; six do not.
+        //
+        // The bar shows `tab.hoods` — "Areas", the short variant the strings files carry — because "Neighborhoods
+        // and cities" is the longest label in the app. A screen reader is told the whole thing instead
+        // (`tab.hoods_wide`), so nothing is abbreviated for the person who cannot see that the bar is narrow.
         val items = listOf(
             Triple("tab.home", null, Route.Home),
             Triple("tab.help", null, Route.Help),
             Triple("tab.map", null, Route.Map),
             Triple("tab.hoods", "tab.hoods_wide", Route.Hoods()),
-            Triple("search.title", null, Route.Search),
-            Triple("saved.title", null, Route.Saved),
         )
         for ((key, spoken, route) in items) {
             val b = UI.button(
@@ -662,7 +768,15 @@ class MainActivity : Activity() {
         arrived(best)
     }
 
-    /** True when a single update was asked for and [arrived] will be called later — once, whatever happens. */
+    /**
+     * True when a single update was asked for and [arrived] will be called later — once, whatever happens.
+     *
+     * **We listen for five minutes, and say so after ten seconds** (Kyle, 2026-09-22; DECISIONS 2026-09-22). On a
+     * phone with no network a cold GPS fix is a walk outside and a few minutes of sky; giving up at ten seconds and
+     * saying "we couldn't get your location" was the app telling the truth about its own patience and a lie about
+     * the phone's, to the two people it is most for. At ten seconds the screen says what is happening and what
+     * would help, with **Stop looking** beside it and the cross-street and ZIP ways in still on the screen.
+     */
     private fun askOneFix(lm: LocationManager): Boolean {
         val provider = listOf(LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER)
             .firstOrNull { runCatching { lm.isProviderEnabled(it) }.getOrDefault(false) } ?: return false
@@ -674,11 +788,19 @@ class MainActivity : Activity() {
             runCatching { lm.removeUpdates(listener) }
             arrived(null)
         }
+        // One line, once, after ten seconds: not a second permission pattern and not a dialog, just words on the
+        // screen that is already open.
+        val saySlow = Runnable {
+            if (done || !locateWaiting) return@Runnable
+            locateSlow = true
+            render()
+        }
         listener = object : android.location.LocationListener {
             override fun onLocationChanged(location: Location) {
                 if (done) return
                 done = true
                 content.removeCallbacks(giveUp)
+                content.removeCallbacks(saySlow)
                 runCatching { lm.removeUpdates(this) }
                 arrived(location)
             }
@@ -690,7 +812,25 @@ class MainActivity : Activity() {
         }
         return try {
             lm.requestLocationUpdates(provider, 0L, 0f, listener, mainLooper)
-            content.postDelayed(giveUp, 10_000)
+            content.postDelayed(giveUp, LOCATE_TIMEOUT_MS)
+            content.postDelayed(saySlow, LOCATE_SLOW_MS)
+            locateWaiting = true
+            locateSlow = false
+            // Cancelling does not stop Android's own request — there is no API for that — it stops US listening,
+            // which is the whole of what cancelling means here. A fix that lands after somebody has typed a
+            // junction must never move the map out from under them.
+            stopLooking = {
+                if (!done) {
+                    done = true
+                    content.removeCallbacks(giveUp)
+                    content.removeCallbacks(saySlow)
+                    runCatching { lm.removeUpdates(listener) }
+                }
+                locateWaiting = false
+                locateSlow = false
+                stopLooking = null
+            }
+            render()
             true
         } catch (_: SecurityException) {
             false
@@ -699,9 +839,29 @@ class MainActivity : Activity() {
         }
     }
 
+    /** True while we are still listening for a fix, and true again once ten seconds have gone by with none. */
+    var locateWaiting = false
+        private set
+    var locateSlow = false
+        private set
+
+    /** "Stop looking", when there is something to stop. Null when nothing is being listened for. */
+    private var stopLooking: (() -> Unit)? = null
+
+    val canStopLooking: Boolean get() = stopLooking != null
+
+    /** The button. Nothing is refused and nothing is nagged: the other two ways in stay on the screen. */
+    fun stopLookingForLocation() {
+        stopLooking?.invoke()
+        render()
+    }
+
     /** What to do with a fix, or with the absence of one. The one place any of that is decided. */
     private fun arrived(found: Location?) {
         locateCard = false
+        locateWaiting = false
+        locateSlow = false
+        stopLooking = null
         if (found == null) {
             locationRefused = true
         } else if (!inServiceArea(found.latitude, found.longitude)) {
@@ -713,6 +873,9 @@ class MainActivity : Activity() {
             locateOutside = true
         } else {
             near = LatLon(found.latitude, found.longitude)
+            // A fix is not a junction somebody typed: the words that said where they were go with it.
+            crossText = null
+            crossWanted = false
             locationRefused = false
             locateOutside = false
             // In memory only, as everywhere else: the map moves there, and nothing is written down or sent.

@@ -4,18 +4,19 @@
 // rather than dropped).
 //
 // Held to the things that could go wrong when numbers stop being a table and become a shape:
-//  1. a count the pipeline hid is drawn at a value, or dropped so a gap reads as a zero (docs/13, honesty rule 2);
+//  1. a year with nothing recorded is joined across, so a gap reads as a zero;
 //  2. the table — the thing a screen reader can actually read — goes away when the picture arrives;
 //  3. the picture quietly becomes a comparison with somewhere else, or a trend, which docs/13 forbids;
-//  4. both lines get switched off and the chart becomes an empty pair of axes.
+//  4. both lines get switched off and the chart becomes an empty pair of axes;
+//  5. a number that used to be hidden is still hidden somewhere (Kyle, 2026-09-22: exact numbers, everywhere).
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { hoodPage, hoodView, seriesOf, type Hood, type Indicators, type Ui, type YearStats } from '../src/hoods.js';
+import { conditionsPanel, crashPanel, hoodPage, hoodView, latestYear, seriesOf, type Hood, type Indicators, type Ui, type YearStats } from '../src/hoods.js';
 import {
-  MARKER_FRACTION, axisYears, chartModel, chartSummary, chartable, shownSeries,
-  type ChartPoint, type ChartSeries,
+  anyValue, axisYears, chartModel, chartSummary, chartable, fmtValue, shownSeries,
+  type ChartPoint, type ChartSeries, type Tone,
 } from '../src/hoodchart.js';
 
 const root = join(__dirname, '../../..');
@@ -35,12 +36,17 @@ const YEARS = ['2020', '2021', '2022', '2023', '2024', '2025'];
 /** Since 2026-09-22 sales and permits carry their real count, however small (DECISIONS): 3 is written as 3. */
 const SALES = [12, 3, 18, 24, 31, 9];
 const PERMITS = [6, 7, 1, 14, 11, 8];
-/** Demolitions still arrive hidden under five — the marker path is alive, and this is what exercises it. */
-const DEMOS: (number | 'lt5' | undefined)[] = [7, 'lt5', 9, undefined, 12, 'lt5'];
+/** Demolitions with a 3 and a year nobody counted: the real number, and a break in the line. */
+const DEMOS: (number | undefined)[] = [7, 3, 9, undefined, 12, 4];
+const BLIGHT = [40, 52, 61, 30, 22, 9];
+const ISSUES = [9, 12, 3, 15, 11, 6];
+const DAYS = [8, 21, 40, 12, 9, 5];
+const FIRES = [3, 4, 6, 2, 5, 1];
 
 function years(): Record<string, YearStats> {
   return Object.fromEntries(YEARS.map((y, i) => [y, {
     sales: SALES[i], median_price: 50000 + i * 1000, permits: PERMITS[i], permit_cost: 900000 + i, demolitions: DEMOS[i],
+    blight: BLIGHT[i], issues: ISSUES[i], issue_days: DAYS[i], fires: FIRES[i],
   }]));
 }
 const hood = (over: Partial<Hood> = {}): Hood => ({
@@ -53,10 +59,12 @@ const d: Indicators = {
   near_miles: 0.5, origin: [-83.32, 42.22], city: Object.fromEntries(YEARS.map((y) => [y, { sales: 900, median_price: 70000, permits: 400, permit_cost: 1e8 }])),
   neighborhoods: [], segments: {},
 };
-const points = (counts: readonly (number | 'lt5' | undefined)[]): ChartPoint[] =>
+const points = (counts: readonly (number | undefined)[]): ChartPoint[] =>
   counts.map((c, i) => ({ year: YEARS[i]!, count: c, partial: false }));
-const series = (key: string, tone: 'a' | 'b', label: string, counts: readonly (number | 'lt5' | undefined)[]): ChartSeries =>
+const series = (key: string, tone: Tone, label: string, counts: readonly (number | undefined)[]): ChartSeries =>
   ({ key, tone, label, points: points(counts) });
+/** The Conditions sources switched on, so the panel is drawn. */
+const cond: Indicators = { ...d, sources: { ...d.sources, blight: src, demolitions: src, issues: src, fires: src, vacant: src, pavement: src, parcels: src }, city_parcels: 380000, issue_types: ['Illegal Dump Sites', 'Tree Issue'], fire_types: ['Building fire'], vacant_period: ['2025-09-22', '2026-09-21'], roads_years: [2021, 2024], city_now: { rental_certs: 12000, vacant_reg: 1500, roads: { pieces: 15000, miles: 826, poor_pct: 33 } } };
 
 // ---------------------------------------------------------------------------------------------------
 // The control
@@ -127,39 +135,39 @@ describe('the chart is the same numbers, drawn', () => {
     expect(css).toContain('.hoodsvg .pt:hover .tip,.hoodsvg .pt:focus-visible .tip { opacity:1; }');
   });
 
-  it('a hidden count is a hollow marker at a fixed height, never a value, and the line goes on through it', () => {
-    const cond = { ...d, sources: { ...d.sources, blight: src } };
+  it('a year with three of something is drawn at 3 and says 3 — nothing is hidden, and the code for hiding is gone', () => {
     const page = hoodPage(hood(), cond, ui, 'chart');
-    const demo = [...page.matchAll(/<svg class="hoodsvg"[\s\S]*?<\/svg>/g)].map((m) => m[0])
-      .find((s) => s.includes('2021, Torn down: fewer than 5'));
-    expect(demo).toBeTypeOf('string');
-    // Two hidden years, two hollow markers, and not one of them carries a number.
-    expect([...demo!.matchAll(/class="mk t[ab] hollow"/g)]).toHaveLength(2);
-    expect(page).toContain(strings['hood.chart_lt5']);
-    // The pieces of line that touch a hidden year are drawn, and drawn differently.
-    expect(demo).toContain('class="ln ta unsure"');
-    // The height is a constant, not a value.
-    expect(chartSrc).toContain('export const MARKER_FRACTION = 10 / 96;');
-    expect(MARKER_FRACTION).toBeCloseTo(10 / 96, 12);
+    expect(page).toContain('2021, Torn down: 3');
+    expect(page).toContain('2020, Building fires: 3');
+    expect(page).toContain('2025 so far, Building fires: 1');
+    for (const gone of ['hollow', 'unsure', 'MARKER_FRACTION', 'lt5', "'hidden'"]) { expect(chartSrc).not.toContain(gone); expect(page).not.toContain(gone); }
+    expect(css).not.toMatch(/hollow|unsure|chart-lt5/);
+    // A 3 is placed at three quarters of an axis whose top is 4.
+    const m = chartModel([series('x', 'a', 'x', [3, 4, 4])]);
+    expect(m.top).toBe(4);
+    expect(m.series[0]!.points[0]).toMatchObject({ kind: 'value', value: 3, frac: 0.75 });
   });
 
-  it('a marker always sits below the first tick over zero, so it can never be read off the axis', () => {
-    for (const counts of [[5, 6, 7], [12, 18, 24, 31, 9], [200, 410, 90], [6, 6, 6], [1, 2, 3]]) {
-      const m = chartModel([series('x', 'a', 'x', counts)]);
-      const firstTick = m.ticks.find((t) => t > 0)!;
-      expect(MARKER_FRACTION * m.top, `top ${m.top}`).toBeLessThan(firstTick);
-    }
+  it('a year with nothing recorded is a break in the line, never a zero', () => {
+    const page = hoodPage(hood(), cond, ui, 'chart');
+    const demo = [...page.matchAll(/<svg class="hoodsvg"[\s\S]*?<\/svg>/g)].map((m) => m[0]).find((s) => s.includes('Torn down: 3'))!;
+    // Six years, five with a number: five diamonds, and only three pieces of dashed line (2020–21, 2021–22, 2024–25).
+    expect([...demo.matchAll(/class="mk tb"/g)]).toHaveLength(5);
+    expect([...demo.matchAll(/class="ln tb"/g)]).toHaveLength(3);
+    expect(demo).not.toContain('2023, Torn down');
   });
 
-  it('the axis starts at 0 and never labels a value under 5 as if it were exact', () => {
-    for (const counts of [[5, 6, 7], [12, 3, 18, 24, 31, 9], [200, 410, 90], [1, 1, 2]]) {
+  it('the axis starts at 0, ends on a round number at or above the tallest year, and labels small values exactly', () => {
+    for (const counts of [[5, 6, 7], [12, 3, 18, 24, 31, 9], [200, 410, 90], [1, 1, 2], [0, 0, 0]]) {
       const m = chartModel([series('x', 'a', 'x', counts)]);
       expect(m.ticks[0]).toBe(0);
-      expect(m.top).toBeGreaterThanOrEqual(5);
-      for (const t of m.ticks) expect(t === 0 || t >= 5, `tick ${t}`).toBe(true);
+      expect(m.top).toBeGreaterThanOrEqual(Math.max(1, ...counts));
       expect(m.ticks[m.ticks.length - 1]).toBe(m.top);
+      expect(m.ticks.length).toBeLessThanOrEqual(6);
       for (const p of m.series[0]!.points) expect(p.frac).toBeLessThanOrEqual(1);
     }
+    expect(chartModel([series('x', 'a', 'x', [1, 1, 2])]).ticks).toEqual([0, 1, 2]);   // 1 and 2 are labelled: they are exact
+    expect(chartModel([series('x', 'a', 'x', [0, 0, 0])]).top).toBe(1);
   });
 
   it('a summary sentence says what is drawn, over which years, and names each series’ biggest year', () => {
@@ -294,30 +302,164 @@ describe('a small number of sales is a number, not a hiding place', () => {
     expect(strings['hood.money_note']).toMatch(/10 sales/);        // the median's own threshold stays
   });
 
-  it('the pipeline writes the real count for sales and permits, and goes on hiding the rest', () => {
+  it('the pipeline writes the real count for every series, and there is no function left that hides one', () => {
     const ingest = readFileSync(join(root, 'pipeline/src/ingest-neighborhoods.ts'), 'utf8');
     expect(ingest).toContain('export function plainCount(');
-    expect(ingest).toMatch(/plainCount\(f\.attributes\.n, f\.attributes\.median\);[^\n]*\{ sales/);
-    expect(ingest).toMatch(/plainCount\(f\.attributes\.n, null, f\.attributes\.cost\);[^\n]*\{ permits/);
-    for (const still of ['blight', 'demolitions', 'fires']) {
-      expect(ingest, still).toMatch(new RegExp(`${still}: suppress\\(`));
-    }
+    for (const k of ['sales', 'permits', 'blight', 'demolitions', 'issues', 'fires', 'rental_certs', 'vacant_reg']) expect(ingest, k).toMatch(new RegExp(`${k}: (plainCount\\(|r\\.count)`));
+    expect(ingest).not.toMatch(/suppress|'lt5'/);
+    expect(readFileSync(join(root, 'pipeline/src/ingest-crashes.ts'), 'utf8')).not.toMatch(/'lt5'|suppress\(/);
   });
 
-  it('the shipped numbers carry no hidden sale or permit, and still hide what counts people', () => {
+  it('the shipped numbers hold no hidden count of any kind: not a sale, not a fire, not a crash', () => {
     const file = join(root, 'data/indicators/neighborhoods.json');
-    const shipped = JSON.parse(readFileSync(file, 'utf8')) as Indicators;
-    let hiddenSales = 0, smallSales = 0, hiddenElsewhere = 0;
+    const text = readFileSync(file, 'utf8');
+    expect(text).not.toContain('lt5');
+    const shipped = JSON.parse(text) as Indicators;
+    let small = 0, smallCrash = 0;
     for (const n of shipped.neighborhoods) {
-      for (const y of Object.values(n.years)) {
-        if (y.sales === 'lt5' || y.permits === 'lt5') hiddenSales++;
-        if (typeof y.sales === 'number' && y.sales < 5) smallSales++;
-        if (y.blight === 'lt5' || y.demolitions === 'lt5' || y.fires === 'lt5') hiddenElsewhere++;
-      }
+      for (const y of Object.values(n.years)) for (const k of ['sales', 'permits', 'blight', 'demolitions', 'issues', 'fires'] as const) if (y[k] !== undefined) { expect(typeof y[k]).toBe('number'); if (y[k]! < 5) small++; }
+      if (n.crashes) for (const v of Object.values(n.crashes)) { expect(typeof v).toBe('number'); if (v < 5) smallCrash++; }
     }
-    expect(hiddenSales).toBe(0);
-    expect(smallSales).toBeGreaterThan(0);
-    expect(hiddenElsewhere).toBeGreaterThan(0);
+    expect(small).toBeGreaterThan(500);
+    expect(smallCrash).toBeGreaterThan(50);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// The Conditions panel: grouped charts, one control, a glance row, ledes, empty states
+// ---------------------------------------------------------------------------------------------------
+
+describe('the Conditions panel', () => {
+  const table = conditionsPanel(hood(), cond, ui, 'table', new Set());
+  const chart = conditionsPanel(hood(), cond, ui, 'chart', new Set());
+  const svgs = (html: string) => [...html.matchAll(/<figure class="hoodchart" role="group" aria-label="([^"]+)"[\s\S]*?<\/figure>/g)].map((m) => ({ name: m[1]!, html: m[0] }));
+
+  it('groups the series into four charts that each share a unit and a meaning, in a fixed order', () => {
+    const names = svgs(chart).map((f) => f.name);
+    expect(names).toEqual([
+      'Blight tickets and buildings torn down by year, 2020 to 2025, chart',
+      'Problems reported by year, 2020 to 2025, chart',
+      'Days to close a problem by year, 2020 to 2025, chart',
+      'Building fires by year, 2020 to 2025, chart',
+    ]);
+    // Tickets and demolitions are two COUNTS on one axis, each switchable; days are a chart of their own.
+    const first = svgs(chart)[0]!.html;
+    expect(first).toContain('data-hoodseries="cond:blight"');
+    expect(first).toContain('data-hoodseries="cond:demo"');
+    expect(first).toContain('class="ln ta"'); expect(first).toContain('class="ln tb"');
+    const days = svgs(chart)[2]!.html;
+    expect(days).toContain('2022, Middle time to close: 40 days');
+    expect(days).toContain(strings['hood.chart_plot_days']);
+    expect(days).not.toContain('data-hoodseries');                     // one series: nothing to choose
+    // Never a second y-axis: no chart carries two units.
+    for (const f of svgs(chart)) expect([...f.html.matchAll(/<svg /g)]).toHaveLength(1);
+  });
+
+  it('has ONE Table | Chart control for the whole panel, above the charts, and the tables stay in the page', () => {
+    expect([...chart.matchAll(/role="radiogroup"/g)]).toHaveLength(1);
+    expect(chart).toContain('name="hoodview-cond"');
+    expect(chart.indexOf('role="radiogroup"')).toBeLessThan(chart.indexOf('<figure'));
+    expect([...chart.matchAll(/class="yeartables vh"/g)]).toHaveLength(4);   // blight+demo, issues, days (one line pointing at the issues table), fires
+    expect(chart).toContain('aria-describedby="days-sum days-rows"');
+    expect([...table.matchAll(/role="radiogroup"/g)]).toHaveLength(1);
+    expect(table).not.toContain('<svg');
+    expect([...table.matchAll(/<table class="years"/g)]).toHaveLength(4);
+  });
+
+  it('every table and every axis runs oldest to newest, so the most recent year is at the end', () => {
+    for (const t of [...table.matchAll(/<table class="years"[\s\S]*?<\/table>/g)].map((m) => m[0])) {
+      const rows = [...t.matchAll(/<th scope="row">([^<]+)<\/th>/g)].map((m) => m[1]);
+      expect(rows[0]).toBe('2020'); expect(rows[rows.length - 1]).toBe('2025 so far');
+    }
+    for (const f of svgs(chart)) { const yrs = [...f.html.matchAll(/class="yr"[^>]*>(\d{4})</g)].map((m) => m[1]); expect(yrs).toEqual(['2020', '2021', '2022', '2023', '2024', '2025']); }
+  });
+
+  it('opens with an "at a glance" row of the latest year’s figures, plus today’s two, each a label over a value', () => {
+    const glance = /<dl class="glance">[\s\S]*?<\/dl>/.exec(table)![0];
+    const tiles = [...glance.matchAll(/<dt>([^<]+)(?: <small>([^<]*)<\/small>)?<\/dt><dd>([^<]+)<\/dd>/g)].map((m) => [m[1], m[2], m[3]]);
+    expect(tiles).toEqual([
+      ['Blight tickets', '2025 so far', '9'], ['Torn down', '2025 so far', '4'], ['Problems reported', '2025 so far', '6'],
+      ['Middle time to close', '2025 so far', '5 days'], ['Building fires', '2025 so far', '1'],
+      ['Empty buildings registered in the past year', 'today', 'none recorded'], ['Main streets in poor shape', 'today', 'no main streets rated here'],
+    ]);
+    expect(table.indexOf('class="glance"')).toBeLessThan(table.indexOf('role="radiogroup"'));
+    // The latest year is the latest with a number in it, not the last column.
+    expect(latestYear(hood({ years: { 2020: { blight: 3 }, 2021: {}, 2022: { sales: 4 } } }), cond, ['blight', 'demolitions', 'issues', 'fires'])).toBe('2020');
+    expect(latestYear(hood({ years: {} }), cond, ['blight'])).toBeNull();
+  });
+
+  it('each chart has a one-sentence lede saying what the number is and where it comes from', () => {
+    for (const k of ['hood.cond_blight_lede', 'hood.cond_issues_lede', 'hood.cond_days_lede', 'hood.cond_fires_lede']) {
+      expect(table).toContain(`<p>${strings[k]}</p>`);
+      expect(strings[k]!.split(/[.!?]\s/).length).toBeLessThanOrEqual(3);
+      expect(strings[k]).toMatch(/From |City|Department/);              // names the source
+    }
+    expect(strings['hood.cond_days_lede']).toMatch(/days, not a count/);
+  });
+
+  it('a series the City has published nothing for says so in one sentence, with the neighborhood’s name, instead of a table of blanks', () => {
+    const none = hood({ years: Object.fromEntries(YEARS.map((y, i) => [y, { blight: BLIGHT[i], issues: ISSUES[i], issue_days: DAYS[i] }])) });
+    for (const view of ['table', 'chart'] as const) {
+      const html = conditionsPanel(none, cond, ui, view, new Set());
+      expect(html).toContain('<p class="empty">The City has not published this for Bagley.</p>');
+      expect([...html.matchAll(/The City has not published this for Bagley/g)]).toHaveLength(1);   // fires only: tickets are there, demolitions ride with them
+      expect(html).not.toContain(strings['hood.fire_caption']);
+    }
+    expect(conditionsPanel(hood({ years: {} }), cond, ui, 'chart', new Set())).not.toContain('role="radiogroup"');
+  });
+
+  it('a point says its exact figure, spoken and shown, for counts and for days', () => {
+    expect(chart).toContain('<title>2023, Blight tickets: 30</title>');
+    expect(chart).toContain('aria-label="2023, Blight tickets: 30"');
+    expect(chart).toMatch(/<text x="[\d.]+" y="[\d.]+" text-anchor="middle">40 days<\/text>/);
+  });
+
+  it('keeps the words that make the numbers honest, and never the ones that hid them', () => {
+    for (const k of ['hood.small_numbers', 'hood.blight_note', 'hood.fire_note', 'hood.vacant_note', 'hood.roads_note']) expect(table).toContain(strings[k]);
+    expect(table).not.toMatch(/fewer than 5|too few to show|lt5/);
+    expect(Object.keys(strings).filter((k) => /lt5|too_few_permits/.test(k))).toEqual([]);
+    for (const v of Object.values(strings)) expect(v).not.toMatch(/under 5 shows|fewer than 5/);
+  });
+
+  it('is the same on a page: the neighborhood page draws it once, then the crash panel, then the sources', () => {
+    const page = hoodPage(hood(), cond, ui, 'chart');
+    expect(page.indexOf(strings['hood.cond_head']!)).toBeGreaterThan(page.indexOf(strings['hood.money_head']!));
+    expect(page.indexOf(strings['hood.sources_head']!)).toBeGreaterThan(page.indexOf(strings['hood.cond_head']!));
+    expect([...page.matchAll(/class="glance"/g)]).toHaveLength(1);
+  });
+});
+
+describe('the crash panel, by year', () => {
+  const byYear = { '2020': { walk: 12, bike: 1, severe: 5 }, '2021': { walk: 12, bike: 2, severe: 5 }, '2022': { walk: 8, bike: 0, severe: 4 }, '2023': { walk: 10, bike: 1, severe: 4 }, '2024': { walk: 7, bike: 5, severe: 4 } };
+  const h = hood({ crashes: { walk: 49, bike: 9, severe: 22 }, crashes_by_year: byYear });
+  const dd: Indicators = { ...d, sources: { ...d.sources, crashes: src }, crash_years: [2020, 2024], city_crashes: { walk: 2024, bike: 664, severe: 630 } };
+
+  it('prints the exact totals and a year table with the window as its last row — no "fewer than 5" anywhere', () => {
+    const html = crashPanel(h, dd, ui);
+    expect(html).toContain('<span>49 <small>Whole city: 2,024</small></span>');
+    expect(html).toContain('<span>9 <small>Whole city: 664</small></span>');
+    const rows = [...html.matchAll(/<tr><th scope="row">([^<]+)<\/th><td>([^<]+)<\/td><td>([^<]+)<\/td><td>([^<]+)<\/td><\/tr>/g)].map((m) => m.slice(1, 5));
+    expect(rows).toEqual([['2020', '12', '1', '5'], ['2021', '12', '2', '5'], ['2022', '8', '0', '4'], ['2023', '10', '1', '4'], ['2024', '7', '5', '4'], ['2020 to 2024 total', '49', '9', '22']]);
+    expect(html).not.toMatch(/fewer than|lt5/);
+    expect(strings['hood.crash_note']).not.toMatch(/hidden|fewer than/);
+  });
+
+  it('draws walking, biking and badly hurt as three toggleable lines on one axis, in the chart view', () => {
+    const html = crashPanel(h, dd, ui, 'chart');
+    expect(html).toContain('aria-label="Crashes with someone walking or biking by year, 2020 to 2024, chart"');
+    for (const k of ['walk', 'bike', 'severe']) expect(html).toContain(`data-hoodseries="crash:${k}"`);
+    expect(html).toContain('class="ln tc"');
+    expect(html).toContain('<title>2024, Biking: 5</title>');
+    expect(html).toContain('<title>2022, Biking: 0</title>');
+    const off = crashPanel(h, dd, ui, 'chart', new Set(['crash:walk', 'crash:bike']));
+    expect(off).toContain('data-hoodseries="crash:severe" checked disabled');
+    expect(off).not.toContain('class="ln ta"');
+  });
+
+  it('a bundle without the years draws the totals and no chart, exactly as before', () => {
+    const html = crashPanel(hood({ crashes: { walk: 49, bike: 9, severe: 22 } }), dd, ui, 'chart');
+    expect(html).toContain('<span>49 <small>Whole city: 2,024</small></span>');
+    expect(html).not.toContain('<svg'); expect(html).not.toContain('role="radiogroup"');
   });
 });
 
@@ -333,20 +475,38 @@ describe('the drawing works without colour', () => {
     expect(svg).toMatch(/class="mk ta" d="M[\d.]+ [\d.]+a4 4/);
     expect(svg).toMatch(/class="mk tb" d="M[\d.]+ [\d.]+L/);
     expect(css).toContain('.hoodsvg .ln.tb { stroke:var(--chart-b); stroke-dasharray:7 4; }');
-    expect(css).toContain('.hoodsvg .ln.unsure { stroke-dasharray:1 3; stroke-width:1.5; }');
+    // A third series — the crash chart's — is a square on a dash-dot line.
+    const crash = crashPanel(hood({ crashes: { walk: 10, bike: 2, severe: 1 }, crashes_by_year: { '2020': { walk: 3, bike: 1, severe: 0 }, '2021': { walk: 4, bike: 0, severe: 1 }, '2022': { walk: 3, bike: 1, severe: 0 } } }), { ...d, sources: { ...d.sources, crashes: src }, crash_years: [2020, 2022] }, ui, 'chart');
+    expect(crash).toMatch(/class="mk tc" d="M[\d.]+ [\d.]+h7v7h-7Z"/);
+    expect(css).toContain('.hoodsvg .ln.tc { stroke:var(--chart-c); stroke-dasharray:7 3 1.5 3; }');
+    expect(css).toContain('.chartkey .sw.tc {');
   });
 
-  it('the colours are tokens, with a step for dark, for increased contrast, and for forced colours', () => {
-    for (const token of ['--chart-a', '--chart-b', '--chart-lt5', '--chart-grid', '--chart-ink']) {
+  it('the colours are tokens, with a step for dark, for increased contrast, and for forced colours, and every one is 3:1 on its card', () => {
+    for (const token of ['--chart-a', '--chart-b', '--chart-c', '--chart-grid', '--chart-ink']) {
       expect(css, token).toContain(token + ':');
       expect([...css.matchAll(new RegExp(token + ':', 'g'))].length, token).toBeGreaterThanOrEqual(5);
     }
+    expect(css).not.toContain('--chart-lt5');
     const forced = css.slice(css.indexOf('@media (forced-colors: active) { :root { --chart-a'));
     expect(forced).toContain('--chart-a:CanvasText');
     expect(forced).toContain('--chart-b:LinkText');
-    expect(forced).toContain('--chart-lt5:GrayText');
+    expect(forced).toContain('--chart-c:Highlight');
     expect(css).toContain('@media (prefers-contrast: more) { :root { --chart-a:');
     expect(css).toContain('@media print {');
+    // Contrast, computed: each series colour against the card it is drawn on, in light, dark and both
+    // "increase contrast" modes, is at least 3:1 (WCAG 1.4.11).
+    const read = (block: string) => Object.fromEntries([...block.matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-f]{6})\s*;/gi)].map((m) => [m[1]!, m[2]!.toLowerCase()]));
+    const slice = (from: string, to: string) => css.slice(css.indexOf(from), css.indexOf(to));
+    const light = read(slice(':root {', '@media (prefers-color-scheme: dark)')), dark = { ...light, ...read(slice('@media (prefers-color-scheme: dark)', '* { box-sizing')) };
+    const chartLight = read(slice('--chart-a:#', '@media (prefers-color-scheme: dark) { :root {\n  /* Its own')), chartDark = read(slice('@media (prefers-color-scheme: dark) { :root {\n  /* Its own', '/* "Increase contrast" deliberately'));
+    const moreLight = read(slice('@media (prefers-contrast: more) { :root { --chart-a', '@media (prefers-contrast: more) and (prefers-color-scheme: dark) { :root { --chart-a'));
+    const moreDark = read(slice('@media (prefers-contrast: more) and (prefers-color-scheme: dark) { :root { --chart-a', '@media (forced-colors: active) { :root { --chart-a'));
+    const lum = (hex: string) => { const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!; };
+    const ratio = (a: string, b: string) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    for (const [name, tokens, surface] of [['light', chartLight, light['--surface']], ['dark', chartDark, dark['--surface']], ['more light', moreLight, '#ffffff'], ['more dark', moreDark, dark['--surface']]] as const)
+      for (const k of ['--chart-a', '--chart-b', '--chart-c', '--chart-ink']) expect(ratio(tokens[k]!, surface!), `${k} ${name} ${tokens[k]} on ${surface}`).toBeGreaterThanOrEqual(3);
+    expect([chartLight['--chart-c'], chartDark['--chart-c']]).toEqual(['#b5177a', '#c86aa0']);
   });
 });
 
@@ -355,32 +515,37 @@ describe('the drawing works without colour', () => {
 // ---------------------------------------------------------------------------------------------------
 
 describe('the chart model', () => {
-  it('turns a series into points, segments, markers and blanks, and never mixes them up', () => {
-    const m = chartModel([series('x', 'a', 'x', [12, 'lt5', undefined, 24, 7, 7])]);
+  it('turns a series into points, segments and blanks, and never mixes them up', () => {
+    const m = chartModel([series('x', 'a', 'x', [12, 2, undefined, 24, 7, 7])]);
     const s = m.series[0]!;
-    expect(s.points.map((p) => p.kind)).toEqual(['value', 'hidden', 'none', 'value', 'value', 'value']);
-    expect(s.markers).toEqual(['2021']);
+    expect(s.points.map((p) => p.kind)).toEqual(['value', 'value', 'none', 'value', 'value', 'value']);
     expect(s.blanks).toEqual(['2022']);
-    expect(s.points[1]!.value).toBeUndefined();
-    expect(s.points[1]!.frac).toBe(MARKER_FRACTION);
-    // No piece of line crosses the year with nothing recorded; the pieces that touch the hidden one are dotted.
-    expect(s.segments).toEqual([
-      { from: 0, to: 1, dotted: true },
-      { from: 3, to: 4, dotted: false },
-      { from: 4, to: 5, dotted: false },
-    ]);
+    expect(s.points[1]).toMatchObject({ value: 2, frac: 2 / m.top });
+    // No piece of line crosses the year with nothing recorded.
+    expect(s.segments).toEqual([{ from: 0, to: 1 }, { from: 3, to: 4 }, { from: 4, to: 5 }]);
+    expect(JSON.stringify(m)).not.toMatch(/hidden|marker|dotted/);
+  });
+
+  it('a chart holds one unit: days are said as days, in the point, the tip and the summary', () => {
+    const m = chartModel([{ ...series('days', 'a', 'Middle time to close', DAYS), unit: 'days' }]);
+    expect(m.unit).toBe('days');
+    expect(fmtValue(ui, 'days', 12)).toBe('12 days');
+    expect(fmtValue(ui, 'count', 12)).toBe('12');
+    expect(chartSummary(ui, m)).toContain('Middle time to close, 40 days in 2022');
+    expect(chartModel([series('x', 'a', 'x', [1, 2, 3])]).unit).toBe('count');
   });
 
   it('names the earliest of two equal peaks, so one bundle always says the same year', () => {
     expect(chartModel([series('x', 'a', 'x', [30, 12, 30])]).series[0]!.peak).toEqual({ year: '2020', value: 30 });
   });
 
-  it('offers a chart only for three years with something in them and at least one number to draw', () => {
+  it('offers a chart only for three years with a number in them', () => {
     expect(chartable(points([12, 14, 16]))).toBe(true);
+    expect(chartable(points([0, 0, 0]))).toBe(true);                   // three zeros are three numbers
     expect(chartable(points([12, 14]))).toBe(false);
     expect(chartable(points([12, undefined, undefined, 14]))).toBe(false);
-    expect(chartable(points(['lt5', 'lt5', 'lt5']))).toBe(false);     // nothing to draw at a value
-    expect(chartable(points(['lt5', 'lt5', 7]))).toBe(true);
+    expect(anyValue(points([undefined, undefined, 0]))).toBe(true);
+    expect(anyValue(points([undefined, undefined]))).toBe(false);
   });
 
   it('reads the years out of the same table the page prints, in the same order', () => {
@@ -396,10 +561,14 @@ describe('the chart model', () => {
 
 describe('the new words', () => {
   const keys = ['hood.view_label', 'hood.view_table', 'hood.view_chart', 'hood.view_say', 'hood.chart_series_name',
-    'hood.chart_name_money', 'hood.chart_name_blight', 'hood.chart_name_demo', 'hood.chart_name_issues', 'hood.chart_name_fires',
-    'hood.chart_summary', 'hood.chart_peak', 'hood.chart_peak_none', 'hood.chart_bar', 'hood.chart_lt5', 'hood.chart_lt5_note',
+    'hood.chart_name_money', 'hood.chart_name_cond', 'hood.chart_name_issues', 'hood.chart_name_days', 'hood.chart_name_fires', 'hood.chart_name_crashes',
+    'hood.chart_summary', 'hood.chart_peak', 'hood.chart_peak_none', 'hood.chart_bar',
     'hood.chart_money_note', 'hood.small_numbers', 'hood.chart_show', 'hood.chart_only_one', 'hood.chart_series_on',
-    'hood.chart_series_off', 'hood.chart_plot'];
+    'hood.chart_series_off', 'hood.chart_plot', 'hood.chart_plot_days',
+    'hood.glance', 'hood.glance_today', 'hood.blight_tickets', 'hood.issues_reported', 'hood.fires_short', 'hood.vacant_short', 'hood.roads_poor_short',
+    'hood.cond_blight_head', 'hood.cond_blight_lede', 'hood.cond_issues_head', 'hood.cond_issues_lede', 'hood.cond_days_head', 'hood.cond_days_lede', 'hood.cond_days_table',
+    'hood.cond_fires_head', 'hood.cond_fires_lede', 'hood.cond_none', 'hood.crash_walk_short', 'hood.crash_bike_short', 'hood.crash_severe_short', 'hood.crash_caption',
+    'hood.crash_total', 'hood.crash_years_lede', 'hood.crash_note', 'hood.places_head', 'hood.rule_inside', 'hood.rule_near', 'hood.places_note'];
   for (const l of ['en', 'es', 'ar', 'bn']) {
     it(`${l} has every one of them, with the same placeholders`, () => {
       const tbl = JSON.parse(readFileSync(join(root, `strings/${l}.json`), 'utf8')) as Record<string, string>;

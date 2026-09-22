@@ -17,19 +17,19 @@
 //   (CJIC), not SEMCOG's own: MSP has not been asked about its terms or attribution. Both follow-ups stand —
 //   accept or decline the indemnity, ask MSP, and remove the layer if either owner objects.
 //
-// What we keep, and nothing else. At ingest each crash becomes +1 in one neighborhood's tally for the whole
-// window and is then forgotten: no crash id, no date or time (not even the year, per crash), no ages, no
+// What we keep, and nothing else. At ingest each crash becomes +1 in one neighborhood's tally for its year and
+// for the whole window and is then forgotten: no crash id, no date or time beyond the year, no ages, no
 // driver, vehicle, road, weather, alcohol or hit-and-run fields, and no coordinates in the output. The
 // committed file holds counts alone.
-//   data/ingested/crashes.json   one multi-year total per neighborhood and per city, the years it covers, the
-//                                source and the licence
+//   data/ingested/crashes.json   per neighborhood and per city: one count per year of the window, and the
+//                                window total; the years it covers, the source and the licence
 //
-// Counts under 5 are stored as "lt5" (docs/13 honesty rule 2) before anything is written. NOTHING ELSE
-// DERIVABLE IS PUBLISHED: the file used to carry a per-year count *and* the window total, each suppressed on
-// its own, so a hidden year could be recovered by subtracting the published years from the total. Eighteen
-// cells came out exactly that way (2026-09-20). Only the window total is written now. Any number added here
-// later must pass the test in pipeline/test/crashes.test.ts: for every hidden cell, more than one value has to
-// be consistent with everything the file publishes.
+// **Every count is the exact number** (Kyle, 2026-09-22: "crashes too" — DECISIONS). Until that day a count
+// under 5 was written as "lt5", and the per-year counts had been removed because a hidden year could be
+// recovered by subtracting the published years from the total. With nothing hidden there is nothing to
+// recover, so the per-year counts are back: they are what the chart draws. The identification concern that
+// suppression answered is reversed deliberately, on the owner's call: these are police-reported crashes on
+// public streets, already published by SEMCOG with the coordinates on them, and this app ranks nothing.
 //
 // Crashes are about streets, never people: nothing here says who was at fault, and there is no ranking of
 // neighborhoods, no rate (docs/13 defines no denominator for crashes) and nothing on the Map tab.
@@ -38,7 +38,7 @@
 
 import { readFileSync } from 'node:fs';
 import { inBbox, p, today, writeJson } from './util.js';
-import { pointInRing, suppress, type Count, type Neighborhood } from './ingest-neighborhoods.js';
+import { pointInRing, type Neighborhood } from './ingest-neighborhoods.js';
 
 export const LAYER = 'https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/crash2024_10year/FeatureServer/0';
 export const PAGE = 'https://maps-semcog.opendata.arcgis.com/datasets/SEMCOG::crash-locations-2015-2024';
@@ -64,16 +64,23 @@ const UA = { 'user-agent': '313help-pipeline (open-source civic directory for De
 
 export type Pt = [number, number];
 export interface Tally { walk: number; bike: number; severe: number }
-export interface CrashCounts { walk: Count; bike: Count; severe: Count }
-/** One place's counts for the whole window. Deliberately nothing per year: see the note at the top of the file. */
-export interface CrashRow { window: CrashCounts }
+export interface CrashCounts { walk: number; bike: number; severe: number }
+/** One place's counts: the whole window, and each year of it (keyed "2020" … "2024"). */
+export interface CrashRow { window: CrashCounts; years: Record<string, CrashCounts> }
 /** One crash, already stripped to what a tally needs. Never written anywhere. */
 export interface Crash { year: number; walk: boolean; bike: boolean; severe: boolean; pt: Pt }
 
 const empty = (): Tally => ({ walk: 0, bike: 0, severe: 0 });
 const add = (t: Tally, c: Crash) => { if (c.walk) t.walk++; if (c.bike) t.bike++; if (c.severe) t.severe++; };
-/** docs/13 honesty rule 2, applied before anything is stored. */
-export const hide = (t: Tally): CrashCounts => ({ walk: suppress(t.walk).count, bike: suppress(t.bike).count, severe: suppress(t.severe).count });
+/** A tally as it is written: the same three numbers, exactly. (Nothing is hidden: see the note at the top.) */
+export const plain = (t: Tally): CrashCounts => ({ walk: t.walk, bike: t.bike, severe: t.severe });
+/** One row from per-year tallies: the window total is the sum of its years. */
+export function rowOf(byYear: Record<string, Tally>, years: number[]): CrashRow {
+  const window = empty();
+  const out: Record<string, CrashCounts> = {};
+  for (const y of years) { const t = byYear[String(y)] ?? empty(); out[String(y)] = plain(t); window.walk += t.walk; window.bike += t.bike; window.severe += t.severe; }
+  return { window: plain(window), years: out };
+}
 
 /** The most recent complete years the layer offers, newest last. The layer's newest year is its newest complete one. */
 export function pickYears(maxYear: number, window = WINDOW): number[] {
@@ -81,9 +88,10 @@ export function pickYears(maxYear: number, window = WINDOW): number[] {
 }
 
 /**
- * Crashes into one tally per neighborhood, over the whole window. A crash belongs to the neighborhood whose
- * outline holds it; one outside every outline (a freeway edge, or one of the other three cities) is counted only
- * in its city total. `years` is the window: a crash from any other year is not counted at all.
+ * Crashes into one tally per neighborhood and year. A crash belongs to the neighborhood whose outline holds it
+ * (even-odd over its rings, so a hole is outside); one outside every outline (a freeway edge, or one of the other
+ * three cities) is counted only in its city total. `years` is the window: a crash from any other year is not
+ * counted at all.
  */
 export function aggregate(crashes: Crash[], hoods: Neighborhood[], years: number[]): {
   neighborhoods: Record<string, CrashRow>; placed: number; unplaced: number;
@@ -92,32 +100,21 @@ export function aggregate(crashes: Crash[], hoods: Neighborhood[], years: number
     const b = n.rings.flat();
     return { id: n.id, rings: n.rings, x0: Math.min(...b.map((q) => q[0])), x1: Math.max(...b.map((q) => q[0])), y0: Math.min(...b.map((q) => q[1])), y1: Math.max(...b.map((q) => q[1])) };
   });
-  const tallies = new Map<string, Tally>();
+  const tallies = new Map<string, Record<string, Tally>>();
   let placed = 0, unplaced = 0;
   for (const c of crashes) {
     if (!years.includes(c.year)) continue;
     const [lon, lat] = c.pt;
-    const hit = boxes.find((b) => lon >= b.x0 && lon <= b.x1 && lat >= b.y0 && lat <= b.y1 && b.rings.some((r) => pointInRing(c.pt, r)));
+    const hit = boxes.find((b) => lon >= b.x0 && lon <= b.x1 && lat >= b.y0 && lat <= b.y1 && b.rings.filter((r) => pointInRing(c.pt, r)).length % 2 === 1);
     if (!hit) { unplaced++; continue; }
     placed++;
-    let t = tallies.get(hit.id);
-    if (!t) { t = empty(); tallies.set(hit.id, t); }
-    add(t, c);
+    let by = tallies.get(hit.id);
+    if (!by) { by = {}; tallies.set(hit.id, by); }
+    add((by[String(c.year)] ??= empty()), c);
   }
   const neighborhoods: Record<string, CrashRow> = {};
-  for (const n of hoods) neighborhoods[n.id] = { window: hide(tallies.get(n.id) ?? empty()) };
+  for (const n of hoods) neighborhoods[n.id] = rowOf(tallies.get(n.id) ?? {}, years);
   return { neighborhoods, placed, unplaced };
-}
-
-/** How many counts came out hidden, for the run's own log and for docs/OPERATIONS. */
-export function suppressedCount(rows: Record<string, CrashRow>): { places: number; cells: number } {
-  let places = 0, cells = 0;
-  for (const r of Object.values(rows)) {
-    const n = [r.window.walk, r.window.bike, r.window.severe].filter((v) => v === 'lt5').length;
-    cells += n;
-    if (n) places++;
-  }
-  return { places, cells };
 }
 
 // ---- reading ---------------------------------------------------------------------
@@ -156,24 +153,24 @@ async function readCrashes(years: number[]): Promise<Crash[]> {
  * "killed or seriously hurt" counts crashes here exactly as it does per neighborhood, not people.
  */
 async function cityTotals(years: number[]): Promise<Record<string, CrashRow>> {
-  const byCity: Record<string, Tally> = {};
-  for (const c of CITIES) byCity[c] = empty();
+  const byCity: Record<string, Record<string, Tally>> = {};
+  for (const c of CITIES) byCity[c] = {};
   const modes = await query({ where: cityWhere(years), groupByFieldsForStatistics: 'community,YEAR', outStatistics: JSON.stringify([
     { statisticType: 'sum', onStatisticField: 'PEDESTRIAN', outStatisticFieldName: 'walk' },
     { statisticType: 'sum', onStatisticField: 'BICYCLE', outStatisticFieldName: 'bike' }]) });
   await new Promise((r) => setTimeout(r, 300));
   const bad = await query({ where: `${cityWhere(years)} AND (KCOUNT > 0 OR ACOUNT > 0)`, groupByFieldsForStatistics: 'community,YEAR', outStatistics: JSON.stringify([
     { statisticType: 'count', onStatisticField: 'OBJECTID', outStatisticFieldName: 'severe' }]) });
-  // The server groups by year as well as city so that the two queries line up row for row; the years are then
-  // added together and thrown away. Nothing per year is kept, let alone written (see the note at the top).
+  // The server groups by city and year, so the two queries line up row for row and each year is kept.
   const put = (a: any, t: Partial<Tally>) => {
     const city = byCity[String(a.community)];
     if (!city || !years.includes(a.YEAR)) return;
-    for (const k of Object.keys(t) as (keyof Tally)[]) city[k] += t[k] ?? 0;
+    const tally = (city[String(a.YEAR)] ??= empty());
+    for (const k of Object.keys(t) as (keyof Tally)[]) tally[k] += t[k] ?? 0;
   };
   for (const f of modes.features ?? []) put(f.attributes, { walk: f.attributes.walk ?? 0, bike: f.attributes.bike ?? 0 });
   for (const f of bad.features ?? []) put(f.attributes, { severe: f.attributes.severe ?? 0 });
-  return Object.fromEntries(Object.entries(byCity).map(([c, t]) => [c, { window: hide(t) }]));
+  return Object.fromEntries(Object.entries(byCity).map(([c, by]) => [c, rowOf(by, years)]));
 }
 
 async function main(): Promise<void> {
@@ -190,7 +187,6 @@ async function main(): Promise<void> {
   if (crashes.length < 500) throw new Error(`crashes: only ${crashes.length} crashes read for ${years[0]} to ${years.at(-1)}. Not overwriting the last good file.`);
   const { neighborhoods, placed, unplaced } = aggregate(crashes, hoods, years);
   const cities = await cityTotals(years);
-  const hidden = suppressedCount(neighborhoods);
 
   writeJson(p('data/ingested/crashes.json'), {
     source: {
@@ -207,11 +203,10 @@ async function main(): Promise<void> {
     years: [years[0], years.at(-1)],
     years_covered: years,
     cities: CITIES,
-    kept: 'Counts only: crashes involving a person walking or biking, added up over the years in years_covered, per neighborhood and per city, and how many of those crashes killed or seriously hurt someone. Nothing per year and nothing else from the layer is kept, so a hidden "fewer than 5" cannot be recovered by subtracting published numbers from a total.',
+    kept: 'Counts only, exact: crashes involving a person walking or biking, per neighborhood and per city, for each year in years_covered and for the whole window, and how many of those crashes killed or seriously hurt someone. Nothing else from the layer is kept.',
     city: cities.Detroit, city_by_name: cities, neighborhoods,
   });
   console.log(`crashes ${years[0]} to ${years.at(-1)}: ${crashes.length} crashes read in the four cities, ${placed} placed in a Detroit neighborhood, ${unplaced} outside every outline (the other three cities, or on a city-edge road)`);
-  console.log(`crashes: ${hidden.cells} counts hidden as "fewer than 5"; ${hidden.places} of ${Object.keys(neighborhoods).length} neighborhoods have a hidden number in the ${years.length}-year total`);
   console.log(`crashes: city totals ${years[0]}-${years.at(-1)} — ${CITIES.map((c) => `${c} walking ${cities[c]!.window.walk}, biking ${cities[c]!.window.bike}`).join('; ')}`);
 }
 

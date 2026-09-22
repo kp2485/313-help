@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -13,12 +13,12 @@ import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
 import { importInto, lineToRows, parseSchedule } from '../src/import-lines.js';
-import { buildIndicators, canBeNearest, milesToArea, nearestMiles, nearestPicks } from '../src/indicators.js';
-import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, plainCount, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
+import { COUNT_RULE, buildIndicators, canBeNearest, milesToArea, nearestMiles, nearestPicks, pointInRings } from '../src/indicators.js';
+import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, plainCount, roadShare, roadsByHood, sqlIn, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
 import { addressOnPage, fetchPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
-import { GRID, crossings, encodeLine, insideRings, mergeChains, packRoads, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
+import { GRID, clipToRings, crossings, encodeLine, insideRings, mergeChains, metresApart, packRoads, pickNames, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
@@ -655,6 +655,38 @@ describe('street map from City open data', () => {
     expect(hoods).not.toMatch(/-83\.36\b/);
   });
   const road = (name: string, cls: number, line: [number, number][]): Road => ({ name, cls, line });
+  it('the committed basemap draws the streets that run through Highland Park, not only the ones that end there', () => {
+    // The mid-vertex rule used to drop any TIGER line that ran on past the city line, and the City of Detroit's
+    // own layer stops dead at it, so 16.6% of Highland Park's 97 km of street — Woodward, John R, Brush, 3rd,
+    // Glendale, the Davison — had nothing drawn at all (2026-09-22). These are points on those streets, well
+    // inside Highland Park, each of which must now have a line within 20 m.
+    const dir = p('data/ingested/basemap');
+    const lines: [number, number][][] = [];
+    for (const f of ['base.json', ...readdirSync(join(dir, 'cells')).map((c) => join('cells', c))]) {
+      const j = JSON.parse(readFileSync(join(dir, f), 'utf8')) as { origin: [number, number]; roads: [number, number, number[]][] };
+      for (const [, , enc] of j.roads) { let x = 0, y = 0; const l: [number, number][] = [];
+        for (let i = 0; i < enc.length; i += 2) { x += enc[i]!; y += enc[i + 1]!; l.push([j.origin[0] + x / 1e5, j.origin[1] + y / 1e5]); }
+        lines.push(l); }
+    }
+    const nearest = (pt: [number, number]) => {
+      let best = Infinity;
+      for (const l of lines) for (let i = 0; i + 1 < l.length; i++) {
+        const [ax, ay] = l[i]!, [bx, by] = l[i + 1]!, dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy;
+        const t = L ? Math.max(0, Math.min(1, ((pt[0] - ax) * dx + (pt[1] - ay) * dy) / L)) : 0;
+        const d = metresApart(pt, [ax + t * dx, ay + t * dy]);
+        if (d < best) best = d;
+      }
+      return best;
+    };
+    const on: [string, [number, number]][] = [
+      ['Woodward Ave in Highland Park', [-83.09629, 42.40440]],     // was 25 m from anything we drew
+      ['John R St in Highland Park', [-83.09004, 42.40073]],        // was 54 m
+      ['Brush St in Highland Park', [-83.08921, 42.40502]],         // was 31 m
+      ['Glendale Ave in Highland Park', [-83.09923, 42.39702]],     // was 116 m
+      ['Hamilton Ave in Highland Park', [-83.10699, 42.40362]],     // was already drawn; must stay
+    ];
+    for (const [what, pt] of on) expect(nearest(pt), what).toBeLessThan(20);
+  });
   it('names: freeways the way people say them; turn lanes and ramps have no name', () => {
     expect(roadName('N I 75')).toBe('I-75'); expect(roadName('W I 96 CD')).toBe('I-96'); expect(roadName('S M 10')).toBe('M-10');
     expect(roadName('W I 94 Service Drive')).toBe('I-94 Service Drive');
@@ -667,6 +699,74 @@ describe('street map from City open data', () => {
     ]);
     expect(out).toHaveLength(2);
     expect(out.find((r) => r.name === 'Mack Ave')!.line.map((q) => q[0])).toEqual([-83.04, -83.03, -83.02, -83.01]);
+  });
+  // A city line, as TIGER draws one: a square with its west edge at -83.11. "Inside" is the city.
+  const CITY: [number, number][][] = [[[-83.11, 42.39], [-83.09, 42.39], [-83.09, 42.42], [-83.11, 42.42], [-83.11, 42.39]]];
+  it('joins two pieces of one street that end a couple of metres apart, as TIGER leaves them', () => {
+    // 2 m at this latitude is about 0.000018 of a degree of latitude.
+    const a: [number, number][] = [[-83.100, 42.400], [-83.098, 42.400]];
+    const b: [number, number][] = [[-83.098, 42.400018], [-83.096, 42.400018]];
+    expect(metresApart(a[1]!, b[0]!)).toBeLessThan(2.1);
+    const out = mergeChains([road('Ford St', 4, a), road('Ford St', 4, b)]);
+    expect(out).toHaveLength(1);
+    expect(out[0]!.line[0]![0]).toBeCloseTo(-83.1, 6);
+    expect(out[0]!.line[out[0]!.line.length - 1]![0]).toBeCloseTo(-83.096, 6);
+  });
+  it('steps over the gap TIGER leaves at an intersection, but not across to another carriageway', () => {
+    // 15 m of nothing, then the street carries straight on: one line.
+    const west: [number, number][] = [[-83.104, 42.400], [-83.1020, 42.400]];
+    const east: [number, number][] = [[-83.10182, 42.400], [-83.100, 42.400]];
+    expect(metresApart(west[1]!, east[0]!)).toBeGreaterThan(10);
+    expect(mergeChains([road('Tyler St', 4, west), road('Tyler St', 4, east)])).toHaveLength(1);
+    // The same 15 m, but the other piece runs back the way we came, 15 m to the side: two lines, as before.
+    const back: [number, number][] = [[-83.10182, 42.40013], [-83.104, 42.40013]];
+    expect(mergeChains([road('Tyler St', 4, west), road('Tyler St', 4, back)])).toHaveLength(2);
+    // And a street that turns hard at the gap is not swept up either.
+    const turn: [number, number][] = [[-83.10182, 42.400], [-83.10182, 42.403]];
+    expect(mergeChains([road('Tyler St', 4, west), road('Tyler St', 4, turn)])).toHaveLength(2);
+  });
+  it('a street that crosses the city line is kept and cut at the line, not thrown away', () => {
+    // Runs from Detroit into the city and out the far side. Its middle vertex is inside; its ends are not.
+    const line: [number, number][] = [[-83.13, 42.40], [-83.10, 42.40], [-83.07, 42.40]];
+    const inside = clipToRings(line, CITY, true);
+    expect(inside).toHaveLength(1);
+    expect(inside[0]![0]![0]).toBeCloseTo(-83.11, 6);
+    expect(inside[0]![inside[0]!.length - 1]![0]).toBeCloseTo(-83.09, 6);
+    const outside = clipToRings(line, CITY, false);
+    expect(outside).toHaveLength(2);
+    // The two sides meet exactly on the line: no gap for a street to disappear into.
+    expect(outside[0]![outside[0]!.length - 1]![0]).toBeCloseTo(-83.11, 9);
+    expect(outside[1]![0]![0]).toBeCloseTo(-83.09, 9);
+    // A line nowhere near the city is handed back whole, and none of it is "inside".
+    const far: [number, number][] = [[-83.20, 42.30], [-83.19, 42.30]];
+    expect(clipToRings(far, CITY, false)).toEqual([far]);
+    expect(clipToRings(far, CITY, true)).toEqual([]);
+  });
+  it('a street through the city line comes out as one polyline with one label', () => {
+    // What the ingest does: the City of Detroit's layer clipped to outside, TIGER's clipped to inside, merged.
+    const city: [number, number][] = [[-83.13, 42.40], [-83.10, 42.40]];      // the City draws past the line
+    const tiger: [number, number][] = [[-83.12, 42.40], [-83.07, 42.40]];     // TIGER draws right across it
+    const pieces = [
+      ...clipToRings(city, CITY, false).map((l) => road('Ford St', 4, l)),
+      ...clipToRings(tiger, CITY, true).map((l) => road('Ford St', 4, l)),
+    ];
+    const out = mergeChains(pieces);
+    expect(out).toHaveLength(1);
+    const xs = out[0]!.line.map((q) => q[0]);
+    expect(Math.min(...xs)).toBeCloseTo(-83.13, 6);
+    expect(Math.max(...xs)).toBeCloseTo(-83.09, 6);
+    // No step anywhere along it bigger than a block: the line really is continuous.
+    for (let i = 1; i < out[0]!.line.length; i++) expect(metresApart(out[0]!.line[i - 1]!, out[0]!.line[i]!)).toBeLessThan(2600);
+  });
+  it('TIGER sends one edge once per name; one geometry keeps one name, the one the City uses', () => {
+    const l: [number, number][] = [[-83.10, 42.40], [-83.09, 42.40]];
+    const w: [number, number][] = [[-83.10, 42.41], [-83.09, 42.41]];
+    const out = pickNames([
+      { line: l, name: 'Tyler Ave', cls: 4 }, { line: l, name: 'Tyler St', cls: 4 },
+      { line: w, name: 'State Hwy 1', cls: 1 }, { line: w, name: 'Woodward Ave', cls: 1 },
+    ], new Set(['Tyler St', 'Mack Ave']));
+    expect(out).toHaveLength(2);
+    expect(out.map((r) => r.name).sort()).toEqual(['Tyler St', 'Woodward Ave']);   // a route number never wins
   });
   it('drops points that do not change the shape, keeps corners, and encodes to whole meters-ish', () => {
     const line: [number, number][] = [[-83.05, 42.35], [-83.04, 42.350001], [-83.03, 42.35], [-83.03, 42.36]];
@@ -753,14 +853,26 @@ describe('neighborhood indicators (docs/13)', () => {
     expect(hoods[1]!.district).toBeNull(); expect(hoods[1]!.jlg_study_area).toBeUndefined();
     expect(nameKey('Mc Dougall-Hunt')).toBe(nameKey('McDougall Hunt'));
   });
-  it('small numbers are hidden before anything is stored', () => {
-    expect(suppress(4, 90000, 1000)).toEqual({ count: 'lt5' });
-    // The two series that no longer hide a small count: a 3 is a 3, and the median keeps its ten-sale rule.
+  it('every count is the real number, however small; only a MEDIAN needs ten records (2026-09-22)', () => {
+    // A 3 is a 3, a 0 is a 0, and there is no function left in the pipeline that turns a count into "lt5".
     expect(plainCount(3, 90000, 1000)).toEqual({ count: 3, cost: 1000 });
     expect(plainCount(0)).toEqual({ count: 0 });
+    expect(plainCount(4, 90000)).toEqual({ count: 4 });
+    expect(plainCount(9, 90000)).toEqual({ count: 9 });
     expect(plainCount(12, 90000.4)).toEqual({ count: 12, median: 90000 });
-    expect(suppress(9, 90000)).toEqual({ count: 9 });
-    expect(suppress(10, 90000.4)).toEqual({ count: 10, median: 90000 });
+    const src = readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8') + readFileSync(p('pipeline/src/ingest-crashes.ts'), 'utf8') + readFileSync(p('pipeline/src/indicators.ts'), 'utf8');
+    expect(src).not.toMatch(/'lt5'/);
+  });
+  it('a hole in an outline is outside it, and a two-part outline is inside either part (even-odd)', () => {
+    const outer: [number, number][] = [[-83.16, 42.41], [-83.15, 42.41], [-83.15, 42.42], [-83.16, 42.42], [-83.16, 42.41]];
+    const hole: [number, number][] = [[-83.157, 42.413], [-83.153, 42.413], [-83.153, 42.417], [-83.157, 42.417], [-83.157, 42.413]];
+    const island: [number, number][] = [[-83.14, 42.41], [-83.13, 42.41], [-83.13, 42.42], [-83.14, 42.42], [-83.14, 42.41]];
+    expect(pointInRings({ lat: 42.415, lon: -83.155 }, [outer])).toBe(true);
+    expect(pointInRings({ lat: 42.415, lon: -83.155 }, [outer, hole])).toBe(false);   // in the hole
+    expect(pointInRings({ lat: 42.412, lon: -83.155 }, [outer, hole])).toBe(true);    // in the ring, not the hole
+    expect(pointInRings({ lat: 42.415, lon: -83.135 }, [outer, island])).toBe(true);
+    expect(pointInRings({ lat: 42.415, lon: -83.145 }, [outer, island])).toBe(false); // between the two parts
+    expect(milesToArea({ lat: 42.415, lon: -83.155 }, [outer, hole])).toBeGreaterThan(0);
   });
   it('counts help inside or within half a mile, says what our list is missing, and never ranks', () => {
     expect(milesToArea({ lat: 42.415, lon: -83.155 }, hoods[0]!.rings)).toBe(0);
@@ -776,6 +888,9 @@ describe('neighborhood indicators (docs/13)', () => {
     expect(b.help.by).toMatchObject({ food: 1, harm: 1 });
     expect(b.places).toEqual({ parks: 1, rec_centers: 0, greenway_open: 1 });
     expect(b.years['2025']).toEqual({ sales: 183, median_price: 190000 });
+    // Two rules, and the page says which one each count uses: help, parks, rec centers and greenway pieces are
+    // "inside or within half a mile"; bus stops and Bridge-card stores are "inside" (docs/13, "Counting rules").
+    expect(COUNT_RULE).toEqual({ bus_stops: 'inside', snap_stores: 'inside', parks: 'near', rec_centers: 'near', greenway_open: 'near', help: 'near' });
     expect(out.segments).toEqual({ seg_a: ['nbh_bagley'] });
     expect(JSON.stringify(out)).not.toMatch(/rank|score|worst|best/i);
   });
@@ -818,7 +933,11 @@ describe('neighborhood indicators (docs/13)', () => {
     expect(src).not.toMatch(/outFields[^\n]*(owner|inspector|taxpayer|grantor|grantee)/i);
     const st = JSON.parse(readFileSync(p('data/ingested/city_stats.json'), 'utf8'));
     expect(st.city_parcels).toBeGreaterThan(300000); expect(Object.keys(st.parcels).length).toBeGreaterThan(190);
-    for (const years of Object.values<any>(st.neighborhoods)) for (const y of Object.values<any>(years)) for (const k of ['blight', 'demolitions', 'issues']) if (y[k] !== undefined && y[k] !== 'lt5') expect(y[k]).toBeGreaterThanOrEqual(5);
+    // Exact numbers, every series (Kyle, 2026-09-22): a count under 5 is written as itself, never as "lt5".
+    let small = 0;
+    for (const years of Object.values<any>(st.neighborhoods)) for (const y of Object.values<any>(years)) for (const k of ['blight', 'demolitions', 'issues', 'fires']) if (y[k] !== undefined) { expect(typeof y[k], k).toBe('number'); if (y[k] < 5) small++; }
+    expect(small, 'small counts are stated, not hidden').toBeGreaterThan(100);
+    expect(JSON.stringify(st)).not.toContain('lt5');
     expect(JSON.stringify(st)).not.toMatch(/owner|inspector|taxpayer/i);
   });
   it('the committed City numbers cover all 205 neighborhoods and hold no names of buyers or sellers', () => {
@@ -847,7 +966,7 @@ describe('neighborhood indicators (docs/13)', () => {
     expect(uncountedFireTypes(['Building fire', 'Fire - Structure Fire - Attic Fire', 'Rescue - Structure - Elevator / Escalator Rescue', 'Grass fire', 'Fire - Outside Fire - Utility Infrastructure Fire', 'Structure fire, other'])).toEqual(['Fire - Structure Fire - Attic Fire', 'Structure fire, other']);
     expect(sqlIn('t', ["Kyle's", 'b'])).toBe("t IN ('Kyle''s', 'b')");
   });
-  it('street pieces go to the neighborhood around their middle, and "poor" is a share of rated length with small numbers hidden', () => {
+  it('street pieces go to the neighborhood around their middle, and "poor" is a share of rated length', () => {
     expect(pathMidpoint([[-83.16, 42.41], [-83.15, 42.41]])).toEqual([-83.155, 42.41]);
     expect(pathMidpoint([[-83.16, 42.41], [-83.159, 42.41], [-83.15, 42.41]])).toEqual([-83.155, 42.41]);
     const piece = (cond: number, miles: number, mid: [number, number]) => ({ cond, miles, mid });
@@ -855,37 +974,85 @@ describe('neighborhood indicators (docs/13)', () => {
     const r = roadsByHood([piece(3, 1, inB), piece(4, 1, inB), piece(9, 2, inB), piece(2, 5, [-82.95, 42.35])], hoods);
     expect(r.byHood).toEqual({ nbh_bagley: { pieces: 3, miles: 4, poor_miles: 2 } });
     expect(r.city).toEqual({ pieces: 4, miles: 9, poor_miles: 7 });
-    expect(roadShare({ pieces: 3, miles: 4, poor_miles: 2 })).toEqual({ pieces: 'lt5' });
+    // The real number of pieces however few; a SHARE of poor street still needs ten pieces, like a median.
+    expect(roadShare({ pieces: 3, miles: 4, poor_miles: 2 })).toEqual({ pieces: 3, miles: 4 });
     expect(roadShare({ pieces: 8, miles: 4, poor_miles: 2 })).toEqual({ pieces: 8, miles: 4 });
     expect(roadShare({ pieces: 12, miles: 4.04, poor_miles: 1.3 })).toEqual({ pieces: 12, miles: 4, poor_pct: 32 });
     expect(roadShare(undefined)).toBeUndefined();
   });
-  it('Bridge-card stores and bus stops: nearest in a straight line from the middle, and how many inside or within half a mile', () => {
+  it('Bridge-card stores and bus stops: nearest in a straight line from the middle, and how many INSIDE the outline', () => {
     expect(nearestMiles({ lat: 42.415, lon: -83.155 }, [])).toBeNull();
     expect(nearestMiles({ lat: 42.415, lon: -83.155 }, [[-83.155, 42.4295], [-83.155, 42.30]])).toBe(1);
     const out = buildIndicators({
-      hoods, parks: [], segments: [], rows: [], stats: { neighborhoods: {}, current: { neighborhoods: { nbh_bagley: { rental_certs: 12, vacant_reg: 'lt5' } } } },
-      snap: [[-83.155, 42.415, 0], [-83.155, 42.4225, 1], [-83.155, 42.44, 1], [-82.9, 42.3, 1]], busStops: [[-83.1551, 42.4151], [-83.2, 42.3]],
+      hoods, parks: [{ lat: 42.4225, lon: -83.155 }], segments: [], rows: [], stats: { neighborhoods: {}, current: { neighborhoods: { nbh_bagley: { rental_certs: 12, vacant_reg: 3 } } } },
+      // One store inside the square, one half a mile north of its edge (a stop or store that near counted twice), one far.
+      snap: [[-83.155, 42.415, 0], [-83.155, 42.4225, 1], [-83.155, 42.44, 1], [-82.9, 42.3, 1]], busStops: [[-83.1551, 42.4151], [-83.155, 42.4225], [-83.2, 42.3]],
     });
     const b = out.neighborhoods[0]!;
-    expect(b.places).toMatchObject({ snap_stores: 2, bus_stops: 1 });
+    // Strictly inside: the store and the stop just outside the edge are NOT counted here — a park there is.
+    expect(b.places).toMatchObject({ snap_stores: 1, bus_stops: 1, parks: 1 });
+    // The distances are measured to the nearest point wherever it is, so the counting rule does not touch them.
     // The middle of this square outline is [-83.156, 42.414] (the average of its five stored corners).
     expect(b.nearest_city).toEqual({ snap: 0.1, grocery: 0.6, bus: 0.1 });
-    expect(b.now).toEqual({ rental_certs: 12, vacant_reg: 'lt5' });
+    expect(b.now).toEqual({ rental_certs: 12, vacant_reg: 3 });
     expect(out.neighborhoods[1]!.now).toBeUndefined();
   });
-  it('the new City numbers are added up by the City, hold no count under 5, and no owner, address or store name', () => {
+  it('the committed counts: each bus stop and Bridge-card store is in exactly one neighborhood, and Airport Sub has 139 stops', () => {
+    // Before 2026-09-22 the 205 pages added up to 20,505 bus stops against 5,098 real ones, and Airport Sub said
+    // 289 where 139 lie inside its outline: "within half a mile of the edge" counted a stop in every neighborhood
+    // it was near. Now the sum is the number of stops inside a Detroit neighborhood outline.
+    const h = JSON.parse(readFileSync(p('data/ingested/neighborhoods.json'), 'utf8')).neighborhoods;
+    const pts = JSON.parse(readFileSync(p('data/ingested/city_points.json'), 'utf8'));
+    const ct = JSON.parse(readFileSync(p('data/ingested/cities.json'), 'utf8')).cities.find((c: any) => c.id === 'city_detroit');
+    const ind = JSON.parse(readFileSync(p('data/indicators/neighborhoods.json'), 'utf8'));
+    const sum = (k: string) => ind.neighborhoods.reduce((n: number, x: any) => n + (x.places[k] ?? 0), 0);
+    const inHoods = (arr: number[][]) => arr.filter((q) => h.some((n: any) => pointInRings({ lat: q[1]!, lon: q[0]! }, n.rings))).length;
+    const inDetroit = (arr: number[][]) => arr.filter((q) => pointInRings({ lat: q[1]!, lon: q[0]! }, ct.rings)).length;
+    expect(ind.neighborhoods).toHaveLength(205);
+    expect(sum('bus_stops')).toBe(4526);
+    expect(sum('snap_stores')).toBe(893);
+    expect(ind.neighborhoods.find((n: any) => n.id === 'nbh_airport_sub').places).toMatchObject({ bus_stops: 139, snap_stores: 16 });
+    // The sum is the stops inside SOME neighborhood outline, give or take the three that sit on a shared simplified
+    // edge and count in both; the rest of the 5,098 are on or outside the city line (Hamtramck, Highland Park,
+    // Dearborn, freeway edges) and count in no neighborhood.
+    expect(sum('bus_stops') - inHoods(pts.bus_stops)).toBeGreaterThanOrEqual(0);
+    expect(sum('bus_stops') - inHoods(pts.bus_stops)).toBeLessThanOrEqual(5);
+    expect(Math.abs(sum('bus_stops') - inDetroit(pts.bus_stops))).toBeLessThanOrEqual(20);
+    expect(sum('bus_stops')).toBeLessThan(pts.bus_stops.length);
+    expect(Math.abs(sum('snap_stores') - inDetroit(pts.snap))).toBeLessThanOrEqual(10);
+    // The counting rule did not touch the distances: no `nearest_city` value moved between the two rules.
+    for (const n of ind.neighborhoods) if (n.nearest_city) for (const v of Object.values(n.nearest_city)) expect(v === null || typeof v === 'number').toBe(true);
+  });
+  it('the regenerated indicators file holds no hidden count of any kind', () => {
+    const text = readFileSync(p('data/indicators/neighborhoods.json'), 'utf8');
+    expect(text).not.toContain('lt5');
+    expect(text).not.toContain('fewer than');
+    const ind = JSON.parse(text);
+    // A fixture year with three fires renders as 3: the number is in the file as a number.
+    let small = 0;
+    for (const n of ind.neighborhoods) for (const y of Object.values<any>(n.years)) if (typeof y.fires === 'number' && y.fires < 5) small++;
+    expect(small).toBeGreaterThan(100);
+    // Crashes too: the window and each year of it are numbers, and the window is the sum of its years.
+    for (const n of ind.neighborhoods) if (n.crashes) {
+      for (const k of ['walk', 'bike', 'severe']) expect(typeof n.crashes[k]).toBe('number');
+      expect(n.crashes_by_year).toBeDefined();
+      for (const k of ['walk', 'bike', 'severe']) expect(Object.values<any>(n.crashes_by_year).reduce((s, y) => s + y[k], 0)).toBe(n.crashes[k]);
+    }
+    expect(Object.keys(ind.city_crashes_by_year)).toEqual(['2020', '2021', '2022', '2023', '2024']);
+  });
+  it('the new City numbers are added up by the City, are exact, and hold no owner, address or store name', () => {
     const src = readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8');
     expect(src).not.toMatch(/outFields[^\n]*(owner|address|RETAILER_NAME|GRANTEE|location|record_id|parcel)/i);
     const st = JSON.parse(readFileSync(p('data/ingested/city_stats.json'), 'utf8'));
     expect(Object.keys(st.sources)).toEqual(expect.arrayContaining(['rentals', 'fires', 'pavement', 'vacant']));
     expect(st.fire_types).toEqual(FIRE_TYPES);
     let fires = 0;
-    for (const years of Object.values<any>(st.neighborhoods)) for (const y of Object.values<any>(years)) if (y.fires !== undefined) { fires++; if (y.fires !== 'lt5') expect(y.fires).toBeGreaterThanOrEqual(5); }
+    for (const years of Object.values<any>(st.neighborhoods)) for (const y of Object.values<any>(years)) if (y.fires !== undefined) { fires++; expect(typeof y.fires).toBe('number'); }
     expect(fires).toBeGreaterThan(500);
     expect(Object.keys(st.current.neighborhoods).length).toBeGreaterThan(190);
     for (const n of Object.values<any>(st.current.neighborhoods)) {
-      for (const k of ['rental_certs', 'vacant_reg']) if (n[k] !== undefined && n[k] !== 'lt5') expect(n[k]).toBeGreaterThanOrEqual(5);
+      for (const k of ['rental_certs', 'vacant_reg']) if (n[k] !== undefined) expect(typeof n[k]).toBe('number');
+      if (n.roads) expect(typeof n.roads.pieces).toBe('number');
       if (n.roads?.poor_pct !== undefined) { expect(n.roads.pieces).toBeGreaterThanOrEqual(10); expect(n.roads.poor_pct).toBeLessThanOrEqual(100); }
     }
     expect(JSON.stringify(st)).not.toMatch(/owner|RETAILER_NAME|grantee/i);

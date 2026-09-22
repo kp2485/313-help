@@ -160,12 +160,62 @@ class AnchorViewTest {
     private fun metresPerDp(c: MapCamera): Double = MapProjection.METERS_PER_UNIT / c.scale
 
     @Test
-    fun `the anchor is the civic point the app already carries`() {
-        // Detroit City Hall (Coleman A. Young Municipal Center) — the `detroit` service area's reference point.
-        assertEquals(42.3293, MAP_ANCHOR.lat, 1e-9)
-        assertEquals(-83.0452, MAP_ANCHOR.lon, 1e-9)
+    fun `the anchor is City Hall, nudged up Woodward, at two miles`() {
+        // Detroit City Hall (Coleman A. Young Municipal Center) — the `detroit` service area's reference point,
+        // which is still what the app SAYS in words.
+        assertEquals(42.3293, CITY_HALL.lat, 1e-9)
+        assertEquals(-83.0452, CITY_HALL.lon, 1e-9)
+        // The view opens 0.6 mile up Woodward from it (Grand Circus Park), because a two-mile box centred on City
+        // Hall itself spends a third of its height on Windsor (DECISIONS 2026-09-22).
+        assertEquals(42.3366, MAP_ANCHOR.lat, 1e-9)
+        assertEquals(-83.0514, MAP_ANCHOR.lon, 1e-9)
         assertTrue(inServiceArea(MAP_ANCHOR))
-        assertEquals(4023.36, ANCHOR_RADIUS_METERS, 0.001)          // two and a half miles, in metres
+        // The pinned number really is the nudge it claims to be: north of City Hall, west of it, and 0.6 mile away.
+        assertTrue("the anchor is north of City Hall", MAP_ANCHOR.lat > CITY_HALL.lat)
+        assertTrue("and west of it", MAP_ANCHOR.lon < CITY_HALL.lon)
+        val miles = kotlin.math.hypot(
+            (MAP_ANCHOR.lat - CITY_HALL.lat) * 69.0,
+            (MAP_ANCHOR.lon - CITY_HALL.lon) * 69.0 * MapProjection.K,
+        )
+        assertEquals(ANCHOR_NUDGE_MILES, miles, 0.02)
+        // **One radius people can learn**: the anchor view and the you-are-here view are the same two miles.
+        assertEquals(3218.688, ANCHOR_RADIUS_METERS, 0.001)
+        assertEquals(LOCATE_RADIUS_METERS, ANCHOR_RADIUS_METERS, 0.0)
+    }
+
+    /**
+     * The three ways in are one decision: a location, then a junction a person typed, then the anchor — and the
+     * card's three buttons all mark it answered while only one of them asks the system for anything.
+     */
+    @Test
+    fun `the card's three answers`() {
+        val yes = locateCardClick(LocateCardAnswer.YES)
+        assertTrue("\"Use my location\" asks", yes.ask)
+        assertTrue("and remembers, so the card does not come back", yes.remember)
+        assertTrue("it does not close the card itself; the fix or the refusal does", !yes.close)
+
+        val cross = locateCardClick(LocateCardAnswer.CROSS)
+        assertTrue("\"Type a cross street\" asks the system for nothing at all", !cross.ask)
+        assertTrue("it opens the field", cross.openCrossStreet)
+        assertTrue("closes the card", cross.close)
+        assertTrue("and is an answer, so the card is not shown again", cross.remember)
+
+        val no = locateCardClick(LocateCardAnswer.NO)
+        assertTrue(!no.ask)
+        assertTrue(!no.openCrossStreet)
+        assertTrue(no.close)
+        assertTrue(no.remember)
+    }
+
+    /**
+     * **We listen for five minutes and say so after ten seconds.** Giving up at ten was the app being honest about
+     * its own patience and wrong about a phone with no network (Kyle, 2026-09-22).
+     */
+    @Test
+    fun `the ask runs for five minutes and speaks up after ten seconds`() {
+        assertEquals(10_000L, LOCATE_SLOW_MS)
+        assertEquals(300_000L, LOCATE_TIMEOUT_MS)
+        assertTrue("the slow note must come long before we stop", LOCATE_SLOW_MS < LOCATE_TIMEOUT_MS)
     }
 
     @Test
@@ -180,11 +230,12 @@ class AnchorViewTest {
     }
 
     @Test
-    fun `five miles across the shorter side, portrait or landscape`() {
+    fun `four miles across the shorter side, portrait or landscape`() {
         val (centre, radius) = openingView(null)
         for (size in listOf(phoneW to phoneH, phoneH to phoneW, laptopW to laptopH)) {
             val cam = MapCamera.forRadius(centre, radius, size.first, size.second)
-            assertEquals(8046.72, metresAcrossShortSide(cam), 1.0)
+            // Two miles in every direction, which is the one radius the whole app opens on now.
+            assertEquals(6437.376, metresAcrossShortSide(cam), 1.0)
         }
     }
 

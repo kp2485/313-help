@@ -38,6 +38,13 @@
     <color name="lyr_smart">#0F766E</color>
     <color name="lyr_rail">#7E22CE</color>
     <color name="lyr_bike">#C2410C</color>
+    <!-- The two tones one trip is drawn in (DECISIONS 2026-09-22): byte for byte the web's route-walk and
+         route-ride tokens (apps/web/src/style.css). A walking leg is solid in the walk tone; a ride wears its own
+         agency's layer tone (lyr_bus, lyr_smart, lyr_rail) and a dash, and falls back to the ride tone when the
+         agency is one we have no layer for. Colour never carries the meaning: every leg is also a numbered
+         sentence in the step list below the map. -->
+    <color name="route_walk">#9D1B6A</color>
+    <color name="route_ride">#00558F</color>
     <color name="grp_food">#A16207</color>
     <color name="grp_shelter">#4338CA</color>
     <color name="grp_health">#BE185D</color>
@@ -52,4 +59,5 @@
          other in both themes and under colour-blind simulation. -->
     <color name="chart_a">#0B6B43</color>
     <color name="chart_b">#1D4ED8</color>
+    <color name="chart_c">#B5177A</color>
 </resources>

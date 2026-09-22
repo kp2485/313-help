@@ -83,6 +83,10 @@ class MapPalette(private val context: Context) {
         "gwBuild" -> c(R.color.gw_build)
         "gwFund" -> c(R.color.gw_fund)
         "gwPlan" -> c(R.color.gw_plan)
+        // The two tones one trip is drawn in (DirWords.rideToken). A ride names its agency's own layer token
+        // above; "routeRide" is what an agency we carry no layer for falls back to.
+        "routeWalk" -> c(R.color.route_walk)
+        "routeRide" -> c(R.color.route_ride)
         else -> brand
     }
 

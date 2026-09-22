@@ -1,8 +1,8 @@
 // The chart model behind Table | Chart on a neighborhood's year panels (docs/13, 2026-09-22).
 //
 // These are the web's cases in `apps/web/test/hoodchart.test.ts`, ported one for one: the same years, the same
-// counts, the same expected points, markers, segments, axis and sentence. If the two ever disagree, one of the two
-// apps is drawing something the other is not.
+// counts, the same expected points, segments, axis and sentence. If the two ever disagree, one of the two apps is
+// drawing something the other is not. Since 2026-09-22 nothing is hidden: a 3 is a 3, in every series.
 import XCTest
 @testable import HelpCore
 
@@ -21,14 +21,13 @@ final class HoodChartTests: XCTestCase {
     /// The app's own words, as the screen hands them in.
     private func words(_ key: String, _ p: [String: String]) -> String {
         let table = [
-            "hood.lt5": "fewer than 5",
             "hood.none_recorded": "none recorded",
+            "hood.days": "{n} days",
             "hood.so_far": "{year} so far",
             "hood.chart_bar": "{year}, {label}: {count}",
             "hood.chart_summary": "The chart shows each year from {from} to {to}. Most in one year: {most}.",
             "hood.chart_peak": "{label}, {count} in {year}",
             "hood.chart_peak_none": "{label}, no year has a number we can show",
-            "hood.chart_lt5_note": "A year with fewer than 5 shows a hollow marker at a fixed height, not a value.",
             "list.sep": ", ",
         ]
         var out = table[key] ?? "MISSING:" + key
@@ -36,45 +35,58 @@ final class HoodChartTests: XCTestCase {
         return out
     }
 
-    // MARK: - points, segments, markers and blanks
+    // MARK: - points, segments and blanks
 
-    func testASeriesBecomesPointsSegmentsMarkersAndBlanksAndNeverMixesThemUp() {
-        let m = HoodChart.model([one([.number(12), .suppressed, nil, .number(24), .number(7), .number(7)])])
+    func testASeriesBecomesPointsSegmentsAndBlanksAndNeverMixesThemUp() {
+        let m = HoodChart.model([one([.number(12), .number(2), nil, .number(24), .number(7), .number(7)])])
         let s = m.series[0]
-        XCTAssertEqual(s.points.map(\.kind), [.value, .hidden, .none, .value, .value, .value])
-        XCTAssertEqual(s.markers, ["2021"])
+        XCTAssertEqual(s.points.map(\.kind), [.value, .value, .none, .value, .value, .value])
         XCTAssertEqual(s.blanks, ["2022"])
-        XCTAssertNil(s.points[1].value)
-        XCTAssertEqual(s.points[1].frac, HoodChart.markerFraction, accuracy: 1e-12)
-        // No piece of line crosses the year with nothing recorded; the pieces that touch the hidden one are dotted.
+        XCTAssertEqual(s.points[1].value, 2)
+        XCTAssertEqual(s.points[1].frac, 2.0 / Double(m.top), accuracy: 1e-12)
+        // No piece of line crosses the year with nothing recorded.
         XCTAssertEqual(s.segments, [
-            HoodChart.Segment(from: 0, to: 1, dotted: true),
-            HoodChart.Segment(from: 3, to: 4, dotted: false),
-            HoodChart.Segment(from: 4, to: 5, dotted: false),
+            HoodChart.Segment(from: 0, to: 1),
+            HoodChart.Segment(from: 3, to: 4),
+            HoodChart.Segment(from: 4, to: 5),
         ])
     }
 
-    /// The whole point of the marker: there is no path from a hidden count to a value.
-    func testAHiddenCountIsNeverAValue() {
-        let hidden: HoodCount? = .suppressed
-        let m = HoodChart.model([one([hidden, hidden, hidden, .number(40), hidden, hidden])])
-        XCTAssertEqual(m.series[0].points.filter { $0.kind == .value }.count, 1)
-        XCTAssertEqual(m.series[0].markers.count, 5)
-        for p in m.series[0].points where p.kind == .hidden {
-            XCTAssertNil(p.value)
-            XCTAssertEqual(p.frac, HoodChart.markerFraction, accuracy: 1e-12)
-        }
-        XCTAssertEqual(HoodChart.markerFraction, 10.0 / 96.0, accuracy: 1e-12)
+    /// A 3 is drawn at 3: three quarters of an axis whose top is 4 (the web's case).
+    func testASmallCountIsDrawnAtItsValue() {
+        let m = HoodChart.model([one([.number(3), .number(4), .number(4), nil, nil, nil])])
+        XCTAssertEqual(m.top, 4)
+        XCTAssertEqual(m.series[0].points[0].kind, .value)
+        XCTAssertEqual(m.series[0].points[0].frac, 0.75, accuracy: 1e-12)
+        XCTAssertEqual(m.ticks, [0, 1, 2, 3, 4])
     }
 
-    /// And it can never be lined up against a tick and read as a number.
-    func testAMarkerAlwaysSitsBelowTheFirstTickOverZero() {
-        for counts in [[5, 6, 7], [12, 18, 24, 31, 9], [200, 410, 90], [6, 6, 6], [1, 2, 3]] {
-            let m = HoodChart.model([HoodChart.Series(key: "x", tone: .a, label: "x",
-                points: counts.enumerated().map { HoodChart.Point(year: String(2020 + $0.offset), count: .number($0.element)) })])
-            let firstTick = m.ticks.first(where: { $0 > 0 }) ?? m.top
-            XCTAssertLessThan(HoodChart.markerValue(top: m.top), Double(firstTick), "top \(m.top)")
-        }
+    /// A chart holds one unit: days are said as days, in the point and in the summary.
+    func testAChartHoldsOneUnitAndSaysDaysAsDays() {
+        let days = HoodChart.Series(key: "days", tone: .a, label: "Middle time to close",
+                                    points: points([.number(8), .number(21), .number(40), .number(12), .number(9), .number(5)]), unit: .days)
+        let m = HoodChart.model([days])
+        XCTAssertEqual(m.unit, .days)
+        XCTAssertEqual(HoodChart.pointText(m.series[0].points[2], label: "Middle time to close", unit: .days, words: words), "2022, Middle time to close: 40 days")
+        XCTAssertTrue(HoodChart.summary(m, words: words).contains("Middle time to close, 40 days in 2022"))
+        XCTAssertEqual(HoodChart.model([one(sales)]).unit, .count)
+    }
+
+    /// The crash chart: three series from the years, oldest first, walking / biking / badly hurt as a / b / c.
+    func testCrashSeriesAreThreeLinesFromTheYears() {
+        let by: [String: HoodCrashes] = [
+            "2021": HoodCrashes(walk: .number(12), bike: .number(2), severe: .number(5)),
+            "2020": HoodCrashes(walk: .number(12), bike: .number(1), severe: .number(5)),
+            "2022": HoodCrashes(walk: .number(8), bike: .number(0), severe: .number(4)),
+        ]
+        let s = HoodChart.crashSeries(by, labels: (walk: "Walking", bike: "Biking", severe: "Killed or badly hurt"))
+        XCTAssertEqual(s.map(\.key), ["walk", "bike", "severe"])
+        XCTAssertEqual(s.map(\.tone), [.a, .b, .c])
+        XCTAssertEqual(s[0].points.map(\.year), ["2020", "2021", "2022"])
+        XCTAssertEqual(s[1].points.map { $0.count?.shown }, [1, 2, 0])
+        XCTAssertTrue(HoodChart.crashSeries(nil, labels: (walk: "", bike: "", severe: "")).isEmpty)
+        let m = HoodChart.model(s)
+        XCTAssertEqual(HoodChart.pointText(m.series[1].points[2], label: "Biking", words: words), "2022, Biking: 0")
     }
 
     func testTheEarliestOfTwoEqualPeaksIsNamed() {
@@ -85,16 +97,18 @@ final class HoodChartTests: XCTestCase {
 
     // MARK: - the axis
 
-    func testTheAxisStartsAtZeroAndNeverLabelsAValueUnderFive() {
-        for counts in [[5, 6, 7], [12, 3, 18, 24, 31, 9], [200, 410, 90], [1, 1, 2]] {
+    func testTheAxisStartsAtZeroEndsOnARoundNumberAndLabelsSmallValuesExactly() {
+        for counts in [[5, 6, 7], [12, 3, 18, 24, 31, 9], [200, 410, 90], [1, 1, 2], [0, 0, 0]] {
             let m = HoodChart.model([HoodChart.Series(key: "x", tone: .a, label: "x",
                 points: counts.enumerated().map { HoodChart.Point(year: String(2020 + $0.offset), count: .number($0.element)) })])
             XCTAssertEqual(m.ticks.first, 0, "\(counts)")
-            XCTAssertGreaterThanOrEqual(m.top, 5, "\(counts)")
+            XCTAssertGreaterThanOrEqual(m.top, Swift.max(1, counts.max() ?? 0), "\(counts)")
             XCTAssertEqual(m.ticks.last, m.top, "\(counts)")
-            for t in m.ticks { XCTAssertTrue(t == 0 || t >= 5, "tick \(t) in \(counts)") }
+            XCTAssertLessThanOrEqual(m.ticks.count, 6)
             for p in m.series[0].points { XCTAssertLessThanOrEqual(p.frac, 1.0) }
         }
+        XCTAssertEqual(HoodChart.model([one([.number(1), .number(1), .number(2), nil, nil, nil])]).ticks, [0, 1, 2])
+        XCTAssertEqual(HoodChart.model([one([.number(0), .number(0), .number(0), nil, nil, nil])]).top, 1)
     }
 
     /// Two series share ONE axis: its top is the larger of the two, never one scale each.
@@ -106,11 +120,13 @@ final class HoodChartTests: XCTestCase {
         XCTAssertEqual(m.series[1].points[0].frac, 6.0 / Double(m.top), accuracy: 1e-12)
     }
 
-    func testAnAllHiddenSeriesHasAnAxisOfFive() {
-        let m = HoodChart.model([one([.suppressed, .suppressed, .suppressed, nil, nil, nil])])
-        XCTAssertEqual(m.top, 5)
-        XCTAssertEqual(m.ticks, [0, 5])
+    func testAnEmptySeriesHasAnAxisOfOneAndNoPeak() {
+        let m = HoodChart.model([one([nil, nil, nil, nil, nil, nil])])
+        XCTAssertEqual(m.top, 1)
+        XCTAssertEqual(m.ticks, [0, 1])
         XCTAssertNil(m.series[0].peak)
+        XCTAssertFalse(HoodChart.anyValue(m.series[0].points.map { HoodChart.Point(year: $0.year, count: nil) }))
+        XCTAssertTrue(HoodChart.anyValue(points([nil, nil, .number(0), nil, nil, nil])))
     }
 
     func testTheStepIsAlwaysAOneATwoOrAFiveTimesAPowerOfTen() {
@@ -135,12 +151,11 @@ final class HoodChartTests: XCTestCase {
 
     // MARK: - when a chart is offered at all
 
-    func testAChartIsOfferedOnlyForThreeYearsWithAtLeastOneNumberToDraw() {
+    func testAChartIsOfferedOnlyForThreeYearsWithANumber() {
         XCTAssertTrue(HoodChart.chartable(points([.number(12), .number(14), .number(16), nil, nil, nil])))
+        XCTAssertTrue(HoodChart.chartable(points([.number(0), .number(0), .number(0), nil, nil, nil])))
         XCTAssertFalse(HoodChart.chartable(points([.number(12), .number(14), nil, nil, nil, nil])))
         XCTAssertFalse(HoodChart.chartable(points([.number(12), nil, nil, .number(14), nil, nil])))
-        XCTAssertFalse(HoodChart.chartable(points([.suppressed, .suppressed, .suppressed, nil, nil, nil])))
-        XCTAssertTrue(HoodChart.chartable(points([.suppressed, .suppressed, .number(7), nil, nil, nil])))
     }
 
     // MARK: - the labels under the axis
@@ -156,26 +171,24 @@ final class HoodChartTests: XCTestCase {
 
     // MARK: - the words
 
-    func testAPointSaysItsYearItsSeriesAndItsCountAndNeverADigitForAHiddenOne() {
+    func testAPointSaysItsYearItsSeriesAndItsExactCount() {
         let m = HoodChart.model([one(sales, label: "Homes sold")])
         XCTAssertEqual(HoodChart.pointText(m.series[0].points[0], label: "Homes sold", words: words), "2020, Homes sold: 12")
         XCTAssertEqual(HoodChart.pointText(m.series[0].points[1], label: "Homes sold", words: words), "2021, Homes sold: 3")
-        let hid = HoodChart.model([one([.suppressed, .suppressed, .suppressed, .number(9), nil, nil], label: "Torn down")])
-        XCTAssertEqual(HoodChart.pointText(hid.series[0].points[0], label: "Torn down", words: words), "2020, Torn down: fewer than 5")
-        XCTAssertEqual(HoodChart.pointText(hid.series[0].points[4], label: "Torn down", words: words), "2024, Torn down: none recorded")
+        let small = HoodChart.model([one([.number(3), .number(1), .number(0), .number(9), nil, nil], label: "Torn down")])
+        XCTAssertEqual(HoodChart.pointText(small.series[0].points[0], label: "Torn down", words: words), "2020, Torn down: 3")
+        XCTAssertEqual(HoodChart.pointText(small.series[0].points[2], label: "Torn down", words: words), "2022, Torn down: 0")
+        XCTAssertEqual(HoodChart.pointText(small.series[0].points[4], label: "Torn down", words: words), "2024, Torn down: none recorded")
         // The year that is still running says so, exactly as its table row does.
         let sofar = HoodChart.model([HoodChart.Series(key: "x", tone: .a, label: "Homes sold", points: points(sales, partial: "2025"))])
         XCTAssertEqual(HoodChart.pointText(sofar.series[0].points[5], label: "Homes sold", words: words), "2025 so far, Homes sold: 9")
     }
 
-    func testTheSummarySaysWhatIsDrawnOverWhichYearsAndThatHiddenYearsAreNotDrawnAtAValue() {
-        let m = HoodChart.model([one([.suppressed, .number(12), .number(31), nil, nil, nil], label: "Torn down")])
+    func testTheSummarySaysWhatIsDrawnOverWhichYearsAndEachSeriesBiggestYear() {
+        let m = HoodChart.model([one([.number(2), .number(12), .number(31), nil, nil, nil], label: "Torn down")])
         let s = HoodChart.summary(m, words: words)
-        XCTAssertEqual(s, "The chart shows each year from 2020 to 2025. Most in one year: Torn down, 31 in 2022. "
-                       + "A year with fewer than 5 shows a hollow marker at a fixed height, not a value.")
-        // No hidden year, no sentence about hidden years.
-        let plain = HoodChart.model([one([.number(12), .number(14), .number(16), nil, nil, nil], label: "Homes sold")])
-        XCTAssertFalse(HoodChart.summary(plain, words: words).contains("hollow marker"))
+        XCTAssertEqual(s, "The chart shows each year from 2020 to 2025. Most in one year: Torn down, 31 in 2022.")
+        XCTAssertFalse(s.contains("fewer than"))
         // Never a trend: the sentence describes, it does not explain (docs/13, honesty rule 4).
         for word in ["rising", "falling", "better", "worse", "trend"] {
             XCTAssertFalse(s.lowercased().contains(word), word)

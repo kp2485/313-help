@@ -33,6 +33,9 @@
     <color name="lyr_smart">#4FD1C5</color>
     <color name="lyr_rail">#C79BFF</color>
     <color name="lyr_bike">#FB923C</color>
+    <!-- The trip's two tones in the dark theme (apps/web/src/style.css). -->
+    <color name="route_walk">#FF8AD4</color>
+    <color name="route_ride">#73C2FF</color>
     <color name="grp_food">#E3B341</color>
     <color name="grp_shelter">#A5B4FC</color>
     <color name="grp_health">#F9A8D4</color>
@@ -47,4 +50,5 @@
          other in both themes and under colour-blind simulation. -->
     <color name="chart_a">#35A870</color>
     <color name="chart_b">#5B8DE0</color>
+    <color name="chart_c">#C86AA0</color>
 </resources>
