@@ -651,7 +651,7 @@ final class MapModel {
     /// can never disagree about which shapes are there.
     var areasShown: [AreaOutline] {
         guard isOn(areasLayerId) else { return [] }
-        return areasDrawn(areas, view: camera.visible, metersPerPoint: camera.metersPerPoint)
+        return areasDrawn(areas, view: camera.visible)
     }
     func area(id: String) -> AreaOutline? { areas.first { $0.id == id } }
 

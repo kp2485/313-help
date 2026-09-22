@@ -747,3 +747,140 @@ item above is already what the other two clients do. From the two implementers, 
       48 dp hit boxes; TalkBack traversal order per section 9 via `semantics { traversalIndex }`.
 - [ ] Tests (`ParityTest`-style): shared fixtures; real `.net.json` files decode; ratios ≥ 3:1.
 - [ ] Screenshots: the same list on a Pixel-class emulator, light/dark, font scale 1.5, TalkBack on.
+
+---
+
+## 15. Neighbourhood and city boundaries (both styles)
+
+**Status:** spec, 2026-09-22, built on the web (`apps/web/src/bounds.ts`, drawn in `map.ts`). iPhone and Android
+next. Nothing here depends on the map style: boundaries are drawn identically in `standard` and `subway`, and
+section 4.3's quietened basemap explicitly leaves them alone.
+
+Kyle, 2026-09-22: *"The user needs to be able to see the boundaries of the neighborhoods on the map."*
+
+Until that day the outlines layer (`place:areas`) was **off by default on the Map tab** and a neighbourhood was
+drawn only under 14 m per pixel. The Map tab opens on the whole city, so in practice a person saw four city edges
+and none of the 205 neighbourhoods they had come to find. Two things changed: the layer is in `DEFAULT_LAYERS`,
+and every outline is drawn in every band — what keeps 205 of them from being a mesh is **weight**, not hiding.
+
+### 15.1 The table
+
+`boundaryStyle(mpp)` — pure, no theme, no stylesheet, no position. Units are **u** (1 CSS px = 1 pt = 1 dp), as
+everywhere else in this document. The bands are section 5's, unchanged, so there is one ladder to port
+(`city` is section 5's `far`).
+
+| band | mpp | neighbourhood | city outline | dash (u, absolute) | names |
+|---|---|---|---|---|---|
+| **city** | > 30 | **1.1** | **1.5** | `[2, 2]` | **none** |
+| **mid** | 12 – 30 | **1.6** | **2.4** | `[3, 3]` | yes, ≤ **12** a frame |
+| **near** | < 12 | **2.2** | **3.0** | `[6, 3]` | yes, ≤ **12** a frame |
+
+- **The dash is absolute**, not `× lineWidth` the way a transit dash is (section 2). A thin line whose dash
+  scales with it stops being dashed; the dashed texture is what says "this is not a street". The **"on" length
+  is never shorter than the stroke is wide** (a test holds it): a dash shorter than that reads as dust.
+- **A city outline is heavier than a neighbourhood's, and that is the only difference between them.** Never a
+  different colour, and never a fill: docs/13 rule 1 forbids a choropleth, and weight is the one channel that
+  carries "bigger thing" without carrying a value.
+- **At city zoom 1.1 u is still thinner than the thinnest street drawn there.** Section 2's basemap draws
+  classes 0–2 above 11 mpp, and their width floor is 1.6. So a boundary is never mistaken for a road, and the
+  lattice sits under everything. This is the one number a later "make it stronger" pass may not simply raise.
+- **These numbers were strengthened twice, from the screenshots rather than from the table.** The first draft
+  (0.6 / 1.1 / 1.8 on `[1, 3]`, `[2, 3]`, `[5, 3]`) vanished at city zoom under the help dots; the second
+  (0.9 / 1.1 / 1.8) still read faint at mid zoom beside the streets, and the whole ask was that a person can
+  SEE the boundary. **Porters: copy the table above, not an earlier draft of it.**
+- **Names:** centred on the outline's bounding box, horizontal, never rotated, weight 700 size 13, halo 3.5 in
+  `--map-land` — and **left-to-right on an Arabic screen like every other name on the map** (section 8: the map
+  never mirrors). A name is offered only when its outline is at least **70 u** wide on screen
+  (`BOUNDARY_NAME_MIN_PX`), the candidates are taken **nearest the middle of the screen first**, the band's cap
+  is **12**, and each one still goes through the map's existing collision test (`free()` in `map.ts`): a name
+  that does not fit is dropped, never shrunk and never overlapped. Area names are placed before park names and
+  after street names, so the bigger thing wins.
+- **The tapped / current outline**: solid, `--focus`, width **4**, with a wash of `--brand` at **0.08** over its
+  rings (even-odd). That is a selection, not a value. (It was 3 when an ordinary outline was at most 1.6; it has
+  to stay clear of the 3.0 a city outline now carries at near zoom.)
+- **Hysteresis** is not applied here. A boundary has no badge to flicker and no cached geometry; recomputing a
+  width on a band change costs nothing. (A porter that already has section 5's `zoomBand` with its 5 % hysteresis
+  may reuse it; either answer is within a pixel.)
+
+### 15.2 The token
+
+| token | light | dark | light + more contrast | dark + more contrast | forced colours |
+|---|---|---|---|---|---|
+| `--map-bnd` | `#7a5588` | `#a98cbb` | `#5a3a6b` | `#cdb4da` | `GrayText` |
+
+Contrast, computed from the tokens in `apps/web/src/style.css` (floor 3.00; the web test walks all four modes):
+
+| pair | light | dark | light + contrast | dark + contrast |
+|---|---|---|---|---|
+| boundary / `--map-land` | 5.70 | 5.77 | 9.32 | 9.84 |
+| boundary / `--map-park` | 4.36 | 4.20 | 7.68 | 7.58 |
+| boundary / `--map-out` (the hatched ground outside the four cities, which a city outline runs along) | 4.88 | 6.75 | 7.92 | 11.14 |
+
+For scale: a main road is 4.91 against the land in the light theme and a side street 4.01. The boundary now sits
+just above the main road — which is the point. The first values (`#8d6a9a` / `#9f83b1`, land 4.26 / 5.13) cleared
+the 3.00 floor and still read faint at mid zoom, because a 1.6 u dashed line has far less ink on the screen than
+a 4 u solid road of the same swatch. Contrast is a floor, not the whole answer; the screenshots are the answer.
+
+It is **deliberately not a street colour.** `--map-road`, `--map-main` and `--map-fwy` are all within a step of
+each other in grey-green (section 2), and an administrative edge that wears one of them is not a boundary, it is
+a road. A plum reads as "administrative" beside them, while the thin stroke and the gaps keep it quiet under the
+help. Under forced colours it is a system keyword like every other map token, and the **dash** is then the only
+thing telling it from a street — the same argument section 4.4 makes for the greenway's four phases.
+
+Against the quietened basemap of section 4.3 nothing changes: the quiet park is lighter than the park in the
+light theme and darker than it in the dark theme, so every ratio above is a floor.
+
+### 15.3 Draw order
+
+Boundaries are **step 4½** of section 11: after the streets (3) and the city fill and edge of the basemap, and
+before bike lanes (6) and everything above them. So: **over the ground, the parks and the streets; under the
+transit lines, the greenway, the listing dots, the labels and the focus ring.** Switching boundaries on can
+never hide a place that helps. (Section 11's "4 city boundary · 5 neighbourhood outline" is this step; it is now
+one pass with one table, and the neighbourhood is no longer conditional on the zoom.)
+
+### 15.4 On by default, and the one-time migration
+
+`place:areas` is in `DEFAULT_LAYERS` (`apps/web/src/layers.ts`). A phone that has never touched the switcher
+simply gets it. A phone that **has** never reads the defaults again, so it would have gone on seeing no
+boundaries for ever; adding the layer on every load instead would mean nobody could switch it off. So:
+
+- a **version marker** lives beside the layer list (web: the `layers_v` key in the same IndexedDB store;
+  iPhone: the excluded-from-backup state file; Android: the app-private state file), value `LAYERS_VERSION = 2`;
+- on load, a stored list with **no marker, or an older one**, gains `place:areas` once (at the end, nothing else
+  touched, the 30-layer cap still applied), and the marker is written;
+- **every write of the layer list writes the marker too**, so a choice made after the migration — including
+  "off" — is never migrated again.
+
+### 15.5 In words
+
+- The layer is named **`layer.place.areas` = "Neighborhood and city boundaries"** (reworded 2026-09-22 from
+  "City and neighborhood outlines"; all four languages). That one string is the switcher's label, the key's row
+  and the list's heading, so the three can never drift.
+- **The key under the map** (`mapKeyHtml` in `apps/web/src/stylepanel.ts`, formerly `subwayKeyHtml`) carries a
+  dotted boundary sample and that name whenever the layer is on, **in either map style**, under the one
+  `map.key` heading it shares with the subway rows.
+- **"See this map as a list"** gains a section with the same heading, a count, and the area names, bounded at 30
+  with `map.list_more` — exactly as the parks section works, and the same answer the Areas tab's list gives.
+- Nothing about the outline a person tapped is written down: the selection is a field on the view, the page is
+  told through a callback, and `bounds.ts` touches no storage at all.
+
+### 15.6 For the porters
+
+- [x] Web: `bounds.ts`, `map.ts` (one pass), `layers.ts` (defaults + marker), `maplist.ts`, `stylepanel.ts`,
+      `style.css` (`--map-bnd` ×4 modes, `.trkey i.bnd`), `apps/web/test/boundaries.test.ts`, the contrast walk
+      in `web.test.ts`. Screenshots: `docs/img/map-boundaries/`.
+- [x] iPhone (2026-09-22): `HelpCore/Boundaries.swift` with `boundaryBand` / `boundaryStyle` against the same
+      table; `MapToken.boundary` carries `--map-bnd` in all four values (`MapStyle.swift`, resolved by
+      `MapPalette.swift`); `MapCanvas` draws the pass between the streets and the transit lines, names
+      nearest-centre-first through the map's own collision test; `defaultMapLayers` gains the layer and
+      `layersVersion` / `migrateMapLayers` do the once-only migration in `state/map-layers.json`; the key row
+      and the list section are in `MapScreen.swift`. `areasDrawn` no longer takes a zoom and
+      `areaDetailMetersPerPoint` is gone. Tests: `HelpCoreTests/BoundariesTests.swift`, the contrast pairs in
+      `MapStyleTests`, and `AppParityTests` reads this table out of `bounds.ts` and out of `Boundaries.swift`.
+- [ ] Android: the same in `MapStyle.kt` / `MapPalette.kt`, the pass in the same place, the marker in the
+      app-private state file.
+- Four things to get right, because they are where the web went wrong first: the dash is **absolute** and its
+  "on" length is never under the stroke width; names are **capped and nearest-first**, not "whatever fits"; the
+  migration marker must be written by **every** write of the layer list, not only by the migration; and the
+  numbers in 15.1 are the **third** set — take them from the table, and look at your own screenshots before
+  believing any of them.

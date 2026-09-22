@@ -7,6 +7,7 @@ import { LISTING_KINDS, PLACE_KINDS } from '../src/report.js';
 import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
 import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
+import { boundaryStyle } from '../src/bounds.js';
 import { directionsHref, placeQuery, transitAppHref, transitAppQuery, transitHref } from '../src/directions.js';
 import { LINKS } from '../src/links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
@@ -835,7 +836,7 @@ describe('wider screens: laptops and desktops (Kyle, 2026-09-20)', () => {
   it('the Map tab is one column on a phone and map-beside-list on a laptop', () => {
     expect(css).toContain('.maptop,.mapside { display:contents; }');            // the phone: the wrappers are not boxes
     expect(main).toContain('<div class="maptop">');
-    expect(main).toContain('<div class="mapside">${subwayKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>');
+    expect(main).toContain('<div class="mapside">${mapKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>');
     expect(wideBlock).toContain('.maptop > .mapbox:not(.big) { position:sticky;');
   });
   it('the map is drawn again when the pixel ratio or the window changes, and Escape leaves the full-screen map', () => {
@@ -1083,6 +1084,12 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
     ['the outline of a control on a card', '--edge', '--surface'], ['the outline of a control on the page', '--edge', '--bg'],
     ...['road', 'main', 'fwy'].flatMap((r): [string, string, string][] =>
       [[`a ${r} on land`, `--map-${r}`, '--map-land'], [`a ${r} over a park`, `--map-${r}`, '--map-park'], [`a ${r} outside the cities`, `--map-${r}`, '--map-out']]),
+    // A neighbourhood or city boundary (bounds.ts, 2026-09-22). It is a hairline, so it is measured against every
+    // ground it can be drawn over — the land, a park, and the hatched ground outside the four cities, because the
+    // four city outlines run along exactly that edge. It is also held APART from the streets: an edge that is the
+    // same colour as a road is not a boundary, it is a road.
+    ['a boundary on land', '--map-bnd', '--map-land'], ['a boundary over a park', '--map-bnd', '--map-park'],
+    ['a boundary outside the cities', '--map-bnd', '--map-out'],
     ['the hatch outside the four cities, over its own ground', '--map-out-ink', '--map-out'],
     ['the hatch outside the four cities, against the land inside them', '--map-out-ink', '--map-land'],
     ['the casing under a route and the focus ring, over a road', '--gw-case', '--map-road'],
@@ -1141,6 +1148,10 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
       expect(`${token} in forced colours: ${new RegExp(`${token}\\s*:`).test(block)}`).toBe(`${token} in forced colours: true`);
     }
     // Colour is down to a handful of system values there, so every line must still say what it is another way.
+    // A boundary is one of those: under forced colours it is a system keyword like every road, so what tells it
+    // from a street is its dash, which comes from the shared table and is never empty.
+    expect(block).toContain('--map-bnd:');
+    for (const mpp of [60, 20, 6]) expect(boundaryStyle(mpp).dash.filter((d) => d > 0)).toHaveLength(2);
     expect(mapSrc).toContain('const gwStyle: Record<string, { color: string; dash: number[] }>');
     expect(mapSrc).toMatch(/dash: \[gwW \* 2\.4/);
   });

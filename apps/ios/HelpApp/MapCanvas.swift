@@ -130,25 +130,40 @@ enum MapPainter {
             }
         }
 
-        // City and neighbourhood outlines (`place:areas`). A thin dashed line and a name, and — for the one that
-        // was tapped — a wash of the brand colour so the tap can be seen. **Never a fill that carries a value**:
-        // docs/13 rule 1 forbids a choropleth, and a map that shades an area by a number is a league table with
-        // a picture on it. The line is the same weight whatever the area is, so nothing here says one place is
-        // more than another. Dashed, so a boundary is never mistaken for a street.
-        var areaLabels: [(name: String, x: Double, y: Double)] = []
+        // Neighbourhood and city boundaries (`place:areas`, docs/MAP-STYLE.md section 15). A dashed line and a
+        // name, and — for the one that was tapped — a wash of the brand colour so the tap can be seen. **Never a
+        // fill that carries a value**: docs/13 rule 1 forbids a choropleth, and a map that shades an area by a
+        // number is a league table with a picture on it.
+        //
+        // Every outline is drawn in EVERY band (2026-09-22). Until then a neighbourhood appeared only under 14
+        // metres per point, so the Map tab — which opens on the whole city — showed four city edges and none of
+        // the 205 outlines a person came for. What stops 205 dotted outlines being a mesh is not hiding them: it
+        // is the WEIGHT. `boundaryStyle` (HelpCore/Boundaries.swift) is the whole table, shared with the ports.
+        //
+        // The dash is **absolute**, not multiplied by the line width the way a transit dash is: a hairline whose
+        // dash scales with it stops being dashed, and the dotted texture is what says "this is not a street". A
+        // city outline is heavier than a neighbourhood's, and that is the only difference between them — never a
+        // different colour, and never a fill.
+        var areaLabels: [(name: String, x: Double, y: Double, d: Double)] = []
+        let bs = boundaryStyle(mpp)
         for a in s.areas {
             var shape = Path()
             for ring in a.rings { trace(ring, cam: cam, into: &shape, close: true) }
             let on = a.id == s.areaSelected
-            if on { ctx.fill(shape, with: .color(Color.brand.opacity(s.plainColors ? 0.16 : 0.08)), style: FillStyle(eoFill: true)) }
-            ctx.stroke(shape, with: .color(on ? MapColor.focus : MapColor.areaLine),
-                       style: StrokeStyle(lineWidth: on ? 3 : 1.6, lineJoin: .round, dash: on ? [] : [6, 4]))
-            let wide = a.box.width * cam.scale
-            if wide > areaLabelMinPoints {
-                let x = cam.screenX(a.box.centerX), y = cam.screenY(a.box.centerY)
-                if x > 0, x < w, y > 0, y < h { areaLabels.append((a.name, x, y)) }
+            if on { ctx.fill(shape, with: .color(Color.brand.opacity(s.plainColors ? 0.16 : boundaryWashAlpha)), style: FillStyle(eoFill: true)) }
+            ctx.stroke(shape, with: .color(on ? MapColor.focus : MapColor.boundary),
+                       style: StrokeStyle(lineWidth: on ? boundarySelectedWidth : a.isCity ? bs.cityWidth : bs.width,
+                                          lineJoin: .round, dash: on ? [] : bs.dash.map { CGFloat($0) }))
+            guard bs.names, a.box.width * cam.scale > bs.nameMinPoints else { continue }
+            let x = cam.screenX(a.box.centerX), y = cam.screenY(a.box.centerY)
+            if x > 0, x < w, y > 0, y < h {
+                areaLabels.append((a.name, x, y, hypot(x - w / 2, y - h / 2)))
             }
         }
+        // Nearest the middle of the screen first, and no more than the band's cap: downtown has a dozen outlines
+        // in one frame, and a name that loses the collision test below is dropped, never shrunk or overlapped.
+        areaLabels.sort { $0.d < $1.d }
+        if areaLabels.count > bs.nameCap { areaLabels.removeLast(areaLabels.count - bs.nameCap) }
 
         // The transport layers a person switched on. Drawn under the greenway and under the listing dots, so
         // switching a layer on never hides the thing this screen is about.
@@ -175,7 +190,7 @@ enum MapPainter {
         drawGreenway(s, cam: cam, view: view, mpp: mpp, size: size, ctx: ctx)
         drawNames(labels, s, cam: cam, view: view, mpp: mpp, size: size, ctx: ctx, occupied: plan?.occupied ?? [],
                   ink: quiet.map { Color(rgb: $0.ink) }, parkInk: quiet.map { Color(rgb: $0.parkInk) },
-                  parkHalo: quiet.map { Color(rgb: $0.park) }, areaLabels: areaLabels)
+                  parkHalo: quiet.map { Color(rgb: $0.park) }, areaLabels: areaLabels.map { ($0.name, $0.x, $0.y) })
 
         // Stops and stations. A dense layer waits for the zoom (thousands of bus stops are a smear, not places);
         // the list below the map shows every one of them at any zoom.

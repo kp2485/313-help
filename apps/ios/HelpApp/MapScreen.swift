@@ -868,13 +868,16 @@ private struct MapKeyRow: View {
     @Environment(\.colorScheme) private var scheme
     @Environment(\.colorSchemeContrast) private var contrast
     let key: String
+    /// The boundary row's words are the LAYER's own name (`layer.place.areas`), not a `map.key_*` string, so the
+    /// switcher, the key and the list can never call the same thing three things (docs/MAP-STYLE.md 15.5).
+    var words: String?
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Canvas { ctx, size in sample(ctx, size) }
                 .frame(width: 44, height: 18).alignmentGuide(.firstTextBaseline) { $0[.bottom] - 3 }
                 .environment(\.layoutDirection, .leftToRight)
                 .accessibilityHidden(true)
-            Text(L.t("map.key_" + key)).font(.footnote).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+            Text(words ?? L.t("map.key_" + key)).font(.footnote).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
         }
     }
     private func color(_ t: TransitToken) -> Color {
@@ -888,6 +891,11 @@ private struct MapKeyRow: View {
         }
         let dot = { (r: Double) in Path(ellipseIn: CGRect(x: size.width / 2 - r, y: y - r, width: r * 2, height: r * 2)) }
         switch key {
+        // A boundary: the mid band's own dash and weight in the boundary token, so the sample is the line.
+        case "bnd":
+            let bs = boundaryStyle(boundaryMidMetersPerPoint)
+            ctx.stroke(line, with: .color(MapColor.boundary),
+                       style: StrokeStyle(lineWidth: bs.width, lineCap: .butt, dash: bs.dash.map { CGFloat($0) }))
         case "frequent": stroke(.fill, 9); stroke(.tr0, 6)
         case "local": stroke(.fill, 7.5); stroke(.tr1, 3.5)
         case "smart": stroke(.fill, 9); stroke(.tr2, 6); stroke(.fill, 2)
@@ -995,14 +1003,19 @@ struct MapLayersSheet: View {
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel(L.t("map.layer_loading") + " " + waiting.map { mapLayerName($0, fallback: bundleName($0)) }.joined(separator: L.t("list.sep")))
                 }
-                if !keyRows.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(L.t("map.key")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.ink)
-                            .accessibilityAddTraits(.isHeader)
-                        ForEach(keyRows, id: \.self) { MapKeyRow(key: $0) }
+            }
+            // What the lines mean, in words, each with a drawn sample — **in either style**, because the dotted
+            // boundary is drawn the same way in both and its row is its own reason for a key (MAP-STYLE 15.5).
+            // One heading over the lot: two "What the lines mean" headings would be two keys.
+            if !keyRows.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L.t("map.key")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.ink)
+                        .accessibilityAddTraits(.isHeader)
+                    ForEach(keyRows, id: \.self) { row in
+                        MapKeyRow(key: row, words: row == "bnd" ? mapLayerName(areasLayerId, fallback: "") : nil)
                     }
-                    .padding(.vertical, 4)
                 }
+                .padding(.vertical, 4)
             }
         } header: {
             Text(L.t("map.style"))
@@ -1011,10 +1024,14 @@ struct MapLayersSheet: View {
     }
     private func styleName(_ s: MapStyleChoice) -> String { L.t("map.style_" + s.rawValue) }
 
-    /// The key, in words, only for what is switched on.
+    /// The key, in words, only for what is switched on. The dotted boundary is first and belongs to **either**
+    /// style; the transport rows are the subway style's drawings and appear only there, exactly as on the web
+    /// (`mapKeyHtml`, whose `on` is false unless the subway style is showing).
     private var keyRows: [String] {
-        let on = { (id: String) in model.isOn("go:" + id) }
+        let subway = model.style == .subway
+        let on = { (id: String) in subway && model.isOn("go:" + id) }
         var rows: [String] = []
+        if model.isOn(areasLayerId) { rows.append("bnd") }
         let bus = on("ddot_routes") || on("smart_routes")
         if bus { rows += ["frequent", "local"] }
         if on("smart_routes") { rows.append("smart") }
@@ -1137,6 +1154,15 @@ struct MapListSheet: View {
                         Text(names(parks.map(\.name), limit: 30)).font(.subheadline).foregroundStyle(Color.ink)
                             .fixedSize(horizontal: false, vertical: true).card()
                     }
+                    // The boundaries the map is drawing, in words: the same names the map puts over them, for a
+                    // person reading the list instead of the picture — and for a screen reader, which cannot read
+                    // a Canvas at all. The heading is the switcher's own wording, so the two can never drift
+                    // (docs/MAP-STYLE.md 15.5).
+                    if !boundaries.isEmpty {
+                        SectionHead(text: mapLayerName(areasLayerId, fallback: ""))
+                        Text(names(boundaries.map(\.name), limit: 30)).font(.subheadline).foregroundStyle(Color.ink)
+                            .fixedSize(horizontal: false, vertical: true).card()
+                    }
                     ForEach(overlays) { o in
                         SectionHead(text: o.label)
                         let list = (o.data.lines.map(\.name) + o.data.points.map(\.name)).filter { !$0.isEmpty }
@@ -1188,6 +1214,11 @@ struct MapListSheet: View {
     private var parks: [Park] {
         guard model.isOn("place:parks") else { return [] }
         return (store.bundle?.parks ?? []).sorted { $0.name < $1.name }
+    }
+    /// The outlines the map is drawing right now, by name. `areasShown` is the same list the picture and the hit
+    /// test use, so the words and the shapes can never disagree about what is on the screen.
+    private var boundaries: [AreaOutline] {
+        model.areasShown.sorted { $0.name < $1.name }
     }
     private var sources: String {
         (store.bundle?.transitLayers ?? []).filter { model.isOn("go:" + $0.id) }
