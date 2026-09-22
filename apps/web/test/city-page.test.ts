@@ -45,7 +45,8 @@ const area = (over: Partial<Area> = {}): Area => ({
   help: { total: 19, by: { food: 6, health: 3 }, nearest_miles: { food: 0.4, clinic: 0.7, narcan: 0.3, indoors: 0.6 }, nearest_id: { food: null, clinic: null, narcan: null, indoors: null }, none_listed_yet: [], coverage_checked: false },
   places: { parks: 3, rec_centers: 1, greenway_open: 0 }, park_acres: 15, parcels: 6876,
   years: {},
-  crashes: { walk: 69, bike: 29, severe: 'lt5' },
+  crashes: { walk: 69, bike: 29, severe: 3 },
+  crashes_by_year: { '2020': { walk: 14, bike: 6, severe: 1 }, '2021': { walk: 13, bike: 5, severe: 0 }, '2022': { walk: 14, bike: 6, severe: 1 }, '2023': { walk: 14, bike: 6, severe: 1 }, '2024': { walk: 14, bike: 6, severe: 0 } },
   roads_bands: { pieces: 244, miles: 12.4, good_pct: 44, fair_pct: 36, poor_pct: 20 },
   vacancy: { housing_units: 8911, vacant: 772, pct: 9, population: 28433 },
   permits_by_year: [
@@ -246,11 +247,16 @@ describe('the numbers say what they are, and only about this city', () => {
     expect(html).toContain(T('city.vacancy_note'));
   });
 
-  it('keeps a hidden crash count hidden, and prints the real count everywhere else', () => {
+  it('prints the real count everywhere, crashes included, and draws the crashes by year with the same chart', () => {
     const html = cityPage(area(), d(), ui);
-    expect(html).toContain(strings['hood.lt5']!);           // severe crashes
-    expect(html).toContain('69');                           // walking crashes: a real number
-    expect(html).toContain('3');                            // three parks: small, and still the real number
+    expect(html).not.toContain('fewer than');
+    expect(html).toContain('<span>3</span>');               // three severe crashes: small, and still the real number
+    expect(html).toContain('69');                           // walking crashes
+    expect(html).toContain('<td>14</td>');                  // a year of the crash table
+    expect(html).toContain(T('hood.crash_total', { from: 2020, to: 2024 }));
+    const chart = cityPage(area(), d(), ui, 'chart');
+    expect(chart).toContain('aria-label="Crashes with someone walking or biking by year, 2020 to 2024, chart"');
+    expect(chart).toContain('data-hoodseries="crash:severe"');
   });
 
   it('carries no other city’s number and no ranking anywhere', () => {
@@ -265,7 +271,7 @@ describe('the numbers say what they are, and only about this city', () => {
     expect(html).toContain(T('city.help_count', { count: 19, city: 'Hamtramck' }));
     expect(html).toContain(T('city.nearest_head'));
     expect(html).toContain(T('city.nearest_note'));
-    expect(html).not.toContain(T('hood.places_head', { miles: 0.5 }));
+    expect(html).not.toContain(T('hood.places_head'));
   });
 });
 
@@ -280,7 +286,9 @@ describe('Table | Chart on the permits panel, on the same terms as a neighborhoo
   });
 
   it('offers nothing when there are not enough years, and still prints the table', () => {
-    const thin = area({ permits_by_year: [{ year: 2025, buildings: 4, units: 4, months_reported: 12 }] });
+    // One year of permits, and no crash years either: nothing on the page is worth a chart.
+    const { crashes_by_year: _y, ...rest } = area({ permits_by_year: [{ year: 2025, buildings: 4, units: 4, months_reported: 12 }] });
+    const thin = rest as Area;
     const html = cityPage(thin, d({ areas: [thin] }), ui);
     expect(html).not.toContain('role="radiogroup"');
     expect(html).toContain('<table class="years">');

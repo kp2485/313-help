@@ -47,4 +47,5 @@
          other in both themes and under colour-blind simulation. -->
     <color name="chart_a">#35A870</color>
     <color name="chart_b">#5B8DE0</color>
+    <color name="chart_c">#C86AA0</color>
 </resources>

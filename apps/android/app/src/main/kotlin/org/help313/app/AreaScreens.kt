@@ -612,9 +612,5 @@ object AreaScreens {
         }
     }
 
-    private fun countWords(c: HoodCount?): String = when {
-        c == null -> L.t("hood.none_recorded")
-        c.hidden -> L.t("hood.lt5")
-        else -> String.format(L.locale(), "%,d", c.value ?: 0)
-    }
+    private fun countWords(c: HoodCount?): String = hoodCountText(c) { L.t(it) }
 }

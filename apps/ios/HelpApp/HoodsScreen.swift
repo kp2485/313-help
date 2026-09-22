@@ -346,7 +346,7 @@ struct HoodPageView: View {
             HoodHelpPanel(hood: hood, d: d)
             HoodMoneyPanel(hood: hood, d: d, view: yearView)
             HoodConditionsPanel(hood: hood, d: d, view: yearView)
-            HoodCrashPanel(hood: hood, d: d)
+            HoodCrashPanel(hood: hood, d: d, view: yearView)
             HoodSourcesPanel(d: d)
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea())
@@ -404,12 +404,16 @@ private struct HoodHelpPanel: View {
                     NearestHelpRow(kind: kind, help: hood.help, rows: store.bundle?.rows ?? [])
                 }
             }
-            HoodSubHead(L.t("hood.places_head", ["miles": HoodFormat.loose(d.nearMiles)]))
-            HoodRows([(L.t("hood.parks"), plain(hood.places.parks), ""),
-                      (L.t("hood.rec_centers"), plain(hood.places.recCenters), ""),
-                      (L.t("hood.greenway_open"), plain(hood.places.greenwayOpen), "")]
-                     + (hood.places.snapStores.map { [(L.t("hood.snap_stores"), plain($0), "")] } ?? [])
-                     + (hood.places.busStops.map { [(L.t("hood.bus_stops"), plain($0), "")] } ?? []))
+            // Which counting rule each count uses, on its row (docs/13, "Counting rules"): a bus stop or a
+            // Bridge-card store counts only inside the outline; a park or rec center inside or within half a mile.
+            let near = L.t("hood.rule_near", ["miles": HoodFormat.loose(d.nearMiles)]), inside = L.t("hood.rule_inside")
+            HoodSubHead(L.t("hood.places_head"))
+            HoodRows([(L.t("hood.parks") + " (" + near + ")", plain(hood.places.parks), ""),
+                      (L.t("hood.rec_centers") + " (" + near + ")", plain(hood.places.recCenters), ""),
+                      (L.t("hood.greenway_open") + " (" + near + ")", plain(hood.places.greenwayOpen), "")]
+                     + (hood.places.snapStores.map { [(L.t("hood.snap_stores") + " (" + inside + ")", plain($0), "")] } ?? [])
+                     + (hood.places.busStops.map { [(L.t("hood.bus_stops") + " (" + inside + ")", plain($0), "")] } ?? []))
+            HoodFoot(L.t("hood.places_note", ["miles": HoodFormat.loose(d.nearMiles)]))
             if let nc = hood.nearestCity {
                 HoodSubHead(L.t("hood.city_near_head"))
                 HoodRows([(L.t("hood.near.snap"), miles(nc.snap), ""),
@@ -506,15 +510,15 @@ private struct HoodMoneyPanel: View {
             HoodHead(L.t("hood.money_head"))
             VStack(alignment: .leading, spacing: 14) {
                 Text(L.t("hood.money_lede")).font(.subheadline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
-                HoodYearGroup(view: $view, chartName: "hood.chart_name_money", hood: hood, d: d,
-                              series: [("sales", .a, L.t("hood.sales"), { $0.sales }),
-                                       ("permits", .b, L.t("hood.permits"), { $0.permits })]) {
+                HoodYearGroup(view: $view, chartName: "hood.chart_name_money",
+                              series: [HoodChart.Series(key: "sales", tone: .a, label: L.t("hood.sales"), points: HoodChart.series(hood, d) { $0.sales }),
+                                       HoodChart.Series(key: "permits", tone: .b, label: L.t("hood.permits"), points: HoodChart.series(hood, d) { $0.permits })]) {
                     HoodYearsTable(caption: L.t("hood.sales_caption"), d: d, hood: hood,
                                    head: L.t("hood.median"), countHead: L.t("hood.sales"), missing: L.t("hood.too_few"),
                                    value: { $0.medianPrice }, count: { $0.sales },
                                    fmt: { HoodFormat.money($0) })
                     HoodYearsTable(caption: L.t("hood.permits_caption"), d: d, hood: hood,
-                                   head: L.t("hood.permit_cost"), countHead: L.t("hood.permits"), missing: L.t("hood.too_few_permits"),
+                                   head: L.t("hood.permit_cost"), countHead: L.t("hood.permits"), missing: L.t("hood.none_recorded"),
                                    value: { $0.permitCost }, count: { $0.permits },
                                    fmt: { HoodFormat.bigMoney($0, language: L.current) })
                 }
@@ -534,62 +538,88 @@ private struct HoodMoneyPanel: View {
     }
 }
 
-/// 3. "Conditions" — blight tickets per 1,000 lots, demolitions, how long the City took to close a reported
-/// problem, fires, empty buildings registered, and the share of main streets rated poor. Every one of them with
-/// the sentence that says what it does NOT mean.
+/// 3. "Conditions" — what the City recorded here, grouped into charts that share a unit and a meaning, the same
+/// four groups as the web's `conditionsPanel`:
+///
+///   Blight tickets and buildings torn down   two COUNTS on one axis, each switchable
+///   Problems reported                        a COUNT
+///   Time to close                            DAYS — its own small chart, never a second axis on the count chart
+///   Building fires                           a COUNT, on its own
+///
+/// each with a one-sentence lede saying what the number is and where it comes from, ONE Table | Chart control
+/// for the whole panel, and an "at a glance" row of the latest year's figures above the charts. Empty buildings
+/// registered and street condition are today's numbers, not years: tiles in that row and rows below, never a
+/// chart. Every count is the real number (2026-09-22); a series the City has not published for this neighborhood
+/// says so in one sentence.
 private struct HoodConditionsPanel: View {
     let hood: Hood
     let d: Indicators
     @Binding var view: HoodViewChoice
+
+    private var blight: HoodChart.Series { HoodChart.Series(key: "blight", tone: .a, label: L.t("hood.blight_tickets"), points: HoodChart.series(hood, d) { $0.blight }) }
+    private var demo: HoodChart.Series { HoodChart.Series(key: "demo", tone: .b, label: L.t("hood.demolitions"), points: HoodChart.series(hood, d) { $0.demolitions }) }
+    private var issues: HoodChart.Series { HoodChart.Series(key: "issues", tone: .a, label: L.t("hood.issues_reported"), points: HoodChart.series(hood, d) { $0.issues }) }
+    private var days: HoodChart.Series { HoodChart.Series(key: "days", tone: .a, label: L.t("hood.issue_days"), points: HoodChart.daysSeries(hood, d), unit: .days) }
+    private var fires: HoodChart.Series { HoodChart.Series(key: "fires", tone: .a, label: L.t("hood.fires_short"), points: HoodChart.series(hood, d) { $0.fires }) }
+    private var anyChart: Bool {
+        ([blight, demo, issues, days] + (d.sources.fires != nil ? [fires] : [])).contains { HoodChart.chartable($0.points) }
+    }
+
     var body: some View {
         if d.sources.blight != nil {
             VStack(alignment: .leading, spacing: 10) {
                 HoodHead(L.t("hood.cond_head"))
                 VStack(alignment: .leading, spacing: 14) {
                     Text(L.t("hood.cond_lede")).font(.subheadline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
-                    HoodYearGroup(view: $view, chartName: "hood.chart_name_blight", hood: hood, d: d,
-                                  series: [("blight", .a, L.t("hood.blight"), { $0.blight })]) {
+                    HoodGlance(hood: hood, d: d)
+                    if anyChart { HoodViewPicker(view: $view) }
+                    HoodSubHead(L.t("hood.cond_blight_head"))
+                    HoodCondGroup(view: $view, chartName: "hood.chart_name_cond", lede: "hood.cond_blight_lede", hood: hood, series: [blight, demo]) {
                         HoodYearsTable(caption: L.t("hood.blight_caption"), d: d, hood: hood,
-                                       head: L.t("hood.blight_rate"), countHead: L.t("hood.blight"), missing: L.t("hood.too_few_permits"),
+                                       head: L.t("hood.blight_rate"), countHead: L.t("hood.blight"), missing: L.t("hood.none_recorded"),
                                        value: { HoodFormat.rate($0.blight, parcels: hood.parcels) },
                                        cityValue: { HoodFormat.rate($0.blight, parcels: d.cityParcels) },
                                        count: { $0.blight },
                                        fmt: { HoodFormat.number($0, decimals: 0) })
-                    }
-                    HoodFoot(L.t("hood.blight_note"))
-                    HoodYearGroup(view: $view, chartName: "hood.chart_name_demo", hood: hood, d: d,
-                                  series: [("demo", .a, L.t("hood.demolitions"), { $0.demolitions })]) {
                         HoodYearsTable(caption: L.t("hood.demo_caption"), d: d, hood: hood,
-                                       head: L.t("hood.demolitions"), countHead: nil, missing: L.t("hood.lt5_or_none"),
+                                       head: L.t("hood.demolitions"), countHead: nil, missing: L.t("hood.none_recorded"),
                                        value: { $0.demolitions?.shown.map(Double.init) }, count: nil,
                                        fmt: { HoodFormat.number($0, decimals: 0) })
+                        HoodFoot(L.t("hood.blight_note"))
                     }
-                    HoodYearGroup(view: $view, chartName: "hood.chart_name_issues", hood: hood, d: d,
-                                  series: [("issues", .a, L.t("hood.issues"), { $0.issues })]) {
+                    HoodSubHead(L.t("hood.cond_issues_head"))
+                    HoodCondGroup(view: $view, chartName: "hood.chart_name_issues", lede: "hood.cond_issues_lede", hood: hood, series: [issues]) {
                         HoodYearsTable(caption: L.t("hood.issues_caption"), d: d, hood: hood,
-                                       head: L.t("hood.issue_days"), countHead: L.t("hood.issues"), missing: L.t("hood.too_few_permits"),
+                                       head: L.t("hood.issue_days"), countHead: L.t("hood.issues"), missing: L.t("hood.none_recorded"),
                                        value: { $0.issueDays }, count: { $0.issues },
                                        fmt: { L.t("hood.days", ["n": HoodFormat.number($0, decimals: 0)]) })
                     }
-                    // The City's own names for the kinds of problem it counts: one English run inside our sentence.
-                    HoodFoot(L.t("hood.issues_note", ["types": ltr((d.issueTypes ?? []).joined(separator: L.t("list.sep")))]))
+                    HoodSubHead(L.t("hood.cond_days_head"))
+                    // The days table IS the problems table above (both columns are in it): in table view nothing
+                    // is repeated, and in chart view one line says where the numbers are.
+                    HoodCondGroup(view: $view, chartName: "hood.chart_name_days", lede: "hood.cond_days_lede", hood: hood, series: [days]) {
+                        if view == .chart { HoodFoot(L.t("hood.cond_days_table")) }
+                        // The City's own names for the kinds of problem it counts: one English run inside our sentence.
+                        HoodFoot(L.t("hood.issues_note", ["types": ltr((d.issueTypes ?? []).joined(separator: L.t("list.sep")))]))
+                    }
                     if d.sources.fires != nil {
-                        HoodYearGroup(view: $view, chartName: "hood.chart_name_fires", hood: hood, d: d,
-                                      series: [("fires", .a, L.t("hood.fires"), { $0.fires })]) {
+                        HoodSubHead(L.t("hood.cond_fires_head"))
+                        HoodCondGroup(view: $view, chartName: "hood.chart_name_fires", lede: "hood.cond_fires_lede", hood: hood, series: [fires]) {
                             HoodYearsTable(caption: L.t("hood.fire_caption"), d: d, hood: hood,
-                                           head: L.t("hood.blight_rate"), countHead: L.t("hood.fires"), missing: L.t("hood.too_few_permits"),
+                                           head: L.t("hood.blight_rate"), countHead: L.t("hood.fires"), missing: L.t("hood.none_recorded"),
                                            value: { HoodFormat.rate($0.fires, parcels: hood.parcels) },
                                            cityValue: { HoodFormat.rate($0.fires, parcels: d.cityParcels) },
                                            count: { $0.fires },
                                            fmt: { HoodFormat.number($0, decimals: 1) })
+                            HoodFoot(L.t("hood.fire_note"))
+                            DisclosureGroup(L.t("hood.fire_types")) {
+                                Text(ltr((d.fireTypes ?? []).joined(separator: "; "))).font(.footnote).foregroundStyle(Color.muted)
+                                    .fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .font(.footnote).tint(Color.brand)
                         }
-                        HoodFoot(L.t("hood.fire_note"))
-                        DisclosureGroup(L.t("hood.fire_types")) {
-                            Text(ltr((d.fireTypes ?? []).joined(separator: "; "))).font(.footnote).foregroundStyle(Color.muted)
-                                .fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .font(.footnote).tint(Color.brand)
                     }
+                    HoodFoot(L.t("hood.small_numbers"))
                     if d.sources.vacant != nil {
                         HoodRows([(L.t("hood.vacant", ["from": prettyDate(d.vacantPeriod?.first ?? ""), "to": prettyDate(d.vacantPeriod?.last ?? "")]),
                                    hoodPer1000(hood.now?.vacantReg, parcels: hood.parcels),
@@ -619,6 +649,7 @@ private struct HoodConditionsPanel: View {
 struct HoodCrashPanel: View {
     let hood: Hood
     let d: Indicators
+    @Binding var view: HoodViewChoice
     var body: some View {
         if let src = d.sources.crashes, let c = hood.crashes, let years = d.crashYears, years.count >= 2 {
             VStack(alignment: .leading, spacing: 10) {
@@ -629,6 +660,15 @@ struct HoodCrashPanel: View {
                     HoodRows([(L.t("hood.crash_walk"), show(c.walk), city(d.cityCrashes?.walk)),
                               (L.t("hood.crash_bike"), show(c.bike), city(d.cityCrashes?.bike)),
                               (L.t("hood.crash_severe"), show(c.severe), city(d.cityCrashes?.severe))])
+                    // The same crashes year by year — a table, or the same three-line chart every other year
+                    // panel gets — when the bundle carries the years (2026-09-22).
+                    let byYear = HoodChart.crashSeries(hood.crashesByYear, labels: (walk: L.t("hood.crash_walk_short"), bike: L.t("hood.crash_bike_short"), severe: L.t("hood.crash_severe_short")))
+                    if !byYear.isEmpty {
+                        Text(L.t("hood.crash_years_lede")).font(.subheadline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+                        HoodYearGroup(view: $view, chartName: "hood.chart_name_crashes", series: byYear) {
+                            HoodCrashTable(hood: hood, d: d, byYear: hood.crashesByYear ?? [:], years: years)
+                        }
+                    }
                     HoodFoot(L.t("hood.crash_note"))
                     // The dataset's name and the agency that publishes the records are theirs, written in
                     // English: each stays one left-to-right run inside the Arabic sentence, so its own commas
@@ -646,10 +686,156 @@ struct HoodCrashPanel: View {
         }
     }
     private func show(_ c: HoodCount) -> String {
-        HoodFormat.count(c, none: L.t("hood.none_recorded"), fewerThanFive: L.t("hood.lt5"), grouped: true)
+        HoodFormat.count(c, none: L.t("hood.none_recorded"), grouped: true)
     }
     private func city(_ c: HoodCount?) -> String {
         c?.shown.map { L.t("hood.crash_city", ["count": HoodFormat.grouped(Double($0))]) } ?? ""
+    }
+}
+
+/// The crashes by year: walking, biking, killed or badly hurt, one row per year and the window total last. At
+/// the accessibility text sizes it is one stacked block per year, like every other table on this screen.
+private struct HoodCrashTable: View {
+    let hood: Hood
+    let d: Indicators
+    let byYear: [String: HoodCrashes]
+    let years: [Int]
+    @Environment(\.dynamicTypeSize) private var textSize
+    private var heads: [String] { [L.t("hood.crash_walk_short"), L.t("hood.crash_bike_short"), L.t("hood.crash_severe_short")] }
+    private func cells(_ c: HoodCrashes?) -> [String] {
+        [c?.walk, c?.bike, c?.severe].map { HoodFormat.count($0, none: L.t("hood.none_recorded"), grouped: true) }
+    }
+    private var rows: [(String, [String])] {
+        byYear.keys.sorted().map { ($0, cells(byYear[$0])) }
+            + (hood.crashes.map { [(L.t("hood.crash_total", ["from": String(years[0]), "to": String(years[1])]), cells($0))] } ?? [])
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(L.t("hood.crash_caption")).font(.subheadline.weight(.semibold)).foregroundStyle(Color.ink)
+                .fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityAddTraits(.isHeader)
+            if textSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(rows, id: \.0) { r in
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(r.0).font(.subheadline.weight(.bold)).foregroundStyle(Color.ink).accessibilityAddTraits(.isHeader)
+                            ForEach(Array(zip(heads, r.1)), id: \.0) { h, v in Text(h + L.t("list.sep") + v).fixedSize(horizontal: false, vertical: true) }
+                        }
+                        .font(.footnote).foregroundStyle(Color.muted).frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityElement(children: .combine)
+                    }
+                }
+            } else {
+                Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 8) {
+                    GridRow {
+                        Text(L.t("hood.year")).gridColumnAlignment(.leading)
+                        ForEach(heads, id: \.self) { Text($0) }
+                    }
+                    .font(.caption.weight(.bold)).foregroundStyle(Color.muted).accessibilityHidden(true)
+                    Divider().gridCellUnsizedAxes(.horizontal).overlay(Color.line)
+                    ForEach(rows, id: \.0) { r in
+                        GridRow {
+                            Text(r.0).font(.footnote.weight(.semibold)).foregroundStyle(Color.muted).accessibilityAddTraits(.isHeader)
+                            ForEach(Array(zip(heads, r.1)), id: \.0) { h, v in
+                                Text(v).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+                                    .accessibilityLabel(r.0 + L.t("list.sep") + v + " " + h)
+                            }
+                        }
+                    }
+                }
+                .font(.footnote).padding(.vertical, 4)
+            }
+        }
+    }
+}
+
+/// "At a glance": the latest year's figure for each Conditions series, and today's two numbers, as a row of
+/// stat tiles above the charts. Label over value, the value in the text ink (never a series colour), and no tile
+/// coloured by size: nothing here is a score. VoiceOver reads each tile as one element: label, when, value.
+private struct HoodGlance: View {
+    let hood: Hood
+    let d: Indicators
+    @Environment(\.dynamicTypeSize) private var textSize
+
+    private var tiles: [(label: String, when: String, value: String)] {
+        var out: [(String, String, String)] = []
+        let none = L.t("hood.none_recorded")
+        let fields: [(HoodYear) -> Bool] = [{ $0.blight != nil }, { $0.demolitions != nil }, { $0.issues != nil }, { $0.fires != nil }]
+        if let y = HoodFormat.latestYear(hood, d, fields: fields) {
+            let ys = hood.years[y] ?? HoodYear()
+            let when = Int(y) == d.partialYear ? L.t("hood.so_far", ["year": y]) : y
+            out.append((L.t("hood.blight_tickets"), when, HoodFormat.count(ys.blight, none: none)))
+            out.append((L.t("hood.demolitions"), when, HoodFormat.count(ys.demolitions, none: none)))
+            out.append((L.t("hood.issues_reported"), when, HoodFormat.count(ys.issues, none: none)))
+            out.append((L.t("hood.issue_days"), when, ys.issueDays.map { L.t("hood.days", ["n": HoodFormat.number($0, decimals: 0)]) } ?? none))
+            if d.sources.fires != nil { out.append((L.t("hood.fires_short"), when, HoodFormat.count(ys.fires, none: none))) }
+        }
+        if d.sources.vacant != nil { out.append((L.t("hood.vacant_short"), L.t("hood.glance_today"), HoodFormat.count(hood.now?.vacantReg, none: none))) }
+        if d.sources.pavement != nil {
+            let v: String
+            if let r = hood.now?.roads {
+                v = r.poorPct.map { L.t("hood.roads_pct", ["pct": HoodFormat.loose($0), "miles": HoodFormat.number(r.miles ?? 0, decimals: 1)]) } ?? L.t("hood.roads_few")
+            } else { v = L.t("hood.roads_none") }
+            out.append((L.t("hood.roads_poor_short"), L.t("hood.glance_today"), v))
+        }
+        return out.map { (label: $0.0, when: $0.1, value: $0.2) }
+    }
+
+    var body: some View {
+        let all = tiles
+        if !all.isEmpty {
+            HoodSubHead(L.t("hood.glance"))
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: textSize.isAccessibilitySize ? 220 : 136), spacing: 8, alignment: .top)], alignment: .leading, spacing: 8) {
+                ForEach(Array(all.enumerated()), id: \.offset) { _, t in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(t.label).font(.caption).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                        Text(t.when).font(.caption2).foregroundStyle(Color.muted)
+                        Text(t.value).font(.title3.weight(.semibold)).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal, 12).padding(.vertical, 10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.appBg, in: RoundedRectangle(cornerRadius: 12))
+                    .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.line, lineWidth: 1))
+                    .accessibilityElement(children: .combine)
+                }
+            }
+        }
+    }
+}
+
+/// One chart's worth of the Conditions panel: a lede saying what the number means and where it comes from, then
+/// the table or the chart. When the City has published nothing at all for this neighborhood in this series, one
+/// sentence says so instead of a table of "none recorded".
+private struct HoodCondGroup<Tables: View>: View {
+    @Binding var view: HoodViewChoice
+    let chartName: String
+    let lede: String
+    let hood: Hood
+    let series: [HoodChart.Series]
+    @ViewBuilder let tables: Tables
+    var body: some View {
+        Text(L.t(lede)).font(.subheadline).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+        if series.contains(where: { HoodChart.anyValue($0.points) }) {
+            HoodYearGroup(view: $view, chartName: chartName, series: series, showPicker: false) { tables }
+        } else {
+            Text(L.t("hood.cond_none", ["name": hood.name])).font(.subheadline).foregroundStyle(Color.muted)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 14).padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.appBg, in: RoundedRectangle(cornerRadius: 12))
+        }
+    }
+}
+
+/// Table | Chart: one segmented control, the same one over every year panel.
+private struct HoodViewPicker: View {
+    @Binding var view: HoodViewChoice
+    var body: some View {
+        Picker(L.t("hood.view_label"), selection: $view) {
+            ForEach(HoodViewChoice.allCases, id: \.self) { c in Text(L.t("hood.view_" + c.rawValue)).tag(c) }
+        }
+        .pickerStyle(.segmented)
+        .accessibilityLabel(L.t("hood.view_label"))
     }
 }
 
@@ -686,13 +872,14 @@ private struct HoodSourcesPanel: View {
 
 // MARK: - table or chart (2026-09-22)
 
-/// Which of the two identities a line wears. Two IDENTITIES, never two ends of a scale — nothing on this screen
-/// says good or bad. The colours are the web's `--chart-a` and `--chart-b`, checked against the card in both
-/// themes; the SHAPE of the point and the DASH of the line carry the same difference with no colour at all.
+/// Which identity a line wears. IDENTITIES, never ends of a scale — nothing on this screen says good or bad. The
+/// colours are the web's `--chart-a`, `--chart-b` and `--chart-c`, checked against the card in both themes; the
+/// SHAPE of the point (circle, diamond, square) and the DASH of the line (solid, dashed, dash-dot) carry the same
+/// difference with no colour at all.
 extension HoodChart.Tone {
-    var color: Color { self == .a ? Color.chartA : Color.chartB }
-    var symbol: BasicChartSymbolShape { self == .a ? .circle : .diamond }
-    var dash: [CGFloat] { self == .a ? [] : [7, 4] }
+    var color: Color { switch self { case .a: Color.chartA; case .b: Color.chartB; case .c: Color.chartC } }
+    var symbol: BasicChartSymbolShape { switch self { case .a: .circle; case .b: .diamond; case .c: .square } }
+    var dash: [CGFloat] { switch self { case .a: []; case .b: [7, 4]; case .c: [7, 3, 1.5, 3] } }
 }
 
 /**
@@ -708,33 +895,24 @@ extension HoodChart.Tone {
 struct HoodYearGroup<Tables: View>: View {
     @Binding var view: HoodViewChoice
     let chartName: String
-    /// The series, already built. A neighborhood page builds them from its year table's own counts; a city page
-    /// builds them from the rows the Census Bureau publishes. Either way the picture adds nothing the tables do
-    /// not already say.
+    /// The series, already built: a neighborhood page builds them from its year table's own counts
+    /// (`HoodChart.series`, `daysSeries`, `crashSeries`); a city page from the rows the Census Bureau publishes.
+    /// Either way the picture adds nothing the tables do not already say.
     let series: [HoodChart.Series]
+    /// A panel with several charts draws ONE control above them all (`HoodViewPicker`) and passes `false` here.
+    let showPicker: Bool
     @ViewBuilder let tables: Tables
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
     /// Which lines are switched off, this screen only: a way of looking at a page, never stored, never sent.
     @State private var off: Set<String> = []
 
-    init(view: Binding<HoodViewChoice>, chartName: String, series: [HoodChart.Series],
+    init(view: Binding<HoodViewChoice>, chartName: String, series: [HoodChart.Series], showPicker: Bool = true,
          @ViewBuilder tables: () -> Tables) {
         _view = view
         self.chartName = chartName
         self.series = series
+        self.showPicker = showPicker
         self.tables = tables()
-    }
-
-    /// The neighborhood page's form: each series named by the count it reads out of a year.
-    init(view: Binding<HoodViewChoice>, chartName: String, hood: Hood, d: Indicators,
-         series: [(key: String, tone: HoodChart.Tone, label: String, count: (HoodYear) -> HoodCount?)],
-         @ViewBuilder tables: () -> Tables) {
-        self.init(view: view, chartName: chartName,
-                  series: series.map {
-                      HoodChart.Series(key: $0.key, tone: $0.tone, label: $0.label,
-                                       points: HoodChart.series(hood, d, count: $0.count))
-                  },
-                  tables: tables)
     }
 
     private var drawable: [HoodChart.Series] { series.filter { HoodChart.chartable($0.points) } }
@@ -747,16 +925,11 @@ struct HoodYearGroup<Tables: View>: View {
             let shown = HoodChart.shown(all, off: off)
             let m = HoodChart.model(shown)
             VStack(alignment: .leading, spacing: 10) {
-                Picker(L.t("hood.view_label"), selection: $view) {
-                    ForEach(HoodViewChoice.allCases, id: \.self) { c in Text(L.t("hood.view_" + c.rawValue)).tag(c) }
-                }
-                .pickerStyle(.segmented)
-                .accessibilityLabel(L.t("hood.view_label"))
+                if showPicker { HoodViewPicker(view: $view) }
                 if view == .chart {
                     VStack(alignment: .leading, spacing: 12) {
                         HoodLineChart(model: m)
                         if all.count > 1 { key(all: all, shown: shown) }
-                        if m.series.contains(where: { !$0.markers.isEmpty }) { hiddenKey }
                         HoodFoot(HoodChart.summary(m) { k, p in L.t(k, p) })
                     }
                     .accessibilityElement(children: .contain)
@@ -782,7 +955,7 @@ struct HoodYearGroup<Tables: View>: View {
                     set: { wanted in if wanted { off.remove(s.key) } else if !only { off.insert(s.key) } }
                 )) {
                     HStack(spacing: 8) {
-                        HoodKeySample(tone: s.tone, hollow: false)
+                        HoodKeySample(tone: s.tone)
                         Text(s.label).foregroundStyle(Color.ink)
                     }
                 }
@@ -797,30 +970,18 @@ struct HoodYearGroup<Tables: View>: View {
         }
         .font(.subheadline)
     }
-
-    private var hiddenKey: some View {
-        HStack(spacing: 8) {
-            HoodKeySample(tone: .a, hollow: true)
-            Text(L.t("hood.chart_lt5"))
-        }
-        .font(.footnote).foregroundStyle(Color.muted)
-        .accessibilityElement(children: .combine)
-    }
 }
 
 /// The little shape beside a line of the key: the series' own marker, drawn rather than described, so the key
 /// looks like the picture it explains.
 struct HoodKeySample: View {
     let tone: HoodChart.Tone
-    let hollow: Bool
     var body: some View {
         Group {
-            if hollow {
-                Circle().strokeBorder(Color.muted, lineWidth: 1.5)
-            } else if tone == .a {
-                Circle().fill(tone.color)
-            } else {
-                Rectangle().fill(tone.color).rotationEffect(.degrees(45)).frame(width: 9, height: 9)
+            switch tone {
+            case .a: Circle().fill(tone.color)
+            case .b: Rectangle().fill(tone.color).rotationEffect(.degrees(45)).frame(width: 9, height: 9)
+            case .c: Rectangle().fill(tone.color).frame(width: 10, height: 10)
             }
         }
         .frame(width: 14, height: 14)
@@ -829,16 +990,13 @@ struct HoodKeySample: View {
 }
 
 /**
- The whole chart: one pair of axes, one line per series switched on, a point at every year, and a hollow marker at
- every year the pipeline hid.
+ The whole chart: one pair of axes, one line per series switched on, and a point at every year with a value.
 
  Swift Charts rather than a Canvas, because it hands VoiceOver a real chart — each point is an element that reads
  "2023, Homes sold: 14", and the Audio Graph rotor works — where a Canvas is one opaque picture. It is a system
  framework on iOS 16 and the app's floor is 17, so nothing is added to the app to get it.
 
- A year the pipeline hid is NOT at a value: it is a hollow marker at a fixed height (`HoodChart.markerFraction`,
- the same constant on all three apps), below the first tick over zero, and the line goes on through it as a dotted
- piece — so the year is visibly there, its number is visibly not, and the gap never reads as a zero.
+ A year with nothing recorded is a break in the line, never a zero.
  */
 struct HoodLineChart: View {
     let model: HoodChart.Model
@@ -856,41 +1014,28 @@ struct HoodLineChart: View {
     var body: some View {
         Chart {
             ForEach(model.series) { s in
-                // The line, piece by piece, so the pieces that touch a hidden year can be drawn differently.
+                // The line, piece by piece, so a year with nothing recorded breaks it.
                 ForEach(s.segments) { g in
                     ForEach([g.from, g.to], id: \.self) { i in
                         LineMark(
                             x: .value(L.t("hood.year"), s.points[i].year),
-                            y: .value(s.label, Double(s.points[i].value ?? 0) == 0 && s.points[i].kind == .hidden
-                                      ? HoodChart.markerValue(top: model.top) : Double(s.points[i].value ?? 0)),
+                            y: .value(s.label, Double(s.points[i].value ?? 0)),
                             series: .value(s.label, s.key + "-" + String(g.from))
                         )
                         .foregroundStyle(s.tone.color)
-                        .lineStyle(StrokeStyle(lineWidth: g.dotted ? 1.5 : 2,
-                                               lineCap: .round,
-                                               dash: g.dotted ? [1, 3] : s.tone.dash))
+                        .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round, dash: s.tone.dash))
                         .accessibilityHidden(true)
                     }
                 }
-                // The points: one per year that has something, each one an element of its own to VoiceOver.
+                // The points: one per year that has a value, each one an element of its own to VoiceOver, saying
+                // its exact figure in the chart's unit ("2022, Middle time to close: 40 days").
                 ForEach(s.points.filter { $0.kind == .value }) { p in
                     PointMark(x: .value(L.t("hood.year"), p.year), y: .value(s.label, Double(p.value ?? 0)))
                         .symbol(s.tone.symbol)
                         .symbolSize(textSize.isAccessibilitySize ? 90 : 60)
                         .foregroundStyle(s.tone.color)
-                        .accessibilityLabel(HoodChart.pointText(p, label: s.label, words: words))
-                        .accessibilityValue(HoodFormat.grouped(Double(p.value ?? 0)))
-                }
-                // A hidden year: the series' own shape, HOLLOW, at a fixed height below the first tick. There is
-                // no value under it to read, and the shape says so at a glance (docs/13, honesty rule 2).
-                ForEach(s.points.filter { $0.kind == .hidden }) { p in
-                    PointMark(x: .value(L.t("hood.year"), p.year),
-                              y: .value(s.label, HoodChart.markerValue(top: model.top)))
-                        .symbol {
-                            HoodKeySample(tone: s.tone, hollow: true)
-                        }
-                        .accessibilityLabel(HoodChart.pointText(p, label: s.label, words: words))
-                        .accessibilityValue(L.t("hood.lt5"))
+                        .accessibilityLabel(HoodChart.pointText(p, label: s.label, unit: model.unit, words: words))
+                        .accessibilityValue(HoodChart.valueText(p.value ?? 0, unit: model.unit, words: words))
                 }
             }
         }
@@ -910,7 +1055,7 @@ struct HoodLineChart: View {
         .chartPlotStyle { plot in plot.padding(.horizontal, textSize.isAccessibilitySize ? 18 : 10) }
         .environment(\.layoutDirection, .leftToRight)
         .frame(height: textSize.isAccessibilitySize ? 260 : 170)
-        .accessibilityLabel(L.t("hood.chart_plot"))
+        .accessibilityLabel(L.t(model.unit == .days ? "hood.chart_plot_days" : "hood.chart_plot"))
     }
 }
 
@@ -996,7 +1141,6 @@ struct HoodRows: View {
 /// A count as a person reads it, and its rate per 1,000 lots when there is a count to show and a base to defend.
 func hoodPer1000(_ c: HoodCount?, parcels: Int?) -> String {
     guard let c else { return L.t("hood.none_recorded") }
-    if c == .suppressed { return L.t("hood.lt5") }
     let n = c.shown ?? 0
     guard let r = HoodFormat.rate(c, parcels: parcels) else {
         return String(n)
@@ -1033,7 +1177,7 @@ struct HoodYearsTable: View {
         let v = value(mine), cv = (cityValue ?? value)(theirs)
         return (year: Int(year) == d.partialYear ? L.t("hood.so_far", ["year": year]) : year,
                 value: v.map(fmt) ?? missing,
-                count: count.map { HoodFormat.count($0(mine), none: L.t("hood.none_recorded"), fewerThanFive: L.t("hood.lt5")) },
+                count: count.map { HoodFormat.count($0(mine), none: L.t("hood.none_recorded")) },
                 city: cv.map(fmt) ?? "")
     }
 

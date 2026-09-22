@@ -174,7 +174,7 @@ struct CityPageView: View {
         }
     }
     private func show(_ c: HoodCount?) -> String {
-        HoodFormat.count(c, none: L.t("hood.none_recorded"), fewerThanFive: L.t("hood.lt5"), grouped: true)
+        HoodFormat.count(c, none: L.t("hood.none_recorded"), grouped: true)
     }
 
     @ViewBuilder private var roadsPanel: some View {

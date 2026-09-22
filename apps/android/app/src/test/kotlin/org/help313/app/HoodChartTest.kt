@@ -2,7 +2,7 @@
 //
 // These are the web's cases in `apps/web/test/hoodchart.test.ts` and the iPhone's in
 // `apps/ios/Tests/HelpCoreTests/HoodChartTests.swift`, ported one for one: the same years, the same counts, the
-// same points, segments, markers, axis and sentence. If the three ever disagree, one of the three apps is drawing
+// same points, segments, axis and sentence. If the three ever disagree, one of the three apps is drawing
 // something the others are not.
 //
 // It runs on a plain JDK, under `:core` as well as `:app`: nothing here touches a Canvas, and the rule that a
@@ -41,14 +41,13 @@ class HoodChartTest {
     /** The app's own words, as the screen hands them in. */
     private val words: (String, Map<String, String>) -> String = { key, p ->
         val table = mapOf(
-            "hood.lt5" to "fewer than 5",
+            "hood.days" to "{n} days",
             "hood.none_recorded" to "none recorded",
             "hood.so_far" to "{year} so far",
             "hood.chart_bar" to "{year}, {label}: {count}",
             "hood.chart_summary" to "The chart shows each year from {from} to {to}. Most in one year: {most}.",
             "hood.chart_peak" to "{label}, {count} in {year}",
             "hood.chart_peak_none" to "{label}, no year has a number we can show",
-            "hood.chart_lt5_note" to "A year with fewer than 5 shows a hollow marker at a fixed height, not a value.",
             "list.sep" to ", ",
         )
         var out = table[key] ?: "MISSING:$key"
@@ -56,48 +55,61 @@ class HoodChartTest {
         out
     }
 
-    // ---- points, segments, markers and blanks ----------------------------------------------------------------
+    // ---- points, segments and blanks --------------------------------------------------------------------------
 
     @Test
-    fun `a series becomes points segments markers and blanks and never mixes them up`() {
-        val m = hoodChartModel(listOf(one(listOf(n(12), HoodCount.HIDDEN, null, n(24), n(7), n(7)))))
+    fun `a series becomes points segments and blanks and never mixes them up`() {
+        val m = hoodChartModel(listOf(one(listOf(n(12), n(2), null, n(24), n(7), n(7)))))
         val s = m.series[0]
         assertEquals(
-            listOf(HoodPointKind.VALUE, HoodPointKind.HIDDEN, HoodPointKind.NONE, HoodPointKind.VALUE, HoodPointKind.VALUE, HoodPointKind.VALUE),
+            listOf(HoodPointKind.VALUE, HoodPointKind.VALUE, HoodPointKind.NONE, HoodPointKind.VALUE, HoodPointKind.VALUE, HoodPointKind.VALUE),
             s.points.map { it.kind },
         )
-        assertEquals(listOf("2021"), s.markers)
         assertEquals(listOf("2022"), s.blanks)
-        assertNull(s.points[1].value)
-        assertEquals(HOOD_MARKER_FRACTION, s.points[1].frac, 1e-12)
-        // No piece of line crosses the year with nothing recorded; the pieces that touch the hidden one are dotted.
-        assertEquals(listOf(0 to true, 3 to false, 4 to false), s.segments.map { it.from to it.dotted })
+        assertEquals(2, s.points[1].value)
+        assertEquals(2.0 / m.top, s.points[1].frac, 1e-12)
+        // No piece of line crosses the year with nothing recorded.
+        assertEquals(listOf(0, 3, 4), s.segments.map { it.from })
         assertEquals(listOf(1, 4, 5), s.segments.map { it.to })
     }
 
-    /** The whole point of the marker: there is no path from a hidden count to a value. */
+    /** A 3 is drawn at 3: three quarters of an axis whose top is 4 (the web's case). */
     @Test
-    fun `a hidden count is never a value`() {
-        val hidden = HoodCount.HIDDEN
-        val m = hoodChartModel(listOf(one(listOf(hidden, hidden, hidden, n(40), hidden, hidden))))
-        assertEquals(1, m.series[0].points.count { it.kind == HoodPointKind.VALUE })
-        assertEquals(5, m.series[0].markers.size)
-        for (p in m.series[0].points.filter { it.kind == HoodPointKind.HIDDEN }) {
-            assertNull(p.value)
-            assertEquals(HOOD_MARKER_FRACTION, p.frac, 1e-12)
-        }
-        assertEquals(10.0 / 96.0, HOOD_MARKER_FRACTION, 1e-12)
+    fun `a small count is drawn at its value`() {
+        val m = hoodChartModel(listOf(one(listOf(n(3), n(4), n(4), null, null, null))))
+        assertEquals(4, m.top)
+        assertEquals(HoodPointKind.VALUE, m.series[0].points[0].kind)
+        assertEquals(0.75, m.series[0].points[0].frac, 1e-12)
+        assertEquals(listOf(0, 1, 2, 3, 4), m.ticks)
     }
 
-    /** And it can never be lined up against a tick and read as a number. */
+    /** A chart holds one unit: days are said as days, in the point and in the summary. */
     @Test
-    fun `a marker always sits below the first tick over zero`() {
-        for (counts in listOf(listOf(5, 6, 7), listOf(12, 18, 24, 31, 9), listOf(200, 410, 90), listOf(6, 6, 6), listOf(1, 2, 3))) {
-            val m = hoodChartModel(listOf(HoodSeries("x", HoodTone.A, "x",
-                counts.mapIndexed { i, c -> HoodChartPoint((2020 + i).toString(), n(c)) })))
-            val firstTick = m.ticks.first { it > 0 }
-            assertTrue("top ${m.top}", HOOD_MARKER_FRACTION * m.top < firstTick)
-        }
+    fun `a chart holds one unit and says days as days`() {
+        val days = HoodSeries("days", HoodTone.A, "Middle time to close", points(listOf(n(8), n(21), n(40), n(12), n(9), n(5))), HoodUnit.DAYS)
+        val m = hoodChartModel(listOf(days))
+        assertEquals(HoodUnit.DAYS, m.unit)
+        assertEquals("2022, Middle time to close: 40 days", hoodPointText(m.series[0].points[2], "Middle time to close", words, HoodUnit.DAYS))
+        assertTrue(hoodChartSummary(m, words).contains("Middle time to close, 40 days in 2022"))
+        assertEquals(HoodUnit.COUNT, hoodChartModel(listOf(one(sales))).unit)
+    }
+
+    /** The crash chart: three series from the years, oldest first, walking / biking / badly hurt as A / B / C. */
+    @Test
+    fun `crash series are three lines from the years`() {
+        val by = mapOf(
+            "2021" to HoodCrashes(n(12), n(2), n(5)),
+            "2020" to HoodCrashes(n(12), n(1), n(5)),
+            "2022" to HoodCrashes(n(8), n(0), n(4)),
+        )
+        val s = hoodCrashSeries(by, "Walking", "Biking", "Killed or badly hurt")
+        assertEquals(listOf("walk", "bike", "severe"), s.map { it.key })
+        assertEquals(listOf(HoodTone.A, HoodTone.B, HoodTone.C), s.map { it.tone })
+        assertEquals(listOf("2020", "2021", "2022"), s[0].points.map { it.year })
+        assertEquals(listOf(1, 2, 0), s[1].points.map { it.count?.value })
+        assertTrue(hoodCrashSeries(emptyMap(), "", "", "").isEmpty())
+        val m = hoodChartModel(s)
+        assertEquals("2022, Biking: 0", hoodPointText(m.series[1].points[2], "Biking", words))
     }
 
     @Test
@@ -110,16 +122,18 @@ class HoodChartTest {
     // ---- the axis ---------------------------------------------------------------------------------------------
 
     @Test
-    fun `the axis starts at zero and never labels a value under five`() {
-        for (counts in listOf(listOf(5, 6, 7), listOf(12, 3, 18, 24, 31, 9), listOf(200, 410, 90), listOf(1, 1, 2))) {
+    fun `the axis starts at zero ends on a round number and labels small values exactly`() {
+        for (counts in listOf(listOf(5, 6, 7), listOf(12, 3, 18, 24, 31, 9), listOf(200, 410, 90), listOf(1, 1, 2), listOf(0, 0, 0))) {
             val m = hoodChartModel(listOf(HoodSeries("x", HoodTone.A, "x",
                 counts.mapIndexed { i, c -> HoodChartPoint((2020 + i).toString(), n(c)) })))
             assertEquals("$counts", 0, m.ticks.first())
-            assertTrue("$counts", m.top >= 5)
+            assertTrue("$counts", m.top >= maxOf(1, counts.max()))
             assertEquals("$counts", m.top, m.ticks.last())
-            for (t in m.ticks) assertTrue("tick $t in $counts", t == 0 || t >= 5)
+            assertTrue("$counts", m.ticks.size <= 6)
             for (p in m.series[0].points) assertTrue(p.frac <= 1.0)
         }
+        assertEquals(listOf(0, 1, 2), hoodChartModel(listOf(one(listOf(n(1), n(1), n(2), null, null, null)))).ticks)
+        assertEquals(1, hoodChartModel(listOf(one(listOf(n(0), n(0), n(0), null, null, null)))).top)
     }
 
     /** Two series share ONE axis: its top is the larger of the two, never one scale each. */
@@ -133,11 +147,13 @@ class HoodChartTest {
     }
 
     @Test
-    fun `an all hidden series has an axis of five`() {
-        val m = hoodChartModel(listOf(one(listOf(HoodCount.HIDDEN, HoodCount.HIDDEN, HoodCount.HIDDEN, null, null, null))))
-        assertEquals(5, m.top)
-        assertEquals(listOf(0, 5), m.ticks)
+    fun `an empty series has an axis of one and no peak`() {
+        val m = hoodChartModel(listOf(one(listOf(null, null, null, null, null, null))))
+        assertEquals(1, m.top)
+        assertEquals(listOf(0, 1), m.ticks)
         assertNull(m.series[0].peakYear)
+        assertFalse(hoodAnyValue(points(listOf(null, null, null, null, null, null))))
+        assertTrue(hoodAnyValue(points(listOf(null, null, n(0), null, null, null))))
     }
 
     @Test
@@ -165,12 +181,11 @@ class HoodChartTest {
     // ---- when a chart is offered at all -----------------------------------------------------------------------
 
     @Test
-    fun `a chart is offered only for three years with at least one number to draw`() {
+    fun `a chart is offered only for three years with a number`() {
         assertTrue(hoodChartable(points(listOf(n(12), n(14), n(16), null, null, null))))
+        assertTrue(hoodChartable(points(listOf(n(0), n(0), n(0), null, null, null))))
         assertFalse(hoodChartable(points(listOf(n(12), n(14), null, null, null, null))))
         assertFalse(hoodChartable(points(listOf(n(12), null, null, n(14), null, null))))
-        assertFalse(hoodChartable(points(listOf(HoodCount.HIDDEN, HoodCount.HIDDEN, HoodCount.HIDDEN, null, null, null))))
-        assertTrue(hoodChartable(points(listOf(HoodCount.HIDDEN, HoodCount.HIDDEN, n(7), null, null, null))))
     }
 
     // ---- the labels under the axis ----------------------------------------------------------------------------
@@ -188,28 +203,24 @@ class HoodChartTest {
     // ---- the words --------------------------------------------------------------------------------------------
 
     @Test
-    fun `a point says its year its series and its count and never a digit for a hidden one`() {
+    fun `a point says its year its series and its exact count`() {
         val m = hoodChartModel(listOf(one(sales, label = "Homes sold")))
         assertEquals("2020, Homes sold: 12", hoodPointText(m.series[0].points[0], "Homes sold", words))
         assertEquals("2021, Homes sold: 3", hoodPointText(m.series[0].points[1], "Homes sold", words))
-        val hid = hoodChartModel(listOf(one(listOf(HoodCount.HIDDEN, HoodCount.HIDDEN, HoodCount.HIDDEN, n(9), null, null), label = "Torn down")))
-        assertEquals("2020, Torn down: fewer than 5", hoodPointText(hid.series[0].points[0], "Torn down", words))
-        assertEquals("2024, Torn down: none recorded", hoodPointText(hid.series[0].points[4], "Torn down", words))
+        val small = hoodChartModel(listOf(one(listOf(n(3), n(1), n(0), n(9), null, null), label = "Torn down")))
+        assertEquals("2020, Torn down: 3", hoodPointText(small.series[0].points[0], "Torn down", words))
+        assertEquals("2022, Torn down: 0", hoodPointText(small.series[0].points[2], "Torn down", words))
+        assertEquals("2024, Torn down: none recorded", hoodPointText(small.series[0].points[4], "Torn down", words))
         val sofar = hoodChartModel(listOf(one(sales, label = "Homes sold", soFar = "2025")))
         assertEquals("2025 so far, Homes sold: 9", hoodPointText(sofar.series[0].points[5], "Homes sold", words))
     }
 
     @Test
-    fun `the summary says what is drawn over which years and that hidden years are not drawn at a value`() {
-        val m = hoodChartModel(listOf(one(listOf(HoodCount.HIDDEN, n(12), n(31), null, null, null), label = "Torn down")))
+    fun `the summary says what is drawn over which years and each series biggest year`() {
+        val m = hoodChartModel(listOf(one(listOf(n(2), n(12), n(31), null, null, null), label = "Torn down")))
         val s = hoodChartSummary(m, words)
-        assertEquals(
-            "The chart shows each year from 2020 to 2025. Most in one year: Torn down, 31 in 2022. " +
-                "A year with fewer than 5 shows a hollow marker at a fixed height, not a value.",
-            s,
-        )
-        val plain = hoodChartModel(listOf(one(listOf(n(12), n(14), n(16), null, null, null), label = "Homes sold")))
-        assertFalse(hoodChartSummary(plain, words).contains("hollow marker"))
+        assertEquals("The chart shows each year from 2020 to 2025. Most in one year: Torn down, 31 in 2022.", s)
+        assertFalse(s.contains("fewer than"))
         // Never a trend: the sentence describes, it does not explain (docs/13, honesty rule 4).
         for (word in listOf("rising", "falling", "better", "worse", "trend")) {
             assertFalse(word, s.lowercase().contains(word))

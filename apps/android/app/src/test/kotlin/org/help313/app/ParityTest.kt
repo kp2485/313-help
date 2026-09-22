@@ -177,7 +177,10 @@ class ParityTest {
     @Test
     fun theNeighborhoodPageHasTheWebsPanelsInTheWebsOrder() {
         val web = text("apps/web/src/hoods.ts")
-        val crash = web.substringAfter("export function crashPanel").substringBefore("export function hoodPage")
+        // The Conditions and Safe-streets panels are functions of their own since 2026-09-22 (the Conditions
+        // panel grew charts and a glance row), so each one's body is spliced in where `hoodPage` calls it.
+        val cond = web.substringAfter("export function conditionsPanel").substringBefore("\nfunction crashYears")
+        val crash = web.substringAfter("export function crashPanel").substringBefore("\nexport ")
         // `hoodPage`'s OWN body, and nothing after it. Since 2026-09-22 the same file also holds `cityPage`,
         // which reuses several of these headings for the four city pages — and this phone has no city page yet
         // (docs/13, "The four cities"). Reading to the end of the file would add the city page's panels to the
@@ -185,7 +188,7 @@ class ParityTest {
         // function ends, so the bound is structure rather than a guess at a comment. The crash panel is spliced
         // in afterwards, because the text being spliced carries exports of its own.
         val hoodBody = web.substringAfter("export function hoodPage").substringBefore("\nexport ")
-        val page = hoodBody.replace("\${crashPanel(h, d, ui)}", crash)
+        val page = hoodBody.replace("\${conditionsPanel(h, d, ui, view, off)}", cond).replace("\${crashPanel(h, d, ui, view, off)}", crash)
         fun keysAfter(marker: String, body: String) =
             Regex(Regex.escape(marker) + "\\$\\{T\\('(hood\\.[a-z_.]+)'").findAll(body).map { it.groupValues[1] }.toList()
 
@@ -198,10 +201,15 @@ class ParityTest {
             .findAll(screens).map { it.groupValues[1] }.toList()
         assertEquals("the Android neighborhood page draws its panels in a different order", webPanels, androidPanels)
 
-        // The three lists inside the help panel, under their own smaller headings, in the same order too.
+        // The lists inside the help panel and the four chart groups of the Conditions panel, under their own
+        // smaller headings, in the same order too (the glance row's heading is drawn from a variable on the web).
         val webSubs = keysAfter("<h3 class=\"sub\">", page)
-        assertEquals(listOf("hood.nearest_head", "hood.places_head", "hood.city_near_head"), webSubs)
-        for (key in webSubs) assertTrue("HoodScreens.kt never draws $key", screens.contains("L.t(\"$key\""))
+        assertEquals(
+            listOf("hood.nearest_head", "hood.places_head", "hood.city_near_head",
+                "hood.cond_blight_head", "hood.cond_issues_head", "hood.cond_days_head", "hood.cond_fires_head"),
+            webSubs,
+        )
+        for (key in webSubs + "hood.glance") assertTrue("HoodScreens.kt never draws $key", screens.contains("L.t(\"$key\""))
     }
 
     /** SEMCOG asks for their notice wherever their data is reproduced. Both apps print the same sentence. */

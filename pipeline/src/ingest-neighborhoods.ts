@@ -16,13 +16,14 @@
 //
 // We never download a sale or a permit record, so buyer and seller names never reach this repo. The rental,
 // fire and vacant-building layers carry addresses and (vacant) owner names: we only ever ask them for counts.
-// Small numbers are dropped here, before anything is written — but only where docs/13's honesty rule 2 still
-// applies. **Home sales and building permits state their real count, however small** (Kyle, 2026-09-22): both are
-// public transaction records the City already publishes with the address on them, so hiding a 3 protected nobody
-// and only made a page say less than the source it cites. Everything that could identify a person, and every
-// count the City itself suppresses, is unchanged: crashes, blight tickets, demolitions, reported problems, fires,
-// rental certificates, vacant registrations and street ratings all still become "lt5" under five. A median price
-// still needs ten sales, because a middle of three is a shaky statistic whoever publishes it.
+// **Every count here is the real number, however small** (Kyle, 2026-09-22, twice: first for home sales and
+// building permits, then "I want exact numbers" for the rest — DECISIONS). Blight tickets, demolitions, reported
+// problems, building fires, rental certificates, vacant registrations and rated street pieces are all counts of
+// things the City already publishes with the address on them, so hiding a 3 protected nobody and only made a page
+// say less than the source it cites. Crashes (ingest-crashes.ts) are exact too, since later the same day: no count
+// anywhere in the dataset is hidden. Two summary statistics keep a floor, because the
+// middle of three moves with any one of them: a median price needs ten sales, and a share of poor street needs
+// ten rated pieces. The count beside either is printed whatever it is.
 
 import { writeFileSync } from 'node:fs';
 import { p, slug, writeJson, today } from './util.js';
@@ -72,7 +73,8 @@ export const FIRST_YEAR = 2019;
 
 type Pt = [number, number];
 export interface Neighborhood { id: string; name: string; district: number | null; center: Pt; rings: Pt[][]; jlg_study_area?: boolean }
-export type Count = number | 'lt5';
+/** Every count is the exact number the City's server returned. There is no hidden value of any kind (2026-09-22). */
+export type Count = number;
 export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number; fires?: Count }
 /** Numbers that describe today, not a year: rental certificates in force, vacant registrations of the past 12 months, street ratings. */
 export interface NowStats { rental_certs?: Count; vacant_reg?: Count; roads?: { pieces: Count; miles?: number; poor_pct?: number } }
@@ -102,7 +104,9 @@ export function toNeighborhoods(features: any[], studyRings: Pt[][]): Neighborho
   return features.map((f) => {
     const name = String(f.properties?.nhood_name ?? '').replace(/\s+/g, ' ').trim(), g = f.geometry;
     const polys: Pt[][][] = !g ? [] : g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
-    const rings = polys.map((poly) => simplify(poly[0]!, 12).map(([x, y]) => [Number(x.toFixed(5)), Number(y.toFixed(5))] as Pt)).filter((r) => r.length >= 4);
+    // Every ring, holes included: the outer ring first, then any inner ring. `pointInRings` (even-odd) then puts
+    // a point that lies in a hole OUTSIDE the neighborhood. Belle Isle is the one outline with a hole (2026-09-22).
+    const rings = polys.flatMap((poly) => poly.map((ring) => simplify(ring, 12).map(([x, y]) => [Number(x.toFixed(5)), Number(y.toFixed(5))] as Pt))).filter((r) => r.length >= 4);
     if (!name || !rings.length) return null;
     let id = `nbh_${slug(name)}`; while (seen.has(id)) id += '_b'; seen.add(id);
     const big = rings.reduce((a, b) => (b.length > a.length ? b : a));
@@ -112,19 +116,14 @@ export function toNeighborhoods(features: any[], studyRings: Pt[][]): Neighborho
   }).filter((n): n is Neighborhood => !!n).sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** Honesty rule 2 (docs/13), applied before anything is stored. For the series that still hide a small count. */
-export function suppress(n: number, median?: number | null, cost?: number | null): { count: Count; median?: number; cost?: number } {
-  if (n < 5) return { count: 'lt5' };
-  return { count: n, ...(median != null && n >= 10 ? { median: Math.round(median) } : {}), ...(cost != null ? { cost: Math.round(cost) } : {}) };
-}
-
 /**
- * The same shape, for the two series that no longer hide a small count: **home sales and building permits**
- * (Kyle, 2026-09-22 — DECISIONS). A count of three is written as 3.
+ * A count, as the City's server returned it: a count of three is written as 3 (Kyle, 2026-09-22 — DECISIONS, for
+ * every series this file writes; the crash series in ingest-crashes.ts is exact too).
  *
- * The ten-sale rule on the MEDIAN stays: a count is a count, but the middle of three sales is a statistic that
- * moves with any one of them, and the panel says "too few sales to show a price" rather than print it. The page
- * carries one plain sentence — "Small numbers change a lot from year to year." — in place of the hiding.
+ * The ten-record rule on the MEDIAN stays: a count is a count, but the middle of three sales (or three closed
+ * problems) is a statistic that moves with any one of them, and the panel says "too few to show a price" rather
+ * than print it. The page carries one plain sentence — "Small numbers change a lot from year to year." — in
+ * place of the hiding.
  */
 export function plainCount(n: number, median?: number | null, cost?: number | null): { count: Count; median?: number; cost?: number } {
   return { count: n, ...(median != null && n >= 10 ? { median: Math.round(median) } : {}), ...(cost != null ? { cost: Math.round(cost) } : {}) };
@@ -159,10 +158,10 @@ export function roadsByHood(pieces: { cond: number; miles: number; mid: Pt }[], 
   return { byHood, city };
 }
 
-/** Honesty rule 2 for street ratings: fewer than 5 pieces is "lt5", and a share needs at least 10 rated pieces. */
+/** Street ratings: the real number of rated pieces, however few; a SHARE needs at least 10 of them (a share of three
+ *  pieces moves with any one of them, like a median of three sales). */
 export function roadShare(t: RoadTotals | undefined): NowStats['roads'] {
   if (!t) return undefined;
-  if (t.pieces < 5) return { pieces: 'lt5' };
   return { pieces: t.pieces, miles: Number(t.miles.toFixed(1)), ...(t.pieces >= 10 && t.miles > 0 ? { poor_pct: Math.round((t.poor_miles / t.miles) * 100) } : {}) };
 }
 
@@ -210,12 +209,12 @@ async function stats(hoods: Neighborhood[]): Promise<void> {
       await q(ISSUES, { where: issueWhere, ...grouped, outStatistics: issueStats }), await q(ISSUES, { where: issueWhere, outStatistics: issueStats }),
       await q(FIRES, { where: fireWhere, ...grouped, outStatistics: countStat('ObjectId') }), await q(FIRES, { where: fireWhere, outStatistics: countStat('ObjectId') }),
     ];
-    for (const f of bl.features ?? []) put(f.attributes.neighborhood, y, { blight: suppress(f.attributes.n).count });
-    for (const f of de.features ?? []) put(f.attributes.neighborhood, y, { demolitions: suppress(f.attributes.n).count });
-    for (const f of is.features ?? []) { const r = suppress(f.attributes.n, f.attributes.median); put(f.attributes.neighborhood, y, { issues: r.count, ...(r.median !== undefined ? { issue_days: r.median } : {}) }); }
-    for (const f of fi.features ?? []) put(f.attributes.neighborhood, y, { fires: suppress(f.attributes.n).count });
-    const ci = suppress(isAll.features?.[0]?.attributes.n ?? 0, isAll.features?.[0]?.attributes.median);
-    const conditions: YearStats = { blight: suppress(blAll.features?.[0]?.attributes.n ?? 0).count, demolitions: suppress(deAll.features?.[0]?.attributes.n ?? 0).count, issues: ci.count, ...(ci.median !== undefined ? { issue_days: ci.median } : {}), fires: suppress(fiAll.features?.[0]?.attributes.n ?? 0).count };
+    for (const f of bl.features ?? []) put(f.attributes.neighborhood, y, { blight: plainCount(f.attributes.n).count });
+    for (const f of de.features ?? []) put(f.attributes.neighborhood, y, { demolitions: plainCount(f.attributes.n).count });
+    for (const f of is.features ?? []) { const r = plainCount(f.attributes.n, f.attributes.median); put(f.attributes.neighborhood, y, { issues: r.count, ...(r.median !== undefined ? { issue_days: r.median } : {}) }); }
+    for (const f of fi.features ?? []) put(f.attributes.neighborhood, y, { fires: plainCount(f.attributes.n).count });
+    const ci = plainCount(isAll.features?.[0]?.attributes.n ?? 0, isAll.features?.[0]?.attributes.median);
+    const conditions: YearStats = { blight: plainCount(blAll.features?.[0]?.attributes.n ?? 0).count, demolitions: plainCount(deAll.features?.[0]?.attributes.n ?? 0).count, issues: ci.count, ...(ci.median !== undefined ? { issue_days: ci.median } : {}), fires: plainCount(fiAll.features?.[0]?.attributes.n ?? 0).count };
     for (const f of s.features ?? []) { const r = plainCount(f.attributes.n, f.attributes.median); put(f.attributes.neighborhood, y, { sales: r.count, ...(r.median ? { median_price: r.median } : {}) }); }
     for (const f of b.features ?? []) { const r = plainCount(f.attributes.n, null, f.attributes.cost); put(f.attributes.neighborhood, y, { permits: r.count, ...(r.cost ? { permit_cost: r.cost } : {}) }); }
     const cs = plainCount(sAll.features?.[0]?.attributes.n ?? 0, sAll.features?.[0]?.attributes.median), cb = plainCount(bAll.features?.[0]?.attributes.n ?? 0, null, bAll.features?.[0]?.attributes.cost);
@@ -239,15 +238,15 @@ async function stats(hoods: Neighborhood[]): Promise<void> {
   // Rental certificates of compliance in force today: the layer holds only active ones; the date check makes sure.
   const rentWhere = `expired_date >= DATE '${today()}'`;
   const [rn, rnAll] = [await q(RENTALS, { where: rentWhere, groupByFieldsForStatistics: 'neighborhood', outStatistics: count1('ObjectId') }), await q(RENTALS, { where: rentWhere, outStatistics: count1('ObjectId') })];
-  for (const f of rn.features ?? []) putNow(f.attributes.neighborhood, { rental_certs: suppress(f.attributes.n).count });
-  cityNow.rental_certs = suppress(rnAll.features?.[0]?.attributes.n ?? 0).count;
+  for (const f of rn.features ?? []) putNow(f.attributes.neighborhood, { rental_certs: plainCount(f.attributes.n).count });
+  cityNow.rental_certs = plainCount(rnAll.features?.[0]?.attributes.n ?? 0).count;
   // Vacant-building registrations issued in the past 12 months. Counts only: this layer carries owner names.
   const yearAgo = today(new Date(Date.now() - 365 * 864e5)), vacWhere = `issued_date >= DATE '${yearAgo}'`;
   const [va, vaAll] = [await q(VACANT, { where: vacWhere, groupByFieldsForStatistics: 'neighborhood', outStatistics: count1('ObjectId') }),
     await q(VACANT, { where: vacWhere, outStatistics: JSON.stringify([{ statisticType: 'count', onStatisticField: 'ObjectId', outStatisticFieldName: 'n' }, { statisticType: 'min', onStatisticField: 'issued_date', outStatisticFieldName: 'a' }, { statisticType: 'max', onStatisticField: 'issued_date', outStatisticFieldName: 'b' }]) })];
-  for (const f of va.features ?? []) putNow(f.attributes.neighborhood, { vacant_reg: suppress(f.attributes.n).count });
+  for (const f of va.features ?? []) putNow(f.attributes.neighborhood, { vacant_reg: plainCount(f.attributes.n).count });
   const vAll = vaAll.features?.[0]?.attributes ?? {};
-  cityNow.vacant_reg = suppress(vAll.n ?? 0).count;
+  cityNow.vacant_reg = plainCount(vAll.n ?? 0).count;
   const day = (v: unknown) => (typeof v === 'number' ? today(new Date(v)) : String(v ?? '').slice(0, 10));
   const vacantPeriod: [string, string] = [day(vAll.a) || yearAgo, day(vAll.b) || today()];
   // Street ratings: the one layer with no neighborhood field.

@@ -174,7 +174,7 @@ export async function build(opts: BuildOptions = {}) {
       ...(cr ? { crashes: cr.city_by_name, crashSource: { name: cr.source.name, url: cr.source.page, license: cr.source.license, license_url: cr.source.license_url, notice: cr.source.license_notice, last_edited: cr.source.last_edited, records_from: cr.source.records_from } } : {}),
     }) : null;
     const doc = { sources: { neighborhoods: h.source, ...st.sources, ...(pts?.sources ?? {}), ...crashSource }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types,
-      ...(cr ? { crash_years: cr.years, city_crashes: cr.city.window, crash_records_from: cr.source.records_from } : {}),
+      ...(cr ? { crash_years: cr.years, city_crashes: cr.city.window, ...(cr.city.years ? { city_crashes_by_year: cr.city.years } : {}), crash_records_from: cr.source.records_from } : {}),
       ...(st.current ? { city_now: st.current.city, fire_types: st.fire_types, roads_years: st.roads_years, vacant_period: st.vacant_period } : {}), ...ind,
       ...(areaDoc ? { cities: areaDoc.cities, areas: areaDoc.areas, area_sources: areaDoc.area_sources, paser: ct.paser, pavement_year: ct.pavement_year, permit_years: ct.permit_years } : {}) };
     putCompact('indicators/neighborhoods.json', doc);

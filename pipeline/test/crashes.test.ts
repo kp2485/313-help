@@ -3,7 +3,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CITIES, FIELDS, LAYER, LICENSE_PAGE, NOTICE, WINDOW, aggregate, cityWhere, hide, pickYears, suppressedCount, type Crash } from '../src/ingest-crashes.js';
+import { CITIES, FIELDS, LAYER, LICENSE_PAGE, NOTICE, WINDOW, aggregate, cityWhere, pickYears, rowOf, type Crash } from '../src/ingest-crashes.js';
 import { buildIndicators } from '../src/indicators.js';
 import type { Neighborhood } from '../src/ingest-neighborhoods.js';
 import { p } from '../src/util.js';
@@ -26,26 +26,33 @@ describe('crashes: adding up by neighborhood', () => {
     const got = aggregate(crashes, HOODS, years);
     expect(got.placed).toBe(18);
     expect(got.unplaced).toBe(1);
-    expect(got.neighborhoods.nbh_a!.window).toEqual({ walk: 6, bike: 5, severe: 'lt5' });
-    expect(got.neighborhoods.nbh_b!.window).toEqual({ walk: 7, bike: 'lt5', severe: 'lt5' });
-    // Every neighborhood gets a row, and a row is one multi-year total and nothing else.
+    expect(got.neighborhoods.nbh_a!.window).toEqual({ walk: 6, bike: 5, severe: 0 });
+    expect(got.neighborhoods.nbh_b!.window).toEqual({ walk: 7, bike: 0, severe: 0 });
+    // Each year of the window too, exact, and the window is their sum (2026-09-22: nothing is hidden).
+    expect(got.neighborhoods.nbh_a!.years).toEqual({ '2020': { walk: 6, bike: 5, severe: 0 }, '2021': { walk: 0, bike: 0, severe: 0 } });
+    expect(got.neighborhoods.nbh_b!.years).toEqual({ '2020': { walk: 0, bike: 0, severe: 0 }, '2021': { walk: 7, bike: 0, severe: 0 } });
+    // Every neighborhood gets a row, and a row is the window and its years and nothing else.
     expect(Object.keys(got.neighborhoods).sort()).toEqual(['nbh_a', 'nbh_b']);
-    expect(Object.keys(got.neighborhoods.nbh_a!)).toEqual(['window']);
+    expect(Object.keys(got.neighborhoods.nbh_a!).sort()).toEqual(['window', 'years']);
   });
   it('a crash that killed or badly hurt someone is counted once, among the crashes of its mode', () => {
     const crashes = Array.from({ length: 5 }, () => at(-83.045, 2020, { severe: true }));
     const got = aggregate(crashes, HOODS, years).neighborhoods.nbh_a!;
-    expect(got.window).toEqual({ walk: 5, bike: 'lt5', severe: 5 });
+    expect(got.window).toEqual({ walk: 5, bike: 0, severe: 5 });
   });
   it('a crash with both a person walking and a person biking counts in both modes', () => {
     const got = aggregate([at(-83.045, 2020, { bike: true })], HOODS, years).neighborhoods.nbh_a!.window;
-    expect(got).toEqual({ walk: 'lt5', bike: 'lt5', severe: 'lt5' });   // still hidden: one is under 5
+    expect(got).toEqual({ walk: 1, bike: 1, severe: 0 });                // a 1 is a 1: nothing is hidden
   });
-  it('hides every count under 5, including zero (docs/13 honesty rule 2)', () => {
-    expect(hide({ walk: 0, bike: 4, severe: 5 })).toEqual({ walk: 'lt5', bike: 'lt5', severe: 5 });
-    const hidden = suppressedCount(aggregate([], HOODS, years).neighborhoods);
-    expect(hidden.cells).toBe(2 * 3);                                     // 2 neighborhoods x 3 numbers
-    expect(hidden.places).toBe(2);
+  it('every count is the exact number, zero included, and a window is the sum of its years (Kyle, 2026-09-22)', () => {
+    expect(rowOf({ '2020': { walk: 0, bike: 4, severe: 5 }, '2021': { walk: 1, bike: 0, severe: 0 } }, [2020, 2021]))
+      .toEqual({ window: { walk: 1, bike: 4, severe: 5 }, years: { '2020': { walk: 0, bike: 4, severe: 5 }, '2021': { walk: 1, bike: 0, severe: 0 } } });
+    expect(JSON.stringify(aggregate([], HOODS, years).neighborhoods)).not.toContain('lt5');
+  });
+  it('a crash in a hole of an outline is outside it (even-odd)', () => {
+    const holed: Neighborhood = { ...box('nbh_h', -83.06), rings: [...box('nbh_h', -83.06).rings, [[-83.057, 42.333], [-83.053, 42.333], [-83.053, 42.337], [-83.057, 42.337], [-83.057, 42.333]]] };
+    const got = aggregate([at(-83.055, 2020), at(-83.0585, 2020)], [holed], years);
+    expect(got.placed).toBe(1); expect(got.unplaced).toBe(1);
   });
   it('covers the most recent complete years the layer offers, newest last', () => {
     expect(pickYears(2024)).toEqual([2020, 2021, 2022, 2023, 2024]);
@@ -88,9 +95,10 @@ describe('crashes: what we refuse to keep', () => {
     expect(text).not.toMatch(/-8[23]\.\d/);
     expect(text).not.toMatch(/42\.\d\d/);
     expect(text).not.toMatch(/\d{4}-\d\d-\d\dT/);
-    for (const row of Object.values(doc.neighborhoods) as { window: Record<string, unknown> }[]) {
-      expect(Object.keys(row).sort()).toEqual(['window']);               // nothing per year: see the suppression test
+    for (const row of Object.values(doc.neighborhoods) as { window: Record<string, unknown>; years: Record<string, Record<string, unknown>> }[]) {
+      expect(Object.keys(row).sort()).toEqual(['window', 'years']);      // the window and its years: counts only
       expect(Object.keys(row.window).sort()).toEqual(['bike', 'severe', 'walk']);
+      for (const y of Object.values(row.years)) expect(Object.keys(y).sort()).toEqual(['bike', 'severe', 'walk']);
     }
   });
   it("says what the licence actually is, and carries the notice SEMCOG's agreement requires", () => {
@@ -108,82 +116,31 @@ describe('crashes: what we refuse to keep', () => {
     expect(doc.source.review).toMatch(/indemnif/i);
     expect(doc.source.review).toMatch(/MSP has not been asked/);          // the other owner's terms, still unasked
   });
-  it('the counts in the committed file are already hidden under 5', () => {
+  it('the committed file is exact: every count a number, the window the sum of its years, and no "lt5" anywhere', () => {
     const file = p('data/ingested/crashes.json');
     if (!existsSync(file)) return;
-    const doc = JSON.parse(readFileSync(file, 'utf8'));
-    for (const row of [...Object.values(doc.neighborhoods), ...Object.values(doc.city_by_name)] as { window: Record<string, number | string> }[])
-      for (const [k, v] of Object.entries(row.window)) expect(v === 'lt5' || (typeof v === 'number' && v >= 5), `${k}=${v}`).toBe(true);
-  });
-});
-
-/**
- * Hidden has to mean hidden. The file used to publish a per-year count *and* the five-year total for the same
- * place, each suppressed on its own, so a hidden year was just the total minus the published years: eighteen
- * cells came out exactly (2026-09-20). This walks every hidden cell in the committed file and proves that more
- * than one value is still consistent with everything the file publishes — per place (a severe crash is one of
- * that place's walking or biking crashes, so `severe <= walk + bike`) and against the city total it belongs to.
- */
-describe('crashes: a hidden count cannot be worked out from the published ones', () => {
-  const MAX = 4;                                                          // "lt5" means 0..4
-  const feasible = (window: Record<string, number | string>): Record<string, Set<number>> => {
-    const opts = (k: string) => (window[k] === 'lt5' ? [0, 1, 2, 3, 4] : [window[k] as number]);
-    const ok: Record<string, Set<number>> = { walk: new Set(), bike: new Set(), severe: new Set() };
-    for (const w of opts('walk')) for (const b of opts('bike')) for (const s of opts('severe')) if (s <= w + b) { ok.walk!.add(w); ok.bike!.add(b); ok.severe!.add(s); }
-    return ok;
-  };
-
-  it('two or more values fit every hidden cell, in each place and against its city total', () => {
-    const file = p('data/ingested/crashes.json');
-    if (!existsSync(file)) return;
-    const doc = JSON.parse(readFileSync(file, 'utf8'));
-    const rows = Object.entries(doc.neighborhoods) as [string, { window: Record<string, number | string> }][];
-    for (const [id, row] of rows) {
-      const ok = feasible(row.window);
-      for (const k of ['walk', 'bike', 'severe']) if (row.window[k] === 'lt5') expect(ok[k]!.size, `${id} ${k}`).toBeGreaterThan(1);
+    const text = readFileSync(file, 'utf8'), doc = JSON.parse(text);
+    expect(text).not.toContain('lt5');
+    let small = 0;
+    for (const row of [...Object.values(doc.neighborhoods), ...Object.values(doc.city_by_name)] as { window: Record<string, number>; years: Record<string, Record<string, number>> }[]) {
+      for (const k of ['walk', 'bike', 'severe']) {
+        expect(typeof row.window[k]).toBe('number');
+        if (row.window[k]! < 5) small++;
+        expect(Object.values(row.years).reduce((s, y) => s + y[k]!, 0), k).toBe(row.window[k]);
+      }
+      expect(Object.keys(row.years)).toEqual(doc.years_covered.map(String));
     }
-    // Detroit's neighborhoods sit inside Detroit's published total, and crashes outside every outline are not
-    // published at all, so the total only ever gives an upper bound. Prove the slack is wider than one value.
-    for (const k of ['walk', 'bike', 'severe'] as const) {
-      const known = rows.reduce((n, [, r]) => n + (typeof r.window[k] === 'number' ? (r.window[k] as number) : 0), 0);
-      const hidden = rows.filter(([, r]) => r.window[k] === 'lt5').length;
-      const city = doc.city.window[k];
-      if (typeof city !== 'number' || !hidden) continue;
-      // With one hidden cell set to v and the others to 0, the sum must still fit under the city total.
-      expect(city - known, `${k}: only one value fits under the city total`).toBeGreaterThan(1);
-      expect(hidden * MAX, `${k}: the hidden cells cannot even reach the city total, so they are all pinned high`).toBeGreaterThan(city - known);
-    }
-  });
-
-  it('catches the shape that leaked: a total beside its parts, each suppressed on its own', () => {
-    // 2020-2024 walking counts for one place: 7, 6, <5, <5, <5 with a five-year total of 14 leaves 1 to split
-    // between three hidden years -- which is 1, 0, 0 in some order, so each is known to be 0 or 1, not 0..4.
-    // A total of 25 leaves 12 for three cells that cannot hold more than 4 each: every one of them is exactly 4.
-    const fits = (parts: (number | string)[], total: number, at: number) => {
-      const hidden = parts.filter((v) => v === 'lt5').length;
-      const rest = total - parts.reduce<number>((n, v) => n + (typeof v === 'number' ? v : 0), 0);
-      const values = new Set<number>();
-      const walk = (i: number, left: number, chosen: number[]) => {
-        if (i === hidden) { if (left === 0) values.add(chosen[at]!); return; }
-        for (let v = 0; v <= MAX; v++) walk(i + 1, left - v, [...chosen, v]);
-      };
-      walk(0, rest, []);
-      return values;
-    };
-    expect(fits([7, 6, 'lt5', 'lt5', 'lt5'], 14, 0)).toEqual(new Set([0, 1]));
-    expect(fits([7, 6, 'lt5', 'lt5', 'lt5'], 25, 0)).toEqual(new Set([4]));      // pinned exactly: the old leak
-    // Which is why the file publishes the total and nothing else to subtract from it.
-    const got = aggregate([], HOODS, [2020, 2021]).neighborhoods.nbh_a!;
-    expect(JSON.stringify(got)).not.toMatch(/20(20|21)/);
+    expect(small, 'the point of 2026-09-22: small counts are stated').toBeGreaterThan(50);
   });
 });
 
 describe('crashes in the bundle', () => {
-  it('each neighborhood carries the multi-year totals only, and never a rate or a rank', () => {
-    const crashes = aggregate([...Array.from({ length: 9 }, () => at(-83.045, 2020))], HOODS, [2020]).neighborhoods;
+  it('each neighborhood carries the multi-year totals and the years, and never a rate or a rank', () => {
+    const crashes = aggregate([...Array.from({ length: 9 }, () => at(-83.045, 2020)), at(-83.045, 2021, { bike: true })], HOODS, [2020, 2021]).neighborhoods;
     const { neighborhoods } = buildIndicators({ hoods: HOODS, rows: [], parks: [], segments: [], stats: { neighborhoods: {} }, crashes });
     const a = neighborhoods.find((n) => n.id === 'nbh_a')!;
-    expect(a.crashes).toEqual({ walk: 9, bike: 'lt5', severe: 'lt5' });
+    expect(a.crashes).toEqual({ walk: 10, bike: 1, severe: 0 });
+    expect(a.crashes_by_year).toEqual({ '2020': { walk: 9, bike: 0, severe: 0 }, '2021': { walk: 1, bike: 1, severe: 0 } });
     expect(JSON.stringify(a.crashes)).not.toMatch(/rate|rank|per_1000/);
     // The order of the list is the order the neighborhoods came in: nothing is sorted by a crash count.
     expect(neighborhoods.map((n) => n.id)).toEqual(['nbh_a', 'nbh_b']);

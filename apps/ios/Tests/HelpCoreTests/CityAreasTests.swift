@@ -136,14 +136,14 @@ final class CityAreasTests: XCTestCase {
          "help":{"total":5,"by":{"food":5},"nearest_miles":{"food":0.4},"none_listed_yet":["narcan"],
                  "coverage_checked":false},
          "places":{"parks":3,"rec_centers":0,"greenway_open":0},"years":{},
-         "crashes":{"walk":12,"bike":"lt5","severe":7},
+         "crashes":{"walk":12,"bike":3,"severe":7},
          "city":"Dearborn","kind":"city","panels":["crashes"],"sources":{"crashes":"semcog"},"missing":[],
          "permits_by_year":[{"year":2023,"buildings":4,"units":9,"months_reported":12},
                             {"year":2024,"buildings":2,"units":3,"months_reported":7}]}
         """)
         XCTAssertEqual(area.hood.name, "Dearborn")
         XCTAssertEqual(area.hood.help.total, 5)
-        XCTAssertEqual(area.hood.crashes?.bike, .suppressed)
+        XCTAssertEqual(area.hood.crashes?.bike, .number(3))
         XCTAssertEqual(area.permitsByYear?.count, 2)
         XCTAssertEqual(area.permitsByYear?[1].monthsReported, 7)
         XCTAssertEqual(area.hood.rings?.count, 1)

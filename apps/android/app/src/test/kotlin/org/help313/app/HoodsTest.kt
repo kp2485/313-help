@@ -3,7 +3,7 @@
 //
 // It runs under `:core` as well as `:app` — `HELP313_NO_ANDROID=1 ./gradlew :core:test` — because these are rules
 // a mistake in would be worst: an index that quietly sorted by a number would be the league table docs/13 forbids,
-// and a suppressed count turned back into a digit would undo the suppression.
+// and every count is the real number: nothing is hidden (Kyle, 2026-09-22).
 //
 // **It reads the file the app actually ships.** A decoder held only to a fixture is a decoder held to a guess: the
 // last test below opens data/bundle/v1/indicators/neighborhoods.json, all 380 KB of it, and checks that every one
@@ -74,19 +74,33 @@ class HoodsTest {
         assertEquals(d.neighborhoods.size, d.neighborhoods.map { it.id }.toSet().size)
     }
 
-    /** A suppressed count arrives already hidden and there is no way back to the number. */
+    /** Every count is the exact number, however small (Kyle, 2026-09-22): a 3 is a 3, crashes included. */
     @Test
-    fun suppressedCountsStayWords() {
+    fun everyCountIsTheExactNumber() {
         val d = real() ?: return
-        val hidden = d.neighborhoods.flatMap { it.years.values }.count { it.sales?.hidden == true } +
-            d.neighborhoods.count { it.crashes?.bike?.hidden == true }
-        assertTrue("the shipped file has no suppressed counts at all, which is not what docs/13 describes", hidden > 0)
-        assertNull("a hidden count must have no value", HoodCount.HIDDEN.value)
-        assertEquals("fewer than 5", hoodCountText(HoodCount.HIDDEN) { "fewer than 5" })
+        val small = d.neighborhoods.flatMap { it.years.values }.count { (it.fires?.value ?: 9) < 5 }
+        val smallCrash = d.neighborhoods.count { (it.crashes?.bike?.value ?: 9) < 5 }
+        assertTrue("small fire counts are stated", small > 100)
+        assertTrue("small crash counts are stated", smallCrash > 50)
+        assertEquals("3", hoodCountText(HoodCount.of(3)) { it })
+        assertEquals("0", hoodCountText(HoodCount.of(0)) { it })
         assertEquals("none recorded", hoodCountText(null) { "none recorded" })
         assertEquals("14", hoodCountText(HoodCount.of(14)) { it })
-        // And a hidden count never becomes a rate, which would hand the number back.
-        assertNull(hoodRate(HoodCount.HIDDEN, 10_000))
+        assertNotNull(hoodRate(HoodCount.of(3), 10_000))
+        // The crash years are there, and each window is the sum of its years.
+        for (h in d.neighborhoods) {
+            val c = h.crashes ?: continue
+            assertTrue(h.id, h.crashesByYear.isNotEmpty())
+            assertEquals(h.id, c.walk?.value, h.crashesByYear.values.sumOf { it.walk?.value ?: 0 })
+        }
+        assertEquals(listOf("2020", "2021", "2022", "2023", "2024"), d.cityCrashesByYear.keys.toList())
+        // A file built before 2026-09-22 still carried "lt5": it reads as nothing recorded, never as a number.
+        val old = HoodYear.fromJson(org.help313.query.Json.parse("{\"sales\":3,\"fires\":\"lt5\"}".toByteArray()))
+        assertEquals(3, old.sales?.value)
+        assertNull(old.fires)
+        // The "at a glance" year is the latest with a number in any of the given series.
+        assertEquals(d.years.last(), hoodLatestYear(d.neighborhoods[0], d, listOf({ it.blight }, { it.issues })))
+        assertNull(hoodLatestYear(d.neighborhoods[0], d, listOf({ null })))
     }
 
     // ---- where a point falls -----------------------------------------------------------------------------------

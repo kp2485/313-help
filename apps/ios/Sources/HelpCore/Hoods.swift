@@ -1,6 +1,6 @@
 // The neighborhood numbers (docs/13), in numbers only: no UIKit, no SwiftUI, so `swift test` runs every rule here
 // on Linux as well. This is the Swift half of `apps/web/src/hoods.ts`, and it is deliberately a port rather than a
-// rewrite: the same file, the same fields, the same suppression, the same rates, the same words.
+// rewrite: the same file, the same fields, the same rates, the same words.
 //
 // What comes from where. `indicators/neighborhoods.json` is built by the pipeline from PUBLIC City and SEMCOG
 // datasets joined with our own listings. Nothing in it comes from a phone, a report, or app usage (docs/13), and
@@ -10,31 +10,25 @@
 // The honesty rules that live in this file, the same three as the web's:
 //  1. No ranking. `hoodsAlphabetical` and `hoodsByDistrict` sort by name and by council district and by nothing
 //     else; `testIndexOrderNeverDependsOnAnIndicator` holds them to it.
-//  2. Small counts arrive already hidden (`"lt5"`) and are shown as WORDS, never as a number and never as zero.
-//  3. A rate needs a count we can show and a base we can defend (at least 100 lots), or there is no rate.
+//  2. Every count is the real number, however small (Kyle, 2026-09-22 — DECISIONS). Nothing in the file is hidden
+//     and nothing here hides it: a 3 is a 3, crashes included.
+//  3. A rate needs a base we can defend (at least 100 lots), or there is no rate.
 import DetroitQuery
 import Foundation
 
-// MARK: - a count that may be too small to show
+// MARK: - a count
 
-/// A count the pipeline either gives as a number or hides as `"lt5"` — "fewer than 5" (docs/13). There is
-/// deliberately no way to get a number out of a hidden one: it is not 4, it is not 0, it is not shown.
+/// A count, exactly as the pipeline wrote it. Since 2026-09-22 there is no hidden value in the file at all, so a
+/// count is simply a whole number; the type stays so that every field that is a count says so.
 public enum HoodCount: Equatable, Sendable, Decodable {
     case number(Int)
-    /// `"lt5"` in the file: under five, so the City's own suppression rule hides it and so do we.
-    case suppressed
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.singleValueContainer()
-        if let n = try? c.decode(Int.self) { self = .number(n); return }
-        let s = try c.decode(String.self)
-        guard s == "lt5" else {
-            throw DecodingError.dataCorruptedError(in: c, debugDescription: "a count is a number or \"lt5\", not \(s)")
-        }
-        self = .suppressed
+        self = .number(try c.decode(Int.self))
     }
 
-    /// The number, when there is one to show. `nil` for a hidden count, so no caller can accidentally print it.
+    /// The number. (Optional only so a missing count and a present one read the same way at every call site.)
     public var shown: Int? { if case .number(let n) = self { return n }; return nil }
 }
 
@@ -64,6 +58,20 @@ public struct HoodYear: Decodable, Equatable, Sendable {
         case medianPrice = "median_price", permitCost = "permit_cost", issueDays = "issue_days"
     }
     public init() {}
+    /// A count that is not a number — the `"lt5"` a file built before 2026-09-22 carried — reads as nothing
+    /// recorded, so an older list on a phone still draws every number it does have instead of no page at all.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        sales = try? c.decodeIfPresent(HoodCount.self, forKey: .sales)
+        medianPrice = try c.decodeIfPresent(Double.self, forKey: .medianPrice)
+        permits = try? c.decodeIfPresent(HoodCount.self, forKey: .permits)
+        permitCost = try c.decodeIfPresent(Double.self, forKey: .permitCost)
+        blight = try? c.decodeIfPresent(HoodCount.self, forKey: .blight)
+        demolitions = try? c.decodeIfPresent(HoodCount.self, forKey: .demolitions)
+        issues = try? c.decodeIfPresent(HoodCount.self, forKey: .issues)
+        issueDays = try c.decodeIfPresent(Double.self, forKey: .issueDays)
+        fires = try? c.decodeIfPresent(HoodCount.self, forKey: .fires)
+    }
 }
 
 public struct HoodRoads: Decodable, Equatable, Sendable {
@@ -80,14 +88,22 @@ public struct HoodNow: Decodable, Equatable, Sendable {
     public var vacantReg: HoodCount?
     public var roads: HoodRoads?
     enum CodingKeys: String, CodingKey { case rentalCerts = "rental_certs", vacantReg = "vacant_reg", roads }
+    /// Same tolerance as `HoodYear`: a value an older file hid reads as nothing recorded.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        rentalCerts = try? c.decodeIfPresent(HoodCount.self, forKey: .rentalCerts)
+        vacantReg = try? c.decodeIfPresent(HoodCount.self, forKey: .vacantReg)
+        roads = try? c.decodeIfPresent(HoodRoads.self, forKey: .roads)
+    }
 }
 
 /// "Safe streets" (docs/13): crashes the police wrote up that involved someone walking or biking, over the years
-/// the panel names. Plain counts, hidden under five. Never a rate — docs/13 defines no denominator here.
+/// the panel names. Exact counts. Never a rate — docs/13 defines no denominator here.
 public struct HoodCrashes: Decodable, Equatable, Sendable {
     public var walk: HoodCount
     public var bike: HoodCount
     public var severe: HoodCount
+    public init(walk: HoodCount, bike: HoodCount, severe: HoodCount) { self.walk = walk; self.bike = bike; self.severe = severe }
 }
 
 public struct HoodHelp: Decodable, Equatable, Sendable {
@@ -149,11 +165,33 @@ public struct Hood: Decodable, Equatable, Sendable, Identifiable {
     public var years: [String: HoodYear]
     public var now: HoodNow?
     public var crashes: HoodCrashes?
+    /// The same three counts for each year of the window (2026-09-22). Optional: a bundle built before that day
+    /// carries the window only, and the panel then draws the totals and no chart.
+    public var crashesByYear: [String: HoodCrashes]?
     enum CodingKeys: String, CodingKey {
         case id, name, district, center, rings, help, places, parcels, years, now, crashes
-        case jlgStudyArea = "jlg_study_area", nearestCity = "nearest_city"
+        case jlgStudyArea = "jlg_study_area", nearestCity = "nearest_city", crashesByYear = "crashes_by_year"
     }
     public var inJLG: Bool { jlgStudyArea == true }
+    /// The crash counts of a file built before 2026-09-22 may still say `"lt5"`; such a panel is left out rather
+    /// than the whole page refused. Everything else decodes exactly as before.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        district = try c.decodeIfPresent(Int.self, forKey: .district)
+        jlgStudyArea = try c.decodeIfPresent(Bool.self, forKey: .jlgStudyArea)
+        center = try c.decode([Double].self, forKey: .center)
+        rings = try c.decodeIfPresent([[Int]].self, forKey: .rings)
+        help = try c.decode(HoodHelp.self, forKey: .help)
+        places = try c.decode(HoodPlaces.self, forKey: .places)
+        nearestCity = try c.decodeIfPresent(HoodNearestCity.self, forKey: .nearestCity)
+        parcels = try c.decodeIfPresent(Int.self, forKey: .parcels)
+        years = try c.decode([String: HoodYear].self, forKey: .years)
+        now = try c.decodeIfPresent(HoodNow.self, forKey: .now)
+        crashes = try? c.decodeIfPresent(HoodCrashes.self, forKey: .crashes)
+        crashesByYear = try? c.decodeIfPresent([String: HoodCrashes].self, forKey: .crashesByYear)
+    }
 }
 
 /// Every dataset behind these numbers, in the order the sources panel prints them. Each one is optional: a bundle
@@ -196,8 +234,31 @@ public struct Indicators: Decodable, Equatable, Sendable {
     public var vacantPeriod: [String]?
     public var crashYears: [Int]?
     public var cityCrashes: HoodCrashes?
+    public var cityCrashesByYear: [String: HoodCrashes]?
     public var crashRecordsFrom: String?
     public var statsFetchedAt: String
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        sources = try c.decode(HoodSources.self, forKey: .sources)
+        cityParcels = try c.decodeIfPresent(Int.self, forKey: .cityParcels)
+        issueTypes = try c.decodeIfPresent([String].self, forKey: .issueTypes)
+        fireTypes = try c.decodeIfPresent([String].self, forKey: .fireTypes)
+        cityNow = try c.decodeIfPresent(HoodNow.self, forKey: .cityNow)
+        roadsYears = try c.decodeIfPresent([Int].self, forKey: .roadsYears)
+        vacantPeriod = try c.decodeIfPresent([String].self, forKey: .vacantPeriod)
+        crashYears = try c.decodeIfPresent([Int].self, forKey: .crashYears)
+        cityCrashes = try? c.decodeIfPresent(HoodCrashes.self, forKey: .cityCrashes)
+        cityCrashesByYear = try? c.decodeIfPresent([String: HoodCrashes].self, forKey: .cityCrashesByYear)
+        crashRecordsFrom = try c.decodeIfPresent(String.self, forKey: .crashRecordsFrom)
+        statsFetchedAt = try c.decode(String.self, forKey: .statsFetchedAt)
+        firstYear = try c.decode(Int.self, forKey: .firstYear)
+        partialYear = try c.decode(Int.self, forKey: .partialYear)
+        nearMiles = try c.decode(Double.self, forKey: .nearMiles)
+        origin = try c.decode([Double].self, forKey: .origin)
+        city = try c.decode([String: HoodYear].self, forKey: .city)
+        neighborhoods = try c.decode([Hood].self, forKey: .neighborhoods)
+        segments = try c.decode([String: [String]].self, forKey: .segments)
+    }
     public var firstYear: Int
     /// The year that is still running: its row is labelled "so far", never compared as if it were finished.
     public var partialYear: Int
@@ -222,7 +283,7 @@ public struct Indicators: Decodable, Equatable, Sendable {
         case areaSources = "area_sources", pavementYear = "pavement_year", permitYears = "permit_years"
         case cityParcels = "city_parcels", issueTypes = "issue_types", fireTypes = "fire_types", cityNow = "city_now"
         case roadsYears = "roads_years", vacantPeriod = "vacant_period", crashYears = "crash_years"
-        case cityCrashes = "city_crashes", crashRecordsFrom = "crash_records_from", statsFetchedAt = "stats_fetched_at"
+        case cityCrashes = "city_crashes", cityCrashesByYear = "city_crashes_by_year", crashRecordsFrom = "crash_records_from", statsFetchedAt = "stats_fetched_at"
         case firstYear = "first_year", partialYear = "partial_year", nearMiles = "near_miles"
     }
 
@@ -630,8 +691,8 @@ public enum HoodFormat {
 
     // MARK: rates and counts
 
-    /// Per 1,000 lots. No rate without a count we can show AND a base we can defend: a hidden count has no rate,
-    /// and neither has a neighborhood with fewer than a hundred lots in it (honesty rules 2 and 3).
+    /// Per 1,000 lots. No rate without a base we can defend: a neighborhood with fewer than a hundred lots in it
+    /// has no rate (honesty rule 3).
     public static func rate(_ c: HoodCount?, parcels: Int?) -> Double? {
         guard let n = c?.shown, let p = parcels, p >= 100 else { return nil }
         return Double(n) / Double(p) * 1000
@@ -641,17 +702,21 @@ public enum HoodFormat {
     public static func rateText(_ r: Double) -> String { number(r, decimals: r < 10 ? 1 : 0) }
 
     /**
-     A count as a person reads it: the number, "fewer than 5" when the pipeline hid it, or "none recorded" when
-     there is nothing at all. The two sentences are the app's own words, handed in by the screen — the rule of
-     which one to use is what lives here, and it is the rule the web applies in `count()` and `show()`.
-
-     There is no branch that turns a hidden count into a digit. That is the point of it.
+     A count as a person reads it: the number, or "none recorded" when there is nothing at all. The sentence is the
+     app's own words, handed in by the screen; the rule is the web's `count()` and `show()`.
      */
-    public static func count(_ c: HoodCount?, none: String, fewerThanFive: String, grouped useGrouping: Bool = false) -> String {
+    public static func count(_ c: HoodCount?, none: String, grouped useGrouping: Bool = false) -> String {
         switch c {
         case .none: return none
-        case .suppressed: return fewerThanFive
         case .number(let n): return fixed(Double(n), decimals: 0, grouped: useGrouping)
+        }
+    }
+
+    /// The latest year with a number in any of the given fields: the year the "at a glance" row names.
+    public static func latestYear(_ h: Hood, _ d: Indicators, fields: [(HoodYear) -> Bool]) -> String? {
+        d.years.reversed().first { y in
+            let year = h.years[y] ?? HoodYear()
+            return fields.contains { $0(year) }
         }
     }
 }
