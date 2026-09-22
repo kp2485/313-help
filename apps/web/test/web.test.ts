@@ -606,8 +606,9 @@ describe('map', () => {
     expect(directionsHref({}, 'Android')).toBeNull();
     expect(transitHref(spot)).toBe('https://www.google.com/maps/dir/?api=1&destination=42.3314,-83.0458&travelmode=transit');
     // The screen: the buttons and the "Where" block no longer depend on there being an address, and where there is
-    // none the page says so in words instead of turning the coordinate into one.
-    expect(main).toContain('${goHere(r) ? `<div class="two">');
+    // none the page says so in words instead of turning the coordinate into one. Since 2026-09-22 the three
+    // link-outs sit under "Other apps", below our own Directions — the same gate, one fold down.
+    expect(main).toContain('${goHere(r) ? `<details class="browse otherapps">');
     expect(main).toContain("${r.address || (!sensitive && r.lat !== undefined) ? `<h2>${T('detail.where')}</h2>");
     expect(main).toContain("T('detail.where_no_address', { source: r.facts.source.name })");
     expect(main).not.toMatch(/r\.address!/);
@@ -632,7 +633,7 @@ describe('map', () => {
     expect(transitAppHref({}, 'iPhone')).toBeNull();                     // nothing to point at, no link
     // The screen: inside the same gate as Directions and Bus directions, so a row whose directions are withheld
     // (DV and crisis rows carry neither an address nor a coordinate) never shows it. Bus directions stays first.
-    expect(main).toContain("${goHere(r) ? `<div class=\"two\">");
+    expect(main).toContain("${goHere(r) ? `<details class=\"browse otherapps\">");
     expect(main).toContain("${busApp(r) ? `<a class=\"btn ghost\" href=\"${esc(busApp(r)!)}\"");
     expect(main).toMatch(/transitHref\(r\)![\s\S]{0,200}busApp\(r\)/);
     expect(main).toContain("const busApp = (r: BundleRow) => transitAppHref(r, navigator.userAgent);");
@@ -670,7 +671,7 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     for (const tab of TABS) { expect(strings[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); expect(es[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); }
     expect(main).toContain("tab === 'map' ? mapTab()");
     // The greenway, parks and segment screens now sit under Map, so the tab bar highlights Map on them.
-    expect(main).toContain("greenway: 'map', segment: 'map', parks: 'map', park: 'map' };");
+    expect(main).toContain("greenway: 'map', segment: 'map', parks: 'map', park: 'map', directions: 'map' };");
   });
   it('everything the Recreation and Transit tabs offered is still on it', () => {
     // "Parks and paths" replaced the two sections the Map tab used to carry (audit §6): one heading, the nearest
@@ -1082,6 +1083,12 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
     ['the keyboard focus ring on the map', '--focus', '--gw-case'],
     ...['open', 'build', 'fund', 'plan'].flatMap((p): [string, string, string][] =>
       [[`the greenway (${p}) on land`, `--gw-${p}`, '--map-land'], [`the greenway (${p}) on its casing`, `--gw-${p}`, '--gw-case']]),
+    // A drawn itinerary (the Directions screen, 2026-09-22). The same three grounds as every other line on the
+    // map — the land, a park it crosses, and the casing map.ts lays under it — plus the surface, because the
+    // route's own start, end and boarding markers are drawn with a ring in the surface colour.
+    ...['walk', 'ride'].flatMap((r): [string, string, string][] =>
+      [[`the ${r} leg of a route on land`, `--route-${r}`, '--map-land'], [`the ${r} leg of a route over a park`, `--route-${r}`, '--map-park'],
+        [`the ${r} leg of a route on its casing`, `--route-${r}`, '--gw-case'], [`a route marker inside its own ring`, `--route-${r}`, '--surface']]),
     ...['bus', 'smart', 'rail', 'bike'].flatMap((l): [string, string, string][] =>
       [[`the ${l} layer on land`, `--lyr-${l}`, '--map-land'], [`the ${l} layer over a park`, `--lyr-${l}`, '--map-park'], [`the ${l} layer on its casing`, `--lyr-${l}`, '--gw-case']]),
     ...['food', 'shelter', 'health', 'rec', 'work', 'kids', 'things', 'paperwork'].flatMap((g): [string, string, string][] =>

@@ -268,6 +268,83 @@ because everywhere else the map is a thing you drag. The hand is decided by the 
 a frame at most, only for a mouse or a pen, and a drag is not a hover. Elsewhere in the app, `summary` rows, tick
 boxes, radios and selects gained the hand, and anything switched off says so with the default arrow instead.
 
+## Directions (2026-09-22)
+
+Our own walking and bus directions, computed on the phone from the files the bundle already carries. The rules
+are in `schema/query-spec.md` ("Streets graph", "Walking directions", "Trip plans") and in `packages/query`;
+this section is what a person sees. The two people it was built for are a survivor whose phone service has been
+cut off and needs to get somewhere safe, and a person without housing and without signal looking for free food
+(DECISIONS 2026-09-22). Google cannot answer either of them offline. We can — as long as we are honest about
+the three things we do not have: **times, sidewalks, and the door.**
+
+**Three sentences that may never move.** The estimate is always a **range** ("about 25–40 min"), never a single
+number, never a clock time, never an arrival time. A route's **published headway** is the only time-like fact we
+carry and may only be read out as the agency's own sentence ("about every 15 min"); the wait we assume is never
+shown. And **no screen says "safe", "accessible", "lit" or "step-free"** — we have no sidewalk, curb-ramp or
+lighting data at all. Two caveat lines sit at the top of every state of the screen, in all four languages:
+
+> Directions are computed on your phone from public maps. They are not checked for safety or lighting. If a
+> street looks wrong, use another.
+>
+> Times are estimates. Buses may come more or less often.
+
+**Where a person asks.** A listing's own screen leads with **Directions** — ours — and the three link-outs that
+were there before (Apple/Google Maps, Bus directions, the Transit app) move below it, unchanged, under **Other
+apps**, with the same gate and the same warning that another app will see the place. Every results row with a
+known place has one, which includes the urgent sheet's "Get somewhere safe now" list and every browse and
+search result; so does a park page; so does the map's bottom card, where **Directions** comes before "See
+details". A row the map may not draw at all — a DV shelter, a crisis line — has no button, because it carries no
+coordinate in the first place and the one gate (`dirValue`) fails closed.
+
+**Where a person starts.** The origin is whatever is already known this visit: the position if it was allowed,
+else the cross street or ZIP they typed. With nothing known the screen asks, and it asks with the **cross-street
+field open and first** — it is the only one of the three that works with no satellite and no signal, and this is
+the screen a person with neither is on. It is the same field, the same handler and the same words as everywhere
+else in the app (`locChip`), only reordered. **The origin is never persisted, never put in a URL, and never
+sent.** "Change the start" lets it go again.
+
+**The screen.** The street graph is built lazily off the main thread in a Web Worker the first time, cached in
+memory for the session, behind "Getting the map ready… (about a second)". Then up to **three itineraries** as
+cards — "Walk · 2.7 mi · about 45–70 min", "Bus 4 · walk 0.1 mi, ride 3 stops, walk 0.1 mi · about 5–15 min ·
+about every 12 min", and one-change variants — with walking always offered while it is under three miles.
+Picking one gives the map (the app's own canvas, with a route overlay) and a **numbered step list**, which is
+the source of truth for the whole screen:
+
+> 1. Walk east on W Warren Ave for 0.1 mi
+> 2. Turn right onto Woodward Ave and walk 0.5 mi
+> 3. Board the 4 at Woodward & Warren toward Woodward
+> 4. Ride 3 stops to Woodward & Alexandrine
+> 5. Get off at Woodward & Alexandrine
+> 6. Walk 0.1 mi to Bicentennial Towers
+> 7. Then about 6 m to the building
+
+The last line is the rule that **we route to the street outside, not to the door.** Every sentence is built from
+the structured facts the rules hand over — a street name, a compass word, a turn word, a stop's own name, a
+count of stops — and never from prose the rules produced.
+
+**Following along.** With a live position the current step is highlighted and announced and the map keeps the
+person in view. There is no rerouting and there is not going to be: off the line, the screen says "You are off
+the route." and offers **Plan again**. Under Reduce Motion the map does not animate.
+
+**Accessibility.** The step list is an ordered list of sentences and really is numbered; N and P step through it
+while it has the cursor, and each change is announced in the app's one live region. The route overlay has a text
+equivalent read out with the picture ("The line on the map is this trip: …"). The map's own N and P reach the
+route's markers first, in the order they happen. A turn is a **word**, never an arrow glyph, so nothing has to
+mirror in Arabic; street names are `<bdi lang="en">`, so a name keeps its own direction and punctuation inside a
+right-to-left sentence. The route line and its markers clear 3:1 against the land, a park, their own casing and
+the marker ring, in both themes and under `prefers-contrast: more` and forced colours.
+
+**Traceless.** The Directions screen has no address at all: `hashFor` answers `null`, so nothing reaches the URL
+or the browser's history, and the window title is the plain "Directions · 313 Help" — the same treatment as the
+urgent sheet and a private listing. Where somebody is, and where they are going, are on screen and nowhere else.
+
+**Offline.** `map/base.json`, `map/streets.json` and the transit layers are files the map already downloads and
+keeps, checksum-verified, in IndexedDB, so a phone that has opened a map once can route with no network at all —
+tested by blocking the network in headless Chrome, where the whole flow (three itineraries, a DDOT route, the
+steps) works with no failed request. The screen and its Worker are their own lazily loaded chunk, handed to the
+service worker to keep the moment they arrive, so the second tap needs no signal either. A phone that has never
+held the streets says so and names the Map tab; a phone with the streets and no transit files still walks.
+
 ## List / Map
 
 - Same query, two views. The map is closed until asked for ("Show these {count} on a map"), so the first **Call** button stays near the top. Every listed place with coordinates is a dot that opens its details. Sensitive listings (DV, mental-health crisis) never get a dot, and the "not safe at home" screen has no map. The list is fully usable if the map fails to load.
@@ -280,8 +357,12 @@ boxes, radios and selects gained the hand, and anything switched off says so wit
 Top → bottom:
 1. Name (in the top bar) · organization · open now or next time, computed from RRULE ("Open now until {time}" / "Closed now. Next: {day} {time}") · freshness badge, which states a fact and never says "verified" and which distinguishes who looked ("A program matched this to their website on {date}" for a script's match, "Their website was read and matched on {date}" for a person's browser read, "Nobody has checked it. Call first." for neither) · a notice, if the listing has one.
    **On a holiday** a row whose schedule would have said "Open" says "Holiday today. Call first." instead, with a line naming its usual hours ("Today is a holiday. The usual hours are {hours}, but they may be different today. Call before you go."), and an occurrence in "Next times" that falls on a holiday is labelled "Holiday. Call first." rather than dropped. Nobody's holiday hours are in any source we read, so the app stops claiming and starts saying what it knows (`schema/query-spec.md`, "Holidays").
-2. Big buttons: **Call** (one per phone number) · **Directions** · **Bus directions** · **Bus directions in the Transit app** (phones only, see below) · **Save** · **Share** (share a deep link — no personal data in the link). DV and crisis listings have no Save button.
-   - **Bus directions** is first and needs no app: it opens a trip plan in the browser, wherever the person is.
+2. Big buttons: **Call** (one per phone number) · **Directions** — ours, computed on the phone (see "Directions"
+   above) — then **Other apps**, which folds away the three link-outs below: **Directions** (Apple or Google
+   Maps) · **Bus directions** · **Bus directions in the Transit app** (phones only, see below). Then **Save** ·
+   **Share** (share a deep link — no personal data in the link). DV and crisis listings have no Save button, and
+   none of the four directions buttons at all.
+   - **Bus directions** is first inside "Other apps" and needs no app: it opens a trip plan in the browser, wherever the person is.
    - **Bus directions in the Transit app** is an addition under it, for the app DDOT and SMART riders use for
      real-time buses. It is Transit's own documented link (`transit://directions?to=…`, `apps/web/src/directions.ts`
      and `apps/ios/HelpApp/Listing.swift`; sources in `docs/research/2026-09-20/transit-app.md`) and carries the
