@@ -82,7 +82,12 @@ jobs:
       # ./gradlew, so the Gradle version is the one pinned in gradle/wrapper/gradle-wrapper.properties.
       - run: ./gradlew --no-daemon :query:test :core:test
         working-directory: apps/android
-      # The same 190 fixture cases again with no test framework on the classpath at all, which is the route that
-      # still works if JUnit (EPL-1.0, test-only) is ever dropped.
+      # The same 203 fixture cases again with no test framework on the classpath at all, which is the route that
+      # still works if JUnit (EPL-1.0, test-only) is ever dropped. Since 2026-09-22 they include the thirteen
+      # directions cases (schema/fixtures/14 and 15), which this job used to count as skipped.
+      #
+      # :query:test also builds the routable street graph from data/ingested/basemap, which IS committed, so the
+      # graph's size and shape are held here on a fresh clone; the cases that need a built bundle (the listings
+      # and the transit layers) skip, as the other shipped-bundle tests do.
       - run: ./gradlew --no-daemon :query:runFixtures
         working-directory: apps/android
