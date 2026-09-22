@@ -247,6 +247,9 @@ public final class CrossStreets {
     private var cache: [String: CrossOutcome] = [:]
 
     public init(map: BaseMap) { index = StreetIndex(map) }
+    /// The same thing from an index that was built somewhere else — off the main actor, on a phone, because
+    /// walking a city's worth of street geometry is not work a screen should do while a finger is on it.
+    public init(index: StreetIndex) { self.index = index }
 
     public func resolve(_ text: String) -> CrossOutcome? {
         guard let parsed = parseCrossing(text) else { return nil }
