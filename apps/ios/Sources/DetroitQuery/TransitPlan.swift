@@ -211,7 +211,11 @@ public func stopsNear(_ net: TransitNetwork, _ pt: LatLon, metres: Double = ACCE
 
 // ---- what a plan looks like -------------------------------------------------------------------
 
-public struct StopRef: Sendable, Equatable { public var index: Int; public var name: String }
+public struct StopRef: Sendable, Equatable {
+    public var index: Int
+    public var name: String
+    public init(index: Int, name: String) { self.index = index; self.name = name }
+}
 
 public struct WalkLeg: Sendable {
     public var metres: Double
@@ -221,6 +225,12 @@ public struct WalkLeg: Sendable {
     /// Set when this leg ends at, or starts from, a stop.
     public var toStop: StopRef?
     public var fromStop: StopRef?
+    /// Public so a client's own wording tests can build a leg without a bundle.
+    public init(metres: Double, minutes: Double, steps: [WalkStep], polyline: [[Double]],
+                toStop: StopRef? = nil, fromStop: StopRef? = nil) {
+        self.metres = metres; self.minutes = minutes; self.steps = steps; self.polyline = polyline
+        self.toStop = toStop; self.fromStop = fromStop
+    }
 }
 
 public struct RideLeg: Sendable {
@@ -242,6 +252,15 @@ public struct RideLeg: Sendable {
     public var polyline: [[Double]]
     // Which pattern this ride is, so the drawn line can be filled in for the few itineraries returned.
     var route = -1, pattern = -1, fromAt = -1, toAt = -1
+    /// Public so a client's own wording tests can build a leg without a bundle. The pattern indices above stay
+    /// internal: they are how the planner found the line, not anything a client may invent.
+    public init(routeId: String, routeShort: String, routeLong: String, agency: String, headwayMinutes: Double?,
+                fromStop: StopRef, toStop: StopRef, stops: Int, metres: Double, minutes: Double,
+                waitMinutes: Double, polyline: [[Double]]) {
+        self.routeId = routeId; self.routeShort = routeShort; self.routeLong = routeLong; self.agency = agency
+        self.headwayMinutes = headwayMinutes; self.fromStop = fromStop; self.toStop = toStop; self.stops = stops
+        self.metres = metres; self.minutes = minutes; self.waitMinutes = waitMinutes; self.polyline = polyline
+    }
 }
 
 public enum PlanLeg: Sendable {
@@ -264,6 +283,12 @@ public struct Itinerary: Sendable {
     /// Metres from the asked-for start to the first street, and from the last street to the destination.
     public var startOffMetres: Double
     public var endOffMetres: Double
+    /// Public so a client's own wording tests can build one without a bundle.
+    public init(legs: [PlanLeg], changes: Int, walkMetres: Double, rideMetres: Double, minutes: Double,
+                range: (lo: Int, hi: Int), startOffMetres: Double, endOffMetres: Double) {
+        self.legs = legs; self.changes = changes; self.walkMetres = walkMetres; self.rideMetres = rideMetres
+        self.minutes = minutes; self.range = range; self.startOffMetres = startOffMetres; self.endOffMetres = endOffMetres
+    }
 }
 
 /// The range a client says. Rounded to 5 minutes, at least 5 minutes wide, never a single number.

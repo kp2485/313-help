@@ -70,6 +70,14 @@ enum MapColor {
     static let grpPaperwork = mapPair(0x475569, 0xCBD5E1)
     /// Where this phone is, when the person asked for it.
     static let me = mapPair(0x0A57C2, 0x8AB8FF)
+    /// A city or neighbourhood outline (`place:areas`): the web's `--muted` for the dashed line, `--ink` for the
+    /// name, `--focus` for the one that was tapped. A boundary is a line and a name and never a shade.
+    static let areaLine = mapPair(0x47584F, 0xA3B5AA)
+    static let areaInk = mapPair(0x10201A, 0xE9F1EC)
+    static let focus = mapPair(0x0A57C2, 0x8AB8FF)
+    /// A trip, on a Directions map: the web's `--route-walk` and `--route-ride` (apps/web/src/style.css).
+    static let routeWalk = mapPair(0x9D1B6A, 0xFF8AD4)
+    static let routeRide = mapPair(0x00558F, 0x73C2FF)
 
     /// The name a layer style or a greenway phase carries (HelpCore/MapLayers.swift), resolved to a colour here so
     /// that the rules stay free of SwiftUI and `swift test` can reach them.
@@ -83,6 +91,8 @@ enum MapColor {
         case "gwBuild": return gwBuild
         case "gwFund": return gwFund
         case "gwPlan": return gwPlan
+        case routeWalkToken: return routeWalk
+        case routeRideToken: return routeRide
         default: return .brand
         }
     }

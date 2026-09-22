@@ -45,21 +45,34 @@ final class HoodsModel {
     }
 }
 
-/// Where a tap on the index, or on "Your neighborhood", goes next.
-enum HoodRoute: Hashable { case hood(String) }
+/// Where a tap on the map, on the index, or on "Your neighborhood" goes next. `hood` is any area id — a Detroit
+/// neighborhood or one of the four cities — because both are the same page drawn from the same components.
+enum HoodRoute: Hashable { case hood(String), index }
 
-/// A to Z, or grouped by council district. Neither is a ranking: the City numbers its districts, and that is all
-/// the second one is (docs/13, honesty rule 1).
+/// A to Z, grouped by council district, or nearest first. **None of the three is a ranking**: the City numbers
+/// its districts, and a distance to the middle of an outline says how far away a place is, never how good it is
+/// (docs/13, honesty rule 1). "Nearest first" is offered only when a location, a ZIP or a cross street is
+/// already known, and the distance is worked out here, on the phone, from a point that never leaves it.
 enum HoodGrouping: String, CaseIterable, Identifiable {
-    case abc, district
+    case near, abc, district
     var id: String { rawValue }
-    var label: String { L.t(self == .abc ? "hood.group_abc" : "hood.group_district") }
+    var label: String {
+        switch self {
+        case .near: return L.t("hood.order_near")
+        case .abc: return L.t("hood.group_abc")
+        case .district: return L.t("hood.group_district")
+        }
+    }
 }
+
+/// Which view of the Areas tab is showing. The map is the landing (audit §3.1); the index is the second view.
+enum HoodsView: String { case map, list }
 
 // MARK: - the tab
 
 struct HoodsTabView: View {
     @EnvironmentObject private var store: BundleStore
+    @Environment(MapModel.self) private var map
     @State private var model = HoodsModel()
     @State private var path: [HoodRoute] = []
 
@@ -69,11 +82,19 @@ struct HoodsTabView: View {
                 .navigationDestination(for: HoodRoute.self) { route in
                     switch route {
                     case .hood(let id):
-                        if let d = model.indicators, let h = d.hood(id: id) { HoodPageView(hood: h, d: d) }
+                        if let d = model.indicators, let page = d.areaPage(id: id) { AreaPageView(page: page, d: d) }
+                    case .index:
+                        // "All 205 Detroit neighborhoods", from the Detroit city page: the index, not the map.
+                        HoodsIndexView(model: model, startAs: .list)
                     }
                 }
         }
-        .task(id: store.bundle?.index.version) { await model.load(from: store) }
+        .task(id: store.bundle?.index.version) {
+            await model.load(from: store)
+            // The Areas tab lands on a map, so the outlines and the city under them are wanted here too.
+            await map.loadAreas(from: store)
+            await map.loadBase(from: store)
+        }
     }
 }
 
@@ -81,32 +102,34 @@ struct HoodsTabView: View {
 
 struct HoodsIndexView: View {
     let model: HoodsModel
+    /// The Detroit city page's "All 205 Detroit neighborhoods" arrives straight at the index.
+    var startAs: HoodsView = .map
+    @EnvironmentObject private var here: Here
+    @Environment(MapModel.self) private var map
     /// Memory only, like every other search box in this app: never stored, never sent, never logged.
     @State private var find = ""
     @State private var grouping: HoodGrouping = .abc
+    @State private var view: HoodsView?
+    /// The outline a tap chose, this screen only.
+    @State private var picked = ""
+    @State private var navigate: String?
+
+    private var showing: HoodsView { view ?? startAs }
 
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 10) {
             if let d = model.indicators {
                 Text(L.t("hood.index_intro")).font(.body).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                if showing == .map { mapView }
+                // The switch is a button, not a tab set: there are two views of one thing, and the wording says
+                // which one you are about to get.
+                Button(L.t(showing == .map ? "map.list_title" : "map.list_as_map")) {
+                    view = showing == .map ? .list : .map
+                }
+                .font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand)
                 MyHoodCard(d: d)
-                Text(L.t("hood.only_detroit")).font(.footnote).foregroundStyle(Color.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-                Picker(L.t("hood.group_label"), selection: $grouping) {
-                    ForEach(HoodGrouping.allCases) { g in Text(g.label).tag(g) }
-                }
-                .pickerStyle(.segmented)
-                .accessibilityLabel(L.t("hood.group_label"))
-                let shown = hoodsMatching(hoodsAlphabetical(d.neighborhoods), query: find)
-                Text(shown.isEmpty ? L.t("hood.find_none")
-                     : L.t(shown.count == 1 ? "hood.find_one" : "hood.find_count", ["count": String(shown.count)]))
-                    .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
-                LazyVStack(alignment: .leading, spacing: 8, pinnedViews: []) {
-                    ForEach(groups(of: shown), id: \.0) { title, hoods in
-                        SectionHead(text: title)
-                        ForEach(hoods) { h in HoodRowLink(hood: h) }
-                    }
-                }
+                if showing == .list { list(d) }
+                cities(d)
                 Text(L.t("hood.index_sources")).font(.footnote).foregroundStyle(Color.muted)
                     .fixedSize(horizontal: false, vertical: true).padding(.top, 8)
                 Text(L.t("hood.describe")).font(.footnote).foregroundStyle(Color.muted)
@@ -118,31 +141,103 @@ struct HoodsIndexView: View {
         .background(Color.appBg.ignoresSafeArea())
         .searchable(text: $find, placement: .navigationBarDrawer(displayMode: .always), prompt: L.t("hood.find_label"))
         .autocorrectionDisabled()
+        // "Nearest first" is only an order once there is a point to measure from; it can never be left selected
+        // after the location is switched off.
+        .onChange(of: here.point) { _, p in if p == nil, grouping == .near { grouping = .abc } }
+        .navigationDestination(item: $navigate) { id in
+            if let d = model.indicators, let page = d.areaPage(id: id) { AreaPageView(page: page, d: d) }
+        }
         // The full word on the screen and in VoiceOver; the tab bar's own label is the short one (`tab.hoods`).
         .navigationTitle(L.t("tab.hoods_wide"))
         .urgentHelp()
     }
 
-    /// The headings over the list: one per letter, or one per council district. Both are the A–Z list cut up; the
-    /// order inside a heading is always the A–Z one (HelpCore).
+    /// The landing: the four city outlines and the 205 neighbourhood outlines, and nothing else on the map.
+    @ViewBuilder private var mapView: some View {
+        AreasMapView(areas: map.areas, base: map.base, selected: $picked, open: { navigate = $0 })
+        if let a = map.area(id: picked) {
+            AreaCard(area: a) { navigate = a.id }
+        }
+        Text(L.t("hood.map_note")).font(.footnote).foregroundStyle(Color.muted)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    @ViewBuilder private func list(_ d: Indicators) -> some View {
+        Picker(L.t("hood.group_label"), selection: $grouping) {
+            ForEach(orders) { g in Text(g.label).tag(g) }
+        }
+        .pickerStyle(.segmented)
+        .accessibilityLabel(L.t("hood.group_label"))
+        let shown = hoodsMatching(hoodsAlphabetical(d.neighborhoods), query: find)
+        Text(shown.isEmpty ? L.t("hood.find_none")
+             : L.t(shown.count == 1 ? "hood.find_one" : "hood.find_count", ["count": String(shown.count)]))
+            .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+        LazyVStack(alignment: .leading, spacing: 8, pinnedViews: []) {
+            ForEach(groups(of: shown), id: \.0) { title, hoods in
+                if !title.isEmpty { SectionHead(text: title) }
+                ForEach(hoods) { h in HoodRowLink(hood: h) }
+            }
+        }
+    }
+
+    /// The other three cities, as rows. They are outlines on the map too, but a list has to name them: a person
+    /// who reads lists rather than pictures must reach a Hamtramck page in the same number of taps as a
+    /// Detroiter reaches theirs, and "it is on the map" is not an answer to that.
+    @ViewBuilder private func cities(_ d: Indicators) -> some View {
+        if d.cityRows.isEmpty {
+            Text(L.t("hood.only_detroit")).font(.footnote).foregroundStyle(Color.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        } else {
+            SectionHead(text: L.t("city.list_head"))
+            Text(L.t("city.list_note")).font(.footnote).foregroundStyle(Color.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            ForEach(d.cityRows) { c in
+                NavigationLink(value: HoodRoute.hood(c.id)) {
+                    HStack(spacing: 12) {
+                        Text(L.rightToLeft ? ltr(c.name) : c.name)
+                            .font(.body.weight(.semibold)).foregroundStyle(Color.ink)
+                            .fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
+                        Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.muted)
+                    }.card(padding: 14)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(c.name)
+            }
+        }
+    }
+
+    /// "Nearest first" is offered only when a location, a typed ZIP or a typed cross street is already known.
+    private var orders: [HoodGrouping] {
+        here.point == nil ? [.abc, .district] : HoodGrouping.allCases
+    }
+
+    /// The headings over the list: one per letter, one per council district, or none at all when the order is by
+    /// distance — a letter over a distance-ordered list is a heading that lies about the order under it.
     private func groups(of list: [Hood]) -> [(String, [Hood])] {
         switch grouping {
+        case .near:
+            guard let p = here.point else { return groupsAlphabetical(list) }
+            return [("", hoodsNearestFirst(list, to: p))]
         case .district:
             return hoodsByDistrict(list).map { g in
                 (g.district.map { L.t("hood.district", ["n": String($0)]) } ?? L.t("hood.no_district"), g.hoods)
             }
         case .abc:
-            // The web's `groupHoods('abc')`: one group per first letter, and a name that starts with anything
-            // else files last under "Other" — never first.
-            var letters: [(String, [Hood])] = [], other: [Hood] = []
-            for h in list {
-                let key = hoodLetter(h)
-                if key.isEmpty { other.append(h) }
-                else if letters.last?.0 == key { letters[letters.count - 1].1.append(h) }
-                else { letters.append((key, [h])) }
-            }
-            return letters + (other.isEmpty ? [] : [(L.t("hood.letter_other"), other)])
+            return groupsAlphabetical(list)
         }
+    }
+
+    private func groupsAlphabetical(_ list: [Hood]) -> [(String, [Hood])] {
+        // The web's `groupHoods('abc')`: one group per first letter, and a name that starts with anything
+        // else files last under "Other" — never first.
+        var letters: [(String, [Hood])] = [], other: [Hood] = []
+        for h in list {
+            let key = hoodLetter(h)
+            if key.isEmpty { other.append(h) }
+            else if letters.last?.0 == key { letters[letters.count - 1].1.append(h) }
+            else { letters.append((key, [h])) }
+        }
+        return letters + (other.isEmpty ? [] : [(L.t("hood.letter_other"), other)])
     }
 }
 
@@ -337,7 +432,7 @@ private struct HoodHelpPanel: View {
  (HelpCore, `nearestListing`), the row names it and opens it — the distance stops being a fact with nowhere to go.
  Otherwise it is the plain row the web has always drawn: the kind, and how far away.
  */
-private struct NearestHelpRow: View {
+struct NearestHelpRow: View {
     let kind: String
     let help: HoodHelp
     let rows: [BundleRow]
@@ -521,7 +616,7 @@ private struct HoodConditionsPanel: View {
 
 /// 4. "Safe streets" — plain counts of crashes involving someone walking or biking, with the whole-city number
 /// beside each. No rate, no ranking, nothing about who was at fault, and SEMCOG's notice in SEMCOG's own English.
-private struct HoodCrashPanel: View {
+struct HoodCrashPanel: View {
     let hood: Hood
     let d: Indicators
     var body: some View {
@@ -610,23 +705,39 @@ extension HoodChart.Tone {
  The control appears only where a chart could say something: three years with something in them and at least one
  number to draw (`HoodChart.chartable`). A neighborhood with two years of sales keeps its table.
  */
-private struct HoodYearGroup<Tables: View>: View {
+struct HoodYearGroup<Tables: View>: View {
     @Binding var view: HoodViewChoice
     let chartName: String
-    let hood: Hood
-    let d: Indicators
-    /// Each series: its key, which identity it wears, its name, and which count it reads.
-    let series: [(key: String, tone: HoodChart.Tone, label: String, count: (HoodYear) -> HoodCount?)]
+    /// The series, already built. A neighborhood page builds them from its year table's own counts; a city page
+    /// builds them from the rows the Census Bureau publishes. Either way the picture adds nothing the tables do
+    /// not already say.
+    let series: [HoodChart.Series]
     @ViewBuilder let tables: Tables
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
     /// Which lines are switched off, this screen only: a way of looking at a page, never stored, never sent.
     @State private var off: Set<String> = []
 
-    private var drawable: [HoodChart.Series] {
-        series
-            .map { HoodChart.Series(key: $0.key, tone: $0.tone, label: $0.label, points: HoodChart.series(hood, d, count: $0.count)) }
-            .filter { HoodChart.chartable($0.points) }
+    init(view: Binding<HoodViewChoice>, chartName: String, series: [HoodChart.Series],
+         @ViewBuilder tables: () -> Tables) {
+        _view = view
+        self.chartName = chartName
+        self.series = series
+        self.tables = tables()
     }
+
+    /// The neighborhood page's form: each series named by the count it reads out of a year.
+    init(view: Binding<HoodViewChoice>, chartName: String, hood: Hood, d: Indicators,
+         series: [(key: String, tone: HoodChart.Tone, label: String, count: (HoodYear) -> HoodCount?)],
+         @ViewBuilder tables: () -> Tables) {
+        self.init(view: view, chartName: chartName,
+                  series: series.map {
+                      HoodChart.Series(key: $0.key, tone: $0.tone, label: $0.label,
+                                       points: HoodChart.series(hood, d, count: $0.count))
+                  },
+                  tables: tables)
+    }
+
+    private var drawable: [HoodChart.Series] { series.filter { HoodChart.chartable($0.points) } }
 
     var body: some View {
         let all = drawable
@@ -699,7 +810,7 @@ private struct HoodYearGroup<Tables: View>: View {
 
 /// The little shape beside a line of the key: the series' own marker, drawn rather than described, so the key
 /// looks like the picture it explains.
-private struct HoodKeySample: View {
+struct HoodKeySample: View {
     let tone: HoodChart.Tone
     let hollow: Bool
     var body: some View {
@@ -729,7 +840,7 @@ private struct HoodKeySample: View {
  the same constant on all three apps), below the first tick over zero, and the line goes on through it as a dotted
  piece — so the year is visibly there, its number is visibly not, and the gap never reads as a zero.
  */
-private struct HoodLineChart: View {
+struct HoodLineChart: View {
     let model: HoodChart.Model
     @Environment(\.dynamicTypeSize) private var textSize
 
@@ -806,7 +917,7 @@ private struct HoodLineChart: View {
 // MARK: - the pieces a panel is built from
 
 /// A panel heading. It is a heading to VoiceOver as well as to the eye, so the rotor can jump between panels.
-private struct HoodHead: View {
+struct HoodHead: View {
     let text: String
     init(_ text: String) { self.text = text }
     var body: some View {
@@ -817,7 +928,7 @@ private struct HoodHead: View {
     }
 }
 
-private struct HoodSubHead: View {
+struct HoodSubHead: View {
     let text: String
     init(_ text: String) { self.text = text }
     var body: some View {
@@ -829,7 +940,7 @@ private struct HoodSubHead: View {
 }
 
 /// The small print under a panel: what a number does not mean, and where it came from.
-private struct HoodFoot: View {
+struct HoodFoot: View {
     let text: String
     init(_ text: String) { self.text = text }
     var body: some View {
@@ -841,7 +952,7 @@ private struct HoodFoot: View {
 /// A short list of label-and-value rows, with an optional whole-city figure under the value. At the accessibility
 /// text sizes the value drops onto its own line rather than being cut short or pushing the screen sideways —
 /// the same rule that keeps a phone number whole (Views.swift, CallRow).
-private struct HoodRows: View {
+struct HoodRows: View {
     let rows: [(String, String, String)]
     @Environment(\.dynamicTypeSize) private var textSize
     init(_ rows: [(String, String, String)]) { self.rows = rows }
@@ -883,7 +994,7 @@ private struct HoodRows: View {
 }
 
 /// A count as a person reads it, and its rate per 1,000 lots when there is a count to show and a base to defend.
-private func hoodPer1000(_ c: HoodCount?, parcels: Int?) -> String {
+func hoodPer1000(_ c: HoodCount?, parcels: Int?) -> String {
     guard let c else { return L.t("hood.none_recorded") }
     if c == .suppressed { return L.t("hood.lt5") }
     let n = c.shown ?? 0
@@ -904,7 +1015,7 @@ private func hoodPer1000(_ c: HoodCount?, parcels: Int?) -> String {
  There is no bar, no colour and no sorting: a neighborhood is compared with ITSELF over time and with the city as
  a whole, never with another neighborhood (docs/13).
  */
-private struct HoodYearsTable: View {
+struct HoodYearsTable: View {
     let caption: String
     let d: Indicators
     let hood: Hood

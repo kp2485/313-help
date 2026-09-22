@@ -5,7 +5,7 @@ Four parts:
 - **`Sources/DetroitQuery`**: the rules for open now, next times, badges, ranking, search, greenway distances and — since 2026-09-22 — the streets graph, walking directions and whole trip plans. It is a Swift copy of `packages/query`, tested against the same `schema/fixtures` the web app uses. `swift test` runs on macOS, Linux and Windows: **203 fixture cases, none skipped**.
 - **`Sources/HelpCore`**: the parts of the app itself that are not a screen — the install key and its daily dedupe hash, what a report is and what the Worker's closed schema allows, the outbox, the saved-places rules, the one session every request goes through, the signed-bundle check (key shape, the small-order deny-list, checksums, the downgrade floor), what a release build may ship, and **the map**: the projection, the bundle's own map-file format, the camera, hit-testing, which layers exist and how each is drawn, the never-drawn predicate and the reading order VoiceOver gets (`MapData.swift`, `MapLayers.swift`). No UIKit, no SwiftUI, no Combine, so `swift test` runs it too. **These used to live in `HelpApp/` and were tested only inside the git-ignored Xcode project, which meant CI never ran them** (iPhone review, 2026-09-20).
 - **`HelpApp/`**: the SwiftUI screens (iOS 17). They compile and run in the iOS Simulator (first built 2026-09-20 on Xcode 27; re-verified the same day on iPhone 16 Pro / iOS 18.0). They have not been run on a real iPhone and have never been signed for a device.
-- **`Tests/`**: `HelpCoreTests` (the app's own rules), `DetroitQueryTests` (the shared fixtures) and `AppParityTests` — the needs list held to the web app's. Parity reads `HelpApp/Help.swift`, `apps/web/src/needs.ts` and `strings/*.json` as text and fails when the three disagree: a different need, a missing choice, a different category, a screen that gained or lost its **quick exit**, or a string key the app asks for and `strings/en.json` does not have. It compiles nothing from `HelpApp/`, so it runs with `swift test` and needs no Xcode. Because it reads both files as text, both write a need's own settings (`first`, `intro`, `emptyKey`, `quickExit`, `query`) **above** its `refine` list; keep it that way.
+- **`Tests/`**: `HelpCoreTests` (the app's own rules — since 2026-09-22 including `DirWordsTests`, the whole trip-plan wording contract in all four languages against the same table as `apps/web/test/directions.test.ts`, and `CityAreasTests`, the areas layer's hit test and reading order and the city page's allow-list), `DetroitQueryTests` (the shared fixtures) and `AppParityTests` — the needs list held to the web app's. Parity reads `HelpApp/Help.swift`, `apps/web/src/needs.ts` and `strings/*.json` as text and fails when the three disagree: a different need, a missing choice, a different category, a screen that gained or lost its **quick exit**, or a string key the app asks for and `strings/en.json` does not have. It compiles nothing from `HelpApp/`, so it runs with `swift test` and needs no Xcode. Because it reads both files as text, both write a need's own settings (`first`, `intro`, `emptyKey`, `quickExit`, `query`) **above** its `refine` list; keep it that way.
 
 ## The Neighborhoods tab (2026-09-21)
 
@@ -51,7 +51,7 @@ The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme
 
 ### How the project is wired
 
-- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, `AddPlace.swift`, `Browse.swift`, and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
+- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, `AddPlace.swift`, `Browse.swift`, the navigation work of 2026-09-22's five — `CrossStreet.swift`, `CityPage.swift`, `Directions.swift`, `DirectionsEntry.swift`, `RouteOverlay.swift` — and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
 - `HelpApp/Assets.xcassets` (the app icon) and `HelpApp/PrivacyInfo.xcprivacy` are referenced in place too and are copied in by the Resources phase.
 - `DetroitQuery` and `HelpCore` are local Swift package products from `apps/ios` (the `Package.swift` beside this README), linked into the app target.
 - `strings/en.json`, `es.json`, `ar.json` and `bn.json` are referenced in place from the repo root (`../../../strings/…`) and land flat in the app bundle, which is what `L.table(_:)` expects. `Info.plist` lists the same four under `CFBundleLocalizations`, so iOS offers them in `Locale.preferredLanguages`.
@@ -87,7 +87,7 @@ It refuses: an empty or non-https origin, the placeholder host, fewer than two k
 ### Making the project again (or by hand in Xcode)
 
 1. File → New → Project → iOS App, named "313 Help", interface SwiftUI, language Swift, saved in `apps/ios/Xcode/`.
-2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in **every** Swift file from `HelpApp/` (fourteen today: the five `Map*.swift`, and `Browse.swift`), choosing **Create groups** and leaving **Copy items** unticked. Drag in `HelpApp/Assets.xcassets` and `HelpApp/PrivacyInfo.xcprivacy` the same way.
+2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in **every** Swift file from `HelpApp/` (twenty-one today: the list under "How the project is wired"), choosing **Create groups** and leaving **Copy items** unticked. Drag in `HelpApp/Assets.xcassets` and `HelpApp/PrivacyInfo.xcprivacy` the same way.
 3. File → Add Package Dependencies → Add Local… → select `apps/ios`. Add **both** the `DetroitQuery` and `HelpCore` libraries to the app target.
 4. Drag `strings/en.json`, `es.json`, `ar.json` and `bn.json` in from the repo root, without copying. Add a first Run Script phase containing `"$SRCROOT/../Scripts/preflight.sh"`, and a last Run Script phase "Copy and check bundle snapshot":
    ```sh
@@ -145,7 +145,10 @@ It does:
 - **About and Your privacy** (2026-09-20), reachable from the bottom of Home. About shows the list version, its date and whether it was signed with the release key or a test key; Your privacy has the plain-language table from docs/08, **how many reports are still waiting** with a control to delete them unsent, and **"Make a new key"**, which throws the install key away and makes a new random one.
 - English, Spanish, Arabic and Bengali, following the phone's language. am/pm come from `clock.am` / `clock.pm` and list separators from `list.sep`, so an Arabic time reads "2 م" rather than "2 pm".
 
-Not yet: link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, photos on condition reports. Still open from the navigation audit and listed in "The navigation work of 2026-09-22" below: whole-city area pages, the Areas layer and the Areas tab's map landing, the cross-street field and the slow-GPS state on the screens, "Getting around" and a ZIP control on the Map tab, and the Directions screen itself. (Neighborhood pages, add-a-place and a typed ZIP arrived on 2026-09-21 and have sections of their own below.) The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
+- **Our own directions, the areas layer, the city pages and the cross-street field** (2026-09-22). The whole of
+  the navigation audit's deferred list; see "The navigation work of 2026-09-22" below.
+
+Not yet: link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, photos on condition reports. The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
 
 ## The navigation work of 2026-09-22
 
@@ -184,18 +187,62 @@ has landed here so far, and what has not.
 `AppParityTests` holds the chips, the quick-need order, the first-open layers, the tab set and Home's own
 controls to the web's files, so none of the six can drift back.
 
+### Done, part two: the screens (later on 2026-09-22)
+
+The five things the list below used to say were waiting. Every one of them mirrors the web's own files — the
+Directions screen is `apps/web/src/{dirwords,dirscreen,dirfiles,dirworker}.ts`, the areas layer and the city
+pages are the `areas` halves of `apps/web/src/{map,hoods}.ts`, and the cross-street field and the slow-GPS
+banner are `locChip`, `crossBox` and `slowBanner` in `apps/web/src/main.ts`.
+
+- **The cross-street field on the location card** (`HelpApp/CrossStreet.swift`). `LocationChip` now offers all
+  three ways in — "Use my location", "Type a cross street", "Type a ZIP code" — wherever it appears, and the
+  junction is resolved on this phone from the street geometry the signed bundle already carries
+  (`HelpCore/Intersections.swift`). Two streets that cross more than once are a short list to pick from, named
+  by the end of the street they are at; a street we do not know, and a pair that never meets, are sentences.
+  What is typed lives in one `@State` that dies with the screen.
+- **The slow-GPS state.** `Here` keeps listening for **five minutes** (`startUpdatingLocation`, not
+  `requestLocation`, which gives up on its own in ten seconds), says "Still looking…" after ten
+  (`locateSlowSeconds`) with what would help and a real **Stop**, and a fix that lands after Stop is dropped on
+  the floor — so it can never move the map out from under somebody who has since typed a cross street.
+- **The `place:areas` layer** (`HelpCore/CityAreas.swift`, painted in `MapCanvas.swift`). The four city outlines
+  and Detroit's 205, dashed so a boundary is never mistaken for a street, named once their own name fits
+  (`areaDetailMetersPerPoint`, the web's `AREA_DETAIL_MPP`), and the one that was tapped washed — **never a fill
+  that carries a value**. A tap picks the smallest outline holding it, so a neighbourhood beats the city it sits
+  inside, and Detroit's enclaves are holes rather than parts of it. The pick order is the web's — dot, glyph,
+  stop, greenway, route, **area**, park — and the VoiceOver order is segment → area → dot (`orderFeatures`).
+  Off by default on the Map tab; the Areas tab opens with it on.
+- **The Areas tab lands on a map** (`HelpApp/CityPage.swift`, `AreasMapView`), with the index as the second view
+  behind "See this map as a list" and **"Nearest first"** offered there whenever a location, a typed ZIP or a
+  typed cross street is known (`hoodsNearestFirst`, which is still not a ranking — docs/13, rule 1).
+- **City pages** (`CityPageView`): six panels, drawn **only** when this area's own `panels` allow-list names
+  them, in `cityPanels` order, each printing its own source, its own "Records from…" and its owner's own
+  required notice — SEMCOG's four panels each carry SEMCOG's sentence with SEMCOG's own year. `missing` is one
+  plain sentence; Table | Chart works on the permits panel like every other year panel.
+- **"Getting around" as a labelled row and the location control on the Map tab** (audit H3, M6): both sit under
+  the round buttons at the top, where the keyboard the cross-street field opens cannot reach them.
+- **The Directions screen** (`HelpApp/Directions.swift`, `DirectionsEntry.swift`, `RouteOverlay.swift`;
+  `HelpCore/DirWords.swift`). Reached from a listing's own screen (the primary button, with the maps-app
+  link-outs moved under "Other apps"), from every results row and the safe-now list, from a park page and from
+  the map's own card, where "Directions" comes first as it does on the web. The start is a position, a cross
+  street, a ZIP or the question — **with the cross-street field open and first**, because it is the only one of
+  the three that works with no satellite and no signal, and this is the screen a person with neither is on. The
+  street graph is built off the main actor, once per bundle, while the screen says "Getting the map ready…";
+  `plan()` gives up to three itinerary cards; choosing one draws the route on a `Canvas` — walking solid in the
+  walk token, rides in the agency's colour with the ride dash, over a casing, the active leg thicker, and start,
+  board, alight and end markers with an inner ring on the two that involve a bus — beside the numbered steps,
+  which are the source of truth. Follow-along is `CLLocation`, the current step and `offRouteMetres` (120 m) and
+  nothing else: **there is no rerouting**, by design. The caveat pair is on every state of the screen, including
+  the one that is still thinking.
+
+**Traceless.** Nothing about a trip is written anywhere: not the destination, not the origin, not the plan. The
+destination is a value on a navigation stack; the origin lives in `Here` for as long as the app is open and is
+passed to `plan()` and to nothing else. The privacy shield covers this screen like every other, and a sensitive
+listing — a DV shelter, a crisis line — carries no coordinate and gets no Directions button at all.
+
 ### Not done yet
 
-- **Whole-city area pages for Hamtramck, Highland Park and Dearborn** (audit C1). The bundle already carries
-  `cities[]` and `areas[]` with a `panels` allow-list; `HoodsScreen.swift` does not read them, so a resident of
-  three of our four cities is still told by name that they do not get a page.
-- **The Areas layer and the Areas tab's map landing** (audit §3).
-- **The cross-street field and the slow-GPS "Still looking…" state on the screens.** The rules for both are in
-  `HelpCore` and tested; no screen offers them yet, so the Map tab's first-open card still has two buttons
-  rather than three.
-- **"Getting around" as a labelled row on the Map tab** (audit H3) and **a ZIP control there** (M6).
-- **The Directions screen.** It waits on the web's `directions-web` branch, which carries the strings and the
-  wording rules; `DetroitQuery` already answers every question it will ask.
+- Photos on condition reports, an in-app language switch, archived listings on search, a listing's own alerts on
+  its detail screen. The age banner is on Home and Saved places but not yet on every list and listing.
 
 ## The Map tab
 
@@ -336,6 +383,30 @@ digits), instead of printing "2026-09-25".
 screenshot or a frame-time run can be repeated: `-mapTab`, `-mapStyle subway`, `-mapLayers ddot_routes,qline`,
 `-mapAt 42.3314,-83.0458,8`, `-mapSelect ddot_routes:rt_ddot_4`, `-mapSheet layers|list`,
 `-mapSheetScroll style`, `-mapBench` (drags the map in a circle for ten seconds).
+
+### Verified in the simulator, 2026-09-22, the navigation work (iPhone 16 Pro, iOS 18.0, `58DF0CC6`)
+
+- The Map tab opens with the three ways in under the round buttons and a labelled **Buses and getting around**
+  row. "Type a cross street" → "Woodward and Warren" resolved on the phone, the map moved there, and every list
+  then read "Sorted by distance from Woodward & Warren".
+- The **Areas** tab landed on the outlines map. Tapping Dearborn washed its outline and opened a card —
+  "Whole city · Dearborn · See details" — and the page drew the help, parks, crashes, roads, vacancy and permits
+  panels in that order, each with its own source line, "Records from Michigan's Transportation Asset Management
+  Council", and SEMCOG's own notice with its own year on each one (© 2025 on pavement, © 2024 on the 2020
+  Census totals, © 2026 on parks).
+- **Directions** from the safe-now list ("From Woodward & Warren") and from a map card ("From where you are",
+  with `xcrun simctl location`, cleared afterwards): three cards — Walk, Bus 851, Bus 8 then bus 4 — with the
+  range, the agency's own headway and the caveat pair. The walking route drew magenta over the real streets with
+  start and end markers; the bus route drew the walk legs solid and the 851 in SMART's colour with the ride
+  dash and an inner ring on the boarding and alighting markers. **Follow along** highlighted step 1 and the
+  button became "Stop following".
+- **Arabic** (`-AppleLanguages "(ar)"`): the whole of Directions mirrors, the numbers stay Western, the place's
+  own name stays one left-to-right run, and the map does not mirror.
+- **Dynamic Type AX3** (`simctl ui content_size accessibility-extra-large`): the location card and the
+  "Buses and getting around" row grow and wrap, and nothing is cut short.
+- **Not verified here: VoiceOver's own reading of the new elements** — the UI-inspection tools in this
+  environment still cannot read a live tree (see below). The area outlines and the step list are ordinary
+  SwiftUI elements with the labels the tests hold.
 
 ### Verified in the simulator, 2026-09-21, subway style (iPhone 16 Pro, iOS 18.0)
 

@@ -84,6 +84,10 @@ public struct WalkStep: Sendable, Equatable {
     /// How to get onto this street from the last one. `nil` on the first step.
     public var turn: Turn?
     public var metres: Double
+    /// Public so a client's own wording tests can build one without a bundle.
+    public init(street: String, bearing: Bearing, turn: Turn?, metres: Double) {
+        self.street = street; self.bearing = bearing; self.turn = turn; self.metres = metres
+    }
 }
 
 public struct WalkRoute: Sendable {

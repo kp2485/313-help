@@ -81,6 +81,14 @@ actor MapLoader {
         return decoded
     }
 
+    /// One map file, checked against the **signed** index and then decoded here, off the main actor, as whatever
+    /// the caller asks for. The Directions screen reads the street files and the transit networks this way, so
+    /// they go through exactly the check every other map file goes through, and a phone that has opened the Map
+    /// tab once already holds them (DECISIONS 2026-09-22: offline directions cost no new bytes).
+    func decoded<T: Decodable & Sendable>(_ src: MapFileSource, as type: T.Type) async throws -> T {
+        try directionsDecoder().decode(T.self, from: try await bytes(src))
+    }
+
     /// Frees everything but what is still switched on, when iOS says memory is short.
     func forgetEverything() { baseMaps = [:]; layers = [:]; nets = [:]; servesFiles = [:]; indicatorFiles = [:] }
 
@@ -141,6 +149,9 @@ enum MapSelection: Identifiable, Hashable {
     case segment(String)
     case listing(String)
     case park(String)
+    /// A city or neighbourhood outline (`place:areas`). It carries no listing and no number — the card is a
+    /// name, whose area it is, and the way to its page.
+    case area(String)
     /// A stop or a route on a switched-on transport layer: its own name, and the layer's name in words.
     case stop(name: String, layer: String)
     case route(name: String, layer: String)
@@ -159,6 +170,7 @@ enum MapSelection: Identifiable, Hashable {
         case .segment(let s): return "seg:" + s
         case .listing(let s): return "row:" + s
         case .park(let s): return "park:" + s
+        case .area(let s): return "area:" + s
         case .stop(let n, let l): return "stop:" + l + ":" + n
         case .route(let n, let l): return "route:" + l + ":" + n
         case .line(let l, let r): return "line:" + l + ":" + r
@@ -175,6 +187,10 @@ enum MapRoute: Hashable {
     case segment(String)
     case listing(String)
     case greenway
+    /// A city or neighbourhood page (docs/13).
+    case area(String)
+    /// Our own directions to a place on the map (DECISIONS 2026-09-22).
+    case directions(DirDestination)
 }
 
 // MARK: - the model
@@ -425,11 +441,61 @@ final class MapModel {
         guard let base = store.mapSource("map/base.json") else { baseFailed = true; return }
         let streets = store.mapSource("map/streets.json")
         do {
-            self.base = try await MapLoader.shared.baseMap(base, streets: streets)
+            let next = try await MapLoader.shared.baseMap(base, streets: streets)
+            if next != self.base { crossStreets = nil }      // another bundle's crossings mean nothing here
+            self.base = next
             baseFailed = false
         } catch {
             baseFailed = true                    // the greenway and the dots still draw; the streets simply do not
         }
+    }
+
+    // MARK: the city and neighbourhood outlines (`place:areas`)
+    //
+    // Both come from the same file the area pages come from: the four city outlines the pipeline ships
+    // (`areas[]`, DECISIONS 2026-09-22) and the City's own 205 neighbourhood outlines. **No dot, no listing, no
+    // value-carrying fill** — the layer cannot draw a listing because it is never handed one, which is how
+    // docs/08's rule about sensitive rows is satisfied here: trivially, by there being nothing to drop.
+
+    private(set) var indicators: Indicators?
+    private(set) var areas: [AreaOutline] = []
+    /// The outline a tap chose. It is a way of drawing the map and nothing else: it is never written down.
+    var areaSelected = ""
+    private var areasKey = ""
+
+    /// The outlines live in the numbers file, which is fetched the first time any screen wants it — lazily,
+    /// checksum first, decoded off the main actor, exactly as a map file is.
+    func loadAreas(from store: BundleStore) async {
+        guard let src = store.mapSource(HoodsFile.name) else { return }
+        guard src.sha256 != areasKey || areas.isEmpty else { return }
+        guard let d = try? await MapLoader.shared.indicators(src) else { return }
+        indicators = d
+        areas = areaOutlines(d, wholeCity: L.t("city.area_sub"),
+                             district: { $0.map { n in L.t("hood.district", ["n": String(n)]) } ?? L.t("hood.no_district") })
+        areasKey = src.sha256
+    }
+
+    // MARK: the streets a typed cross street is resolved against
+    //
+    // "Type a cross street" (Kyle, 2026-09-22) is answered on this phone from `map/base.json` and
+    // `map/streets.json` — the files the map already holds — so it works with no signal and nothing is sent.
+    // Building the name index walks a city's worth of geometry, so it happens off the main actor, once per
+    // bundle; what a person types never reaches this object at all (HelpCore/Intersections.swift).
+
+    private(set) var crossStreets: CrossStreets?
+    private(set) var crossFailed = false
+    private var crossBuilding = false
+
+    /// The street map, then the index. Safe to call from any screen that offers the field, as often as it likes.
+    func ensureCrossStreets(from store: BundleStore) async {
+        guard crossStreets == nil, !crossBuilding else { return }
+        crossBuilding = true
+        defer { crossBuilding = false }
+        if base == nil { await loadBase(from: store) }
+        guard let map = base else { crossFailed = true; return }
+        let index = await Task.detached(priority: .userInitiated) { StreetIndex(map) }.value
+        crossStreets = CrossStreets(index: index)
+        crossFailed = false
     }
 
     /// One transport layer's shapes, asked for only when that layer is switched on. A failure is a state of its
@@ -570,11 +636,24 @@ final class MapModel {
         }
         if let b = best { return b.hit }
 
+        // An outline sits ahead of the parks and behind everything a person came to the map to find, and the
+        // smallest area containing the point wins — a Detroit neighbourhood beats the Detroit city outline
+        // (`areaAt`, HelpCore/CityAreas.swift; the web's `probe`).
+        if isOn(areasLayerId), let a = areaAt(areasShown, x: x, y: y) { return .area(a.id) }
+
         if parksOn, let park = base?.parks.first(where: {
             !$0.name.isEmpty && $0.box.contains(x: x, y: y) && MapHit.inside(x, y, ring: $0.points)
         }) { return .park(park.name) }
         return nil
     }
+
+    /// The outlines the map is drawing this frame: only what a tap may land on, so the picture and the hit test
+    /// can never disagree about which shapes are there.
+    var areasShown: [AreaOutline] {
+        guard isOn(areasLayerId) else { return [] }
+        return areasDrawn(areas, view: camera.visible, metersPerPoint: camera.metersPerPoint)
+    }
+    func area(id: String) -> AreaOutline? { areas.first { $0.id == id } }
 
     /// The greenway, projected once per bundle.
     func prepareSegments(_ list: [Segment]) {
@@ -587,6 +666,9 @@ final class MapModel {
     // MARK: selecting
     func select(_ s: MapSelection?) {
         selection = s
+        // The outline that was tapped stays washed until another one is: that is how a person sees which shape
+        // the card belongs to. It is a way of drawing the map, and it is never written down.
+        if case .area(let id) = s { areaSelected = id }
         if s != nil { selectionCount += 1 }
     }
 }
