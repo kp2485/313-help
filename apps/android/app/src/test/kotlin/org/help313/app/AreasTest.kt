@@ -166,7 +166,7 @@ class AreasTest {
     @Test
     fun everyOutlineTheLayerDrawsOpensAPage() {
         val d = real() ?: return
-        for (a in drawnAreas(d, 1.0)) {
+        for (a in drawnAreas(d)) {
             val page = areaById(d, a.id)
             assertNotNull("the layer draws ${a.id}, which opens nothing", page)
             assertTrue("no city name for ${a.id}", cityNameOf(d, page!!).isNotEmpty())
@@ -175,15 +175,16 @@ class AreasTest {
 
     // ---- what the layer draws, and what a tap finds -----------------------------------------------------------------
 
-    /** Cities at every zoom; the 205 neighborhoods only from the zoom at which a name fits. */
+    /** Cities and all 205 neighborhoods, at every zoom (docs/MAP-STYLE.md section 15). */
     @Test
-    fun theNeighborhoodOutlinesWaitForTheZoomAtWhichANameFits() {
+    fun theLayerDrawsEveryOutlineAtEveryZoom() {
         val d = real() ?: return
-        val farOut = drawnAreas(d, AREAS_NAME_METERS_PER_DP + 0.001)
-        assertEquals("zoomed out, the four city outlines alone", 4, farOut.size)
-        assertTrue("and all of them are cities", farOut.all { it.isCity })
-        val closeIn = drawnAreas(d, AREAS_NAME_METERS_PER_DP)
-        assertEquals("at the label zoom, the cities and all 205", 4 + 205, closeIn.size)
+        // Every outline, at every zoom (docs/MAP-STYLE.md section 15): what keeps 205 of them from being a mesh
+        // is weight, not hiding. It is the NAMES the zoom still governs, in boundaryStyle.
+        val all = drawnAreas(d)
+        assertEquals("the four cities and all 205", 4 + 205, all.size)
+        assertEquals("the four cities come first", 4, all.take(4).count { it.isCity })
+        assertEquals("and nothing else is a city", 4, all.count { it.isCity })
     }
 
     /**
@@ -222,7 +223,7 @@ class AreasTest {
     @Test
     fun anEnclaveBeatsTheCityItSitsInside() {
         val d = real() ?: return
-        val hit = areaHit(drawnAreas(d, 1.0), 42.3928, -83.0496)
+        val hit = areaHit(drawnAreas(d), 42.3928, -83.0496)
         assertNotNull("nothing was found in Hamtramck", hit)
         assertEquals("city_hamtramck", hit!!.id)
     }

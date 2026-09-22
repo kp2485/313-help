@@ -545,6 +545,24 @@ fun hoodsByDistrict(list: List<Hood>): List<HoodDistrictGroup> {
     return if (none.isEmpty()) groups else groups + HoodDistrictGroup(null, none)
 }
 
+/**
+ * **Nearest first** — the index's third order, offered only while a location or a typed ZIP is known (DECISIONS
+ * 2026-09-22). It is not a ranking: a distance to the middle of an outline says how far away a place is, never
+ * how good it is (docs/13, honesty rule 1), and the only number this function ever sees is a coordinate.
+ *
+ * One group, no headings: a letter or a district over a distance-ordered list would be a heading that lies about
+ * the order under it. The straight-line distance is the same comparison-only measure the web's `away` uses, and
+ * ties break on the name, so one bundle and one point always give one list.
+ */
+fun hoodsNearest(list: List<Hood>, from: LatLon): List<Hood> {
+    fun away(h: Hood): Double {
+        val dx = (h.center.lon - from.lon) * 0.74
+        val dy = h.center.lat - from.lat
+        return dx * dx + dy * dy
+    }
+    return list.sortedWith(compareBy({ away(it) }, { foldHoodName(it.name) }, { it.name }))
+}
+
 // ---- the numbers, in words -------------------------------------------------------------------------------------------
 
 /**

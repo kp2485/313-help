@@ -23,6 +23,8 @@
     <color name="map_main">#88968D</color>
     <color name="map_fwy">#A3863A</color>
     <color name="map_ink">#D5E2DA</color>
+    <color name="map_bnd">#A98CBB</color>
+    <color name="map_bnd_more">#CDB4DA</color>
     <color name="map_me">#8AB8FF</color>
     <color name="gw_open">#4FCF93</color>
     <color name="gw_build">#E3974A</color>

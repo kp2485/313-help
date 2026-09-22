@@ -148,11 +148,11 @@ fun mapLayerStyle(id: String, @Suppress("UNUSED_PARAMETER") style: MapStyle = Ma
  */
 const val AREAS_LAYER = "place:areas"
 
-/**
- * Below this many metres per dp the neighborhood outlines are drawn and named; above it, the four city outlines
- * alone. It is the label rule itself: about 70 dp of name over an area about a kilometre across.
- */
-const val AREAS_NAME_METERS_PER_DP = 14.0
+// The 14-metre threshold that used to live here — below it the neighborhood outlines were drawn, above it the
+// four cities alone — is gone (docs/MAP-STYLE.md section 15, 2026-09-22). The Map tab opens on the whole city, so
+// in practice it meant a person saw four city edges and none of the 205 they had come to find. Every outline is
+// drawn in every band now; what keeps them from being a mesh is WEIGHT, in `boundaryStyle` (Bounds.kt), and what
+// the zoom still governs is the NAMES.
 
 /**
  * What a first-time visitor sees (audit H2; Kyle, 2026-09-22; DECISIONS 2026-09-22).
@@ -169,7 +169,30 @@ const val AREAS_NAME_METERS_PER_DP = 14.0
  *
  * A remembered choice still wins: this list is only ever read on a phone that has never touched the switcher.
  */
-val defaultMapLayers = mapGroups.map { "help:${it.id}" } + listOf("place:parks")
+val defaultMapLayers = mapGroups.map { "help:${it.id}" } + listOf("place:parks", AREAS_LAYER)
+
+/**
+ * The version of the layer list this build understands (docs/MAP-STYLE.md section 15.4).
+ *
+ * A phone that has never touched the switcher simply gets [defaultMapLayers]. A phone that **has** never reads
+ * the defaults again, so it would have gone on seeing no boundaries for ever; adding the layer on every load
+ * instead would mean nobody could ever switch it off. So the stored list carries a marker, a list without one —
+ * or with an older one — gains `place:areas` **once**, and every write stamps the marker.
+ */
+const val LAYERS_VERSION = 2
+
+/**
+ * The one-time migration, as a pure function so `:core` can hold it to its three cases: a list from before the
+ * marker gains the boundaries layer at the end and nothing else is touched; a list already at this version is
+ * handed back untouched, off or on; and the 30-layer cap still applies.
+ */
+fun migrateLayers(stored: List<String>, version: Int): List<String> {
+    if (version >= LAYERS_VERSION) return stored
+    if (stored.contains(AREAS_LAYER)) return stored
+    // `takeLast`, as the web's `slice(-30)` is: the layer that has just been added must survive the cap, or the
+    // migration would run for ever on a phone with thirty layers on and never take.
+    return (stored + AREAS_LAYER).takeLast(30)
+}
 
 /** How wide a layer's line is drawn, in dp, at this zoom. */
 fun mapLayerLineWidth(style: MapLayerStyle, metersPerPoint: Double): Double =
@@ -351,9 +374,14 @@ class MapLayerStore(private val dir: File) {
         try {
             val j = org.help313.query.Json.parse(file.readBytes())
             val list = if (j is org.help313.query.Json.Arr) j else (j["on"] as? org.help313.query.Json.Arr ?: throw IllegalStateException())
-            on = list.items.mapNotNull { it.str }.take(CAP)
+            val stored = list.items.mapNotNull { it.str }.take(CAP)
+            val version = j["v"]?.int ?: 0
+            on = migrateLayers(stored, version)
             style = mapStyleOf(j["style"]?.str)
             hoodView = hoodViewOf(j["hoodView"]?.str)
+            // A migrated list is written back at once, so the marker is on disk even if nothing else is ever
+            // touched — otherwise the same migration would run on every launch and "off" could never stick.
+            if (version < LAYERS_VERSION) write()
         } catch (_: Throwable) {
             on = defaultMapLayers
             style = MapStyle.STANDARD
@@ -364,7 +392,10 @@ class MapLayerStore(private val dir: File) {
     private fun write(): Boolean = try {
         dir.mkdirs()
         val temp = File(dir, "map-layers.json.new")
-        val text = "{\"on\":" + encode(on) + ",\"style\":\"" + (if (style == MapStyle.SUBWAY) "subway" else "standard") +
+        // **Every write stamps the version marker**, not only the migration: a choice made after it — including
+        // switching the boundaries back off — must never be migrated a second time (docs/MAP-STYLE.md 15.4).
+        val text = "{\"v\":" + LAYERS_VERSION + ",\"on\":" + encode(on) +
+            ",\"style\":\"" + (if (style == MapStyle.SUBWAY) "subway" else "standard") +
             "\",\"hoodView\":\"" + (if (hoodView == HoodViewChoice.CHART) "chart" else "table") + "\"}"
         temp.writeBytes(text.toByteArray(Charsets.UTF_8))
         if (!temp.renameTo(file)) {

@@ -70,6 +70,16 @@ class MapPalette(private val context: Context) {
     val me = c(R.color.map_me)
     val brand = c(R.color.brand)
 
+    /** The wash on the one area outline a tap picked out. It carries no number (docs/13, rule 1). */
+    val brandSoft = c(R.color.brand_soft)
+
+    /**
+     * Every neighbourhood and city boundary, in one token (docs/MAP-STYLE.md section 15.2) — so a boundary is one
+     * thing wherever it is drawn, in either map style. The high-contrast value is picked here, as the subway
+     * tones are, rather than by the painter.
+     */
+    val boundary = c(if (highContrast) R.color.map_bnd_more else R.color.map_bnd)
+
     /**
      * The colour a layer style or a greenway phase names (MapLayers.kt), resolved here so that the rules stay free
      * of Android and `:core` can run them on a plain JDK.

@@ -10,7 +10,7 @@ Three Gradle modules:
 - **`core/`** — no sources of its own. It compiles the app's *android-free* files (`Ed25519.kt`, `Verify.kt`,
   `Net.kt`, `Http.kt`, `Outbox.kt`, `Route.kt`, `Trace.kt`, `Listing.kt`, `Needs.kt`, `ReportModel.kt`,
   `SavedRules.kt`, since 2026-09-21 `MapData.kt`, `MapLayers.kt` and `Language.kt`, and since 2026-09-22
-  `Directions.kt`, `DirWords.kt` and `Intersections.kt`) and runs the app's own unit
+  `Directions.kt`, `DirWords.kt`, `Intersections.kt`, `AreasHome.kt` and `Bounds.kt`) and runs the app's own unit
   tests against them on a plain JVM, so the signature check, the daily report hash, the needs list, the network
   policy, the report queue's rules, which screens are private, **the map's whole arithmetic and the one rule that
   says a listing is never a dot** are checked on every build whether or not anyone has an Android SDK.
@@ -34,6 +34,66 @@ Three Gradle modules:
 > listing detail, Urgent help and Home in Arabic, all screenshotted. Five real errors were found and fixed; they
 > are listed under "What the first compile found", and two of them would have broken the app on every phone
 > below Android 15.
+>
+> **State on 2026-09-22 (fourth entry).** **The Areas tab is a map, an area page opens under a collapsing strip,
+> and the Map tab finally draws the boundaries it has been offering.** The Kotlin port of the web's PR #27 and of
+> `docs/MAP-STYLE.md` section 15.
+>
+> - **The landing is a full-screen map** of the outlines and nothing else, filling the tab under the app bar and
+>   above the tab bar — Urgent help, Search and the four tabs all stay, and nothing is made inert. It opens
+>   **zoomed to the person's own polygon** when their area is known (a position, a cross street or a ZIP): the
+>   Detroit neighborhood that holds the point, else the city that does, highlighted and named ("You are in
+>   Hamtramck"). Unknown: the location card over the app's one opening view, which moves to the polygon the
+>   moment it is answered. Outside the four cities: the plain message, and the map stays on the city.
+>   `MapCamera.forArea` is the port of the web's `cameraForArea` — fit the rings with an **8 %** margin, never
+>   closer than **4 m per dp**, never wider than the camera's own **90**.
+> - **A Map | List switch** in the map's end corner: two real 48 dp buttons, each saying whether it is the one
+>   showing, mirroring to the top-LEFT in Arabic. The map is the default every time the tab opens; the choice
+>   lives in a field that dies with the launch and is written nowhere.
+> - **Tapping a polygon opens that area's page IN PLACE**, not as a pushed screen: the map becomes a strip 38 %
+>   of the viewport with Back at its top-start and the name beside it, and the page scrolls under it. Reading
+>   down collapses the strip to a 48 dp bar; **turning round brings it back**, mid-page, on an 8 dp threshold
+>   with a 320 ms settling period. `AreaStripLayout` is a plain `ViewGroup` coordinating an ordinary `ScrollView`
+>   — **no AndroidX CoordinatorLayout**, which this app could not use and which could not express "back the
+>   moment they turn round" anyway, because a scroll-range behaviour has no direction. The collapse is a layout
+>   on the strip and a `translationY` on the page, never a re-measure of the scrolling content, so `scrollY`
+>   never changes and there is no jump. Tapping another outline in the strip swaps the page; system Back is the
+>   strip's Back, and coming back keeps the highlight.
+> - **Neighborhood and city boundaries are on the Map tab by default, at every zoom** (section 15) — the gap PR
+>   #22 left, where the layer, its pick order and its keyboard walk all existed and the canvas drew nothing.
+>   `Bounds.kt` (`:core`) carries the band table — 1.1 / 1.6 / 2.2 for a neighbourhood, 1.5 / 2.4 / 3.0 for a
+>   city, absolute dashes `[2,2]` / `[3,3]` / `[6,3]`, names only from the mid band and at most twelve a frame,
+>   nearest the middle of the screen first and through the map's own collision test — and the `map_bnd` plum in
+>   four modes. The pass is step 4½: over the ground, the parks and the streets, under the transit lines, the
+>   greenway, the dots and the labels, so switching boundaries on can never hide a place that helps. The layer is
+>   in `defaultMapLayers` with a `LAYERS_VERSION = 2` marker that **every** write of the layer list stamps, so a
+>   phone that already had a choice gains the boundaries exactly once and "off" then sticks. The key under the
+>   map carries the boundary row in either style, and "See this map as a list" gains the area names.
+> - **The index gains a third order, "Nearest first"**, offered only while a location or a typed ZIP is known,
+>   and dropped again the moment it is not. It is still not a ranking (docs/13, rule 1).
+>
+> Totals now: **27 + 345 + 345 JUnit tests and 203 fixture cases, 0 failures** (`:core` runs 372 of them on a
+> plain JDK with `HELP313_NO_ANDROID=1`, `:query` included). `:app:lintDebug` passes, the release-key gate still
+> refuses a release build with no keys, and the debug APK is **2,344,971 bytes (2.24 MiB)** on a clean build, up
+> from 2.20 MiB — no new file ships in it, only code and one colour.
+>
+> **Walked on the emulator** (AOSP `android-35` arm64) in English and Arabic, light and dark, at font scale 1.0
+> and 2.0: the landing with no location, with a Detroit neighborhood, with Hamtramck and from outside the four
+> cities; the list; the strip open, collapsed and returning mid-scroll; Back; and the Map tab's boundaries at the
+> city, mid and near bands. A `uiautomator` dump confirms that the strip's own virtual nodes — one per outline,
+> with the open one `selected` — stay in the accessibility tree while the strip is collapsed, beside the real
+> Back button and the name. **Two real defects came out of that run and are fixed**: the collapsed strip was
+> clipped but still laid out full height, so it swallowed every finger over the 38 % of the screen it was no
+> longer drawing and a scroll up panned a hidden map instead of bringing the strip back (a view's hit rectangle
+> is its layout, so the layout is what has to shrink); and `requestSendAccessibilityEvent` throws
+> `IllegalStateException: Accessibility off` when no screen reader is running, so pressing Back crashed the app
+> on every phone with TalkBack off, which is nearly all of them.
+>
+> One honest limitation of the run itself: the app asks for `ACCESS_COARSE_LOCATION` and nothing else, and
+> Android fuzzes a coarse fix to a grid it caches per app, so a named neighborhood cannot be targeted exactly on
+> an emulator. The Detroit-neighborhood landing is whichever outline the fuzzed fix fell in; Hamtramck was
+> reached with a mock GPS provider and the outside case with `adb emu geo fix`, and all of them were cleared
+> afterwards.
 >
 > **State on 2026-09-22 (third entry).** **The Directions screen is built**, the Kotlin port of the web's
 > `dirwords.ts`, `dirscreen.ts` and the Directions parts of its `main.ts` and `map.ts`. Four ways in (a listing's

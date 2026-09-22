@@ -872,8 +872,11 @@ boundaries for ever; adding the layer on every load instead would mean nobody co
 - [ ] iPhone: `HelpCore/Boundaries.swift` with `boundaryBand` / `boundaryStyle` against the same table;
       `MapPalette.swift` gains `--map-bnd` in all four values; `MapCanvas` draws the pass between the streets
       and the transit lines; the layer defaults and the `LAYERS_VERSION` marker in the state file.
-- [ ] Android: the same in `MapStyle.kt` / `MapPalette.kt`, the pass in the same place, the marker in the
-      app-private state file.
+- [x] Android: `app/src/main/kotlin/org/help313/app/Bounds.kt` in `:core` (the band table and the token in four
+      modes), `MapPalette.boundary`, `map_bnd` / `map_bnd_more` in `res/values{,-night}/colors.xml`, the pass in
+      `MapView.drawAreas` with the names in `drawNames` between the streets and the parks, `defaultMapLayers` and
+      `LAYERS_VERSION` / `migrateLayers` in `MapLayers.kt`, the key in `MapScreen.mapKey` and the list section in
+      `MapScreen.list`. Held to this table by `ParityTest`, which reads `apps/web/src/bounds.ts`.
 - Four things to get right, because they are where the web went wrong first: the dash is **absolute** and its
   "on" length is never under the stroke width; names are **capped and nearest-first**, not "whatever fits"; the
   migration marker must be written by **every** write of the layer list, not only by the migration; and the

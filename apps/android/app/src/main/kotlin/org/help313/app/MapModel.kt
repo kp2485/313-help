@@ -67,6 +67,12 @@ sealed class MapSelection {
     class Stretch(val id: String) : MapSelection()
     class Listing(val id: String) : MapSelection()
     class Park(val name: String) : MapSelection()
+
+    /**
+     * One outline of the `place:areas` layer, by its own `nbh_`/`city_` id. The card names it and offers its page,
+     * which is the same page the Areas tab opens — one place, one page, whichever door it was found through.
+     */
+    class Area(val id: String) : MapSelection()
     class Stop(val name: String, val layer: String) : MapSelection()
     class Route(val name: String, val layer: String) : MapSelection()
 
@@ -102,6 +108,7 @@ sealed class MapSelection {
             is Stretch -> "seg:$id"
             is Listing -> "row:$id"
             is Park -> "park:$name"
+            is Area -> "area:$id"
             is Stop -> "stop:$layer:$name"
             is Route -> "route:$layer:$name"
             is TripStop -> "trip:$at"
@@ -605,8 +612,20 @@ object MapModel {
      * route, then the park a finger is inside. Tolerances are in dp and are turned into map units here, so a finger
      * is the same size at every zoom.
      */
+    /**
+     * The outlines to draw at this zoom, or nothing at all when the neighborhood numbers have not arrived. The
+     * decision about which outlines is [drawnAreas]'s, in Areas.kt, where `:core` tests it; this only hands over
+     * whatever the repository is holding.
+     */
+    fun areasFor(metersPerPoint: Double): List<DrawnArea> {
+        val d = HoodRepo.data ?: return emptyList()
+        return drawnAreas(d)
+    }
+
     fun pick(
         sx: Double, sy: Double, overlays: List<MapOverlay>, greenwayOn: Boolean, parksOn: Boolean,
+        /** The `place:areas` layer, when it is on: asked after a route and before a park (MAP_PICK_ORDER). */
+        areas: List<DrawnArea> = emptyList(),
         /** Subway only: the glyph under a 48 dp box, asked after the listing dots; and the route line within 22 dp. */
         glyph: (() -> MapSelection?)? = null,
         line: (() -> MapSelection?)? = null,
@@ -658,6 +677,14 @@ object MapModel {
             }
         }
         best?.let { return it }
+
+        // An area sits **behind everything a person came to the map to find and ahead of a park**
+        // ([MAP_PICK_ORDER], DECISIONS 2026-09-22), and the SMALLEST outline holding the tap wins, so a Detroit
+        // neighborhood beats the Detroit outline it sits inside. Never the nearest outline: a tap outside every
+        // one of them is a miss, and stays a miss.
+        if (areas.isNotEmpty()) {
+            areaHit(areas, MapProjection.lat(y), MapProjection.lon(x))?.let { return MapSelection.Area(it.id) }
+        }
 
         if (parksOn) {
             val park = base?.parks?.firstOrNull {

@@ -656,13 +656,16 @@ class MapLayerStoreTest {
     fun aFirstOpenShowsEveryHelpLayerAndTheParks() {
         val store = MapLayerStore(tempDir())
         assertEquals(defaultMapLayers, store.on)
-        assertEquals("all eight help groups, and parks", 9, store.on.size)
+        assertEquals("all eight help groups, the parks and the boundaries", 10, store.on.size)
         for (g in mapGroups) assertTrue("${g.id} is not on at a first open", store.isOn("help:${g.id}"))
         assertTrue(store.isOn("place:parks"))
-        // Off: the greenway is one path inside a 302-park system, the outlines are the Areas tab's job, and a bus
-        // route line over eight kinds of dot is the busiest thing on the screen.
+        // **The boundaries are on** (docs/MAP-STYLE.md section 15; Kyle, 2026-09-22: "The user needs to be able to
+        // see the boundaries of the neighborhoods on the map"). They used to be off, on the reasoning that they
+        // were the Areas tab's job; the Map tab is where a person looks at the city.
+        assertTrue("the boundaries are not on at a first open", store.isOn(AREAS_LAYER))
+        // Off: the greenway is one path inside a 302-park system, and a bus route line over eight kinds of dot is
+        // the busiest thing on the screen.
         assertFalse("the greenway comes off the default", store.isOn("place:greenway"))
-        assertFalse("so do the outlines", store.isOn(AREAS_LAYER))
         assertFalse("and the bus routes", store.isOn("go:ddot_routes"))
         assertFalse(store.isOn("go:ddot_stops"))
     }
