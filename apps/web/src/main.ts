@@ -5,7 +5,7 @@ import {
 import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang } from './i18n.js';
 import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
-import { hoodIndex, hoodList, hoodPage, hoodRows, loadIndicators, outline, type Hood, type Indicators, type Ui } from './hoods.js';
+import { hoodIndex, hoodList, hoodPage, hoodRows, hoodView, loadHoodView, loadIndicators, outline, saveHoodView, type Hood, type HoodView, type Indicators, type Ui } from './hoods.js';
 import { hoodAt, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
 import { icon } from './icons.js';
 import { MapView, focusRadius, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
@@ -51,6 +51,14 @@ let searchCount = '';                                    // "12 places found": w
 // The Neighborhoods tab's own two choices: what has been typed into "Find a neighborhood", and whether the list
 // is in A–Z or council-district order. Memory only, like the search box, and neither is ever an indicator.
 let hoodQuery = '', hoodOrder: HoodOrder = 'abc';
+// Table or chart for the year panels (Kyle, 2026-09-22). ONE choice for every panel on every neighborhood page,
+// kept in the same place as the map layer choices — this device only, never sent, never in a report — and
+// **Table by default**, because the table is the accessible source of truth (hoods.ts, `yearGroup`).
+let hoodViewNow: HoodView = 'table';
+// Which chart series have been switched off, as "<panel>:<series>" (hoods.ts, `yearGroup`). This visit only, like
+// the search box: a way of looking at a page, not a fact about anybody, and it is never stored or sent. The last
+// series on cannot be switched off, so this set can never empty a chart (`shownSeries`).
+const hoodSeriesOff = new Set<string>();
 let layersOn: string[] = [];                             // map layers switched on (layers.ts): this phone only
 // Layer shapes already loaded, this visit only, keyed by file AND the checksum the signed index gives it.
 // 'loading' is a request in flight; 'failed' is a try that did not come back and can be made again.
@@ -876,7 +884,7 @@ function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string;
   if (v.v === 'hoods') return { title: t(v.lens === 'jlg' ? 'hood.lens_jlg' : 'hood.title'), ownTitle: false, html: hoodList(d, ui, v.lens) };
   const h = d.neighborhoods.find((x) => x.id === v.id);
   // An id nobody knows (an old link, a typo): the whole list, under the tab's own name, never a half-built page.
-  return h ? { title: h.name, ownTitle: true, html: hoodPage(h, d, ui) } : { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
+  return h ? { title: h.name, ownTitle: true, html: hoodPage(h, d, ui, hoodViewNow, hoodSeriesOff) } : { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
 }
 // What this app keeps and sends, in plain words (docs/08). Everything here is true of the code; tests check the parts
 // that can be checked (no storage writes in main.ts, closed report fields, no IP in the Worker).
@@ -1004,7 +1012,7 @@ function render(focus = true): void {
   }
 }
 function navigate(view: View): void {
-  if (view.v === 'tab') { searchText = ''; hoodQuery = ''; }   // a tab is a fresh start
+  if (view.v === 'tab') { searchText = ''; hoodQuery = ''; hoodSeriesOff.clear(); }   // a tab is a fresh start
   if (view.v !== 'detail') listMap = false;   // coming back from a place, the map is still open
   if (view.v === 'add') { proposed = null; proposeError = false; missing = []; addValues = {}; }
   if (view.v === 'privacy') { keyReset = false; keyResetFailed = false; queueCleared = false; void queuedCount().then((n) => { if (n !== queued) { queued = n; render(false); } }); }
@@ -1174,6 +1182,27 @@ app.addEventListener('change', (ev) => {
   redrawHoodList();
   announce(t(hoodOrder === 'district' ? 'hood.group_district' : 'hood.group_abc'));
 });
+// Table | Chart on the year panels. Two real radio buttons, so the arrow keys already move between them. The
+// choice is kept on this device (hoods.ts, beside the layer list), applies to every panel at once, is said out
+// loud, and the cursor stays on the radio that was just chosen.
+app.addEventListener('change', (ev) => {
+  const el = ev.target as HTMLInputElement;
+  if (!el.dataset?.hoodview) return;
+  const next = hoodView(el.value);
+  refocusSel = '#' + el.id;
+  void saveHoodView(next).then((v) => { hoodViewNow = v; render(false); announce(t('hood.view_say', { name: t('hood.view_' + v) })); });
+});
+// A key entry on a chart: two real checkboxes, so the keyboard and screen readers already work. Which lines are
+// drawn is this visit's business only; the cursor stays on the box that was just used, and the change is said.
+app.addEventListener('change', (ev) => {
+  const el = ev.target as HTMLInputElement;
+  const id = el.dataset?.hoodseries;
+  if (!id) return;
+  if (el.checked) hoodSeriesOff.delete(id); else hoodSeriesOff.add(id);
+  refocusSel = `[data-hoodseries="${id}"]`;
+  render(false);
+  announce(t(el.checked ? 'hood.chart_series_on' : 'hood.chart_series_off', { name: el.closest('label')?.textContent?.trim() ?? '' }));
+});
 app.addEventListener('toggle', (ev) => {
   const el = ev.target as HTMLDetailsElement;
   const box = el.closest?.('.report') as HTMLElement | null;
@@ -1258,6 +1287,7 @@ async function start(): Promise<void> {
   savedIds = await loadSaved();
   layersOn = await loadLayers();
   styleNow = await loadStyle();
+  hoodViewNow = await loadHoodView();
   // What this phone has already said, and is still waiting to send. Without this a reload offered "Still open,
   // info is right" again for a place whose confirmation was already in the queue (web review, 2026-09-20).
   for (const id of await queuedTargets()) reported.set(id, 'queued');

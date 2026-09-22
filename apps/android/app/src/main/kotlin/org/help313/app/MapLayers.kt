@@ -259,6 +259,14 @@ class MapLayerStore(private val dir: File) {
     var style: MapStyle = MapStyle.STANDARD
         private set
 
+    /**
+     * Table or chart on a neighborhood's year panels (docs/13, 2026-09-22). Not about the map at all, but the same
+     * KIND of fact — a way of showing something, chosen on this phone — so it lives in the same file under the same
+     * rules: private storage, excluded from backup, never sent. `table` is the default.
+     */
+    var hoodView: HoodViewChoice = HoodViewChoice.TABLE
+        private set
+
     init {
         read()
     }
@@ -284,6 +292,12 @@ class MapLayerStore(private val dir: File) {
         return write()
     }
 
+    /** One choice for every year panel on every neighborhood page. False only when it could not be written down. */
+    fun setHoodView(next: HoodViewChoice): Boolean {
+        hoodView = next
+        return write()
+    }
+
     /**
      * `{"on":[…],"style":"subway"}`. Yesterday's file was a bare list of layer ids; it still reads, and the style is
      * then `standard`.
@@ -294,16 +308,19 @@ class MapLayerStore(private val dir: File) {
             val list = if (j is org.help313.query.Json.Arr) j else (j["on"] as? org.help313.query.Json.Arr ?: throw IllegalStateException())
             on = list.items.mapNotNull { it.str }.take(CAP)
             style = mapStyleOf(j["style"]?.str)
+            hoodView = hoodViewOf(j["hoodView"]?.str)
         } catch (_: Throwable) {
             on = defaultMapLayers
             style = MapStyle.STANDARD
+            hoodView = HoodViewChoice.TABLE
         }
     }
 
     private fun write(): Boolean = try {
         dir.mkdirs()
         val temp = File(dir, "map-layers.json.new")
-        val text = "{\"on\":" + encode(on) + ",\"style\":\"" + (if (style == MapStyle.SUBWAY) "subway" else "standard") + "\"}"
+        val text = "{\"on\":" + encode(on) + ",\"style\":\"" + (if (style == MapStyle.SUBWAY) "subway" else "standard") +
+            "\",\"hoodView\":\"" + (if (hoodView == HoodViewChoice.CHART) "chart" else "table") + "\"}"
         temp.writeBytes(text.toByteArray(Charsets.UTF_8))
         if (!temp.renameTo(file)) {
             // Some filesystems refuse a rename onto an existing file; the delete-then-rename is the fallback, and

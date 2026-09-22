@@ -1,0 +1,100 @@
+<!doctype html><html lang="en" data-theme="dark"><meta charset="utf-8">
+<title>A neighborhood's year panel as a chart — web, dark</title>
+<!-- Built from apps/web/src/hoodchart.ts and apps/web/src/style.css on 2026-09-22, so what is here is what the
+     app draws: Cadillac Community, both lines on. Open it in a browser, or print it. -->
+<style>
+:root { color-scheme:dark; --surface:#121e18; --ink:#e9f1ec; --muted:#a3b5aa; --brand:#4fcf93; --focus:#8ab8ff; }
+/* ---- a year panel as a picture (docs/13, 2026-09-22) -------------------------------------------------------
+   Table | Chart above every year panel, and the chart itself. The chart is inline SVG built from the same
+   numbers as the table beside it: no canvas (a canvas has no text to read and prints as a blur), no library,
+   no script. The table is still in the page in chart view — `.vh` only hides it from the eye — so a screen
+   reader has every number whichever view is chosen.
+
+   The two fills are two IDENTITIES (homes sold, permits), never two ends of a scale: nothing here says good or
+   bad. They are told apart by three things at once, so colour is never the only carrier (WCAG 1.4.1): each
+   small multiple has its own caption over it, the second fill carries a hatch, and both are in the key. */
+:root {
+  /* Validated against the surface in both themes with the categorical checks (green ΔE 26.7 normal / 24.4
+     deutan from the blue, both over 3:1 on the card). */
+  --chart-a:#0b6b43; --chart-b:#1d4ed8; --chart-lt5:#47584f; --chart-grid:#d9e3dc; --chart-ink:#47584f;
+}
+@media all { :root {
+  --chart-a:#35a870; --chart-b:#5b8de0; --chart-lt5:#a3b5aa; --chart-grid:#25362d; --chart-ink:#a3b5aa;
+} }
+/* "Increase contrast" deliberately steps outside the categorical lightness band: at this setting contrast with
+   the card wins over the even-lightness rule, and the hatch and the captions still carry identity. */
+@media (prefers-contrast: more) { :root { --chart-a:#064e31; --chart-b:#142f9e; --chart-lt5:#26332c; --chart-grid:#8ea39a; --chart-ink:#26332c; } }
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) { :root { --chart-a:#57c894; --chart-b:#7fb0ff; --chart-lt5:#d4e2d9; --chart-grid:#4c5f55; --chart-ink:#d4e2d9; } }
+@media (forced-colors: active) { :root { --chart-a:CanvasText; --chart-b:LinkText; --chart-lt5:GrayText; --chart-grid:GrayText; --chart-ink:CanvasText; } }
+
+.viewpick { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0 .25rem; }
+.viewpick .pick { font-size:.9375rem; }
+.hoodchart { margin:.75rem 0 0; padding:0; }
+.hoodsvg { display:block; width:100%; height:auto; overflow:visible; }
+/* Recessive grid, hairline and solid; the data is the only loud thing. */
+.hoodsvg .gl,.hoodsvg .ax { stroke:var(--chart-grid); stroke-width:1; fill:none; }
+.hoodsvg .ax { stroke:var(--chart-ink); }
+.hoodsvg .tk,.hoodsvg .yr { fill:var(--chart-ink); font-size:11px; font-family:inherit; font-variant-numeric:tabular-nums; }
+/* Each series has a colour, a line pattern AND a marker shape, so the two are still two with no colour at all
+   (WCAG 1.4.1): a solid line with round points, and a dashed line with diamonds. */
+.hoodsvg .ln { fill:none; stroke-width:2; stroke-linecap:round; }
+.hoodsvg .ln.ta { stroke:var(--chart-a); }
+.hoodsvg .ln.tb { stroke:var(--chart-b); stroke-dasharray:7 4; }
+/* The piece of a line that runs to or from a year whose count is hidden: it is drawn, because the year happened
+   and a gap would read as a zero, and it is drawn DIFFERENTLY, because nobody knows where it really goes. */
+.hoodsvg .ln.unsure { stroke-dasharray:1 3; stroke-width:1.5; }
+.hoodsvg .mk.ta { fill:var(--chart-a); }
+.hoodsvg .mk.tb { fill:var(--chart-b); }
+/* A count the pipeline hid: the series' own shape, hollow, at a FIXED height. There is no value to measure and
+   no number to read off it (docs/13, honesty rule 2). */
+.hoodsvg .mk.hollow { fill:var(--surface); stroke-width:1.5; }
+.hoodsvg .mk.hollow.ta { stroke:var(--chart-a); }
+.hoodsvg .mk.hollow.tb { stroke:var(--chart-b); }
+/* The number at a point, on hover and on keyboard focus. It is decoration: the same words are in the point's own
+   accessible name, in its `<title>`, and in the table. */
+.hoodsvg .pt { outline:none; }
+.hoodsvg .tip { opacity:0; }
+.hoodsvg .tip rect { fill:var(--chart-ink); }
+.hoodsvg .tip text { fill:var(--surface); font-size:10px; font-family:inherit; font-variant-numeric:tabular-nums; }
+.hoodsvg .pt:hover .tip,.hoodsvg .pt:focus-visible .tip { opacity:1; }
+.hoodsvg .pt:focus-visible .mk { stroke:var(--focus); stroke-width:2.5; }
+@media (prefers-reduced-motion:no-preference) { .hoodsvg .tip { transition:opacity .12s; } }
+/* The key. With two series it is two real checkboxes, so the keyboard and screen readers already work and
+   nothing has to be invented; the last one left on is disabled, and the line under it says why. */
+.chartkey { display:flex; flex-wrap:wrap; gap:.5rem 1rem; margin:.375rem 0 .25rem; padding:0; border:0; list-style:none; font-size:.9375rem; color:var(--ink); }
+.chartkey legend { font-size:.875rem; color:var(--muted); padding:0; margin-bottom:.25rem; }
+.chartkey.plain { color:var(--muted); font-size:.875rem; }
+.chartkey li,.keybox { display:flex; align-items:center; gap:.375rem; }
+.keybox { min-height:2.75rem; cursor:pointer; }
+.keybox input { accent-color:var(--brand); width:1.125rem; height:1.125rem; margin:0; }
+.keybox:has(input:disabled) { cursor:default; color:var(--muted); }
+.chartkey .sw { width:1rem; height:1rem; border-radius:99rem; forced-color-adjust:none; }
+.chartkey .sw.ta { background:var(--chart-a); }
+/* The second series' key sample is its own shape, turned on its point, not a second circle. */
+.chartkey .sw.tb { background:var(--chart-b); border-radius:2px; rotate:45deg; width:.875rem; height:.875rem; }
+.chartkey .sw.hollow { background:none; border:1.5px solid var(--chart-lt5); }
+/* Forced colours and print keep the two lines apart by their dash and their shape, which survive both. */
+@media (forced-colors: active) {
+  .hoodsvg .mk.hollow { fill:Canvas; }
+  .hoodsvg .tip rect { fill:CanvasText; }
+  .chartkey .sw { border:1px solid CanvasText; }
+}
+@media print {
+  .hoodsvg .ln.ta,.hoodsvg .mk.ta { stroke:#000; fill:#000; }
+  .hoodsvg .ln.tb,.hoodsvg .mk.tb { stroke:#000; fill:#fff; }
+  .hoodsvg .mk { stroke:#000; stroke-width:1.5; }
+  .hoodsvg .tip { display:none; }
+}
+
+body { font:16px/1.5 system-ui,sans-serif; background:var(--surface); color:var(--ink); margin:0; padding:16px; max-width:352px; }
+.foot { font-size:.875rem; color:var(--muted); }
+</style>
+<figure class="hoodchart" role="group" aria-label="Homes sold and building permits by year, 2019 to 2026, chart">
+  <svg class="hoodsvg" viewBox="0 0 320 130" role="group" aria-label="Years across, counts up, starting at 0">
+      <g class="grid"><line class="gl" x1="30" y1="108" x2="318" y2="108"></line><text class="tk" x="27" y="112" text-anchor="end">0</text><line class="gl" x1="30" y1="76" x2="318" y2="76"></line><text class="tk" x="27" y="80" text-anchor="end">5</text><line class="gl" x1="30" y1="44" x2="318" y2="44"></line><text class="tk" x="27" y="48" text-anchor="end">10</text><line class="gl" x1="30" y1="12" x2="318" y2="12"></line><text class="tk" x="27" y="16" text-anchor="end">15</text></g>
+      <line class="ax" x1="30" y1="108" x2="318" y2="108"></line>
+      <line class="ln ta" x1="42" y1="69.6" x2="80.29" y2="63.2"></line><line class="ln ta" x1="80.29" y1="63.2" x2="118.57" y2="95.2"></line><line class="ln ta" x1="118.57" y1="95.2" x2="156.86" y2="37.6"></line><line class="ln ta" x1="156.86" y1="37.6" x2="195.14" y2="95.2"></line><line class="ln ta" x1="195.14" y1="95.2" x2="233.43" y2="50.4"></line><line class="ln ta" x1="233.43" y1="50.4" x2="271.71" y2="44"></line><line class="ln ta" x1="271.71" y1="44" x2="310" y2="95.2"></line><line class="ln tb" x1="42" y1="69.6" x2="80.29" y2="95.2"></line><line class="ln tb" x1="80.29" y1="95.2" x2="118.57" y2="56.8"></line><line class="ln tb" x1="118.57" y1="56.8" x2="156.86" y2="76"></line><line class="ln tb" x1="156.86" y1="76" x2="195.14" y2="44"></line><line class="ln tb" x1="195.14" y1="44" x2="233.43" y2="56.8"></line><line class="ln tb" x1="233.43" y1="56.8" x2="271.71" y2="76"></line><line class="ln tb" x1="271.71" y1="76" x2="310" y2="101.6"></line><g class="pt" tabindex="0" role="img" aria-label="2019, Homes sold: 6"><title>2019, Homes sold: 6</title><path class="mk ta" d="M38 69.6a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="42" y="48.6" width="48" height="15" rx="3"></rect><text x="66" y="59.6" text-anchor="middle">6</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2020, Homes sold: 7"><title>2020, Homes sold: 7</title><path class="mk ta" d="M76.29 63.2a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="56.29" y="42.2" width="48" height="15" rx="3"></rect><text x="80.29" y="53.2" text-anchor="middle">7</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2021, Homes sold: 2"><title>2021, Homes sold: 2</title><path class="mk ta" d="M114.57 95.2a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="94.57" y="74.2" width="48" height="15" rx="3"></rect><text x="118.57" y="85.2" text-anchor="middle">2</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2022, Homes sold: 11"><title>2022, Homes sold: 11</title><path class="mk ta" d="M152.86 37.6a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="132.86" y="16.6" width="48" height="15" rx="3"></rect><text x="156.86" y="27.6" text-anchor="middle">11</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2023, Homes sold: 2"><title>2023, Homes sold: 2</title><path class="mk ta" d="M191.14 95.2a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="171.14" y="74.2" width="48" height="15" rx="3"></rect><text x="195.14" y="85.2" text-anchor="middle">2</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2024, Homes sold: 9"><title>2024, Homes sold: 9</title><path class="mk ta" d="M229.43 50.4a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="209.43" y="29.4" width="48" height="15" rx="3"></rect><text x="233.43" y="40.4" text-anchor="middle">9</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2025, Homes sold: 10"><title>2025, Homes sold: 10</title><path class="mk ta" d="M267.71 44a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="247.71" y="23" width="48" height="15" rx="3"></rect><text x="271.71" y="34" text-anchor="middle">10</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2026 so far, Homes sold: 2"><title>2026 so far, Homes sold: 2</title><path class="mk ta" d="M306 95.2a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z"></path><g class="tip" aria-hidden="true"><rect x="262" y="74.2" width="48" height="15" rx="3"></rect><text x="286" y="85.2" text-anchor="middle">2</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2019, Permits: 6"><title>2019, Permits: 6</title><path class="mk tb" d="M42 65.6L46 69.6L42 73.6L38 69.6Z"></path><g class="tip" aria-hidden="true"><rect x="42" y="48.6" width="48" height="15" rx="3"></rect><text x="66" y="59.6" text-anchor="middle">6</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2020, Permits: 2"><title>2020, Permits: 2</title><path class="mk tb" d="M80.29 91.2L84.29 95.2L80.29 99.2L76.29 95.2Z"></path><g class="tip" aria-hidden="true"><rect x="56.29" y="74.2" width="48" height="15" rx="3"></rect><text x="80.29" y="85.2" text-anchor="middle">2</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2021, Permits: 8"><title>2021, Permits: 8</title><path class="mk tb" d="M118.57 52.8L122.57 56.8L118.57 60.8L114.57 56.8Z"></path><g class="tip" aria-hidden="true"><rect x="94.57" y="35.8" width="48" height="15" rx="3"></rect><text x="118.57" y="46.8" text-anchor="middle">8</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2022, Permits: 5"><title>2022, Permits: 5</title><path class="mk tb" d="M156.86 72L160.86 76L156.86 80L152.86 76Z"></path><g class="tip" aria-hidden="true"><rect x="132.86" y="55" width="48" height="15" rx="3"></rect><text x="156.86" y="66" text-anchor="middle">5</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2023, Permits: 10"><title>2023, Permits: 10</title><path class="mk tb" d="M195.14 40L199.14 44L195.14 48L191.14 44Z"></path><g class="tip" aria-hidden="true"><rect x="171.14" y="23" width="48" height="15" rx="3"></rect><text x="195.14" y="34" text-anchor="middle">10</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2024, Permits: 8"><title>2024, Permits: 8</title><path class="mk tb" d="M233.43 52.8L237.43 56.8L233.43 60.8L229.43 56.8Z"></path><g class="tip" aria-hidden="true"><rect x="209.43" y="35.8" width="48" height="15" rx="3"></rect><text x="233.43" y="46.8" text-anchor="middle">8</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2025, Permits: 5"><title>2025, Permits: 5</title><path class="mk tb" d="M271.71 72L275.71 76L271.71 80L267.71 76Z"></path><g class="tip" aria-hidden="true"><rect x="247.71" y="55" width="48" height="15" rx="3"></rect><text x="271.71" y="66" text-anchor="middle">5</text></g></g><g class="pt" tabindex="0" role="img" aria-label="2026 so far, Permits: 1"><title>2026 so far, Permits: 1</title><path class="mk tb" d="M310 97.6L314 101.6L310 105.6L306 101.6Z"></path><g class="tip" aria-hidden="true"><rect x="262" y="80.6" width="48" height="15" rx="3"></rect><text x="286" y="91.6" text-anchor="middle">1</text></g></g><text class="yr" x="80.29" y="123" text-anchor="middle">2020</text><text class="yr" x="156.86" y="123" text-anchor="middle">2022</text><text class="yr" x="233.43" y="123" text-anchor="middle">2024</text><text class="yr" x="310" y="123" text-anchor="middle">2026</text>
+    </svg>
+  <fieldset class="chartkey"><legend>Show on the chart</legend><label class="keybox"><input type="checkbox" checked><span class="sw ta" aria-hidden="true"></span>Homes sold</label><label class="keybox"><input type="checkbox" checked><span class="sw tb" aria-hidden="true"></span>Permits</label></fieldset>
+  <figcaption class="foot">The chart shows each year from 2019 to 2026. Most in one year: Homes sold, 11 in 2022, Permits, 10 in 2023.</figcaption></figure>
+</html>

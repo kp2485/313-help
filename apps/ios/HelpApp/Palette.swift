@@ -25,6 +25,12 @@ extension Color {
     static let warnBg = pair(0xFDF1D8, 0x33270A)
     static let warnInk = pair(0x6B4300, 0xFFD98A)
     static let danger = pair(0x8F1D1D, 0xE26A6A)
+    // The two chart fills (docs/13, 2026-09-22). Two identities — homes sold, permits — never two ends of a
+    // scale: nothing on a neighborhood page says good or bad. Byte for byte the web's `--chart-a` and
+    // `--chart-b`, which were checked for contrast against the card and for distance from each other in both
+    // themes and under colour-blind simulation; the hatch and the captions carry them where colour cannot.
+    static let chartA = pair(0x0B6B43, 0x35A870)
+    static let chartB = pair(0x1D4ED8, 0x5B8DE0)
 }
 
 /// The app's background behind every screen, including Lists.
