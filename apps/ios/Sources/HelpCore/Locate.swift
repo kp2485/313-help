@@ -73,6 +73,10 @@ public let anchorRadiusMeters = locateRadiusMeters
 /// the phone's. So the ask runs on, and after ten seconds the screen says what is happening and what would help,
 /// with the cross-street and ZIP ways in beside it the whole time, and a **Stop** that is a real button.
 public let locateSlowSeconds = 10.0
+/// Five minutes, and then the ask stops on its own: the same `timeout: 300000` the web passes the browser. A
+/// receiver that has not found the sky in five minutes is not going to, and a manager left running is a battery
+/// a person without housing cannot spare.
+public let locateGiveUpSeconds = 300.0
 
 /// The opening view of the Map tab, as a point and a radius — the one decision behind "how far out does the map
 /// open?", so the first view and "centre on me" are the same arithmetic (`MapCamera.forRadius`) with a different

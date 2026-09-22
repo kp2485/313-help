@@ -209,9 +209,17 @@ public struct Indicators: Decodable, Equatable, Sendable {
     public var neighborhoods: [Hood]
     /// Greenway stretch id → the neighborhoods it runs through.
     public var segments: [String: [String]]
+    /// The four cities (DECISIONS 2026-09-22), all optional: a bundle built before the city pages carries none
+    /// of them and every screen that existed before behaves exactly as it did.
+    public var cities: [CityRow]?
+    public var areas: [Area]?
+    public var areaSources: [String: AreaSource]?
+    public var pavementYear: Int?
+    public var permitYears: [Int]?
 
     enum CodingKeys: String, CodingKey {
-        case sources, origin, city, neighborhoods, segments
+        case sources, origin, city, neighborhoods, segments, cities, areas
+        case areaSources = "area_sources", pavementYear = "pavement_year", permitYears = "permit_years"
         case cityParcels = "city_parcels", issueTypes = "issue_types", fireTypes = "fire_types", cityNow = "city_now"
         case roadsYears = "roads_years", vacantPeriod = "vacant_period", crashYears = "crash_years"
         case cityCrashes = "city_crashes", crashRecordsFrom = "crash_records_from", statsFetchedAt = "stats_fetched_at"
@@ -371,6 +379,29 @@ public func hoodsByDistrict(_ list: [Hood]) -> [HoodDistrict] {
         let items = sorted.filter { $0.district == d }
         return items.isEmpty ? nil : HoodDistrict(district: d, hoods: items)
     }
+}
+
+/**
+ Nearest first, from a point this phone worked out for itself — a location, the middle of a typed ZIP, or a
+ junction typed into the cross-street field.
+
+ **It is still not a ranking** (docs/13, honesty rule 1): a distance to the middle of an outline says how far
+ away a place is, never how good it is, and the only other thing this function can read is the name it breaks
+ ties with. The arithmetic is the web's `away` in apps/web/src/hoodfind.ts — flat units, longitude squeezed by
+ 0.74, comparisons only — so one bundle and one point always give one list on all three clients.
+ */
+public func hoodsNearestFirst(_ list: [Hood], to p: LatLon) -> [Hood] {
+    func away(_ h: Hood) -> Double {
+        guard h.center.count >= 2 else { return .infinity }
+        return hypot((h.center[1] - p.lon) * 0.74, h.center[0] - p.lat)
+    }
+    let byName = hoodsAlphabetical(list)
+    return byName.enumerated()
+        .sorted { a, b in
+            let (x, y) = (away(a.element), away(b.element))
+            return x != y ? x < y : a.offset < b.offset
+        }
+        .map(\.element)
 }
 
 /// A name flattened for matching what a person types against a name the City wrote: accents dropped, case

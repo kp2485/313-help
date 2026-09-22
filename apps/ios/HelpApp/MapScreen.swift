@@ -53,6 +53,10 @@ struct MapTabView: View {
                         if let r = store.bundle?.rows.first(where: { $0.id == id }) { DetailView(row: r) }
                     case .greenway:
                         GreenwayView()
+                    case .area(let id):
+                        if let d = model.indicators, let page = d.areaPage(id: id) { AreaPageView(page: page, d: d) }
+                    case .directions(let to):
+                        DirectionsView(to: to)
                     }
                 }
         }
@@ -83,6 +87,8 @@ struct MapTabView: View {
         }
         .task(id: model.layersOn) {
             model.rebuildDots(from: store)
+            // The outlines live in the numbers file, which is fetched the first time any screen wants it.
+            if model.isOn(areasLayerId) { await model.loadAreas(from: store) }
             await loadSwitchedOnLayers()
         }
         #if DEBUG
@@ -166,6 +172,8 @@ struct MapSurface: View {
     @State private var locateChecked = false
     /// The one thing this phone remembers about all of it: that the card was answered. Never the answer.
     @State private var flags = LocateFlagStore(dir: DeviceState.dir)
+    /// "Getting around" as its own sheet, from the labelled row at the foot of the map (audit H3).
+    @State private var showGettingAround = false
 
     var body: some View {
         ZStack {
@@ -180,6 +188,7 @@ struct MapSurface: View {
         .overlay(alignment: .top) { locateCardView }
         .background(Color.appBg)
         .sensoryFeedback(.selection, trigger: model.selectionCount)
+        .sheet(isPresented: $showGettingAround) { GettingAroundSheet() }
         .onAppear { firstOpen() }
     }
 
@@ -301,6 +310,8 @@ struct MapSurface: View {
                  segments: model.isOn("place:greenway") ? model.segments : [],
                  focus: focusedSegment,
                  dots: model.dots,
+                 areas: model.areasShown,
+                 areaSelected: model.areaSelected,
                  me: here.point,
                  plainColors: plainBackgrounds,
                  subway: subwayInput)
@@ -417,6 +428,17 @@ struct MapSurface: View {
             }
         }
         let view = model.camera.visible
+        // The outlines come after the greenway and BEFORE the dots: an area is the ground the dots stand on, and
+        // a reader that walks the ground first reads the map the way an eye does (`MapFeatureKind`, audit §3.4).
+        // The one nearest the middle of the screen is offered first, like every other place on this map.
+        let areasNear = placesInReadingOrder(model.areasShown, fromX: model.camera.centerX, fromY: model.camera.centerY,
+                                             x: { $0.box.centerX }, y: { $0.box.centerY }, tieBreak: { $0.id })
+        for a in areasNear.prefix(20) {
+            out.append(MapElement(
+                id: "area:" + a.id,
+                label: "\(a.name), \(a.sub). \(L.t("map.details"))",
+                action: { model.select(.area(a.id)) }))
+        }
         let onScreen = model.dots.filter { view.contains(x: $0.x, y: $0.y) }
         let near = placesInReadingOrder(onScreen, fromX: model.camera.centerX, fromY: model.camera.centerY,
                                         x: { $0.x }, y: { $0.y }, tieBreak: { $0.name })
@@ -474,11 +496,25 @@ struct MapSurface: View {
     // MARK: the controls
 
     private var topControls: some View {
-        HStack(spacing: 10) {
-            MapButton(symbol: "phone.fill", label: L.t("strip.more"), plain: plainBackgrounds) { showUrgent = true }
-            Spacer(minLength: 0)
-            MapButton(symbol: "square.3.layers.3d", label: L.t("map.layers"), plain: plainBackgrounds) { showLayers = true }
-            MapButton(symbol: "list.bullet", label: L.t("map.list_title"), plain: plainBackgrounds) { showList = true }
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                MapButton(symbol: "phone.fill", label: L.t("strip.more"), plain: plainBackgrounds) { showUrgent = true }
+                Spacer(minLength: 0)
+                MapButton(symbol: "square.3.layers.3d", label: L.t("map.layers"), plain: plainBackgrounds) { showLayers = true }
+                MapButton(symbol: "list.bullet", label: L.t("map.list_title"), plain: plainBackgrounds) { showList = true }
+            }
+            // The three ways a person can say where they are — "Use my location", a cross street, a ZIP — and,
+            // once one of them has answered, what the map is using and how to stop (audit M6). The same control,
+            // the same words and the same refusal handling as every list screen, and the same one the web's Map
+            // tab carries beside its map. It sits under the round buttons rather than over the attribution,
+            // because the cross-street field opens the keyboard and the keyboard comes up from the bottom.
+            // While our own first-open card is up it has the floor: two cards asking the same question at once
+            // is two cards, and the card is the one that explains itself.
+            if !locateCard { whereCard }
+            // "Getting around" as a labelled row, not a symbol (audit H3): trip planners, fares, free rides and
+            // the phone numbers, which is what the web's Map tab prints under its map. It is also still in
+            // "See this map as a list", exactly as it was.
+            gettingAroundRow
         }
         .padding(.horizontal, 16).padding(.vertical, 8)
     }
@@ -511,15 +547,6 @@ struct MapSurface: View {
                     MapButton(symbol: "scope", label: L.t("map.reset"), plain: plainBackgrounds) { model.reset() }
                 }
             }
-            if askedForLocation, here.denied {
-                // iOS has no "type a ZIP" screen yet, so a refusal is answered in plain words rather than silence.
-                // Once iOS has been told no it will not ask again, so the words say where the switch is — said
-                // once, on the screen, with no link and no second prompt (docs/08: never nag).
-                Text(L.t(here.permanentlyDenied ? "loc.denied_settings" : "loc.denied"))
-                    .font(.footnote).foregroundStyle(Color.ink)
-                    .padding(10).background(Color.surface, in: RoundedRectangle(cornerRadius: 10))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
             if locateOutside {
                 Text(L.t("map.locate_outside")).font(.footnote).foregroundStyle(Color.ink)
                     .padding(10).background(Color.surface, in: RoundedRectangle(cornerRadius: 10))
@@ -532,6 +559,38 @@ struct MapSurface: View {
             locationArrived(p)
         }
         .onChange(of: here.denied) { _, no in if no { locateCard = false } }
+    }
+
+    /// The location card over the map: the three ways in, "Still looking…" with its Stop, and what the map is
+    /// using once one of them has answered. It never covers the map — it sits in the bottom inset with the
+    /// attribution, and the map keeps drawing and answering fingers behind it.
+    private var whereCard: some View {
+        LocationChip()
+            .padding(12)
+            .frame(maxWidth: 420, alignment: .leading)
+            .background(plainBackgrounds ? AnyShapeStyle(Color.surface) : AnyShapeStyle(.regularMaterial),
+                        in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+    }
+
+    private var gettingAroundRow: some View {
+        Button { showGettingAround = true } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "bus").accessibilityHidden(true)
+                Text(L.t("transit.head")).fontWeight(.semibold).multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).accessibilityHidden(true)
+            }
+            .font(.subheadline).foregroundStyle(Color.brand)
+            .padding(.horizontal, 14).padding(.vertical, 12)
+            .frame(maxWidth: 420, minHeight: 44, alignment: .leading)
+            .background(plainBackgrounds ? AnyShapeStyle(Color.surface) : AnyShapeStyle(.regularMaterial),
+                        in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(L.t("transit.head"))
     }
 
     /// Plus and minus, and the same two steps offered to a screen reader as one adjustable control, so zooming
@@ -642,7 +701,19 @@ struct MapCardSheet: View {
                         // "Next: Friday, Sep 25 3:30 pm" — a day by its name, as the web says it, never a raw date.
                         Pill(text: openText(open1, now: now1), tone: Pill.tone(for: open1.state))
                         if let phone = r.phones.first { CallRow(label: L.t("detail.call"), number: phone.number) }
+                        // "Directions" comes FIRST on the card: on the Map tab it is the thing a person came
+                        // for, and "See details" is the longer road to the same place (the web's `pick`).
+                        if let dest = dirDestination(name: r.name, lat: r.lat, lon: r.lon, category: r.category) {
+                            openButton(L.t("dir.open")) { open(.directions(dest)) }
+                        }
                         openButton(L.t("map.details")) { open(.listing(id)) }
+                    }
+                case .area(let id):
+                    if let a = model.area(id: id) {
+                        // A name, whose area it is, and the way to its page. No number, ever: docs/13's first
+                        // honesty rule means an outline is never handed anything that could read as a score.
+                        head(a.sub, a.name)
+                        openButton(L.t("map.details")) { open(.area(id)) }
                     }
                 case .park(let name):
                     head(L.t("map.park"), name)
@@ -999,6 +1070,10 @@ struct MapLayersSheet: View {
         var out: [String] = []
         if !(store.bundle?.segments.isEmpty ?? true) { out.append("place:greenway") }
         if !(store.bundle?.parks.isEmpty ?? true) { out.append("place:parks") }
+        // The outlines. Off by default on the Map tab, where the job is "what is near me?"; the Areas tab opens
+        // with them on, because there the job is "tell me about this part of the city" (audit §3.1). The row is
+        // offered whenever this bundle carries the numbers file the outlines ride in.
+        if store.mapSource(HoodsFile.name) != nil { out.append(areasLayerId) }
         return out
     }
     private var goLayers: [String] { (store.bundle?.transitLayers ?? []).map { "go:" + $0.id } }
@@ -1126,6 +1201,20 @@ struct MapListSheet: View {
 /// Trip planners, fares, free rides, phone numbers, the MoGo pass and the Transit app link-out: what the web's Map
 /// tab shows under its map (apps/web/src/transit.ts), here in the map's list. The same in both map styles. Every
 /// link names its owner and opens in the browser; nothing about the rider goes with it, and nothing here is live.
+/// The same panels on a sheet of their own, opened by the labelled "Getting around" row at the foot of the Map
+/// tab (audit H3). Nothing on it is live and nothing about a rider goes anywhere.
+struct GettingAroundSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    var body: some View {
+        NavigationStack {
+            ScrollView { VStack(alignment: .leading, spacing: 10) { GettingAround() }.padding(16) }
+                .background(Color.appBg)
+                .navigationTitle(L.t("transit.head")).navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L.t("map.done")) { dismiss() } } }
+        }
+    }
+}
+
 struct GettingAround: View {
     private let facts = TransitFacts.current
     var body: some View {
