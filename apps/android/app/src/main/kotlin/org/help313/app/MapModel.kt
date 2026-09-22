@@ -82,6 +82,13 @@ sealed class MapSelection {
     class Interchange(val layer: String, val index: Int) : MapSelection()
     class Hub(val name: String) : MapSelection()
 
+    /**
+     * One marker on a drawn trip: where it starts, where a bus is got on or off, where it ends. It opens no card.
+     * It exists so that every stop of a route is a node of its own for TalkBack (MapView.features), which is the
+     * text equivalent the picture owes (WCAG 1.1.1) — the numbered step list beside it says the same thing again.
+     */
+    class TripStop(val at: Int, val label: String) : MapSelection()
+
     /** True for a selection only the subway drawing can show; dropped when the style goes back to `standard`. */
     val isSubway: Boolean get() = this is Line || this is Trunk || this is Station || this is Interchange || this is Hub
 
@@ -97,6 +104,7 @@ sealed class MapSelection {
             is Park -> "park:$name"
             is Stop -> "stop:$layer:$name"
             is Route -> "route:$layer:$name"
+            is TripStop -> "trip:$at"
         }
 }
 

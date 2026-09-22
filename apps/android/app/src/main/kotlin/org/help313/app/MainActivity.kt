@@ -61,6 +61,9 @@ class MainActivity : Activity() {
     /** A typed ZIP becomes the point the list is sorted from. The point is the middle of the ZIP, not a person. */
     fun useZip(zip: String, point: LatLon) {
         nearZip = zip
+        // A ZIP and a junction are two answers to one question, so the newer one is the answer.
+        crossText = null
+        crossWanted = false
         near = point
         zipWanted = false
         locationRefused = false
@@ -170,6 +173,9 @@ class MainActivity : Activity() {
     }
 
     private val stack = ArrayList<Route>()
+
+    /** The kind of screen drawn last, so that "left Directions" is a thing this activity can know. */
+    private var lastDrawn: Route? = null
     private lateinit var content: FrameLayout
     private lateinit var tabs: LinearLayout
 
@@ -240,6 +246,9 @@ class MainActivity : Activity() {
         if (store.onChange != null) store.onChange = null
         MapModel.onChange = null
         HoodRepo.onChange = null
+        // A trip is never carried over an activity's death, finishing or not: the plan, the steps, the position
+        // watch and the view the follow-along was drawing into all go now.
+        DirectionsScreen.close(this)
         if (isFinishing) {
             // Really leaving: the route stack, the background thread and the loader all go. Nothing about this
             // session outlives it (docs/08, "cleared on exit").
@@ -408,6 +417,11 @@ class MainActivity : Activity() {
         // NoSuchMethodError on the first screen (found by the first :app compile, 2026-09-20). Indexing binds to
         // List.get, which has always been there.
         val route = stack[stack.size - 1]
+        // Leaving Directions ends the trip: the plan, the chosen way, the current step and the position watch all
+        // go. "Leaving" is a screen that WAS Directions and now is not, which is why the last one drawn is
+        // remembered rather than the stack being asked — opening Directions draws the screen behind it first.
+        if (lastDrawn is Route.Directions && route !is Route.Directions) DirectionsScreen.close(this)
+        lastDrawn = route
         // One place decides whether this screen may be photographed, so a screen added later cannot forget. See
         // Route.isPrivate and apps/android/README.md for why this is per-screen rather than for the whole app.
         keepOutOfScreenshots(Route.isPrivate(route))
@@ -859,6 +873,9 @@ class MainActivity : Activity() {
             locateOutside = true
         } else {
             near = LatLon(found.latitude, found.longitude)
+            // A fix is not a junction somebody typed: the words that said where they were go with it.
+            crossText = null
+            crossWanted = false
             locationRefused = false
             locateOutside = false
             // In memory only, as everywhere else: the map moves there, and nothing is written down or sent.

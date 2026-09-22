@@ -138,6 +138,11 @@ class ParityTest {
         for (id in PROPOSE_CATEGORIES) built += "add.cat.$id"
         for (id in HOW_KNOWN) built += "add.how.$id"
         built += listOf("add.sent", "add.queued", "loc.denied", "loc.denied_settings", "hood.nearest_open")
+        // Directions (DECISIONS 2026-09-22): the keys DirWords.kt builds from a fact `:query` hands over — a
+        // compass word, a turn word — and the ones the cross-street field builds from the end of a street.
+        for (b in org.help313.query.BEARINGS) built += "dir.bearing.$b"
+        for (turn in DIR_TURNS) built += "dir.turn.$turn"
+        for (where in listOf("north", "south", "east", "west")) built += "loc.where_$where"
         built += listOf(
             "tab.home", "tab.help", "search.title", "saved.title", "tabs.label",
             "help.now", "help.soon", "help.later", "results.none",
@@ -149,6 +154,60 @@ class ParityTest {
         )
         for (key in built) if (!en.containsKey(key)) missing += "built: $key"
         assertEquals("string keys the app asks for that strings/en.json does not have", emptyList<String>(), missing)
+    }
+
+    /**
+     * Every `dir.*` key the web app's Directions screen uses exists here too, in all four languages, with the same
+     * placeholders — because the Android screen is a line-for-line copy of it and a missing key would put a raw
+     * string in front of somebody walking somewhere at night.
+     *
+     * The set is read out of apps/web/src/dirwords.ts, dirscreen.ts and main.ts rather than typed here, so a
+     * sentence added to the web and not to Android fails this test instead of quietly going missing.
+     */
+    @Test
+    fun everyDirectionsKeyTheWebUsesIsHereInEveryLanguage() {
+        val web = text("apps/web/src/dirwords.ts") + text("apps/web/src/dirscreen.ts") + text("apps/web/src/main.ts")
+        val used = Regex("'(dir\\.[a-z_.]+)'").findAll(web).map { it.groupValues[1] }
+            // The two keys built from a fact rather than written out; their members are checked below.
+            .filter { it != "dir.bearing." && it != "dir.turn." }
+            .toSortedSet()
+        assertTrue("apps/web/src/dirwords.ts could not be read", used.size > 30)
+        for (lang in LANGS) {
+            val words = strings("strings/$lang.json")
+            for (key in used) assertNotNull("strings/$lang.json has no $key", words[key])
+        }
+        // The two built families, in full: eight compass words and eight turn words, in every language.
+        for (lang in LANGS) {
+            val words = strings("strings/$lang.json")
+            for (b in org.help313.query.BEARINGS) assertNotNull("strings/$lang.json has no dir.bearing.$b", words["dir.bearing.$b"])
+            for (turn in DIR_TURNS) assertNotNull("strings/$lang.json has no dir.turn.$turn", words["dir.turn.$turn"])
+        }
+    }
+
+    /** The turn words `:query` can produce (Walk.turnWord). A ninth would have no sentence to go in. */
+    private val DIR_TURNS = listOf(
+        "straight", "slight_left", "left", "sharp_left", "slight_right", "right", "sharp_right", "around",
+    )
+
+    /**
+     * A trip is never put back after a recreation, and one reached from "Get somewhere safe now" is a private
+     * screen: no recents thumbnail, no screenshot, and "Leave this page fast" above it (Route.kt).
+     */
+    @Test
+    fun aTripIsNeverPutBackAfterARecreation() {
+        val trip = Route.Directions(42.35, -83.05, "Somewhere")
+        val secret = Route.Directions(42.35, -83.05, "Somewhere", secure = true)
+        assertFalse("an ordinary trip is not a private screen", Route.isPrivate(trip))
+        assertTrue("a trip from the safe-now list is", Route.isPrivate(secret))
+        assertTrue(Route.isTraceless(trip))
+        assertTrue(Route.isTraceless(secret))
+        // Everything before it is public and comes back; the trip itself does not, secure or not.
+        assertEquals(listOf<Route>(Route.Home), Route.keepable(listOf(Route.Home, trip)))
+        assertEquals(listOf<Route>(Route.Home, Route.Help), Route.keepable(listOf(Route.Home, Route.Help, secret)))
+        assertEquals(
+            "a stack that is only a trip falls back to Home",
+            listOf<Route>(Route.Home), Route.keepable(listOf(trip)),
+        )
     }
 
     /** Keys retired on 2026-09-20, when the web app folded Recreation and Transit into one Map tab. */

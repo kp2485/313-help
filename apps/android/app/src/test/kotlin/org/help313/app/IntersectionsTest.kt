@@ -109,6 +109,42 @@ class IntersectionsTest {
         assertEquals("Andover", Intersections.parseCrossing("Andover")!!.first)
     }
 
+    // ---- the two pieces the grid cases exercise only indirectly --------------------------------------------------
+    // Carried over from the Directions branch's own port of intersections.ts, which was dropped in favour of this
+    // file (2026-09-22). Both are worth asserting on their own: a wrong answer here is a junction in the wrong
+    // place, and the grid below would only show it as a missing crossing.
+
+    /** Where two straight pieces cross, and the three ways there is no answer. */
+    @Test
+    fun twoPiecesCrossWhereTheyCross() {
+        val hit = Intersections.segmentCross(1.0, 0.0, 1.0, 2.0, 0.0, 1.0, 2.0, 1.0)!!
+        assertEquals(1.0, hit[0], 1e-9)
+        assertEquals(1.0, hit[1], 1e-9)
+        assertNull("parallel", Intersections.segmentCross(0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0))
+        assertNull(
+            "the lines would meet, but not within either piece",
+            Intersections.segmentCross(0.0, 0.0, 1.0, 0.0, 5.0, -1.0, 5.0, 1.0),
+        )
+        assertNull("a piece of no length", Intersections.segmentCross(0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0))
+    }
+
+    /**
+     * The axis is whichever way the answers are actually spread, so two crossings of an east-west pair read east
+     * and west rather than being forced onto north and south.
+     */
+    @Test
+    fun theAxisIsWhicheverWayTheAnswersAreSpread() {
+        assertEquals(
+            listOf("west", "east"),
+            Intersections.whereWords(listOf(LatLonPoint(42.350, -83.20), LatLonPoint(42.351, -83.00))),
+        )
+        assertEquals(
+            listOf("north", "south"),
+            Intersections.whereWords(listOf(LatLonPoint(42.45, -83.05), LatLonPoint(42.26, -83.05))),
+        )
+        assertEquals("one answer is not at an end of anything", listOf(""), Intersections.whereWords(listOf(LatLonPoint(42.35, -83.05))))
+    }
+
     // ---- the crossings, on a grid whose every answer is known by hand -----------------------------------------------
 
     /**

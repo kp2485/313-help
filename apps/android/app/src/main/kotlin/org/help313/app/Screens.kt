@@ -45,6 +45,7 @@ object Screens {
         is Route.Parks -> ParkScreens.screen(a)
         is Route.Park -> ParkScreens.page(a, route.parkId)
         is Route.Add -> AddScreen.view(a)
+        is Route.Directions -> DirectionsScreen.view(a, route)
         is Route.Stretch -> {
             // A route outlives a draw, so the stretch is looked up again: the bundle may have been refreshed since.
             val s = a.store.bundle?.segments?.firstOrNull { it.id == route.segmentId }
@@ -313,7 +314,12 @@ object Screens {
         // A screen that mixes categories ("Get somewhere safe now") has no query of its own: it names the kinds,
         // and the rows are narrowed before the one ranking call that orders the whole mixed list.
         if (need.categories.isNotEmpty()) {
-            listBody(a, col, Query(), need.emptyKey, need.sensitive, only = need.categories)
+            listBody(
+                a, col, Query(), need.emptyKey, need.sensitive, only = need.categories,
+                // The one list in the app whose directions are private. The screen itself says nothing about why
+                // somebody opened it, and a route drawn from it must not say it for them (docs/08).
+                secureDirections = need.id == "safe_now",
+            )
             // One quiet line under the list. It names no kind of danger, so the screen stays as blank about why
             // a person opened it as the urgent sheet it hangs off (docs/08).
             if (need.id == "safe_now") col.addView(UI.text(a, L.t("safe_now.home"), 15f, R.color.muted, topDp = 12))
@@ -371,6 +377,8 @@ object Screens {
         /** Several categories in one list ("Get somewhere safe now"): the rows are narrowed by `inCategories`
          *  (MapLayers.kt) before one `rank` call orders them. Empty on every other screen. */
         only: List<String> = emptyList(),
+        /** "Get somewhere safe now": the trips its rows offer are private screens (Route.Directions.secure). */
+        secureDirections: Boolean = false,
     ) {
         val bundle = a.store.bundle
         if (bundle == null) {
@@ -414,7 +422,7 @@ object Screens {
             col.addView(UI.text(a, L.t(emptyKey ?: "results.none"), 17f, R.color.muted, topDp = 16))
             return
         }
-        for (r in ranked) col.addView(listingCard(a, r, showDistance = !sensitive))
+        for (r in ranked) col.addView(listingCard(a, r, showDistance = !sensitive, secureDirections = secureDirections))
     }
 
     /** The open-now pill. A holiday is never the open colour: the words say "Call first" and the colour agrees. */
@@ -423,7 +431,13 @@ object Screens {
         else UI.pill(a, openText(o, a.today()))
 
     /** One row in a list: name, what you get, open now, the badge, and how far. Never a bare colour. */
-    private fun listingCard(a: MainActivity, r: Ranked, showDistance: Boolean): View {
+    private fun listingCard(
+        a: MainActivity,
+        r: Ranked,
+        showDistance: Boolean,
+        /** True on "Get somewhere safe now": a trip drawn from there must not reach the recents thumbnail. */
+        secureDirections: Boolean = false,
+    ): View {
         val card = UI.tappableCard(a, r.row.name) { a.push(Route.Detail(r.row.id, r.row.category)) }
         card.addView(UI.text(a, r.row.name, 18f, R.color.ink, bold = true))
         if (r.row.what.isNotEmpty()) card.addView(UI.text(a, r.row.what, 16f, R.color.muted, topDp = 2))
@@ -437,6 +451,16 @@ object Screens {
             card.addView(UI.text(a, L.t("miles", "miles" to String.format(L.locale(), "%.1f", it)), 14f, R.color.muted, topDp = 2))
         }
         r.row.notice?.let { card.addView(UI.pill(a, it, R.drawable.pill_warn, R.color.warn_ink)) }
+        // Our own directions, from a row in a list, exactly as the web app offers them there (DECISIONS
+        // 2026-09-22). A row with no published point, and every sensitive row, gets no button at all.
+        ownDirectionsPoint(r.row)?.let { at ->
+            card.addView(
+                UI.button(
+                    a, L.t("dir.open"), description = L.t("dir.open_label", "name" to r.row.name),
+                    backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink,
+                ) { a.push(Route.Directions(at.lat, at.lon, r.row.name, secureDirections)) },
+            )
+        }
         return card
     }
 
@@ -493,7 +517,18 @@ object Screens {
                 col.addView(UI.sectionHead(a, L.t("detail.where")))
                 col.addView(UI.text(a, L.t("detail.where_no_address", "source" to row.facts.source.name), 17f, R.color.ink))
             }
+            // Our own directions first, and the one primary button on this screen: worked out on this phone from
+            // the signed bundle, nothing sent, and it works with no signal (DECISIONS 2026-09-22). The link-outs
+            // below it hand the place to somebody else's app and are grouped and labelled as exactly that.
+            ownDirectionsPoint(row)?.let { at ->
+                col.addView(
+                    UI.button(a, L.t("dir.open"), description = L.t("dir.open_label", "name" to row.name)) {
+                        a.push(Route.Directions(at.lat, at.lon, row.name))
+                    },
+                )
+            }
             mapsDestination(row)?.let { destination ->
+                col.addView(UI.sectionHead(a, L.t("dir.other_apps")))
                 col.addView(UI.button(a, L.t("detail.directions"), description = L.t("detail.directions_label", "name" to row.name),
                     backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
                     a.directions(row.lat, row.lon, destination)
@@ -510,6 +545,9 @@ object Screens {
                         })
                     }
                 }
+                // What these buttons do, before they are tapped: they open another app, and that app sees the
+                // place. Nothing about the person goes with it — no origin, no location, no identifier.
+                col.addView(UI.text(a, L.t("dir.other_apps_note"), 14f, R.color.muted, topDp = 6))
                 col.addView(UI.text(a, L.t("detail.directions_note"), 14f, R.color.muted, topDp = 4))
             }
         }
