@@ -136,21 +136,30 @@ final class RealCrossStreetTests: XCTestCase {
         return m
     }()
 
-    private func cross() throws -> CrossStreets {
-        let m = try XCTUnwrap(Self.map, "no bundle in this checkout — run `pnpm build:bundle`")
-        return CrossStreets(map: m)
+    /// Skipped, loudly, when there is no bundle: `data/bundle/v1` is never committed (CLAUDE.md), so CI runs
+    /// the table above and skips these until somebody has run `pnpm build:bundle`.
+    private func loadedMap() throws -> BaseMap {
+        try XCTSkipUnless(Self.map != nil, "no bundle in this checkout — run `pnpm build:bundle`")
+        return Self.map!
+    }
+
+    private func cross() throws -> CrossStreets { CrossStreets(map: try loadedMap()) }
+
+    /// The skip has to happen before `XCTUnwrap`, which would otherwise catch it and report it as a failure.
+    private func resolved(_ typed: String) throws -> CrossOutcome {
+        let c = try cross()
+        return try XCTUnwrap(c.resolve(typed), typed)
     }
 
     func testKnowsTheStreetsPeopleName() throws {
-        let m = try XCTUnwrap(Self.map, "no bundle in this checkout — run `pnpm build:bundle`")
-        let index = StreetIndex(m)
+        let index = StreetIndex(try loadedMap())
         for name in ["woodward", "grand river", "gratiot", "michigan", "8 mile"] {
             XCTAssertFalse(index.lines(for: name).isEmpty, name)
         }
     }
 
     func testWoodwardAndWarrenIsOneJunctionInMidtown() throws {
-        let out = try XCTUnwrap(cross().resolve("Woodward and Warren"))
+        let out = try resolved("Woodward and Warren")
         // Warren has an east and a west half, so this may be one point or a short list; either way every answer
         // is on Woodward in Midtown, which is the fact that matters.
         let points: [LatLon]
@@ -169,7 +178,7 @@ final class RealCrossStreetTests: XCTestCase {
     /// Woodward IS the line that splits E 7 Mile from W 7 Mile, so the road records that carry the name all meet
     /// it at one junction, which the merge correctly reports as one answer.
     func testWoodwardAndSevenMileIsOneJunction() throws {
-        let out = try XCTUnwrap(cross().resolve("Woodward & 7 Mile"))
+        let out = try resolved("Woodward & 7 Mile")
         guard case .point(let p, _, _) = out else { return XCTFail("expected one junction, got \(out)") }
         XCTAssertEqual(p.lat, 42.4321, accuracy: 0.01)
         XCTAssertEqual(p.lon, -83.1150, accuracy: 0.01)
@@ -177,7 +186,7 @@ final class RealCrossStreetTests: XCTestCase {
 
     func testTwoStreetsThatReallyCrossTwiceAreAShortList() throws {
         // Dequindre crosses Davison twice: the street and the service drive beside the freeway.
-        let out = try XCTUnwrap(cross().resolve("Dequindre and Davison"))
+        let out = try resolved("Dequindre and Davison")
         guard case .choices(_, _, let choices) = out else { return XCTFail("expected a short list, got \(out)") }
         XCTAssertGreaterThanOrEqual(choices.count, 2)
         XCTAssertLessThanOrEqual(choices.count, maxCrossChoices)
@@ -195,7 +204,7 @@ final class RealCrossStreetTests: XCTestCase {
     }
 
     func testOneStreetNameIsAnsweredWithTheMiddleOfItAndSaidToBeThat() throws {
-        let out = try XCTUnwrap(cross().resolve("Woodward Ave"))
+        let out = try resolved("Woodward Ave")
         guard case .street(let p, let a) = out else { return XCTFail("expected the middle of a street, got \(out)") }
         XCTAssertEqual(a, "Woodward Ave")
         XCTAssertTrue(inServiceArea(p))
@@ -204,13 +213,13 @@ final class RealCrossStreetTests: XCTestCase {
     func testAStreetWeDoNotCarryIsSaidToBeUnknownNeverGuessedAt() throws {
         // Deliberately a street this city does not have: the app says it does not know it, and never answers
         // with the nearest thing it does know.
-        let out = try XCTUnwrap(cross().resolve("Nonesuch Boulevard and Woodward"))
+        let out = try resolved("Nonesuch Boulevard and Woodward")
         guard case .unknown(let name) = out else { return XCTFail("expected unknown, got \(out)") }
         XCTAssertEqual(name, "Nonesuch Boulevard")
     }
 
     func testTwoRealStreetsThatDoNotMeetSaySo() throws {
-        let out = try XCTUnwrap(cross().resolve("8 Mile and Michigan"))
+        let out = try resolved("8 Mile and Michigan")
         guard case .noCrossing = out else { return XCTFail("expected no crossing, got \(out)") }
     }
 }
