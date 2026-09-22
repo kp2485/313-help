@@ -16,10 +16,13 @@ import SwiftUI
 struct AreaPageView: View {
     let page: AreaPage
     let d: Indicators
+    /// False when the page is being drawn INSIDE something that already scrolls and already carries the screen's
+    /// title and Urgent help — the Areas tab's strip (HoodsScreen.swift). The panels are identical either way.
+    var chrome = true
     var body: some View {
         switch page {
-        case .neighborhood(let h): HoodPageView(hood: h, d: d)
-        case .city(let a): CityPageView(area: a, d: d)
+        case .neighborhood(let h): HoodPageView(hood: h, d: d, chrome: chrome)
+        case .city(let a): CityPageView(area: a, d: d, chrome: chrome)
         }
     }
 }
@@ -29,6 +32,7 @@ struct AreaPageView: View {
 struct CityPageView: View {
     let area: Area
     let d: Indicators
+    var chrome = true
     @EnvironmentObject private var nav: AppNav
     @Environment(MapModel.self) private var map
 
@@ -40,8 +44,19 @@ struct CityPageView: View {
 
     private var isDetroit: Bool { d.cityRows.first { $0.id == area.id }?.hasNeighborhoods == true }
 
-    var body: some View {
-        ScrollView { VStack(alignment: .leading, spacing: 10) {
+    @ViewBuilder var body: some View {
+        if chrome {
+            ScrollView { stack }
+                .background(Color.appBg.ignoresSafeArea())
+                .navigationTitle(area.name).navigationBarTitleDisplayMode(.inline)
+                .urgentHelp()
+        } else {
+            stack
+        }
+    }
+
+    private var stack: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Text(L.t("city.kind")).font(.subheadline).foregroundStyle(Color.muted)
             Text(L.t("hood.describe")).font(.subheadline).foregroundStyle(Color.warnInk)
                 .padding(12).frame(maxWidth: .infinity, alignment: .leading)
@@ -88,10 +103,7 @@ struct CityPageView: View {
             }
             sourcesPanel
             HoodFoot(L.t("hood.left_out"))
-        }.padding(16) }
-        .background(Color.appBg.ignoresSafeArea())
-        .navigationTitle(area.name).navigationBarTitleDisplayMode(.inline)
-        .urgentHelp()
+        }.padding(16)
     }
 
     private var notPublished: [String] {
@@ -354,12 +366,16 @@ struct PanelSource: View {
 // MARK: - the map the Areas tab lands on
 
 /**
- One screen, two views, one control (Kyle, 2026-09-22: "the most intuitive way for people to reach their
- neighborhood is through a map"; audit §3).
+ The Areas tab's map (Kyle, 2026-09-22; DECISIONS 2026-09-22).
 
- The map is the landing: the four city outlines and the 205 neighbourhood outlines, nothing else on it — no dot,
- no listing, no number, and never a fill that carries a value. A tap opens a card with the area's name and the
- way to its page. "See this map as a list" swaps to the index.
+ It is the landing, and it fills the tab: the four city outlines and the 205 neighbourhood outlines, nothing else
+ on it — no dot, no listing, no number, and never a fill that carries a value. It opens ZOOMED TO the outline the
+ phone has worked out a person is standing in (`MapCamera.forArea`, HelpCore), highlighted; an answer that lands
+ after it has opened GLIDES to that outline, and simply arrives under Reduce Motion.
+
+ **A tap on an outline here is not a card offering to open a page; it IS the page opening** (the web's `onArea`).
+ The same view is what an area page wears as a strip across its top, at a smaller height, with the outline the
+ page is about framed in it — one map, two heights.
 
  It draws itself, on this phone, from the signed bundle: no tile server is ever contacted (DECISIONS 2026-09-18).
  */
@@ -367,8 +383,24 @@ struct AreasMapView: View {
     let areas: [AreaOutline]
     let base: BaseMap?
     @Binding var selected: String
+    /// A tap on an outline. On the landing it opens that area's page; in a strip it swaps the page underneath.
     let open: (String) -> Void
+    /// The outline this map opens on, already decoded. Empty — an area the bundle carries no outline for, or
+    /// nobody has said where they are — and it opens on the four cities instead, which is where it always did.
+    var openOn: [[LatLon]] = []
+    /// The id of that outline. It is what tells this view an ANSWER has arrived: when it changes, the camera
+    /// travels to the new outline rather than being rebuilt around it.
+    var openId: String = ""
+    /// How tall. `nil` fills whatever it is given: the landing hands it the tab, the strip hands it 38 %.
+    var height: CGFloat?
+    /// The landing map is the tab, edge to edge; a strip is too. A map inside a page is a rounded card.
+    var framed = true
+    /// Where VoiceOver's cursor is among the outlines, so Back from an area page can put it back on the polygon
+    /// it was opened from. Optional: only the landing needs it.
+    var focus: AccessibilityFocusState<String?>.Binding?
+
     @Environment(\.accessibilityReduceTransparency) private var plainBackgrounds
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var camera = MapCamera(centerX: 0, centerY: 0, scale: MapCamera.minScale, width: 1, height: 1)
     @State private var sized = false
     @State private var lastDrag: CGSize = .zero
@@ -390,6 +422,8 @@ struct AreasMapView: View {
             }
             .onAppear { fit(geo.size) }
             .onChange(of: geo.size) { _, s in fit(s) }
+            // An answer arriving after the map opened: travel to the outline, or simply be there (WCAG 2.3.3).
+            .onChange(of: openId) { _, _ in glide() }
             .contentShape(Rectangle())
             .gesture(drag)
             .simultaneousGesture(pinch)
@@ -397,32 +431,57 @@ struct AreasMapView: View {
                 let x = camera.mapX(e.location.x), y = camera.mapY(e.location.y)
                 guard let a = areaAt(shown, x: x, y: y) else { return }
                 selected = a.id
+                open(a.id)
             })
             // A Canvas is one opaque picture to VoiceOver, so every outline is also a real button, in the
             // reading order the shared rules give: nearest the middle of the screen first.
             .accessibilityElement(children: .contain)
             .accessibilityLabel(L.t("map.label_areas"))
-            .accessibilityChildren {
-                MapCanvasElements(items: placesInReadingOrder(shown, fromX: camera.centerX, fromY: camera.centerY,
-                                                              x: { $0.box.centerX }, y: { $0.box.centerY },
-                                                              tieBreak: { $0.id }).prefix(40).map { a in
-                    MapElement(id: "area:" + a.id, label: "\(a.name), \(a.sub). \(L.t("map.details"))",
-                               action: { selected = a.id; open(a.id) })
-                })
-            }
+            .accessibilityHint(L.t("hood.map_note"))
+            .accessibilityChildren { elements }
         }
         // Arabic mirrors the controls; a map must not mirror, or Detroit is back to front.
         .environment(\.layoutDirection, .leftToRight)
-        .frame(height: 300)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+        .frame(maxWidth: .infinity, maxHeight: height == nil ? .infinity : nil)
+        .frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: framed ? 14 : 0))
+        .overlay {
+            if framed { RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1) }
+        }
+    }
+
+    /// One real button per outline. They stay in the tree whatever the map is doing — a strip that has collapsed
+    /// is a map that is merely small, never a map that has gone.
+    @ViewBuilder private var elements: some View {
+        let items = Array(placesInReadingOrder(shown, fromX: camera.centerX, fromY: camera.centerY,
+                                               x: { $0.box.centerX }, y: { $0.box.centerY },
+                                               tieBreak: { $0.id }).prefix(40))
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(items) { a in
+                let label = "\(a.name), \(a.sub). \(L.t("map.details"))"
+                Button(label) { selected = a.id; open(a.id) }
+                    .accessibilityLabel(label)
+                    .accessibilityAddTraits(a.id == selected ? [.isButton, .isSelected] : .isButton)
+                    .modifier(AreaFocus(id: a.id, focus: focus))
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            }
+        }
     }
 
     private func fit(_ size: CGSize) {
         guard size.width > 1, size.height > 1 else { return }
         if sized { camera = camera.resized(width: size.width, height: size.height).clamped(); return }
         sized = true
-        camera = MapCamera.fitting(corners, width: size.width, height: size.height, cover: true)
+        camera = MapCamera.forArea(openOn, width: size.width, height: size.height)
+            ?? MapCamera.fitting(corners, width: size.width, height: size.height, cover: true)
+    }
+
+    /// The camera travels to the outline an answer named. Nothing is stored and nothing is sent: a fix becomes a
+    /// camera and an id, both of which die with the screen (docs/08).
+    private func glide() {
+        guard sized, let cam = MapCamera.forArea(openOn, width: camera.width, height: camera.height) else { return }
+        if reduceMotion { camera = cam }
+        else { withAnimation(.easeOut(duration: areasShrinkMilliseconds / 1000)) { camera = cam } }
     }
 
     private var drag: some Gesture {
@@ -444,27 +503,55 @@ struct AreasMapView: View {
     }
 }
 
-/// The card a tap on an outline opens: the name, whose area it is, and the way to its page. No number, ever.
-struct AreaCard: View {
-    let area: AreaOutline
-    let open: () -> Void
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(area.sub).font(.footnote.weight(.semibold)).foregroundStyle(Color.muted)
-            Text(L.rightToLeft ? ltr(area.name) : area.name).font(.title3.bold()).foregroundStyle(Color.ink)
-                .fixedSize(horizontal: false, vertical: true)
-            Button(action: open) {
-                HStack(spacing: 8) {
-                    Text(L.t("map.details")).fontWeight(.semibold)
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.right")
-                }
-                .font(.subheadline).foregroundStyle(Color.brandSoftInk)
-                .padding(.horizontal, 16).padding(.vertical, 13).frame(maxWidth: .infinity, minHeight: 44)
-                .background(Color.brandSoft, in: RoundedRectangle(cornerRadius: 12))
-            }.buttonStyle(.plain)
-        }
-        .card()
-        .accessibilityElement(children: .contain)
+/// `accessibilityFocused` needs a real binding; the strip's map has nowhere to put the cursor back to and passes
+/// none. One modifier, so the map itself stays free of the `if let`.
+private struct AreaFocus: ViewModifier {
+    let id: String
+    let focus: AccessibilityFocusState<String?>.Binding?
+    @ViewBuilder func body(content: Content) -> some View {
+        if let focus { content.accessibilityFocused(focus, equals: id) } else { content }
     }
 }
+
+/**
+ The Map | List switch (Kyle: "a list option up in the top right for mobile users").
+
+ Two real buttons, each saying whether it is the one showing — `.isSelected` and a value a screen reader reads —
+ rather than one control whose word changes meaning underneath it. It rides in the map's top corner: the top
+ RIGHT of an English screen and the top LEFT of an Arabic one, because it is laid out in the interface's own
+ direction (the map inside it is not), and that is the corner a right-to-left reader starts from.
+
+ 44 points tall, which is the smallest a control on a map may be.
+ */
+struct AreasSwitch: View {
+    let showing: HoodsView
+    let choose: (HoodsView) -> Void
+    var body: some View {
+        HStack(spacing: 2) {
+            button(.map, L.t("hood.switch_map"), L.t("hood.say_map"))
+            button(.list, L.t("hood.switch_list"), L.t("hood.say_list"))
+        }
+        .padding(2)
+        .background(.regularMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(Color.line, lineWidth: 1))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(L.t("hood.switch_label"))
+    }
+    private func button(_ id: HoodsView, _ word: String, _ said: String) -> some View {
+        let on = showing == id
+        return Button { if !on { choose(id) } } label: {
+            Text(word)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(on ? Color.brandSoftInk : Color.brand)
+                .lineLimit(1)
+                .padding(.horizontal, 14)
+                .frame(minWidth: 60, minHeight: 44)
+                .background(on ? Color.brandSoft : Color.clear, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(word)
+        .accessibilityValue(on ? said : "")
+        .accessibilityAddTraits(on ? [.isButton, .isSelected] : .isButton)
+    }
+}
+

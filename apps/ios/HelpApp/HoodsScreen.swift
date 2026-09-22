@@ -25,6 +25,10 @@ final class HoodsModel {
     /// True when this bundle has no neighborhood numbers at all, or they could not be read. The screen then says
     /// so in words; it never shows an empty list as if there were nothing in Detroit.
     private(set) var failed = false
+    /// Which face of the Areas tab is showing. It lives here, on a model that is made once and lasts as long as
+    /// the app does, so the choice survives a walk through the other tabs and dies with the app: **the map is
+    /// the default every launch** (Kyle, 2026-09-22). It is never written to a file and never sent.
+    var areasView: HoodsView = .map
     private var key = ""
     private var asking = false
 
@@ -81,8 +85,10 @@ struct HoodsTabView: View {
             HoodsIndexView(model: model)
                 .navigationDestination(for: HoodRoute.self) { route in
                     switch route {
-                    case .hood(let id):
-                        if let d = model.indicators, let page = d.areaPage(id: id) { AreaPageView(page: page, d: d) }
+                    // An area opens UNDER the map: the page wears it as a strip (Kyle, 2026-09-22). It wears it
+                    // whichever door it was opened by — an outline, a row in the list, a link from elsewhere —
+                    // so there is one area page on this tab and not two.
+                    case .hood(let id): AreaStripScreen(id: id, model: model)
                     case .index:
                         // "All 205 Detroit neighborhoods", from the Detroit city page: the index, not the map.
                         HoodsIndexView(model: model, startAs: .list)
@@ -102,64 +108,160 @@ struct HoodsTabView: View {
 
 struct HoodsIndexView: View {
     let model: HoodsModel
-    /// The Detroit city page's "All 205 Detroit neighborhoods" arrives straight at the index.
-    var startAs: HoodsView = .map
+    /// The Detroit city page's "All 205 Detroit neighborhoods" arrives straight at the index and stays there:
+    /// that door asked for a list. `nil` is the tab itself, which lands on the map.
+    var startAs: HoodsView?
     @EnvironmentObject private var here: Here
     @Environment(MapModel.self) private var map
     /// Memory only, like every other search box in this app: never stored, never sent, never logged.
     @State private var find = ""
     @State private var grouping: HoodGrouping = .abc
-    @State private var view: HoodsView?
+    /// True once a person has picked an order for themselves. Until then the list opens nearest-first when there
+    /// is a point to measure from, which is what the Map | List switch is asked for.
+    @State private var orderChosen = false
     /// The outline a tap chose, this screen only.
     @State private var picked = ""
     @State private var navigate: String?
+    /// A fix that came back from outside the four cities. The map does not move and the words say why — the
+    /// point is not kept either, exactly as on the Map tab and on the web.
+    @State private var outside = false
+    /// Where VoiceOver's cursor is among the outlines, so coming Back from an area page puts it on the polygon
+    /// that was opened rather than at the top of the screen.
+    @AccessibilityFocusState private var focusedArea: String?
 
-    private var showing: HoodsView { view ?? startAs }
+    private var showing: HoodsView { startAs ?? model.areasView }
 
     var body: some View {
-        ScrollView { VStack(alignment: .leading, spacing: 10) {
+        Group {
             if let d = model.indicators {
-                Text(L.t("hood.index_intro")).font(.body).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
-                if showing == .map { mapView }
-                // The switch is a button, not a tab set: there are two views of one thing, and the wording says
-                // which one you are about to get.
-                Button(L.t(showing == .map ? "map.list_title" : "map.list_as_map")) {
-                    view = showing == .map ? .list : .map
-                }
-                .font(.subheadline.weight(.semibold)).foregroundStyle(Color.brand)
-                MyHoodCard(d: d)
-                if showing == .list { list(d) }
-                cities(d)
-                Text(L.t("hood.index_sources")).font(.footnote).foregroundStyle(Color.muted)
-                    .fixedSize(horizontal: false, vertical: true).padding(.top, 8)
-                Text(L.t("hood.describe")).font(.footnote).foregroundStyle(Color.muted)
-                    .fixedSize(horizontal: false, vertical: true)
+                if showing == .map { mapFace(d) } else { listFace(d) }
             } else {
-                Text(L.t(model.failed ? "hood.unavailable" : "home.loading")).foregroundStyle(Color.muted).card()
+                ScrollView {
+                    Text(L.t(model.failed ? "hood.unavailable" : "home.loading"))
+                        .foregroundStyle(Color.muted).card().padding(16)
+                }
             }
-        }.padding(16) }
+        }
         .background(Color.appBg.ignoresSafeArea())
-        .searchable(text: $find, placement: .navigationBarDrawer(displayMode: .always), prompt: L.t("hood.find_label"))
-        .autocorrectionDisabled()
         // "Nearest first" is only an order once there is a point to measure from; it can never be left selected
         // after the location is switched off.
-        .onChange(of: here.point) { _, p in if p == nil, grouping == .near { grouping = .abc } }
-        .navigationDestination(item: $navigate) { id in
-            if let d = model.indicators, let page = d.areaPage(id: id) { AreaPageView(page: page, d: d) }
+        .onChange(of: here.point) { _, p in
+            if p == nil, grouping == .near { grouping = .abc }
+            arrived(p)
         }
+        .navigationDestination(item: $navigate) { id in AreaStripScreen(id: id, model: model) }
+        // Back from an area page: the outline stays picked out, and a screen reader's cursor goes back to it.
+        .onChange(of: navigate) { was, now in if now == nil, let was { focusedArea = was } }
         // The full word on the screen and in VoiceOver; the tab bar's own label is the short one (`tab.hoods`).
         .navigationTitle(L.t("tab.hoods_wide"))
+        .navigationBarTitleDisplayMode(showing == .map ? .inline : .automatic)
         .urgentHelp()
     }
 
-    /// The landing: the four city outlines and the 205 neighbourhood outlines, and nothing else on the map.
-    @ViewBuilder private var mapView: some View {
-        AreasMapView(areas: map.areas, base: map.base, selected: $picked, open: { navigate = $0 })
-        if let a = map.area(id: picked) {
-            AreaCard(area: a) { navigate = a.id }
+    // MARK: the map face — the landing
+
+    /// The landing (Kyle, 2026-09-22): a map filling the tab under the top bar and above the tab bar — Urgent
+    /// help and the tabs all stay, and nothing is made inert, so it is deliberately not the full-screen map
+    /// dialog. On it: the four city outlines and the 205 neighbourhood outlines and **nothing else**.
+    @ViewBuilder private func mapFace(_ d: Indicators) -> some View {
+        let mine = here.point.flatMap { d.area(containing: $0) }
+        let land = areasLanding(located: here.point != nil, area: mine != nil, outside: outside)
+        AreasMapView(areas: map.areas, base: map.base, selected: $picked,
+                     open: { openArea($0) },
+                     openOn: mine.map { hoodOutline($0.hood, origin: d.origin) } ?? [],
+                     openId: mine?.hood.id ?? "",
+                     framed: false,
+                     focus: $focusedArea)
+            .overlay(alignment: .topTrailing) {
+                AreasSwitch(showing: .map) { choose($0) }.padding(12)
+            }
+            .overlay(alignment: .bottom) { said(land, mine) }
+            // The outline a person is standing in is the one picked out, whether it was known when the map
+            // opened or an answer arrived afterwards. A tap elsewhere is then what changes it.
+            .onAppear { if let mine, picked.isEmpty { picked = mine.hood.id } }
+            .onChange(of: mine?.hood.id) { _, id in if let id { picked = id } }
+    }
+
+    /// What is said over the map. The area a person is in, named; or — with nothing known, and for a spot
+    /// outside the four cities — the three ways in, over the view the map already had.
+    @ViewBuilder private func said(_ land: AreasLanding, _ mine: AreaPage?) -> some View {
+        switch land {
+        case .area:
+            if let mine {
+                HStack(spacing: 8) {
+                    Image(systemName: "mappin.and.ellipse").foregroundStyle(Color.brand)
+                    Text(L.t("hood.here_is", ["name": L.rightToLeft ? ltr(mine.hood.name) : mine.hood.name]))
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(Color.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 14).padding(.vertical, 10)
+                .background(.regularMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(Color.line, lineWidth: 1))
+                .padding(.bottom, 12).padding(.horizontal, 16)
+            }
+        case .ask, .outside:
+            VStack(alignment: .leading, spacing: 8) {
+                if land == .outside {
+                    Text(L.t("map.locate_outside")).font(.subheadline).foregroundStyle(Color.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                LocationChip()
+            }
+            .card()
+            .padding(.horizontal, 16).padding(.bottom, 12)
+            .accessibilityElement(children: .contain)
+            .accessibilitySortPriority(10)
         }
-        Text(L.t("hood.map_note")).font(.footnote).foregroundStyle(Color.muted)
-            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// A tap on an outline is not a card offering to open a page; it IS the page opening (Kyle, 2026-09-22).
+    private func openArea(_ id: String) {
+        picked = id
+        navigate = id
+        if let name = map.area(id: id)?.name { announce(name) }
+    }
+
+    private func choose(_ v: HoodsView) {
+        model.areasView = v
+        announce(L.t(v == .map ? "hood.say_map" : "hood.say_list"))
+    }
+
+    /// A fix, a typed junction or the middle of a typed ZIP. Inside the four cities the map glides to the
+    /// outline that holds it; outside them nothing moves, the point is dropped, and the words say why.
+    private func arrived(_ p: LatLon?) {
+        guard let p else { return }
+        guard inServiceArea(p) else {
+            outside = true
+            here.forget()
+            announce(L.t("map.locate_outside"))
+            return
+        }
+        outside = false
+    }
+
+    private func announce(_ what: String) {
+        UIAccessibility.post(notification: .announcement, argument: what)
+    }
+
+    // MARK: the list face — the index the tab has always had
+
+    @ViewBuilder private func listFace(_ d: Indicators) -> some View {
+        ScrollView { VStack(alignment: .leading, spacing: 10) {
+            if startAs == nil {
+                AreasSwitch(showing: .list) { choose($0) }.frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            Text(L.t("hood.index_intro")).font(.body).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+            MyHoodCard(d: d)
+            SectionHead(text: L.t("hood.list_head"))
+            list(d)
+            cities(d)
+            Text(L.t("hood.index_sources")).font(.footnote).foregroundStyle(Color.muted)
+                .fixedSize(horizontal: false, vertical: true).padding(.top, 8)
+            Text(L.t("hood.describe")).font(.footnote).foregroundStyle(Color.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }.padding(16) }
+        .searchable(text: $find, placement: .navigationBarDrawer(displayMode: .always), prompt: L.t("hood.find_label"))
+        .autocorrectionDisabled()
     }
 
     @ViewBuilder private func list(_ d: Indicators) -> some View {
@@ -168,6 +270,10 @@ struct HoodsIndexView: View {
         }
         .pickerStyle(.segmented)
         .accessibilityLabel(L.t("hood.group_label"))
+        .onChange(of: grouping) { _, _ in orderChosen = true }
+        // The list the Map | List switch opens is nearest-first when this phone already knows roughly where it
+        // is, and A–Z otherwise — until somebody chooses, after which their choice is the one that stands.
+        .onAppear { if !orderChosen, here.point != nil { grouping = .near } }
         let shown = hoodsMatching(hoodsAlphabetical(d.neighborhoods), query: find)
         Text(shown.isEmpty ? L.t("hood.find_none")
              : L.t(shown.count == 1 ? "hood.find_one" : "hood.find_count", ["count": String(shown.count)]))
@@ -319,6 +425,8 @@ struct MyHoodCard: View {
 struct HoodPageView: View {
     let hood: Hood
     let d: Indicators
+    /// False inside the Areas tab's strip, which already scrolls and already carries the title and Urgent help.
+    var chrome = true
     @EnvironmentObject private var nav: AppNav
     @Environment(MapModel.self) private var map
 
@@ -328,8 +436,19 @@ struct HoodPageView: View {
         Binding(get: { map.hoodView }, set: { map.setHoodView($0) })
     }
 
-    var body: some View {
-        ScrollView { VStack(alignment: .leading, spacing: 10) {
+    @ViewBuilder var body: some View {
+        if chrome {
+            ScrollView { stack }
+                .background(Color.appBg.ignoresSafeArea())
+                .navigationTitle(hood.name).navigationBarTitleDisplayMode(.inline)
+                .urgentHelp()
+        } else {
+            stack
+        }
+    }
+
+    private var stack: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Text([hood.district.map { L.t("hood.district", ["n": String($0)]) }, hood.inJLG ? L.t("hood.in_jlg") : nil]
                 .compactMap { $0 }.joined(separator: " · "))
                 .font(.subheadline).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
@@ -348,10 +467,195 @@ struct HoodPageView: View {
             HoodConditionsPanel(hood: hood, d: d, view: yearView)
             HoodCrashPanel(hood: hood, d: d, view: yearView)
             HoodSourcesPanel(d: d)
-        }.padding(16) }
+        }.padding(16)
+    }
+}
+
+// MARK: - an area page, under the map it was opened from
+
+/**
+ The strip (Kyle, 2026-09-22: *"tapping on a neighborhood full screen should then animate-shrink the map to the
+ top (with a back button top left) and have the bottom portion of the screen display all the neighborhood
+ content"*; then *"I want the map to disappear as the user scrolls down and have it still there when they scroll
+ up"*).
+
+ What it is: the same outlines map the tab lands on, `areasStripFraction` of the screen tall, pinned above the
+ area's own page, with the outline the page is about framed and picked out in it. On it, at the top **leading**
+ corner — the top-left of an English screen, the top-right of an Arabic one, because the map is the one thing in
+ this app that never mirrors and a control bar is not the map — a real Back button that says where it goes, and
+ the area's name.
+
+ Tapping another outline in the strip swaps the page underneath rather than pushing a second copy of this screen:
+ one map, one page, whichever outline is under the finger.
+
+ **It is a collapsing header.** Reading down shuts it to a `areasBarPoints` bar that keeps Back and the name;
+ the moment a person turns round it comes back (`stripAt`, HelpCore — an 8-point turn). The height is the only
+ thing that changes: the map stays in the view, stays in the accessibility tree, and the scroll position is never
+ touched by us. Under Reduce Motion it still collapses and still returns — it just arrives rather than travels.
+ */
+struct AreaStripScreen: View {
+    let model: HoodsModel
+    @Environment(MapModel.self) private var map
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// Which area the page under the strip is about. It CHANGES, when another outline in the strip is tapped.
+    @State private var areaId: String
+    @State private var picked: String
+    @State private var strip = stripStart()
+    /// When the strip last really changed size, in milliseconds. Nothing is stored; it dies with the screen.
+    @State private var changedAt = 0.0
+    @AccessibilityFocusState private var focusHeading: Bool
+
+    init(id: String, model: HoodsModel) {
+        self.model = model
+        _areaId = State(initialValue: id)
+        _picked = State(initialValue: id)
+    }
+
+    private var page: AreaPage? { model.indicators?.areaPage(id: areaId) }
+    private var name: String { page?.hood.name ?? "" }
+    private var rings: [[LatLon]] {
+        guard let page, let d = model.indicators else { return [] }
+        return hoodOutline(page.hood, origin: d.origin)
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            let full = max(areasBarPoints, geo.size.height * areasStripFraction)
+            VStack(spacing: 0) {
+                stripView(full: full)
+                pageBelow
+            }
+        }
         .background(Color.appBg.ignoresSafeArea())
-        .navigationTitle(hood.name).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(name).navigationBarTitleDisplayMode(.inline)
         .urgentHelp()
+        .onAppear { focusHeading = true }
+    }
+
+    // MARK: the strip
+
+    private func stripView(full: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            AreasMapView(areas: map.areas, base: map.base, selected: $picked,
+                         open: { swap(to: $0) }, openOn: rings, openId: areaId,
+                         height: full, framed: false)
+            bar
+        }
+        // The collapse is height, and nothing else: the map is still there, merely small.
+        .frame(height: strip.state == .shut ? areasBarPoints : full, alignment: .top)
+        .clipped()
+        .animation(reduceMotion ? nil : .easeOut(duration: areasShrinkMilliseconds / 1000), value: strip.state)
+        .accessibilityElement(children: .contain)
+    }
+
+    /// Back and the name. It is what is left when the strip has collapsed, so it can never be smaller than a
+    /// 44-point target plus its padding — which is what `areasBarPoints` is.
+    private var bar: some View {
+        HStack(spacing: 6) {
+            Button { dismissToMap() } label: {
+                Image(systemName: "chevron.backward")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color.brand)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L.t("hood.back_map"))
+            Text(L.rightToLeft ? ltr(name) : name)
+                .font(.headline).foregroundStyle(Color.ink).lineLimit(1).minimumScaleFactor(0.7)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityFocused($focusHeading)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 2)
+        .frame(height: areasBarPoints)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial)
+    }
+
+    // MARK: the page under it
+
+    @ViewBuilder private var pageBelow: some View {
+        if let page, let d = model.indicators {
+            ScrollView {
+                VStack(spacing: 0) {
+                    ScrollProbe(space: Self.space) { onScroll($0) }
+                    AreaPageView(page: page, d: d, chrome: false)
+                }
+            }
+            .modifier(TracksScroll(space: Self.space, onY: { onScroll($0) }))
+        } else {
+            ScrollView { Text(L.t("hood.unavailable")).foregroundStyle(Color.muted).card().padding(16) }
+        }
+    }
+
+    private static let space = "areapage"
+
+    /// The whole of the thinking is `stripAt` (HelpCore); this keeps the clock and the last answer.
+    private func onScroll(_ y: Double) {
+        let now = Date().timeIntervalSince1970 * 1000
+        // The page is still rearranging itself after the last change: the move is the header giving up its
+        // height, not a person turning round. The top of the page is never ambiguous, so it still answers.
+        if y > 0, stripSettling(changedAt: changedAt, now: now) {
+            strip = StripScroll(state: strip.state, y: y, pivot: y)
+            return
+        }
+        let next = stripAt(strip, y: y)
+        if next.state != strip.state { changedAt = now }
+        strip = next
+    }
+
+    /// Another outline, tapped in the strip: the page underneath swaps, and the strip travels to that outline.
+    /// It is never a second copy of this screen pushed on top of the first.
+    private func swap(to id: String) {
+        guard id != areaId, model.indicators?.areaPage(id: id) != nil else { return }
+        areaId = id
+        picked = id
+        strip = stripStart()
+        changedAt = 0
+        focusHeading = true
+        UIAccessibility.post(notification: .announcement, argument: map.area(id: id)?.name ?? "")
+    }
+
+    @Environment(\.dismiss) private var dismiss
+    private func dismissToMap() { dismiss() }
+}
+
+/// The scroll offset, on both floors the app supports. iOS 18 has a real answer for this; iOS 17 is the
+/// deployment target, and there the only honest way to know where a scroll view is, is to put something inside
+/// it and ask where that has got to. Both report the same number: how far down the page the reader has come.
+private struct TracksScroll: ViewModifier {
+    let space: String
+    let onY: (Double) -> Void
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 18.0, *) {
+            content.onScrollGeometryChange(for: Double.self) { g in g.contentOffset.y + g.contentInsets.top }
+                action: { _, y in onY(y) }
+        } else {
+            content.coordinateSpace(name: space)
+        }
+    }
+}
+
+private struct ScrollYKey: PreferenceKey {
+    static var defaultValue: Double { 0 }
+    static func reduce(value: inout Double, nextValue: () -> Double) { value = nextValue() }
+}
+
+/// A zero-height marker at the top of the scrolled content, for iOS 17. On iOS 18 it draws nothing and reports
+/// nothing: `onScrollGeometryChange` has already answered.
+private struct ScrollProbe: View {
+    let space: String
+    let onY: (Double) -> Void
+    var body: some View {
+        if #available(iOS 18.0, *) {
+            Color.clear.frame(height: 0)
+        } else {
+            GeometryReader { g in
+                Color.clear.preference(key: ScrollYKey.self, value: -g.frame(in: .named(space)).minY)
+            }
+            .frame(height: 0)
+            .onPreferenceChange(ScrollYKey.self) { y in Task { @MainActor in onY(y) } }
+        }
     }
 }
 
