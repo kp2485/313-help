@@ -2,7 +2,7 @@
 
 Four parts:
 
-- **`Sources/DetroitQuery`**: the rules for open now, next times, badges, ranking, search and greenway distances. It is a Swift copy of `packages/query`, tested against the same `schema/fixtures` the web app uses. `swift test` runs on macOS, Linux and Windows (190 fixture cases).
+- **`Sources/DetroitQuery`**: the rules for open now, next times, badges, ranking, search, greenway distances and — since 2026-09-22 — the streets graph, walking directions and whole trip plans. It is a Swift copy of `packages/query`, tested against the same `schema/fixtures` the web app uses. `swift test` runs on macOS, Linux and Windows: **203 fixture cases, none skipped**.
 - **`Sources/HelpCore`**: the parts of the app itself that are not a screen — the install key and its daily dedupe hash, what a report is and what the Worker's closed schema allows, the outbox, the saved-places rules, the one session every request goes through, the signed-bundle check (key shape, the small-order deny-list, checksums, the downgrade floor), what a release build may ship, and **the map**: the projection, the bundle's own map-file format, the camera, hit-testing, which layers exist and how each is drawn, the never-drawn predicate and the reading order VoiceOver gets (`MapData.swift`, `MapLayers.swift`). No UIKit, no SwiftUI, no Combine, so `swift test` runs it too. **These used to live in `HelpApp/` and were tested only inside the git-ignored Xcode project, which meant CI never ran them** (iPhone review, 2026-09-20).
 - **`HelpApp/`**: the SwiftUI screens (iOS 17). They compile and run in the iOS Simulator (first built 2026-09-20 on Xcode 27; re-verified the same day on iPhone 16 Pro / iOS 18.0). They have not been run on a real iPhone and have never been signed for a device.
 - **`Tests/`**: `HelpCoreTests` (the app's own rules), `DetroitQueryTests` (the shared fixtures) and `AppParityTests` — the needs list held to the web app's. Parity reads `HelpApp/Help.swift`, `apps/web/src/needs.ts` and `strings/*.json` as text and fails when the three disagree: a different need, a missing choice, a different category, a screen that gained or lost its **quick exit**, or a string key the app asks for and `strings/en.json` does not have. It compiles nothing from `HelpApp/`, so it runs with `swift test` and needs no Xcode. Because it reads both files as text, both write a need's own settings (`first`, `intro`, `emptyKey`, `quickExit`, `query`) **above** its `refine` list; keep it that way.
@@ -51,7 +51,7 @@ The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme
 
 ### How the project is wired
 
-- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, `AddPlace.swift`, and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
+- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, `AddPlace.swift`, `Browse.swift`, and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
 - `HelpApp/Assets.xcassets` (the app icon) and `HelpApp/PrivacyInfo.xcprivacy` are referenced in place too and are copied in by the Resources phase.
 - `DetroitQuery` and `HelpCore` are local Swift package products from `apps/ios` (the `Package.swift` beside this README), linked into the app target.
 - `strings/en.json`, `es.json`, `ar.json` and `bn.json` are referenced in place from the repo root (`../../../strings/…`) and land flat in the app bundle, which is what `L.table(_:)` expects. `Info.plist` lists the same four under `CFBundleLocalizations`, so iOS offers them in `Locale.preferredLanguages`.
@@ -87,7 +87,7 @@ It refuses: an empty or non-https origin, the placeholder host, fewer than two k
 ### Making the project again (or by hand in Xcode)
 
 1. File → New → Project → iOS App, named "313 Help", interface SwiftUI, language Swift, saved in `apps/ios/Xcode/`.
-2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in **every** Swift file from `HelpApp/` (thirteen today, including the five `Map*.swift`), choosing **Create groups** and leaving **Copy items** unticked. Drag in `HelpApp/Assets.xcassets` and `HelpApp/PrivacyInfo.xcprivacy` the same way.
+2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in **every** Swift file from `HelpApp/` (fourteen today: the five `Map*.swift`, and `Browse.swift`), choosing **Create groups** and leaving **Copy items** unticked. Drag in `HelpApp/Assets.xcassets` and `HelpApp/PrivacyInfo.xcprivacy` the same way.
 3. File → Add Package Dependencies → Add Local… → select `apps/ios`. Add **both** the `DetroitQuery` and `HelpCore` libraries to the app target.
 4. Drag `strings/en.json`, `es.json`, `ar.json` and `bn.json` in from the repo root, without copying. Add a first Run Script phase containing `"$SRCROOT/../Scripts/preflight.sh"`, and a last Run Script phase "Copy and check bundle snapshot":
    ```sh
@@ -145,7 +145,57 @@ It does:
 - **About and Your privacy** (2026-09-20), reachable from the bottom of Home. About shows the list version, its date and whether it was signed with the release key or a test key; Your privacy has the plain-language table from docs/08, **how many reports are still waiting** with a control to delete them unsent, and **"Make a new key"**, which throws the install key away and makes a new random one.
 - English, Spanish, Arabic and Bengali, following the phone's language. am/pm come from `clock.am` / `clock.pm` and list separators from `list.sep`, so an Arabic time reads "2 م" rather than "2 pm".
 
-Not yet: link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, a parks list screen, photos on condition reports. (Neighborhood pages, add-a-place and a typed ZIP arrived on 2026-09-21 and have sections of their own below.) The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
+Not yet: link-outs beyond the one 313SafeBeds card, archived listings on search, a listing's own alerts on its detail screen, an in-app language switch, photos on condition reports. Still open from the navigation audit and listed in "The navigation work of 2026-09-22" below: whole-city area pages, the Areas layer and the Areas tab's map landing, the cross-street field and the slow-GPS state on the screens, "Getting around" and a ZIP control on the Map tab, and the Directions screen itself. (Neighborhood pages, add-a-place and a typed ZIP arrived on 2026-09-21 and have sections of their own below.) The age banner is on Home and Saved places but not yet on every list and listing. These screens exist in the web app; the iPhone can open the web app for them until they are ported.
+
+## The navigation work of 2026-09-22
+
+`docs/NAVIGATION-AUDIT-2026-09-22.md` found that on this phone *screens got built and entry points did not*. What
+has landed here so far, and what has not.
+
+### Done
+
+- **The directions rules** (`Sources/DetroitQuery/{Streets,Walk,TransitPlan}.swift`), a case-for-case port of
+  `packages/query/src/{streets,walk,transit-plan}.ts`: the noded street graph, the half-edge A\* with its 40 m
+  turn penalty and the City's own safety-byte penalties, and whole trip plans of walking and riding legs. The
+  13 fixture cases the Swift runner used to **skip** now run — `fixtures: 203 cases, 0 failed, 0 skipped` — and
+  the runner fails if that skip count is ever anything but zero. `RoutingRealTests` runs the same bounds as
+  `packages/query/test/routing-real.test.ts` against a built bundle and skips without one; the two
+  implementations agree exactly on the committed basemap (23,863 nodes, 40,342 edges, 45 components). The graph
+  is built off the main actor and cached by `StreetGraphCache`, keyed by the map files' own sha256.
+- **`Sources/HelpCore/Intersections.swift`** — "type a cross street", resolved on this phone from the street
+  geometry the signed bundle already carries. The parse table, the name normaliser, the 120 m junction merge
+  and the where-words are the web's, and `IntersectionsTests` runs the same table plus the real streets. What a
+  person types lives in one object that dies with the screen; the cache is keyed by the *normalised* names.
+- **The anchor view**: `mapAnchor` is the web's `MAP_ANCHOR`, 0.6 mile up Woodward from City Hall, and one
+  radius — two miles — for both the first open and "centre on me" (Kyle, 2026-09-22).
+- **Browse by type on the Help tab** (audit C2). The 19 chips of `apps/web/src/needs.ts`, in that order, folded
+  away as the web folds them. Before this there was **no** browse path here at all, so the five shower listings
+  and the nineteen for young people could only be reached by already knowing a name to type into Search.
+- **Parks and paths** (audit H4; Kyle's direction (b)): one front door for the whole park system, with a page
+  for each of the 302 City parks — kind, acres, the address where the City publishes one and an honest line
+  where it does not, Directions, the greenway stretch within half a mile, and the help within a ten-minute
+  walk. The greenway is one row inside it, and its screen and its 52 stretch screens are untouched.
+- **One Home** (audit M1, M2, H7, L1): six quick needs in docs/05's order, led by Food; "Find free help"
+  *selects* the Help tab instead of pushing a second copy of it into Home's stack; Map, Parks and paths and
+  Your area as tiles; Saved places under Help → More only.
+- **The Map tab opens with help on it** (audit H2), matching the web's `DEFAULT_LAYERS`: all eight help groups
+  and the parks; the greenway and the bus routes off. Verified on simulator `58DF0CC6` from a fresh install.
+
+`AppParityTests` holds the chips, the quick-need order, the first-open layers, the tab set and Home's own
+controls to the web's files, so none of the six can drift back.
+
+### Not done yet
+
+- **Whole-city area pages for Hamtramck, Highland Park and Dearborn** (audit C1). The bundle already carries
+  `cities[]` and `areas[]` with a `panels` allow-list; `HoodsScreen.swift` does not read them, so a resident of
+  three of our four cities is still told by name that they do not get a page.
+- **The Areas layer and the Areas tab's map landing** (audit §3).
+- **The cross-street field and the slow-GPS "Still looking…" state on the screens.** The rules for both are in
+  `HelpCore` and tested; no screen offers them yet, so the Map tab's first-open card still has two buttons
+  rather than three.
+- **"Getting around" as a labelled row on the Map tab** (audit H3) and **a ZIP control there** (M6).
+- **The Directions screen.** It waits on the web's `directions-web` branch, which carries the strings and the
+  wording rules; `DetroitQuery` already answers every question it will ask.
 
 ## The Map tab
 
