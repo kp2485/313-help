@@ -352,7 +352,10 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
 .dirways { display:grid; gap:.5rem; margin-block:.75rem 1rem; list-style:none; padding:0; }
 .dirways .row { width:100%; }
 .dirways .row .chip { flex:none; pointer-events:none; }
-.dirsteps { margin:.75rem 0 1.25rem; padding-inline-start:1.75rem; display:grid; gap:.625rem; }
+/* Really numbered: the app resets every list, and "the numbered steps below" has to have numbers in it — they
+   are how a person keeps their place, and how a screen reader says "3 of 7". */
+.dirsteps { margin:.75rem 0 1.25rem; padding-inline-start:1.75rem; display:grid; gap:.625rem; list-style:decimal; }
+.dirsteps li::marker { color:var(--muted); font-weight:650; }
 .dirsteps li { line-height:1.5; }
 /* The step a person is on. A left bar AND a weight change, so it is not colour alone (1.4.1). */
 .dirsteps li.now { font-weight:650; padding-inline-start:.625rem; margin-inline-start:-.625rem; border-inline-start:4px solid var(--route-walk); }

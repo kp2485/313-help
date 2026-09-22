@@ -69,8 +69,9 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking — are
   written three times against [one spec](schema/query-spec.md) and **190 shared fixture cases**; all three pass
   every case.
-- **Tested and small.** 772 tests in `pnpm test`, 156 in `swift test`, over 120 in Gradle. 81 KB of JavaScript and 8 KB
-  of CSS gzipped; a language (20–23 KB) or the Subway style (12 KB) loads only if chosen; the bundle is 2.3 MB.
+- **Tested and small.** 1,169 tests in `pnpm test`, 156 in `swift test`, over 120 in Gradle. 99 KB of JavaScript and
+  9 KB of CSS gzipped; a language (20–23 KB), the Subway style (12 KB) or offline directions (25 KB) loads only if
+  chosen; the bundle is 2.3 MB.
 
 ## How listings stay fresh
 

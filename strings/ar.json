@@ -1088,7 +1088,7 @@
   "dir.other_ways": "طرق أخرى للوصول",
   "dir.dist_mi": "{miles} ميل",
   "dir.dist_m": "{metres} م",
-  "dir.step_first": "امشِ نحو الـ{bearing} في {street} مسافة {distance}",
+  "dir.step_first": "امشِ باتجاه {bearing} في {street} مسافة {distance}",
   "dir.step_turn": "{turn} إلى {street} وامشِ {distance}",
   "dir.step_walk": "امشِ {distance}",
   "dir.step_walk_to_stop": "امشِ {distance} إلى {stop}",

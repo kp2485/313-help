@@ -92,6 +92,7 @@ let refocus = '';                                        // a layer switch to pu
 let dirMod: typeof import('./dirscreen.js') | null = null;
 let dirState: '' | 'loading' | 'failed' = '';
 let dirWanted: { lat: number; lon: number; name: string } | null = null;
+let lastDrawn: View['v'] | '' = '';                      // the kind of screen drawn last, so "left Directions" is knowable
 // Where the cursor goes after a redraw that is not a new screen (a report sent, a place saved, the map opened on a
 // list). Without this the whole page is replaced under the person's feet and the keyboard starts again at the top.
 type ReportOutcome = 'sent' | 'queued' | 'sent_no_photo' | 'failed';
@@ -971,9 +972,10 @@ function askForLocation(): void {
 }
 /** The field opens; the streets are asked for at the same moment, so a person who types fast is not kept
  *  waiting on a file that was always going to be needed. The basemap is the same one the map draws from. */
-function openCross(): void {
+function openCross(focus = true): void {
   crossOpen = true; zipOpen = false; crossOut = null; zipUnknown = locateOutside = false;
   if (bundle && !crossAsked) { crossAsked = true; void loadMap(bundle.index).then(() => render(false)); }
+  if (!focus) return;                                      // the Directions screen is about to draw itself
   redraw();
   app.querySelector<HTMLInputElement>('.crossform input')?.focus();
 }
@@ -1252,7 +1254,13 @@ function render(focus = true): void {
   const v = stack[stack.length - 1]!;
   // Leaving Directions ends the trip: the plan, the chosen way, the current step and any position watch all go.
   // The street graph stays — it belongs to the bundle, not to the trip, and it cost a second to build.
-  if (v.v !== 'directions') { dirMod?.close(); dirWanted = null; }
+  //
+  // "Leaving" is a screen that WAS Directions and now is not, which is why the last screen drawn is remembered
+  // rather than the stack being asked. Opening Directions draws one frame of the screen behind it first (the
+  // chunk is asked for before the navigation, so the right trip is on screen when it lands), and a plain
+  // `v.v !== 'directions'` threw that trip away in the same breath as starting it.
+  if (lastDrawn === 'directions' && v.v !== 'directions') { dirMod?.close(); dirWanted = null; }
+  lastDrawn = v.v;
   // Where the cursor was, so a redraw that is not a new screen can hand it back (2.4.3). A caller that already
   // knows where it wants the cursor (refocusSel) wins.
   const wasFocused = focus ? '' : whereIsTheCursor();
@@ -1350,11 +1358,20 @@ app.addEventListener('click', async (ev) => {
   // "Get somewhere safe now" list, the map's bottom card. The payload is the destination and nothing else.
   if (el.dataset.dir) {
     const to = JSON.parse(el.dataset.dir) as { lat: number; lon: number; name: string };
+    // With nowhere to start from, the field that needs no satellite and no signal is already open when the
+    // screen arrives — a person with neither should not have to find a button first (DECISIONS 2026-09-22).
+    if (!here) openCross(false);
     wantDirections(to);                                    // the destination first, so the screen draws the right trip
     navigate({ v: 'directions', to: { lat: to.lat, lon: to.lon }, name: to.name });
     return;
   }
-  if ((el.dataset.dirPick !== undefined || el.dataset.dirAct) && bundle && dirMod) { dirMod.onClick(el, dirDeps()); return; }
+  if ((el.dataset.dirPick !== undefined || el.dataset.dirAct) && bundle && dirMod) {
+    // "Change the start" is the origin's business, which belongs to main.ts: the position is let go here, and
+    // the cross-street field is opened again, before the screen is told to go back to asking.
+    if (el.dataset.dirAct === 'restart') { here = null; hereZip = ''; hereCross = ''; locateOutside = false; openCross(false); }
+    dirMod.onClick(el, dirDeps());
+    return;
+  }
   if ('skip' in el.dataset) { app.querySelector<HTMLElement>('main')?.focus(); }   // past the bar and the tabs, into the page
   else if ('resetKey' in el.dataset) {
     // The new key is what every waiting report will be hashed with when it goes (report.ts recomputes the
