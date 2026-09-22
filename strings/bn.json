@@ -331,7 +331,7 @@
   "city.parks_head": "পার্ক",
   "city.parks_count": "পার্ক",
   "city.parks_acres": "পার্কের একর",
-  "city.parks_note_semcog": "SEMCOG পুরো অঞ্চলে একইভাবে পার্ক গোনে।",
+  "city.parks_note_semcog": "এখানকার পার্ক অঞ্চলের বাকি জায়গার মতো একইভাবে গোনা হয়।",
   "city.parks_note_detroit": "ডেট্রয়েট শহরের নিজের পার্কের তালিকা থেকে।",
   "city.roads_head": "রাস্তার অবস্থা",
   "city.roads_lede": "{year} সালে {city}-এর যাচাই করা প্রতিটি মাইল রাস্তা, যাচাইকারীদের তিনটি ভাগে।",

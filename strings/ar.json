@@ -331,7 +331,7 @@
   "city.parks_head": "الحدائق",
   "city.parks_count": "الحدائق",
   "city.parks_acres": "أفدنة الحدائق",
-  "city.parks_note_semcog": "تعدّ SEMCOG الحدائق بالطريقة نفسها في المنطقة كلها.",
+  "city.parks_note_semcog": "تُعدّ الحدائق هنا بالطريقة نفسها المتّبعة في بقية المنطقة.",
   "city.parks_note_detroit": "من قائمة حدائق مدينة ديترويت نفسها.",
   "city.roads_head": "حالة الشوارع",
   "city.roads_lede": "كل ميل شارع جرى تقييمه في {city} سنة {year}، في المجموعات الثلاث التي يستعملها المقيّمون.",

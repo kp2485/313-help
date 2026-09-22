@@ -331,7 +331,7 @@
   "city.parks_head": "Parques",
   "city.parks_count": "Parques",
   "city.parks_acres": "Acres de parque",
-  "city.parks_note_semcog": "SEMCOG cuenta los parques de la misma manera en toda la región.",
+  "city.parks_note_semcog": "Los parques aquí se cuentan de la misma manera que en el resto de la región.",
   "city.parks_note_detroit": "De la propia lista de parques de la Ciudad de Detroit.",
   "city.roads_head": "Estado de las calles",
   "city.roads_lede": "Cada milla de calle calificada en {city}, en {year}, en los tres grupos que usan quienes califican.",

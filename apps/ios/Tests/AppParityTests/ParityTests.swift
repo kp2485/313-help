@@ -196,7 +196,14 @@ final class ParityTests: XCTestCase {
     func testTheNeighborhoodPagePanelsMatchTheWebApp() throws {
         let web = try text("apps/web/src/hoods.ts")
         guard let start = web.range(of: "export function hoodPage(") else { return XCTFail("hoodPage moved") }
-        let webBody = String(web[start.upperBound...])
+        // `hoodPage`'s OWN body, and nothing after it. Since 2026-09-22 the same file also holds `cityPage`,
+        // which reuses several of these headings for Hamtramck, Highland Park, Dearborn and Detroit — and the
+        // iPhone has no city page yet (docs/13, "The four cities"). Reading to the end of the file would mix the
+        // two pages' panels together and compare the sum against one screen. The next top-level `export` is
+        // where this function ends, which is structure rather than a guess at a comment.
+        let afterStart = String(web[start.upperBound...])
+        guard let end = afterStart.range(of: "\nexport ") else { return XCTFail("hoodPage is no longer followed by another export; the bound this test uses is gone") }
+        let webBody = String(afterStart[..<end.lowerBound])
         var webPanels = headKeys(in: webBody)
         // The crash panel is drawn by a function of its own, called from inside `hoodPage`.
         if let at = webBody.range(of: "crashPanel(h, d, ui)") {
