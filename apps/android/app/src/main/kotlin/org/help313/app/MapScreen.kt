@@ -43,6 +43,9 @@ object MapScreen {
         map.greenwayOn = MapModel.isOn(a, "place:greenway")
         map.parksOn = MapModel.isOn(a, "place:parks")
         map.here = a.near
+        // Where the map opens if this is the first layout of this launch: a location already known, or — with
+        // none — the civic anchor (Locate.kt, DECISIONS 2026-09-22). Never stored; it dies with the process.
+        MapModel.openAt = a.near
         map.onSelect = { selection ->
             MapModel.selection = selection
             // A chosen route shows its stops: that asks for its network's stops layer and stops file, if not held.

@@ -36,6 +36,31 @@ public func inServiceArea(_ p: LatLon, slack: Double = 0) -> Bool { inServiceAre
 /// Two miles, in metres. The shorter side of the map spans twice this: four miles across, the walk-and-bus city.
 public let locateRadiusMeters = 3218.688
 
+/// Where a map of Detroit looks when nobody has said where they are (Kyle, 2026-09-22: "the initial map
+/// presentation needs to be much more zoomed in"; DECISIONS 2026-09-22).
+///
+/// The point is **Detroit City Hall** — the Coleman A. Young Municipal Center — which the app already carries,
+/// in code, as the civic reference point of the `detroit` service area (`serviceAreas` in
+/// apps/ios/Sources/DetroitQuery/Areas.swift, the Swift copy of packages/query/src/areas.ts). Reused rather than
+/// re-typed, so there is one Detroit-centre number on all three clients; and it is the published address of a
+/// public building, which says nothing about anybody.
+public let mapAnchor: LatLon = serviceAreas["detroit"]!.point!
+
+/// Two and a half miles, in metres: the anchor view is a little wider than the you-are-here view, because the
+/// anchor is the city's front door and not where the person actually is.
+public let anchorRadiusMeters = 4023.36
+
+/// The opening view of the Map tab, as a point and a radius — the one decision behind "how far out does the map
+/// open?", so the first view and "centre on me" are the same arithmetic (`MapCamera.forRadius`) with a different
+/// centre. A location already known — allowed earlier, or the centre of a ZIP a person typed — wins and keeps
+/// today's two-mile view; with none, the map opens on the anchor instead of the whole four-city region.
+///
+/// Pure, and the same three lines on all three clients (`openingView` in apps/web/src/locate.ts and
+/// apps/android/.../Locate.kt). Nothing is stored: it is arithmetic about a view.
+public func openingView(_ here: LatLon?) -> (center: LatLon, radiusMeters: Double) {
+    here.map { ($0, locateRadiusMeters) } ?? (mapAnchor, anchorRadiusMeters)
+}
+
 // MARK: - what the tab does when it opens
 
 /// What the system already knows, before anybody is asked anything. `.unknown` is for a state a future iOS adds.

@@ -185,7 +185,10 @@ export interface MapSpec {
   outline?: { lat: number; lon: number }[][];   // a neighborhood's edge
   overlays?: Overlay[];                         // switched-on transport layers, already loaded (Map tab)
   dots?: MapDot[]; me?: { lat: number; lon: number } | null;
-  fit: { lat: number; lon: number }[];          // show at least these points at the start
+  fit: { lat: number; lon: number }[];          // the "whole area" view: the reset button, and the start when there is no `open`
+  /** Where this map OPENS, when it opens on a radius rather than on a bounding box (the Map tab, 2026-09-22).
+   *  `fit` still decides what the reset button shows, so the four cities stay one tap away. */
+  open?: { lat: number; lon: number; radiusMeters: number };
   minMeters?: number;                           // never start closer than this many meters across
   quiet?: boolean;                              // a map about help, not parks: no dots for small parks, so the listing dots stand out
   cover?: boolean;                              // fill the box with the fit area (the wide city on a tall phone) instead of showing all of it
@@ -437,7 +440,10 @@ export class MapView {
       const spanX = Math.max(maxX - minX, min) * 1.18, spanY = Math.max(maxY - minY, min) * 1.18;
       this.home = { cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, s: (this.spec.cover ? Math.max : Math.min)(this.w / spanX, this.h / spanY) };
       const saved = cameras.get(this.spec.key);
-      Object.assign(this, saved ?? this.home); this.touched = !!saved;
+      // `home` is the whole of `fit` and stays that way — it is what the reset button (&#8982;) goes back to, so
+      // the four cities are one tap away however the map opened. `open` only changes where it opens.
+      const o = this.spec.open;
+      Object.assign(this, saved ?? (o ? cameraForRadius(o, o.radiusMeters, this.w, this.h) : this.home)); this.touched = !!saved;
     } else if (!this.touched) { this.resize(true); return; }     // the box changed size before anyone moved the map: fit again
     this.redraw();
   }

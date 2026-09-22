@@ -10,8 +10,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  LOCATE_OPTIONS, LOCATE_RADIUS_M, SERVICE_BBOX, firstOpenAction, inServiceArea, locateCardClick, locateCardHtml,
-  locatePermission, positionOutcome, requestPosition, type FirstOpenAction, type LocatePermission,
+  ANCHOR_RADIUS_M, LOCATE_OPTIONS, LOCATE_RADIUS_M, MAP_ANCHOR, SERVICE_BBOX, firstOpenAction, inServiceArea,
+  locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, requestPosition,
+  type FirstOpenAction, type LocatePermission,
 } from '../src/locate.js';
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
@@ -328,6 +329,139 @@ describe('the map actually moves there', () => {
     expect(m.page.frames - before).toBeGreaterThan(1);
     expect((Math.min(W, H) * 111320) / m.cam().s).toBeCloseTo(6437.376, 0);
     m.view.destroy();
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// The anchor view: what the Map tab opens at when nobody has said where they are (DECISIONS 2026-09-22)
+// ---------------------------------------------------------------------------------------------------
+
+describe('the anchor view', () => {
+  let cameraForRadius: typeof import('../src/map.js').cameraForRadius;
+  let S_MIN = 0, S_MAX = 0;
+  beforeEach(async () => {
+    const m = await import('../src/map.js');
+    cameraForRadius = m.cameraForRadius; S_MIN = m.S_MIN; S_MAX = m.S_MAX;
+  });
+
+  const M_PER_UNIT = 111320;
+  const mpp = (cam: { s: number }) => M_PER_UNIT / cam.s;
+  const metresAcrossShortSide = (cam: { s: number }, w: number, h: number) => (Math.min(w, h) * M_PER_UNIT) / cam.s;
+  // A 375 px phone: the page's own gutters leave the map about 343 px wide, and .mapframe is min(58vh, 24rem).
+  const PHONE: [number, number] = [343, 384];
+  // A laptop: the Map tab's two columns leave the map about 600 px, min(74vh, 40rem) tall.
+  const LAPTOP: [number, number] = [600, 640];
+
+  it('is the civic point the app already carries, not a new number', () => {
+    // Detroit City Hall (Coleman A. Young Municipal Center) — the `detroit` service area's reference point.
+    expect(MAP_ANCHOR).toEqual({ lat: 42.3293, lon: -83.0452 });
+    expect(inServiceArea(MAP_ANCHOR.lat, MAP_ANCHOR.lon)).toBe(true);
+    expect(ANCHOR_RADIUS_M).toBeCloseTo(4023.36, 3);              // two and a half miles, in metres
+  });
+
+  it('is what the Map tab opens at with no location, and the two-mile view with one', () => {
+    expect(openingView(null)).toEqual({ ...MAP_ANCHOR, radiusMeters: ANCHOR_RADIUS_M });
+    expect(openingView(undefined)).toEqual({ ...MAP_ANCHOR, radiusMeters: ANCHOR_RADIUS_M });
+    // A location known — allowed earlier, or the middle of a typed ZIP — keeps today's two-mile view, unchanged.
+    expect(openingView({ lat: 42.3487, lon: -83.0567 })).toEqual({ lat: 42.3487, lon: -83.0567, radiusMeters: LOCATE_RADIUS_M });
+  });
+
+  it('spans five miles across the shorter side, portrait or landscape', () => {
+    const v = openingView(null);
+    for (const [w, h] of [PHONE, [PHONE[1], PHONE[0]] as [number, number], LAPTOP]) {
+      expect(metresAcrossShortSide(cameraForRadius(v, v.radiusMeters, w, h), w, h)).toBeCloseTo(8046.72, 0);
+    }
+  });
+
+  it('puts the middle on the anchor', () => {
+    const v = openingView(null);
+    const cam = cameraForRadius(v, v.radiusMeters, ...PHONE);
+    const lon = cam.cx / Math.cos((42.35 * Math.PI) / 180) + -83.1;
+    expect(42.35 - cam.cy).toBeCloseTo(MAP_ANCHOR.lat, 6);
+    expect(lon).toBeCloseTo(MAP_ANCHOR.lon, 6);
+  });
+
+  it('is inside the zoom limits the whole app shares, and the middle inside the pan limits', () => {
+    const v = openingView(null);
+    for (const [w, h] of [PHONE, LAPTOP, [0, 0] as [number, number]]) {
+      const cam = cameraForRadius(v, v.radiusMeters, w, h);
+      expect(cam.s).toBeGreaterThanOrEqual(S_MIN);
+      expect(cam.s).toBeLessThanOrEqual(S_MAX);
+      expect(Number.isFinite(cam.s)).toBe(true);
+      expect(Math.abs(cam.cx)).toBeLessThanOrEqual(0.25 + 1e-9);
+      expect(Math.abs(cam.cy)).toBeLessThanOrEqual(0.2 + 1e-9);
+    }
+  });
+
+  it('reads at a phone size: the mid band, where streets are drawn and named', () => {
+    // docs/MAP-STYLE.md section 5: mid is 12 < mpp <= 30, where street classes 0-3 are drawn (class 3 from
+    // mpp < 11 is the one that waits) and main roads are named (class <= 1 from mpp < 30). Far, > 30, is where
+    // the old region fit sat.
+    const v = openingView(null);
+    expect(mpp(cameraForRadius(v, v.radiusMeters, ...PHONE))).toBeLessThanOrEqual(30);
+    expect(mpp(cameraForRadius(v, v.radiusMeters, ...LAPTOP))).toBeLessThanOrEqual(15);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// The real map, opened
+// ---------------------------------------------------------------------------------------------------
+
+describe('the Map tab opens on the anchor, not on the region', () => {
+  const W = 343, H = 384;
+
+  async function open(more: Record<string, unknown> = {}) {
+    const { FakeEl, installPage } = await import('./fakes.js');
+    const { MapView } = await import('../src/map.js');
+    const { baseSpec, serveBasemap } = await import('./mapfixture.js');
+    installPage({ width: W, height: H });
+    const key = 'open' + Math.random().toString(36).slice(2);
+    // The Map tab's own spec: the four cities as `fit` (the reset button), the opening view as `open`.
+    const spec = baseSpec(key, [], { cover: true, fit: [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }], ...more });
+    const view = new MapView(new FakeEl('div') as unknown as HTMLElement, spec, serveBasemap());
+    await new Promise((ok) => setTimeout(ok, 25));
+    const priv = view as unknown as { cx: number; cy: number; s: number };
+    return { view, cam: () => ({ cx: priv.cx, cy: priv.cy, s: priv.s }), mpp: () => 111320 / priv.s };
+  }
+
+  it('the first render is the anchor camera, and the region fit is what it is not', async () => {
+    const region = await open();
+    const wide = region.mpp();
+    region.view.destroy();
+    const m = await open({ open: openingView(null) });
+    expect(m.mpp()).toBeLessThan(wide / 2);
+    expect((Math.min(W, H) * 111320) / m.cam().s).toBeCloseTo(8046.72, 0);
+    expect(42.35 - m.cam().cy).toBeCloseTo(MAP_ANCHOR.lat, 5);
+    m.view.destroy();
+  });
+
+  it('with a location known, the two-mile view around the person wins', async () => {
+    const here = { lat: 42.3487, lon: -83.0567 };
+    const m = await open({ open: openingView(here) });
+    expect((Math.min(W, H) * 111320) / m.cam().s).toBeCloseTo(6437.376, 0);
+    expect(42.35 - m.cam().cy).toBeCloseTo(here.lat, 5);
+    m.view.destroy();
+  });
+
+  it('the whole area is still one press of the reset button away', async () => {
+    const region = await open();
+    const wide = region.cam();
+    region.view.destroy();
+    const m = await open({ open: openingView(null) });
+    (m.view as unknown as { tool(act: string, s: unknown): void }).tool('reset', {});
+    expect(m.cam().s).toBeCloseTo(wide.s, 6);
+    expect(m.cam().cy).toBeCloseTo(wide.cy, 9);
+    m.view.destroy();
+  });
+
+  it('the Map tab really asks for it: main.ts passes the opening view, and nothing else does', () => {
+    const main = src('main.ts');
+    const tab = main.split('\n').filter((l) => l.includes("key: 'maptab'"));
+    expect(tab).toHaveLength(1);
+    expect(tab[0]).toContain('open: openingView(here)');
+    // The maps that are about one subject — a listing, a stretch of greenway, a park, a neighbourhood — keep
+    // fitting their subject, and never take the Map tab's opening view.
+    expect(main.match(/open: openingView\(/g)).toHaveLength(1);
   });
 });
 

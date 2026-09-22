@@ -264,10 +264,22 @@ final class MapModel {
     var switchedOnTops: [String] { mapGroups.filter { isOn("help:" + $0.id) }.flatMap(\.tops) }
 
     // MARK: the camera
+
+    /// Where the map OPENS: a point already known (allowed earlier, or the centre of a typed ZIP) or, with none,
+    /// nothing at all — and then `openingView` hands back the civic anchor (HelpCore/Locate.swift). Set by the
+    /// screen before the first layout. It is a view, not a person: nothing here is written down or sent.
+    var openAt: LatLon?
+
+    /// The camera the tab opens at, for a box of this size. Pure, and the same on all three clients.
+    func openingCamera(width: Double, height: Double) -> MapCamera {
+        let v = openingView(openAt)
+        return MapCamera.forRadius(v.center, radiusMeters: v.radiusMeters, width: width, height: height)
+    }
+
     func resize(_ size: CGSize) {
         guard size.width > 1, size.height > 1 else { return }
         if !everMoved || camera.width <= 1 {
-            camera = MapCamera.fitting(cityCorners, width: size.width, height: size.height, cover: true)
+            camera = openingCamera(width: size.width, height: size.height)
         } else {
             camera = camera.resized(width: size.width, height: size.height).clamped()
         }
@@ -363,8 +375,11 @@ final class MapModel {
             if let self, self.motionNo == mine { self.motion = nil }
         }
     }
+    /// The whole area, one tap away: the reset button still shows all four cities, whatever the map opened at
+    /// (DECISIONS 2026-09-22). It counts as a move now — before, `everMoved = false` meant the next layout refit
+    /// the region, which since 2026-09-22 would instead throw the person back to the anchor they just left.
     func reset() {
-        everMoved = false
+        everMoved = true
         camera = MapCamera.fitting(cityCorners, width: camera.width, height: camera.height, cover: true)
         band = zoomBand(metersPerPoint: camera.metersPerPoint, previous: band)
     }

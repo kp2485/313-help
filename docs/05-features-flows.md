@@ -143,6 +143,15 @@ first open skips the card and goes straight to the two-mile view; if a ZIP has a
 centres on the ZIP's point and the card is not shown. The card never appears on a private or sensitive screen,
 the map still never draws sensitive rows, and DV rows still show no distance. DECISIONS 2026-09-21.
 
+**Where the Map tab opens (2026-09-22).** With no location known — before the card is answered, after "Not now",
+after a refusal, or from outside the four cities — the map opens on a **two-and-a-half-mile radius around Detroit
+City Hall**, the civic point the app already carries as the `detroit` service area's reference (about 23 m per
+pixel on a 375 px phone: Woodward, Gratiot, Michigan Ave and the greenway are drawn and named), and the whole
+four-city region stays one press of the map's reset button away; a location already known — allowed earlier, or
+the centre of a typed ZIP — still wins, with the two-mile view above. The anchor view and "centre on me" are the
+same function (`cameraForRadius` / `MapCamera.forRadius`) with a different centre, on all three clients.
+DECISIONS 2026-09-22.
+
 **Two map styles (2026-09-21).** The layers panel has a **Map style** choice: **Standard** (each kind of transport
 in one color — the default on every client) and **Subway lines** (bus and rail drawn like a subway map: route
 badges, shared-street runs side by side, interchanges, terminals, the People Mover as a loop, the QLINE line

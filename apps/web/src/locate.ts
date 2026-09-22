@@ -11,13 +11,41 @@
 // permission, and never a position. A position lives in one variable in main.ts for as long as the tab is open
 // and goes nowhere else: not to IndexedDB, not to the URL, not into the history, not into a report (docs/08).
 
-import { SERVICE_BBOX, inServiceArea } from '@313help/query';
+import { SERVICE_AREAS, SERVICE_BBOX, inServiceArea } from '@313help/query';
 import { idbGet, idbSet } from './data.js';
 
 export { SERVICE_BBOX, inServiceArea };
 
 /** Two miles, in metres. The shorter side of the map spans twice this: four miles across, the walk-and-bus city. */
 export const LOCATE_RADIUS_M = 3218.688;
+
+/**
+ * Where a map of Detroit looks when nobody has said where they are (Kyle, 2026-09-22: "the initial map
+ * presentation needs to be much more zoomed in"; DECISIONS 2026-09-22).
+ *
+ * The point is **Detroit City Hall** — the Coleman A. Young Municipal Center — which is already in the app as a
+ * civic reference point, in code, for the service areas a DV row may carry (`SERVICE_AREAS.detroit` in
+ * packages/query/src/areas.ts). It is reused rather than re-typed so there is one Detroit-centre number on all
+ * three clients, and it is a *published address of a public building*: it says nothing about anybody.
+ */
+export const MAP_ANCHOR: { lat: number; lon: number } = SERVICE_AREAS.detroit!.point!;
+
+/** Two and a half miles, in metres: the anchor view is a little wider than the you-are-here view, because the
+ *  anchor is the city's front door and not where the person actually is. */
+export const ANCHOR_RADIUS_M = 4023.36;
+
+/**
+ * The opening view of the Map tab, as a point and a radius — the one decision behind "how far out does the map
+ * open?", so that the first view and "centre on me" are the same arithmetic (`cameraForRadius`) with a different
+ * centre. A location already known — allowed earlier this visit, or the centre of a ZIP a person typed — wins
+ * and keeps today's two-mile view; with none, the map opens on the anchor instead of the whole four-city region.
+ *
+ * Pure, and the same three lines on all three clients (`openingView` in apps/ios/Sources/HelpCore/Locate.swift
+ * and apps/android/.../Locate.kt). Nothing here is stored: it is arithmetic about a view.
+ */
+export function openingView(here?: { lat: number; lon: number } | null): { lat: number; lon: number; radiusMeters: number } {
+  return here ? { lat: here.lat, lon: here.lon, radiusMeters: LOCATE_RADIUS_M } : { ...MAP_ANCHOR, radiusMeters: ANCHOR_RADIUS_M };
+}
 
 /**
  * Coarse is enough, and coarse is what we ask for: the list is sorted in bands of a mile, and the dot on the map
