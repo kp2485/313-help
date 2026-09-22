@@ -87,6 +87,15 @@ a { color:var(--brand); text-underline-offset:.15em; } strong { font-weight:700;
 .tel { direction:ltr; unicode-bidi:isolate; }
 .callrow strong .tel > bdi,.btn strong .tel > bdi { white-space:nowrap; }
 button { font:inherit; color:inherit; cursor:pointer; border:0; background:none; text-align:inherit; }
+/* The pointing hand on everything that answers a click, and only on those (Kyle, 2026-09-22). A mouse user
+   learns what is live from the cursor before anything else, and three kinds of control here were live and did
+   not say so: a disclosure's own summary row, a tick box or a radio (the label around it had the hand, the box
+   itself did not), and the map canvas — which now works it out per frame against the same hit test as a click
+   (map.ts, `hover`). A control that is switched off says THAT instead: a hand that does nothing is worse than
+   no hand at all. */
+summary { cursor:pointer; }
+input[type="checkbox"],input[type="radio"],select { cursor:pointer; }
+button:disabled,input:disabled,select:disabled,.pick:has(input:disabled) { cursor:default; }
 small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); font-size:1.0625rem; margin:.5rem 0 0; }
 .foot { color:var(--muted); font-size:.9375rem; margin-top:1.25rem; } .dim { color:var(--muted); opacity:.8; }
 .ic { flex:none; width:1.5rem; height:1.5rem; } .ic.sm { width:1.125rem; height:1.125rem; }
@@ -156,6 +165,10 @@ small { font-size:.9375rem; color:var(--muted); } .lede { color:var(--muted); fo
 .loc { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .625rem; margin:.75rem 0; color:var(--muted); }
 .zipform { display:inline-flex; flex-wrap:wrap; align-items:center; gap:.5rem; } .zipform label { display:inline-flex; align-items:center; gap:.5rem; font-size:.9375rem; }
 .zipform input,.searchbox input { font:inherit; color:var(--ink); padding:.5rem .875rem; border-radius:var(--r-sm); border:1.5px solid var(--edge); background:var(--surface); } .zipform input { min-height:2.75rem; width:6.5rem; }
+/* A junction is two street names, not five digits: the field is as wide as the line it has to hold, and it
+   wraps to its own line on a phone rather than squeezing the button off the edge. */
+.crossform { flex-basis:100%; } .crossform input { width:min(15rem, 100%); }
+.crossform ~ .rows { inline-size:100%; }
 .addform { display:grid; gap:1.125rem; margin-top:1rem; } .addform label { display:grid; gap:.375rem; font-weight:600; } .addform label small,.addform legend + small { font-weight:400; }
 .addform input:not([type=radio]),.addform textarea { width:100%; font:inherit; font-weight:400; color:var(--ink); min-height:3rem; padding:.625rem .75rem; border-radius:var(--r-sm); border:1.5px solid var(--edge); background:var(--surface); }
 /* A field that was left empty: named in words next to it, outlined, never colour alone (WCAG 1.4.1, 3.3.1). */

@@ -692,7 +692,7 @@ describe('"I want free Narcan" lists every harm-reduction place that stocks nalo
   });
 
   it('the Home shortcut and the Help tile open that same need, so all three list the same places', () => {
-    expect(main).toContain("const quick = ['food', 'shelter', 'doctor', 'drugs', 'job', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);");
+    expect(main).toContain("const quick = ['food', 'shelter', 'doctor', 'drugs', 'narcan', 'job'].map((id) => NEEDS.find((n) => n.id === id)!);");
     expect(main).toContain("<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>");
     // And the neighborhood panel measures the same thing the screen lists, or it would name a different place.
     const indicators = readFileSync(join(root, 'pipeline/src/indicators.ts'), 'utf8');

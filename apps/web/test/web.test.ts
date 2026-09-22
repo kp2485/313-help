@@ -669,10 +669,15 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     for (const tab of TABS) { expect(strings[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); expect(es[`tab.${tab.id}`], tab.id).toBeTypeOf('string'); }
     expect(main).toContain("tab === 'map' ? mapTab()");
     // The greenway, parks and segment screens now sit under Map, so the tab bar highlights Map on them.
-    expect(main).toContain("greenway: 'map', segment: 'map', parks: 'map' };");
+    expect(main).toContain("greenway: 'map', segment: 'map', parks: 'map', park: 'map' };");
   });
   it('everything the Recreation and Transit tabs offered is still on it', () => {
-    for (const k of ['gw.title', 'rec.parks', 'rec.all_parks', 'rec.centers', 'rec.bike', 'transit.tip', 'transit.checked']) expect(main, k).toContain(`T('${k}'`);
+    // "Parks and paths" replaced the two sections the Map tab used to carry (audit §6): one heading, the nearest
+    // parks as real rows, one "See all", and the greenway as a row on the Parks screen rather than a feature
+    // button above the parks. `rec.centers`, the bike panel and the transit facts are untouched.
+    for (const k of ['rec.title', 'rec.see_all', 'rec.centers', 'rec.bike', 'transit.tip', 'transit.checked']) expect(main, k).toContain(`T('${k}'`);
+    expect(main).toContain("t('gw.title')");                             // the greenway screen is still there
+    expect(main).not.toContain("T('rec.gw_sub'");                        // its live open-segment count is gone
     expect(main).toContain('${transitPanels()}');                       // trip planners, fares, free rides, phone numbers
     expect(main).toContain("TRANSIT.sections.map");
     expect(main).toContain("${T('detail.bus')}");                        // bus directions still on every listing
@@ -1254,7 +1259,11 @@ describe('accessibility: WCAG 2.2 AA, the parts a test can hold', () => {
   });
   it('3.1.2: what a place wrote about itself is marked as English on a screen that is not English', () => {
     expect(main).toContain("const owner = (s: unknown) => (currentLang() === 'en' ? esc(s) : `<span lang=\"en\">${esc(s)}</span>`);");
-    for (const field of ['r.row.name', 'r.row.what', 'r.org', 'r.eligibility', 'a.title', 'p.name']) expect(main).toContain(`owner(${field})`);
+    for (const field of ['r.row.name', 'r.row.what', 'r.org', 'r.eligibility', 'a.title', 'p.type']) expect(main).toContain(`owner(${field})`);
+    // A park's name is the City's too. It reaches `owner()` through the two places that already mark an
+    // owner-written title — `rowLink(..., own)` on a park row, and `ownTitle` on the park page's heading.
+    expect(main).toContain("const parkRow = (p: Park, mi?: number) =>");
+    expect(main).toMatch(/rowLink\(\{ v: 'park', id: p\.id \}[\s\S]*?, true\);/);
     expect(main).toContain('<address lang="en">');
   });
   it('a phone number stays left to right and never breaks in the middle (CLAUDE.md, and Arabic is next)', () => {

@@ -5,11 +5,12 @@ import {
 import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang } from './i18n.js';
 import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
-import { areaById, areaPage, hoodIndex, hoodList, hoodRows, hoodView, loadHoodView, loadIndicators, outline, saveHoodView, type Hood, type HoodView, type Indicators, type Ui } from './hoods.js';
-import { hoodAt, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
+import { areaById, areaPage, hoodIndex, hoodList, hoodRows, hoodView, loadHoodView, loadIndicators, outline, saveHoodView, type Area, type Hood, type HoodView, type Indicators, type Ui } from './hoods.js';
+import { hoodAt, hoodOrder as hoodOrderOf, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
 import { icon } from './icons.js';
-import { MapView, focusRadius, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
-import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, rememberLocateAnswered, requestPosition } from './locate.js';
+import { MapView, focusRadius, loadLayer, loadMap, loadNet, loadedBase, type LayerData, type MapArea, type MapDot, type MapSpec, type Overlay } from './map.js';
+import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, rememberLocateAnswered, requestPosition, type LocateAsk } from './locate.js';
+import { forgetCrossings, resolveCrossing, type CrossOutcome } from './intersections.js';
 import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
 import { loadLayers, loadStyle, mapStyle, saveStyle, toggleLayer, type MapStyle } from './layers.js';
 import { LAYER_STYLE } from './layerstyle.js';
@@ -31,12 +32,25 @@ let bundle: Bundle | undefined;
 let loadError = false;
 let here: { lat: number; lon: number } | null = null;   // device location, or a ZIP's center: this variable only, never stored
 let hereZip = '';                                        // the ZIP a person typed, when `here` came from one
+// The words for the junction a person typed, when `here` came from one ("Woodward & Warren"). It is on the
+// screen and nowhere else: not stored, not sent, not in the URL. `here` is the point it resolved to.
+let hereCross = '';
 let locDenied = false, zipOpen = false, zipUnknown = false;
 // The Map tab's first open (docs/05, DECISIONS 2026-09-21). `locateCard` is our own card, on the map, waiting to
 // be answered; `locateOutside` is a fix that arrived from somewhere that is not one of the four cities, which
 // moves nothing and says so; `locateChecked` is "the decision has already been made this visit", so coming back
 // to the tab does not re-open anything. The position itself is `here`, above, and lives nowhere else.
 let locateCard = false, locateOutside = false, locateChecked = false;
+// "Type a cross street" (Kyle, 2026-09-22). `crossOpen` is the field being shown; `crossText` is what has been
+// typed into it and `crossOut` is what this phone made of it. **All three are memory only**, exactly like the
+// search box: the text is never stored, never sent, and never put in the URL or the history (docs/08).
+let crossOpen = false, crossText = '', crossOut: CrossOutcome | null = null, crossAsked = false;
+// A location request that is still running, and whether it has been running long enough to say so. A phone with
+// no service can take minutes to find itself, so the ask no longer gives up at ten seconds: it says what is
+// happening, offers the two ways in that need no satellite, and can be cancelled.
+let locAsk: LocateAsk | null = null, locSlow = false;
+// Which view the Areas tab is showing: the map of the outlines, or the same screen's list. This visit only.
+let hoodsView: 'map' | 'list' = 'map';
 let savedIds: string[] = [];                             // listing ids saved on this phone (saved.ts); never sent
 let proposed: { state: 'sent' | 'queued'; ref?: string } | null = null, proposeError = false;
 let missing: string[] = [];                              // which "Add a place" fields were left empty, for the error text
@@ -244,8 +258,41 @@ function ageBanner(): string {
 }
 /** Retired only when a person published a final list marked retired: no report buttons, no new places. */
 const retired = () => bundle?.index.retired === true;
+/**
+ * "Still looking…" — the ask is running and has been for ten seconds (Kyle, 2026-09-22). It says what is taking
+ * the time and what actually helps, it leaves both the other ways in on the screen beside it, and it can be
+ * stopped. No spinner: a spinner says "wait" and says nothing about going outside.
+ *
+ * Not a live region of its own: the app has exactly one, outside the part of the page a redraw replaces, and a
+ * region built by the very redraw that fills it is a region a screen reader never announces. `announce()` says
+ * this sentence there, in the region that was already on the page.
+ */
+const slowBanner = () => (!locSlow ? '' : `<p class="banner plain">${T('loc.slow')} <button class="chip" data-loc="stop">${T('loc.slow_stop')}</button></p>`);
+/**
+ * The cross-street field and whatever this phone made of what was typed. Everything is worked out here, from
+ * `map/base.json` and `map/streets.json` — the streets are already on the phone — so the one honest way to say
+ * "where I am" without a satellite and without an account costs a person nothing but the typing.
+ */
+/** "Woodward & 7 Mile — north": one junction of several, named by the end of the street it is at. */
+const crossWords = (o: Extract<CrossOutcome, { kind: 'choices' }>, at: number) =>
+  t('loc.cross_choice', { a: o.a, b: o.b, where: t('loc.where_' + (o.choices[at]?.where ?? '')) });
+function crossBox(): string {
+  if (!crossOpen) return `<button class="chip" data-loc="cross">${T('loc.cross')}</button>`;
+  const field = `<form class="zipform crossform" data-cross><label>${T('loc.cross_label')} <input name="cross" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="60" value="${esc(crossText)}" aria-describedby="crossnote"${crossOut && (crossOut.kind === 'unknown' || crossOut.kind === 'no_crossing') ? ' aria-invalid="true"' : ''}></label><button class="chip" type="submit">${T('loc.cross_go')}</button></form>`;
+  let said = `<small id="crossnote">${T('loc.cross_hint')}</small>`;
+  if (crossOut?.kind === 'unknown') said = `<small id="crossnote">${T('loc.cross_unknown', { street: crossOut.unknown })}</small>`;
+  else if (crossOut?.kind === 'no_crossing') said = `<small id="crossnote">${T('loc.cross_no_crossing', { a: crossOut.a, b: crossOut.b })}</small>`;
+  else if (crossOut?.kind === 'street') said = `<small id="crossnote">${T('loc.cross_one_street', { street: crossOut.a })}</small>`;
+  // Two streets that cross more than once — Woodward and 7 Mile do, on either side of the city — are a question,
+  // not a guess: a short list, each answer named by the end of the street it is at.
+  const many = crossOut?.kind === 'choices' ? crossOut : null;
+  const choices = many
+    ? `<ul class="rows">${many.choices.map((c, i) => `<li><button class="row" data-cross-pick="${i}"><span class="rowtx"><strong>${esc(crossWords(many, i))}</strong></span></button></li>`).join('')}</ul>`
+    : '';
+  return `${field}${said}${choices}`;
+}
 function locChip(): string {
-  if (here) return `<p class="loc">${icon('pin', 'sm')}<span>${T(hereZip ? 'loc.zip_using' : 'loc.using', { zip: hereZip })}</span> <button class="chip" data-loc="off">${T(hereZip ? 'loc.zip_off' : 'loc.off')}</button></p>`;
+  if (here) return `<p class="loc">${icon('pin', 'sm')}<span>${T(hereZip ? 'loc.zip_using' : hereCross ? 'loc.cross_using' : 'loc.using', { zip: hereZip, where: hereCross })}</span> <button class="chip" data-loc="off">${T(hereZip ? 'loc.zip_off' : hereCross ? 'loc.cross_off' : 'loc.off')}</button></p>`;
   // "Type a ZIP" (docs/05): for a person who would rather not share a location. The ZIP is looked up in the bundle, on the phone.
   const zip = !bundle?.zips ? '' : zipOpen
     // autocomplete="postal-code" names the field's purpose, which is what WCAG 1.3.5 asks for and what lets a
@@ -255,13 +302,17 @@ function locChip(): string {
   // A fix from outside the four cities is not a refusal and must not read like one: the map stays on the city,
   // and the ZIP entry beside this is the way to look at a part of it (docs/05, "Map tab").
   const note = locateOutside ? 'map.locate_outside' : zipUnknown ? 'loc.zip_unknown' : locDenied ? 'loc.denied' : 'loc.note';
-  return `<div class="loc"><button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button>${zip}<small id="locnote">${T(note)}</small></div>`;
+  return `<div class="loc">${slowBanner()}<button class="chip" data-loc="on">${icon('pin', 'sm')}${T('loc.use')}</button>${crossBox()}${zip}<small id="locnote">${T(note)}</small></div>`;
 }
 const searchBtn = () => `<button class="searchbtn" ${go({ v: 'search' })}>${icon('search', 'sm')}<span>${T('search.open')}</span></button>`;
 // `own` marks a title a place or a city dataset wrote (a park, a greenway stretch, a listing): it is never
 // translated, so on a Spanish screen it is marked as English (WCAG 3.1.2).
-const rowLink = (view: View, ic: string, title: string, sub = '', own = false) =>
-  `<li><button class="row" ${go(view)}><span class="rowic">${icon(ic)}</span><span class="rowtx"><strong>${own ? owner(title) : esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${icon('chevron', 'sm turn dim')}</button></li>`;
+// `subHtml` is a second line already built, for a row whose second line is PART ours and part the City's — a
+// park's address beside a distance. An address that is not marked English has its house number thrown to the far
+// end of the line on an Arabic screen ("2942 15th St" read back as "15th St 2942"), and marking the whole line
+// English would do the same to our own word for miles.
+const rowLink = (view: View, ic: string, title: string, sub = '', own = false, subHtml = '') =>
+  `<li><button class="row" ${go(view)}><span class="rowic">${icon(ic)}</span><span class="rowtx"><strong>${own ? owner(title) : esc(title)}</strong>${subHtml || sub ? `<small>${subHtml || esc(sub)}</small>` : ''}</span>${icon('chevron', 'sm turn dim')}</button></li>`;
 
 // A domestic-violence row's only statement about where it is: the coarse area it serves, in words. Never a
 // distance, never a dot, never "near you" — the row carries no place at all (docs/08, schema/query-spec.md).
@@ -342,15 +393,17 @@ function homeTab(): string {
     <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}</ul></main>`;
   const sunset = retired();
   const alerts = bundle.alerts.filter((a) => Date.parse(a.ends_at) > now().getTime() && Date.parse(a.starts_at) <= now().getTime());
-  const ev = upcoming(3), openSegs = bundle.greenway?.segments.filter((s) => s.phase === 'open').length ?? 0;
-  const quick = ['food', 'shelter', 'doctor', 'drugs', 'job', 'narcan'].map((id) => NEEDS.find((n) => n.id === id)!);
+  const ev = upcoming(3), parkCount = bundle.parks?.length ?? 0;
+  // The order of docs/05 and of the audit's one-Home recommendation (§4.2), written out here rather than
+  // filtered out of NEEDS, so what is on the screen is the order on this line and cannot drift with that list.
+  const quick = ['food', 'shelter', 'doctor', 'drugs', 'narcan', 'job'].map((id) => NEEDS.find((n) => n.id === id)!);
   return `<main><section class="hero"><h1 tabindex="-1">${T('home.hero')}</h1><p>${T('app.tagline')}</p></section>${ageBanner()}${sunset ? '' : searchBtn()}
     ${alerts.map(alertBox).join('')}
     ${sunset ? '' : `<button class="feature" ${go({ v: 'tab', tab: 'help' })}><span class="rowic big">${icon('help')}</span><span class="rowtx"><strong>${T('home.help_title')}</strong><small>${T('home.help_sub')}</small></span>${icon('chevron', 'turn dim')}</button>
     <ul class="quick">${quick.map((n) => `<li><button ${go({ v: 'need', id: n.id })}>${icon(n.icon)}<span>${T('quick.' + n.id)}</span></button></li>`).join('')}</ul>`}
     ${ev.length ? `<div class="sechead"><h2>${T('home.events')}</h2><button class="link" ${go({ v: 'tab', tab: 'events' })}>${T('home.see_all')}</button></div><ul class="events">${ev.map(eventItem).join('')}</ul>` : ''}
     <div class="duo"><button class="tile" ${go({ v: 'tab', tab: 'map' })}>${icon('pin')}<strong>${T('tab.map')}</strong><small>${T('home.map_sub')}</small></button>
-      <button class="tile" ${go({ v: 'greenway' })}>${icon('path')}<strong>${T('gw.title')}</strong><small>${T('home.rec_sub', { count: openSegs })}</small></button>
+      ${parkCount ? `<button class="tile" ${go({ v: 'parks' })}>${icon('rec')}<strong>${T('rec.title')}</strong><small>${T('home.rec_sub', { count: parkCount })}</small></button>` : ''}
       <button class="tile" ${go({ v: 'tab', tab: 'hoods' })}>${icon('district')}<strong>${T('home.hoods_title')}</strong><small>${T('home.hoods_sub')}</small></button></div>
     <p class="foot">${T('home.updated', { when: prettyDate(bundle.index.generated_at) })} · <button class="link" ${go({ v: 'about' })}>${T('about.title')}</button> · <button class="link" ${go({ v: 'privacy' })}>${T('privacy.title')}</button></p>
     </main>`;
@@ -385,12 +438,48 @@ const layerName = (id: string, fallback = '') => { const k = 'layer.' + id.repla
 function layerMenu(): { group: string; items: { id: string; icon: string; name: string; note?: string }[] }[] {
   const help = MAP_GROUPS.filter((g) => (bundle?.rows ?? []).some((r) => g.tops.includes(r.category.split('.')[0]!) && r.lat !== undefined && !isSensitive(r.category)))
     .map((g) => ({ id: 'help:' + g.id, icon: g.icon, name: layerName('help:' + g.id) }));
+  // Parks first and the greenway second (audit §6): the greenway is one path inside a 302-park system, and the
+  // order of a menu is one of the places an app says what it thinks is important.
   const places = [
-    ...(bundle?.greenway ? [{ id: 'place:greenway', icon: 'path', name: layerName('place:greenway') }] : []),
     ...(bundle?.parks?.length ? [{ id: 'place:parks', icon: 'rec', name: layerName('place:parks') }] : []),
+    ...(bundle?.greenway ? [{ id: 'place:greenway', icon: 'path', name: layerName('place:greenway') }] : []),
   ];
+  // The outlines. Off by default on the Map tab, where the job is "what is near me?"; the Areas tab opens with
+  // them on, because there the job is "tell me about this part of the city" (audit §3.1).
+  const areas = mapAreas().length ? [{ id: 'place:areas', icon: 'district', name: layerName('place:areas') }] : [];
   const go2 = (bundle?.transit?.layers ?? []).map((l) => ({ id: 'go:' + l.id, icon: 'transit', name: layerName('go:' + l.id, l.name), ...(LAYER_STYLE['go:' + l.id]?.dense ? { note: t('map.layer_zoom') } : {}) }));
-  return [{ group: 'map.group_help', items: help }, { group: 'map.group_places', items: places }, { group: 'map.group_go', items: go2 }].filter((s) => s.items.length > 0);
+  return [{ group: 'map.group_help', items: help }, { group: 'map.group_places', items: [...places, ...areas] }, { group: 'map.group_go', items: go2 }].filter((s) => s.items.length > 0);
+}
+/**
+ * The city and neighbourhood outlines, ready to draw (`place:areas`; audit §3.3).
+ *
+ * Both come from the same file the area pages come from: the four city outlines the pipeline now ships
+ * (`areas[]`, DECISIONS 2026-09-22) and the City's own 205 neighbourhood outlines. **No dot, no listing, no
+ * value-carrying fill** — the layer cannot draw a listing because it is never handed one, which is how docs/08's
+ * rule about sensitive rows is satisfied here: trivially, by there being nothing to drop. And no choropleth,
+ * ever: docs/13's first honesty rule means a shape may be outlined and named, never shaded by a number.
+ *
+ * Every area has a page, so every card gets its "See details" button; the cities are listed first so a tap that
+ * lands in two outlines at once can prefer the smaller one (map.ts, `areaAt`) and a Detroit neighbourhood wins
+ * over the Detroit outline it sits inside.
+ */
+function mapAreas(): MapArea[] {
+  const d = indicators;
+  if (!d) return [];
+  const cities: MapArea[] = (d.areas ?? []).filter((a) => a.kind === 'city' && a.rings.length).map((a) => ({
+    id: a.id, name: a.name, sub: t('city.area_sub'), rings: outline(a, d.origin),
+    go: JSON.stringify({ v: 'hood', id: a.id } satisfies View),
+  }));
+  const hoods: MapArea[] = d.neighborhoods.filter((h) => h.rings.length).map((h) => ({
+    id: h.id, name: h.name, sub: h.district ? t('hood.district', { n: h.district }) : t('hood.no_district'),
+    rings: outline(h, d.origin), go: JSON.stringify({ v: 'hood', id: h.id } satisfies View),
+  }));
+  return [...cities, ...hoods];
+}
+/** The outlines live in the numbers file, which is fetched the first time any screen wants it. Asking here keeps
+ *  every screen that offers the layer from having to know that. */
+function wantAreas(): void {
+  if (bundle) hoodsReady();
 }
 const layerOn = (id: string) => layersOn.includes(id);
 /** Listings a switched-on help layer puts on the map, already ranked. Private kinds are never in this list. */
@@ -533,9 +622,9 @@ function layerSource(l: NonNullable<Bundle['transit']>['layers'][number]): strin
   return `${owner(l.source.name)} (${license}, ${esc(prettyDate(l.source.fetched_at))})`;
 }
 function mapTab(): string {
-  const g = bundle?.greenway, parks = bundle?.parks ?? [];
-  const openCount = g?.segments.filter((s) => s.phase === 'open').length ?? 0;
+  const parks = bundle?.parks ?? [];
   const rows = layerRows(), over = overlays();
+  if (layerOn('place:areas')) wantAreas();
   // `sub` is what a tap card says under the name, and what the keyboard's ring reads out: the kind of help, and
   // whether it is open now. `category` is what lets map.ts run every dot through `mapDrawable` again before the
   // keyboard is allowed to land on it.
@@ -546,21 +635,94 @@ function mapTab(): string {
   // On a phone this is one column, exactly as before (.maptop and .mapside are display:contents). On a laptop
   // the map sits beside the switcher and the list, and stays put while the list scrolls.
   return `<main class="wide"><h1 class="page" tabindex="-1">${T('tab.map')}</h1><p class="lede">${T('map.lede')}</p>
-    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), fit: CITY, cover: true, open: openingView(here) })}
+    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), areas: layerOn('place:areas') ? mapAreas() : undefined, fit: CITY, cover: true, open: openingView(here) })}
     <div class="mapside">${subwayKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
     ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map(layerSource).join(' · ')}<br>${T('map.layer_filtered')}</p>` : ''}
-    ${g ? `<h2>${T('gw.title')}</h2><button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'turn dim')}</button>` : ''}
-    ${parks.length ? `<h2>${T('rec.parks')}</h2>${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => `<li><div class="row static"><span class="rowic">${icon('rec')}</span><span class="rowtx"><strong>${owner(p.name)}</strong><small>${[p.address ? owner(p.address) : '', T('miles', { miles: mi.toFixed(1) })].filter(Boolean).join(' · ')}</small></span></div></li>`).join('')}</ul>` : ''}
-      <button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.all_parks', { count: parks.length })}</button>` : ''}
+    ${parks.length ? `<h2>${T('rec.title')}</h2>${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => parkRow(p, mi)).join('')}</ul>` : ''}
+      <button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.see_all')}</button>` : ''}
     <h2>${T('rec.centers')}</h2>${centers.length ? `<ul class="cards">${centers.map((r) => card(r)).join('')}</ul>` : `<p class="empty">${T('rec.centers_none')}</p>`}
     ${transitPanels()}
     ${TRANSIT.bike ? `<h2>${T('rec.bike')}</h2><div class="panel"><p>${esc(TRANSIT.bike.body)}</p>${ext(TRANSIT.bike.url, TRANSIT.bike.label)}</div>` : ''}
     <p class="foot">${T('transit.tip')}</p><p class="foot">${T('transit.checked', { date: prettyDate(TRANSIT.checked) })}</p></main>`;
 }
+type Park = NonNullable<Bundle['parks']>[number];
+/** The nearer of "the open greenway stretch nearest here" and "the park nearest here", within a quarter mile.
+ *  A tie goes to the park: the greenway is one of the places in the park system, not a rival to it. */
+export function nearestParkOrPath(at: { lat: number; lon: number }): { name: string; miles: number; icon: string; view: View } | null {
+  const MAX = 0.25;
+  let best: { name: string; miles: number; icon: string; view: View } | null = null;
+  for (const p of bundle?.parks ?? []) {
+    const mi = milesBetween(at, p);
+    if (mi <= MAX && (!best || mi < best.miles)) best = { name: p.name, miles: mi, icon: 'rec', view: { v: 'park', id: p.id } };
+  }
+  const gw = bundle?.greenway ? nearestSegment(at, bundle.greenway.segments, { openOnly: true, maxMiles: MAX }) : null;
+  if (gw && (!best || gw.miles < best.miles)) best = { name: gw.segment.name, miles: gw.miles, icon: 'path', view: { v: 'segment', id: gw.segment.id } };
+  return best;
+}
+/** Parks, nearest first when a location or a ZIP is known, and A–Z when none is: the order of a list of places
+ *  is either distance or the alphabet, and never a number about the place (docs/13, rule 1 — there is no park
+ *  indicator in the bundle and this function could not read one if there were). */
+const parksInOrder = (): Park[] => [...(bundle?.parks ?? [])].sort((a, b) => (here ? milesBetween(here, a) - milesBetween(here, b) : a.name.localeCompare(b.name)));
+/** One park: a real row that opens a real page. It was a `div.row.static` — a name and an address with nothing
+ *  behind them — in a list 302 long (audit H4). */
+const parkRow = (p: Park, mi?: number) => {
+  const away = mi ?? (here ? milesBetween(here, p) : undefined);
+  const sub = [p.address ? owner(p.address) : '', away === undefined ? '' : T('miles', { miles: away.toFixed(1) })].filter(Boolean).join(' · ');
+  return rowLink({ v: 'park', id: p.id }, 'rec', p.name, '', true, sub);
+};
+
+/**
+ * "Parks and paths" (Kyle, 2026-09-22: "this is not a Joe Louis Greenway app; it is just one component of the
+ * park system"; audit §6).
+ *
+ * One front door for the whole park system: every City park, each with a page; the recreation centers and
+ * libraries; and the greenway as **one row** among them, leading to the screen it has always had, with its 52
+ * stretches and their condition reports untouched. What changed is the weight, not the content.
+ */
 function parksList(): string {
-  const parks = [...(bundle?.parks ?? [])].sort((a, b) => (here ? milesBetween(here, a) - milesBetween(here, b) : a.name.localeCompare(b.name)));
-  return `<main>${mapBox({ key: 'parks', label: t('map.label_parks'), ...(here ? { fit: [here], minMeters: 3000 } : { fit: CITY, cover: true }) })}${locChip()}<ul class="rows">${parks.map((p) => `<li><div class="row static"><span class="rowtx"><strong>${owner(p.name)}</strong><small>${[p.address ? owner(p.address) : '', here ? T('miles', { miles: milesBetween(here, p).toFixed(1) }) : ''].filter(Boolean).join(' · ')}</small></span></div></li>`).join('')}</ul>
-    <p class="foot">${T('rec.parks_source', { date: prettyDate(bundle?.parks_source?.last_edited ?? '') })}</p></main>`;
+  const parks = parksInOrder(), g = bundle?.greenway;
+  const open = g?.segments.filter((s) => s.phase === 'open').length ?? 0;
+  const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now(), bundle?.alerts ?? []);
+  // The greenway is drawn on this map, because this screen IS about the paths.
+  return `<main><p class="lede">${T('rec.lede')}</p>
+    ${mapBox({ key: 'parks', label: t('map.label_parks'), segments: true, ...(here ? { fit: [here], minMeters: 3000 } : { fit: CITY, cover: true }) })}${locChip()}
+    ${g ? `<h2>${T('rec.paths')}</h2><ul class="rows">${rowLink({ v: 'greenway' }, 'path', t('gw.title'), t('rec.gw_row', { open, total: g.segments.length }), true)}</ul>
+      <p class="foot">${T('rec.paths_gap')}</p>` : ''}
+    <h2>${T('rec.parks')} <span class="count">${parks.length}</span></h2>
+    <p class="foot">${T(here ? 'rec.parks_near' : 'rec.parks_abc')}</p>
+    <ul class="rows">${parks.map((p) => parkRow(p)).join('')}</ul>
+    <p class="foot">${T('rec.parks_source', { date: prettyDate(bundle?.parks_source?.last_edited ?? '') })}</p>
+    <h2>${T('rec.centers')}</h2>${centers.length ? `<ul class="cards">${centers.map((r) => card(r)).join('')}</ul>` : `<p class="empty">${T('rec.centers_none')}</p>`}
+    <h2>${T('rec.bike_lanes')}</h2><ul class="rows">${rowLink({ v: 'tab', tab: 'map' }, 'transit', t('layer.go.bike_lanes'), t('rec.bike_lanes_sub'))}</ul></main>`;
+}
+
+/**
+ * One park (audit H4). Everything on it is already in `places/parks.json`: the City's own name for the place,
+ * what kind of park it is, how big it is, the address where the City publishes one, and a coordinate — which is
+ * what makes Directions, Bus directions and a small map possible without asking anybody anything.
+ *
+ * The greenway is drawn here only when this park touches an open stretch, which is the rule everywhere now: a
+ * map draws the path when the screen is about the path, and not otherwise.
+ */
+function parkPage(id: string): { title: string; html: string; ownTitle: true } {
+  const p = bundle?.parks?.find((x) => x.id === id);
+  if (!p) return { title: t('rec.parks'), ownTitle: true, html: `<main><p class="banner warn">${T('detail.not_found')}</p><button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.see_all')}</button></main>` };
+  const at = { lat: p.lat, lon: p.lon };
+  const gw = bundle?.greenway ? nearestSegment(at, bundle.greenway.segments, { openOnly: true, maxMiles: 0.5 }) : null;
+  // A park is a place people go to, so the two things a place needs are here: how to get there, and what help is
+  // near it once you are. "Help nearby" is the ordinary ranked list, so nothing sensitive can appear in it.
+  const near = rank(mapDrawable(bundle?.rows ?? [], MAP_GROUPS.flatMap((x) => x.tops)).filter((r) => milesBetween(at, { lat: r.lat!, lon: r.lon! }) <= 0.5), { near: at }, now(), bundle?.alerts ?? []).slice(0, 5);
+  const q = encodeURIComponent(p.address ? `${p.address}, Detroit, MI` : `${p.lat},${p.lon}`);
+  return { title: p.name, ownTitle: true, html: `<main class="detail"><p class="org">${owner(p.type)}${p.acres ? ` · ${T('rec.acres', { acres: p.acres })}` : ''}</p>
+    ${p.address ? `<address lang="en"><bdi>${esc(p.address)}</bdi><br><bdi>Detroit, MI</bdi></address>` : `<p>${T('rec.no_address')}</p>`}
+    ${mapBox({ key: 'park:' + p.id, label: t('map.label_park', { name: p.name }), small: true, quiet: false, segments: !!gw, fit: [at], minMeters: 700, dots: [{ lat: p.lat, lon: p.lon, label: p.name }] })}
+    <div class="stackbtns"><div class="two"><a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${q}" target="_blank" rel="noopener noreferrer" aria-label="${T('detail.directions_label', { name: p.name })}">${icon('pin', 'sm')}${T('detail.directions')}</a>
+      <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=transit" target="_blank" rel="noopener noreferrer">${icon('transit', 'sm')}${T('detail.bus')}</a></div>
+      <button class="btn ghost" ${go({ v: 'tab', tab: 'map' })}>${T('rec.on_the_map')}</button></div>
+    ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
+    <h2>${T('rec.help_near')}</h2>${near.length ? `<ul class="cards">${near.map((r) => card(r)).join('')}</ul>` : `<p class="empty">${T('rec.help_near_none')}</p>`}
+    <h2>${T('detail.source')}</h2><p>${owner(bundle?.parks_source?.name ?? '')}</p>
+    <p class="foot">${T('rec.parks_source', { date: prettyDate(bundle?.parks_source?.last_edited ?? '') })}</p></main>` };
 }
 /** Everything the old Transit tab carried: trip planners, fares, free rides, phone numbers (transit.ts). */
 function transitPanels(): string {
@@ -637,7 +799,10 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
   }
   const b = badgeText(r), o = openNow(r, now(), bundle!.alerts), next = nextOccurrences(r, now(), 3, bundle!.alerts);
   const sensitive = isSensitive(r.category), priv = isPrivate(r.category);
-  const gw = !sensitive && r.lat !== undefined && bundle!.greenway ? nearestSegment({ lat: r.lat, lon: r.lon! }, bundle!.greenway.segments, { openOnly: true, maxMiles: 0.5 }) : null;
+  // "Near a park or path" (audit §6): whichever of the nearest open greenway stretch and the nearest park is
+  // closer, within a quarter of a mile, and both of them open a page. It used to be a greenway-only row at half
+  // a mile — one path named on every listing in the app, and 302 parks named on none.
+  const nearPlace = !sensitive && r.lat !== undefined ? nearestParkOrPath({ lat: r.lat, lon: r.lon! }) : null;
   // Alerts that name this listing and haven't ended, including ones announced ahead ("closed Saturday").
   const own = bundle!.alerts.filter((a) => a.status === 'published' && a.targets?.includes(r.id) && Date.parse(a.ends_at) > now().getTime())
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
@@ -655,7 +820,7 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
     ${r.schedules.length ? `<h2>${T('detail.hours')}</h2><ul class="hours">${r.schedules.map(hoursLine).join('')}</ul>` : ''}${r.hours_text ? `<p>${T('detail.hours_as_listed', { text: '' })}<span lang="en">${esc(r.hours_text)}</span></p>` : ''}
     ${next.length ? `<h2>${T('detail.next')}</h2><ul class="hours">${next.map((n) => `<li><span>${esc(dayName(n.date))}</span><span>${clockHtml(clock(n.opens_at), clock(n.closes_at))}${n.holiday ? ` · ${T('hours.holiday')}` : ''}</span></li>`).join('')}</ul>` : ''}
     ${r.address || (!sensitive && r.lat !== undefined) ? `<h2>${T('detail.where')}</h2>${r.address ? `<address lang="en"><bdi>${esc(r.address.line1)}</bdi><br><bdi>${esc(r.address.city)}, MI ${esc(r.address.zip ?? '')}</bdi></address>` : `<p>${T('detail.where_no_address', { source: r.facts.source.name })}</p>`}${!sensitive && r.lat !== undefined ? mapBox({ key: 'r:' + r.id, label: t('map.label_place', { name: r.name }), small: true, quiet: true, fit: [{ lat: r.lat, lon: r.lon! }], minMeters: 650, dots: [{ lat: r.lat, lon: r.lon!, label: r.name, category: r.category }] }) : ''}<p class="foot">${T('detail.directions_note')}</p>` : ''}
-    ${gw ? `<p><button class="link" ${go({ v: 'segment', id: gw.segment.id })}>${icon('path', 'sm')} ${T('detail.near_greenway', { miles: gw.miles.toFixed(1), segment: gw.segment.name })}</button></p>` : ''}
+    ${nearPlace ? `<p><button class="link" ${go(nearPlace.view)}>${icon(nearPlace.icon, 'sm')} ${T('detail.near_place', { miles: nearPlace.miles.toFixed(1), place: nearPlace.name })}</button></p>` : ''}
     ${r.website ? `<p>${ext(r.website, t('detail.website'), 'link')}</p>` : ''}
     <h2>${T('detail.source')}</h2><p>${owner(r.facts.source.name)}</p>${reportBox(r.id, false, r.category)}</main>` };
 }
@@ -664,12 +829,18 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
-  // Every map but the Map tab's always draws the greenway; there, it is a layer a person switches on.
-  const segments = o.segments === false ? [] : bundle?.greenway?.segments ?? [];
+function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; areas?: MapArea[]; selected?: string; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
+  // The greenway is drawn when a map is ASKED to draw it, and not otherwise (Kyle, 2026-09-22; audit §6).
+  //
+  // It used to be the other way round: every map in the app drew it unless a caller opted out, and only the
+  // greenway's own screen ever did — so a green line ran across the map on a listing, on a results list, on the
+  // parks map and on a neighbourhood outline, on screens that were about none of those things. Now it is on the
+  // Map tab when that layer is on, on the greenway screen, on a stretch, on Parks and paths, and on a park page
+  // whose park touches an open stretch. Everywhere else the map is about its own subject.
+  const segments = o.segments ? bundle?.greenway?.segments ?? [] : [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, open: o.open, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, open: o.open, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, areas: o.areas, selected: o.selected, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
@@ -688,7 +859,7 @@ function mountMaps(): void {
   // is certainly the map, at every width and in both layouts.
   if (locateCard) {
     const frame = app.querySelector<HTMLElement>('.maptop .mapbox .mapframe');
-    if (frame) frame.insertAdjacentHTML('beforeend', locateCardHtml({ title: t('map.locate_title'), body: t('map.locate_body'), yes: t('map.locate_yes'), no: t('map.locate_no') }, esc));
+    if (frame) frame.insertAdjacentHTML('beforeend', locateCardHtml({ title: t('map.locate_title'), body: t('map.locate_body'), yes: t('map.locate_yes'), no: t('map.locate_no'), cross: t('loc.cross') }, esc));
     else locateCard = false;
   }
 }
@@ -711,7 +882,54 @@ function centreMapOn(p: { lat: number; lon: number }): boolean {
  * and `here` is a variable that dies with the page.
  */
 function askForLocation(): void {
-  requestPosition(navigator.geolocation, locationArrived, locationFailed);
+  locAsk?.cancel();
+  locSlow = false;
+  locAsk = requestPosition(navigator.geolocation, locationArrived, locationFailed, () => {
+    // Ten seconds in and still nothing. Say so, in the one place it matters: beside the two ways in that need
+    // no satellite at all.
+    locSlow = true; redraw(); announce(t('loc.slow'));
+  });
+}
+/** The field opens; the streets are asked for at the same moment, so a person who types fast is not kept
+ *  waiting on a file that was always going to be needed. The basemap is the same one the map draws from. */
+function openCross(): void {
+  crossOpen = true; zipOpen = false; crossOut = null; zipUnknown = locateOutside = false;
+  if (bundle && !crossAsked) { crossAsked = true; void loadMap(bundle.index).then(() => render(false)); }
+  redraw();
+  app.querySelector<HTMLInputElement>('.crossform input')?.focus();
+}
+/** What this phone makes of the words. Every line of it runs here (intersections.ts); the text goes no further
+ *  than this function and the field it came from. */
+function resolveTyped(text: string): void {
+  crossText = text;
+  const map = loadedBase();
+  if (!map) { crossOut = null; announce(t('map.no_streets')); redraw(); return; }
+  crossOut = resolveCrossing(map, text);
+  if (crossOut?.kind === 'point') { useCross(crossOut.point, `${crossOut.a} & ${crossOut.b}`); return; }
+  if (crossOut?.kind === 'street') { useCross(crossOut.point, crossOut.a); return; }
+  refocusSel = crossOut?.kind === 'choices' ? '[data-cross-pick="0"]' : '.crossform input';
+  redraw();
+  announce(crossOut?.kind === 'choices' ? t('loc.cross_choices_say', { count: crossOut.choices.length })
+    : crossOut?.kind === 'no_crossing' ? t('loc.cross_no_crossing', { a: crossOut.a, b: crossOut.b })
+    : crossOut?.kind === 'unknown' ? t('loc.cross_unknown', { street: crossOut.unknown }) : t('loc.cross_hint'));
+}
+/** "Stop looking": the ask is let go, the screen goes back to what it was, and nothing was sent either way. */
+function stopLocating(): void {
+  locAsk?.cancel(); locAsk = null; locSlow = false;
+  refocusSel = '[data-loc="on"]';
+  redraw(); announce(t('loc.slow_stopped'));
+}
+/** A point a person named, by typing a junction. The map moves exactly as it does for a fix, and the words
+ *  under it say which junction it is, because a point with no name is not something anybody can check. */
+function useCross(p: { lat: number; lon: number }, words: string): void {
+  locAsk?.cancel(); locAsk = null; locSlow = false;
+  here = { lat: p.lat, lon: p.lon }; hereZip = ''; hereCross = words;
+  locDenied = zipUnknown = zipOpen = locateOutside = false;
+  crossOpen = false; crossText = ''; crossOut = null;
+  refocusSel = '[data-loc="off"]';
+  redraw();
+  const moved = centreMapOn(here);
+  announce(t(moved ? 'map.locate_centered' : 'loc.cross_using', { where: words }));
 }
 
 function locationArrived(pos: GeolocationPosition): void {
@@ -720,15 +938,16 @@ function locationArrived(pos: GeolocationPosition): void {
   // Outside Detroit, Hamtramck, Highland Park and Dearborn: the map does not move, and the words say why. The
   // point is not kept either — sorting a Detroit list by distance from another state is a worse answer than
   // not sorting it at all.
+  locAsk = null; locSlow = false;
   if (positionOutcome(lat, lon) === 'outside') {
-    here = null; hereZip = ''; locDenied = zipUnknown = false; locateOutside = true;
+    here = null; hereZip = ''; hereCross = ''; locDenied = zipUnknown = false; locateOutside = true;
     zipOpen = !!bundle?.zips;
     refocusSel = zipOpen ? '.zipform input' : '[data-loc="on"]';
     redraw(); announce(t('map.locate_outside'));
     return;
   }
   const moving = onMapTab();
-  here = { lat, lon }; hereZip = '';
+  here = { lat, lon }; hereZip = ''; hereCross = '';
   locDenied = zipUnknown = zipOpen = locateOutside = false;
   refocusSel = '[data-loc="off"]';
   redraw();
@@ -736,8 +955,10 @@ function locationArrived(pos: GeolocationPosition): void {
   announce(t(moved && moving ? 'map.locate_centered' : 'loc.on_say'));
 }
 
-/** Refused, or no fix in ten seconds, or no geolocation at all: the card goes, the map stays where it was. */
+/** Refused, no fix at all after five minutes, or no geolocation in this browser: the card goes, the map stays
+ *  where it was, and the two ways in that need no satellite are still on the screen. */
 function locationFailed(): void {
+  locAsk = null; locSlow = false;
   locateCard = false; locDenied = true; zipUnknown = locateOutside = false;
   refocusSel = '[data-loc="on"]';
   redraw(); announce(t('loc.denied'));
@@ -780,13 +1001,13 @@ function greenway(): string {
   const group = (phase: string) => { const s = g.segments.filter((x) => x.phase === phase); return s.length ? `<h2>${T('gw.' + phase)} <span class="count">${s.length}</span></h2><ul class="rows">${s.map((x) => rowLink({ v: 'segment', id: x.id }, 'path', x.name, '', true)).join('')}</ul>` : ''; };
   // The key: what each line on the map means, in words (docs/05: colour never carries meaning alone).
   const key = `<ul class="gwkey">${[['open', ''], ['under_construction', 'build'], ['funded', 'fund'], ['planned', 'plan']].map(([ph, cls]) => `<li><i class="${cls}"></i>${T('gw.' + ph)}</li>`).join('')}</ul>`;
-  return `<main><p class="lede">${T('gw.intro')}</p>${mapBox({ key: 'greenway', label: t('gw.map_label') })}${key}${group('open')}${group('under_construction')}${group('funded')}${group('planned')}<p class="foot">${T('gw.source', { date: prettyDate(g.source.last_edited) })}</p></main>`;
+  return `<main><p class="lede">${T('gw.intro')}</p>${mapBox({ key: 'greenway', label: t('gw.map_label'), segments: true })}${key}${group('open')}${group('under_construction')}${group('funded')}${group('planned')}<p class="foot">${T('gw.source', { date: prettyDate(g.source.last_edited) })}</p></main>`;
 }
 function segment(s: Segment): string {
   const near = helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s);
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `<main><p class="meta"><span class="pill ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}</span></p>${s.phase === 'open' ? '' : `<p class="lede">${T('gw.not_open')}</p>`}
-    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, category: n.row.category, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
+    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), segments: true, focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, category: n.row.category, go: JSON.stringify({ v: 'detail', id: n.row.id }) })) })}
     ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${owner(s.cross_streets.join(' · '))}</p>` : ''}
     <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
     ${s.phase === 'open' ? reportBox(s.id, true) : ''}
@@ -865,11 +1086,19 @@ const hoodsWaiting = () => `<main><h1 class="page" tabindex="-1">${T('hood.title
 function hoodsTab(): string {
   const d = hoodsReady();
   if (!d) return hoodsWaiting();
+  wantAreas();
   const mine = here ? (hereZip ? hoodsForZip(d.neighborhoods, d.origin, here)[0] ?? null : hoodAt(d.neighborhoods, d.origin, here)) : null;
+  // A second map, with only outlines on it: no dots, no listings, no transport, nothing that could be drawn
+  // from a number. It opens where the Map tab opens — on the person, then on a typed junction or ZIP, then on
+  // City Hall — and with the area they are in already picked out, so their own page is two taps away.
+  const areas = mapAreas();
+  const mapHtml = areas.length
+    ? mapBox({ key: 'areastab', label: t('map.label_areas'), areas, selected: mine?.id ?? '', fit: CITY, cover: true, open: openingView(here) })
+    : `<p class="foot">${T('home.loading')}</p>`;
   // The ordinary location chip, until there is a location: then the answer above it is the whole point, and the
   // chip's own line ("Sorted by distance from you") would be a claim about a list that is in ABC order. What
   // stays is the button that turns it off, which is the same button, with the same handler, as everywhere else.
-  return hoodIndex(d, hoodUi(d), { order: hoodOrder, query: hoodQuery, located: !!here, zip: hereZip, mine, locHtml: here ? '' : locChip() });
+  return hoodIndex(d, hoodUi(d), { order: hoodOrder, query: hoodQuery, located: !!here, zip: hereZip, mine, locHtml: here ? '' : locChip(), view: hoodsView, mapHtml, near: here });
 }
 /** "14 neighborhoods", for the live region under the box. Silent until something has been typed. */
 function hoodSaid(d: Indicators): string {
@@ -931,7 +1160,7 @@ function credits(): string {
 const PURPOSE: Partial<Record<View['v'], string>> = {
   need: 'title.find', list: 'title.find', search: 'title.search', saved: 'title.saved', detail: 'title.listing', urgent: 'title.urgent',
 };
-const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'hoods', hood: 'hoods', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map' };
+const TAB_OF: Partial<Record<View['v'], TabId>> = { privacy: 'home', about: 'home', search: 'help', saved: 'help', add: 'help', hoods: 'hoods', hood: 'hoods', need: 'help', list: 'help', detail: 'help', greenway: 'map', segment: 'map', parks: 'map', park: 'map' };
 /** Where the cursor is now, named so it can be found again after the page is drawn (focus.ts). */
 const whereIsTheCursor = () => focusSelector(document.activeElement as unknown as FocusEl | null, (n) => n !== (document.body as unknown as FocusEl) && app.contains(n as unknown as Node));
 function render(focus = true): void {
@@ -960,7 +1189,8 @@ function render(focus = true): void {
   else if (v.v === 'list') { title = t('cat.' + v.cat); body = `<main>${results(CATEGORIES.find((c) => c.id === v.cat)?.query ?? {}, {})}</main>`; }
   else if (v.v === 'detail') { const d = detail(v.id); title = d.title; exit = d.exit; ownTitle = d.ownTitle; body = d.html; }
   else if (v.v === 'greenway') { title = t('gw.title'); body = greenway(); }
-  else if (v.v === 'parks') { title = t('rec.parks'); body = parksList(); }
+  else if (v.v === 'parks') { title = t('rec.title'); body = parksList(); }
+  else if (v.v === 'park') { const p = parkPage(v.id); title = p.title; ownTitle = p.ownTitle; body = p.html; }
   else { const s = bundle!.greenway?.segments.find((x) => x.id === v.id); title = s?.name ?? t('gw.title'); ownTitle = !!s; body = s ? segment(s) : greenway(); }
   const fromStack = stack.map((x) => (x.v === 'tab' ? x.tab : undefined)).filter(Boolean).pop();
   const active = v.v === 'tab' ? v.tab : fromStack ?? TAB_OF[v.v];
@@ -1024,7 +1254,7 @@ function navigate(view: View): void {
 }
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-locate],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-locate],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry],[data-cross-pick],[data-hoodview-map]');
   if (!el) return;
   if ('skip' in el.dataset) { app.querySelector<HTMLElement>('main')?.focus(); }   // past the bar and the tabs, into the page
   else if ('resetKey' in el.dataset) {
@@ -1082,15 +1312,27 @@ app.addEventListener('click', async (ev) => {
   }
   else if ('back' in el.dataset) { if (stack.length > 1) history.back(); else navigate({ v: 'tab', tab: TAB_OF[stack[0]!.v] ?? 'home' }); }
   else if ('exit' in el.dataset) { stack.length = 0; location.replace('https://www.weather.gov/'); }   // replace(): this page leaves the back button too
-  else if (el.dataset.loc === 'off') { here = null; hereZip = ''; locateOutside = false; refocusSel = '[data-loc="on"]'; redraw(); announce(t('loc.off_say')); }
-  else if (el.dataset.loc === 'zip') { zipOpen = true; zipUnknown = locateOutside = false; redraw(); app.querySelector<HTMLInputElement>('.zipform input')?.focus(); }
+  else if (el.dataset.loc === 'off') { here = null; hereZip = ''; hereCross = ''; locateOutside = false; refocusSel = '[data-loc="on"]'; redraw(); announce(t('loc.off_say')); }
+  else if (el.dataset.loc === 'zip') { zipOpen = true; crossOpen = false; zipUnknown = locateOutside = false; redraw(); app.querySelector<HTMLInputElement>('.zipform input')?.focus(); }
+  else if (el.dataset.loc === 'cross') { openCross(); }
+  else if (el.dataset.loc === 'stop') { stopLocating(); }
+  else if (el.dataset.crossPick) {
+    // One of several junctions of the same two streets.
+    const at = Number(el.dataset.crossPick), many = crossOut?.kind === 'choices' ? crossOut : null, c = many?.choices[at];
+    if (many && c) useCross(c.point, crossWords(many, at));
+  }
+  else if (el.dataset.hoodviewMap) { hoodsView = el.dataset.hoodviewMap === 'map' ? 'map' : 'list'; refocusSel = '[data-hoodview-map]'; render(false); announce(t(hoodsView === 'map' ? 'map.shown' : 'map.hidden')); }
   else if (el.dataset.loc === 'on') { locateOutside = false; askForLocation(); }
   // The Map tab's card. "Use my location" asks the browser FIRST, inside the click, because that is what makes it
   // a gesture — remembering that the card was answered is a write to IndexedDB, and awaiting it here would hand
   // the browser a prompt with no gesture behind it.
-  else if (el.dataset.locate === 'yes' || el.dataset.locate === 'no') {
+  else if (el.dataset.locate === 'yes' || el.dataset.locate === 'no' || el.dataset.locate === 'cross') {
+    const answer = el.dataset.locate;
     locateOutside = false;
-    locateCardClick(el.dataset.locate, { ask: askForLocation, remember: () => void rememberLocateAnswered(), close: () => { locateCard = false; refocusSel = '[data-loc="on"]'; redraw(); } });
+    locateCardClick(answer, { ask: askForLocation, remember: () => void rememberLocateAnswered(),
+      close: () => { locateCard = false; refocusSel = '[data-loc="on"]'; },
+      cross: () => { crossOpen = true; zipOpen = false; refocusSel = '.crossform input'; } });
+    if (answer !== 'yes') redraw();                        // "yes" leaves the card up until the fix arrives
   }
   else if (el.dataset.share) {
     const url = `${location.origin}/#/r/${el.dataset.share}`;   // a listing id only; nothing about the person
@@ -1157,7 +1399,7 @@ function redrawHoodList(): void {
   const out = app.querySelector('#hoodlist');
   const d = indicators;
   if (!out || !d) return;
-  out.innerHTML = hoodRows(d, hoodUi(d), { order: hoodOrder, query: hoodQuery });
+  out.innerHTML = hoodRows(d, hoodUi(d), { order: hoodOrder, query: hoodQuery, near: here });
   const say = app.querySelector('#hoodsay');
   if (say) say.textContent = hoodSaid(d);
 }
@@ -1165,6 +1407,9 @@ app.addEventListener('input', (ev) => {
   const el = ev.target as HTMLInputElement;
   if (el.id === 'q') { searchText = el.value; redraw(); return; }
   if (el.id === 'hoodq') { hoodQuery = el.value; redrawHoodList(); return; }
+  // What has been typed into the cross-street field survives a redraw, like every other half-finished thing on
+  // the screen (WCAG 3.3.7) — and, like every other one, it is a variable and nothing more.
+  if (el.name === 'cross' && el.closest('.crossform')) { crossText = el.value; return; }
   const report = el.closest<HTMLElement>('.report');
   if (report && el.tagName === 'TEXTAREA') { notes.set(report.dataset.target!, el.value); return; }
   if (el.closest('.addform') && el.name) addValues[el.name] = el.value;
@@ -1180,9 +1425,11 @@ app.addEventListener('change', (ev) => {
 app.addEventListener('change', (ev) => {
   const el = ev.target as HTMLInputElement;
   if (!el.dataset?.hoodorder) return;
-  hoodOrder = el.dataset.hoodorder === 'district' ? 'district' : 'abc';
+  // "Nearest first" only exists while a location or a ZIP is known; `hoodOrderOf` refuses it otherwise rather
+  // than silently ordering a list by a distance from nowhere.
+  hoodOrder = hoodOrderOf(el.dataset.hoodorder, !!here);
   redrawHoodList();
-  announce(t(hoodOrder === 'district' ? 'hood.group_district' : 'hood.group_abc'));
+  announce(t(hoodOrder === 'district' ? 'hood.group_district' : hoodOrder === 'near' ? 'hood.order_near' : 'hood.group_abc'));
 });
 // Table | Chart on the year panels. Two real radio buttons, so the arrow keys already move between them. The
 // choice is kept on this device (hoods.ts, beside the layer list), applies to every panel at once, is said out
@@ -1233,6 +1480,7 @@ app.addEventListener('submit', (ev) => {
     void submitProposal(p).then((r) => { proposed = r; proposeError = false; render(); announce(t(r.state === 'queued' ? 'add.queued' : 'add.sent')); });
     return;
   }
+  if ('cross' in form.dataset) { resolveTyped(String(new FormData(form).get('cross') ?? '').trim()); return; }
   if (!('zip' in form.dataset)) return;
   const zip = String(new FormData(form).get('zip') ?? '').trim(), c = bundle?.zips?.[zip];
   if (c) { here = { lat: c[0], lon: c[1] }; hereZip = zip; zipOpen = zipUnknown = locDenied = false; refocusSel = '[data-loc="off"]'; }
@@ -1254,7 +1502,8 @@ function checkForUpdate(force = false): Promise<void> {
     // A new list brings new neighborhood numbers: forget the old ones, and load again when a neighborhood screen asks.
     try {
       const next = await refresh(bundle);
-      if (next) { bundle = next; indicators = undefined; router.retrace(); }
+      // A newer list brings newer streets: what the old ones said about a junction means nothing about the new ones.
+      if (next) { bundle = next; indicators = undefined; crossAsked = false; forgetCrossings(); router.retrace(); }
       if (loadError || next) { loadError = false; render(false); }
       retryIn = 5000;
     } catch (e) {

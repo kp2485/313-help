@@ -6,8 +6,25 @@
 
 import { idbGet, idbSet } from './data.js';
 
-/** What a first-time visitor sees: the greenway and the buses, nothing else, so the map opens fast and plain. */
-export const DEFAULT_LAYERS = ['place:greenway', 'place:parks', 'go:ddot_routes'];
+/**
+ * What a first-time visitor sees (audit H2; Kyle, 2026-09-22).
+ *
+ * It used to be the greenway, the parks and the DDOT routes — a street map with a green line on it and **not one
+ * place that helps**. The one tab named after the thing on it opened without the thing, and a person who tapped
+ * Map to find food had to open the switcher and tick a box before the tab did anything the app is for.
+ *
+ * So: **every help layer on, parks on, the greenway off, the bus routes off.** All eight help groups rather than
+ * food alone, because the map is where a helper asks "what is near this address?" and the honest answer is all
+ * of it; parks because they are the other thing a map is for; the greenway off because it is one path inside a
+ * 302-park system (Kyle, direction b) and one tap away in the switcher; the bus routes off because a route line
+ * over eight kinds of dot is the busiest thing on the screen and the stops only draw at zoom anyway.
+ *
+ * A remembered choice still wins: this list is only ever read on a phone that has never touched the switcher.
+ */
+export const DEFAULT_LAYERS = [
+  'help:food', 'help:shelter', 'help:health', 'help:rec', 'help:work', 'help:kids', 'help:things', 'help:paperwork',
+  'place:parks',
+];
 
 export async function loadLayers(): Promise<string[]> {
   const ids = await idbGet<unknown>('layers');

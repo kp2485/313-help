@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  ANCHOR_RADIUS_M, LOCATE_OPTIONS, LOCATE_RADIUS_M, MAP_ANCHOR, SERVICE_BBOX, firstOpenAction, inServiceArea,
+  ANCHOR_RADIUS_M, CITY_HALL, LOCATE_OPTIONS, LOCATE_RADIUS_M, LOCATE_SLOW_MS, MAP_ANCHOR, SERVICE_BBOX, firstOpenAction, inServiceArea,
   locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, requestPosition,
   type FirstOpenAction, type LocatePermission,
 } from '../src/locate.js';
@@ -60,7 +60,7 @@ describe('what the Map tab does the first time it is opened', () => {
 // ---------------------------------------------------------------------------------------------------
 
 describe('our own card, before any permission prompt', () => {
-  const html = locateCardHtml({ title: 'See what is near you?', body: 'Your location stays on this phone. We never send it or save it.', yes: 'Use my location', no: 'Not now' }, esc);
+  const html = locateCardHtml({ title: 'See what is near you?', body: 'Your location stays on this phone. We never send it or save it.', yes: 'Use my location', no: 'Not now', cross: 'Type a cross street' }, esc);
 
   it('says what it is and what it will not do', () => {
     expect(html).toContain('See what is near you?');
@@ -75,14 +75,17 @@ describe('our own card, before any permission prompt', () => {
     expect(html).toContain('id="locardh" tabindex="-1"');  // the cursor is moved here when it opens
   });
 
-  it('offers two real buttons, both reachable by the keyboard', () => {
+  it('offers three real buttons, all reachable by the keyboard', () => {
     expect(html).toContain('type="button" data-locate="yes"');
+    // The third choice (Kyle, 2026-09-22): a person who will not share a location, or whose phone cannot find
+    // one, can still say where they are by naming two streets.
+    expect(html).toContain('type="button" data-locate="cross"');
     expect(html).toContain('type="button" data-locate="no"');
     expect(html).not.toContain('<a ');
   });
 
   it('escapes what it is given, whatever language it is in', () => {
-    const bad = locateCardHtml({ title: '<script>x</script>', body: 'b', yes: 'y', no: 'n' }, esc);
+    const bad = locateCardHtml({ title: '<script>x</script>', body: 'b', yes: 'y', no: 'n', cross: 'c' }, esc);
     expect(bad).not.toContain('<script>');
     expect(bad).toContain('&lt;script&gt;');
   });
@@ -118,22 +121,26 @@ describe('the two buttons', () => {
 });
 
 describe('asking the browser', () => {
-  it('asks once, coarsely, and gives up after ten seconds', () => {
+  it('asks once, coarsely, and keeps looking for minutes, not seconds', () => {
     const getCurrentPosition = vi.fn();
-    const ok = requestPosition({ getCurrentPosition } as unknown as Geolocation, () => {}, () => {});
-    expect(ok).toBe(true);
+    const ask = requestPosition({ getCurrentPosition } as unknown as Geolocation, () => {}, () => {});
+    expect(typeof ask.cancel).toBe('function');
     expect(getCurrentPosition).toHaveBeenCalledTimes(1);
     const opts = getCurrentPosition.mock.calls[0]![2] as PositionOptions;
     expect(opts.enableHighAccuracy).toBe(false);           // a dot on a city map, not a doorway
-    expect(opts.timeout).toBe(10000);
+    // Kyle, 2026-09-22: a cold GPS fix with no network is a walk outside and a few minutes of sky. Ten seconds
+    // was the app being honest about its own patience and wrong about the phone's.
+    expect(opts.timeout).toBe(300000);
+    expect(LOCATE_SLOW_MS).toBe(10000);                    // ...and at ten seconds it SAYS so, instead of giving up
     expect(opts.maximumAge).toBeGreaterThan(0);            // a fix from a few minutes ago is a fine answer
     expect(LOCATE_OPTIONS.enableHighAccuracy).toBe(false);
   });
 
   it('a browser with no geolocation at all is answered like a refusal, not with silence', () => {
     let failed = 0;
-    expect(requestPosition(undefined, () => {}, () => { failed++; })).toBe(false);
+    const ask = requestPosition(undefined, () => {}, () => { failed++; });
     expect(failed).toBe(1);
+    expect(() => ask.cancel()).not.toThrow();              // nothing was asked, so there is nothing to call off
   });
 
   it('says "denied" without asking anybody when the browser has no geolocation', async () => {
@@ -354,9 +361,15 @@ describe('the anchor view', () => {
 
   it('is the civic point the app already carries, not a new number', () => {
     // Detroit City Hall (Coleman A. Young Municipal Center) — the `detroit` service area's reference point.
-    expect(MAP_ANCHOR).toEqual({ lat: 42.3293, lon: -83.0452 });
+    expect(CITY_HALL).toEqual({ lat: 42.3293, lon: -83.0452 });
+    // ...and the view is nudged 0.6 mile up Woodward from it (Kyle, 2026-09-22), so a two-mile box is not a
+    // third river and hatching. Still City Hall in words; Grand Circus Park on the ground.
+    expect(MAP_ANCHOR).toEqual({ lat: 42.3366, lon: -83.0514 });
+    expect(MAP_ANCHOR.lat).toBeGreaterThan(CITY_HALL.lat);        // north
+    expect(MAP_ANCHOR.lon).toBeLessThan(CITY_HALL.lon);           // ...and west, which is the way Woodward runs
+    expect(Math.hypot((MAP_ANCHOR.lat - CITY_HALL.lat) * 111320, (MAP_ANCHOR.lon - CITY_HALL.lon) * 111320 * Math.cos(42.35 * Math.PI / 180))).toBeCloseTo(965.6, -2);
     expect(inServiceArea(MAP_ANCHOR.lat, MAP_ANCHOR.lon)).toBe(true);
-    expect(ANCHOR_RADIUS_M).toBeCloseTo(4023.36, 3);              // two and a half miles, in metres
+    expect(ANCHOR_RADIUS_M).toBeCloseTo(3218.688, 3);             // two miles, as everywhere else
   });
 
   it('is what the Map tab opens at with no location, and the two-mile view with one', () => {
@@ -366,10 +379,10 @@ describe('the anchor view', () => {
     expect(openingView({ lat: 42.3487, lon: -83.0567 })).toEqual({ lat: 42.3487, lon: -83.0567, radiusMeters: LOCATE_RADIUS_M });
   });
 
-  it('spans five miles across the shorter side, portrait or landscape', () => {
+  it('spans four miles across the shorter side, portrait or landscape', () => {
     const v = openingView(null);
     for (const [w, h] of [PHONE, [PHONE[1], PHONE[0]] as [number, number], LAPTOP]) {
-      expect(metresAcrossShortSide(cameraForRadius(v, v.radiusMeters, w, h), w, h)).toBeCloseTo(8046.72, 0);
+      expect(metresAcrossShortSide(cameraForRadius(v, v.radiusMeters, w, h), w, h)).toBeCloseTo(6437.376, 0);
     }
   });
 
@@ -430,7 +443,7 @@ describe('the Map tab opens on the anchor, not on the region', () => {
     region.view.destroy();
     const m = await open({ open: openingView(null) });
     expect(m.mpp()).toBeLessThan(wide / 2);
-    expect((Math.min(W, H) * 111320) / m.cam().s).toBeCloseTo(8046.72, 0);
+    expect((Math.min(W, H) * 111320) / m.cam().s).toBeCloseTo(6437.376, 0);
     expect(42.35 - m.cam().cy).toBeCloseTo(MAP_ANCHOR.lat, 5);
     m.view.destroy();
   });
@@ -454,14 +467,19 @@ describe('the Map tab opens on the anchor, not on the region', () => {
     m.view.destroy();
   });
 
-  it('the Map tab really asks for it: main.ts passes the opening view, and nothing else does', () => {
+  it('every map that opens on "where you are" asks for it, and no other map does', () => {
     const main = src('main.ts');
     const tab = main.split('\n').filter((l) => l.includes("key: 'maptab'"));
     expect(tab).toHaveLength(1);
     expect(tab[0]).toContain('open: openingView(here)');
+    // Two maps open on where the person is: the Map tab, and the Areas tab's map of the outlines (Kyle,
+    // 2026-09-22 — the rule is about all of them, not about one tab).
+    const areas = main.split('\n').filter((l) => l.includes("key: 'areastab'"));
+    expect(areas).toHaveLength(1);
+    expect(areas[0]).toContain('open: openingView(here)');
     // The maps that are about one subject — a listing, a stretch of greenway, a park, a neighbourhood — keep
-    // fitting their subject, and never take the Map tab's opening view.
-    expect(main.match(/open: openingView\(/g)).toHaveLength(1);
+    // fitting their subject, and never take the opening view.
+    expect(main.match(/open: openingView\(/g)).toHaveLength(2);
   });
 });
 

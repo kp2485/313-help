@@ -96,7 +96,15 @@ export function matchHoods(list: readonly Hood[], query: string): Hood[] {
 
 const byName = (a: Hood, b: Hood) => a.name.localeCompare(b.name);
 
-export type HoodOrder = 'abc' | 'district';
+/** Three orders. "Nearest first" is offered only when a location or a typed ZIP is already known, and it is
+ *  still not a ranking: a distance to the middle of an outline says how far away a place is, never how good it
+ *  is (docs/13, rule 1). The distance is computed here, on the device, from a point that never leaves it. */
+export type HoodOrder = 'abc' | 'district' | 'near';
+export const hoodOrder = (stored: unknown, canNear: boolean): HoodOrder =>
+  stored === 'district' ? 'district' : stored === 'near' && canNear ? 'near' : 'abc';
+
+/** Straight-line distance, in the flat units this file already uses for outlines: only comparisons use it. */
+const away = (h: Hood, p: Point) => Math.hypot((h.center[1] - p.lon) * 0.74, h.center[0] - p.lat);
 
 /** The first letter a name is filed under; anything that is not a letter files under one "Other" group. */
 export const letterOf = (h: Hood) => { const c = foldName(h.name)[0] ?? ''; return /[a-z]/.test(c) ? c.toUpperCase() : ''; };
@@ -108,8 +116,16 @@ export const letterOf = (h: Hood) => { const c = foldName(h.name)[0] ?? ''; retu
  *
  * `key` is the letter, or the district number, or '' for the group that has neither.
  */
-export function groupHoods(list: readonly Hood[], order: HoodOrder): { key: string | number; items: Hood[] }[] {
+export function groupHoods(list: readonly Hood[], order: HoodOrder, near?: Point | null): { key: string | number; items: Hood[] }[] {
   const sorted = [...list].sort(byName);
+  // Nearest first: one group, no headings, because a letter or a district over a distance-ordered list would be
+  // a heading that lies about the order under it. Without a point there is nothing to measure, so it falls back
+  // to A to Z rather than inventing a distance.
+  if (order === 'near') {
+    if (!near) return groupHoods(list, 'abc');
+    // Ties break on the name, so one bundle and one point always give one list.
+    return [{ key: '', items: sorted.sort((a, b) => away(a, near) - away(b, near) || byName(a, b)) }];
+  }
   if (order === 'district') {
     const districts = [...new Set(sorted.map((h) => h.district))].filter((d): d is number => typeof d === 'number').sort((a, b) => a - b);
     const keys: (string | number)[] = [...districts, ''];

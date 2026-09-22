@@ -15,6 +15,10 @@ import type { SubwayData, SubwayPainter } from './subway.js';
 const LON0 = -83.1, LAT0 = 42.35, K = Math.cos((LAT0 * Math.PI) / 180), M_PER_UNIT = 111320;
 export const wx = (lon: number) => (lon - LON0) * K;
 export const wy = (lat: number) => LAT0 - lat;
+/** The way back. Only two files need it — the cross-street finder and the city outlines — and both work in
+ *  world coordinates and hand lat/lon back out, so the projection stays in this one file. */
+export const ilon = (x: number) => x / K + LON0;
+export const ilat = (y: number) => LAT0 - y;
 type Box = [number, number, number, number];                           // minX, minY, maxX, maxY
 interface Line { cls: number; name: string; pts: Float32Array; box: Box }
 interface Area { name: string; pts: Float32Array; box: Box }
@@ -51,6 +55,9 @@ export function decodeMap(base: BaseFile, streets: { cells: Record<string, RoadF
 
 // ---- loading: checked against the signed index, then kept on the phone --------------------------------------
 let loaded: { key: string; map: BaseMap } | undefined, loading: Promise<BaseMap | null> | undefined;
+/** The basemap if it is already decoded and in memory, without asking for it. The cross-street finder needs the
+ *  streets synchronously while a person is typing, and this is the one thing it needs from the loading path. */
+export const loadedBase = (): BaseMap | null => loaded?.map ?? null;
 export function loadMap(index: BundleIndex): Promise<BaseMap | null> {
   const want = ['map/base.json', 'map/streets.json'].map((n) => index.files[n]?.sha256);
   if (!want[0] || !want[1]) return Promise.resolve(null);
@@ -133,8 +140,20 @@ export interface MapDot { lat: number; lon: number; label: string; go?: string; 
 // carries a roving focus of its own: N and P step through what is on screen, Enter opens it, Escape steps back
 // out to the map. N and P rather than Tab, because Tab has to keep leaving the map (2.1.2, no keyboard trap)
 // and the arrows have to keep panning it (2.5.7); all three are written out in the map's keyboard help.
+/** A city or neighbourhood outline on the map (audit §1; Kyle, 2026-09-22). It is a SHAPE and a NAME and
+ *  nothing else: no dot, no listing, no number. `sub` is the council district, or the city's own name for a
+ *  whole-city area; `go` is the ordinary `data-go` payload, absent for an area that has no page yet. */
+export const AREA_DETAIL_MPP = 14;
+export interface MapArea { id: string; name: string; sub: string; rings: { lat: number; lon: number }[][]; go?: string }
+
+/** What is under a point on the map: a card to show, a subway glyph to choose, an area to select — or nothing. */
+type Hit =
+  | { kind: 'card'; title: string; sub: string; go?: string }
+  | { kind: 'area'; id: string; title: string; sub: string; go?: string }
+  | { kind: 'glyph'; glyph: string; sel: string };
+
 export interface MapFeature {
-  kind: 'segment' | 'dot' | 'hub' | 'terminal' | 'interchange' | 'route';   // the last four: subway style only, always after the first two
+  kind: 'segment' | 'dot' | 'area' | 'hub' | 'terminal' | 'interchange' | 'route';   // the last four: subway style only, always after the first two
   id: string;                 // stable across a pan, so the ring stays on the same thing
   route: number;              // a greenway stretch's place in the route
   d: number;                  // a place's distance from the middle of the screen, in pixels
@@ -142,10 +161,13 @@ export interface MapFeature {
   sel?: string;               // subway style: what Enter chooses (a route, an interchange…), instead of a screen to go to
   box: [number, number, number, number];   // on screen: what the ring is drawn round
 }
-/** A stable, meaningful order: the greenway first, stretch by stretch along the route, then the places, the
- *  one nearest the middle of the screen first. Pure, so the order is held to a fixture rather than to a map. */
-export function orderFeatures<T extends { kind: 'segment' | 'dot'; route: number; d: number }>(list: readonly T[]): T[] {
-  return [...list].sort((a, b) => (a.kind === b.kind ? (a.kind === 'segment' ? a.route - b.route : a.d - b.d) : a.kind === 'segment' ? -1 : 1));
+/** A stable, meaningful order: the greenway first, stretch by stretch along the route; then the areas, the one
+ *  nearest the middle of the screen first; then the places, likewise. An area comes before the dots because it
+ *  is the ground they stand on, and a keyboard that walks the ground first reads the map the way an eye does
+ *  (audit §3.4). Pure, so the order is held to a fixture rather than to a map. */
+const KIND_ORDER: Record<string, number> = { segment: 0, area: 1, dot: 2 };
+export function orderFeatures<T extends { kind: 'segment' | 'dot' | 'area'; route: number; d: number }>(list: readonly T[]): T[] {
+  return [...list].sort((a, b) => (a.kind === b.kind ? (a.kind === 'segment' ? a.route - b.route : a.d - b.d) : (KIND_ORDER[a.kind] ?? 9) - (KIND_ORDER[b.kind] ?? 9)));
 }
 export type MapAction = 'in' | 'out' | 'left' | 'right' | 'up' | 'down' | 'next' | 'prev' | 'open' | 'escape' | null;
 /** What one key press means to the map — the whole of it, as a plain function, so the choice of keys can be
@@ -183,6 +205,11 @@ export interface MapSpec {
   label: string;                                // what a screen reader hears for the picture
   segments: Segment[]; focus?: string;          // greenway; `focus` is drawn bold
   outline?: { lat: number; lon: number }[][];   // a neighborhood's edge
+  /** City and neighbourhood outlines (`place:areas`). Drawn thin and never filled with a value — docs/13's
+   *  first honesty rule: no choropleth anywhere, ever. The one that is `selected` gets a light wash of the
+   *  land colour so a tap can be seen, which carries no number and means nothing but "this one". */
+  areas?: MapArea[];
+  selected?: string;
   overlays?: Overlay[];                         // switched-on transport layers, already loaded (Map tab)
   dots?: MapDot[]; me?: { lat: number; lon: number } | null;
   fit: { lat: number; lon: number }[];          // the "whole area" view: the reset button, and the start when there is no `open`
@@ -348,6 +375,11 @@ export class MapView {
   private animId = 0; private animAt = 0; private animN = 0;      // the fling, and the animated double-tap zoom
   private slow = matchMedia('(prefers-reduced-motion: reduce)');
   private segs: { seg: Segment; lines: Float32Array[]; box: Box }[];
+  /** City and neighbourhood outlines, in world coordinates. `size` is how big the shape is, and it is used for
+   *  one thing: when a tap is inside two outlines, the smaller one wins, so a Detroit neighbourhood beats the
+   *  Detroit city outline (audit §3.4, "most specific wins"). */
+  private areas: { area: MapArea; rings: Float32Array[]; box: Box; size: number }[];
+  private areaSel = '';                                   // the outline that was tapped; the page is not told
   private ro: ResizeObserver; private mq = matchMedia('(prefers-color-scheme: dark)');
   private onScheme = () => this.redraw();
   // A laptop: the window can move to a screen with a different pixel ratio, or be zoomed. The canvas is then the
@@ -369,6 +401,11 @@ export class MapView {
   constructor(private el: HTMLElement, private spec: MapSpec, index: BundleIndex) {
     const S = spec.strings;
     this.segs = spec.segments.map((seg) => { const lines = seg.lines.map((l) => { const a = new Float32Array(l.length * 2); l.forEach((pt, i) => { a[i * 2] = wx(pt[0]); a[i * 2 + 1] = wy(pt[1]); }); return a; }); return { seg, lines, box: merge(lines.map(boxOf)) }; });
+    this.areas = (spec.areas ?? []).map((area) => {
+      const rings = area.rings.map((r) => { const a = new Float32Array(r.length * 2); r.forEach((q, i) => { a[i * 2] = wx(q.lon); a[i * 2 + 1] = wy(q.lat); }); return a; });
+      return { area, rings, box: merge(rings.map(boxOf)), size: rings.reduce((n, r) => n + Math.abs(shoelace(r)), 0) };
+    });
+    this.areaSel = spec.selected ?? '';
     this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', spec.label); this.canvas.tabIndex = 0;
     // The picture answers to the keyboard, so it says how, and the description is read out with the label.
     const help = document.createElement('p'); help.className = 'vh'; help.id = 'mapkeys' + ++mapNo; help.textContent = S.keys;
@@ -424,7 +461,7 @@ export class MapView {
       return u < 1;
     });
   }
-  destroy(): void { this.release(); this.stopMotion(); this.cancelPick(); if (live.get(this.spec.key) === this) live.delete(this.spec.key); this.bar?.remove(); this.bar = null; this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); this.mqc.removeEventListener('change', this.onScheme); window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); if (this.goal) cameras.set(this.spec.key, this.goal); else if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
+  destroy(): void { this.release(); this.stopMotion(); this.cancelPick(); if (this.hoverRaf) cancelAnimationFrame(this.hoverRaf); this.hoverRaf = 0; if (live.get(this.spec.key) === this) live.delete(this.spec.key); this.bar?.remove(); this.bar = null; this.ro.disconnect(); this.mq.removeEventListener('change', this.onScheme); this.mqc.removeEventListener('change', this.onScheme); window.removeEventListener('resize', this.onWindow); document.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); if (this.goal) cameras.set(this.spec.key, this.goal); else if (this.touched) cameras.set(this.spec.key, { cx: this.cx, cy: this.cy, s: this.s }); document.body.classList.remove('mapbig'); }
 
   // -- camera
   private resize(first = false): void {
@@ -563,6 +600,7 @@ export class MapView {
       const was = this.pointers.get(e.pointerId); if (!was) return;
       const now = at(e); this.pointers.set(e.pointerId, now);
       if (this.pointers.size === 1) {
+        this.hoverNow = '';                                  // a drag is not a hover: ask again when it ends
         this.moved += Math.abs(now.x - was.x) + Math.abs(now.y - was.y);
         this.path.push({ ...now, t: when(e) }); if (this.path.length > 24) this.path.shift();
         if (this.dtz) this.put(zoomAbout(this.dtz.cam, dragZoom(now.y - this.dtz.y), this.dtz.x, this.dtz.y, this.w, this.h));
@@ -598,6 +636,9 @@ export class MapView {
       } else if (this.oneFinger(e.pointerType)) this.startFling();
     };
     c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+    // The cursor. A mouse or a pen only: `pointertype` is 'touch' for a finger, and a finger has no cursor.
+    c.addEventListener('pointermove', (e) => { if (e.pointerType !== 'touch') this.hover(at(e)); });
+    c.addEventListener('pointerleave', () => this.hover(null));
     // A trackpad pinch arrives as a wheel with ctrlKey. It is zoom, not scroll, and it must not reach the page.
     c.addEventListener('wheel', (e) => { e.preventDefault(); const q = at(e); this.zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : e.deltaMode ? 0.05 : 0.0022)), q.x, q.y); }, { passive: false });
     // Older iOS Safari answers a pinch with its own page zoom before any pointer event is sent. These three are
@@ -622,7 +663,7 @@ export class MapView {
   /** Everything on screen right now that a keyboard may land on, in order. Recomputed on every step, because
    *  panning and zooming change what is there — the ring stays on its own feature by id, not by position. */
   private features(): MapFeature[] {
-    const view = this.viewBox(), out: (MapFeature & { kind: 'segment' | 'dot' })[] = [], S = this.spec.strings;
+    const view = this.viewBox(), out: (MapFeature & { kind: 'segment' | 'dot' | 'area' })[] = [], S = this.spec.strings;
     this.segs.forEach((g, i) => {
       if (!touches(g.box, view)) return;
       const xs = [this.X(g.box[0]), this.X(g.box[2])], ys = [this.Y(g.box[1]), this.Y(g.box[3])];
@@ -630,6 +671,16 @@ export class MapView {
         go: g.seg.id === this.spec.focus ? undefined : this.spec.segGo?.(g.seg.id),
         box: [Math.max(6, Math.min(...xs)), Math.max(6, Math.min(...ys)), Math.min(this.w - 6, Math.max(...xs)), Math.min(this.h - 6, Math.max(...ys))] });
     });
+    // An outline is a feature like any other: N and P reach it, Enter opens its page, and the ring is drawn
+    // round it. An area carries no listing and no dot, so nothing about the sensitive rules is in play here.
+    for (const a of this.areas) {
+      if (!touches(a.box, view)) continue;
+      const xs = [this.X(a.box[0]), this.X(a.box[2])], ys = [this.Y(a.box[1]), this.Y(a.box[3])];
+      const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+      out.push({ kind: 'area', id: 'area:' + a.area.id, route: 0, d: Math.hypot(cx - this.w / 2, cy - this.h / 2),
+        label: a.area.name, sub: a.area.sub, go: a.area.go,
+        box: [Math.max(6, Math.min(...xs)), Math.max(6, Math.min(...ys)), Math.min(this.w - 6, Math.max(...xs)), Math.min(this.h - 6, Math.max(...ys))] });
+    }
     for (const dot of focusableDots(this.spec.dots ?? [])) {
       const x = this.X(wx(dot.lon)), y = this.Y(wy(dot.lat));
       if (x < 0 || y < 0 || x > this.w || y > this.h) continue;
@@ -692,45 +743,101 @@ export class MapView {
   private X = (x: number) => (x - this.cx) * this.s + this.w / 2;
   private Y = (y: number) => (y - this.cy) * this.s + this.h / 2;
   private say(html: string): void { this.note.innerHTML = html; }
-  private pick(q: { x: number; y: number }): void {
+  /**
+   * What is under a point on the map, in the app's own pick order:
+   *
+   *     listing dot → subway glyph → stop → greenway → route → AREA → park
+   *
+   * One function, so a tap and the mouse cursor can never disagree about what is tappable (Kyle, 2026-09-22).
+   * It decides and returns; it changes nothing. `pick` acts on the answer; `hover` only asks whether there is
+   * one. An area sits ahead of the parks and behind everything a person came to the map to find, and the
+   * smallest area containing the point wins — a Detroit neighbourhood beats the Detroit city outline.
+   */
+  private probe(q: { x: number; y: number }): Hit | null {
     const S = this.spec.strings;
-    const card = (title: string, sub: string, go?: string) => this.say(`<div class="mappick"><span><strong>${esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${go ? `<button class="btn ghost" data-go="${esc(go)}">${esc(S.details)}</button>` : ''}</div>`);
     let best: { d: number; dot: MapDot } | undefined;
     for (const dot of this.spec.dots ?? []) { const d = Math.hypot(this.X(wx(dot.lon)) - q.x, this.Y(wy(dot.lat)) - q.y); if (d < 24 && (!best || d < best.d)) best = { d, dot }; }
-    if (best) return card(best.dot.label, best.dot.sub ?? '', best.dot.go);
+    if (best) return { kind: 'card', title: best.dot.label, sub: best.dot.sub ?? '', go: best.dot.go };
     // Subway style: a station, a pill, a terminal, a marker or a badge, each with a 44-unit box of its own.
     const std = this.sub ? this.sub.rest : this.spec.overlays ?? [];
     const glyph = this.sub?.hit(q, this.lastGlyph);
-    if (glyph) { this.lastGlyph = glyph.glyph; return this.choose(glyph.sel); }
+    if (glyph) return { kind: 'glyph', glyph: glyph.glyph, sel: glyph.sel };
     // A stop or station on a switched-on layer: its name, and what kind of thing it is, in words.
     let stop: { d: number; name: string; label: string } | undefined;
     for (const o of std) for (const pt of o.points) {
       const d = Math.hypot(this.X(pt.x) - q.x, this.Y(pt.y) - q.y);
       if (d < 18 && (!stop || d < stop.d)) stop = { d, name: pt.name, label: o.label };
     }
-    if (stop) return card(stop.name || stop.label, stop.name ? stop.label : '');
+    if (stop) return { kind: 'card', title: stop.name || stop.label, sub: stop.name ? stop.label : '' };
     let near: { d: number; seg: Segment } | undefined;
     for (const g of this.segs) for (const l of g.lines) for (let i = 0; i + 3 < l.length; i += 2) {
       const d = distToPiece(q.x, q.y, this.X(l[i]!), this.Y(l[i + 1]!), this.X(l[i + 2]!), this.Y(l[i + 3]!));
       if (d < 16 && (!near || d < near.d)) near = { d, seg: g.seg };
     }
-    if (near) return card(near.seg.name, S.phase[near.seg.phase] ?? '', near.seg.id === this.spec.focus ? undefined : this.spec.segGo?.(near.seg.id));
+    if (near) return { kind: 'card', title: near.seg.name, sub: S.phase[near.seg.phase] ?? '', go: near.seg.id === this.spec.focus ? undefined : this.spec.segGo?.(near.seg.id) };
     const line = this.sub?.hitLine(q);
-    if (line) return this.choose(line);
-    if (this.sel) this.choose('');                       // a tap on the empty map lets the chosen route go
+    if (line) return { kind: 'glyph', glyph: this.lastGlyph, sel: line };
     // A route or a bike lane on a switched-on layer.
     let route: { d: number; name: string; label: string } | undefined;
     for (const o of this.sub ? [...std, ...(this.spec.overlays ?? []).filter((x) => x.id === 'go:bike_lanes')] : this.spec.overlays ?? []) for (const l of o.lines) {
-      if (!touches(l.box, [this.cx - this.w / 2 / this.s, this.cy - this.h / 2 / this.s, this.cx + this.w / 2 / this.s, this.cy + this.h / 2 / this.s])) continue;
+      if (!touches(l.box, this.viewBox())) continue;
       for (let i = 0; i + 3 < l.pts.length; i += 2) {
         const d = distToPiece(q.x, q.y, this.X(l.pts[i]!), this.Y(l.pts[i + 1]!), this.X(l.pts[i + 2]!), this.Y(l.pts[i + 3]!));
         if (d < 14 && (!route || d < route.d)) route = { d, name: l.name, label: o.label };
       }
     }
-    if (route) return card(route.name || route.label, route.name ? route.label : '');
+    if (route) return { kind: 'card', title: route.name || route.label, sub: route.name ? route.label : '' };
     const X = this.cx + (q.x - this.w / 2) / this.s, Y = this.cy + (q.y - this.h / 2) / this.s;
+    const area = this.areaAt(X, Y);
+    if (area) return { kind: 'area', id: area.area.id, title: area.area.name, sub: area.area.sub, go: area.area.go };
     const park = !this.parksOn() ? undefined : this.map?.parks.find((a) => a.name && X >= a.box[0] && X <= a.box[2] && Y >= a.box[1] && Y <= a.box[3] && inside(X, Y, a.pts));
-    if (park) card(park.name, S.park);
+    return park ? { kind: 'card', title: park.name, sub: S.park } : null;
+  }
+  /** The smallest outline holding a world point, or none. */
+  private areaAt(X: number, Y: number): { area: MapArea; size: number } | undefined {
+    let found: { area: MapArea; size: number } | undefined;
+    for (const a of this.areas) {
+      if (X < a.box[0] || X > a.box[2] || Y < a.box[1] || Y > a.box[3]) continue;
+      // `evenodd` over every ring at once, so Detroit's enclave holes are not part of Detroit.
+      let hit = false;
+      for (const r of a.rings) if (inside(X, Y, r)) hit = !hit;
+      if (hit && (!found || a.size < found.size)) found = { area: a.area, size: a.size };
+    }
+    return found;
+  }
+  private pick(q: { x: number; y: number }): void {
+    const S = this.spec.strings;
+    const card = (title: string, sub: string, go?: string) => this.say(`<div class="mappick"><span><strong>${esc(title)}</strong>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${go ? `<button class="btn ghost" data-go="${esc(go)}">${esc(S.details)}</button>` : ''}</div>`);
+    const hit = this.probe(q);
+    if (hit?.kind === 'glyph') { this.lastGlyph = hit.glyph; return this.choose(hit.sel); }
+    // A tap on the empty map, or on something that is not a route, lets a chosen route go.
+    if (this.sel && hit?.kind !== 'card') this.choose('');
+    if (!hit) return;
+    // A tapped outline stays highlighted, and the highlight lives HERE rather than in the page: telling the page
+    // would redraw it, and a redraw throws the map away — taking the card that was just opened with it.
+    if (hit.kind === 'area') { this.areaSel = hit.id; this.redraw(); return card(hit.title, hit.sub, hit.go); }
+    card(hit.title, hit.sub, hit.go);
+  }
+  /**
+   * The mouse cursor (Kyle, 2026-09-22): a hand over anything a click would open or name, and the grab hand
+   * everywhere else, because everywhere else the map is a thing you drag. The hit test is `probe` — the very
+   * same one the click runs — so the cursor can never promise something a click does not do. Once a frame at
+   * most, and only for a mouse or a pen: a touch screen has no cursor and must pay nothing for this.
+   */
+  private hoverRaf = 0; private hoverAt: { x: number; y: number } | null = null; private hoverNow = '';
+  private hover(q: { x: number; y: number } | null): void {
+    this.hoverAt = q;
+    if (this.hoverRaf) return;
+    this.hoverRaf = requestAnimationFrame(() => {
+      this.hoverRaf = 0;
+      // '' rather than 'grab': an empty inline value hands the canvas back to style.css, which already says
+      // `grab`, and — the point — `grabbing` while a button is held. An inline 'grab' would win over both.
+      const want = this.hoverAt && !this.pointers.size && this.probe(this.hoverAt) ? 'pointer' : '';
+      if (want === this.hoverNow) return;
+      this.hoverNow = want;
+      const style = (this.canvas as Partial<HTMLElement>).style;
+      if (style) style.cursor = want;
+    });
   }
 
   // -- drawing
@@ -807,6 +914,30 @@ export class MapView {
     if (this.spec.outline) {
       c.beginPath(); for (const ring of this.spec.outline) { ring.forEach((q, i) => (i ? c.lineTo(this.X(wx(q.lon)), this.Y(wy(q.lat))) : c.moveTo(this.X(wx(q.lon)), this.Y(wy(q.lat))))); c.closePath(); }
       c.globalAlpha = 0.12; c.fillStyle = col.brand; c.fill(); c.globalAlpha = 1; c.strokeStyle = col.strong; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.stroke(); c.setLineDash([]);
+    }
+    // City and neighbourhood outlines (`place:areas`). A thin line and a name, and — for the one that was
+    // tapped — a wash of the land colour so the tap can be seen. **Never a fill that carries a value**: docs/13
+    // rule 1 forbids a choropleth, and a map that shades an area by a number is a league table with a picture on
+    // it. The line is the same weight whatever the area is, so nothing here says one place is more than another.
+    const areaLabels: { name: string; x: number; y: number }[] = [];
+    if (this.areas.length) {
+      const trace = (rings: Float32Array[]) => { c.beginPath(); for (const r of rings) { this.trace(r); c.closePath(); } };
+      // A neighbourhood is drawn only from the zoom at which its own name fits (audit §3.3); below that, the
+      // four city outlines alone, because 205 dashed outlines at city zoom are a mesh, not a map. The number is
+      // the label rule itself: a name needs about 70 px, and a Detroit neighbourhood is about a kilometre
+      // across, so it earns its outline at 1000/70 ≈ 14 metres per pixel.
+      const detailed = mpp < AREA_DETAIL_MPP;
+      const shown = this.areas.filter((a) => touches(a.box, view) && (detailed || a.area.id.startsWith('city_')));
+      for (const a of shown) {
+        const on = a.area.id === this.areaSel;
+        if (on) { trace(a.rings); c.globalAlpha = 0.08; c.fillStyle = col.brand; c.fill('evenodd'); c.globalAlpha = 1; }
+        // Dashed, so a boundary is never mistaken for a street: the map is full of grey lines and an area edge
+        // is not one of them. The selected one goes solid, heavier and in the focus colour.
+        c.setLineDash(on ? [] : [6, 4]); c.strokeStyle = on ? col.focus : col.muted; c.lineWidth = on ? 3 : 1.6;
+        trace(a.rings); c.stroke(); c.setLineDash([]);
+        const wide = (a.box[2] - a.box[0]) * this.s;
+        if (wide > 70) { const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2); if (x > 0 && x < w && y > 0 && y < h) areaLabels.push({ name: a.area.name, x, y }); }
+      }
     }
     // Transport layers a person switched on (bus routes, the streetcar, bike lanes, stations). They are drawn
     // under the greenway and under the listing dots, so switching a layer on never hides the thing a screen is
@@ -887,6 +1018,16 @@ export class MapView {
       named.push({ n: l.name, x: spot.x, y: spot.y });
       c.save(); c.translate(spot.x, spot.y); c.rotate(spot.a); c.strokeStyle = col.halo; c.lineWidth = 3.5; c.strokeText(l.name, 0, 0); c.fillStyle = col.ink; c.fillText(l.name, 0, 0); c.restore();
     }
+    // An area's name, over its middle. It goes through the same "is there room?" test as every other name, so an
+    // outline never writes over a street name, and it is drawn before the parks so the bigger thing wins.
+    if (areaLabels.length) {
+      c.font = '700 13px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+      for (const a of areaLabels) {
+        const tw = c.measureText(a.name).width;
+        if (!free(a.x, a.y, 0, tw, 13)) continue;
+        c.strokeStyle = col.halo; c.lineWidth = 3.5; c.strokeText(a.name, a.x, a.y); c.fillStyle = col.strong; c.fillText(a.name, a.x, a.y);
+      }
+    }
     if (this.map && mpp < 7 && this.parksOn()) {
       c.font = 'italic 600 12px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
       for (const a of this.map.parks) {
@@ -948,6 +1089,13 @@ export class MapView {
 function distToPiece(x: number, y: number, ax: number, ay: number, bx: number, by: number): number {
   const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy, t = len2 ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / len2)) : 0;
   return Math.hypot(x - ax - t * dx, y - ay - t * dy);
+}
+/** Twice the signed area of a ring, in world units. Used for one thing: when two outlines hold a tap, the
+ *  smaller one is the more specific answer. */
+export function shoelace(pts: Float32Array): number {
+  let a = 0;
+  for (let i = 0, j = pts.length - 2; i + 1 < pts.length; j = i, i += 2) a += pts[j]! * pts[i + 1]! - pts[i]! * pts[j + 1]!;
+  return a / 2;
 }
 export function inside(x: number, y: number, ring: Float32Array): boolean {
   let hit = false;
