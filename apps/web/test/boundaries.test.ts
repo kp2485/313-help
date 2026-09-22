@@ -107,9 +107,9 @@ describe('boundaryStyle: one table, three bands', () => {
 
   it('the whole table, to the digit', () => {
     const CASES = [
-      { mpp: 60, band: 'city', width: 0.9, cityWidth: 1.5, dash: [1, 2], names: false, nameCap: 0 },
-      { mpp: 20, band: 'mid', width: 1.1, cityWidth: 1.8, dash: [2, 3], names: true, nameCap: BOUNDARY_NAME_CAP },
-      { mpp: 6, band: 'near', width: 1.8, cityWidth: 2.6, dash: [5, 3], names: true, nameCap: BOUNDARY_NAME_CAP },
+      { mpp: 60, band: 'city', width: 1.1, cityWidth: 1.5, dash: [2, 2], names: false, nameCap: 0 },
+      { mpp: 20, band: 'mid', width: 1.6, cityWidth: 2.4, dash: [3, 3], names: true, nameCap: BOUNDARY_NAME_CAP },
+      { mpp: 6, band: 'near', width: 2.2, cityWidth: 3, dash: [6, 3], names: true, nameCap: BOUNDARY_NAME_CAP },
     ] as const;
     for (const { mpp, ...want } of CASES) expect(boundaryStyle(mpp), `${mpp} m/px`).toEqual({ ...want, nameMinPx: BOUNDARY_NAME_MIN_PX });
     expect(BOUNDARY_NAME_CAP).toBe(12);
@@ -121,6 +121,8 @@ describe('boundaryStyle: one table, three bands', () => {
       const s = boundaryStyle(mpp);
       expect(s.dash.length, `${mpp} m/px`).toBe(2);
       expect(s.dash.every((d) => d > 0), `${mpp} m/px`).toBe(true);
+      // A dash shorter than the line is wide reads as dust, not as a line: the "on" length is never under the stroke.
+      expect(s.dash[0]!, `${mpp} m/px`).toBeGreaterThanOrEqual(s.width);
     }
     expect(BOUNDARY_TOKEN).toBe('--map-bnd');
     // The one exception is the outline a person tapped: solid, heavier, and in the focus colour.
@@ -129,7 +131,8 @@ describe('boundaryStyle: one table, three bands', () => {
 
   it('at city zoom the line is thinner than the thinnest street the map draws there', () => {
     // map.ts: under 30 m/px only classes 0–2 are drawn, and their width floor is 1.6 px. 205 outlines can only
-    // be a lattice rather than a mesh if each one is lighter than every road it crosses.
+    // be a lattice rather than a mesh if each one is lighter than every road it crosses. This is the one number
+    // the "make it stronger" passes may not simply keep raising.
     expect(boundaryStyle(60).width).toBeLessThan(1.6);
     expect(boundaryStyle(60).cityWidth).toBeLessThan(1.6);
   });
@@ -187,8 +190,8 @@ describe('where a boundary is drawn, and in what order', () => {
       const i = at(log, `strokeStyle=${tokens['--map-bnd']}`);
       expect(i).toBeGreaterThan(-1);
       // The dash is set immediately before the colour, and it is one of the three the table allows.
-      expect(log[i - 1]).toMatch(/^setLineDash\(\[(1,2|2,3|5,3)\]\)$/);
-      expect(log[i + 1]).toMatch(/^lineWidth=(0\.9|1\.5|1\.1|1\.8|2\.6)$/);
+      expect(log[i - 1]).toMatch(/^setLineDash\(\[(2,2|3,3|6,3)\]\)$/);
+      expect(log[i + 1]).toMatch(/^lineWidth=(1\.1|1\.5|1\.6|2\.4|2\.2|3)$/);
     }
     // Both outlines reached the canvas in the far frame: the city AND the neighbourhood inside it. Until today a
     // neighbourhood was not drawn at all above 14 m/px, which is every view the Map tab opens on.

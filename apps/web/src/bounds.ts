@@ -31,7 +31,7 @@ export const boundaryBand = (mpp: number): BoundaryBand => (mpp > BOUNDARY_MID_M
  */
 export const BOUNDARY_TOKEN = '--map-bnd';
 /** The wash and the heavier solid stroke on the one outline that was tapped keep the colours they had. */
-export const BOUNDARY_SELECTED_TOKEN = '--focus', BOUNDARY_WASH_TOKEN = '--brand', BOUNDARY_WASH_ALPHA = 0.08, BOUNDARY_SELECTED_WIDTH = 3;
+export const BOUNDARY_SELECTED_TOKEN = '--focus', BOUNDARY_WASH_TOKEN = '--brand', BOUNDARY_WASH_ALPHA = 0.08, BOUNDARY_SELECTED_WIDTH = 4;
 
 export interface BoundaryStyle {
   band: BoundaryBand;
@@ -61,27 +61,31 @@ export const BOUNDARY_NAME_CAP = 12, BOUNDARY_NAME_MIN_PX = 70;
  *
  * | band | m/px | neighbourhood | city | dash | names |
  * |---|---|---|---|---|---|
- * | `city` | > 30 | 0.9 | 1.5 | 1 on, 2 off | no |
- * | `mid` | 12–30 | 1.1 | 1.8 | 2 on, 3 off | yes, ≤ 12 |
- * | `near` | < 12 | 1.8 | 2.6 | 5 on, 3 off | yes, ≤ 12 |
+ * | `city` | > 30 | 1.1 | 1.5 | 2 on, 2 off | no |
+ * | `mid` | 12–30 | 1.6 | 2.4 | 3 on, 3 off | yes, ≤ 12 |
+ * | `near` | < 12 | 2.2 | 3.0 | 6 on, 3 off | yes, ≤ 12 |
  *
  * Why these numbers:
  *
- * - **0.9 px at city zoom is thinner than the thinnest street on the screen.** At that zoom the map draws
+ * - **1.1 px at city zoom is still thinner than the thinnest street on the screen.** At that zoom the map draws
  *   classes 0–2 only, whose floor is 1.6 px (`map.ts`), so a boundary can never be mistaken for a road, and 205
- *   of them read as a faint lattice over the city rather than as a mesh. The old rule drew none of them at all
- *   below 14 m/px, which is why a person who opened the Map tab saw no neighbourhoods. (The first draft was 0.6
- *   with a 1-on-3-off dot; on a real city-wide frame, over the help dots, it was not a line anyone could see.
- *   0.9 on 1-on-2-off is still under every street and is a line.)
- * - **The dash gets longer, not just thicker, as you come in.** A 1-on-2-off dot is a texture; a 5-on-3-off dash
- *   is a line with gaps, which is what an edge you are about to walk to should look like. Colour never carries
- *   the meaning alone (WCAG 1.4.1): the dash and the name do it too, and the list under the map says it in words.
+ *   of them read as a lattice over the city rather than as a mesh. The old rule drew none of them at all below
+ *   14 m/px, which is why a person who opened the Map tab saw no neighbourhoods.
+ * - **Twice strengthened, from looking at the picture, not at the table.** The first draft was 0.6 on a
+ *   1-on-3-off dot; on a real city-wide frame, over the help dots, it was not a line anyone could see. The
+ *   second (0.9 / 1.1 / 1.8 on 1-2, 2-3, 5-3) was still faint at mid zoom beside the streets — and the whole
+ *   ask was that a person can SEE the boundary. These are the numbers that survived the screenshots.
+ * - **The dash gets longer, not just thicker, as you come in.** A 2-on-2-off dot is a texture; a 6-on-3-off dash
+ *   is a line with gaps, which is what an edge you are about to walk to should look like. A dash shorter than it
+ *   is wide reads as dust rather than as a line, which is why the "on" length grows with the stroke. Colour
+ *   never carries the meaning alone (WCAG 1.4.1): the dash and the name do it too, and the list under the map
+ *   says it in words.
  * - **No names in the city band.** 205 names at 70 px apiece do not fit, and a name that is dropped for want of
  *   room is worse than a band that never promised one.
  */
 export function boundaryStyle(mpp: number): BoundaryStyle {
   const band = boundaryBand(mpp);
-  if (band === 'city') return { band, width: 0.9, cityWidth: 1.5, dash: [1, 2], names: false, nameCap: 0, nameMinPx: BOUNDARY_NAME_MIN_PX };
-  if (band === 'mid') return { band, width: 1.1, cityWidth: 1.8, dash: [2, 3], names: true, nameCap: BOUNDARY_NAME_CAP, nameMinPx: BOUNDARY_NAME_MIN_PX };
-  return { band, width: 1.8, cityWidth: 2.6, dash: [5, 3], names: true, nameCap: BOUNDARY_NAME_CAP, nameMinPx: BOUNDARY_NAME_MIN_PX };
+  if (band === 'city') return { band, width: 1.1, cityWidth: 1.5, dash: [2, 2], names: false, nameCap: 0, nameMinPx: BOUNDARY_NAME_MIN_PX };
+  if (band === 'mid') return { band, width: 1.6, cityWidth: 2.4, dash: [3, 3], names: true, nameCap: BOUNDARY_NAME_CAP, nameMinPx: BOUNDARY_NAME_MIN_PX };
+  return { band, width: 2.2, cityWidth: 3, dash: [6, 3], names: true, nameCap: BOUNDARY_NAME_CAP, nameMinPx: BOUNDARY_NAME_MIN_PX };
 }

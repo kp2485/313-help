@@ -21,10 +21,12 @@
      own lines clear 3:1 instead (DECISIONS 2026-09-20). */
   --map-out:#e2e9e4; --map-out-ink:#768079; --map-land:#f7f9f6; --map-park:#c4e3c9; --map-park-ink:#1d5a31; --map-road:#747d77; --map-main:#666f69; --map-fwy:#926c16; --map-ink:#2b3a32;
   /* Neighbourhood and city boundaries (bounds.ts; Kyle, 2026-09-22). Deliberately NOT a street colour: the roads
-     are all within a step of each other in grey-green and an administrative edge is not one of them. A muted plum
-     clears 3:1 against the land (4.26), a park (3.26) and the ground outside the four cities (3.65) — 5.13 / 3.73
-     / 6.00 in the dark theme — while the hairline width and the dotted dash keep it quiet under the help. */
-  --map-bnd:#8d6a9a;
+     are all within a step of each other in grey-green and an administrative edge is not one of them. A plum that
+     clears 3:1 against the land (5.70), a park (4.36) and the ground outside the four cities (4.88) — 5.77 / 4.20
+     / 6.75 in the dark theme — while the thin stroke and the dash keep it quiet under the help. It sits about
+     where a main road sits against the land (4.91) on purpose: one notch paler than that and, at mid zoom over
+     the help dots, it was not a line anyone could see (screenshots, 2026-09-22). */
+  --map-bnd:#7a5588;
   /* The greenway is drawn like a transit line: one width, a casing, a colour and a dash per phase. */
   --gw-open:#0b6b43; --gw-build:#c2701a; --gw-fund:#2f6f9e; --gw-plan:#7d8c84; --gw-case:#ffffff;
   /* One chosen trip, drawn on the Directions screen (DECISIONS 2026-09-22). A walking leg is solid in its own
@@ -53,7 +55,7 @@
   --brand:#4fcf93; --brand-ink:#04140c; --brand-strong:#86e6b6; --brand-soft:#15311f; --brand-soft-ink:#a6ebc8;
   --warn-bg:#33270a; --warn-ink:#ffd98a; --danger:#e26a6a; --danger-ink:#1a0505; --focus:#8ab8ff; --shadow:none;
   --map-out:#060b09; --map-out-ink:#76827a; --map-land:#141f19; --map-park:#1c3b27; --map-park-ink:#9fdcb4; --map-road:#75827a; --map-main:#88968d; --map-fwy:#a3863a; --map-ink:#d5e2da;
-  --map-bnd:#9f83b1;
+  --map-bnd:#a98cbb;
   --gw-open:#4fcf93; --gw-build:#e3974a; --gw-fund:#6aa9d6; --gw-plan:#8ea79a; --gw-case:#0a110e;
   --route-walk:#ff8ad4; --route-ride:#73c2ff;
   --lyr-bus:#7aa7ff; --lyr-smart:#4fd1c5; --lyr-rail:#c79bff; --lyr-bike:#fb923c;
@@ -341,7 +343,7 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
 .trkey i.dpm { height:.5rem; background:var(--tr-dpm); } .trkey i.dpm::after { content:"\203A\2002\203A\2002\203A"; position:absolute; inset:0; display:grid; place-items:center; font:700 .625rem/1 system-ui,sans-serif; color:var(--tr-fill); direction:ltr; unicode-bidi:isolate; }
 .trkey i.bike { height:.3125rem; border-radius:0; background:none; border-block:1.5px solid var(--tr-bike); }
 /* The boundary sample: the dotted hairline the map draws, at the weight the mid band uses. */
-.trkey i.bnd { height:.125rem; border-radius:0; background:repeating-linear-gradient(90deg,var(--map-bnd) 0 .1875rem,transparent .1875rem .375rem); }
+.trkey i.bnd { height:.125rem; border-radius:0; background:repeating-linear-gradient(90deg,var(--map-bnd) 0 .25rem,transparent .25rem .5rem); }
 /* A route named on a map card is a button that chooses it: 44 px tall, Latin names left to right in every language. */
 .mappick.route { align-items:flex-start; } .routebtns { display:flex; flex-wrap:wrap; gap:.375rem; width:100%; } .routebtns .chip { min-height:2.75rem; }
 .maplist { margin-top:.25rem; } .maplistbody { margin-top:.875rem; } .maplistbody h3 { margin-top:1.25rem; } .maplistbody h3:first-child { margin-top:0; }

@@ -144,10 +144,10 @@ One tab replaces Recreation and Transit. Top to bottom:
      and **on by default** (Kyle, 2026-09-22: "The user needs to be able to see the boundaries of the
      neighborhoods on the map"). A dotted line in a colour of its own (`--map-bnd`, never a street colour), at
      a weight and a dash that come from one shared table — `boundaryStyle` in `apps/web/src/bounds.ts`,
-     **docs/MAP-STYLE.md section 15**, which is what the iPhone and Android ports implement: a 0.9 px hairline
-     with no names at city zoom, 1.1 px with the names that fit (at most 12 a frame) from 30 m per pixel, 1.8 px
-     with names under 12; a city outline is drawn a touch heavier than a neighborhood's, and the one that was
-     tapped goes solid in the focus colour with a light wash. Boundaries draw **under the listing dots, the
+     **docs/MAP-STYLE.md section 15**, which is what the iPhone and Android ports implement: 1.1 px with no
+     names at city zoom, 1.6 px with the names that fit (at most 12 a frame) from 30 m per pixel, 2.2 px with
+     names under 12, the dash lengthening with the stroke; a city outline is drawn a step heavier than a
+     neighborhood's, and the one that was tapped goes solid in the focus colour with a light wash. Boundaries draw **under the listing dots, the
      transit lines and the greenway and over the streets and the parks**, so switching them on never hides the
      help. **Never a fill that carries a value**: docs/13's first honesty rule forbids a choropleth, so an
      outline may be drawn and named and never shaded by a number. The layer is handed no listing at all, so no
