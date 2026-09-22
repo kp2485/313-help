@@ -2,8 +2,9 @@
 // the user the option on page to switch between a table and chart view for relevant data").
 //
 // **Lines on one chart, since later the same day.** Kyle, after looking at the first bars: he wants "Homes sold"
-// and "Building permits" on the SAME chart with the two selectable, and a year whose count is hidden to be VISIBLE
-// rather than dropped.
+// and "Building permits" on the SAME chart with the two selectable. **And every number exact, since later still**
+// (Kyle: "I want exact numbers"; DECISIONS 2026-09-22): there is no hidden count in the dataset any more, so there
+// is no marker for one — a year has a value or has nothing recorded.
 //
 // This is the Swift half of `apps/web/src/hoodchart.ts`, and, like the rest of HelpCore, it is a port rather than a
 // rewrite: the same arithmetic, the same axis, the same wording, held to the same cases in HoodChartTests. It draws
@@ -12,17 +13,14 @@
 // The rules docs/13 sets, and how each survives being drawn:
 //
 //  1. **No ranking, no comparison with another neighborhood.** A chart holds ONE neighborhood's own years. There is
-//     no whole-city line, no trend line, and no colour that means good or bad: two colours are two identities
-//     (homes sold, permits), never two ends of a scale. ONE y-axis, never two.
-//  2. **A hidden count is never drawn at a value.** `lt5` — which since 2026-09-22 means blight tickets,
-//     demolitions, reported problems and fires, but no longer home sales or building permits (DECISIONS) — becomes
-//     a HOLLOW marker at a fixed height, so the year is visibly there and its number is visibly not.
-//     `markerFraction` is the only thing that turns a hidden count into geometry. The line goes on through it as a
-//     dotted piece, so a hidden year is never a gap that reads as zero.
-//  3. **The axis never labels a value under 5 as if it were exact**: `ticks` holds 0 and then nothing below 5, and
-//     a marker always sits below the first tick over zero.
-//  4. **The table is the source of truth.** The chart is another VIEW of the same rows; the table is still on the
+//     no whole-city line, no trend line, and no colour that means good or bad: the colours are identities (homes
+//     sold, permits; walking, biking, badly hurt), never ends of a scale. ONE y-axis, never two — a series in a
+//     different UNIT (days to close) gets a chart of its own.
+//  2. **A year with nothing recorded is a break in the line, never a zero.**
+//  3. **The table is the source of truth.** The chart is another VIEW of the same rows; the table is still on the
 //     screen for VoiceOver either way (HelpApp/HoodsScreen.swift).
+//  4. **Three ways to tell lines apart, at once**: colour, point shape (circle, diamond, square) and line pattern
+//     (solid, dashed, dash-dot). Never more than three series on one chart.
 import Foundation
 
 /// Which way a neighborhood's year panels are drawn. **Table is the default**, on every platform.
@@ -37,7 +35,7 @@ public enum HoodChart {
 
     // MARK: - what goes in
 
-    /// One year of one series, exactly as the bundle gives it: a number, the hidden `lt5`, or nothing recorded.
+    /// One year of one series, exactly as the bundle gives it: a number, or nothing recorded.
     public struct Point: Equatable, Sendable, Identifiable {
         public var year: String
         public var count: HoodCount?
@@ -48,8 +46,10 @@ public enum HoodChart {
         }
     }
 
-    /// Which of the two identities a series wears: a colour, a marker shape and a line pattern, all three.
-    public enum Tone: String, Sendable, Equatable { case a, b }
+    /// Which identity a series wears: a colour, a marker shape and a line pattern, all three. At most three.
+    public enum Tone: String, Sendable, Equatable { case a, b, c }
+    /// What the numbers are: a count of things, or a number of days. A chart holds ONE unit (rule 1).
+    public enum Unit: String, Sendable, Equatable { case count, days }
 
     /// One series before it is measured against the others. `key` is what a checkbox switches.
     public struct Series: Equatable, Sendable, Identifiable {
@@ -57,15 +57,16 @@ public enum HoodChart {
         public var tone: Tone
         public var label: String
         public var points: [Point]
+        public var unit: Unit
         public var id: String { key }
-        public init(key: String, tone: Tone, label: String, points: [Point]) {
-            self.key = key; self.tone = tone; self.label = label; self.points = points
+        public init(key: String, tone: Tone, label: String, points: [Point], unit: Unit = .count) {
+            self.key = key; self.tone = tone; self.label = label; self.points = points; self.unit = unit
         }
     }
 
     // MARK: - what comes out
 
-    public enum Kind: String, Sendable, Equatable { case value, hidden, none }
+    public enum Kind: String, Sendable, Equatable { case value, none }
 
     /// A year of a series, placed. `frac` is its height as a share of the top of the axis, 0 to 1.
     public struct PlotPoint: Equatable, Sendable, Identifiable {
@@ -73,18 +74,16 @@ public enum HoodChart {
         public var index: Int
         public var partial: Bool
         public var kind: Kind
-        /// The number, when there is one to show. Never set for a hidden year — that is the point of it.
+        /// The number, when there is one to show.
         public var value: Int?
-        /// For a hidden year it is `markerFraction`, a constant chosen by nothing in the data.
         public var frac: Double
         public var id: String { year }
     }
 
-    /// A piece of the line between two neighbouring years. `dotted` where one of its ends is a hidden count.
+    /// A piece of the line between two neighbouring years.
     public struct Segment: Equatable, Sendable, Identifiable {
         public var from: Int
         public var to: Int
-        public var dotted: Bool
         public var id: Int { from }
     }
 
@@ -94,8 +93,6 @@ public enum HoodChart {
         public var label: String
         public var points: [PlotPoint]
         public var segments: [Segment]
-        /// The years the pipeline hid. A hollow marker each — never a value.
-        public var markers: [String]
         /// The years with nothing recorded at all: a place on the axis, no marker, and a break in the line.
         public var blanks: [String]
         /// The tallest year, for the summary sentence; `nil` when there is nothing to draw.
@@ -104,7 +101,7 @@ public enum HoodChart {
 
         public static func == (l: SeriesModel, r: SeriesModel) -> Bool {
             l.key == r.key && l.tone == r.tone && l.label == r.label && l.points == r.points
-                && l.segments == r.segments && l.markers == r.markers && l.blanks == r.blanks
+                && l.segments == r.segments && l.blanks == r.blanks
                 && l.peak?.year == r.peak?.year && l.peak?.value == r.peak?.value
         }
     }
@@ -112,19 +109,12 @@ public enum HoodChart {
     public struct Model: Equatable, Sendable {
         public var years: [String]
         public var series: [SeriesModel]
-        /// The top of the axis. At least 5, so the drawn area never implies a scale finer than suppression.
+        /// The top of the axis: the first round number at or above the tallest value, never under 1.
         public var top: Int
-        /// 0, then every labelled value. Never 1 to 4 (rule 3).
+        /// 0, then every labelled value, ending at `top`.
         public var ticks: [Int]
+        public var unit: Unit
     }
-
-    /**
-     How high a hidden year's marker sits, as a share of the plot: a CONSTANT — ten of the web's ninety-six drawing
-     units — and the same on all three apps, so nothing about the marker comes from the count it stands for. It is
-     always below the first tick over zero, because the axis step is at least a quarter of the top.
-     */
-    public static let markerFraction = 10.0 / 96.0
-    public static func markerValue(top: Int) -> Double { Double(top) * markerFraction }
 
     // MARK: - the model
 
@@ -147,10 +137,10 @@ public enum HoodChart {
         let years = series.first?.points.map(\.year) ?? []
         let max = series.flatMap { $0.points.compactMap { $0.count?.shown } }.max() ?? 0
         let step = axisStep(Swift.max(max, 1))
-        let top = Swift.max(5, ((max + step - 1) / step) * step)
+        let top = Swift.max(1, ((max + step - 1) / step) * step)
         var ticks: [Int] = []
         var t = 0
-        while t <= top { if t == 0 || t >= 5 { ticks.append(t) }; t += step }
+        while t <= top { ticks.append(t); t += step }
         if ticks.last != top { ticks.append(top) }
 
         return Model(years: years, series: series.map { s in
@@ -159,37 +149,41 @@ public enum HoodChart {
                     return PlotPoint(year: p.year, index: index, partial: p.partial, kind: .value, value: n,
                                      frac: Double(n) / Double(top))
                 }
-                if p.count == .suppressed {
-                    return PlotPoint(year: p.year, index: index, partial: p.partial, kind: .hidden, value: nil,
-                                     frac: markerFraction)
-                }
                 return PlotPoint(year: p.year, index: index, partial: p.partial, kind: .none, value: nil, frac: 0)
             }
-            // The line runs between two neighbouring years whenever both have something. A year with nothing
+            // The line runs between two neighbouring years whenever both have a value. A year with nothing
             // recorded breaks it, because joining across one would draw a number nobody counted.
             var segments: [Segment] = []
-            for i in 0..<Swift.max(0, points.count - 1) {
-                let a = points[i], b = points[i + 1]
-                if a.kind == .none || b.kind == .none { continue }
-                segments.append(Segment(from: i, to: i + 1, dotted: a.kind == .hidden || b.kind == .hidden))
+            for i in 0..<Swift.max(0, points.count - 1) where points[i].kind == .value && points[i + 1].kind == .value {
+                segments.append(Segment(from: i, to: i + 1))
             }
             let values = points.filter { $0.kind == .value }
             return SeriesModel(
                 key: s.key, tone: s.tone, label: s.label, points: points, segments: segments,
-                markers: points.filter { $0.kind == .hidden }.map(\.year),
                 blanks: points.filter { $0.kind == .none }.map(\.year),
                 // The tallest year, and the EARLIEST of them when two are equal, so one bundle says one year.
                 peak: values.reduce(nil) { best, p in
                     (best.map { $0.value >= (p.value ?? 0) } ?? false) ? best : (year: p.year, value: p.value ?? 0)
                 }
             )
-        }, top: top, ticks: ticks)
+        }, top: top, ticks: ticks, unit: series.first?.unit ?? .count)
     }
 
-    /// Whether a series is worth offering a chart of at all: three years with something in them, and at least one
-    /// of those a number there is a point to draw. Two points is a line between two dots.
+    /// Whether a series is worth offering a chart of at all: three years with a number in them. Two points is a
+    /// line between two dots.
     public static func chartable(_ points: [Point]) -> Bool {
-        points.filter { $0.count != nil }.count >= 3 && points.contains { $0.count?.shown != nil }
+        points.filter { $0.count?.shown != nil }.count >= 3
+    }
+
+    /// Whether a series has anything at all: one year with a number. Otherwise the panel says the City has not
+    /// published it for this neighborhood, instead of a table of "none recorded".
+    public static func anyValue(_ points: [Point]) -> Bool {
+        points.contains { $0.count?.shown != nil }
+    }
+
+    /// A value in the chart's unit, as words: "14", or "12 days".
+    public static func valueText(_ n: Int, unit: Unit, words: (String, [String: String]) -> String) -> String {
+        unit == .days ? words("hood.days", ["n": HoodFormat.number(Double(n))]) : HoodFormat.grouped(Double(n))
     }
 
     /// Which series are drawn, given what has been switched off. **Never nothing**: the last one left on cannot be
@@ -221,33 +215,49 @@ public enum HoodChart {
         }
     }
 
+    /// The days to close, which the file carries as a decimal median, as a whole number of days.
+    public static func daysSeries(_ h: Hood, _ d: Indicators) -> [Point] {
+        d.years.map { y in
+            Point(year: y, count: (h.years[y] ?? HoodYear()).issueDays.map { .number(Int($0.rounded())) },
+                  partial: Int(y) == d.partialYear)
+        }
+    }
+
+    /// The three crash series of one place, year by year (oldest first), from its `crashes_by_year`. Empty when the
+    /// bundle carries the window only.
+    public static func crashSeries(_ byYear: [String: HoodCrashes]?, labels: (walk: String, bike: String, severe: String)) -> [Series] {
+        guard let byYear, !byYear.isEmpty else { return [] }
+        let years = byYear.keys.sorted()
+        func pts(_ pick: (HoodCrashes) -> HoodCount) -> [Point] { years.map { Point(year: $0, count: byYear[$0].map(pick)) } }
+        return [Series(key: "walk", tone: .a, label: labels.walk, points: pts { $0.walk }),
+                Series(key: "bike", tone: .b, label: labels.bike, points: pts { $0.bike }),
+                Series(key: "severe", tone: .c, label: labels.severe, points: pts { $0.severe })]
+    }
+
     // MARK: - the words
 
-    /// What one point says on its own: "2023, Homes sold: 14", "2021, Torn down: fewer than 5". The sentences are
-    /// the app's own, handed in, exactly as `HoodFormat.count` takes them.
-    public static func pointText(_ p: PlotPoint, label: String, words: (String, [String: String]) -> String) -> String {
+    /// What one point says on its own: "2023, Homes sold: 14", "2021, Time to close: 12 days". The sentences are
+    /// the app's own, handed in.
+    public static func pointText(_ p: PlotPoint, label: String, unit: Unit = .count, words: (String, [String: String]) -> String) -> String {
         let year = p.partial ? words("hood.so_far", ["year": p.year]) : p.year
         let count: String
         switch p.kind {
-        case .value: count = HoodFormat.grouped(Double(p.value ?? 0))
-        case .hidden: count = words("hood.lt5", [:])
+        case .value: count = valueText(p.value ?? 0, unit: unit, words: words)
         case .none: count = words("hood.none_recorded", [:])
         }
         return words("hood.chart_bar", ["year": year, "label": label, "count": count])
     }
 
-    /// The sentence under the picture: what is drawn, over which years, the biggest year of each series, and — only
-    /// when there is one — that some years are hidden and are NOT drawn at a value. A fact about this
-    /// neighborhood's own years, never a trend: these numbers describe and do not explain (docs/13, rule 4).
+    /// The sentence under the picture: what is drawn, over which years, and the biggest year of each series. A
+    /// fact about this neighborhood's own years, never a trend: these numbers describe and do not explain
+    /// (docs/13, rule 4).
     public static func summary(_ m: Model, words: (String, [String: String]) -> String) -> String {
         let most = m.series.map { s -> String in
             guard let peak = s.peak else { return words("hood.chart_peak_none", ["label": s.label]) }
             return words("hood.chart_peak", ["label": s.label,
-                                             "count": HoodFormat.grouped(Double(peak.value)),
+                                             "count": valueText(peak.value, unit: m.unit, words: words),
                                              "year": peak.year])
         }.joined(separator: words("list.sep", [:]))
-        let line = words("hood.chart_summary", ["from": m.years.first ?? "", "to": m.years.last ?? "", "most": most])
-        guard m.series.contains(where: { !$0.markers.isEmpty }) else { return line }
-        return line + " " + words("hood.chart_lt5_note", [:])
+        return words("hood.chart_summary", ["from": m.years.first ?? "", "to": m.years.last ?? "", "most": most])
     }
 }

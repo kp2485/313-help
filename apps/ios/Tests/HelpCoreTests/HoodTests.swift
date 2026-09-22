@@ -73,7 +73,7 @@ final class HoodTests: XCTestCase {
         for i in scrambled.indices {
             scrambled[i].help.total = scrambled.count - i
             scrambled[i].parcels = (i * 7919) % 50_000
-            scrambled[i].crashes = HoodCrashes(walk: .number(i), bike: .suppressed, severe: .number(1000 - i))
+            scrambled[i].crashes = HoodCrashes(walk: .number(i), bike: .number(2), severe: .number(1000 - i))
             scrambled[i].years = [:]
             scrambled[i].now = nil
             scrambled[i].places = HoodPlaces(parks: i, recCenters: i, greenwayOpen: i, snapStores: i, busStops: i)
@@ -204,15 +204,30 @@ final class HoodTests: XCTestCase {
 
     // MARK: - the numbers, as they are written
 
-    func testACountUnderFiveIsWordsAndNeverADigit() {
-        let words = HoodFormat.count(.suppressed, none: "none recorded", fewerThanFive: "fewer than 5")
-        XCTAssertEqual(words, "fewer than 5")
-        XCTAssertNil(HoodCount.suppressed.shown, "a hidden count has no number to print")
-        XCTAssertEqual(HoodFormat.count(nil, none: "none recorded", fewerThanFive: "fewer than 5"), "none recorded")
+    func testACountIsTheExactNumberAndAMissingOneIsWords() throws {
+        XCTAssertEqual(HoodFormat.count(.number(3), none: "none recorded"), "3")
+        XCTAssertEqual(HoodFormat.count(.number(0), none: "none recorded"), "0")
+        XCTAssertEqual(HoodFormat.count(nil, none: "none recorded"), "none recorded")
         // A year table writes a count plainly, as the web's `String(c)` does; the crash panel groups it, as the
         // web's `Intl.NumberFormat` does.
-        XCTAssertEqual(HoodFormat.count(.number(1078), none: "x", fewerThanFive: "y"), "1078")
-        XCTAssertEqual(HoodFormat.count(.number(2024), none: "x", fewerThanFive: "y", grouped: true), "2,024")
+        XCTAssertEqual(HoodFormat.count(.number(1078), none: "x"), "1078")
+        XCTAssertEqual(HoodFormat.count(.number(2024), none: "x", grouped: true), "2,024")
+        // "lt5" is not a count any more: on its own it does not decode, and inside a year (a file built before
+        // 2026-09-22) it reads as nothing recorded, so an older list still draws every number it does have.
+        XCTAssertThrowsError(try JSONDecoder().decode(HoodCount.self, from: Data("\"lt5\"".utf8)))
+        XCTAssertEqual(try JSONDecoder().decode(HoodCount.self, from: Data("4".utf8)), .number(4))
+        let old = try JSONDecoder().decode(HoodYear.self, from: Data(#"{"sales":3,"fires":"lt5","issue_days":8}"#.utf8))
+        XCTAssertEqual(old.sales, .number(3)); XCTAssertNil(old.fires); XCTAssertEqual(old.issueDays, 8)
+    }
+
+    func testTheLatestYearIsTheLatestWithANumberInAnyConditionsSeries() throws {
+        let d = try realIndicators()
+        var h = try XCTUnwrap(d.neighborhoods.first)
+        h.years = ["2020": { var y = HoodYear(); y.blight = .number(3); return y }(), "2021": HoodYear(), "2022": { var y = HoodYear(); y.sales = .number(4); return y }()]
+        let fields: [(HoodYear) -> Bool] = [{ $0.blight != nil }, { $0.demolitions != nil }, { $0.issues != nil }, { $0.fires != nil }]
+        XCTAssertEqual(HoodFormat.latestYear(h, d, fields: fields), "2020")
+        h.years = [:]
+        XCTAssertNil(HoodFormat.latestYear(h, d, fields: fields))
     }
 
     /**
@@ -294,7 +309,7 @@ final class HoodTests: XCTestCase {
 
     func testARateNeedsACountWeCanShowAndABaseWeCanDefend() {
         XCTAssertEqual(HoodFormat.rate(.number(1078), parcels: 10_244)!, 105.23, accuracy: 0.01)
-        XCTAssertNil(HoodFormat.rate(.suppressed, parcels: 10_244), "a hidden count has no rate")
+        XCTAssertEqual(HoodFormat.rate(.number(3), parcels: 10_244)!, 0.29, accuracy: 0.01, "a small count has its rate")
         XCTAssertNil(HoodFormat.rate(.number(3), parcels: 99), "fewer than a hundred lots is not a base")
         XCTAssertNil(HoodFormat.rate(.number(3), parcels: nil))
         XCTAssertNil(HoodFormat.rate(nil, parcels: 10_244))
@@ -321,16 +336,21 @@ final class HoodTests: XCTestCase {
         // Every id is an `nbh_` slug, exactly once (CLAUDE.md: ids are stable slugs and are never reused).
         XCTAssertTrue(d.neighborhoods.allSatisfy { $0.id.hasPrefix("nbh_") })
         XCTAssertEqual(Set(d.neighborhoods.map(\.id)).count, d.neighborhoods.count)
-        // Home sales and building permits state their real count, however small (Kyle, 2026-09-22 — DECISIONS):
-        // both are public transaction records, and hiding a 3 protected nobody. A hidden count is still in the
-        // file for the series that count what people did to a place rather than what they bought, so the
-        // suppression path is exercised by the real file either way.
-        XCTAssertFalse(d.neighborhoods.contains { h in h.years.values.contains { $0.sales == .suppressed || $0.permits == .suppressed } },
-                       "sales and permits no longer hide a small count")
+        // Every count states its real number, however small (Kyle, 2026-09-22 — DECISIONS): a 3 is a 3, and a
+        // crash count is a number too. The file decodes at all only because no "lt5" is left in it.
         XCTAssertTrue(d.neighborhoods.contains { h in h.years.values.contains { ($0.sales?.shown ?? 9) < 5 } },
-                      "and a small one really is stated")
-        XCTAssertTrue(d.neighborhoods.contains { h in h.years.values.contains { $0.demolitions == .suppressed || $0.blight == .suppressed } },
-                      "the real file still carries suppressed counts elsewhere")
+                      "a small sale count really is stated")
+        XCTAssertTrue(d.neighborhoods.contains { h in h.years.values.contains { ($0.fires?.shown ?? 9) < 5 } },
+                      "a small fire count really is stated")
+        XCTAssertTrue(d.neighborhoods.contains { h in (h.crashes?.bike.shown ?? 9) < 5 }, "a small crash count really is stated")
+        // The crash years are there, and each window is the sum of its years.
+        for h in d.neighborhoods {
+            guard let c = h.crashes else { continue }
+            let by = try XCTUnwrap(h.crashesByYear, h.id)
+            XCTAssertEqual(by.values.reduce(0) { $0 + ($1.walk.shown ?? 0) }, c.walk.shown, h.id)
+            XCTAssertEqual(by.values.reduce(0) { $0 + ($1.severe.shown ?? 0) }, c.severe.shown, h.id)
+        }
+        XCTAssertEqual(d.cityCrashesByYear?.keys.sorted(), ["2020", "2021", "2022", "2023", "2024"])
     }
 
     /// The bundle's copy carries the outlines, so every one of the 205 can be drawn and searched. It is not

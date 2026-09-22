@@ -9,8 +9,9 @@
 //
 //   - **No league table.** Lists are alphabetical, or grouped by council district and alphabetical inside that.
 //     Nothing here can sort by a number, and [hoodsAtoZ] and [hoodsByDistrict] are given the names only.
-//   - **Small counts arrive already hidden.** The pipeline writes "lt5"; this file has no way to turn that back
-//     into a number, and [HoodCount.hidden] is rendered as words ("fewer than 5"), never as a digit.
+//   - **Every count is the real number, however small** (Kyle, 2026-09-22 — DECISIONS). Nothing in the file is
+//     hidden, crashes included, and nothing here hides it: a 3 is a 3. A value an older file hid (`"lt5"`) reads
+//     as nothing recorded, so an older list still draws every number it does have.
 //   - **A rate needs a base we can defend** — at least 100 lots, or there is no rate ([hoodRate]).
 //   - **Every number says where it came from and when** ([Indicators.sources]).
 //   - **"None listed yet" describes our list, not the place.**
@@ -25,36 +26,22 @@ import java.util.Locale
 // ---- what the bundle publishes ----------------------------------------------------------------------------------
 
 /**
- * A count as the bundle publishes it.
- *
- * Three states, and they are three different sentences: a number, **hidden** (the pipeline wrote `lt5`, because a
- * count under 5 in a small place swings wildly and can identify a block), or absent altogether — "none recorded",
- * which is not the same as "fewer than 5" and is never written as one.
- *
- * There is deliberately no way back from [HIDDEN] to a number. docs/13 and CLAUDE.md both hold aggregates to it:
- * a suppressed cell that can be recovered by subtraction is not suppressed.
+ * A count as the bundle publishes it: a whole number, exactly as the City's server returned it. Since 2026-09-22
+ * there is no hidden value in the file at all; the type stays so that every field that is a count says so.
+ * Absent altogether is "none recorded", which is a different sentence from any number.
  */
-class HoodCount private constructor(val value: Int?) {
-
-    /** True for `lt5`: a real count the bundle refuses to state. */
-    val hidden: Boolean get() = value == null
+class HoodCount private constructor(val value: Int) {
 
     override fun equals(other: Any?): Boolean = other is HoodCount && other.value == value
-    override fun hashCode(): Int = value ?: -1
-    override fun toString(): String = value?.toString() ?: "lt5"
+    override fun hashCode(): Int = value
+    override fun toString(): String = value.toString()
 
     companion object {
-        val HIDDEN = HoodCount(null)
-
         fun of(n: Int): HoodCount = HoodCount(n)
 
-        /** null when the field is not there at all. Anything that is neither a number nor `"lt5"` is also null. */
-        fun fromJson(j: Json?): HoodCount? = when {
-            j == null -> null
-            j.str == "lt5" -> HIDDEN
-            j.int != null -> HoodCount(j.int)
-            else -> null
-        }
+        /** null when the field is not there at all — or is not a number: the `"lt5"` of a file built before
+         *  2026-09-22 reads as nothing recorded, so an older list on a phone still draws what it does have. */
+        fun fromJson(j: Json?): HoodCount? = j?.int?.let { HoodCount(it) }
     }
 }
 
@@ -111,13 +98,19 @@ class HoodNow(val rentalCerts: HoodCount?, val vacantReg: HoodCount?, val roads:
 
 /**
  * "Safe streets" (docs/13): crashes the police wrote up that involved someone walking or biking, over the years the
- * panel names. Plain counts, hidden under 5. **Never a rate** — docs/13 defines no denominator here.
+ * panel names. Exact counts. **Never a rate** — docs/13 defines no denominator here.
  */
 class HoodCrashes(val walk: HoodCount?, val bike: HoodCount?, val severe: HoodCount?) {
     companion object {
         fun fromJson(j: Json?): HoodCrashes? = if (j == null) null else HoodCrashes(
             HoodCount.fromJson(j["walk"]), HoodCount.fromJson(j["bike"]), HoodCount.fromJson(j["severe"]),
         )
+        /** The same three counts for each year of the window (`crashes_by_year`, 2026-09-22), oldest first. */
+        fun byYear(j: Json?): Map<String, HoodCrashes> {
+            val out = LinkedHashMap<String, HoodCrashes>()
+            for (k in (j?.obj?.keys ?: emptySet()).sorted()) fromJson(j!![k])?.let { out[k] = it }
+            return out
+        }
     }
 }
 
@@ -213,6 +206,9 @@ class Hood(
     val years: Map<String, HoodYear>,
     val now: HoodNow?,
     val crashes: HoodCrashes?,
+    /** The same three counts for each year of the window. Empty for a bundle built before 2026-09-22, and the
+     *  panel then draws the totals and no chart. */
+    val crashesByYear: Map<String, HoodCrashes> = emptyMap(),
 ) {
     fun year(y: String): HoodYear = years[y] ?: HoodYear.EMPTY
 
@@ -241,6 +237,7 @@ class Hood(
                 years = years,
                 now = HoodNow.fromJson(j["now"]),
                 crashes = HoodCrashes.fromJson(j["crashes"]),
+                crashesByYear = HoodCrashes.byYear(j["crashes_by_year"]),
             )
         }
     }
@@ -259,6 +256,7 @@ class Indicators(
     val cityCrashes: HoodCrashes?,
     val crashRecordsFrom: String?,
     val statsFetchedAt: String,
+    val cityCrashesByYear: Map<String, HoodCrashes> = emptyMap(),
     val firstYear: Int,
     val partialYear: Int,
     val nearMiles: Double,
@@ -317,6 +315,7 @@ fun decodeIndicators(bytes: ByteArray): Indicators {
         vacantPeriod = days("vacant_period"),
         crashYears = ints("crash_years"),
         cityCrashes = HoodCrashes.fromJson(j["city_crashes"]),
+        cityCrashesByYear = HoodCrashes.byYear(j["city_crashes_by_year"]),
         crashRecordsFrom = j["crash_records_from"]?.str,
         statsFetchedAt = j["stats_fetched_at"]?.str ?: "",
         firstYear = j["first_year"]?.int ?: 0,
@@ -536,9 +535,8 @@ fun hoodsByDistrict(list: List<Hood>): List<HoodDistrictGroup> {
 /**
  * Per 1,000 lots, or nothing at all.
  *
- * A hidden count has no rate: publishing one would hand back the number the suppression withheld. A base under 100
- * lots has no rate either — docs/13 honesty rule 3, rates need a denominator we can defend, and a hundredth of a
- * neighborhood makes any count look enormous. The same three conditions as `rate` in apps/web/src/hoods.ts.
+ * A base under 100 lots has no rate — docs/13 honesty rule 3, rates need a denominator we can defend, and a
+ * hundredth of a neighborhood makes any count look enormous. The same conditions as `rate` in apps/web/src/hoods.ts.
  */
 fun hoodRate(c: HoodCount?, parcels: Int?): Double? {
     val n = c?.value ?: return null
@@ -635,14 +633,15 @@ fun hoodNumber(n: Int): String = hoodDigits(n.toLong())
 fun hoodNumber(n: Double): String = hoodDigits(rounded(n))
 
 /**
- * A count as a screen says it: the number, "fewer than 5" for a suppressed one, or "none recorded" for one the
- * City never wrote down. The words come from the strings files; nothing here is built out of English fragments.
+ * A count as a screen says it: the number, or "none recorded" for one the City never wrote down. The words come
+ * from the strings files; nothing here is built out of English fragments.
  */
-fun hoodCountText(c: HoodCount?, words: (String) -> String): String = when {
-    c == null -> words("hood.none_recorded")
-    c.hidden -> words("hood.lt5")
-    else -> hoodNumber(c.value!!)
-}
+fun hoodCountText(c: HoodCount?, words: (String) -> String): String =
+    if (c == null) words("hood.none_recorded") else hoodNumber(c.value)
+
+/** The latest year with a number in any of the given fields: the year the "at a glance" row names. */
+fun hoodLatestYear(h: Hood, d: Indicators, fields: List<(HoodYear) -> HoodCount?>): String? =
+    d.years.reversed().firstOrNull { y -> fields.any { it(h.year(y)) != null } }
 
 // ---- a year table ---------------------------------------------------------------------------------------------------
 
@@ -752,23 +751,21 @@ fun hoodCategoryKey(category: String): String =
 //
 // Kyle, 2026-09-22: "for the longitudinal data, we should give the user the option on page to switch between a
 // table and chart view for relevant data" — and, later the same day, lines rather than bars, with "Homes sold" and
-// "Building permits" on the SAME chart and selectable, and a year whose count is hidden VISIBLE rather than
-// dropped. This is the Kotlin half of `apps/web/src/hoodchart.ts` and of `HelpCore/HoodChart.swift`, ported case
-// for case and held to the same numbers in HoodChartTest.
+// "Building permits" on the SAME chart and selectable. And every number exact, later still ("I want exact
+// numbers"; DECISIONS): there is no hidden count in the dataset any more, so there is no marker for one. This is
+// the Kotlin half of `apps/web/src/hoodchart.ts` and of `HelpCore/HoodChart.swift`, ported case for case and held
+// to the same numbers in HoodChartTest.
 //
 // The rules docs/13 sets, and how each one survives being drawn:
 //
 //  1. **No ranking, no comparison with another neighborhood.** A chart holds ONE neighborhood's own years: no
-//     whole-city line, no trend line, no colour that means good or bad. Two colours are two identities, never a
-//     scale, and there is ONE y-axis, never two.
-//  2. **A hidden count is never drawn at a value.** `lt5` — which since 2026-09-22 means blight tickets,
-//     demolitions, reported problems and fires, but no longer home sales or building permits (DECISIONS) —
-//     becomes a HOLLOW marker at a fixed height, so the year is visibly there and its number is visibly not.
-//     [HOOD_MARKER_FRACTION] is the only thing that turns a hidden count into geometry. The line goes on through
-//     it as a dotted piece, so a hidden year is never a gap that reads as zero.
-//  3. **The axis never labels a value under 5 as if it were exact**: [HoodChartModel.ticks] holds 0 and then
-//     nothing below 5, and a marker always sits below the first tick over zero.
-//  4. **The table is the source of truth**, and stays on the screen for TalkBack either way (HoodScreens.kt).
+//     whole-city line, no trend line, no colour that means good or bad. The colours are identities, never a
+//     scale, and there is ONE y-axis, never two — a series in a different UNIT (days to close) gets a chart of
+//     its own.
+//  2. **A year with nothing recorded is a break in the line, never a zero.**
+//  3. **The table is the source of truth**, and stays on the screen for TalkBack either way (HoodScreens.kt).
+//  4. **Three ways to tell lines apart, at once**: colour, point shape (circle, diamond, square) and line pattern
+//     (solid, dashed, dash-dot). Never more than three series on one chart.
 
 /** Which way a neighborhood's year panels are drawn. **Table is the default**, on every platform. */
 enum class HoodViewChoice { TABLE, CHART }
@@ -776,16 +773,19 @@ enum class HoodViewChoice { TABLE, CHART }
 /** Whatever was stored, read safely: only the exact word "chart" is chart; anything else is a table. */
 fun hoodViewOf(stored: String?): HoodViewChoice = if (stored == "chart") HoodViewChoice.CHART else HoodViewChoice.TABLE
 
-/** One year of one series, exactly as the bundle gives it: a number, the hidden `lt5`, or nothing recorded. */
+/** One year of one series, exactly as the bundle gives it: a number, or nothing recorded. */
 class HoodChartPoint(val year: String, val count: HoodCount?, val soFar: Boolean = false)
 
-/** Which of the two identities a series wears: a colour, a marker shape and a line pattern, all three. */
-enum class HoodTone { A, B }
+/** Which identity a series wears: a colour, a marker shape and a line pattern, all three. At most three. */
+enum class HoodTone { A, B, C }
+
+/** What the numbers are: a count of things, or a number of days. A chart holds ONE unit (rule 1). */
+enum class HoodUnit { COUNT, DAYS }
 
 /** One series before it is measured against the others. [key] is what a checkbox switches. */
-class HoodSeries(val key: String, val tone: HoodTone, val label: String, val points: List<HoodChartPoint>)
+class HoodSeries(val key: String, val tone: HoodTone, val label: String, val points: List<HoodChartPoint>, val unit: HoodUnit = HoodUnit.COUNT)
 
-enum class HoodPointKind { VALUE, HIDDEN, NONE }
+enum class HoodPointKind { VALUE, NONE }
 
 /** A year of a series, placed. [frac] is its height as a share of the top of the axis, 0 to 1. */
 class HoodPlotPoint(
@@ -793,13 +793,13 @@ class HoodPlotPoint(
     val index: Int,
     val soFar: Boolean,
     val kind: HoodPointKind,
-    /** The number, when there is one to show. Never set for a hidden year — that is the point of it. */
+    /** The number, when there is one to show. */
     val value: Int?,
     val frac: Double,
 )
 
-/** A piece of the line between two neighbouring years. [dotted] where one of its ends is a hidden count. */
-class HoodSegment(val from: Int, val to: Int, val dotted: Boolean)
+/** A piece of the line between two neighbouring years. */
+class HoodSegment(val from: Int, val to: Int)
 
 class HoodSeriesModel(
     val key: String,
@@ -807,8 +807,6 @@ class HoodSeriesModel(
     val label: String,
     val points: List<HoodPlotPoint>,
     val segments: List<HoodSegment>,
-    /** The years the pipeline hid. A hollow marker each — never a value. */
-    val markers: List<String>,
     /** The years with nothing recorded at all: a place on the axis, no marker, and a break in the line. */
     val blanks: List<String>,
     /** The tallest year, for the summary sentence; null when there is nothing to draw. */
@@ -819,18 +817,12 @@ class HoodSeriesModel(
 class HoodChartModel(
     val years: List<String>,
     val series: List<HoodSeriesModel>,
-    /** The top of the axis. At least 5, so the drawn area never implies a scale finer than suppression. */
+    /** The top of the axis: the first round number at or above the tallest value, never under 1. */
     val top: Int,
-    /** 0, then every labelled value. Never 1 to 4 (rule 3). */
+    /** 0, then every labelled value, ending at [top]. */
     val ticks: List<Int>,
+    val unit: HoodUnit = HoodUnit.COUNT,
 )
-
-/**
- * How high a hidden year's marker sits, as a share of the plot: a CONSTANT — ten of the web's ninety-six drawing
- * units — and the same on all three apps, so nothing about the marker comes from the count it stands for. It is
- * always below the first tick over zero, because the axis step is at least a quarter of the top.
- */
-const val HOOD_MARKER_FRACTION: Double = 10.0 / 96.0
 
 /** 1, 2, 5, 10, 20, 50, … — the only step sizes an axis may use, so a tick is always a round number. */
 fun hoodAxisStep(max: Int): Int {
@@ -853,43 +845,34 @@ fun hoodChartModel(series: List<HoodSeries>): HoodChartModel {
     val years = series.firstOrNull()?.points?.map { it.year } ?: emptyList()
     val max = series.flatMap { s -> s.points.mapNotNull { it.count?.value } }.maxOrNull() ?: 0
     val step = hoodAxisStep(maxOf(max, 1))
-    val top = maxOf(5, ((max + step - 1) / step) * step)
+    val top = maxOf(1, ((max + step - 1) / step) * step)
     val ticks = ArrayList<Int>()
     var t = 0
-    while (t <= top) {
-        if (t == 0 || t >= 5) ticks.add(t)
-        t += step
-    }
+    while (t <= top) { ticks.add(t); t += step }
     if (ticks.lastOrNull() != top) ticks.add(top)
 
     return HoodChartModel(
         years = years,
         top = top,
         ticks = ticks,
+        unit = series.firstOrNull()?.unit ?: HoodUnit.COUNT,
         series = series.map { s ->
             val points = s.points.mapIndexed { index, p ->
                 val n = p.count?.value
-                when {
-                    n != null -> HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.VALUE, n, n.toDouble() / top)
-                    p.count != null -> HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.HIDDEN, null, HOOD_MARKER_FRACTION)
-                    else -> HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.NONE, null, 0.0)
-                }
+                if (n != null) HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.VALUE, n, n.toDouble() / top)
+                else HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.NONE, null, 0.0)
             }
-            // The line runs between two neighbouring years whenever both have something. A year with nothing
+            // The line runs between two neighbouring years whenever both have a value. A year with nothing
             // recorded breaks it, because joining across one would draw a number nobody counted.
             val segments = ArrayList<HoodSegment>()
             for (i in 0 until maxOf(0, points.size - 1)) {
-                val a = points[i]
-                val b = points[i + 1]
-                if (a.kind == HoodPointKind.NONE || b.kind == HoodPointKind.NONE) continue
-                segments.add(HoodSegment(i, i + 1, a.kind == HoodPointKind.HIDDEN || b.kind == HoodPointKind.HIDDEN))
+                if (points[i].kind == HoodPointKind.VALUE && points[i + 1].kind == HoodPointKind.VALUE) segments.add(HoodSegment(i, i + 1))
             }
             // The tallest year, and the EARLIEST of them when two are equal, so one bundle always names one year.
             var peak: HoodPlotPoint? = null
             for (p in points) if (p.kind == HoodPointKind.VALUE && (peak == null || p.value!! > peak.value!!)) peak = p
             HoodSeriesModel(
                 key = s.key, tone = s.tone, label = s.label, points = points, segments = segments,
-                markers = points.filter { it.kind == HoodPointKind.HIDDEN }.map { it.year },
                 blanks = points.filter { it.kind == HoodPointKind.NONE }.map { it.year },
                 peakYear = peak?.year, peakValue = peak?.value,
             )
@@ -898,11 +881,18 @@ fun hoodChartModel(series: List<HoodSeries>): HoodChartModel {
 }
 
 /**
- * Whether a series is worth offering a chart of at all: three years with something in them, and at least one of
- * those a number there is a point to draw. Two points is a line between two dots, not a shape worth a control.
+ * Whether a series is worth offering a chart of at all: three years with a number in them. Two points is a line
+ * between two dots, not a shape worth a control.
  */
-fun hoodChartable(points: List<HoodChartPoint>): Boolean =
-    points.count { it.count != null } >= 3 && points.any { it.count?.value != null }
+fun hoodChartable(points: List<HoodChartPoint>): Boolean = points.count { it.count != null } >= 3
+
+/** Whether a series has anything at all: one year with a number. Otherwise the panel says the City has not
+ *  published it for this neighborhood, instead of a table of "none recorded". */
+fun hoodAnyValue(points: List<HoodChartPoint>): Boolean = points.any { it.count != null }
+
+/** A value in the chart's unit, as words: "14", or "12 days". */
+fun hoodValueText(n: Int, unit: HoodUnit, words: (String, Map<String, String>) -> String): String =
+    if (unit == HoodUnit.DAYS) words("hood.days", mapOf("n" to hoodNumber(n))) else hoodNumber(n)
 
 /**
  * Which series are drawn, given what has been switched off. **Never nothing**: the last one left on cannot be
@@ -933,24 +923,41 @@ fun hoodAxisYears(years: List<String>): List<String> {
 fun hoodChartSeries(h: Hood, d: Indicators, count: (HoodYear) -> HoodCount?): List<HoodChartPoint> =
     d.years.map { y -> HoodChartPoint(y, count(h.year(y)), y.toIntOrNull() == d.partialYear) }
 
+/** The days to close, which the file carries as a decimal median, as a whole number of days. */
+fun hoodDaysSeries(h: Hood, d: Indicators): List<HoodChartPoint> =
+    d.years.map { y -> HoodChartPoint(y, h.year(y).issueDays?.let { HoodCount.of(rounded(it).toInt()) }, y.toIntOrNull() == d.partialYear) }
+
 /**
- * What one point says on its own: "2023, Homes sold: 14", "2021, Torn down: fewer than 5". The sentences are the
- * app's own words, handed in, exactly as [hoodCountText] takes them.
+ * The three crash series of one place, year by year (oldest first), from its `crashes_by_year`. Empty when the
+ * bundle carries the window only. Walking / biking / badly hurt wear A / B / C.
  */
-fun hoodPointText(p: HoodPlotPoint, label: String, words: (String, Map<String, String>) -> String): String {
+fun hoodCrashSeries(byYear: Map<String, HoodCrashes>, walk: String, bike: String, severe: String): List<HoodSeries> {
+    if (byYear.isEmpty()) return emptyList()
+    val years = byYear.keys.sorted()
+    fun pts(pick: (HoodCrashes) -> HoodCount?) = years.map { HoodChartPoint(it, byYear[it]?.let(pick)) }
+    return listOf(
+        HoodSeries("walk", HoodTone.A, walk, pts { it.walk }),
+        HoodSeries("bike", HoodTone.B, bike, pts { it.bike }),
+        HoodSeries("severe", HoodTone.C, severe, pts { it.severe }),
+    )
+}
+
+/**
+ * What one point says on its own: "2023, Homes sold: 14", "2021, Time to close: 12 days". The sentences are the
+ * app's own words, handed in.
+ */
+fun hoodPointText(p: HoodPlotPoint, label: String, words: (String, Map<String, String>) -> String, unit: HoodUnit = HoodUnit.COUNT): String {
     val year = if (p.soFar) words("hood.so_far", mapOf("year" to p.year)) else p.year
     val count = when (p.kind) {
-        HoodPointKind.VALUE -> hoodNumber(p.value!!)
-        HoodPointKind.HIDDEN -> words("hood.lt5", emptyMap())
+        HoodPointKind.VALUE -> hoodValueText(p.value!!, unit, words)
         HoodPointKind.NONE -> words("hood.none_recorded", emptyMap())
     }
     return words("hood.chart_bar", mapOf("year" to year, "label" to label, "count" to count))
 }
 
 /**
- * The sentence under the picture: what is drawn, over which years, the biggest year of each series, and — only
- * when there is one — that some years are hidden and are NOT drawn at a value. A fact about this neighborhood's
- * own years, never a trend: these numbers describe and do not explain (docs/13, honesty rule 4).
+ * The sentence under the picture: what is drawn, over which years, and the biggest year of each series. A fact
+ * about this neighborhood's own years, never a trend: these numbers describe and do not explain (docs/13, rule 4).
  */
 fun hoodChartSummary(m: HoodChartModel, words: (String, Map<String, String>) -> String): String {
     val most = m.series.joinToString(words("list.sep", emptyMap())) { s ->
@@ -959,12 +966,11 @@ fun hoodChartSummary(m: HoodChartModel, words: (String, Map<String, String>) -> 
         if (year == null || value == null) {
             words("hood.chart_peak_none", mapOf("label" to s.label))
         } else {
-            words("hood.chart_peak", mapOf("label" to s.label, "count" to hoodNumber(value), "year" to year))
+            words("hood.chart_peak", mapOf("label" to s.label, "count" to hoodValueText(value, m.unit, words), "year" to year))
         }
     }
-    val line = words(
+    return words(
         "hood.chart_summary",
         mapOf("from" to (m.years.firstOrNull() ?: ""), "to" to (m.years.lastOrNull() ?: ""), "most" to most),
     )
-    return if (m.series.none { it.markers.isNotEmpty() }) line else line + " " + words("hood.chart_lt5_note", emptyMap())
 }

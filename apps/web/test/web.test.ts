@@ -213,8 +213,9 @@ describe('add a place, saved places, help paying for food', () => {
 });
 
 describe('neighborhood pages (docs/13 honesty rules)', () => {
+  const T = (k: string, p: Record<string, string | number> = {}) => (strings[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? ''));
   const ui = { t: (k: string, p: Record<string, string | number> = {}) => (strings[k] ?? 'MISSING:' + k).replace(/[{](\w+)[}]/g, (_, x) => String(p[x] ?? '')), esc: (x: unknown) => String(x), own: (x: unknown) => '<span lang="en">' + String(x) + '</span>', date: (d: string) => d, link: (u: string, l: string) => '<a href="' + u + '">' + l + '</a>', go: (v: object) => "data-go='" + JSON.stringify(v) + "'", map: () => '<div class="mapbox"></div>', icon: (n: string) => '<svg data-ic="' + n + '"></svg>' };
-  const hood = (name: string, district: number | null, total: number): Hood => ({ id: 'nbh_' + name.toLowerCase(), name, district, center: [42.4, -83.1], rings: [], years: { 2024: { sales: 'lt5', permits: 12, permit_cost: 500000 }, 2025: { sales: 40, median_price: 90000 } },
+  const hood = (name: string, district: number | null, total: number): Hood => ({ id: 'nbh_' + name.toLowerCase(), name, district, center: [42.4, -83.1], rings: [], years: { 2024: { sales: 3, permits: 12, permit_cost: 500000 }, 2025: { sales: 40, median_price: 90000 } },
     help: { total, by: { food: 0, harm: total }, nearest_miles: { food: 2.3, clinic: null, narcan: 0.5, indoors: 0.8 }, none_listed_yet: ['food', 'health'], coverage_checked: false }, places: { parks: 3, rec_centers: 1, greenway_open: 0 } });
   const src = { name: 'City data', url: 'https://example.org/x', last_edited: '2026-09-17' };
   const d: Indicators = { sources: { neighborhoods: src, sales: src, permits: src }, stats_fetched_at: '2026-09-18', first_year: 2024, partial_year: 2026, near_miles: 0.5, origin: [-83.32, 42.22], segments: {},
@@ -278,55 +279,61 @@ describe('neighborhood pages (docs/13 honesty rules)', () => {
     });
   });
 
-  it('hidden counts read "fewer than 5", a missing price says why, the unfinished year says "so far", and both tables sit in one panel', () => {
+  it('a small count is the real number, a missing price says why, the unfinished year says "so far", and both tables sit in one panel', () => {
     const html = hoodPage(d.neighborhoods[0]!, d, ui);
-    expect(html).toContain('fewer than 5'); expect(html).toContain('too few sales to show a price'); expect(html).toContain('2026 so far');
+    expect(html).toContain('<td>3</td>'); expect(html).not.toContain('fewer than 5'); expect(html).toContain('too few sales to show a price'); expect(html).toContain('2026 so far');
     const panel = html.slice(html.indexOf('Read these two together'));
     expect(panel.indexOf('<table')).toBeGreaterThan(-1);
     expect(panel.slice(0, panel.indexOf('</div>')).match(/<table/g)).toHaveLength(2);
     expect(html).toContain('We leave out crime numbers on purpose');
   });
-  it('blight is a rate per 1,000 lots with its caveat on the chart, and a hidden count never becomes a rate', () => {
-    expect(rate(250, 5000)).toBe(50); expect(rate('lt5', 5000)).toBeUndefined(); expect(rate(250, 40)).toBeUndefined(); expect(rate(250, undefined)).toBeUndefined();
+  it('blight is a rate per 1,000 lots with its caveat on the chart, and a small count is a number, never a rate on a thin base', () => {
+    expect(rate(250, 5000)).toBe(50); expect(rate(3, 5000)).toBe(0.6); expect(rate(250, 40)).toBeUndefined(); expect(rate(250, undefined)).toBeUndefined();
     const withCond: Indicators = { ...d, city_parcels: 377000, issue_types: ['Illegal Dump Sites'], sources: { ...d.sources, blight: src, demolitions: src, issues: src, parcels: src },
-      neighborhoods: [{ ...d.neighborhoods[0]!, parcels: 5000, years: { 2025: { blight: 250, demolitions: 'lt5', issues: 40, issue_days: 8 } } }] };
+      neighborhoods: [{ ...d.neighborhoods[0]!, parcels: 5000, years: { 2025: { blight: 250, demolitions: 3, issues: 40, issue_days: 8 } } }] };
     const html = hoodPage(withCond.neighborhoods[0]!, withCond, ui);
     expect(html).toContain('Tickets show where inspectors went as much as where blight is');
     expect(html).toContain('We never count reports about people');
-    expect(html).toContain('8 days'); expect(html).toContain('fewer than 5, or none'); expect(html).not.toContain('MISSING:');
+    expect(html).toContain('8 days'); expect(html).toContain('<span>3</span></td>'); expect(html).not.toContain('fewer than 5'); expect(html).not.toContain('MISSING:');
+    // Ledes, an at-a-glance row and the empty state for the series the City has not published (fires).
+    expect(html).toContain('<dl class="glance">'); expect(html).toContain('<dd>250</dd>');
+    expect(html).toContain(T('hood.cond_blight_lede'));
   });
   it('Bridge-card stores, bus stops, rentals, fires, vacant buildings and streets: each with its caveat next to it, and its source', () => {
     const more: Indicators = { ...d, city_parcels: 377000, issue_types: [], fire_types: ['Building fire'], roads_years: [2023, 2024], vacant_period: ['2025-09-19', '2026-09-16'],
       sources: { ...d.sources, blight: src, snap: { ...src, name: 'SNAP stores' }, bus_stops: { ...src, name: 'DDOT stops' }, rentals: { ...src, name: 'Rental certificates' }, fires: { ...src, name: 'Fire calls' }, pavement: { ...src, name: 'Street ratings' }, vacant: { ...src, name: 'Vacant registrations' } },
       city: { 2025: { fires: 2245 } }, city_now: { rental_certs: 12276, vacant_reg: 1493, roads: { pieces: 15000, miles: 826, poor_pct: 31 } },
       neighborhoods: [{ ...d.neighborhoods[0]!, parcels: 5000, years: { 2025: { fires: 20 } }, places: { parks: 1, rec_centers: 0, greenway_open: 0, snap_stores: 7, bus_stops: 31 },
-        nearest_city: { snap: 0.3, grocery: 1.4, bus: 0.1 }, now: { rental_certs: 150, vacant_reg: 'lt5', roads: { pieces: 60, miles: 5.2, poor_pct: 45 } } }] };
+        nearest_city: { snap: 0.3, grocery: 1.4, bus: 0.1 }, now: { rental_certs: 150, vacant_reg: 2, roads: { pieces: 60, miles: 5.2, poor_pct: 45 } } }] };
     const html = hoodPage(more.neighborhoods[0]!, more, ui);
     expect(html).not.toContain('MISSING:');
     expect(html).toContain('Stores that take a Bridge card'); expect(html).toContain('>7<'); expect(html).toContain('>31<'); expect(html).toContain('1.4');
+    // Each count says which rule it uses: stops and stores inside the outline; parks and rec centers inside or within half a mile.
+    expect(html).toContain(`${T('hood.bus_stops')} <small>${T('hood.rule_inside')}</small>`); expect(html).toContain(`${T('hood.snap_stores')} <small>${T('hood.rule_inside')}</small>`);
+    expect(html).toContain(`${T('hood.parks')} <small>${T('hood.rule_near', { miles: 0.5 })}</small>`); expect(html).toContain(T('hood.places_note', { miles: 0.5 }));
     // Rentals sit in the "can people stay" panel, next to their caveat, and the panel still holds exactly its two tables.
     const money = html.slice(html.indexOf('Read these two together')); const moneyPanel = money.slice(0, money.indexOf('</div>'));
     expect(moneyPanel).toContain('150 (30 for every 1,000 lots)'); expect(moneyPanel).toContain('Many rentals never sign up'); expect(moneyPanel.match(/<table/g)).toHaveLength(2);
     // Fires: a rate per 1,000 lots (20 / 5,000 = 4.0), with what was and was not counted right under the table.
     expect(html).toContain('4.0'); expect(html).toContain('Not counted: car, trash and grass fires, medical calls');
-    expect(html).toContain('fewer than 5'); expect(html).toContain('It does not count every empty building');
+    expect(html).toContain('2 (0.4 for every 1,000 lots)'); expect(html).not.toContain('fewer than 5'); expect(html).toContain('It does not count every empty building');
     expect(html).toContain('45% of 5.2 miles'); expect(html).toContain('Whole city: 31%'); expect(html).toContain('not side streets');
     for (const s of ['SNAP stores', 'DDOT stops', 'Rental certificates', 'Fire calls', 'Street ratings', 'Vacant registrations']) expect(html.slice(html.indexOf('Where these numbers come from'))).toContain(s);
     // An older bundle without these numbers still draws a page, without empty rows.
     const old = hoodPage(d.neighborhoods[0]!, d, ui);
-    expect(old).not.toContain('Bridge card'); expect(old).not.toContain('MISSING:');
+    expect(old).not.toContain(`${T('hood.snap_stores')} <small>`); expect(old).not.toContain('MISSING:');
   });
   it('"Safe streets": plain counts with their years, no rate, no rank, no fault, and the records named', () => {
     const safe: Indicators = { ...d, crash_years: [2020, 2024], city_crashes: { walk: 2024, bike: 664, severe: 630 },
       crash_records_from: 'Michigan State Police (CJIC) police-reported crashes, published by SEMCOG',
       sources: { ...d.sources, crashes: { ...src, name: 'SEMCOG — Crash Locations, 2015-2024' } },
-      neighborhoods: [{ ...d.neighborhoods[0]!, crashes: { walk: 49, bike: 'lt5', severe: 22 } }] };
+      neighborhoods: [{ ...d.neighborhoods[0]!, crashes: { walk: 49, bike: 2, severe: 22 } }] };
     const html = hoodPage(safe.neighborhoods[0]!, safe, ui);
     expect(html).not.toContain('MISSING:');
     expect(html).toContain('Safe streets');
     expect(html).toContain('2020 through 2024');
     expect(html).toContain('Crashes with someone walking');
-    expect(html).toContain('49'); expect(html).toContain('fewer than 5'); expect(html).toContain('Whole city: 2,024');
+    expect(html).toContain('49'); expect(html).toContain('<span>2 <small>Whole city: 664</small></span>'); expect(html).not.toContain('fewer than 5'); expect(html).toContain('Whole city: 2,024');
     expect(html).toContain('These count crashes, not people');
     expect(html).toContain('we do not compare one neighborhood with another');
     expect(html).toContain('Michigan State Police');

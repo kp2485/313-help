@@ -3,21 +3,23 @@
 // About, from a greenway segment, or by link.
 //
 // Honesty rules that live in this file: no ranking or sorting by a number (lists are alphabetical); every number
-// says where it came from and when; small counts arrive already hidden ("lt5"); home prices and building permits
-// are drawn in ONE panel so neither is shown without the other; "none listed yet" describes our list, not the place.
+// says where it came from and when; every count is the real number, however small (Kyle, 2026-09-22 — nothing is
+// hidden, crashes included); home prices and building permits are drawn in ONE panel so neither is shown without
+// the other; "none listed yet" describes our list, not the place.
 
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
-import { chartModel, chartSummary, chartSvg, chartable, shownSeries, type ChartPoint, type ChartSeries } from './hoodchart.js';
+import { anyValue, chartModel, chartSummary, chartSvg, chartable, shownSeries, type ChartPoint, type ChartSeries } from './hoodchart.js';
 import { groupHoods, matchHoods, type HoodOrder } from './hoodfind.js';
 import { isPrivate } from './needs.js';
 import { locale } from './i18n.js';
 
-type Count = number | 'lt5';
+/** Every count is the exact number. There has been no hidden value in the bundle since 2026-09-22. */
+type Count = number;
 export interface YearStats { sales?: Count; median_price?: number; permits?: Count; permit_cost?: number; blight?: Count; demolitions?: Count; issues?: Count; issue_days?: number; fires?: Count }
 /** Today's numbers, not a year's: rental certificates in force, vacant registrations of the past 12 months, street ratings. */
 export interface NowStats { rental_certs?: Count; vacant_reg?: Count; roads?: { pieces: Count; miles?: number; poor_pct?: number } }
 /** "Safe streets" (docs/13): crashes the police wrote up that involved someone walking or biking, over the
- *  years the panel names. Plain counts, hidden under 5. Never a rate: docs/13 defines no denominator here. */
+ *  years the panel names. Exact counts. Never a rate: docs/13 defines no denominator here. */
 export interface CrashCounts { walk: Count; bike: Count; severe: Count }
 export interface Hood {
   id: string; name: string; district: number | null; jlg_study_area?: boolean; center: [number, number]; rings: number[][];
@@ -31,6 +33,9 @@ export interface Hood {
   years: Record<string, YearStats>;
   now?: NowStats;
   crashes?: CrashCounts;
+  /** The same three counts for each year of the window (2026-09-22). Optional: a bundle built before that day
+   *  carries the window only, and the panel then draws the totals and no chart. */
+  crashes_by_year?: Record<string, CrashCounts>;
 }
 interface Source { name: string; url: string; last_edited: string }
 /**
@@ -59,7 +64,7 @@ export interface CityRow { id: string; name: string; kind: 'city'; children: 'ne
 export interface Indicators {
   sources: { neighborhoods: Source; sales: Source; permits: Source; blight?: Source; demolitions?: Source; issues?: Source; parcels?: Source; snap?: Source; bus_stops?: Source; rentals?: Source; fires?: Source; pavement?: Source; vacant?: Source; crashes?: Source };
   city_parcels?: number; issue_types?: string[]; fire_types?: string[]; city_now?: NowStats; roads_years?: [number, number]; vacant_period?: [string, string];
-  crash_years?: [number, number]; city_crashes?: CrashCounts; crash_records_from?: string;
+  crash_years?: [number, number]; city_crashes?: CrashCounts; city_crashes_by_year?: Record<string, CrashCounts>; crash_records_from?: string;
   stats_fetched_at: string; first_year: number; partial_year: number;
   near_miles: number; origin: [number, number]; city: Record<string, YearStats>; neighborhoods: Hood[]; segments: Record<string, string[]>;
   /** Added 2026-09-22, all optional: a bundle built before the city pages carries none of them and every screen
@@ -227,7 +232,7 @@ export function hoodList(d: Indicators, ui: Ui, lens?: string): string {
 
 function yearsTable(h: Hood, d: Indicators, ui: Ui, o: { value: (y: YearStats) => number | undefined; cityValue?: (y: YearStats) => number | undefined; count?: (y: YearStats) => Count | undefined; fmt: (n: number) => string; head: string; countHead: string; missing: string; caption: string }): string {
   const years = Object.keys(d.city).sort(), max = Math.max(1, ...years.map((y) => o.value(h.years[y] ?? {}) ?? 0));
-  const count = (c: Count | undefined) => (c === undefined ? ui.t('hood.none_recorded') : c === 'lt5' ? ui.t('hood.lt5') : String(c));
+  const count = (c: Count | undefined) => (c === undefined ? ui.t('hood.none_recorded') : String(c));
   return `<table class="years"><caption>${ui.esc(o.caption)}</caption><thead><tr><th scope="col">${ui.esc(ui.t('hood.year'))}</th><th scope="col">${ui.esc(o.head)}</th>${o.count ? `<th scope="col">${ui.esc(o.countHead)}</th>` : ''}<th scope="col">${ui.esc(ui.t('hood.city'))}</th></tr></thead><tbody>
     ${years.map((y) => { const v = o.value(h.years[y] ?? {}), cv = (o.cityValue ?? o.value)(d.city[y] ?? {});
       return `<tr><th scope="row">${Number(y) === d.partial_year ? ui.esc(ui.t('hood.so_far', { year: y })) : y}</th><td>${v === undefined ? `<small>${ui.esc(o.missing)}</small>` : `<span class="bar" aria-hidden="true" style="width:${Math.max(3, Math.round((v / max) * 100))}%"></span><span>${ui.esc(o.fmt(v))}</span>`}</td>${o.count ? `<td>${ui.esc(count(o.count(h.years[y] ?? {})))}</td>` : ''}<td>${cv === undefined ? '' : ui.esc(o.fmt(cv))}</td></tr>`; }).join('')}</tbody></table>`;
@@ -242,8 +247,8 @@ export const hoodView = (stored: unknown): HoodView => (stored === 'chart' ? 'ch
 export async function loadHoodView(): Promise<HoodView> { return hoodView(await idbGet<unknown>('hoodview')); }
 export async function saveHoodView(v: HoodView): Promise<HoodView> { const next = hoodView(v); await idbSet('hoodview', next); return next; }
 
-/** The years of one count, in the table's own order, ready for `chartModel`. */
-export function seriesOf(h: Hood, d: Indicators, count: (y: YearStats) => Count | undefined): ChartPoint[] {
+/** The years of one number, in the table's own order (oldest first, most recent last), ready for `chartModel`. */
+export function seriesOf(h: Hood, d: Indicators, count: (y: YearStats) => number | undefined): ChartPoint[] {
   return Object.keys(d.city).sort().map((y) => ({ year: y, count: count(h.years[y] ?? {}), partial: Number(y) === d.partial_year }));
 }
 
@@ -269,11 +274,13 @@ function viewPick(ui: Ui, id: string, view: HoodView): string {
  * least one number to draw (`chartable`). A neighborhood with two years of sales keeps its table and is offered
  * nothing else.
  */
-function yearGroup(ui: Ui, o: { id: string; view: HoodView; name: string; tables: string; series: ChartSeries[]; off: ReadonlySet<string> }): string {
+function yearGroup(ui: Ui, o: { id: string; view: HoodView; name: string; tables: string; series: ChartSeries[]; off: ReadonlySet<string>; pick?: boolean }): string {
   const drawable = o.series.filter((s) => chartable(s.points));
   if (!drawable.length) return o.tables;
   const tables = `<div class="yeartables${o.view === 'chart' ? ' vh' : ''}" id="${o.id}-rows">${o.tables}</div>`;
-  if (o.view !== 'chart') return `${viewPick(ui, o.id, o.view)}${tables}`;
+  // A panel with several charts draws ONE control above them all (`pick: false` here, `viewPick` once there).
+  const pick = o.pick === false ? '' : viewPick(ui, o.id, o.view);
+  if (o.view !== 'chart') return `${pick}${tables}`;
 
   // One chart, one pair of axes, and only the series that are switched on — so the axis follows what is on the
   // screen. `shownSeries` refuses to leave nothing: the last one on stays on.
@@ -292,14 +299,137 @@ function yearGroup(ui: Ui, o: { id: string; view: HoodView; name: string; tables
     ? `<fieldset class="chartkey"><legend>${ui.esc(ui.t('hood.chart_show'))}</legend>${drawable.map(toggle).join('')}</fieldset>
        ${lastOn ? `<p class="foot" id="${o.id}-only">${ui.esc(ui.t('hood.chart_only_one'))}</p>` : ''}`
     : '';
-  const marker = m.series.some((sx) => sx.markers.length)
-    ? `<ul class="chartkey plain"><li><span class="sw hollow" aria-hidden="true"></span>${ui.esc(ui.t('hood.chart_lt5'))}</li></ul>` : '';
-  return `${viewPick(ui, o.id, o.view)}
+  return `${pick}
     <figure class="hoodchart" role="group" aria-label="${ui.esc(ui.t(o.name, { from: years[0] ?? '', to: years[years.length - 1] ?? '' }))}" aria-describedby="${o.id}-sum ${o.id}-rows">
-      ${chartSvg(ui, m)}${key}${marker}
+      ${chartSvg(ui, m)}${key}
       <figcaption class="foot" id="${o.id}-sum">${ui.esc(chartSummary(ui, m))}</figcaption>
     </figure>${tables}`;
 }
+
+/**
+ * One chart's worth of a panel: a plain-language lede saying what the number means and where it comes from, then
+ * the table or the chart. When the City has published nothing at all for this neighborhood in this series — no
+ * year with a number — the panel says exactly that, in one sentence, instead of a table of "none recorded".
+ */
+function condGroup(ui: Ui, h: Hood, o: { id: string; view: HoodView; name: string; lede: string; tables: string; series: ChartSeries[]; off: ReadonlySet<string>; after?: string }): string {
+  const lede = `<p>${ui.esc(ui.t(o.lede))}</p>`;
+  if (!o.series.some((sx) => anyValue(sx.points))) return `${lede}<p class="empty">${ui.esc(ui.t('hood.cond_none', { name: h.name }))}</p>`;
+  return `${lede}${yearGroup(ui, { ...o, pick: false })}${o.after ?? ''}`;
+}
+
+/** The latest year with a number in any of the given fields: the year the "at a glance" row names. */
+export function latestYear(h: Hood, d: Indicators, fields: (keyof YearStats)[]): string | null {
+  const years = Object.keys(d.city).sort().reverse();
+  return years.find((y) => fields.some((f) => typeof h.years[y]?.[f] === 'number')) ?? null;
+}
+
+/**
+ * "At a glance": the latest year's figure for each Conditions series, and today's two numbers, in one compact row
+ * of stat tiles above the charts. Each tile is a `<dt>`/`<dd>` pair, so a screen reader hears label then value.
+ * Nothing here is a rate or a comparison: one number per series, the one a reader came for.
+ */
+function glance(ui: Ui, h: Hood, d: Indicators): string {
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const y = latestYear(h, d, ['blight', 'demolitions', 'issues', 'fires']);
+  const num = (n: number | undefined, f: (n: number) => string = String) => (n === undefined ? T('hood.none_recorded') : ui.esc(f(n)));
+  const tile = (label: string, value: string, note = '') => `<div class="tile"><dt>${label}${note ? ` <small>${note}</small>` : ''}</dt><dd>${value}</dd></div>`;
+  const ys = y ? h.years[y] ?? {} : {};
+  const yearLabel = y ? (Number(y) === d.partial_year ? ui.t('hood.so_far', { year: y }) : y) : '';
+  const rows = [
+    ...(y ? [
+      tile(T('hood.blight_tickets'), num(ys.blight), ui.esc(yearLabel)),
+      tile(T('hood.demolitions'), num(ys.demolitions), ui.esc(yearLabel)),
+      tile(T('hood.issues_reported'), num(ys.issues), ui.esc(yearLabel)),
+      tile(T('hood.issue_days'), num(ys.issue_days, (n) => ui.t('hood.days', { n })), ui.esc(yearLabel)),
+      ...(d.sources.fires ? [tile(T('hood.fires_short'), num(ys.fires), ui.esc(yearLabel))] : []),
+    ] : []),
+    ...(d.sources.vacant ? [tile(T('hood.vacant_short'), num(h.now?.vacant_reg), T('hood.glance_today'))] : []),
+    ...(d.sources.pavement ? [tile(T('hood.roads_poor_short'), h.now?.roads?.poor_pct === undefined ? T(h.now?.roads ? 'hood.roads_few' : 'hood.roads_none') : T('hood.roads_pct', { pct: h.now.roads.poor_pct, miles: (h.now.roads.miles ?? 0).toFixed(1) }), T('hood.glance_today'))] : []),
+  ];
+  if (!rows.length) return '';
+  return `<h3 class="sub">${T('hood.glance')}</h3><dl class="glance">${rows.join('')}</dl>`;
+}
+
+/**
+ * Conditions (docs/13): what the City recorded here, grouped into charts that share a unit and a meaning —
+ *
+ *   Blight tickets and buildings torn down   two COUNTS on one axis (both are things the City did to buildings)
+ *   Problems reported                        a COUNT
+ *   Time to close                            DAYS — its own small chart, because days on a count axis is the
+ *                                            dual-axis trick with one axis; the table carries both columns
+ *   Building fires                           a COUNT, on its own: a fire is not a ticket
+ *
+ * — each with a one-sentence lede saying what the number is and where it comes from, ONE Table | Chart control
+ * for the whole panel, and an "at a glance" row of the latest year's figures above the charts. Empty buildings
+ * registered and street condition are today's numbers, not years, so they are tiles in that row and rows below,
+ * never a chart. Years run oldest to newest everywhere, so the most recent year is at the end of every table and
+ * every axis.
+ */
+export function conditionsPanel(h: Hood, d: Indicators, ui: Ui, view: HoodView, off: ReadonlySet<string>): string {
+  if (!d.sources.blight) return '';
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const series = (key: string, tone: 'a' | 'b', label: string, count: (y: YearStats) => number | undefined, unit: 'count' | 'days' = 'count'): ChartSeries =>
+    ({ key, tone, label: ui.t(label), points: seriesOf(h, d, count), unit });
+  const row = (label: string, value: string, city = '') => `<ul class="hours"><li><span>${label}</span><span>${value}${city ? ` <small>${city}</small>` : ''}</span></li></ul>`;
+  const fmtRate = (r: number) => r.toFixed(r < 10 ? 1 : 0);
+  const per1000 = (c: Count | undefined) => { if (c === undefined) return T('hood.none_recorded'); const r = rate(c, h.parcels); return r === undefined ? String(c) : T('hood.per_1000', { count: c, rate: fmtRate(r) }); };
+  const cityPer1000 = (c: Count | undefined) => { const r = rate(c, d.city_parcels); return r === undefined ? '' : T('hood.city_per_1000', { rate: fmtRate(r) }); };
+  const roads = h.now?.roads, cityRoads = d.city_now?.roads;
+  const roadsValue = !roads ? T('hood.roads_none') : roads.poor_pct === undefined ? T('hood.roads_few') : T('hood.roads_pct', { pct: roads.poor_pct, miles: (roads.miles ?? 0).toFixed(1) });
+  const blight = series('blight', 'a', 'hood.blight_tickets', (y) => y.blight), demo = series('demo', 'b', 'hood.demolitions', (y) => y.demolitions);
+  const issues = series('issues', 'a', 'hood.issues_reported', (y) => y.issues), days = series('days', 'a', 'hood.issue_days', (y) => y.issue_days, 'days');
+  const fires = series('fires', 'a', 'hood.fires_short', (y) => y.fires);
+  const issuesTable = yearsTable(h, d, ui, { value: (y) => y.issue_days, count: (y) => y.issues, fmt: (n) => ui.t('hood.days', { n }), head: ui.t('hood.issue_days'), countHead: ui.t('hood.issues'), missing: ui.t('hood.none_recorded'), caption: ui.t('hood.issues_caption') });
+  // One control for the panel, drawn only when at least one group has a chart to offer.
+  const pick = [blight, demo, issues, days, ...(d.sources.fires ? [fires] : [])].some((sx) => chartable(sx.points)) ? viewPick(ui, 'cond', view) : '';
+  return `<h2>${T('hood.cond_head')}</h2><div class="panel"><p>${T('hood.cond_lede')}</p>
+    ${glance(ui, h, d)}
+    ${pick}
+    <h3 class="sub">${T('hood.cond_blight_head')}</h3>
+    ${condGroup(ui, h, { id: 'cond', view, name: 'hood.chart_name_cond', lede: 'hood.cond_blight_lede', off, series: [blight, demo],
+      tables: `${yearsTable(h, d, ui, { value: (y) => rate(y.blight, h.parcels), cityValue: (y) => rate(y.blight, d.city_parcels), count: (y) => y.blight, fmt: (n) => n.toFixed(0), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.blight'), missing: ui.t('hood.none_recorded'), caption: ui.t('hood.blight_caption') })}
+        ${yearsTable(h, d, ui, { value: (y) => y.demolitions, fmt: (n) => String(n), head: ui.t('hood.demolitions'), countHead: '', missing: ui.t('hood.none_recorded'), caption: ui.t('hood.demo_caption') })}`,
+      after: `<p class="foot">${T('hood.blight_note')}</p>` })}
+    <h3 class="sub">${T('hood.cond_issues_head')}</h3>
+    ${condGroup(ui, h, { id: 'issues', view, name: 'hood.chart_name_issues', lede: 'hood.cond_issues_lede', off, series: [issues], tables: issuesTable })}
+    <h3 class="sub">${T('hood.cond_days_head')}</h3>
+    ${condGroup(ui, h, { id: 'days', view, name: 'hood.chart_name_days', lede: 'hood.cond_days_lede', off, series: [days],
+      // The days table IS the problems table above (both columns are in it), so in table view nothing is repeated
+      // and in chart view the picture points at that table.
+      tables: view === 'chart' ? `<p class="foot">${T('hood.cond_days_table')}</p>` : '',
+      after: `<p class="foot">${slot(ui, 'hood.issues_note', 'types', (d.issue_types ?? []).join(', '))}</p>` })}
+    ${d.sources.fires ? `<h3 class="sub">${T('hood.cond_fires_head')}</h3>
+    ${condGroup(ui, h, { id: 'fires', view, name: 'hood.chart_name_fires', lede: 'hood.cond_fires_lede', off, series: [fires],
+      tables: yearsTable(h, d, ui, { value: (y) => rate(y.fires, h.parcels), cityValue: (y) => rate(y.fires, d.city_parcels), count: (y) => y.fires, fmt: (n) => n.toFixed(1), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.fires'), missing: ui.t('hood.none_recorded'), caption: ui.t('hood.fire_caption') }),
+      after: `<p class="foot">${T('hood.fire_note')}</p><details class="foot"><summary>${T('hood.fire_types')}</summary><p>${ui.own((d.fire_types ?? []).join('; '))}</p></details>` })}` : ''}
+    <p class="foot">${T('hood.small_numbers')}</p>
+    ${d.sources.vacant ? `${row(T('hood.vacant', { from: ui.date(d.vacant_period?.[0] ?? ''), to: ui.date(d.vacant_period?.[1] ?? '') }), per1000(h.now?.vacant_reg), cityPer1000(d.city_now?.vacant_reg))}<p class="foot">${T('hood.vacant_note')}</p>` : ''}
+    ${d.sources.pavement ? `${row(T('hood.roads', { from: d.roads_years?.[0] ?? '', to: d.roads_years?.[1] ?? '' }), roadsValue, cityRoads?.poor_pct !== undefined ? T('hood.city_pct', { pct: cityRoads.poor_pct }) : '')}<p class="foot">${T('hood.roads_note')}</p>` : ''}</div>`;
+}
+
+/**
+ * The crashes by year, as a table (walking, biking, killed or badly hurt; the window total as the last row) and
+ * as the same three-line chart every other year panel gets. Drawn only when the bundle carries the years.
+ */
+function crashYears(h: Hood, d: Indicators, ui: Ui, view: HoodView, off: ReadonlySet<string>, byYear: Record<string, CrashCounts> | undefined): string {
+  if (!byYear || !d.crash_years) return '';
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const num = (n: number) => new Intl.NumberFormat(locale()).format(n);
+  const years = Object.keys(byYear).sort();
+  const [from, to] = d.crash_years;
+  const pt = (k: keyof CrashCounts): ChartPoint[] => years.map((y) => ({ year: y, count: byYear[y]?.[k], partial: false }));
+  const series: ChartSeries[] = [
+    { key: 'walk', tone: 'a', label: ui.t('hood.crash_walk_short'), points: pt('walk') },
+    { key: 'bike', tone: 'b', label: ui.t('hood.crash_bike_short'), points: pt('bike') },
+    { key: 'severe', tone: 'c', label: ui.t('hood.crash_severe_short'), points: pt('severe') },
+  ];
+  const cell = (c: number | undefined) => (c === undefined ? T('hood.none_recorded') : ui.esc(num(c)));
+  const table = `<table class="years"><caption>${T('hood.crash_caption')}</caption><thead><tr><th scope="col">${T('hood.year')}</th><th scope="col">${T('hood.crash_walk_short')}</th><th scope="col">${T('hood.crash_bike_short')}</th><th scope="col">${T('hood.crash_severe_short')}</th></tr></thead><tbody>
+    ${years.map((y) => `<tr><th scope="row">${y}</th><td>${cell(byYear[y]?.walk)}</td><td>${cell(byYear[y]?.bike)}</td><td>${cell(byYear[y]?.severe)}</td></tr>`).join('')}
+    ${h.crashes ? `<tr><th scope="row">${T('hood.crash_total', { from, to })}</th><td>${cell(h.crashes.walk)}</td><td>${cell(h.crashes.bike)}</td><td>${cell(h.crashes.severe)}</td></tr>` : ''}</tbody></table>`;
+  return `<p>${T('hood.crash_years_lede')}</p>${yearGroup(ui, { id: 'crash', view, name: 'hood.chart_name_crashes', off, series, tables: table })}`;
+}
+
 
 /** SEMCOG asks for this sentence wherever their data is reproduced, and it is theirs, so it stays in their
  *  words: the same English on an Arabic, Bengali or Spanish screen, marked `lang="en"` so a screen reader says
@@ -313,17 +443,18 @@ export const SEMCOG_NOTICE = 'Copyright © 2025 SEMCOG. All Rights Reserved. Rep
  * comparison with another neighborhood, and nothing about who was at fault: these are counts of crashes on
  * streets, not a judgement of the people in them. Drawn only when the bundle carries the numbers.
  */
-export function crashPanel(h: Hood, d: Indicators, ui: Ui): string {
+export function crashPanel(h: Hood, d: Indicators, ui: Ui, view: HoodView = 'table', off: ReadonlySet<string> = new Set()): string {
   if (!d.sources.crashes || !h.crashes || !d.crash_years) return '';
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
   const num = (n: number) => new Intl.NumberFormat(locale()).format(n);
-  const show = (c: Count | undefined) => (c === undefined ? T('hood.none_recorded') : c === 'lt5' ? T('hood.lt5') : num(c));
+  const show = (c: Count | undefined) => (c === undefined ? T('hood.none_recorded') : ui.esc(num(c)));
   const city = (c: Count | undefined) => (typeof c === 'number' ? T('hood.crash_city', { count: num(c) }) : '');
   const line = (label: string, k: keyof CrashCounts) =>
     `<li><span>${label}</span><span>${show(h.crashes![k])}${city(d.city_crashes?.[k]) ? ` <small>${city(d.city_crashes?.[k])}</small>` : ''}</span></li>`;
   const [from, to] = d.crash_years;
   return `<h2>${T('hood.crash_head')}</h2><div class="panel"><p>${T('hood.crash_lede', { from, to })}</p>
     <ul class="hours">${line(T('hood.crash_walk'), 'walk')}${line(T('hood.crash_bike'), 'bike')}${line(T('hood.crash_severe'), 'severe')}</ul>
+    ${crashYears(h, d, ui, view, off, h.crashes_by_year)}
     <p class="foot">${T('hood.crash_note')}</p>
     <p class="foot">${slot(ui, 'hood.crash_source', 'source', d.sources.crashes.name, { records: d.crash_records_from ?? '' })}</p>
     <p class="foot" lang="en">${SEMCOG_NOTICE}</p></div>`;
@@ -361,18 +492,19 @@ export function nearestRow(h: Hood, ui: Ui, k: string): string {
 export function hoodPage(h: Hood, d: Indicators, ui: Ui, view: HoodView = 'table', off: ReadonlySet<string> = new Set()): string {
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
   /** A count series for the chart view: the same column the table already prints, by year. */
-  const series = (key: string, tone: 'a' | 'b', label: string, count: (y: YearStats) => Count | undefined): ChartSeries =>
+  const series = (key: string, tone: 'a' | 'b', label: string, count: (y: YearStats) => number | undefined): ChartSeries =>
     ({ key, tone, label: ui.t(label), points: seriesOf(h, d, count) });
   const near = (k: string) => nearestRow(h, ui, k);
   const cats = Object.entries(h.help.by).filter(([, n]) => n > 0);
   const src = (s: Source) => `<li>${ui.link(s.url, s.name)} <small>${T('hood.updated', { date: ui.date(s.last_edited) })}</small></li>`;
   const row = (label: string, value: string, city = '') => `<ul class="hours"><li><span>${label}</span><span>${value}${city ? ` <small>${city}</small>` : ''}</span></li></ul>`;
   const fmtRate = (r: number) => r.toFixed(r < 10 ? 1 : 0);
-  /** A count as of today, with its rate per 1,000 lots when the count can be shown and the base defended (rules 2 and 3). */
-  const per1000 = (c: Count | undefined) => { if (c === undefined) return T('hood.none_recorded'); if (c === 'lt5') return T('hood.lt5'); const r = rate(c, h.parcels); return r === undefined ? String(c) : T('hood.per_1000', { count: c, rate: fmtRate(r) }); };
+  /** A count as of today, with its rate per 1,000 lots when the base can be defended (rule 3). */
+  const per1000 = (c: Count | undefined) => { if (c === undefined) return T('hood.none_recorded'); const r = rate(c, h.parcels); return r === undefined ? String(c) : T('hood.per_1000', { count: c, rate: fmtRate(r) }); };
   const cityPer1000 = (c: Count | undefined) => { const r = rate(c, d.city_parcels); return r === undefined ? '' : T('hood.city_per_1000', { rate: fmtRate(r) }); };
-  const roads = h.now?.roads, cityRoads = d.city_now?.roads;
-  const roadsValue = !roads ? T('hood.roads_none') : roads.poor_pct === undefined ? T('hood.roads_few') : T('hood.roads_pct', { pct: roads.poor_pct, miles: (roads.miles ?? 0).toFixed(1) });
+  // Which counting rule each count uses, said on the row (docs/13, "Counting rules"): a bus stop or a Bridge-card
+  // store counts only inside the outline; a park or rec center counts inside or within half a mile.
+  const place = (label: string, n: number, rule: 'inside' | 'near') => `<li><span>${label} <small>${T(rule === 'inside' ? 'hood.rule_inside' : 'hood.rule_near', { miles: d.near_miles })}</small></span><span>${n}</span></li>`;
   const nc = h.nearest_city, mi = (m: number | null) => (m === null ? T('hood.none_found') : T('miles', { miles: m.toFixed(1) }));
   return `<main><p class="org">${h.district ? T('hood.district', { n: h.district }) : ''}${h.jlg_study_area ? ` · ${T('hood.in_jlg')}` : ''}</p>
     <p class="banner plain">${T('hood.describe')}</p>${ui.map(h)}
@@ -383,7 +515,8 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui, view: HoodView = 'table
     ${cats.length ? `<ul class="hours">${cats.map(([c, n]) => `<li><span>${T('add.cat.' + (c === 'shelter' ? 'shelter.emergency' : c))}</span><span>${n}</span></li>`).join('')}</ul>` : ''}
     ${h.help.none_listed_yet.length ? `<p class="foot">${T('hood.none_listed', { kinds: h.help.none_listed_yet.map((c) => ui.t('hood.kind.' + c)).join(', ') })}</p>` : ''}
     <h3 class="sub">${T('hood.nearest_head')}</h3><ul class="hours">${['food', 'clinic', 'narcan', 'indoors'].map(near).join('')}</ul>
-    <h3 class="sub">${T('hood.places_head', { miles: d.near_miles })}</h3><ul class="hours"><li><span>${T('hood.parks')}</span><span>${h.places.parks}</span></li><li><span>${T('hood.rec_centers')}</span><span>${h.places.rec_centers}</span></li><li><span>${T('hood.greenway_open')}</span><span>${h.places.greenway_open}</span></li>${h.places.snap_stores !== undefined ? `<li><span>${T('hood.snap_stores')}</span><span>${h.places.snap_stores}</span></li>` : ''}${h.places.bus_stops !== undefined ? `<li><span>${T('hood.bus_stops')}</span><span>${h.places.bus_stops}</span></li>` : ''}</ul>
+    <h3 class="sub">${T('hood.places_head')}</h3><ul class="hours">${place(T('hood.parks'), h.places.parks, 'near')}${place(T('hood.rec_centers'), h.places.rec_centers, 'near')}${place(T('hood.greenway_open'), h.places.greenway_open, 'near')}${h.places.snap_stores !== undefined ? place(T('hood.snap_stores'), h.places.snap_stores, 'inside') : ''}${h.places.bus_stops !== undefined ? place(T('hood.bus_stops'), h.places.bus_stops, 'inside') : ''}</ul>
+    <p class="foot">${T('hood.places_note', { miles: d.near_miles })}</p>
     ${nc ? `<h3 class="sub">${T('hood.city_near_head')}</h3><ul class="hours"><li><span>${T('hood.near.snap')}</span><span>${mi(nc.snap)}</span></li><li><span>${T('hood.near.grocery')}</span><span>${mi(nc.grocery)}</span></li><li><span>${T('hood.near.bus')}</span><span>${mi(nc.bus)}</span></li></ul>
     <p class="foot">${T('hood.snap_note')}</p>` : ''}
 
@@ -391,28 +524,15 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui, view: HoodView = 'table
       ${yearGroup(ui, { id: 'money', view, name: 'hood.chart_name_money',
         off, series: [series('sales', 'a', 'hood.sales', (y) => y.sales), series('permits', 'b', 'hood.permits', (y) => y.permits)],
         tables: `${yearsTable(h, d, ui, { value: (y) => y.median_price, count: (y) => y.sales, fmt: money, head: ui.t('hood.median'), countHead: ui.t('hood.sales'), missing: ui.t('hood.too_few'), caption: ui.t('hood.sales_caption') })}
-      ${yearsTable(h, d, ui, { value: (y) => y.permit_cost, count: (y) => y.permits, fmt: bigMoney, head: ui.t('hood.permit_cost'), countHead: ui.t('hood.permits'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.permits_caption') })}` })}
+      ${yearsTable(h, d, ui, { value: (y) => y.permit_cost, count: (y) => y.permits, fmt: bigMoney, head: ui.t('hood.permit_cost'), countHead: ui.t('hood.permits'), missing: ui.t('hood.none_recorded'), caption: ui.t('hood.permits_caption') })}` })}
       <p class="foot">${T('hood.money_note')}</p>
       <p class="foot">${T('hood.small_numbers')}</p>
       ${view === 'chart' ? `<p class="foot">${T('hood.chart_money_note')}</p>` : ''}
       ${d.sources.rentals ? `${row(T('hood.rentals'), per1000(h.now?.rental_certs), cityPer1000(d.city_now?.rental_certs))}<p class="foot">${T('hood.rentals_note')}</p>` : ''}</div>
 
-    ${d.sources.blight ? `<h2>${T('hood.cond_head')}</h2><div class="panel"><p>${T('hood.cond_lede')}</p>
-      ${yearGroup(ui, { id: 'blight', view, name: 'hood.chart_name_blight', off, series: [series('blight', 'a', 'hood.blight', (y) => y.blight)],
-        tables: yearsTable(h, d, ui, { value: (y) => rate(y.blight, h.parcels), cityValue: (y) => rate(y.blight, d.city_parcels), count: (y) => y.blight, fmt: (n) => n.toFixed(0), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.blight'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.blight_caption') }) })}
-      <p class="foot">${T('hood.blight_note')}</p>
-      ${yearGroup(ui, { id: 'demo', view, name: 'hood.chart_name_demo', off, series: [series('demo', 'a', 'hood.demolitions', (y) => y.demolitions)],
-        tables: yearsTable(h, d, ui, { value: (y) => (typeof y.demolitions === 'number' ? y.demolitions : undefined), fmt: (n) => String(n), head: ui.t('hood.demolitions'), countHead: '', missing: ui.t('hood.lt5_or_none'), caption: ui.t('hood.demo_caption') }) })}
-      ${yearGroup(ui, { id: 'issues', view, name: 'hood.chart_name_issues', off, series: [series('issues', 'a', 'hood.issues', (y) => y.issues)],
-        tables: yearsTable(h, d, ui, { value: (y) => y.issue_days, count: (y) => y.issues, fmt: (n) => ui.t('hood.days', { n }), head: ui.t('hood.issue_days'), countHead: ui.t('hood.issues'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.issues_caption') }) })}
-      <p class="foot">${slot(ui, 'hood.issues_note', 'types', (d.issue_types ?? []).join(', '))}</p>
-      ${d.sources.fires ? `${yearGroup(ui, { id: 'fires', view, name: 'hood.chart_name_fires', off, series: [series('fires', 'a', 'hood.fires', (y) => y.fires)],
-        tables: yearsTable(h, d, ui, { value: (y) => rate(y.fires, h.parcels), cityValue: (y) => rate(y.fires, d.city_parcels), count: (y) => y.fires, fmt: (n) => n.toFixed(1), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.fires'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.fire_caption') }) })}
-      <p class="foot">${T('hood.fire_note')}</p><details class="foot"><summary>${T('hood.fire_types')}</summary><p>${ui.own((d.fire_types ?? []).join('; '))}</p></details>` : ''}
-      ${d.sources.vacant ? `${row(T('hood.vacant', { from: ui.date(d.vacant_period?.[0] ?? ''), to: ui.date(d.vacant_period?.[1] ?? '') }), per1000(h.now?.vacant_reg), cityPer1000(d.city_now?.vacant_reg))}<p class="foot">${T('hood.vacant_note')}</p>` : ''}
-      ${d.sources.pavement ? `${row(T('hood.roads', { from: d.roads_years?.[0] ?? '', to: d.roads_years?.[1] ?? '' }), roadsValue, cityRoads?.poor_pct !== undefined ? T('hood.city_pct', { pct: cityRoads.poor_pct }) : '')}<p class="foot">${T('hood.roads_note')}</p>` : ''}</div>` : ''}
+    ${conditionsPanel(h, d, ui, view, off)}
 
-    ${crashPanel(h, d, ui)}
+    ${crashPanel(h, d, ui, view, off)}
 
     <h2>${T('hood.sources_head')}</h2><ul class="srcs">${[d.sources.sales, d.sources.permits, d.sources.rentals, d.sources.blight, d.sources.demolitions, d.sources.issues, d.sources.fires, d.sources.vacant, d.sources.pavement, d.sources.parcels, d.sources.snap, d.sources.bus_stops, d.sources.crashes, d.sources.neighborhoods].filter((x): x is Source => !!x).map(src).join('')}<li>${T('hood.source_ours')}</li></ul>
     <p class="foot">${T('hood.left_out')}</p></main>`;
@@ -446,14 +566,15 @@ function panelSource(h: Area, d: Indicators, ui: Ui, panel: string): string {
 }
 
 /** A city's crash panel: the same counts and the same words as a neighborhood's, with this area's own source. */
-function cityCrashPanel(h: Area, d: Indicators, ui: Ui): string {
+function cityCrashPanel(h: Area, d: Indicators, ui: Ui, view: HoodView, off: ReadonlySet<string>): string {
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
   const num = (n: number) => new Intl.NumberFormat(locale()).format(n);
-  const show = (c: Count | undefined) => (c === undefined ? T('hood.none_recorded') : c === 'lt5' ? T('hood.lt5') : num(c));
+  const show = (c: Count | undefined) => (c === undefined ? T('hood.none_recorded') : ui.esc(num(c)));
   const line = (label: string, k: keyof CrashCounts) => `<li><span>${label}</span><span>${show(h.crashes?.[k])}</span></li>`;
   const [from, to] = d.crash_years ?? ['', ''];
   return `<h2>${T('hood.crash_head')}</h2><div class="panel"><p>${T('hood.crash_lede', { from, to })}</p>
     <ul class="hours">${line(T('hood.crash_walk'), 'walk')}${line(T('hood.crash_bike'), 'bike')}${line(T('hood.crash_severe'), 'severe')}</ul>
+    ${crashYears(h, d, ui, view, off, h.crashes_by_year)}
     <p class="foot">${T('hood.crash_note')}</p>${panelSource(h, d, ui, 'crashes')}</div>`;
 }
 
@@ -514,7 +635,7 @@ export function cityPage(h: Area, d: Indicators, ui: Ui, view: HoodView = 'table
     <ul class="hours"><li><span>${T('city.vacancy_share')}</span><span>${T('city.vacancy_pct', { pct: v.pct })}</span></li></ul>
     <p class="foot">${T('city.vacancy_note')}</p>${panelSource(h, d, ui, 'vacancy')}</div>`;
 
-  const drawn: Record<string, string> = { help, parks, crashes: cityCrashPanel(h, d, ui), roads, vacancy, permits: permitPanel(h, d, ui, view, off) };
+  const drawn: Record<string, string> = { help, parks, crashes: cityCrashPanel(h, d, ui, view, off), roads, vacancy, permits: permitPanel(h, d, ui, view, off) };
   const sources = [...new Set(Object.values(h.sources))].map((k) => d.area_sources?.[k]).filter((s): s is AreaSource => !!s);
   return `<main><p class="org">${T('city.kind')}</p>
     <p class="banner plain">${T('hood.describe')}</p>${ui.map(h)}

@@ -57,7 +57,7 @@ const city = (over: Partial<Parameters<typeof buildAreas>[0]['cities'][number]> 
 });
 
 const build = (cities: ReturnType<typeof city>[], rows: BundleRow[] = [], extra: Partial<Parameters<typeof buildAreas>[0]> = {}) =>
-  buildAreas({ cities, sources: SOURCES, rows, crashes: { Hamtramck: { window: { walk: 69, bike: 29, severe: 'lt5' } } }, crashSource: CRASH_SOURCE, ...extra });
+  buildAreas({ cities, sources: SOURCES, rows, crashes: { Hamtramck: { window: { walk: 69, bike: 29, severe: 3 }, years: { '2020': { walk: 30, bike: 10, severe: 1 }, '2021': { walk: 39, bike: 19, severe: 2 } } } }, crashSource: CRASH_SOURCE, ...extra });
 
 // ---- PASER ----------------------------------------------------------------------------------------------
 
@@ -214,12 +214,14 @@ describe('what a city’s public sources do not support is said in words, not dr
   });
 });
 
-// ---- suppression scope ----------------------------------------------------------------------------------
+// ---- nothing is hidden (docs/13, honesty rule 2, as of 2026-09-22) -------------------------------------
 
-describe('suppression is only where suppression protects somebody (docs/13, honesty rule 2)', () => {
-  it('crash counts keep "fewer than 5" exactly as the crash file wrote them', () => {
+describe('every count is the real number: nothing on a city page is hidden (docs/13, honesty rule 2)', () => {
+  it('crash counts are the exact numbers the crash file wrote, per window and per year', () => {
     const a = build([city()]).areas[0]!;
-    expect(a.crashes).toEqual({ walk: 69, bike: 29, severe: 'lt5' });
+    expect(a.crashes).toEqual({ walk: 69, bike: 29, severe: 3 });
+    expect(a.crashes_by_year).toEqual({ '2020': { walk: 30, bike: 10, severe: 1 }, '2021': { walk: 39, bike: 19, severe: 2 } });
+    expect(JSON.stringify(a)).not.toContain('lt5');
   });
 
   it('parks, roads, homes, permits and parcels are real numbers however small', () => {

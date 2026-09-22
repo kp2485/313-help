@@ -26,8 +26,8 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 | **Help access** *(ours)* | Help listings inside or within ½ mile of the neighborhood, by category; "none listed yet" flags | Our bundle | Counts + list. Labeled as **directory coverage** until the directory is reasonably complete (see "Honesty rules") |
 | | Distance from the neighborhood's center to the nearest listed food, clinic, Narcan and indoor place (rec center or library), in a straight line, **and which listing that is** (`help.nearest_id`, 2026-09-22) | Our bundle | Miles, on a row that opens that listing |
 | | Parks, open greenway segments, rec centers within ½ mile | City parks / JLG / rec layers | Counts |
-| | Stores that take a Bridge card (SNAP) inside or within ½ mile; straight-line miles from the center to the nearest one, and to the nearest grocery store / supermarket / super store among them. Restaurant Meals Program places left out (only some people can use them) | `SNAP_Retailer_Locations` (points: coordinates + a grocery flag only; 893 of 921) | Count + miles, with "most are corner stores and gas stations" |
-| | DDOT bus stops inside or within ½ mile; miles to the nearest | `DDOT_Bus_Stops` (5,098 points, coordinates only; not the older `_102023` copy) | Count + miles, with "a stop nearby does not mean the bus comes often" |
+| | Stores that take a Bridge card (SNAP) **inside the outline** (see "Counting rules"); straight-line miles from the center to the nearest one, and to the nearest grocery store / supermarket / super store among them. Restaurant Meals Program places left out (only some people can use them) | `SNAP_Retailer_Locations` (points: coordinates + a grocery flag only; 893 of 921) | Count + miles, with "most are corner stores and gas stations" |
+| | DDOT bus stops **inside the outline**; miles to the nearest | `DDOT_Bus_Stops` (5,098 points, coordinates only; not the older `_102023` copy) | Count + miles, with "a stop nearby does not mean the bus comes often" |
 | **Conditions** | Blight tickets per 1,000 parcels, per year | Blight Tickets | Trend vs. itself, and vs. city median |
 | | Demolitions completed | Completed Demolitions | Count per year |
 | | Illegal dumping / park / tree / street light issues reported, and median days to close | Improve Detroit Issues | Trend + days-to-close |
@@ -41,12 +41,33 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 | **Safe streets** | Crashes involving people walking or biking, and how many of those killed or seriously hurt someone | SEMCOG "Crash Locations, 2015-2024" (`crash2024_10year`); the records are the Michigan State Police's. **Licence accepted as it stands on 2026-09-22 (DECISIONS), indemnification clause included: SEMCOG's portal-wide [Copyright License Agreement](https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement) — a perpetual royalty-free licence to reproduce and publish, a required copyright notice printed on the panel itself, a one-way indemnification clause, and no third-party rights, which is why the State Police are named on the panel.** The City's own Traffic Crashes layer holds 2011 only | Plain counts over one 5-year window, with the years on screen, beside the whole-city number. Never a rate |
 | **Health context** | Physical inactivity, poor mental health days, etc. | CDC PLACES (tract) | Map only, labeled "modeled estimate, about two years old — background, not a result" |
 
+### Counting rules (2026-09-22)
+
+Two rules, and the page says on each row which one its count uses (`hood.rule_inside`, `hood.rule_near`; `COUNT_RULE`
+in `pipeline/src/indicators.ts`):
+
+- **Inside the outline** — bus stops and stores that take a Bridge card. Both are dense along every road, so
+  "inside or within half a mile of the edge" counted most stops in three or four neighborhoods at once: Airport
+  Sub's page said **289** bus stops when **139** lie inside its outline, and the 205 pages added up to **20,505**
+  against 5,098 real stops (SNAP: 3,764 against 893). Now each stop and each store counts in exactly one
+  neighborhood — the one whose outline holds it, even-odd over the rings so a hole is outside (Belle Isle carries
+  one) — and a stop on no outline counts in none. Measured on 2026-09-22: the 205 pages sum to **4,526** bus stops
+  (4,536 lie inside Detroit's own outline; the rest of the 5,098 are in Hamtramck, Highland Park, Dearborn or on a
+  city-edge road, and three sit on a shared simplified edge and count in both neighbours) and **893** Bridge-card
+  stores. Pinned by `pipeline/test/pipeline.test.ts`.
+- **Inside or within half a mile** — our help listings, parks, rec centers and open greenway pieces. These are few,
+  and a park across the street from the line is one you walk to.
+
+The `nearest_city` distances are measured from the middle to the nearest point wherever it is, and are not touched
+by either rule (Airport Sub: 0.3 / 0.8 / 0 miles before and after). City pages count what is inside the city
+outline for everything (rule 7 under "The four cities"), which is the same audit and needed no change.
+
 **Deliberately left out: crime.** A per-neighborhood crime panel stigmatizes blocks, feeds the people-reporting dynamic doc 11 designs out, and adds nothing the City's own dashboard doesn't already show. If a partner insists, it appears only at council-district scale, never per neighborhood. Crashes are not an exception to this: "Safe streets" counts what happened on the streets, says nothing about who was at fault, and is a road-design number, not a crime number.
 
 ## Honesty rules (every one is a build-time check or a fixed piece of page copy)
 
 1. **No league tables.** No "best/worst neighborhoods" ranking anywhere. Each neighborhood is compared to itself over time first, then to the city median. Sorting the citywide table by a "badness" column is not offered.
-2. **Small numbers are suppressed — where suppression protects somebody.** Revised 2026-09-22 (Kyle: "just use the actual number, there is no need to truncate or round anything"; DECISIONS). **Home sales and building permits state their real count, however small**: both are public transaction records the City already publishes with the address on them, so hiding a 3 protected nobody and only made our page say less than the source it cites. The page carries one plain sentence instead — "Small numbers change a lot from year to year." Everything else is unchanged and still shows "fewer than 5" under five: crashes (which are about people, and where the identification risk docs/11 designs against is real), blight tickets, completed demolitions, reported problems, building fires, rental certificates, vacant registrations and rated street pieces. **A median still needs at least 10 sales**, because the middle of three moves with any one of them; the count beside it is shown whatever it is.
+2. **Counts are the real number, always.** Revised twice on 2026-09-22 (Kyle: "just use the actual number, there is no need to truncate or round anything"; then "I also see tons of 'fewer than 5'. I want exact numbers"; then "crashes too" — DECISIONS). Every count on every neighborhood and city page is the exact number the source returned: home sales, building permits, blight tickets, completed demolitions, reported problems, building fires, rental certificates, vacant registrations, rated street pieces **and crashes**. Nothing is written as "fewer than 5" anywhere in the dataset any more; the pipeline has no function that hides a count, and the regenerated file is tested to contain no `lt5`. The reasons: these are public records the City or SEMCOG already publishes with the address or the coordinates on them, so hiding a 3 protected nobody and only made our page say less than the source it cites; and this app ranks nothing, so a small number has nothing to be compared against. The crash decision deliberately reverses the identification concern of 2026-09-20, on the owner's call, and with it the per-year crash counts came back (`crashes_by_year`): with nothing hidden there is nothing to recover by subtraction. The page carries one plain sentence instead — "Small numbers change a lot from year to year." **Two summary statistics keep a floor**, because the middle of three moves with any one of them: a median price needs at least 10 sales, and a share of poor street needs at least 10 rated pieces; the count beside either is shown whatever it is.
 3. **Rates need denominators we can defend.** Per-parcel or per-housing-unit from the City's parcel layer / ACS; never per "resident" from stale counts without saying the year.
 4. **Descriptive, never causal.** Fixed copy on every page: "These numbers describe what happened here. They can't tell you why." Particularly for the greenway lens: the route wasn't placed at random, and before/after differences are not the greenway's "effect."
 5. **Enforcement is not the same as condition.** Blight tickets measure where inspectors went as much as where blight is. Said on the chart, not in a footnote.
@@ -90,21 +111,46 @@ and a diamond) and the pattern of its line (solid and dashed) — so the two are
 under forced colours and to a reader who sees no difference between the hues. Years run across, counts up from
 zero, ticks at round numbers, and **no trend line, no whole-city line and no other neighborhood anywhere on it**.
 
-**A count the pipeline hid is visible and is not a value** (Kyle, 2026-09-22: "the graphs are not showing counts
-fewer than 5"). It is a HOLLOW marker of the series' own shape at a fixed height — a tenth of the plot, the same
-constant on all three apps, always below the first tick over zero — and the line runs on through it as a dotted
-piece, so the year is plainly there, its number is plainly not, and the gap never reads as a zero. The axis is
-built so that it never labels a value between 0 and 5, and there is no code path from a hidden count to a length.
-Since the change to honesty rule 2 above, the series that can still carry one are blight tickets, demolitions,
-reported problems and fires; sales and permits state their number.
+**Every point is its exact number** (honesty rule 2, as of 2026-09-22). The hollow "fewer than 5" marker that the
+first version of the chart carried is gone from all three apps, with the dotted line pieces and the axis rule that
+never labelled a value under 5: a year has a value, drawn at that value and labelled with it, or nothing recorded,
+which is a break in the line — never a zero. A 3 is drawn at 3, on an axis whose ticks may read 1, 2, 3, 4.
 
-The chart shows **counts**; prices and permit costs stay in the table, and the chart view says so in one line.
-Every point carries its own accessible name — "2023, Homes sold: 14" — and its value on hover and on keyboard
-focus. The model (points, segments, markers, ticks, the summary sentence) is `apps/web/src/hoodchart.ts`, ported
-case for case to `HelpCore/HoodChart.swift` and to `hoodChartModel` in Android's `Hoods.kt`, and held to the same
-cases in all three test suites. It is drawn with no library anywhere: inline SVG on the web (which carries a
-`<title>` per point and prints), Swift Charts on the iPhone (for the VoiceOver audio graph the framework gives for
-free), and a plain `Canvas` on Android with one `AccessibilityNodeProvider` node per point.
+The chart shows **counts** (or, for one chart, days); prices and permit costs stay in the table, and the chart
+view says so in one line. Every point carries its own accessible name — "2023, Homes sold: 14", "2022, Middle time
+to close: 40 days" — and its value on hover and on keyboard focus. The model (points, segments, ticks, unit, the
+summary sentence) is `apps/web/src/hoodchart.ts`, ported case for case to `HelpCore/HoodChart.swift` and to
+`hoodChartModel` in Android's `Hoods.kt`, and held to the same cases in all three test suites. It is drawn with no
+library anywhere: inline SVG on the web (which carries a `<title>` per point and prints), Swift Charts on the
+iPhone (for the VoiceOver audio graph the framework gives for free), and a plain `Canvas` on Android with one
+`AccessibilityNodeProvider` node per point. Up to **three** series share one chart, each told apart three ways at
+once — colour (`--chart-a/b/c`, validated against the card in both themes with the dataviz palette checks and every
+one over 3:1), point shape (circle, diamond, square) and line pattern (solid, dashed, dash-dot).
+
+**The Conditions panel (2026-09-22).** Kyle asked for the Building panel's chart treatment on Conditions, with
+better UX. The series are grouped into charts that share a unit and a meaning, rather than one chart per table or
+one chart for everything:
+
+| Chart | Series | Unit | Why together |
+|---|---|---|---|
+| Blight tickets and buildings torn down | blight tickets (a), demolitions (b), each switchable | count | Both are things the City did to buildings, and reading them together is the panel's point; one axis, since they are counts of the same kind |
+| Problems people reported | reported problems | count | On its own: a report is not a ticket |
+| Time to close a problem | median days to close | **days** | Its own small chart, because days on a count axis is the dual-axis trick with one axis. Its table is the problems table above, which carries both columns |
+| Building fires | building fires | count | On its own: a fire is not a ticket |
+
+Registered empty buildings and street condition are today's numbers, not years (the City publishes no history
+for either), so they are tiles in the "at a glance" row and rows under the charts, never a chart. Each chart has a
+one-sentence plain-language lede saying what the number means and where it comes from; **one** Table | Chart
+control covers the panel; an **"at a glance"** row of the latest year's figures (and today's two) sits above the
+charts as stat tiles — label over value, the value in the text ink, never a series colour; every table and every
+axis runs oldest to newest so the most recent year is at the end; a point says its exact figure on hover, focus and
+to a screen reader; and a series the City has published nothing for says **"The City has not published this for
+{neighborhood}."** in one sentence instead of a table of blanks. The accessibility contract is the Building
+panel's: the table is the screen reader's source of truth and stays in the page, the chart has a name and a
+summary sentence, focus stays on the control, and the tokens hold 3:1 in both themes and under
+`prefers-contrast` / `forced-colors` (the contrast test computes it). **Safe streets** gets the same chart of its
+own per-year counts — walking, biking, killed or badly hurt as three toggleable lines — above the five-year totals
+it always had; a bundle built before the years existed draws the totals and no chart.
 
 ## The four cities (2026-09-22)
 
@@ -165,9 +211,9 @@ which is not the same value as `why: "not_published"`.
 3. **SEMCOG's notice is printed on every SEMCOG-sourced panel**, in SEMCOG's own English, marked `lang="en"`,
    never machine-translated. On a city page that is four panels: parks, crashes, street condition and empty
    homes. It is not printed on the Census permits panel, which is not SEMCOG's.
-4. **Suppression is unchanged in scope.** Crash counts — counts of people hurt — keep "fewer than 5" and stay
-   five-year totals. Parks, acres, rated miles, homes, permits and parcels are the real number however small
-   (DECISIONS 2026-09-22): three parks is `3`.
+4. **Nothing is hidden.** Crash counts, parks, acres, rated miles, homes, permits and parcels are the real
+   number however small (DECISIONS 2026-09-22, twice): three parks is `3`, and three severe crashes is `3`. A city
+   page's crashes carry each year of the window too (`crashes_by_year`), drawn with the same chart.
 5. **"Empty homes" is not Detroit's "registered empty buildings."** One counts homes with nobody in them on one
    day in 2020; the other counts owners who filed a registration in the past twelve months. Same word, different
    fact, and the panel says which.
@@ -223,7 +269,7 @@ publishes it.
 4. **Done 2026-09-18:** blight tickets (per 1,000 parcels, with the enforcement caveat on the chart), completed demolitions, and Improve Detroit issues with median days to close. Only four issue types are counted (illegal dumping, trees, parks, street lights): types about people, such as "Squatters Issue," are left out on purpose.
 5. **Done 2026-09-19** (Kyle approved the six layers; fields checked that day): stores that take a Bridge card and bus stops (help section), active rental certificates (staying-power panel), building fires, vacant-building registrations and main-street pavement (conditions). Counts are added up by the City's server by each layer's `neighborhood` field; SNAP stores and bus stops are downloaded as coordinates only (`data/ingested/city_points.json`) because "within ½ mile" needs the point; pavement pieces are downloaded as rating + length + line and only per-neighborhood totals are kept. The rental, fire and vacant layers carry addresses and owner names: we ask them for counts only. The ingest prints any new fire type that looks like a building fire but isn't in `FIRE_TYPES`, for a person to look at.
 6. **Crashes: done 2026-09-20** (Kyle's call, and re-recorded on 2026-09-20: the licence is **not** unstated, as that decision said — SEMCOG publishes a portal-wide Copyright License Agreement with a required notice and a one-way indemnification clause, and the records are the Michigan State Police's — DECISIONS 2026-09-20, "SEMCOG's terms were described wrongly"). `pipeline/src/ingest-crashes.ts` (`pnpm ingest:crashes`, by hand, about once a year) reads SEMCOG's crash layer for the four cities, keeps only crashes with a person walking or biking, and turns them into counts per neighborhood per year by mode and by whether someone was killed or seriously hurt. Everything else about a crash is dropped as it is read: no crash id, no date or time beyond the year, no ages, no driver, vehicle, alcohol or hit-and-run fields, and no coordinates in the output. Counts under 5 become `lt5` before anything is written. `data/ingested/crashes.json` is committed; the bundle carries the 5-year totals only; the page is the "Safe streets" panel.
-   **Its limits, all on the page or in this doc.** (a) The window is 2020 to 2024, the five most recent complete years the layer offers: it starts in the first COVID year, and a crash from 2025 is not in it yet. (b) A crash is placed by the neighborhood outline it falls in, so a crash on a street that forms a boundary can land on either side; of 3,043 crashes read on 2026-09-20, 2,486 fell inside a Detroit outline and the rest were in the other three cities or outside every outline. (c) "Killed or seriously hurt" counts **crashes**, not people, and does not say who was hurt — the walker, the rider or someone in a vehicle. (d) Most neighborhoods have fewer than 5 biking crashes and fewer than 5 serious ones in five years, so those numbers read "fewer than 5" (182 of 205 neighborhoods have at least one hidden number). (e) No rate: this doc defines no denominator for crashes. Walking counts without knowing how many people walk there is not a risk, and street-mile and population denominators both need a decision that has not been made.
+   **Its limits, all on the page or in this doc.** (a) The window is 2020 to 2024, the five most recent complete years the layer offers: it starts in the first COVID year, and a crash from 2025 is not in it yet. (b) A crash is placed by the neighborhood outline it falls in, so a crash on a street that forms a boundary can land on either side; of 3,043 crashes read on 2026-09-20 (and again, exactly, on 2026-09-22), 2,486 fell inside a Detroit outline and the rest were in the other three cities or outside every outline. (c) "Killed or seriously hurt" counts **crashes**, not people, and does not say who was hurt — the walker, the rider or someone in a vehicle. (d) Every count is exact since 2026-09-22 (honesty rule 2): the "fewer than 5" that 182 of 205 neighborhoods used to carry is gone, and the per-year counts are published beside the window total. (e) No rate: this doc defines no denominator for crashes. Walking counts without knowing how many people walk there is not a risk, and street-mile and population denominators both need a decision that has not been made.
 7. PLACES tract map; foreclosure and eviction sources, once found.
 
 Steps 2–6 are done. Step 7 is v1: PLACES and the foreclosure and eviction sources are not started.

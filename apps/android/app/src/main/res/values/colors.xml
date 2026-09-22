@@ -52,4 +52,5 @@
          other in both themes and under colour-blind simulation. -->
     <color name="chart_a">#0B6B43</color>
     <color name="chart_b">#1D4ED8</color>
+    <color name="chart_c">#B5177A</color>
 </resources>

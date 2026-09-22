@@ -8,6 +8,21 @@ import { pointInRing, type Neighborhood, type NowStats, type YearStats } from '.
 import type { CrashCounts, CrashRow } from './ingest-crashes.js';
 
 export const NEAR_MILES = 0.5;                       // "inside or within half a mile" (docs/13)
+/**
+ * Two counting rules, and which count uses which (docs/13, "Counting rules"; DECISIONS 2026-09-22):
+ *
+ *   INSIDE   — bus stops and stores that take a Bridge card. Both are dense along every road, so "within half a
+ *              mile of the edge" counted most stops in three or four neighborhoods at once: Airport Sub published
+ *              289 bus stops when 139 lie inside its outline, and the 205 pages added up to 20,505 against 5,098
+ *              real stops. Each stop and each store now counts in exactly one neighborhood — the one whose outline
+ *              it falls in (even-odd, so a hole is outside) — and a stop on no outline counts in none.
+ *   NEAR     — our help listings, parks, rec centers and open greenway pieces: inside or within half a mile. These
+ *              are few, and a park across the street from the line is one you walk to.
+ *
+ * The page says which rule each count uses. `nearest_city` distances are measured from the middle to the nearest
+ * point wherever it is, and are not touched by either rule.
+ */
+export const COUNT_RULE = { bus_stops: 'inside', snap_stores: 'inside', parks: 'near', rec_centers: 'near', greenway_open: 'near', help: 'near' } as const;
 export const HELP_TOPS = ['food', 'health', 'harm', 'shelter', 'utilities', 'hygiene', 'youth', 'rec', 'jobs', 'learn', 'treatment', 'housing', 'legal', 'ids', 'money', 'goods', 'kids', 'connect', 'transport', 'pets'] as const;
 /** Walk distance from the middle of the neighborhood to the nearest listing of each kind. */
 // `narcan` is the whole `harm` top-level, the same query the "I want free Narcan" screen makes since the
@@ -66,8 +81,11 @@ export interface NeighborhoodIndicators {
   years: Record<string, YearStats>;
   now?: NowStats;
   /** "Safe streets" (docs/13): crashes involving people walking or biking, added up over the years the panel
-   *  names. Plain counts, already hidden under 5. No rate: docs/13 defines no denominator for crashes. */
+   *  names. Exact counts. No rate: docs/13 defines no denominator for crashes. */
   crashes?: CrashCounts;
+  /** The same three counts for each year of the window (2026-09-22, when suppression ended): what the chart
+   *  draws. Additive: `crashes` is still the window total an older client prints. */
+  crashes_by_year?: Record<string, CrashCounts>;
 }
 
 // ---- city pages (docs/13, "The four cities"; DECISIONS 2026-09-22) ----------------------------------------
@@ -107,9 +125,15 @@ export interface AreaIndicators extends NeighborhoodIndicators {
 /** The index row for the Areas layer and the city list: a name and where its page is. Carries no indicator. */
 export interface CityRow { id: string; name: string; kind: 'city'; children: 'neighborhood' | 'none' }
 
-/** Is this point inside the area's own outline? A city page counts what is IN the city, not within half a mile
- *  of it — half a mile outside Hamtramck is Detroit, and Detroit's listings are not Hamtramck's. */
-const insideAny = (pt: { lat: number; lon: number }, rings: Pt[][]) => rings.some((r) => pointInRing([pt.lon, pt.lat], r));
+/**
+ * Is this point inside the area's own outline? Even-odd over every ring, so a point in a hole (Belle Isle carries
+ * one) is outside, and a point in one part of a two-part outline is inside. A city page counts what is IN the
+ * city, not within half a mile of it — half a mile outside Hamtramck is Detroit, and Detroit's listings are not
+ * Hamtramck's.
+ */
+export const pointInRings = (pt: { lat: number; lon: number }, rings: Pt[][]): boolean =>
+  rings.reduce((n, r) => n + (pointInRing([pt.lon, pt.lat], r) ? 1 : 0), 0) % 2 === 1;
+const insideAny = pointInRings;
 
 export function buildAreas(input: {
   cities: {
@@ -122,8 +146,8 @@ export function buildAreas(input: {
   rows: BundleRow[];
   /** Detroit's own parks layer, already in the bundle: Detroit's parks panel stays on the City's own numbers. */
   detroitParks?: { lat: number; lon: number; acres?: number }[];
-  /** Per-city crash totals from ingest-crashes.ts, keyed by the city NAME SEMCOG uses. */
-  crashes?: Record<string, { window: CrashCounts }>;
+  /** Per-city crash counts from ingest-crashes.ts, keyed by the city NAME SEMCOG uses. */
+  crashes?: Record<string, { window: CrashCounts; years?: Record<string, CrashCounts> }>;
   crashSource?: AreaSource;
 }): { cities: CityRow[]; areas: AreaIndicators[]; area_sources: Record<string, AreaSource> } {
   const located = input.rows.filter((r) => r.status === 'active' && r.lat !== undefined && r.lon !== undefined);
@@ -141,7 +165,7 @@ export function buildAreas(input: {
     const parksInCity = detroit && input.detroitParks ? input.detroitParks.filter((q) => insideAny(q, c.rings)) : null;
     const parkCount = parksInCity ? parksInCity.length : c.parks?.count;
     const parkAcres = parksInCity ? Math.round(parksInCity.reduce((s, q) => s + (q.acres ?? 0), 0)) : c.parks?.acres;
-    const crashes = input.crashes?.[c.name]?.window;
+    const crashes = input.crashes?.[c.name]?.window, crashYears = input.crashes?.[c.name]?.years;
     // The allow-list. A panel is listed only where this city has a source for it; `missing` says why for the rest.
     const panels: string[] = ['help'];
     const sources: Record<string, string> = {};
@@ -173,6 +197,7 @@ export function buildAreas(input: {
       ...(c.vacancy ? { vacancy: { housing_units: c.vacancy.housing_units, vacant: c.vacancy.vacant, pct: c.vacancy.pct, population: c.vacancy.population } } : {}),
       ...(anyPermits ? { permits_by_year: c.permits } : {}),
       ...(crashes ? { crashes } : {}),
+      ...(crashYears ? { crashes_by_year: crashYears } : {}),
       years: {},                                     // a city page has no per-year City series of its own
       panels, sources, missing,
     };
@@ -185,7 +210,7 @@ export function buildAreas(input: {
 
 /** 0 when the point is inside; otherwise miles to the nearest edge. */
 export function milesToArea(pt: { lat: number; lon: number }, rings: Pt[][]): number {
-  if (rings.some((r) => pointInRing([pt.lon, pt.lat], r))) return 0;
+  if (pointInRings(pt, rings)) return 0;
   return Math.min(...rings.map((r) => milesToLine(pt, r)));
 }
 
@@ -213,12 +238,13 @@ export function buildIndicators(input: {
     const x0 = Math.min(...box.map((q) => q[0])) - pad, x1 = Math.max(...box.map((q) => q[0])) + pad, y0 = Math.min(...box.map((q) => q[1])) - pad, y1 = Math.max(...box.map((q) => q[1])) + pad;
     const maybe = (q: { lat: number; lon: number }) => q.lon >= x0 && q.lon <= x1 && q.lat >= y0 && q.lat <= y1;
     const near = (q: { lat: number; lon: number }) => maybe(q) && milesToArea(q, n.rings) <= NEAR_MILES;
+    const inside = (q: { lat: number; lon: number }) => maybe(q) && pointInRings(q, n.rings);
     const help = located.filter((r) => near({ lat: r.lat!, lon: r.lon! }));
     const by = Object.fromEntries(HELP_TOPS.map((t) => [t, help.filter((r) => r.category === t || r.category.startsWith(t + '.')).length]));
     const center = { lat: n.center[1], lon: n.center[0] };
     const nearest = nearestPicks(center, located);
     // A segment belongs to every neighborhood it passes through (any point of the path inside the outline).
-    for (const s of input.segments) if (s.lines.some((l) => l.some(([lon, lat]) => maybe({ lat, lon }) && n.rings.some((r) => pointInRing([lon, lat], r))))) (segHoods[s.id] ??= []).push(n.id);
+    for (const s of input.segments) if (s.lines.some((l) => l.some(([lon, lat]) => inside({ lat, lon })))) (segHoods[s.id] ??= []).push(n.id);
     return {
       id: n.id, name: n.name, district: n.district, ...(n.jlg_study_area ? { jlg_study_area: true } : {}),
       center: [n.center[1], n.center[0]] as [number, number],
@@ -233,12 +259,15 @@ export function buildIndicators(input: {
         parks: input.parks.filter(near).length,
         rec_centers: help.filter((r) => r.category === 'rec.center').length,
         greenway_open: open.filter((s) => s.lines.some((l) => l.some(([lon, lat]) => near({ lat, lon })))).length,
-        ...(input.snap ? { snap_stores: input.snap.filter((q) => near(asPt(q))).length } : {}),
-        ...(input.busStops ? { bus_stops: input.busStops.filter((q) => near(asPt(q))).length } : {}),
+        // Strictly inside (COUNT_RULE): a stop or a store counts in one neighborhood, never in every one it is
+        // half a mile from.
+        ...(input.snap ? { snap_stores: input.snap.filter((q) => inside(asPt(q))).length } : {}),
+        ...(input.busStops ? { bus_stops: input.busStops.filter((q) => inside(asPt(q))).length } : {}),
       },
       ...(input.snap && input.busStops ? { nearest_city: { snap: nearestMiles(center, input.snap), grocery: nearestMiles(center, input.snap.filter((q) => q[2] === 1)), bus: nearestMiles(center, input.busStops) } } : {}),
       ...(input.stats.parcels?.[n.id] ? { parcels: input.stats.parcels[n.id] } : {}),
       ...(input.crashes?.[n.id] ? { crashes: input.crashes[n.id]!.window } : {}),
+      ...(input.crashes?.[n.id]?.years ? { crashes_by_year: input.crashes[n.id]!.years } : {}),
       years: input.stats.neighborhoods[n.id] ?? {},
       ...(input.stats.current?.neighborhoods[n.id] ? { now: input.stats.current.neighborhoods[n.id] } : {}),
     };
