@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -18,7 +18,7 @@ import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, plainCo
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
 import { addressOnPage, fetchPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
-import { GRID, crossings, encodeLine, insideRings, mergeChains, packRoads, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
+import { GRID, clipToRings, crossings, encodeLine, insideRings, mergeChains, metresApart, packRoads, pickNames, roadName, simplify, tigerClass, tigerName, type Road } from '../src/ingest-basemap.js';
 
 const row = (over: Partial<BundleRow>): BundleRow => ({
   id: 'sal_test', name: 'Test', org: 'Org', category: 'food.pantry', what: 'Free groceries',
@@ -655,6 +655,38 @@ describe('street map from City open data', () => {
     expect(hoods).not.toMatch(/-83\.36\b/);
   });
   const road = (name: string, cls: number, line: [number, number][]): Road => ({ name, cls, line });
+  it('the committed basemap draws the streets that run through Highland Park, not only the ones that end there', () => {
+    // The mid-vertex rule used to drop any TIGER line that ran on past the city line, and the City of Detroit's
+    // own layer stops dead at it, so 16.6% of Highland Park's 97 km of street — Woodward, John R, Brush, 3rd,
+    // Glendale, the Davison — had nothing drawn at all (2026-09-22). These are points on those streets, well
+    // inside Highland Park, each of which must now have a line within 20 m.
+    const dir = p('data/ingested/basemap');
+    const lines: [number, number][][] = [];
+    for (const f of ['base.json', ...readdirSync(join(dir, 'cells')).map((c) => join('cells', c))]) {
+      const j = JSON.parse(readFileSync(join(dir, f), 'utf8')) as { origin: [number, number]; roads: [number, number, number[]][] };
+      for (const [, , enc] of j.roads) { let x = 0, y = 0; const l: [number, number][] = [];
+        for (let i = 0; i < enc.length; i += 2) { x += enc[i]!; y += enc[i + 1]!; l.push([j.origin[0] + x / 1e5, j.origin[1] + y / 1e5]); }
+        lines.push(l); }
+    }
+    const nearest = (pt: [number, number]) => {
+      let best = Infinity;
+      for (const l of lines) for (let i = 0; i + 1 < l.length; i++) {
+        const [ax, ay] = l[i]!, [bx, by] = l[i + 1]!, dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy;
+        const t = L ? Math.max(0, Math.min(1, ((pt[0] - ax) * dx + (pt[1] - ay) * dy) / L)) : 0;
+        const d = metresApart(pt, [ax + t * dx, ay + t * dy]);
+        if (d < best) best = d;
+      }
+      return best;
+    };
+    const on: [string, [number, number]][] = [
+      ['Woodward Ave in Highland Park', [-83.09629, 42.40440]],     // was 25 m from anything we drew
+      ['John R St in Highland Park', [-83.09004, 42.40073]],        // was 54 m
+      ['Brush St in Highland Park', [-83.08921, 42.40502]],         // was 31 m
+      ['Glendale Ave in Highland Park', [-83.09923, 42.39702]],     // was 116 m
+      ['Hamilton Ave in Highland Park', [-83.10699, 42.40362]],     // was already drawn; must stay
+    ];
+    for (const [what, pt] of on) expect(nearest(pt), what).toBeLessThan(20);
+  });
   it('names: freeways the way people say them; turn lanes and ramps have no name', () => {
     expect(roadName('N I 75')).toBe('I-75'); expect(roadName('W I 96 CD')).toBe('I-96'); expect(roadName('S M 10')).toBe('M-10');
     expect(roadName('W I 94 Service Drive')).toBe('I-94 Service Drive');
@@ -667,6 +699,74 @@ describe('street map from City open data', () => {
     ]);
     expect(out).toHaveLength(2);
     expect(out.find((r) => r.name === 'Mack Ave')!.line.map((q) => q[0])).toEqual([-83.04, -83.03, -83.02, -83.01]);
+  });
+  // A city line, as TIGER draws one: a square with its west edge at -83.11. "Inside" is the city.
+  const CITY: [number, number][][] = [[[-83.11, 42.39], [-83.09, 42.39], [-83.09, 42.42], [-83.11, 42.42], [-83.11, 42.39]]];
+  it('joins two pieces of one street that end a couple of metres apart, as TIGER leaves them', () => {
+    // 2 m at this latitude is about 0.000018 of a degree of latitude.
+    const a: [number, number][] = [[-83.100, 42.400], [-83.098, 42.400]];
+    const b: [number, number][] = [[-83.098, 42.400018], [-83.096, 42.400018]];
+    expect(metresApart(a[1]!, b[0]!)).toBeLessThan(2.1);
+    const out = mergeChains([road('Ford St', 4, a), road('Ford St', 4, b)]);
+    expect(out).toHaveLength(1);
+    expect(out[0]!.line[0]![0]).toBeCloseTo(-83.1, 6);
+    expect(out[0]!.line[out[0]!.line.length - 1]![0]).toBeCloseTo(-83.096, 6);
+  });
+  it('steps over the gap TIGER leaves at an intersection, but not across to another carriageway', () => {
+    // 15 m of nothing, then the street carries straight on: one line.
+    const west: [number, number][] = [[-83.104, 42.400], [-83.1020, 42.400]];
+    const east: [number, number][] = [[-83.10182, 42.400], [-83.100, 42.400]];
+    expect(metresApart(west[1]!, east[0]!)).toBeGreaterThan(10);
+    expect(mergeChains([road('Tyler St', 4, west), road('Tyler St', 4, east)])).toHaveLength(1);
+    // The same 15 m, but the other piece runs back the way we came, 15 m to the side: two lines, as before.
+    const back: [number, number][] = [[-83.10182, 42.40013], [-83.104, 42.40013]];
+    expect(mergeChains([road('Tyler St', 4, west), road('Tyler St', 4, back)])).toHaveLength(2);
+    // And a street that turns hard at the gap is not swept up either.
+    const turn: [number, number][] = [[-83.10182, 42.400], [-83.10182, 42.403]];
+    expect(mergeChains([road('Tyler St', 4, west), road('Tyler St', 4, turn)])).toHaveLength(2);
+  });
+  it('a street that crosses the city line is kept and cut at the line, not thrown away', () => {
+    // Runs from Detroit into the city and out the far side. Its middle vertex is inside; its ends are not.
+    const line: [number, number][] = [[-83.13, 42.40], [-83.10, 42.40], [-83.07, 42.40]];
+    const inside = clipToRings(line, CITY, true);
+    expect(inside).toHaveLength(1);
+    expect(inside[0]![0]![0]).toBeCloseTo(-83.11, 6);
+    expect(inside[0]![inside[0]!.length - 1]![0]).toBeCloseTo(-83.09, 6);
+    const outside = clipToRings(line, CITY, false);
+    expect(outside).toHaveLength(2);
+    // The two sides meet exactly on the line: no gap for a street to disappear into.
+    expect(outside[0]![outside[0]!.length - 1]![0]).toBeCloseTo(-83.11, 9);
+    expect(outside[1]![0]![0]).toBeCloseTo(-83.09, 9);
+    // A line nowhere near the city is handed back whole, and none of it is "inside".
+    const far: [number, number][] = [[-83.20, 42.30], [-83.19, 42.30]];
+    expect(clipToRings(far, CITY, false)).toEqual([far]);
+    expect(clipToRings(far, CITY, true)).toEqual([]);
+  });
+  it('a street through the city line comes out as one polyline with one label', () => {
+    // What the ingest does: the City of Detroit's layer clipped to outside, TIGER's clipped to inside, merged.
+    const city: [number, number][] = [[-83.13, 42.40], [-83.10, 42.40]];      // the City draws past the line
+    const tiger: [number, number][] = [[-83.12, 42.40], [-83.07, 42.40]];     // TIGER draws right across it
+    const pieces = [
+      ...clipToRings(city, CITY, false).map((l) => road('Ford St', 4, l)),
+      ...clipToRings(tiger, CITY, true).map((l) => road('Ford St', 4, l)),
+    ];
+    const out = mergeChains(pieces);
+    expect(out).toHaveLength(1);
+    const xs = out[0]!.line.map((q) => q[0]);
+    expect(Math.min(...xs)).toBeCloseTo(-83.13, 6);
+    expect(Math.max(...xs)).toBeCloseTo(-83.09, 6);
+    // No step anywhere along it bigger than a block: the line really is continuous.
+    for (let i = 1; i < out[0]!.line.length; i++) expect(metresApart(out[0]!.line[i - 1]!, out[0]!.line[i]!)).toBeLessThan(2600);
+  });
+  it('TIGER sends one edge once per name; one geometry keeps one name, the one the City uses', () => {
+    const l: [number, number][] = [[-83.10, 42.40], [-83.09, 42.40]];
+    const w: [number, number][] = [[-83.10, 42.41], [-83.09, 42.41]];
+    const out = pickNames([
+      { line: l, name: 'Tyler Ave', cls: 4 }, { line: l, name: 'Tyler St', cls: 4 },
+      { line: w, name: 'State Hwy 1', cls: 1 }, { line: w, name: 'Woodward Ave', cls: 1 },
+    ], new Set(['Tyler St', 'Mack Ave']));
+    expect(out).toHaveLength(2);
+    expect(out.map((r) => r.name).sort()).toEqual(['Tyler St', 'Woodward Ave']);   // a route number never wins
   });
   it('drops points that do not change the shape, keeps corners, and encodes to whole meters-ish', () => {
     const line: [number, number][] = [[-83.05, 42.35], [-83.04, 42.350001], [-83.03, 42.35], [-83.03, 42.36]];

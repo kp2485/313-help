@@ -139,8 +139,37 @@ val mapLayerStyles: Map<String, MapLayerStyle> = mapOf(
 fun mapLayerStyle(id: String, @Suppress("UNUSED_PARAMETER") style: MapStyle = MapStyle.STANDARD): MapLayerStyle =
     mapLayerStyles[id] ?: MapLayerStyle("bus")
 
-/** What a first-time visitor sees: the greenway, the parks and the buses, so the map opens fast and plain. */
-val defaultMapLayers = listOf("place:greenway", "place:parks", "go:ddot_routes")
+/**
+ * The outlines of the four cities and the 205 Detroit neighborhoods, as a layer (audit §3; DECISIONS 2026-09-22).
+ *
+ * Thin dashed lines with names, the neighborhoods only from the zoom at which a name fits; **no choropleth, ever**
+ * (docs/13, rule 1) — the only fill is a wash on the one outline that was tapped, which carries no number. The
+ * layer is handed no listing at all, so the rule about sensitive rows is satisfied by there being nothing to drop.
+ */
+const val AREAS_LAYER = "place:areas"
+
+/**
+ * Below this many metres per dp the neighborhood outlines are drawn and named; above it, the four city outlines
+ * alone. It is the label rule itself: about 70 dp of name over an area about a kilometre across.
+ */
+const val AREAS_NAME_METERS_PER_DP = 14.0
+
+/**
+ * What a first-time visitor sees (audit H2; Kyle, 2026-09-22; DECISIONS 2026-09-22).
+ *
+ * It used to be the greenway, the parks and the DDOT routes — a street map with a green line on it and **not one
+ * place that helps**. The one tab named after the thing on it opened without the thing, and a person who tapped
+ * Map to find food had to open the switcher and tick a box before the tab did anything the app is for.
+ *
+ * So: **every help layer on, parks on, the greenway off, the outlines off, the bus routes off.** All eight help
+ * groups rather than food alone, because the map is where a helper asks "what is near this address?" and the
+ * honest answer is all of it; parks because they are the other thing a map is for; the greenway off because it is
+ * one path inside a 302-park system (Kyle, direction b) and one tap away in the switcher; the bus routes off
+ * because a route line over eight kinds of dot is the busiest thing on the screen.
+ *
+ * A remembered choice still wins: this list is only ever read on a phone that has never touched the switcher.
+ */
+val defaultMapLayers = mapGroups.map { "help:${it.id}" } + listOf("place:parks")
 
 /** How wide a layer's line is drawn, in dp, at this zoom. */
 fun mapLayerLineWidth(style: MapLayerStyle, metersPerPoint: Double): Double =

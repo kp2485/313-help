@@ -51,19 +51,34 @@ const val LOCATE_RADIUS_METERS = 3218.688
  * Where a map of Detroit looks when nobody has said where they are (Kyle, 2026-09-22: "the initial map
  * presentation needs to be much more zoomed in"; DECISIONS 2026-09-22).
  *
- * The point is **Detroit City Hall** — the Coleman A. Young Municipal Center — which the app already carries, in
- * code, as the civic reference point of the `detroit` service area (`SERVICE_AREAS` in
- * apps/android/query/.../Areas.kt, the Kotlin copy of packages/query/src/areas.ts). Reused rather than re-typed,
- * so there is one Detroit-centre number on all three clients; and it is the published address of a public
- * building, which says nothing about anybody.
+ * The place is **Detroit City Hall** — the Coleman A. Young Municipal Center — which the app already carries, in
+ * code, as the civic reference point of the `detroit` service area ([CITY_HALL]); it is the published address of
+ * a public building and says nothing about anybody, and it is still what the app says in words ("City Hall").
+ *
+ * The *centre of the view* is **0.6 mile up Woodward from it**, which is Grand Circus Park. City Hall itself sits
+ * about a third of a mile from the river, so a two-mile box centred on it spends a third of its height on Windsor
+ * and on the hatching that means "not our area" — a map whose lower half answers nothing. Nudging the centre up
+ * Woodward puts the whole box on the city while keeping the same landmark.
+ *
+ * The number is pinned here rather than computed at run time so the three clients cannot drift (the same constant
+ * is `MAP_ANCHOR` in apps/web/src/locate.ts):
+ * lat 42.3293 + 0.6·cos(31.9°)·1609.344/111320, lon −83.0452 − 0.6·sin(31.9°)·1609.344/(111320·cos 42.35°).
  */
-val MAP_ANCHOR: LatLon = SERVICE_AREAS.getValue("detroit").point!!
+val CITY_HALL: LatLon = SERVICE_AREAS.getValue("detroit").point!!
+
+/** How far up Woodward the opening view is nudged, in miles, and Woodward's bearing from downtown measured off
+ *  the map (Campus Martius to New Center): 31.9° west of north. */
+const val ANCHOR_NUDGE_MILES = 0.6
+const val ANCHOR_BEARING_DEG = -31.9
+
+val MAP_ANCHOR: LatLon = LatLon(42.3366, -83.0514)
 
 /**
- * Two and a half miles, in metres: the anchor view is a little wider than the you-are-here view, because the
- * anchor is the city's front door and not where the person actually is.
+ * Two miles, as everywhere else (Kyle, 2026-09-22: "always a 2-mile radius"). It used to be two and a half here,
+ * on the reasoning that the anchor is the city's front door rather than where the person is; Kyle's answer is that
+ * one radius people can learn is worth more than that distinction.
  */
-const val ANCHOR_RADIUS_METERS = 4023.36
+const val ANCHOR_RADIUS_METERS = LOCATE_RADIUS_METERS
 
 /**
  * The opening view of the Map tab, as a point and a radius — the one decision behind "how far out does the map
@@ -115,6 +130,40 @@ fun firstOpenAction(
     if (permission == LocatePermission.DENIED) return FirstOpenAction.NONE
     if (flagAnswered) return FirstOpenAction.NONE
     return FirstOpenAction.SHOW_CARD
+}
+
+// ---- how long we listen ------------------------------------------------------------------------------------------
+
+/**
+ * **The ten-second give-up is gone** (Kyle, 2026-09-22; DECISIONS 2026-09-22). Two of the first people this app is
+ * for are a survivor whose service has been cut off and a person without housing and without signal, and on a
+ * phone with no network a cold GPS fix is a walk outside and a few minutes of sky — not ten seconds. Giving up at
+ * ten and saying "we couldn't get your location" was the app telling the truth about its own patience and a lie
+ * about the phone's.
+ *
+ * So the ask runs for **five minutes**, and after **ten seconds** the screen says what is happening and what would
+ * help ("Still looking…"), with **Stop looking** beside it and the cross-street and ZIP ways in on the screen the
+ * whole time. Cancelling stops us listening, so a fix that lands after the person has typed a junction never moves
+ * the map out from under them.
+ */
+const val LOCATE_SLOW_MS = 10_000L
+const val LOCATE_TIMEOUT_MS = 300_000L
+
+/** The three answers our own card takes. "Type a cross street" is an answer too: a person who says where they are
+ *  has said where they are, so the card closes, the field opens, and it is not shown again. */
+enum class LocateCardAnswer { YES, NO, CROSS }
+
+/**
+ * What either of the three buttons does, as a decision rather than as three listeners — the same table as
+ * `locateCardClick` in apps/web/src/locate.ts, so the clients cannot drift on the one rule that matters: **every**
+ * answer marks the card answered, and only "yes" asks the system for anything.
+ */
+class LocateCardEffect(val ask: Boolean, val openCrossStreet: Boolean, val close: Boolean, val remember: Boolean)
+
+fun locateCardClick(answer: LocateCardAnswer): LocateCardEffect = when (answer) {
+    LocateCardAnswer.YES -> LocateCardEffect(ask = true, openCrossStreet = false, close = false, remember = true)
+    LocateCardAnswer.CROSS -> LocateCardEffect(ask = false, openCrossStreet = true, close = true, remember = true)
+    LocateCardAnswer.NO -> LocateCardEffect(ask = false, openCrossStreet = false, close = true, remember = true)
 }
 
 // ---- the one thing this phone remembers --------------------------------------------------------------------------
