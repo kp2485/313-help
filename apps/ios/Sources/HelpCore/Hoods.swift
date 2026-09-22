@@ -258,6 +258,16 @@ public struct Indicators: Decodable, Equatable, Sendable {
         city = try c.decode([String: HoodYear].self, forKey: .city)
         neighborhoods = try c.decode([Hood].self, forKey: .neighborhoods)
         segments = try c.decode([String: [String]].self, forKey: .segments)
+        // The four cities (DECISIONS 2026-09-22). This hand-written initialiser left all five of these keys out,
+        // so every one of them was silently nil on the phone however good the bundle was: no city rows in the
+        // index, no city page reachable, and — the reason it was found — nothing for a Hamtramck, Highland Park
+        // or Dearborn fix to land on when the Areas tab became a map (2026-09-22). They are optional because a
+        // bundle built before the city pages carries none of them, not because they are optional to read.
+        cities = try c.decodeIfPresent([CityRow].self, forKey: .cities)
+        areas = try c.decodeIfPresent([Area].self, forKey: .areas)
+        areaSources = try c.decodeIfPresent([String: AreaSource].self, forKey: .areaSources)
+        pavementYear = try c.decodeIfPresent(Int.self, forKey: .pavementYear)
+        permitYears = try c.decodeIfPresent([Int].self, forKey: .permitYears)
     }
     public var firstYear: Int
     /// The year that is still running: its row is labelled "so far", never compared as if it were finished.

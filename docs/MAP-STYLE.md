@@ -869,14 +869,21 @@ boundaries for ever; adding the layer on every load instead would mean nobody co
 - [x] Web: `bounds.ts`, `map.ts` (one pass), `layers.ts` (defaults + marker), `maplist.ts`, `stylepanel.ts`,
       `style.css` (`--map-bnd` ×4 modes, `.trkey i.bnd`), `apps/web/test/boundaries.test.ts`, the contrast walk
       in `web.test.ts`. Screenshots: `docs/img/map-boundaries/`.
-- [ ] iPhone: `HelpCore/Boundaries.swift` with `boundaryBand` / `boundaryStyle` against the same table;
-      `MapPalette.swift` gains `--map-bnd` in all four values; `MapCanvas` draws the pass between the streets
-      and the transit lines; the layer defaults and the `LAYERS_VERSION` marker in the state file.
-- [x] Android: `app/src/main/kotlin/org/help313/app/Bounds.kt` in `:core` (the band table and the token in four
-      modes), `MapPalette.boundary`, `map_bnd` / `map_bnd_more` in `res/values{,-night}/colors.xml`, the pass in
-      `MapView.drawAreas` with the names in `drawNames` between the streets and the parks, `defaultMapLayers` and
-      `LAYERS_VERSION` / `migrateLayers` in `MapLayers.kt`, the key in `MapScreen.mapKey` and the list section in
-      `MapScreen.list`. Held to this table by `ParityTest`, which reads `apps/web/src/bounds.ts`.
+- [x] iPhone (2026-09-22): `HelpCore/Boundaries.swift` with `boundaryBand` / `boundaryStyle` against the same
+      table; `MapToken.boundary` carries `--map-bnd` in all four values (`MapStyle.swift`, resolved by
+      `MapPalette.swift`); `MapCanvas` draws the pass between the streets and the transit lines, names
+      nearest-centre-first through the map's own collision test; `defaultMapLayers` gains the layer and
+      `layersVersion` / `migrateMapLayers` do the once-only migration in `state/map-layers.json`; the key row
+      and the list section are in `MapScreen.swift`. `areasDrawn` no longer takes a zoom and
+      `areaDetailMetersPerPoint` is gone. Tests: `HelpCoreTests/BoundariesTests.swift`, the contrast pairs in
+      `MapStyleTests`, and `AppParityTests` reads this table out of `bounds.ts` and out of `Boundaries.swift`.
+- [x] Android (2026-09-22): `app/src/main/kotlin/org/help313/app/Bounds.kt` in `:core` (the band table and the
+      token in four modes), `MapPalette.boundary`, `map_bnd` / `map_bnd_more` in `res/values{,-night}/colors.xml`,
+      the pass in `MapView.drawAreas` with the names in `drawNames` between the streets and the parks,
+      `defaultMapLayers` gains the layer and `LAYERS_VERSION` / `migrateLayers` do the once-only migration in
+      `files/map-layers.json`, the key row in `MapScreen.mapKey` and the list section in `MapScreen.list`.
+      `drawnAreas` no longer takes a zoom and `AREAS_NAME_METERS_PER_DP` is gone. Held to this table by
+      `ParityTest`, which reads `apps/web/src/bounds.ts`.
 - Four things to get right, because they are where the web went wrong first: the dash is **absolute** and its
   "on" length is never under the stroke width; names are **capped and nearest-first**, not "whatever fits"; the
   migration marker must be written by **every** write of the layer list, not only by the migration; and the

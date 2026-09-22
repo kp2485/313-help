@@ -127,10 +127,36 @@ public func mapLayerStyle(_ id: String) -> MapLayerStyle { mapLayerStyles[id] ??
 ///
 /// A remembered choice still wins: this list is only ever read on a phone that has never touched the switcher.
 /// Exactly `DEFAULT_LAYERS` in apps/web/src/layers.ts, and `AppParityTests` holds the two together.
+///
+/// **Boundaries joined it on 2026-09-22** (Kyle: "The user needs to be able to see the boundaries of the
+/// neighborhoods on the map"; docs/MAP-STYLE.md 15.4). The outlines were the one thing on the Map tab a person
+/// could not get to without knowing the switcher existed, and a neighbourhood edge is not an extra: it is how
+/// somebody says where they live. They are drawn as a hairline under every dot and every line, so the map that
+/// opens is still a map of help with the ground drawn under it.
 public let defaultMapLayers = [
     "help:food", "help:shelter", "help:health", "help:rec", "help:work", "help:kids", "help:things", "help:paperwork",
-    "place:parks",
+    "place:parks", areasLayerId,
 ]
+
+/// What the stored layer list is a list OF. Bumped when the default set gains something every phone should see.
+///
+/// 1 (implied, no marker written): the list as it stood before 2026-09-22.
+/// 2: boundaries are in the defaults, and a list written before this existed gets them added once.
+///
+/// Why a marker rather than "just add it": a phone that has ever touched the switcher never reads
+/// `defaultMapLayers` again, so those people would have gone on seeing no boundaries for ever. Adding it on
+/// every load instead would mean a person could not turn it OFF. So it is added exactly once, the marker records
+/// that it happened, and from then on the remembered choice — including "off" — is the only thing that decides.
+public let layersVersion = 2
+
+/// The migration, as a pure function so `swift test` runs it: a stored list with no marker, or an older one,
+/// gains the boundaries once — at the end, nothing else touched, the 30-layer cap still applied. A list already
+/// stamped with this version is returned exactly as it was, whether or not the boundaries are in it.
+public func migrateMapLayers(_ stored: [String], version: Int?) -> [String] {
+    guard version != layersVersion else { return stored }
+    guard !stored.contains(areasLayerId) else { return stored }
+    return Array((stored + [areasLayerId]).suffix(30))
+}
 
 /// How wide a layer's line is drawn, in points, at this zoom.
 public func mapLayerLineWidth(_ style: MapLayerStyle, metersPerPoint: Double) -> Double {
@@ -235,16 +261,25 @@ public final class MapLayerStore {
     public private(set) var hoodView: HoodViewChoice
 
     /// What the file holds since 2026-09-21. Before that it was a bare list of layer ids, which is still read.
-    private struct Saved: Codable { var on: [String]; var style: String?; var hoodView: String? }
+    /// `v` is the layer list's version marker (docs/MAP-STYLE.md 15.4), added 2026-09-22; a file written before
+    /// that has none, which is exactly what the migration looks for.
+    private struct Saved: Codable { var on: [String]; var style: String?; var hoodView: String?; var v: Int? }
 
     public init(dir: URL) {
         file = dir.appendingPathComponent("map-layers.json")
         let d = DeviceState.read(file)
         if let d, let saved = try? JSONDecoder().decode(Saved.self, from: d) {
-            on = Array(saved.on.prefix(30)); style = mapStyle(saved.style); hoodView = hoodViewChoice(saved.hoodView)
+            let migrated = migrateMapLayers(Array(saved.on.prefix(30)), version: saved.v)
+            on = migrated; style = mapStyle(saved.style); hoodView = hoodViewChoice(saved.hoodView)
+            // The marker is written back the moment a list is migrated, so it happens exactly once: switching
+            // the boundaries off tomorrow must leave them off.
+            if saved.v != layersVersion { _ = write() }
         } else if let d, let list = try? JSONDecoder().decode([String].self, from: d) {
-            on = list; style = .standard; hoodView = .table
+            on = migrateMapLayers(Array(list.prefix(30)), version: nil); style = .standard; hoodView = .table
+            _ = write()
         } else {
+            // Never touched the switcher: the defaults, whatever they are today. Nothing is written, so a first
+            // run that never opens the switcher leaves no layer file at all, exactly as before.
             on = defaultMapLayers; style = .standard; hoodView = .table
         }
     }
@@ -275,8 +310,11 @@ public final class MapLayerStore {
         return write()
     }
 
+    /// **Every** write stamps the version marker, not only the migration: a choice made after it — including
+    /// "boundaries off" — must never be migrated again (docs/MAP-STYLE.md 15.4).
     private func write() -> Bool {
-        guard let d = try? JSONEncoder().encode(Saved(on: on, style: style.rawValue, hoodView: hoodView.rawValue)) else { return false }
+        guard let d = try? JSONEncoder().encode(Saved(on: on, style: style.rawValue, hoodView: hoodView.rawValue,
+                                                      v: layersVersion)) else { return false }
         do { try DeviceState.write(d, to: file); return true } catch { return false }
     }
 }

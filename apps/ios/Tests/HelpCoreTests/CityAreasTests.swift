@@ -45,22 +45,21 @@ final class CityAreasTests: XCTestCase {
         XCTAssertEqual(outline("a", [clockwise]).size, 4, accuracy: 1e-9)
     }
 
-    // MARK: - which outlines are drawn at which zoom
+    // MARK: - which outlines are drawn
 
-    /// A neighbourhood is drawn only from the zoom at which its own name fits; below that, the four city
-    /// outlines alone, because 205 dashed outlines at city zoom are a mesh rather than a map (audit §3.3).
-    func testNeighbourhoodOutlinesWaitForTheZoomAtWhichTheirNameFits() {
+    /// Every outline on the screen is drawn, in every band (2026-09-22, docs/MAP-STYLE.md 15). The zoom decides
+    /// how HEAVILY a boundary is drawn, never whether — the old 14 m/pt threshold hid all 205 of them at the one
+    /// zoom the Map tab ever opens on. The band table itself is `BoundariesTests`.
+    func testEveryOutlineOnTheScreenIsDrawnAtEveryZoom() {
         let view = MapBox(minX: -100, minY: -100, maxX: 100, maxY: 100)
         let list = [outline("city_detroit", [square(0, 0, 10)], city: true), outline("nbh_bagley", [square(1, 1, 1)])]
-        XCTAssertEqual(areasDrawn(list, view: view, metersPerPoint: 60).map(\.id), ["city_detroit"])
-        XCTAssertEqual(areasDrawn(list, view: view, metersPerPoint: 8).map(\.id), ["city_detroit", "nbh_bagley"])
-        XCTAssertEqual(areaDetailMetersPerPoint, 14)
+        XCTAssertEqual(areasDrawn(list, view: view).map(\.id), ["city_detroit", "nbh_bagley"])
     }
 
     func testAnOutlineOffTheScreenIsNotDrawn() {
         let view = MapBox(minX: 0, minY: 0, maxX: 1, maxY: 1)
         let list = [outline("far", [square(50, 50, 2)], city: true)]
-        XCTAssertTrue(areasDrawn(list, view: view, metersPerPoint: 8).isEmpty)
+        XCTAssertTrue(areasDrawn(list, view: view).isEmpty)
     }
 
     // MARK: - the reading order VoiceOver and the keyboard get

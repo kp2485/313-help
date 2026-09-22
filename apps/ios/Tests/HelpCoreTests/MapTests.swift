@@ -449,9 +449,12 @@ final class MapLayerStoreTests: XCTestCase {
     func testAFirstOpenShowsEveryKindOfHelpAndTheParks() throws {
         let store = MapLayerStore(dir: try tempDir())
         XCTAssertEqual(store.on, defaultMapLayers)
-        XCTAssertEqual(defaultMapLayers.count, 9)
+        XCTAssertEqual(defaultMapLayers.count, 10)
         for group in mapGroups { XCTAssertTrue(store.isOn("help:" + group.id), "the Map tab opens with help on it") }
         XCTAssertTrue(store.isOn("place:parks"))
+        // And the boundaries, since 2026-09-22: a neighbourhood edge is how somebody says where they live, and
+        // it was the one thing on this tab a person could not reach without knowing the switcher existed.
+        XCTAssertTrue(store.isOn(areasLayerId))
         XCTAssertFalse(store.isOn("place:greenway"))
         XCTAssertFalse(store.isOn("go:ddot_routes"))
         XCTAssertFalse(store.isOn("go:ddot_stops"))

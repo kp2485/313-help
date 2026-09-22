@@ -145,16 +145,22 @@ final class DirectionsParityTests: XCTestCase {
 
     /// The layer's id, and the fact that it is OFF by default on the Map tab — the Areas tab is where the job is
     /// "tell me about this part of the city" (audit §3.1). The web's `DEFAULT_LAYERS` says the same.
-    func testTheAreasLayerIsOffByDefaultAndNamedTheSame() throws {
+    /// **On by default since 2026-09-22** (Kyle: "The user needs to be able to see the boundaries of the
+    /// neighborhoods on the map"; docs/MAP-STYLE.md 15.4). The two clients' first-open lists are compared
+    /// id for id, in order, so neither can gain or lose a layer on its own.
+    func testTheAreasLayerIsOnByDefaultAndNamedTheSame() throws {
         let swift = try text("apps/ios/Sources/HelpCore/CityAreas.swift")
         XCTAssertTrue(swift.contains(#"public let areasLayerId = "place:areas""#))
         let layers = try text("apps/ios/Sources/HelpCore/MapLayers.swift")
         let defaults = layers.components(separatedBy: "public let defaultMapLayers = [")
         XCTAssertEqual(defaults.count, 2)
         let list = defaults[1].components(separatedBy: "]")[0]
-        XCTAssertFalse(list.contains("place:areas"), "the outlines must not be on when the Map tab first opens")
         let web = try text("apps/web/src/layers.ts")
         let webList = web.components(separatedBy: "export const DEFAULT_LAYERS = [")[1].components(separatedBy: "]")[0]
+        // The web writes it as the constant `AREAS_LAYER`; the iPhone as `areasLayerId`. Both stand for the same
+        // id, and neither list quotes it, so the comparison is made on the quoted ids plus that one name.
+        XCTAssertTrue(webList.contains("AREAS_LAYER"), "apps/web/src/layers.ts no longer ends with AREAS_LAYER")
+        XCTAssertTrue(list.contains("areasLayerId"), "the boundaries must be on when the Map tab first opens")
         XCTAssertEqual(quoted(list), quoted(webList), "the first-open layers differ from apps/web/src/layers.ts")
         // And the layer has a name in every language, so the switcher never shows a raw id.
         for l in Self.languages {
@@ -162,13 +168,78 @@ final class DirectionsParityTests: XCTestCase {
         }
     }
 
-    /// The zoom at which a neighbourhood outline appears is the web's `AREA_DETAIL_MPP`.
-    func testTheAreaDetailZoomMatchesTheWeb() throws {
-        let web = try text("apps/web/src/map.ts")
-        XCTAssertTrue(web.contains("export const AREA_DETAIL_MPP = 14;"),
-                      "apps/web/src/map.ts changed AREA_DETAIL_MPP; HelpCore must follow")
-        let swift = try text("apps/ios/Sources/HelpCore/CityAreas.swift")
-        XCTAssertTrue(swift.contains("public let areaDetailMetersPerPoint = 14.0"))
+    /// The migration marker, which is the only thing that lets a phone that has already touched the switcher see
+    /// the boundaries without taking away its ability to switch them off again.
+    func testTheLayerListVersionMatchesTheWeb() throws {
+        let web = try text("apps/web/src/layers.ts"), swift = try text("apps/ios/Sources/HelpCore/MapLayers.swift")
+        XCTAssertTrue(web.contains("export const LAYERS_VERSION = 2;"), "the web's layer-list version changed")
+        XCTAssertTrue(swift.contains("public let layersVersion = 2"), "HelpCore's layer-list version differs")
+    }
+
+    /// **How a boundary is drawn, band by band** (docs/MAP-STYLE.md 15.1). The web's `boundaryStyle` is the
+    /// table; this reads the numbers out of `apps/web/src/bounds.ts` and out of `HelpCore/Boundaries.swift` and
+    /// fails when one of them moves. It replaces the old single `AREA_DETAIL_MPP = 14` threshold, which hid all
+    /// 205 outlines at the only zoom the Map tab ever opens on.
+    func testTheBoundaryBandsMatchTheWeb() throws {
+        let web = try text("apps/web/src/bounds.ts"), swift = try text("apps/ios/Sources/HelpCore/Boundaries.swift")
+        XCTAssertFalse(try text("apps/web/src/map.ts").contains("export const AREA_DETAIL_MPP"),
+                       "the web dropped the single detail threshold; HelpCore must not bring it back")
+        XCTAssertFalse(try text("apps/ios/Sources/HelpCore/CityAreas.swift").contains("public let areaDetailMetersPerPoint"),
+                       "HelpCore still hides outlines by zoom; every band draws every outline now")
+        // The band cut points.
+        XCTAssertEqual(number(web, #"BOUNDARY_MID_MPP\s*=\s*([0-9.]+)"#), 30)
+        XCTAssertEqual(number(web, #"BOUNDARY_NEAR_MPP\s*=\s*([0-9.]+)"#), 12)
+        XCTAssertEqual(number(swift, #"boundaryMidMetersPerPoint\s*=\s*([0-9.]+)"#), 30)
+        XCTAssertEqual(number(swift, #"boundaryNearMetersPerPoint\s*=\s*([0-9.]+)"#), 12)
+        // The three rows of the table, read out of each client's own `boundaryStyle`.
+        for (band, width, cityWidth, dash) in [("city", 1.1, 1.5, "[2, 2]"), ("mid", 1.6, 2.4, "[3, 3]"), ("near", 2.2, 3.0, "[6, 3]")] {
+            let webRow = row(web, after: "band === '\(band)'") ?? (band == "near" ? tail(web) : nil)
+            XCTAssertNotNil(webRow, "apps/web/src/bounds.ts has no \(band) row")
+            XCTAssertEqual(number(webRow ?? "", #"width:\s*([0-9.]+)"#), width, "\(band) neighbourhood width, web")
+            XCTAssertEqual(number(webRow ?? "", #"cityWidth:\s*([0-9.]+)"#), cityWidth, "\(band) city width, web")
+            XCTAssertTrue((webRow ?? "").contains("dash: \(dash)"), "\(band) dash, web")
+            guard let swiftRow = row(swift, after: "case .\(band):") else { return XCTFail("Boundaries.swift has no \(band) row") }
+            XCTAssertEqual(number(swiftRow, #"width:\s*([0-9.]+)"#), width, "\(band) neighbourhood width, iPhone")
+            XCTAssertEqual(number(swiftRow, #"cityWidth:\s*([0-9.]+)"#), cityWidth, "\(band) city width, iPhone")
+            XCTAssertTrue(swiftRow.contains("dash: \(dash)"), "\(band) dash, iPhone")
+            // No names in the city band, and the cap everywhere else.
+            XCTAssertEqual(swiftRow.contains("names: true"), band != "city", "\(band) names, iPhone")
+            XCTAssertEqual((webRow ?? "").contains("names: true"), band != "city", "\(band) names, web")
+        }
+        // The cap, the minimum width a name needs, the selected stroke and the wash.
+        for (webName, swiftName, want) in [("BOUNDARY_NAME_CAP", "boundaryNameCap", 12.0),
+                                           ("BOUNDARY_NAME_MIN_PX", "boundaryNameMinPoints", 70.0),
+                                           ("BOUNDARY_SELECTED_WIDTH", "boundarySelectedWidth", 4.0),
+                                           ("BOUNDARY_WASH_ALPHA", "boundaryWashAlpha", 0.08)] {
+            XCTAssertEqual(number(web, webName + #"\s*=\s*([0-9.]+)"#), want, webName)
+            XCTAssertEqual(number(swift, swiftName + #"\s*=\s*([0-9.]+)"#), want, swiftName)
+        }
+        // The token is one name on both clients, and it is not a street colour.
+        XCTAssertTrue(web.contains(#"BOUNDARY_TOKEN = '--map-bnd'"#))
+        XCTAssertTrue(try text("apps/ios/Sources/HelpCore/MapStyle.swift").contains(#"boundary = "--map-bnd""#))
+    }
+
+    /// One row of the table: everything after the marker up to the end of that statement. The web writes a band
+    /// on one line, so a line is the row; Swift wraps its `return` over two, so a Swift row runs to the `)`.
+    private func row(_ source: String, after marker: String) -> String? {
+        guard let r = source.range(of: marker) else { return nil }
+        let rest = source[r.upperBound...]
+        if marker.hasPrefix("case ") {
+            guard let end = rest.range(of: ")\n") else { return nil }
+            return String(rest[..<end.upperBound])
+        }
+        return String(rest.prefix(while: { $0 != "\n" }))
+    }
+    /// The `near` band is the web's fall-through `return`, which names no band of its own.
+    private func tail(_ source: String) -> String? {
+        guard let r = source.range(of: "\n  return {", options: .backwards) else { return nil }
+        return String(source[r.upperBound...].prefix(while: { $0 != "\n" }))
+    }
+    private func number(_ source: String, _ pattern: String) -> Double? {
+        guard let re = try? NSRegularExpression(pattern: pattern) else { return nil }
+        let ns = source as NSString
+        guard let m = re.firstMatch(in: source, range: NSRange(location: 0, length: ns.length)) else { return nil }
+        return Double(ns.substring(with: m.range(at: 1)))
     }
 
     /// The layer is never handed a listing, so the sensitive rules are satisfied trivially: `areaOutlines` reads

@@ -45,12 +45,13 @@ final class MapStyleChoiceTests: XCTestCase {
                        "one file, the same one the layer choices are in")
     }
 
-    /// Yesterday's file was a bare list of layer ids. It still reads, and the style is then `standard`.
+    /// Yesterday's file was a bare list of layer ids. It still reads, the style is then `standard`, and — because
+    /// it carries no version marker — it gains the boundaries once (docs/MAP-STYLE.md 15.4).
     func testYesterdaysFileStillReads() throws {
         let dir = try tempDir()
         try Data(#"["go:mogo","place:parks"]"#.utf8).write(to: dir.appendingPathComponent("map-layers.json"))
         let store = MapLayerStore(dir: dir)
-        XCTAssertEqual(store.on, ["go:mogo", "place:parks"])
+        XCTAssertEqual(store.on, ["go:mogo", "place:parks", areasLayerId])
         XCTAssertEqual(store.style, .standard)
     }
 
@@ -59,7 +60,22 @@ final class MapStyleChoiceTests: XCTestCase {
         try Data(#"{"on":["go:mogo"],"style":"neon"}"#.utf8).write(to: dir.appendingPathComponent("map-layers.json"))
         let store = MapLayerStore(dir: dir)
         XCTAssertEqual(store.style, .standard)
-        XCTAssertEqual(store.on, ["go:mogo"])
+        XCTAssertEqual(store.on, ["go:mogo", areasLayerId], "a file with no marker gains the boundaries once")
+    }
+
+    /// Once, and only once. A person who switches the boundaries off must find them off next time: the marker is
+    /// written by every write of the list, not only by the migration.
+    func testTheBoundariesAreAddedOnceAndSwitchingThemOffSticks() throws {
+        let dir = try tempDir()
+        try Data(#"["help:food"]"#.utf8).write(to: dir.appendingPathComponent("map-layers.json"))
+        let first = MapLayerStore(dir: dir)
+        XCTAssertTrue(first.isOn(areasLayerId), "a list from before today gains them")
+        XCTAssertTrue(first.toggle(areasLayerId))
+        XCTAssertFalse(first.isOn(areasLayerId))
+        for _ in 0..<3 {
+            let again = MapLayerStore(dir: dir)
+            XCTAssertFalse(again.isOn(areasLayerId), "off must stay off, however many times the app is opened")
+        }
     }
 }
 
@@ -864,6 +880,10 @@ final class StandardPaletteTests: XCTestCase {
             var pairs: [(String, MapToken, MapToken)] = []
             for r in [MapToken.road, .main, .freeway] { pairs += [("\(r) on land", r, .land), ("\(r) over a park", r, .park), ("\(r) outside the cities", r, .out)] }
             pairs += [("hatch on its own ground", .outInk, .out), ("hatch against the land", .outInk, .land), ("casing over a street", .gwCase, .road)]
+            // A boundary against everything it is ever drawn over (docs/MAP-STYLE.md 15.2): the land, a park, and
+            // the hatched ground outside the four cities, which a city outline runs along.
+            pairs += [("boundary on land", .boundary, .land), ("boundary over a park", .boundary, .park),
+                      ("boundary outside the cities", .boundary, .out)]
             for g in [MapToken.gwOpen, .gwBuild, .gwFund, .gwPlan] { pairs += [("\(g) on land", g, .land), ("\(g) on its casing", g, .gwCase)] }
             for l in [MapToken.bus, .smart, .rail, .bike] { pairs += [("\(l) on land", l, .land), ("\(l) over a park", l, .park), ("\(l) on its casing", l, .gwCase)] }
             for (what, fg, bg) in pairs { XCTAssertGreaterThanOrEqual(RGB.contrast(c(fg), c(bg)), 3, "\(what), \(s)\(more ? ", more contrast" : "")") }

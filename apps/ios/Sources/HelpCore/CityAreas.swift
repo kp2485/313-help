@@ -182,13 +182,11 @@ extension Indicators {
 /// The id of the layer, as it is stored beside the others in `state/map-layers.json`.
 public let areasLayerId = "place:areas"
 
-/// A neighbourhood is drawn only from the zoom at which its own name fits (audit §3.3); below that, the four
-/// city outlines alone, because 205 dashed outlines at city zoom are a mesh, not a map. The number is the label
-/// rule itself: a name needs about 70 points, and a Detroit neighbourhood is about a kilometre across, so it
-/// earns its outline at 1000/70 ≈ 14 metres per point. Exactly `AREA_DETAIL_MPP` on the web.
-public let areaDetailMetersPerPoint = 14.0
-/// An area's name is drawn only when its own box is at least this many points wide (the web's `wide > 70`).
-public let areaLabelMinPoints = 70.0
+// The zoom at which a neighbourhood appeared — `areaDetailMetersPerPoint`, 14 — is **gone** (2026-09-22,
+// docs/MAP-STYLE.md section 15). It hid all 205 outlines at the only zoom the Map tab ever opens on, so a person
+// who came to see their neighbourhood's edge saw four city edges and nothing else. Every outline is drawn in
+// every band now; what keeps them from being a mesh is the weight `boundaryStyle` gives them (Boundaries.swift),
+// and the name rule that used to be spelt `areaLabelMinPoints` is that table's `nameMinPoints`.
 
 /// One city or neighbourhood outline, projected once and ready to draw and to tap. It is a SHAPE and a NAME and
 /// nothing else: it carries no listing, no dot and no number, which is how docs/08's rule about sensitive rows is
@@ -255,11 +253,10 @@ public func areaOutlines(_ d: Indicators, wholeCity: String, district: (Int?) ->
     return out
 }
 
-/// Which outlines are drawn at this zoom: every one that is on screen when a neighbourhood's name would fit, and
-/// the four city outlines alone below that.
-public func areasDrawn(_ list: [AreaOutline], view: MapBox, metersPerPoint: Double) -> [AreaOutline] {
-    let detailed = metersPerPoint < areaDetailMetersPerPoint
-    return list.filter { $0.box.intersects(view) && (detailed || $0.isCity) }
+/// Which outlines are drawn: every one that is on the screen, in every band (docs/MAP-STYLE.md 15.1). The zoom
+/// no longer decides WHETHER a boundary is drawn, only how heavily — so this is a clip and nothing more.
+public func areasDrawn(_ list: [AreaOutline], view: MapBox) -> [AreaOutline] {
+    list.filter { $0.box.intersects(view) }
 }
 
 /// The smallest outline holding a map point, or none. `evenodd` over every ring at once, so Detroit's enclave
