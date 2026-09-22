@@ -15,7 +15,7 @@ export interface Source {
   category?: string; org?: { id: string; name: string };
   fields?: Record<string, string>; extra?: string[]; id_prefix?: string;
   /** Which plain wording normalize.ts gives this layer's rows. Default: the Narcan boxes' wording. */
-  wording?: 'narcan_box' | 'supplies_station';
+  wording?: 'narcan_box' | 'supplies_station' | 'police_station' | 'fire_station';
   /** Service-area cities a layer that covers more than the service area is filtered to (ingest-mymap.ts). */
   cities?: string[];
 }

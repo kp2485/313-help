@@ -23,7 +23,9 @@ public struct MapGroup: Equatable, Sendable, Identifiable {
 public let mapGroups: [MapGroup] = [
     MapGroup(id: "food", symbol: "fork.knife", tops: ["food"]),
     MapGroup(id: "shelter", symbol: "bed.double", tops: ["shelter"]),
-    MapGroup(id: "health", symbol: "cross.case", tops: ["health", "harm"]),
+    // Police and fire stations ride with the emergency rooms they are listed beside (DECISIONS 2026-09-22). A
+    // layer of their own would need a colour of its own in three clients' map palettes.
+    MapGroup(id: "health", symbol: "cross.case", tops: ["health", "harm", "safe"]),
     MapGroup(id: "rec", symbol: "figure.run", tops: ["rec", "connect"]),
     MapGroup(id: "work", symbol: "briefcase", tops: ["jobs", "learn"]),
     MapGroup(id: "kids", symbol: "figure.2.and.child.holdinghands", tops: ["kids", "youth"]),
@@ -59,6 +61,22 @@ public func mapDrawable<T>(_ rows: [T], tops: [String],
 
 public func mapDrawable(_ rows: [BundleRow], tops: [String]) -> [BundleRow] {
     mapDrawable(rows, tops: tops, category: { $0.category }, hasPoint: { $0.lat != nil && $0.lon != nil })
+}
+
+/// The rows a screen that mixes categories draws from (`Need.categories` in HelpApp/Help.swift, `inCategories`
+/// in apps/web/src/needs.ts). A category matches whole or as a parent, the same way `DetroitQuery` matches one.
+///
+/// It lives here, where CI can run it, because "Get somewhere safe now" is an urgent screen and the one thing it
+/// must never do is show a listing that hides where it is.
+public func inCategories<T>(_ rows: [T], _ cats: [String], category: (T) -> String) -> [T] {
+    rows.filter { row in
+        let c = category(row)
+        return cats.contains { c == $0 || c.hasPrefix($0 + ".") }
+    }
+}
+
+public func inCategories(_ rows: [BundleRow], _ cats: [String]) -> [BundleRow] {
+    inCategories(rows, cats, category: { $0.category })
 }
 
 // MARK: - the layers on offer, and how each one is drawn

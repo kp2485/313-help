@@ -31,6 +31,11 @@ class Need(
      *  else's site are translated like the rest of the app; the second is its address. */
     val firstLink: Pair<String, String>? = null,
     val query: Query? = null,
+    /** One list drawn from SEVERAL categories, ranked together by the ordinary rules ("Get somewhere safe now").
+     *  `Query` holds one category and `:query` is the shared spec, so a screen that has to mix kinds says so here
+     *  and the screen narrows the rows before ranking them. Written after `query`, like `also`, so ParityTest
+     *  reads the three files in the same order. */
+    val categories: List<String> = emptyList(),
     /** Written after `query` and read after it, in all three apps, so a need's own list is never mistaken for
      *  this one (ParityTest compares both). */
     val also: Also? = null,
@@ -85,6 +90,13 @@ val NEEDS: List<Need> = listOf(
     ),
     Need("assault", "now", first = listOf("emg_avalon", "emg_voices4", "emg_911"),
         query = Query(category = "assault"), quickExit = true, intro = "assault.intro"),
+    // "Get somewhere safe now" (DECISIONS 2026-09-22): a door that is open at 3am with a phone behind it —
+    // police stations, fire stations and emergency rooms, in one list ranked by distance. It sits BELOW 911,
+    // 988 and the hotlines on the urgent sheet and here: docs/05's ordering is untouched, this is a row under it.
+    // It leads with 911 itself, and the screen names no reason: the one line about home (safe_now.home) says
+    // nothing about what kind of danger brought a person to it (docs/08).
+    Need("safe_now", "now", first = listOf("emg_911"),
+        categories = listOf("safe.police", "safe.fire", "health.er"), intro = "safe_now.intro"),
     Need("food", "soon", refine = listOf(
         Refine("today", Query(category = "food.meal", mode = "now")),
         Refine("week", Query(category = "food", mode = "week")),

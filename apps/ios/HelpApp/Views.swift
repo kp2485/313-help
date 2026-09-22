@@ -284,6 +284,10 @@ struct UrgentView: View {
             Text(L.t("urgent.lede")).font(.body).foregroundStyle(Color.muted).padding(.bottom, 4)
             EmergencyRows(ids: ["emg_911", "emg_988", "emg_shelter_helpline", "emg_shelter_outwayne", "emg_dwihn_crisis", "emg_ndvh", "emg_avalon", "emg_211"])
             NavRow(title: L.t("need.overdose_now"), symbol: "waveform.path.ecg") { OverdoseView() }.padding(.top, 6)
+            // The last row on the sheet, under every number: docs/05's ordering does not move (DECISIONS 2026-09-22).
+            if let safe = needs.first(where: { $0.id == "safe_now" }) {
+                NavRow(title: L.t("need.safe_now"), symbol: safe.symbol) { NeedView(need: safe) }
+            }
         }.padding(16) }
         .background(Color.appBg.ignoresSafeArea()).navigationTitle(L.t("strip.more")).navigationBarTitleDisplayMode(.inline)
     }
@@ -425,8 +429,10 @@ struct NeedView: View {
             .navigationTitle(L.t("need." + need.id)).navigationBarTitleDisplayMode(.inline)
             .urgentHelp(quickExit: need.quickExit)
         } else {
-            ResultsView(query: need.query ?? Query(), sensitive: need.sensitive, first: need.first, intro: need.intro,
+            ResultsView(query: need.query ?? Query(), categories: need.categories, sensitive: need.sensitive,
+                        first: need.first, intro: need.intro,
                         firstLink: need.firstLink, emptyKey: need.emptyKey, quickExit: need.quickExit,
+                        footnote: need.id == "safe_now" ? "safe_now.home" : nil,
                         also: need.also.map { (L.t("also.\(need.id).\($0.id)"), $0.query) })
                 .navigationTitle(L.t("need." + need.id))
         }
@@ -437,6 +443,10 @@ struct ResultsView: View {
     @EnvironmentObject var store: BundleStore
     @EnvironmentObject var here: Here
     let query: Query
+    /// Several categories in one list ("Get somewhere safe now"): the rows are narrowed by `inCategories`
+    /// (HelpCore/MapLayers.swift) before one `rank` call orders the whole mixed list. Empty on every other
+    /// screen, where `query.category` does the narrowing as before.
+    var categories: [String] = []
     var sensitive = false
     var first: [String] = []
     var intro: String? = nil
@@ -445,6 +455,9 @@ struct ResultsView: View {
     var emptyKey: String? = nil
     /// "Leave this page fast" in the top bar instead of "Urgent help" (docs/08): the need's own setting.
     var quickExit = false
+    /// One quiet line under the list. Today only "Get somewhere safe now", whose line about home names no kind
+    /// of danger, so the screen stays as blank about why a person opened it as the sheet it hangs off (docs/08).
+    var footnote: String? = nil
     /// A second list under its own heading, below the first one ("I need to talk to someone": 988 and the crisis
     /// places first, then the daytime places). Its rows are ordinary rows — the `sensitive` screen setting above
     /// belongs to the first list, and a row's own category decides everything else (Saved.isSensitive).
@@ -455,7 +468,10 @@ struct ResultsView: View {
         // ranker whatever is passed, so withholding it only stopped those rows from being banded by service area.
         // Nothing about the person leaves the device either way (docs/08).
         var q = query; q.near = here.point
-        let ranked = rank(store.bundle?.rows ?? [], q, now: now, alerts: store.bundle?.alerts ?? [])
+        // A screen that mixes categories narrows the rows here and leaves `query.category` empty, so one `rank`
+        // call orders the whole mixed list by the ordinary rules (open now, then distance).
+        let pool = categories.isEmpty ? (store.bundle?.rows ?? []) : inCategories(store.bundle?.rows ?? [], categories)
+        let ranked = rank(pool, q, now: now, alerts: store.bundle?.alerts ?? [])
         var alsoQ = also?.query ?? Query(); alsoQ.near = here.point
         let alsoRanked = also == nil ? [] : rank(store.bundle?.rows ?? [], alsoQ, now: now, alerts: store.bundle?.alerts ?? [])
         return ScrollView { VStack(alignment: .leading, spacing: 10) {
@@ -468,6 +484,7 @@ struct ResultsView: View {
             ForEach(ranked, id: \.row.id) { r in
                 CardLink(r: r, showMiles: !sensitive) { DetailView(row: r.row) }
             }
+            if let footnote { Text(L.t(footnote)).font(.footnote).foregroundStyle(Color.muted).padding(.top, 4) }
             if let also, !alsoRanked.isEmpty {
                 Text(also.title).font(.title3.bold()).padding(.top, 8)
                 ForEach(alsoRanked, id: \.row.id) { r in

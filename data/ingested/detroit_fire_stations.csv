@@ -1,0 +1,37 @@
+sal_id,record_ref,name,address_1,city,zip,lat,lon,phone,website,hours_text,extra,source_id,source_last_edited,fetched_at
+sal_dfd_engine_1_fire_station,E-1,Engine 1 fire station,111 W Montcalm Street,Detroit,48201,42.337875,-83.054082,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_17_fire_station,E-17,Engine 17 fire station,6100 Second Avenue,Detroit,48202,42.364789,-83.073589,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_23_fire_station,E-23,Engine 23 fire station,1818 E Grand Boulevard,Detroit,48211,42.375532,-83.036357,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_27_fire_station,E-27,Engine 27 fire station,4700 W Fort Street,Detroit,48209,42.311364,-83.093353,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_30_fire_station,E-30,Engine 30 fire station,16543 Meyers Road,Detroit,48235,42.412714,-83.170243,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_31_fire_station,E-31,Engine 31 fire station,1697 W Grand Boulevard,Detroit,48208,42.348401,-83.110941,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_32_fire_station,E-32,Engine 32 fire station,11740 E Jefferson Avenue,Detroit,48214,42.368213,-82.966741,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_33_fire_station,E-33,Engine 33 fire station,1041 Lawndale Street,Detroit,48209,42.300478,-83.126851,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_34_fire_station,E-34,Engine 34 fire station,6345 Livernois Avenue,Detroit,48210,42.346459,-83.132060,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_35_fire_station,E-35,Engine 35 fire station,111 Kenilworth Street,Detroit,48202,42.385358,-83.080867,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_37_fire_station,E-37,Engine 37 fire station,2820 Central Street,Detroit,48209,42.317558,-83.127580,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_39_fire_station,E-39,Engine 39 fire station,8700 14th Street,Detroit,48206,42.372242,-83.100485,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_40_fire_station,E-40,Engine 40 fire station,13939 Dexter Avenue,Detroit,48238,42.393438,-83.133834,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_41_fire_station,E-41,Engine 41 fire station,5000 Rohns Street,Detroit,48213,42.379931,-83.003244,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_42_fire_station,E-42,Engine 42 fire station,6324 W Chicago Avenue,Detroit,48204,42.366807,-83.139357,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_44_fire_station,E-44,Engine 44 fire station,35 W 7 Mile Road,Detroit,48203,42.432001,-83.103128,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_46_fire_station,E-46,Engine 46 fire station,10101 Knodell Street,Detroit,48213,42.399112,-83.003700,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_48_fire_station,E-48,Engine 48 fire station,2300 S Fort Street,Detroit,48217,42.273015,-83.158820,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_50_fire_station,E-50,Engine 50 fire station,12985 Houston Whittier Street,Detroit,48205,42.420674,-82.985893,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_51_fire_station,E-51,Engine 51 fire station,18236 Livernois Avenue,Detroit,48221,42.425039,-83.140790,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_52_fire_station,E-52,Engine 52 fire station,5029 Manistique Street,Detroit,48224,42.396976,-82.956324,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_53_fire_station,E-53,Engine 53 fire station,15127 Greenfield Road,Detroit,48227,42.401108,-83.199116,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_54_fire_station,E-54,Engine 54 fire station,16825 Trinity Street,Detroit,48219,42.413498,-83.249314,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_55_fire_station,E-55,Engine 55 fire station,18140 Joy Road,Detroit,48228,42.358147,-83.217387,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_56_fire_station,E-56,Engine 56 fire station,18601 Ryan Road,Detroit,48234,42.429960,-83.063223,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_57_fire_station,E-57,Engine 57 fire station,13960 Burt Road,Detroit,48223,42.387028,-83.246282,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_58_fire_station,E-58,Engine 58 fire station,10801 Whittier Avenue,Detroit,48224,42.417314,-82.954674,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_59_fire_station,E-59,Engine 59 fire station,17800 Curtis Street,Detroit,48235,42.423078,-83.218200,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_6_fire_station,E-6,Engine 6 fire station,3050 Russell Street,Detroit,48207,42.350190,-83.041984,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_60_fire_station,E-60,Engine 60 fire station,19701 Hoover Street,Detroit,48205,42.440257,-83.005254,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_engine_9_fire_station,E-9,Engine 9 fire station,3737 E Lafayette Street,Detroit,48207,42.347146,-83.013138,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_ladder_14_fire_station,L-14,Ladder 14 fire station,2200 Crane Street,Detroit,48214,42.362749,-82.992297,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_ladder_19_fire_station,L-19,Ladder 19 fire station,10645 Shoemaker Street,Detroit,48213,42.389481,-82.994013,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_ladder_20_fire_station,L-20,Ladder 20 fire station,433 W Alexandrine Street,Detroit,48201,42.348894,-83.063608,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_ladder_22_fire_station,L-22,Ladder 22 fire station,6830 McGraw Avenue,Detroit,48210,42.338569,-83.133757,,,,,detroit_fire_stations,2024-02-24,2026-09-22
+sal_dfd_ladder_30_fire_station,L-30,Ladder 30 fire station,17475 Mount Elliott Street,Detroit,48212,42.422688,-83.038755,,,,,detroit_fire_stations,2024-02-24,2026-09-22

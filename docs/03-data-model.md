@@ -165,9 +165,10 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 | `kids.care` | Child care and preschool | "Help paying for child care or preschool" |
 | `connect` | Free computers, internet and phones | "I need a phone, internet, or a computer" |
 | `pets` | Pet care and food | "Help with my pet" |
+| `safe.police` / `safe.fire` | Police station · Fire station | "Get somewhere safe now" (Right now, and a row at the bottom of the urgent sheet; 911 first on that screen), beside `health.er`. A category says what a row **offers**, not who runs it: what these two offer is a door that is never locked and a phone inside it. Both come from City open data and carry the plain "from the City's list, last updated …" badge — never "checked by a person". A fire station is staffed but the crew goes out, so its row says "Ring the bell. If no one answers, call 911." |
 | `seniors` / `veterans` / `lgbtq` / `youth` / `women` / `men` / `reentry` / `disability` / `immigrants` / `pregnant` / `paid_training` / `referral_only` / language (`spanish`, `arabic`, `bengali`) / access (`walk_in`, `appointment_required`, `no_id_required`, `sliding_fee`, `medicaid`) | Flags, not categories. `reentry` = for people with a record or coming home from prison; "I have a record" lists jobs with it first |
 
-**47 slugs in all; 44 of them had a live listing on 2026-09-22.** `shelter.warming` and `shelter.cooling` are
+**49 slugs in all; 46 of them had a live listing on 2026-09-22.** `shelter.warming` and `shelter.cooling` are
 alert-driven and empty on purpose; `food.benefits` was emptied by the category audit.
 
 *Category audit, 2026-09-22 (DECISIONS; `docs/CATEGORY-AUDIT-2026-09-22.md`):* **a row has exactly one category, and it
@@ -177,8 +178,19 @@ Rows of one family share a category: a library building is `rec.library` (its co
 Neighborhood Wellness Center is `health.dhd`, help signing up for benefits is `money.benefits`, a property-tax hardship
 exemption is `housing.owner`, recovery coaching is `treatment.recovery`. Since that audit `food.benefits` has no rows
 (the three that carried it were benefits sign-up offices). `health.support` was added on 2026-09-22 (K3) and has one,
-so 44 of the 47 slugs have a live listing. The 47 slugs are
+so 46 of the 49 slugs have a live listing. The 49 slugs are
 `KNOWN_CATEGORIES` in `pipeline/src/validate.ts`. Map layers (`MAP_GROUPS`, eight of them) are listed in docs/05.
+
+*Added 2026-09-22 (DECISIONS, Kyle's plan decision 3):* `safe.police` and `safe.fire`, 51 rows. The 11 Detroit
+precinct buildings and 36 Detroit engine houses are ingested from two City ArcGIS layers by
+`pipeline/src/ingest-safe.ts`; Hamtramck's and Highland Park's one station each come from those cities' own sites
+as ordinary seed rows. Dearborn's site refuses this pipeline's fetcher, so its four stations are a steward job
+(docs/CHECKS-2026-09-22.md), not a guess. Both slugs live on the existing **health** map layer rather than a layer
+of their own, because a new layer needs a colour of its own in three clients' map palettes. The `safe_now` need,
+the `categories` field it uses and the `inCategories` rule that narrows the rows are in **all three clients**
+(`apps/web/src/needs.ts`, `apps/ios/HelpApp/Help.swift` + `Sources/HelpCore/MapLayers.swift`,
+`apps/android/.../Needs.kt` + `MapLayers.kt`); the parity tests on both phones now compare `categories` too, so
+the list of kinds cannot drift in one app.
 
 *Added 2026-09-20 (DECISIONS):* `health.er` and `health.urgent`. A row may now carry a **city and a point but no
 street address** — Wayne County's naloxone and test-strip stations publish exactly that — and a coordinate is never

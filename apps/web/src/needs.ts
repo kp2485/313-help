@@ -23,6 +23,10 @@ export interface Need {
    *  after them rather than being mixed in or hidden behind a tap. Its heading is `also.<need>.<id>`, and its
    *  rows are ordinary rows: a `health.support` listing keeps its address, map, Save, Share and its own URL. */
   also?: { id: string; query: Query };
+  /** One list drawn from SEVERAL categories, ranked together by the ordinary rules (open now, then distance).
+   *  `Query.category` holds one slug and `packages/query` is the shared spec, so a screen that has to mix kinds
+   *  says so here and the screen narrows the rows before ranking them — the ranking itself is untouched. */
+  categories?: string[];
   links?: string;
   /** No list at all: 911 and rescue steps only. A bystander must not be sent on an errand (audit A7). */
   stepsOnly?: boolean;
@@ -59,6 +63,14 @@ export const NEEDS: Need[] = [
   ] },
   // Like the DV screen: hotlines first, quick exit. Places keep an address only if they publish one.
   { id: 'assault', icon: 'shield', group: 'now', first: ['emg_avalon', 'emg_voices4', 'emg_911'], query: { category: 'assault' }, links: 'assault', quickExit: true, intro: 'assault.intro' },
+  // "Get somewhere safe now" (DECISIONS 2026-09-22): a door that is open at 3am with a phone behind it —
+  // police stations, fire stations and emergency rooms, in one list ranked by distance. It sits BELOW 911,
+  // 988 and the hotlines on the urgent sheet and here: docs/05's ordering is untouched, this is a row under it.
+  // It leads with 911 itself, because the fastest way to get somewhere safe is often not to walk anywhere.
+  // The screen is traceless like the rest of the urgent sheet (no hash, no title, nothing stored), and it does
+  // not name domestic violence anywhere on it — the one line about home is written so that a person reading
+  // over a shoulder learns nothing (docs/08).
+  { id: 'safe_now', icon: 'shield', group: 'now', first: ['emg_911'], categories: ['safe.police', 'safe.fire', 'health.er'], intro: 'safe_now.intro' },
   { id: 'food', icon: 'food', group: 'soon', refine: [
     { id: 'today', query: { category: 'food.meal', mode: 'now' } },
     { id: 'week', query: { category: 'food', mode: 'week' } },
@@ -160,7 +172,10 @@ export type TabId = (typeof TABS)[number]['id'];
 export const MAP_GROUPS: { id: string; icon: string; tops: string[] }[] = [
   { id: 'food', icon: 'food', tops: ['food'] },
   { id: 'shelter', icon: 'bed', tops: ['shelter'] },
-  { id: 'health', icon: 'health', tops: ['health', 'harm'] },
+  // Police and fire stations ride with the emergency rooms they are listed beside (DECISIONS 2026-09-22). A
+  // layer of their own would need a colour of its own in the three clients' map palettes; that is a map change,
+  // not a taxonomy one, so it is proposed rather than taken here.
+  { id: 'health', icon: 'health', tops: ['health', 'harm', 'safe'] },
   // Free computers and internet sit with the libraries and rec centers that offer them (category audit, 2026-09-22).
   { id: 'rec', icon: 'rec', tops: ['rec', 'connect'] },
   { id: 'work', icon: 'work', tops: ['jobs', 'learn'] },
@@ -183,6 +198,13 @@ export const isSensitive = (category: string) => SENSITIVE.some((c) => category 
  *  because people have to get there. Every sensitive listing is private too. */
 export const PRIVATE = ['treatment', 'assault'];
 export const isPrivate = (category: string) => isSensitive(category) || PRIVATE.some((c) => category === c || category.startsWith(c + '.'));
+
+/** The rows a screen that mixes categories draws from (`Need.categories`). A category matches whole or as a
+ *  parent, the same way `packages/query` matches one. It lives here, beside the need that names the categories,
+ *  so it can be held to a fixture of the exact rows a screen must and must not show. */
+export function inCategories<T extends { category: string }>(rows: readonly T[], cats: readonly string[]): T[] {
+  return rows.filter((r) => cats.some((c) => r.category === c || r.category.startsWith(c + '.')));
+}
 
 /** The listings a set of switched-on help layers may put on the map. Two rules, and both have to hold: the
  *  private kinds (treatment, help after sexual assault) are dropped as whole top-level kinds, and inside any
