@@ -527,7 +527,13 @@ struct AreaStripScreen: View {
             }
         }
         .background(Color.appBg.ignoresSafeArea())
-        .navigationTitle(name).navigationBarTitleDisplayMode(.inline)
+        // No title in the top bar: the strip's own bar names the page 48 points below it, and two identical
+        // headings one under the other is noise on a phone (Kyle, 2026-09-22). The screen is still NAMED for a
+        // screen reader — the container carries the area's name, and the bar's copy of it is the heading
+        // VoiceOver's cursor is moved to when the page opens.
+        .navigationTitle("").navigationBarTitleDisplayMode(.inline)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(name)
         .urgentHelp()
         .onAppear { focusHeading = true }
     }
