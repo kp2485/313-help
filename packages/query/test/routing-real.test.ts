@@ -72,7 +72,8 @@ describe('the street graph, on the committed basemap', () => {
 
   it.skipIf(!has)('is the size and shape the study measured', () => {
     const s = g!.stats;
-    // The study: 23,863 nodes, 40,342 edges, 45 components, largest 99.5%, built in 183 ms.
+    // The study (before the 2026-09-22 basemap fix): 23,863 nodes, 40,342 edges, 45 components, largest 99.5%,
+    // built in 183 ms. On the clipped, merged basemap: 23,592 nodes, 39,714 edges, 35 components, largest 99.7%.
     expect(g!.nodeCount).toBeGreaterThan(20_000);
     expect(g!.nodeCount).toBeLessThan(28_000);
     expect(g!.edgeCount).toBeGreaterThan(34_000);

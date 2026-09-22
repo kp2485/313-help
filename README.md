@@ -5,17 +5,18 @@
 Free help, transit, parks and neighborhood facts for Detroit, Hamtramck, Highland Park and Dearborn — in an app that
 stores nothing about you, works with no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 531 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 582 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
 | | What they get |
 |---|---|
-| **Residents who need help** | Food, a bed tonight, clinics, emergency rooms and urgent care, Narcan, treatment, legal help, IDs, jobs, school, rent and utility help — two to four taps, ranked on the phone |
+| **Residents who need help** | Food, a bed tonight, clinics, emergency rooms, urgent care, police and fire stations, Narcan, treatment, legal help, IDs, jobs, school, rent and utility help — two to four taps, ranked on the phone |
+| **People with no signal** | Walking and bus directions computed on the phone from the bundle's own streets and routes: no network, no origin sent anywhere, honest ranges instead of times |
 | **Bus and rail riders** | DDOT, SMART, QLINE, People Mover, Amtrak, intercity buses and park-and-ride on one offline map; reduced-fare ID help; one-tap hand-off to a trip planner or the Transit app |
 | **Cyclists and MoGo users** | MoGo stations, bike lanes and the Joe Louis Greenway, segment by segment |
 | **Families and older adults** | 302 parks, recreation centers, libraries, youth programs, senior meals and rides |
-| **Neighbors and block clubs** | A page for each of 205 neighborhoods: help nearby, home sales beside permits, blight, Safe streets |
+| **Neighbors and block clubs** | A page for each of 205 neighborhoods and for Hamtramck, Highland Park and Dearborn: help nearby, home sales beside permits, blight, Safe streets — exact numbers, never a ranking |
 | **Helpers** | Community health workers, librarians, 211 operators, churches and outreach teams who look things up for someone else — and tell us when a listing is wrong |
 | **Spanish, Arabic and Bengali speakers** | The whole interface in four languages; Arabic runs right to left |
 | **People using a screen reader, keyboard, switch or large text** | Audited against WCAG 2.2 AA; every map is also a text list |
@@ -51,27 +52,36 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **531 listings** in 44 categories across four cities: 141 food, 91 harm reduction, 79 health (including **9
-  emergency rooms and 13 urgent care centers**), 37 jobs, 27 treatment, 27 learning, and 15 more groups.
+- **582 listings** in 46 categories across four cities: 141 food, 91 harm reduction, 79 health (including **9
+  emergency rooms and 13 urgent care centers**), 51 places to get somewhere safe now (38 fire stations and 13
+  police stations), 37 jobs, 27 treatment, 27 learning, and 15 more groups.
 - **A Map tab drawn on the phone** from City open data and Census TIGER files inside the signed bundle — no tile
-  server, no map company, works offline — on web, iPhone and Android. Layers: help by category, 52 greenway
-  segments, 302 parks, and **11 transport layers**, with two styles on all three apps: **Standard** and **Subway**
+  server, no map company, works offline — on web, iPhone and Android. It opens two miles around you if you allow
+  it, else around a cross street you type (resolved on the device), else around City Hall. Layers: help by
+  category, neighborhood and city boundaries (on by default, drawn at every zoom), 52 greenway segments, 302
+  parks, and **11 transport layers**, with two styles on all three apps: **Standard** and **Subway**
   ([MAP-STYLE](docs/MAP-STYLE.md)). Keyboard: arrows pan, N and P walk the features, Enter opens one.
-- **205 neighborhood pages** from public datasets: no rankings, no per-neighborhood crime, small counts suppressed
-  ([docs/13](docs/13-neighborhood-indicators.md)). On the web, iPhone and Android they have their own tab, which finds
-  the neighborhood you are standing in on the device and lists all 205 A–Z or by council district — never by a
-  number. Both clients answer the same shared point cases (`schema/neighborhoods/points.json`).
+- **Directions with no signal.** Walking and bus directions computed on the phone from the bundle's own street
+  graph and transit files: A* over the streets, steered off the City's own High Injury Network; published
+  headways only (never real-time, never a timetable); every estimate a range; at most one bus change; the route
+  drawn on our own map. Nothing leaves the device and the screen leaves no URL or history entry
+  ([study](docs/research/2026-09-22-offline-directions.md)). On web, iPhone and Android.
+- **205 neighborhood pages and a page for each city** from public datasets: exact numbers, no rankings, no
+  per-neighborhood crime ([docs/13](docs/13-neighborhood-indicators.md)). The Areas tab is a map that opens on
+  the outline you are standing in (found on the device), with boundaries drawn and the A–Z or by-district list one
+  control away; opening an area shrinks the map to a strip the page scrolls under. By-year numbers read as a table
+  or a line chart. The same on web, iPhone and Android, held to shared point cases (`schema/neighborhoods/points.json`).
 - **Four languages** — English, Español, العربية, বাংলা — each loaded only when chosen. The native apps follow
   the phone's language list. What a place wrote about itself is never machine-translated.
 - **WCAG 2.2 AA audit: 44 pass, 27 found and fixed, 0 open** ([audit](docs/ACCESSIBILITY-AUDIT-2026-09-20.md),
   [test script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
 - **Three clients, one spec.** A web PWA (vanilla TypeScript), an iPhone app (SwiftUI) and an Android app (Kotlin,
-  **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking — are
-  written three times against [one spec](schema/query-spec.md) and **190 shared fixture cases**; all three pass
-  every case.
-- **Tested and small.** 1,169 tests in `pnpm test`, 156 in `swift test`, over 120 in Gradle. 99 KB of JavaScript and
-  9 KB of CSS gzipped; a language (20–23 KB), the Subway style (12 KB) or offline directions (25 KB) loads only if
-  chosen; the bundle is 2.3 MB.
+  **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
+  and trip plans — are written three times against [one spec](schema/query-spec.md) and **203 shared fixture
+  cases**; all three pass every case.
+- **Tested and small.** 1,252 tests in `pnpm test`, 364 in `swift test`, 372 in Gradle on a plain JDK. 102 KB of
+  JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
+  (25 KB) loads only if chosen; the bundle is 2.4 MB.
 
 ## How listings stay fresh
 
@@ -114,7 +124,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 772 tests
+pnpm test                                   # 1,252 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/
@@ -146,8 +156,9 @@ More: [iPhone](apps/ios/README.md) · [Android](apps/android/README.md) · [desi
 - Page watchers that open a steward task the day an owner's page changes, and same-day signals — "out of food
   today," warming centers open — in a small signed signals file.
 - Partner feeds: Gleaners and Forgotten Harvest schedules, and an HSDS exchange with 211.
-- Richer transit: stops in travel order, GTFS-based trip hints — still no tracking.
-- Client parity: the last differences between the three apps, such as the greenway lens on Android's Neighborhoods tab.
+- Richer transit: stops in travel order in the text list, and "which routes stop near this place" — still no
+  tracking, and no timetable until one can stay fresh.
+- Client parity: the last differences between the three apps, such as the greenway lens on Android's Areas tab.
 - A steward mobile mode for outreach workers, and coverage passes for thin neighborhoods.
 
 **Later** — photos on condition reports after legal review; local notifications for saved places and alerts;

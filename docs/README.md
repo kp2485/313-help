@@ -23,9 +23,11 @@ A resource app for every Detroiter that stores nothing about you, works on a che
 | 11 | [Healthy places](11-greenway-public-places.md) | Approved: Joe Louis Greenway, parks, rec sites; condition reports with photos under zero-PII; impact measurement |
 | 12 | [Gift & handoff](12-gift-and-handoff.md) | What "open-source gift to the city" demands of the design: unattended operation, old-copy notes and retiring on purpose, transfer checklist, costs |
 | 13 | [Neighborhood indicators](13-neighborhood-indicators.md) | Citywide public-data picture for all 205 neighborhoods; honesty rules; the greenway as one lens |
-| — | [research/](research/) | Source research: Wayne County data, the 2026-09-19 [new kinds of help](research/2026-09-19-new-help/README.md) (jobs, treatment, housing, legal, IDs and more), and [2026-09-20](research/2026-09-20/) (the held backlog, the hand checks read in a browser, the empty categories, emergency rooms and urgent care) |
+| — | [research/](research/) | Source research: Wayne County data, the 2026-09-19 [new kinds of help](research/2026-09-19-new-help/README.md) (jobs, treatment, housing, legal, IDs and more), [2026-09-20](research/2026-09-20/) (the held backlog, the hand checks read in a browser, the empty categories, emergency rooms and urgent care), and 2026-09-22: [offline directions](research/2026-09-22-offline-directions.md) from the data already in the bundle, and [neighborhood-level information](research/2026-09-22-neighborhoods-three-cities.md) for Hamtramck, Highland Park and Dearborn |
 | — | [AUDIT-2026-09-20.md](AUDIT-2026-09-20.md) | **What is active versus only planned**, checked in the code and data, with four detailed reports in [audit-2026-09-20/](audit-2026-09-20/) |
 | — | [CATEGORY-AUDIT-2026-09-22.md](CATEGORY-AUDIT-2026-09-22.md) | Every listing's category checked against its own words: 8 re-filed, the one-row-per-service rule, the eight map layers, and the judgement calls left for Kyle |
+| — | [NAVIGATION-AUDIT-2026-09-22.md](NAVIGATION-AUDIT-2026-09-22.md) | Navigation and information architecture across the three clients, walked live: the findings behind the 2026-09-22 rebuild (one map opening rule, help on the Map, the Areas tab as a map, Parks and paths) |
+| — | [CHECKS-2026-09-22.md](CHECKS-2026-09-22.md) | Steward worksheet for the police and fire stations: the pages a person still has to read, and the by-hand rows |
 | — | [ACCESSIBILITY-AUDIT-2026-09-20.md](ACCESSIBILITY-AUDIT-2026-09-20.md) | Full WCAG 2.2 AA pass over the web app: 44 pass, 27 fixed, 0 open |
 | — | [ACCESSIBILITY-TEST-SCRIPT.md](ACCESSIBILITY-TEST-SCRIPT.md) | The script for sessions with people who use assistive technology |
 | — | [MAP-STYLE.md](MAP-STYLE.md) | The shared spec for the Map's two styles, Standard and Subway, on all three clients |
@@ -46,7 +48,8 @@ pnpm install             # needs pnpm 12 (see OPERATIONS.md)
 pnpm test                # query fixture cases + pipeline, API and web tests
 pnpm build:bundle        # data/seed + data/ingested -> data/hsds + data/bundle/v1 (signed, dev key)
 pnpm ingest:opendata     # City open-data layers into data/ingested and data/staging, plus the greenway
-                         # segments and the City's events, parks and ZIP areas
+                         # segments, the police and fire stations, and the City's parks and ZIP areas
+pnpm ingest:cities       # the four-city page numbers (SEMCOG, Census, TIGER, Wayne County) -> data/ingested/cities.json
 pnpm ingest:transit      # the 11 transport layers for the Map tab. By hand, about monthly — on purpose
                          # it is NOT in the nightly publish (DECISIONS 2026-09-20)
 pnpm ingest:mymap        # Wayne County's Well Wayne Stations map (Google My Maps KML) -> data/ingested/
@@ -65,6 +68,22 @@ Other scripts, explained in [OPERATIONS.md](OPERATIONS.md): `pnpm ingest:basemap
 
 One or two lines per date; the reasoning behind each change is in [DECISIONS.md](DECISIONS.md) under the same date.
 
+- **2026-09-22 — Directions, one tab set, and the Areas map.** Offline walking and bus directions on all three
+  clients, from the street graph and transit files already in the bundle: A* with the City's own safety fields as
+  the penalty, published headways only, ranges never times, at most one change, traceless
+  ([research](research/2026-09-22-offline-directions.md)). The tab set becomes Home · Help · Map · Areas on
+  every client after the [navigation audit](NAVIGATION-AUDIT-2026-09-22.md): every map opens on your location,
+  else a typed cross street, else City Hall, two miles around; the Map tab opens with help on it and the
+  neighborhood and city boundaries on by default at every zoom ([MAP-STYLE §15](MAP-STYLE.md)); the Areas tab
+  is a map zoomed to the outline you stand in, the list one control away, an area page under a collapsing
+  strip; the greenway is one row inside Parks and paths. City pages for Hamtramck, Highland Park and Dearborn
+  ([research](research/2026-09-22-neighborhoods-three-cities.md); SEMCOG's agreement accepted as it stands).
+  Neighborhood pages: exact numbers everywhere (no small-count suppression, crashes included), bus stops and
+  Bridge-card stores counted strictly inside the outline, Table | Chart on the by-year panels. "Get somewhere
+  safe now": 51 police and fire stations as listings ([CHECKS-2026-09-22.md](CHECKS-2026-09-22.md)); the
+  [category audit](CATEGORY-AUDIT-2026-09-22.md) built, Narcan queries every place that stocks it, ingested ids
+  keyed to the publisher's record. Basemap: TIGER streets clipped to the city line, one name per geometry.
+  582 listings; `pnpm test` 1,252; 203 fixture cases in 15 files.
 - **2026-09-21 — Live, and the Map grows up.** Deployed at <https://313help.com>: a release-signed bundle (531
   listings), the write API at `/v1`, the steward queue behind Cloudflare Access, and the nightly publish switched
   on (`PUBLISH_ENABLED=true`). The four open accessibility items closed (44 pass, 27 fixed, 0 open); the map is

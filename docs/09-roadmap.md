@@ -1,17 +1,33 @@
 # 09 — Roadmap
 
 The short version is the **Roadmap** section of [/README.md](../README.md); this is the fuller one. It lists
-features, by horizon. Day-to-day working lists live elsewhere: the steward worksheet is
-[CHECKS-2026-09-20.md](CHECKS-2026-09-20.md), open decisions and licence questions are the *Open* rows of
-[DECISIONS.md](DECISIONS.md), and store-release checklists are in [apps/ios/README.md](../apps/ios/README.md) and
-[apps/android/README.md](../apps/android/README.md).
+features, by horizon. Day-to-day working lists live elsewhere: the steward worksheets are
+[CHECKS-2026-09-22.md](CHECKS-2026-09-22.md) and [CHECKS-2026-09-20.md](CHECKS-2026-09-20.md), open decisions
+and licence questions are the *Open* rows of [DECISIONS.md](DECISIONS.md), and store-release checklists are in
+[apps/ios/README.md](../apps/ios/README.md) and [apps/android/README.md](../apps/android/README.md).
 
-## Where we are (2026-09-21)
+## Where we are (2026-09-22)
 
 The hackathon build order — seed data and signed bundle, the PWA, the Worker and D1, the steward queue, the
 iPhone app, the Android app — is done, and the app is **live at <https://313help.com>**: a release-signed bundle of
-531 listings, the write API at `/v1`, the steward queue behind Cloudflare Access, and a nightly publish job
+582 listings, the write API at `/v1`, the steward queue behind Cloudflare Access, and a nightly publish job
 (`.github/workflows/publish.yml`, `PUBLISH_ENABLED=true`). Status by date is in [README.md](README.md).
+
+Delivered on 2026-09-22, on all three clients: offline walking and bus directions from the bundle's own data;
+one tab set (Home · Help · Map · Areas) and one map-opening rule (location, else a typed cross street, else City
+Hall); the Areas tab as a map with the boundaries drawn; city pages for Hamtramck, Highland Park and Dearborn;
+exact numbers on every neighborhood page; police and fire stations under "Get somewhere safe now".
+
+### Still open from that work
+
+- Real-phone tests of the directions and location flows: a phone with the SIM out, coarse location, and the
+  map gestures — every check so far was on a simulator or an emulator.
+- Native-speaker review of Spanish, Arabic and Bengali (item 2 below), now including the directions wording.
+- The courtesy email to SEMCOG: drafted on Kyle's Desktop, not sent. It is a notice, not a gate (DECISIONS
+  2026-09-22).
+- Dearborn's police and fire stations, by hand: the city publishes no layer ([CHECKS-2026-09-22.md](CHECKS-2026-09-22.md) §2).
+- Steward checks: whether 13601 W. McNichols is one Narcan box or two, and archiving the Passenger Recovery
+  duplicate through the queue.
 
 ## Now
 
@@ -57,10 +73,13 @@ rest (docs/12). Both stores' privacy answers are the same sentence: no data coll
   or cooling center opened, a mobile pantry cancelled. Each signal has an owner, a source and an expiry.
 - **Partner feeds.** Gleaners and Forgotten Harvest distribution schedules from the food banks themselves, and an
   HSDS exchange with 211: they take our export, and we read theirs as a staged source.
-- **Richer transit.** Stops in travel order in the text list, "which routes stop near this place," and GTFS-based
-  trip hints computed on the device. Still no real-time tracking and no origin ever sent anywhere.
-- **Client parity.** All three clients have the Map tab, its layers and both map styles, drawn from one spec.
-  Next: neighborhood pages and add-a-place in both native apps.
+- **Richer transit.** Stops in travel order in the text list and "which routes stop near this place." Trip plans
+  are built (2026-09-22) from published headways; a timetable arrives only if it can stay fresh under our own
+  rules (the study in [research/2026-09-22-offline-directions.md](research/2026-09-22-offline-directions.md)
+  says why not yet). Still no real-time tracking and no origin ever sent anywhere.
+- **Client parity.** All three clients have the four tabs, the Map tab with its layers and both styles, the Areas
+  map, the city pages, add-a-place and directions, drawn from one spec. Left: the greenway lens on Android's
+  Areas tab, and a walk of every screen on a real phone.
 - **Steward mobile mode.** Verify-on-the-go for outreach workers: open the queue on a phone, confirm in person,
   logged as `in_person`.
 - **Coverage passes.** Neighborhoods where the list is thin, Highland Park's urgent-care gap, and a recorded
@@ -127,5 +146,6 @@ for by **optional hosting and support contracts** with cities, health department
 4. Hosted service: under Linwood Technologies, or a nonprofit set up for it?
 5. The service-area edge: include places inside the bounding box but outside the four named cities (the nearest
    urgent care to parts of Dearborn is in Dearborn Heights)?
-6. Licence questions still to ask (SEMCOG/MSP, Wayne County, the City's open-data terms, Transit) — see the Open
-   rows in [DECISIONS.md](DECISIONS.md).
+6. Licence questions still to ask (MSP, Wayne County, the City's open-data terms, Transit) — see the Open
+   rows in [DECISIONS.md](DECISIONS.md). SEMCOG's agreement is accepted as it stands and the email to them is a
+   courtesy notice, still unsent (DECISIONS 2026-09-22).
