@@ -271,6 +271,12 @@ safetyHin(b) | safetyHighSeverity(b) | safetyLanes(b) | safetySpeed(b) | safetyA
 `PackedStreets = { origin: [lon, lat], names: string[], roads: [cls, nameIdx, encoded][], safety?: number[] }`
 — exactly the shape of `map/base.json` and of each cell inside `map/streets.json`.
 
+**How a client loads it.** `map/base.json` is one `PackedStreets`; `map/streets.json` is
+`{ grid, cells: { "c_X_Y": PackedStreets } }`. Pass the base file and every cell the client holds, in a stable
+order (the base first, then the cell keys sorted), and use the index's own SHA-256 of those files as the cache
+key. Both files are already fetched, checksum-verified and kept on the device for the map, so directions cost
+no new bytes at all.
+
 `EdgePoint = { half, from, to, t, x, y, offMetres }`: the half-edge, its two nodes, how far along, the point in
 metres, and how far off the street the asked-for point was.
 
@@ -386,6 +392,12 @@ Minutes, and only minutes. There is no clock in it.
 | `TRANSFER_WALK_M` | 150 | longest walk at a change |
 | `MAX_WALK_ONLY_M` | 4828 | walking alone is always offered up to 3 miles |
 | `MAX_PLANS` | 3 | how many itineraries come back |
+
+**Where a change can happen.** At the same stop, or at any stop within `TRANSFER_WALK_M` on foot — which
+covers the `interchanges` groups in a `.net.json` file (stops of two or more routes within 75 m) without
+needing them, and covers a DDOT↔SMART change, which no interchange group can, because the two agencies never
+share a stop id. The walk between the two stops is a routed walk like any other, so a "change" that the
+streets cannot actually join is never offered.
 
 `minutes = Σ walk metres ÷ 80 + Σ ride metres ÷ 280 + Σ wait + changes × 5`, where each ride's wait is
 `headway ÷ 2` when the agency publishes one and `DEFAULT_WAIT_MIN` when it does not. Half a headway is what
