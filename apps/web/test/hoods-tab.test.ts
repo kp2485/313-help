@@ -50,7 +50,9 @@ function indicators(list: Hood[]): Indicators {
   return { sources: { neighborhoods: src, sales: src, permits: src }, stats_fetched_at: '2026-09-18', first_year: 2024, partial_year: 2026,
     near_miles: 0.5, origin: ORIGIN, city: {}, segments: {}, neighborhoods: list };
 }
-const INDEX_OPTS = { order: 'abc' as const, query: '', located: false, zip: '', mine: null, locHtml: '<div class="loc"></div>' };
+// The landing is the map now (audit §3), with the index as the same screen's second view: these cases are
+// about the index, so they ask for that view. `mapHtml` stands in for the map the tab builds.
+const INDEX_OPTS = { order: 'abc' as const, query: '', located: false, zip: '', mine: null, locHtml: '<div class="loc"></div>', view: 'list' as const, mapHtml: '<div class="mapbox"></div>' };
 
 // ---------------------------------------------------------------------------------------------------
 // The tab itself
@@ -72,7 +74,8 @@ describe('a tab of its own', () => {
       expect(tbl['tab.hoods_wide'], l).toBeTypeOf('string');
       expect([...tbl['tab.hoods']!].length, `${l} tab label too long for five columns at 320px`).toBeLessThanOrEqual(8);
     }
-    expect(strings['tab.hoods_wide']).toBe('Neighborhoods');
+    // The wide name grew a word on 2026-09-22, because the tab is now the four cities as well as the 205.
+    expect(strings['tab.hoods_wide']).toBe('Neighborhoods and cities');
     expect(main).toContain('esc(wide.matches ? tabName(x.id) : t(\'tab.\' + x.id))');
     expect(main).toContain("const docTitle = title ?? (v.v === 'tab' && v.tab !== 'home' ? tabName(v.tab) : '');");
   });
@@ -193,7 +196,7 @@ describe('finding a neighborhood by name', () => {
     expect(html).toMatch(/<p class="vh" id="hoodsay" role="status" aria-live="polite">/);
     // Only the list is replaced as a person types: the box keeps the cursor and the keyboard, nothing jumps.
     expect(main).toContain("if (el.id === 'hoodq') { hoodQuery = el.value; redrawHoodList(); return; }");
-    expect(main).toContain("out.innerHTML = hoodRows(d, hoodUi(d), { order: hoodOrder, query: hoodQuery });");
+    expect(main).toContain("out.innerHTML = hoodRows(d, hoodUi(d), { order: hoodOrder, query: hoodQuery, near: here });");
     for (const k of ['hood.find_count', 'hood.find_one', 'hood.find_none']) expect(strings[k], k).toBeTypeOf('string');
   });
   it('the A–Z / by-district switch is two real radio buttons', () => {

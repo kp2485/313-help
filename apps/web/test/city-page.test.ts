@@ -112,7 +112,7 @@ describe('a city page lives at the address the Neighborhoods tab already had', (
   });
 
   it('the tab lists the four cities, by name and nothing else', () => {
-    const html = hoodIndex(d(), ui, { order: 'abc', query: '', located: false, zip: '', mine: null, locHtml: '' });
+    const html = hoodIndex(d(), ui, { order: 'abc', query: '', located: false, zip: '', mine: null, locHtml: '', view: 'list', mapHtml: '' });
     for (const c of ['Detroit', 'Hamtramck', 'Highland Park', 'Dearborn']) expect(html).toContain(c);
     expect(html).toContain(`data-go='{"v":"hood","id":"city_hamtramck"}'`);
     // An index row carries no indicator (docs/13, rule 1): no count, no share, no year.
@@ -122,7 +122,7 @@ describe('a city page lives at the address the Neighborhoods tab already had', (
 
   it('a bundle built before city pages existed draws the tab exactly as it did before', () => {
     const old = d({ cities: undefined, areas: undefined, area_sources: undefined });
-    const html = hoodIndex(old, ui, { order: 'abc', query: '', located: false, zip: '', mine: null, locHtml: '' });
+    const html = hoodIndex(old, ui, { order: 'abc', query: '', located: false, zip: '', mine: null, locHtml: '', view: 'list', mapHtml: '' });
     expect(html).toContain(T('hood.only_detroit'));
     expect(html).not.toContain(T('city.list_head'));
     expect(areaById(old, 'city_hamtramck')).toBeNull();

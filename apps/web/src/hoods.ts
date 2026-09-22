@@ -143,12 +143,16 @@ const indexRow = (ui: Ui, n: Hood) => `<li><button class="row" ${ui.go({ v: 'hoo
 /** The groups of the index list, in the order asked for: A to Z, or by council district. `matchHoods` narrows
  *  the list by what has been typed and leaves the order alone. Drawn on its own so typing a letter can replace
  *  this one piece of the screen instead of the whole page: the keyboard stays up and nothing jumps. */
-export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string }): string {
+export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; near?: { lat: number; lon: number } | null }): string {
   const found = matchHoods(d.neighborhoods, o.query);
   if (!found.length) return `<p class="empty">${ui.esc(ui.t('hood.find_none'))}</p>`;
   const head = (key: string | number) =>
     o.order === 'district' ? (key === '' ? ui.t('hood.no_district') : ui.t('hood.district', { n: key })) : key === '' ? ui.t('hood.letter_other') : String(key);
-  return groupHoods(found, o.order).map((g) => `<h3 class="sub">${ui.esc(head(g.key))}</h3><ul class="rows">${g.items.map((n) => indexRow(ui, n)).join('')}</ul>`).join('');
+  return groupHoods(found, o.order, o.near).map((g) => {
+    // Nearest first has one group and no heading: see `groupHoods`.
+    const h = o.order === 'near' ? '' : `<h3 class="sub">${ui.esc(head(g.key))}</h3>`;
+    return `${h}<ul class="rows">${g.items.map((n) => indexRow(ui, n)).join('')}</ul>`;
+  }).join('');
 }
 
 /**
@@ -159,7 +163,21 @@ export function hoodRows(d: Indicators, ui: Ui, o: { order: HoodOrder; query: st
  * (hoodfind.ts), is used to draw one row, and is kept nowhere. `locHtml` is the ordinary location chip, the
  * same one every list screen uses, so there is no second way of asking for a location anywhere in the app.
  */
-export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; located: boolean; zip: string; mine: Hood | null; locHtml: string }): string {
+/**
+ * The Areas tab's landing (Kyle, 2026-09-22: "the most intuitive way for people to reach their neighborhood is
+ * through a map … offer the initial neighborhood selection on a map layer"; audit §3).
+ *
+ * **One screen, two views, one control.** The map is the landing: the four city outlines and the 205
+ * neighbourhood outlines, nothing else on it — no dot, no listing, no number, and never a fill that carries a
+ * value (docs/13, rule 1). "See this map as a list" swaps to the index that used to be the whole screen, and
+ * "See this list as a map" swaps back. Everything else on the tab — what these pages are, where the outlines
+ * come from, "Your neighborhood", the search box, the order — is page content and sits under whichever view is
+ * showing, because it belongs to the screen rather than to the picture.
+ *
+ * `mine` is the answer the device worked out from a location or a typed ZIP (hoodfind.ts): handed in already
+ * decided, used to draw one row and to pre-select one outline, and kept nowhere.
+ */
+export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: string; located: boolean; zip: string; mine: Hood | null; locHtml: string; view: 'map' | 'list'; mapHtml: string; near?: { lat: number; lon: number } | null }): string {
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
   const src = d.sources.neighborhoods;
   const mine = !o.located
@@ -171,17 +189,27 @@ export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: s
       : `<p class="banner plain">${T('hood.mine_outside')}</p><div class="stackbtns"><button class="btn ghost" ${ui.go({ v: 'tab', tab: 'map' })}>${T('hood.mine_map')}</button></div>`;
   const radio = (value: HoodOrder, label: string) =>
     `<label class="pick"><input type="radio" name="hoodorder" value="${value}" data-hoodorder="${value}"${o.order === value ? ' checked' : ''}><span>${T(label)}</span></label>`;
-  return `<main><h1 class="page" tabindex="-1">${T('hood.title')}</h1><p class="lede">${T('hood.index_intro')}</p>
-    <p class="foot">${T('hood.index_sources')} ${ui.link(src.url, src.name)} <small>${T('hood.updated', { date: ui.date(src.last_edited) })}</small></p>
-    <h2>${T('hood.mine_head')}</h2>${mine}${o.locHtml}
-    <label class="searchbox">${T('hood.find_label')}<input id="hoodq" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" maxlength="40" value="${ui.esc(o.query)}" aria-describedby="hoodsay"></label>
+  // The switch is a button, not a tab set: there are two views of one thing and the wording says which one you
+  // are about to get, which is what the Map tab's own disclosure already says.
+  const swap = `<button class="chip" data-hoodview-map="${o.view === 'map' ? 'list' : 'map'}">${T(o.view === 'map' ? 'map.list_title' : 'map.list_as_map')}</button>`;
+  const list = `<label class="searchbox">${T('hood.find_label')}<input id="hoodq" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" maxlength="40" value="${ui.esc(o.query)}" aria-describedby="hoodsay"></label>
     <p class="vh" id="hoodsay" role="status" aria-live="polite"></p>
-    <fieldset class="hoodorder"><legend>${T('hood.group_label')}</legend><div class="kinds">${radio('abc', 'hood.group_abc')}${radio('district', 'hood.group_district')}</div></fieldset>
-    <div id="hoodlist">${hoodRows(d, ui, o)}</div>
-    ${(d.cities ?? []).length ? `<h2>${T('city.list_head')}</h2><p class="foot">${T('city.list_note')}</p>
+    <fieldset class="hoodorder"><legend>${T('hood.group_label')}</legend><div class="kinds">${o.near ? radio('near', 'hood.order_near') : ''}${radio('abc', 'hood.group_abc')}${radio('district', 'hood.group_district')}</div></fieldset>
+    <div id="hoodlist">${hoodRows(d, ui, o)}</div>`;
+  // The other three cities, as rows. They are on the map as outlines too, but a list has to name them: a person
+  // who reads lists rather than pictures must reach a Hamtramck page by the same number of taps as a Detroiter
+  // reaches theirs, and "it is on the map" is not an answer to that.
+  const cities = (d.cities ?? []).length
+    ? `<h2>${T('city.list_head')}</h2><p class="foot">${T('city.list_note')}</p>
       <ul class="rows">${(d.cities ?? []).map((c) => `<li><button class="row" ${ui.go({ v: 'hood', id: c.id })}><span class="rowic">${ui.icon('district')}</span><span class="rowtx"><strong>${ui.own(c.name)}</strong></span></button></li>`).join('')}</ul>`
-      : `<p class="foot">${T('hood.only_detroit')}</p>`}
-    <ul class="rows"><li><button class="row" ${ui.go({ v: 'hoods', lens: 'jlg' })}><span class="rowtx"><strong>${T('hood.lens_jlg')}</strong><small>${T('hood.lens_jlg_sub')}</small></span></button></li></ul>
+    : `<p class="foot">${T('hood.only_detroit')}</p>`;
+  return `<main><h1 class="page" tabindex="-1">${T('hood.title')}</h1><p class="lede">${T('hood.index_intro')}</p>
+    ${o.view === 'map' ? `${o.mapHtml}<p class="foot">${T('hood.map_note')}</p>` : ''}
+    <p class="loc">${swap}</p>
+    <h2>${T('hood.mine_head')}</h2>${mine}${o.locHtml}
+    ${o.view === 'list' ? list : ''}
+    ${cities}
+    <p class="foot">${T('hood.index_sources')} ${ui.link(src.url, src.name)} <small>${T('hood.updated', { date: ui.date(src.last_edited) })}</small></p>
     <p class="foot">${T('hood.describe')}</p></main>`;
 }
 
@@ -193,7 +221,7 @@ export function hoodList(d: Indicators, ui: Ui, lens?: string): string {
   const row = (n: Hood) => `<li><button class="row" ${ui.go({ v: 'hood', id: n.id })}><span class="rowtx"><strong>${ui.own(n.name)}</strong></span></button></li>`;
   const groups = [1, 2, 3, 4, 5, 6, 7, null].map((dist) => ({ dist, items: list.filter((n) => n.district === dist) })).filter((g) => g.items.length);
   return `<main><p class="lede">${ui.esc(ui.t('hood.list_lede'))}</p><p class="foot">${ui.esc(ui.t('hood.describe'))}</p>
-    ${lens === 'jlg' ? `<p class="foot">${ui.esc(ui.t('hood.lens_jlg_note', { count: list.length }))}</p>` : `<ul class="rows"><li><button class="row" ${ui.go({ v: 'hoods', lens: 'jlg' })}><span class="rowtx"><strong>${ui.esc(ui.t('hood.lens_jlg'))}</strong><small>${ui.esc(ui.t('hood.lens_jlg_sub'))}</small></span></button></li></ul>`}
+    ${lens === 'jlg' ? `<p class="foot">${ui.esc(ui.t('hood.lens_jlg_note', { count: list.length }))}</p>` : ''}
     ${groups.map((g) => `<h2>${ui.esc(g.dist ? ui.t('hood.district', { n: g.dist }) : ui.t('hood.no_district'))}</h2><ul class="rows">${g.items.map(row).join('')}</ul>`).join('')}</main>`;
 }
 

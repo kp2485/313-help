@@ -12,9 +12,9 @@ Home
 ├─ Search by name or street          →  Search
 ├─ Active alerts (cards, auto-expire)
 ├─ Find free help                    →  Help tab
-├─ Quick needs: Food · A place to sleep · A doctor · Drugs or alcohol · A job · Free Narcan   →  need screen
+├─ Quick needs: Food · A place to sleep · A doctor · Drugs or alcohol · Free Narcan · A job   →  need screen
 ├─ (Coming up: City events — hidden while there are none; dropped until a real feed, DECISIONS 2026-09-19)
-├─ Tiles: Map · Joe Louis Greenway · Your neighborhood
+├─ Tiles: Map · Parks and paths · Your neighborhood   (2026-09-22: the greenway tile became Parks and paths)
 └─ Footer: Updated {date} · About this app · Your privacy
      About  →  list version and signature · one line to the Neighborhoods tab
      Your privacy  →  the docs/08 table in plain words · "Make a new key"
@@ -26,13 +26,17 @@ Help
 ├─ Browse by type: Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people   →  list (+ map on request)
 └─ More: Saved places · Add a place that helps
 
-Map          one map with a layer switcher (free help by kind · parks · Joe Louis Greenway · bus routes and
-             stops · streetcar · People Mover · bike lanes and MoGo · stations · park and ride), the same
-             thing as a list under the map, then: the greenway, City parks, recreation centers and libraries,
-             trip planners, fares, free rides, transit phone numbers, MoGo Access Pass
-             Joe Louis Greenway (segments  →  Neighborhoods) and City parks keep their own screens
-Neighborhoods: what the pages are · Your neighborhood (found on the device) · find one by name · all 205,
-             A–Z or by council district  →  one neighborhood (docs/13)
+Map          one map with a layer switcher (free help by kind · parks · Joe Louis Greenway · city and
+             neighborhood outlines · bus routes and stops · streetcar · People Mover · bike lanes and MoGo ·
+             stations · park and ride), the same thing as a list under the map, then: Parks and paths,
+             recreation centers and libraries, trip planners, fares, free rides, transit phone numbers,
+             MoGo Access Pass
+Parks and paths (2026-09-22)  →  every City park (each with its own page), the recreation centers, and the
+             Joe Louis Greenway as ONE row  →  the greenway screen  →  its 52 stretches (condition reports
+             unchanged)  →  Neighborhoods
+Areas        the MAP of the four cities and Detroit's 205 neighborhoods, outlines only; the same screen's
+             second view is the list (Nearest first when a location is known, else A–Z or by council
+             district)  →  one neighborhood or one city (docs/13)
 Events:      City calendar, grouped by day
 
 Urgent help (top bar): 911 · 988 · shelter · crisis line · DV hotline · 211 · overdose steps
@@ -62,7 +66,7 @@ docs/13.
 - **Home**: a calm landing page — hero, a search button, active alerts, one "Find free help" card, six quick needs, tiles into the Map tab and the greenway. No red, no emergency strip.
 - **Help**: "What do you need?" lives here. Urgent needs come first under "Right now" (overdose, shelter tonight, not safe at home, need to talk), then "This week," then browse-by-type chips. Urgency is carried by order and wording, not color.
 - **Map** (2026-09-20): one map of the city with a **layer switcher**, then everything Recreation and Transit used to carry. See "Map tab" below. Every listing with an address still gets a **Bus directions** button on its own screen.
-- **Neighborhoods** (2026-09-22): public numbers about each of the City's 205 neighborhoods (docs/13). The tab's own screen is, top to bottom: what these pages are and that we do not rank neighborhoods · where the numbers come from, linked · **Your neighborhood**, worked out **on the device** by point-in-polygon against the outlines the bundle already carries (`apps/web/src/hoodfind.ts`; the shared cases are `schema/neighborhoods/points.json`) from a location already shared this visit or the centre of a typed ZIP, kept in memory and never sent or stored · the ordinary "Use my location" / "Type a ZIP code" chip, with no new permission pattern · **find a neighborhood**, search as you type, with a politely announced count · all 205, **A to Z or by council district** and never by any number (docs/13, rule 1: the index rows carry no indicator at all) · a plain line saying Hamtramck, Highland Park and Dearborn have no neighborhood pages, with the Map tab offered instead. The tab label is short on the phone bar ("Areas") because "Neighborhoods" is three times the width of a fifth of a 320 px screen; the side rail, the window title and the screen's own heading say the whole word.
+- **Neighborhoods** (2026-09-22): public numbers about each of the City's 205 neighborhoods (docs/13). **Its landing became the MAP on 2026-09-22** (Kyle: *"the most intuitive way for people to reach their neighborhood is through a map … offer the initial neighborhood selection on a map layer"*; audit §3): one screen, two views, one control — **"See this map as a list" / "See this list as a map"**. The map is the four city outlines and the 205 neighborhood outlines and **nothing else** — no dot, no listing, no transport, no value-carrying fill — opening where every such map opens (the person, then a typed junction or ZIP, then the anchor) with the area they are in already picked out. N and P walk the outlines and Enter opens one, exactly as on the Map tab. The list view is the index the tab has always had, with a third order, **"Nearest first"**, offered only while a location or a ZIP is known — a distance to the middle of an outline is not a ranking of the place (docs/13, rule 1). The tab's own screen is, top to bottom: what these pages are and that we do not rank neighborhoods · the map or the list · **Your neighborhood**, worked out **on the device** by point-in-polygon against the outlines the bundle already carries (`apps/web/src/hoodfind.ts`; the shared cases are `schema/neighborhoods/points.json`) from a location already shared this visit or the centre of a typed ZIP, kept in memory and never sent or stored · the ordinary "Use my location" / "Type a ZIP code" chip, with no new permission pattern · **find a neighborhood**, search as you type, with a politely announced count · all 205, **Nearest first, A to Z or by council district** and never by any number (docs/13, rule 1: the index rows carry no indicator at all) · the four cities as rows to their own pages · where the numbers come from, linked. The tab label is short on the phone bar ("Areas") because "Neighborhoods" is three times the width of a fifth of a 320 px screen; the side rail, the window title and the screen's own heading say the whole word.
   - **On iPhone (2026-09-21)**: the same tab, in the same place, with the same panels in the same order and the same words, and "Your neighborhood" from either a location or a typed ZIP as on the web. The differences are the ones the platform forces: the index is a `.searchable` list with a segmented A–Z / by-district control, and the outline is drawn with the Map tab's own Canvas — a tap on it opens the Map tab centred on the neighborhood. `HelpCore/Hoods.swift` and `HelpCore/Zips.swift` hold the rules and are run by `swift test` against `schema/neighborhoods/points.json`, the same cases as the web, ZIPs included.
 - **Events**: was the City calendar, grouped by day, with details linking out. **Dropped 2026-09-19** until the City publishes a real events feed, so the bundle carries no events and **the tab hides itself**; the code stays. (A tab bar that reserved a fifth column for it was a bug the 2026-09-20 audit found and fixed.)
 - **Urgent help**: a button in the top bar of every screen (replaced by quick-exit on DV and crisis screens) opens the numbers sheet: 911, 988, shelter, crisis line, DV hotline, 211, plus the overdose steps. One tap from anywhere (Principle 3). 911 is the only red element in the app besides quick exit.
@@ -71,7 +75,7 @@ The earlier "emergency strip" and needs-on-Home layout are superseded by this st
 
 ## Home
 
-- Top to bottom (**revised 2026-09-20**; the language control moved into the top bar 2026-09-21): "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · **six quick needs** (Food · A place to sleep · A doctor · Help with drugs or alcohol · A job · Free Narcan), one tap each · three tiles, **Map**, the greenway and **Your neighborhood** · a footer with "Updated {date}", About and Your privacy.
+- Top to bottom (**revised 2026-09-20**; the language control moved into the top bar 2026-09-21): "What do you need today?" and the tagline · the bundle-age banner when there is one · **Search by name or street** · alerts · **Find free help** (opens the Help tab) · **six quick needs** (Food · A place to sleep · A doctor · Help with drugs or alcohol · Free Narcan · A job), one tap each — the order is written out in `homeTab`, so it cannot drift with the needs list · three tiles, **Map**, **Parks and paths** (2026-09-22, in place of the greenway tile) and **Your neighborhood** · a footer with "Updated {date}", About and Your privacy.
 - **Alerts**: cards with title, plain-language body, a call button for each phone number, when it ends ("Until {when}"), and a link to where it was announced. Hidden when none. Pulled from `alerts.json`; expired ones never render even if the bundle is stale (client checks `ends_at`).
 - **"What do you need?"** now heads the Help tab (see above). Principle 3 path: Help → need (1) → refinement if any (2) → **Call** (3); from Home, a quick need skips the first tap.
 - **Browse by type** (Help tab chips): Food · Shelter · Health · Free Narcan · Utility help · Showers · Young people.
@@ -126,11 +130,18 @@ One tab replaces Recreation and Transit. Top to bottom:
 1. **The map**, drawn on the phone from the signed bundle as before — no tile server, no map company, nothing sent.
 2. **"What to show on the map"** — a layer switcher of real `<input type="checkbox">` in labelled `<fieldset>`s, in three groups:
    - *Free help*: one layer per group of our own listings, **derived from the category taxonomy** (`MAP_GROUPS` in `apps/web/src/needs.ts`): free food · shelters and day centers · health, Narcan and all-night stations (`health` + `harm` + `safe`, since 2026-09-22) · libraries, rec centers and internet (`rec` + `connect`) · jobs and school · kids and teens (`kids` + `youth`) · clothes, showers and pets (`goods` + `hygiene` + `pets`) · money, housing, papers and rides. Eight groups since the category audit of 2026-09-22 (`docs/CATEGORY-AUDIT-2026-09-22.md`): every label names what is in its layer, so nothing surprising sits in one. Every top-level category belongs to exactly one group (a test checks it).
-   - *Parks and paths*: the Joe Louis Greenway · City parks.
+   - *Parks and paths*: City parks · the Joe Louis Greenway · city and neighborhood outlines. Parks first
+     (Kyle, 2026-09-22: the greenway is one component of the park system, not the headline).
+     The **outlines** layer draws the four city boundaries and the 205 Detroit neighborhoods — a thin dashed
+     line, a name from the zoom at which it fits (about 14 m per pixel; below that, the four cities alone), and
+     a light wash on the one that was tapped. **Never a fill that carries a value**: docs/13's first honesty
+     rule forbids a choropleth, so an outline may be drawn and named and never shaded by a number. The layer is
+     handed no listing at all, so no sensitive row can reach it. A tap opens the same bottom card every other
+     feature uses, with "See details" to that area's page.
    - *Getting around*: DDOT bus routes and stops · SMART bus routes and stops · QLINE · People Mover · MoGo bike stations · bike lanes · train and bus stations · intercity bus stops · park and ride lots.
-   The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. A first visit starts with the greenway, parks and DDOT routes.
+   The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. **A first visit starts with every help layer on and City parks on; the greenway, the outlines and the bus routes off** (2026-09-22, audit H2 — the tab used to open as a street map with a green line on it and not one place that helps). A remembered choice always wins.
 3. **"See this map as a list"** — everything switched on, in words: the help listings as cards, greenway stretches as rows, park names, and each transport layer's route and stop names with a count. Nothing on the map is reachable only by looking at it.
-4. Then the rest of what Recreation and Transit carried: the greenway, City parks, recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass. The trip-planner list names the **Transit app** ("live DDOT and SMART buses on your phone") beside DDOT's own planner, as a link-out to transitapp.com like every other; the same link appears in the **"Rides to the doctor or cheaper bus fare"** link-outs, where it leads, because it is the free thing that answers "when is my bus coming?". Neither says DDOT or SMART recommends it: SMART's own page lists Transit among third-party apps that receive SMART data, DDOT's pages could not be read (`docs/research/2026-09-20/transit-app.md`), and we state only what an owner page states.
+4. Then the rest of what Recreation and Transit carried: **Parks and paths** (the nearest parks as rows to their own pages, and "See all parks and paths"), recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass. The trip-planner list names the **Transit app** ("live DDOT and SMART buses on your phone") beside DDOT's own planner, as a link-out to transitapp.com like every other; the same link appears in the **"Rides to the doctor or cheaper bus fare"** link-outs, where it leads, because it is the free thing that answers "when is my bus coming?". Neither says DDOT or SMART recommends it: SMART's own page lists Transit among third-party apps that receive SMART data, DDOT's pages could not be read (`docs/research/2026-09-20/transit-app.md`), and we state only what an owner page states.
 
 **The first time the Map tab is opened (2026-09-21).** Before any permission prompt, the map shows **our own
 small card**: "See what is near you?" — "Your location stays on this phone. We never send it or save it." —
@@ -157,14 +168,39 @@ first open skips the card and goes straight to the two-mile view; if a ZIP has a
 centres on the ZIP's point and the card is not shown. The card never appears on a private or sensitive screen,
 the map still never draws sensitive rows, and DV rows still show no distance. DECISIONS 2026-09-21.
 
-**Where the Map tab opens (2026-09-22).** With no location known — before the card is answered, after "Not now",
-after a refusal, or from outside the four cities — the map opens on a **two-and-a-half-mile radius around Detroit
-City Hall**, the civic point the app already carries as the `detroit` service area's reference (about 23 m per
-pixel on a 375 px phone: Woodward, Gratiot, Michigan Ave and the greenway are drawn and named), and the whole
-four-city region stays one press of the map's reset button away; a location already known — allowed earlier, or
-the centre of a typed ZIP — still wins, with the two-mile view above. The anchor view and "centre on me" are the
-same function (`cameraForRadius` / `MapCamera.forRadius`) with a different centre, on all three clients.
-DECISIONS 2026-09-22.
+**Where a map that opens on "where you are" opens (revised 2026-09-22; Kyle's plan decisions).** The rule is
+about **every** such map — the Map tab and the Areas tab — and it has three steps and one radius:
+
+1. **A location known** (allowed earlier this visit, or just allowed on the card, or the centre of a typed ZIP,
+   or a junction the person typed): a **two-mile** view around that point.
+2. **Otherwise the card**, which now offers three choices: "Use my location", **"Type a cross street"**, and
+   "Not now". The cross street is resolved **on the device** from the street geometry the signed bundle already
+   carries — see "Type a cross street" below.
+3. **Otherwise the anchor**: a **two-mile** view around a point **0.6 mile up Woodward from Detroit City Hall**
+   (lat 42.3366, lon −83.0514 — Grand Circus Park), which is what the app says in words ("City Hall"). The
+   nudge is there because City Hall is a third of a mile from the river, so a box centred on it spent a third of
+   its height on Windsor and on the hatching that means "not our area". The radius came down from two and a half
+   miles to two so that there is **one** radius in the app rather than two (Kyle, 2026-09-22).
+
+The whole four-city region stays one press of the map's reset button away. The opening view and "centre on me"
+are the same function (`cameraForRadius` / `MapCamera.forRadius`) with a different centre, on all three clients.
+
+**"Type a cross street" (2026-09-22).** A field taking "Woodward and Warren", "Woodward & Warren", "Warren at
+Woodward", "Woodward/Warren" or one street name, resolved entirely on the device (`apps/web/src/intersections.ts`)
+by intersecting two named polylines from `map/base.json` and `map/streets.json`. Names are matched with case,
+punctuation, "and"/"&"/"at", street-type words (Ave/St/Rd/Blvd/Dr/Hwy and their full forms), number words
+("Seven Mile" = "7 Mile") and E/W/N/S prefixes set aside; a typed direction narrows, no typed direction matches
+either half. Crossings within 120 m of each other are one junction. Two streets that cross more than once give a
+short list, each named by the end of the street it is at ("Dequindre & Davison — north"); one street name gives
+the middle of it, with a line saying so; a name we do not have says so **by name** and offers the ZIP entry;
+two streets that never meet say that. **The typed text is memory only**: never stored, never sent, never in the
+URL or the history — the same rule as the search box (docs/08). The cache holds normalised names only.
+
+**No signal, slow GPS (2026-09-22).** The location request no longer gives up after ten seconds; it runs for
+five minutes. At ten seconds the screen says "Still looking… Getting your location can take a few minutes with
+no service. Go outside or near a window.", with **Stop looking** beside it and the cross-street and ZIP entries
+still on the screen the whole time. Cancelling stops us listening, so a fix that lands after the person has
+typed a cross street never moves the map out from under them.
 
 **Two map styles (2026-09-21).** The layers panel has a **Map style** choice: **Standard** (each kind of transport
 in one color — the default on every client) and **Subway lines** (bus and rail drawn like a subway map: route
@@ -198,6 +234,40 @@ Rules that do not change:
 
 Each transport layer is its own file in the signed bundle under `map/transit/`, **downloaded only when that layer is first switched on** and checked against the signed index, then kept for offline use. The small list of which layers exist travels with the bundle (`places/transit.json`), so the switcher draws offline. Sources, sizes and licence notes: `pipeline/src/ingest-transit.ts` and DECISIONS 2026-09-20.
 
+## Parks and paths (2026-09-22)
+
+Kyle, 2026-09-22 (b): *"This is not a Joe Louis Greenway app; it is just one component of the park system. It
+doesn't need to be as loud as it is on the main page."* One front door, reached from Home and from the Map tab:
+
+- The map (the greenway **is** drawn here, because this screen is about the paths) and the ordinary location chip.
+- **Paths**: the Joe Louis Greenway as **one row** — "20 of 52 stretches open" — to the screen it has always had,
+  with its 52 stretch screens, their cross streets, "Help within a 10-minute walk" and their condition reports
+  (docs/11) untouched. Under it, the gap named out loud: the Riverwalk and the Dequindre Cut are not in the City
+  list we use, so they are not here.
+- **City parks**, all 302, **nearest first when a location or a ZIP is known and A to Z when none is** — never by
+  acres, by kind of park or by any other number (docs/13, rule 1). Every row opens **a park page**: the City's
+  name for it, what kind of park and how big, the address where the City publishes one, a small map, Directions,
+  Bus directions, "See on the map", the greenway stretch when one is within half a mile, and the help within a
+  ten-minute walk. All of it from `places/parks.json`; nothing new was asked of anybody.
+- **Recreation centers and libraries**, then **bike lanes** as a row to the Map tab with that layer.
+
+**Where the greenway is drawn.** Inverted on 2026-09-22: a map draws the greenway only when it is **asked** to.
+Asked: the Map tab (when that layer is on), the greenway screen, a stretch, this screen, and a park page whose
+park touches an open stretch. Not asked, and no longer drawn: the results-list map, the listing-detail map, the
+Areas map, a neighbourhood outline. **Cut on the same day**: the Home tile's live open-segment count
+(`rec.gw_sub`, removed), the Map tab's full-width greenway feature button, the greenway's name from `map.lede`,
+and the "Neighborhoods along the Joe Louis Greenway" lens row from the Areas landing and from `hoodList` — the
+`#/n/lens-jlg` URL keeps working and keeps its own note.
+
+## The mouse cursor (2026-09-22)
+
+On the map canvas the cursor is a **pointing hand over anything a click would open or name** — a listing dot, a
+greenway stretch, a park, an area outline, a transit line or station — and the **grab** hand everywhere else,
+because everywhere else the map is a thing you drag. The hand is decided by the very same hit test as the click
+(`probe` in `apps/web/src/map.ts`), so it can never promise something a click does not do; it is worked out once
+a frame at most, only for a mouse or a pen, and a drag is not a hover. Elsewhere in the app, `summary` rows, tick
+boxes, radios and selects gained the hand, and anything switched off says so with the default arrow instead.
+
 ## List / Map
 
 - Same query, two views. The map is closed until asked for ("Show these {count} on a map"), so the first **Call** button stays near the top. Every listed place with coordinates is a dot that opens its details. Sensitive listings (DV, mental-health crisis) never get a dot, and the "not safe at home" screen has no map. The list is fully usable if the map fails to load.
@@ -225,7 +295,9 @@ Top → bottom:
 3. What you get (plain language), who it's for and what to bring ("No ID needed" / "Bring proof of Detroit address"). Languages: later.
 4. Hours table, or "Hours as listed: {text}" when a list gave hours as text. "Next times": the next 3 dates.
 5. Where: address, a small map (never for a sensitive listing), and "Directions open in another app, which will see where this place is." — worded for any app the person picks, maps or Transit, and true on a laptop too.
-6. "{miles} mi from the Joe Louis Greenway ({segment})" when an open segment is within half a mile. Tapping it opens the segment.
+6. **"Near a park or path"** (revised 2026-09-22): whichever of the nearest City park and the nearest open
+   greenway stretch is closer, within a quarter of a mile, and both open a page. It used to be a greenway-only
+   row at half a mile — one path named on every listing in the app and 302 parks named on none (audit §6).
 7. Website.
 8. Where this came from: the name of the list or site the row came from.
 9. **Still open, info is right** / **Something wrong?** — the report row (see 04).

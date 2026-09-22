@@ -15,7 +15,7 @@ export const isPrivateCat = (cat: string) => isPrivate(cat);
 export type View =
   // `hoods` is a lens over the list (today only the greenway study area). The plain list of all 205 is the
   // Neighborhoods tab itself, at the same `#/n` it has always had.
-  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'privacy' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' }
+  | { v: 'tab'; tab: TabId } | { v: 'urgent' } | { v: 'about' } | { v: 'privacy' } | { v: 'search' } | { v: 'saved' } | { v: 'add' } | { v: 'hoods'; lens: string } | { v: 'hood'; id: string } | { v: 'greenway' } | { v: 'parks' } | { v: 'park'; id: string }
   | { v: 'need'; id: string; refine?: string; all?: boolean }
   | { v: 'list'; cat: string } | { v: 'detail'; id: string } | { v: 'segment'; id: string };
 
@@ -31,6 +31,9 @@ export function hashFor(v: View, sensitive: (id: string) => boolean, path = '/')
   if (v.v === 'greenway') return '#/greenway';
   if (v.v === 'segment') return `#/greenway/${v.id}`;
   if (v.v === 'parks') return '#/parks';
+  // A park is a public place with a name and an address the City publishes: nothing about opening one says
+  // anything about the person, so it keeps an address like a listing does (audit H4).
+  if (v.v === 'park') return `#/park/${v.id}`;
   if (v.v === 'about') return '#/about';
   if (v.v === 'privacy') return '#/privacy';
   if (v.v === 'add') return '#/add';
@@ -44,7 +47,7 @@ export function fromHash(h: string): View {
   // `map` was missing here while the Map tab's own URL is #/map, so a shared or bookmarked map link opened Home
   // and going back from the Map tab skipped it (found in the accessibility pass, 2026-09-20). `rec` and `transit`
   // are the tab ids the Map tab replaced: they still parse, and TABS below sends them to Home.
-  const m = /^#\/(r|c|n|greenway|about|privacy|add|parks|help|map|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
+  const m = /^#\/(r|c|n|greenway|about|privacy|add|parks|park|help|map|rec|transit|events)(?:\/([\w.-]+))?$/.exec(h);
   if (!m) return HOME;
   if (m[1] === 'r') return m[2] ? { v: 'detail', id: m[2] } : HOME;
   if (m[1] === 'c') return m[2] && CATEGORIES.some((c) => c.id === m[2]) ? { v: 'list', cat: m[2] } : { v: 'tab', tab: 'help' };
@@ -52,6 +55,7 @@ export function fromHash(h: string): View {
   // name is not half a screen: it opens the tab.
   if (m[1] === 'n') return !m[2] ? { v: 'tab', tab: 'hoods' } : m[2].startsWith('lens-') ? (m[2].length > 5 ? { v: 'hoods', lens: m[2].slice(5) } : { v: 'tab', tab: 'hoods' }) : { v: 'hood', id: m[2] };
   if (m[1] === 'greenway') return m[2] ? { v: 'segment', id: m[2] } : { v: 'greenway' };
+  if (m[1] === 'park') return m[2] ? { v: 'park', id: m[2] } : { v: 'parks' };
   if (m[1] === 'about' || m[1] === 'privacy' || m[1] === 'parks' || m[1] === 'add') return m[2] ? HOME : { v: m[1] };
   return !m[2] && TABS.some((x) => x.id === m[1]) ? { v: 'tab', tab: m[1] as TabId } : HOME;
 }
