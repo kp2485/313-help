@@ -18,6 +18,30 @@ Kyle, 2026-09-22: *"The Neighborhood home should be a map view by default showin
 - **The rules are in HelpCore** (`Sources/HelpCore/AreasHome.swift`: the landing table, the strip machine, the four numbers, the camera, and which area holds a point) and `Tests/HelpCoreTests/AreasHomeTests.swift` ports `apps/web/test/areas-map.test.ts` case for case. `Tests/AppParityTests/AreasHomeParityTests.swift` holds the numbers and the eight `hood.*` strings to the web's own files.
 - **Fixed on the way (2026-09-22):** `Indicators.init(from:)` is hand-written and never decoded `cities`, `areas`, `area_sources`, `pavement_year` or `permit_years`, so **every city page was silently missing on the phone** however good the bundle was — the city rows in the index, the Dearborn and Hamtramck pages, and the city outlines the Areas map now lands on. The five lines are back and `CityAreasTests`' bundle cases run instead of skipping.
 
+## Neighborhood and city boundaries on the Map tab (2026-09-22)
+
+Kyle: *"The user needs to be able to see the boundaries of the neighborhoods on the map."* The spec is
+`docs/MAP-STYLE.md` section 15 and the web's `apps/web/src/bounds.ts`; this is the Swift half of it.
+
+- **`Sources/HelpCore/Boundaries.swift`** is the whole rule as arithmetic: the three bands (`city` > 30 m/pt,
+  `mid` 12–30, `near` < 12 — section 5's own ladder), the stroke widths 1.1 / 1.6 / 2.2 for a neighbourhood and
+  1.5 / 2.4 / 3.0 for a city outline, the **absolute** dashes `[2,2]` / `[3,3]` / `[6,3]`, no names in the city
+  band and at most 12 elsewhere. `swift test` runs it.
+- **Every outline is drawn in every band.** The old `areaDetailMetersPerPoint = 14` is gone: it hid all 205
+  outlines at the only zoom the Map tab ever opens on, so a person who came to see their neighbourhood's edge
+  saw four city edges and nothing else. `areasDrawn` is now a clip and takes no zoom.
+- **`--map-bnd` is a token of its own** (`MapToken.boundary`, four values, `StandardPalette`), deliberately not
+  a street colour; `MapStyleTests` holds it to `style.css` and to 3:1 against the land, a park and the hatched
+  ground outside the four cities, in light, dark and both Increase Contrast modes.
+- **The pass is drawn between the streets and the transit lines**, so switching boundaries on can never hide a
+  place that helps; names go through the map's existing collision test, nearest the middle of the screen first.
+- **On by default, once.** `place:areas` is in `defaultMapLayers`, and `layersVersion = 2` with
+  `migrateMapLayers` adds it exactly once to a phone that already had a layer list. Every write of the list
+  stamps the marker, so switching the boundaries off and coming back leaves them off.
+- The key under the map carries the dotted sample **in either map style**, and "See this map as a list" gains
+  the area names — both labelled with the layer's own words (`layer.place.areas`), so the switcher, the key and
+  the list can never call the same thing three things.
+
 ## The Neighborhoods tab (2026-09-21)
 
 Public numbers about each of Detroit's 205 neighborhoods (docs/13), in a tab of its own — Kyle asked for one, "not just on the web, in the apps too". The tab bar is **Home · Help · Map · Neighborhoods**, with Events still hiding itself; the bar's label is the short word (`tab.hoods`, "Areas") because "Neighborhoods" does not fit a fifth of a phone bar at the accessibility text sizes, while the screen, its title and VoiceOver all say the whole word (`tab.hoods_wide`).

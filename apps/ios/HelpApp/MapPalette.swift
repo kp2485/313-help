@@ -70,9 +70,10 @@ enum MapColor {
     static let grpPaperwork = mapPair(0x475569, 0xCBD5E1)
     /// Where this phone is, when the person asked for it.
     static let me = mapPair(0x0A57C2, 0x8AB8FF)
-    /// A city or neighbourhood outline (`place:areas`): the web's `--muted` for the dashed line, `--ink` for the
-    /// name, `--focus` for the one that was tapped. A boundary is a line and a name and never a shade.
-    static let areaLine = mapPair(0x47584F, 0xA3B5AA)
+    /// A city or neighbourhood boundary (`place:areas`): the web's `--map-bnd` for the dashed line — a token of
+    /// its own in all four modes, never a street colour (docs/MAP-STYLE.md 15.2) — `--ink` for the name, and
+    /// `--focus` for the one that was tapped. A boundary is a line and a name and never a shade.
+    static let boundary = mapToken(.boundary)
     static let areaInk = mapPair(0x10201A, 0xE9F1EC)
     static let focus = mapPair(0x0A57C2, 0x8AB8FF)
     /// A trip, on a Directions map: the web's `--route-walk` and `--route-ride` (apps/web/src/style.css).

@@ -102,6 +102,11 @@ public enum TransitPalette {
 public enum MapToken: String, Sendable, CaseIterable {
     case out = "--map-out", outInk = "--map-out-ink", land = "--map-land", park = "--map-park", parkInk = "--map-park-ink"
     case road = "--map-road", main = "--map-main", freeway = "--map-fwy", ink = "--map-ink"
+    /// A neighbourhood or city boundary (docs/MAP-STYLE.md 15.2). Deliberately not a street colour: `road`,
+    /// `main` and `freeway` are all within a step of each other in grey-green, and an administrative edge
+    /// wearing one of them is not a boundary, it is a road. A muted plum reads as "administrative" beside them
+    /// and clears 3:1 against the land, a park and the hatched ground outside the four cities, in all four modes.
+    case boundary = "--map-bnd"
     case gwOpen = "--gw-open", gwBuild = "--gw-build", gwFund = "--gw-fund", gwPlan = "--gw-plan", gwCase = "--gw-case"
     case bus = "--lyr-bus", smart = "--lyr-smart", rail = "--lyr-rail", bike = "--lyr-bike"
 }
@@ -115,6 +120,7 @@ public enum StandardPalette {
         .parkInk: (0x1D5A31, 0x9FDCB4, 0x0D3F1F, 0xCDF0DA),
         .road: (0x747D77, 0x75827A, 0x4F5A54, 0xA4B3AA), .main: (0x666F69, 0x88968D, 0x333C37, 0xC9D8CE),
         .freeway: (0x926C16, 0xA3863A, 0x6A4D08, 0xDCC079), .ink: (0x2B3A32, 0xD5E2DA, 0x101A15, 0xF2F8F4),
+        .boundary: (0x7A5588, 0xA98CBB, 0x5A3A6B, 0xCDB4DA),
         .gwOpen: (0x0B6B43, 0x4FCF93, nil, nil), .gwBuild: (0xC2701A, 0xE3974A, nil, nil),
         .gwFund: (0x2F6F9E, 0x6AA9D6, nil, nil), .gwPlan: (0x7D8C84, 0x8EA79A, nil, nil), .gwCase: (0xFFFFFF, 0x0A110E, nil, nil),
         .bus: (0x1D4ED8, 0x7AA7FF, nil, nil), .smart: (0x0F766E, 0x4FD1C5, nil, nil),

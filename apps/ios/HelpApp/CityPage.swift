@@ -410,7 +410,7 @@ struct AreasMapView: View {
     private let corners = [LatLon(lat: 42.255, lon: -83.29), LatLon(lat: 42.45, lon: -82.91)]
 
     private var shown: [AreaOutline] {
-        areasDrawn(areas, view: camera.visible, metersPerPoint: camera.metersPerPoint)
+        areasDrawn(areas, view: camera.visible)
     }
 
     var body: some View {

@@ -869,9 +869,14 @@ boundaries for ever; adding the layer on every load instead would mean nobody co
 - [x] Web: `bounds.ts`, `map.ts` (one pass), `layers.ts` (defaults + marker), `maplist.ts`, `stylepanel.ts`,
       `style.css` (`--map-bnd` ×4 modes, `.trkey i.bnd`), `apps/web/test/boundaries.test.ts`, the contrast walk
       in `web.test.ts`. Screenshots: `docs/img/map-boundaries/`.
-- [ ] iPhone: `HelpCore/Boundaries.swift` with `boundaryBand` / `boundaryStyle` against the same table;
-      `MapPalette.swift` gains `--map-bnd` in all four values; `MapCanvas` draws the pass between the streets
-      and the transit lines; the layer defaults and the `LAYERS_VERSION` marker in the state file.
+- [x] iPhone (2026-09-22): `HelpCore/Boundaries.swift` with `boundaryBand` / `boundaryStyle` against the same
+      table; `MapToken.boundary` carries `--map-bnd` in all four values (`MapStyle.swift`, resolved by
+      `MapPalette.swift`); `MapCanvas` draws the pass between the streets and the transit lines, names
+      nearest-centre-first through the map's own collision test; `defaultMapLayers` gains the layer and
+      `layersVersion` / `migrateMapLayers` do the once-only migration in `state/map-layers.json`; the key row
+      and the list section are in `MapScreen.swift`. `areasDrawn` no longer takes a zoom and
+      `areaDetailMetersPerPoint` is gone. Tests: `HelpCoreTests/BoundariesTests.swift`, the contrast pairs in
+      `MapStyleTests`, and `AppParityTests` reads this table out of `bounds.ts` and out of `Boundaries.swift`.
 - [ ] Android: the same in `MapStyle.kt` / `MapPalette.kt`, the pass in the same place, the marker in the
       app-private state file.
 - Four things to get right, because they are where the web went wrong first: the dash is **absolute** and its
