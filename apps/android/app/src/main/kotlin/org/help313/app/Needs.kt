@@ -196,3 +196,22 @@ fun isPrivate(category: String): Boolean =
 
 /** 911 and 988 are hardcoded. No bundle, feed, or server can change them (audit A5). */
 val HARDCODED = mapOf("emg_911" to "911", "emg_988" to "988")
+
+/**
+ * **Home's six shortcuts, in the order docs/05 names them: Food first** (audit §4.2, M2 and M4).
+ *
+ * Key and need id together, rather than a filter over [NEEDS], because a filter renders in the declaration order
+ * of the list it filters — which is exactly how the iPhone ended up leading with "A place to sleep". It lives here
+ * rather than in a screen so `:core` compiles it and ParityTest holds it to the web's six on a plain JDK.
+ *
+ * Android had **four** of them before 2026-09-22: "Help with drugs or alcohol" and "A job or training" were
+ * missing from Home altogether.
+ */
+val QUICK_NEEDS: List<Pair<String, String>> = listOf(
+    "quick.food" to "food",
+    "quick.shelter" to "shelter",
+    "quick.doctor" to "doctor",
+    "quick.drugs" to "drugs",
+    "quick.narcan" to "narcan",
+    "quick.job" to "job",
+)

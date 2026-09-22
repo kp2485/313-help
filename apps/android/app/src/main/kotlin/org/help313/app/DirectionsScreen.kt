@@ -47,10 +47,6 @@ object DirectionsScreen {
     private var workingFor = ""
     private var planning = 0
 
-    /** What was typed into the cross-street field, and what this phone made of it. Memory only, like the box. */
-    private var crossText = ""
-    private var crossOut: CrossOutcome? = null
-
     /** The one live location listener the follow-along uses, so it can always be taken off again. */
     private var watcher: android.location.LocationListener? = null
     private var livePos: LatLon? = null
@@ -74,8 +70,6 @@ object DirectionsScreen {
         stepAt = -1
         offRoute = false
         planFor = ""
-        crossText = ""
-        crossOut = null
         phase = Phase.NEED_ORIGIN
     }
 
@@ -93,8 +87,6 @@ object DirectionsScreen {
         stepAt = -1
         offRoute = false
         planFor = ""
-        crossText = ""
-        crossOut = null
         routeView = null
         workingFor = ""
         phase = Phase.NEED_ORIGIN
@@ -346,7 +338,10 @@ object DirectionsScreen {
     private fun startCard(a: MainActivity, col: LinearLayout) {
         col.addView(UI.sectionHead(a, L.t("dir.from_head")))
         col.addView(UI.text(a, L.t("dir.from_hint"), 15f, R.color.muted))
-        crossBox(a, col)
+        // The field itself is CrossBox, the same control every other screen offers, with nothing added and
+        // nothing taken away: all this screen does is put it first, and open it without waiting to be asked.
+        a.crossWanted = a.crossWanted || a.crossText == null
+        CrossBox.add(a, col)
 
         col.addView(
             UI.button(a, L.t("loc.use"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink, topDp = 16) {
@@ -362,91 +357,10 @@ object DirectionsScreen {
         col.addView(UI.text(a, L.t("loc.note"), 14f, R.color.muted, topDp = 4))
     }
 
-    /**
-     * The cross-street field. Every line of the answer is worked out on this phone, from the streets `map/base.json`
-     * and `map/streets.json` already carry (Intersections.kt): **nothing is sent, and what is typed is never
-     * stored** — it lives in [crossText] for as long as this screen is open and goes nowhere else.
-     */
-    private fun crossBox(a: MainActivity, col: LinearLayout) {
-        // No autofill, no personalised keyboard learning, no suggestion strip: what is typed here is where a person
-        // is standing, and it stays on this phone (UI.field).
-        val box = UI.field(a, L.t("loc.cross_label"), L.t("loc.cross_label"), suggestions = false)
-        box.setText(crossText)
-        col.addView(box)
-        val problem = UI.text(a, "", 15f, R.color.warn_ink, topDp = 4)
-        problem.visibility = View.GONE
-        col.addView(problem)
-
-        val choices = UI.column(a)
-        col.addView(choices)
-
-        col.addView(
-            UI.button(a, L.t("loc.cross_go")) {
-                crossText = box.text.toString()
-                val base = MapModel.base
-                if (base == null) {
-                    // The streets are not decoded yet (or this bundle has none). Ask for them, say so, and let the
-                    // person try again — never guess at a point.
-                    MapModel.load(a, a.store)
-                    problem.text = L.t("map.no_streets")
-                    problem.visibility = View.VISIBLE
-                    problem.announceForAccessibility(problem.text)
-                    return@button
-                }
-                crossOut = Crossings.resolve(base, crossText)
-                showCross(a, box, problem, choices)
-            },
-        )
-        col.addView(UI.text(a, L.t("loc.cross_hint"), 14f, R.color.muted, topDp = 4))
-    }
-
-    private fun showCross(a: MainActivity, box: android.widget.EditText, problem: android.widget.TextView, choices: LinearLayout) {
-        choices.removeAllViews()
-        problem.visibility = View.GONE
-        when (val out = crossOut) {
-            is CrossOutcome.Point -> a.useCross(out.point, out.a + " & " + out.b)
-            // One street name is an honest answer, and the screen says exactly what it is: the middle of it.
-            is CrossOutcome.Street -> a.useCross(out.point, out.a)
-            is CrossOutcome.Choices -> {
-                val heading = L.t("loc.cross_choices_say", "count" to out.choices.size.toString())
-                choices.addView(UI.text(a, heading, 15f, R.color.muted, topDp = 8))
-                for (c in out.choices) {
-                    val words = L.t(
-                        "loc.cross_choice",
-                        mapOf("a" to out.a, "b" to out.b, "where" to L.t("loc.where_" + c.where)),
-                    )
-                    val card = UI.tappableCard(a, words) { a.useCross(c.point, words) }
-                    card.addView(UI.text(a, words, 17f, R.color.ink, bold = true))
-                    choices.addView(card)
-                }
-                choices.announceForAccessibility(heading)
-            }
-            is CrossOutcome.NoCrossing -> {
-                problem.text = L.t("loc.cross_no_crossing", mapOf("a" to out.a, "b" to out.b))
-                problem.visibility = View.VISIBLE
-                problem.announceForAccessibility(problem.text)
-                box.contentDescription = joinParts(listOf(L.t("loc.cross_label"), problem.text.toString()))
-                box.requestFocus()
-            }
-            is CrossOutcome.Unknown -> {
-                problem.text = L.t("loc.cross_unknown", "street" to out.unknown)
-                problem.visibility = View.VISIBLE
-                problem.announceForAccessibility(problem.text)
-                box.contentDescription = joinParts(listOf(L.t("loc.cross_label"), problem.text.toString()))
-                box.requestFocus()
-            }
-            null -> {
-                problem.text = L.t("loc.cross_hint")
-                problem.visibility = View.VISIBLE
-                box.requestFocus()
-            }
-        }
-    }
-
     /** Where this trip starts, in words, and the way back to changing it. Never a coordinate, ever. */
     private fun originLine(a: MainActivity, col: LinearLayout) {
-        val kind = dirStart(a.near != null, a.nearZip, a.nearCross)
-        val words = a.nearZip ?: a.nearCross ?: ""
+        val kind = dirStart(a.near != null, a.nearZip, a.crossText)
+        val words = a.nearZip ?: a.crossText ?: ""
         col.addView(UI.text(a, dirFromWords(say, kind, words), 16f, R.color.ink, topDp = 12))
         col.addView(
             UI.button(a, L.t("dir.change_start"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
@@ -454,7 +368,7 @@ object DirectionsScreen {
                 stopFollowing(a)
                 a.near = null
                 a.nearZip = null
-                a.nearCross = null
+                a.crossText = null
                 a.locateOutside = false
                 chosen = -1
                 plans = emptyList()

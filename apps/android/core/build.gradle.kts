@@ -52,8 +52,10 @@ kotlin.sourceSets["main"].kotlin.include(
     "org/help313/app/Zip.kt",            // a typed ZIP: what counts as one, and the point at the middle of it
     "org/help313/app/Propose.kt",        // what a proposal is, its closed body, and the queue's rules
     "org/help313/app/Directions.kt",     // which files the street graph is built from, its one key, its states
+    "org/help313/app/Intersections.kt",  // "Woodward and Warren": the parser, the crossings, the 120 m merge
+    "org/help313/app/Areas.kt",          // the four cities and the 205 outlines: the pages, the layer, the pick
+    "org/help313/app/Parks.kt",          // the 302 parks: what one is, and the only two orders a list may have
     "org/help313/app/DirWords.kt",       // every sentence a trip plan is made of, the overlay, the start decision
-    "org/help313/app/Intersections.kt",  // "two streets that cross", worked out from the bundle's own geometry
 )
 
 // Why the four new names above (Android review, 2026-09-20). :core used to cover Ed25519, Verify, ReportModel and

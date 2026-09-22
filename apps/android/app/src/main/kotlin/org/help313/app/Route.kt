@@ -58,6 +58,15 @@ sealed class Route {
     /** One stretch of the Joe Louis Greenway. */
     class Stretch(val segmentId: String) : Route()
 
+    /**
+     * "Parks and paths": the 302 City parks, the recreation centers, and the greenway as one row inside it
+     * (DECISIONS 2026-09-22). It replaced the greenway's own tile on Home.
+     */
+    object Parks : Route()
+
+    /** One park's page. The id is the City's own `plc_park_` slug for a public place, so it is not private. */
+    class Park(val parkId: String) : Route()
+
     /** One need's screen: its numbers, and either its choices or its list. */
     class Need(val needId: String) : Route()
 

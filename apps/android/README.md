@@ -35,19 +35,53 @@ Three Gradle modules:
 > are listed under "What the first compile found", and two of them would have broken the app on every phone
 > below Android 15.
 >
-> **State on 2026-09-22 (second entry).** **The Directions screen is built**, the Kotlin port of the web's
+> **State on 2026-09-22 (third entry).** **The Directions screen is built**, the Kotlin port of the web's
 > `dirwords.ts`, `dirscreen.ts` and the Directions parts of its `main.ts` and `map.ts`. Four ways in (a listing's
 > primary button with the link-outs grouped under "Other apps", a results row, the "Get somewhere safe now" list,
-> the map's card), a start card with the cross-street field open and first, "Getting the map ready…", up to three
-> itinerary cards, the chosen route drawn on the canvas beside a numbered step list, the caveat pair on every
-> state, and follow-along at 120 m. The screen is never put back after a recreation, and a trip from the safe-now
-> list is FLAG_SECURE. `DirWords.kt` and `Intersections.kt` are `:core` files, so the wording rules in all four
-> languages and the cross-street answers are held to a table on a plain JDK. See **"The Directions screen"**
-> below. Totals now: **27 + 286 + 286 JUnit tests and 203 fixture cases, 0 failures**. **Run on the emulator**
-> (AOSP `android-35` arm64): a junction typed with no network, three real itineraries on the committed bundle,
-> the route on the map, font scale 2.0, and Arabic. Two real defects were found by that run and fixed; they are
-> under "What the emulator run found". The debug APK is **2,259,347 bytes (2.15 MiB)**, up from 2.11 MiB. No new
+> the map's card), a start card that puts **the cross-street field first** — the navigation rebuild's own
+> `CrossBox` and `Intersections.kt`, reused unchanged — then "Getting the map ready…", up to three itinerary
+> cards, the chosen route drawn on the canvas beside a numbered step list, the caveat pair on every state, and
+> follow-along at 120 m. The screen is never put back after a recreation, and a trip from the safe-now list is
+> FLAG_SECURE. `DirWords.kt` joins `:core`, so the wording rules of query-spec "Trip plans" are held to a table
+> in all four languages on a plain JDK. See **"The Directions screen"** below. Totals now:
+> **27 + 324 + 324 JUnit tests and 203 fixture cases, 0 failures**. **Run on the emulator** (AOSP `android-35`
+> arm64): a junction typed with no network, three real itineraries on the committed bundle, the route on the map,
+> font scale 2.0, and Arabic. Two real defects were found by that run and fixed; they are under "What the
+> emulator run found". The debug APK is **2,304,339 bytes (2.20 MiB)** on a clean build, up from 2.17 MiB. No new
 > strings were needed: all 80 `dir.*` keys were already in the four files.
+>
+> **State on 2026-09-22 (second entry).** **The navigation rebuild of
+> `docs/NAVIGATION-AUDIT-2026-09-22.md` is built on Android**, which is item 2 of the port. (The directions UI it
+> called a follow-up is the entry above this one.)
+>
+> - **Four tabs — Home · Help · Map · Areas** (audit H5). Search and Saved were tabs here and on neither of the
+>   other two clients; Search is now the first control on Home and a short button in the app bar, and Saved is a
+>   row under **Help → More**. Four labels fit at 320 px in all four languages, which six never did.
+> - **Urgent help is in the app bar on every screen** (audit H6). It had exactly two entry points before — Home's
+>   page body and the Map tab's chip — so from Help, a need, a listing or an area it took a trip back to Home.
+>   The two screens without the bar are the Map tab, which carries the same control as a floating chip, and a
+>   private screen, whose one pinned control is "Leave this page fast".
+> - **The Map tab opens with help on it** (audit H2): all eight help groups and City parks, with the greenway, the
+>   outlines and the bus routes off. A remembered choice still wins.
+> - **"Type a cross street"** (`Intersections.kt`, `:core`): a person who will not or cannot share a location
+>   types "Woodward and Warren" and the phone works the junction out from the streets the signed bundle already
+>   carries. Nothing is sent, and the typed text is memory only. The ask now runs **five minutes** with "Still
+>   looking…" and **Stop looking** after ten seconds, and the opening view is City Hall nudged 0.6 mile up
+>   Woodward at **two miles**, the same three numbers as the web.
+> - **The Areas tab lands on a map** (audit §3): the four city outlines with the person's own area picked out, the
+>   index behind "See this map as a list", and one virtual accessibility node per outline. **Hamtramck, Highland
+>   Park and Dearborn have a page** instead of being told by name that they are not in Detroit (audit C1):
+>   `Areas.kt` carries the `panels` allow-list, and a city page draws a panel because the area lists it, never
+>   because a number is present.
+> - **"Parks and paths"** replaced the greenway's Home tile (Kyle, direction b): 302 City parks, nearest first
+>   with a location and A to Z without one, each with a page; the recreation centers; and the greenway as **one
+>   row**. A park went from a dead end to two taps.
+>
+> Totals now: **27 + 305 + 305 JUnit tests and 203 fixture cases, 0 failures** (`:core` runs 332 of them on a
+> plain JDK with `HELP313_NO_ANDROID=1`, `:query` included). `:app:lint` passes and the debug APK is
+> **2,270,463 bytes (2.17 MiB)** on a clean build, up from 2.11 MiB — no new file ships in it, only code.
+> Walked on the emulator in English and Arabic and at font scale 2.0, with a `uiautomator` dump per screen
+> confirming Urgent help on Home, a listing detail, the Areas tab, a city page and a park page.
 >
 > **State on 2026-09-22.** **The directions rules are ported.** `:query` gains `Streets.kt`, `Walk.kt` and
 > `TransitPlan.kt`, a case-for-case Kotlin copy of `packages/query/src/{streets,walk,transit-plan}.ts`, so the
@@ -184,7 +218,7 @@ company, nothing sent, and it works with no signal at all** (DECISIONS 2026-09-1
 |---|---|
 | `MapData.kt` (`:core`) | The projection, the delta decoder for `map/base.json`, `map/streets.json` and the eleven `map/transit/*.json` layers, the camera with its clamps, the flick, and hit testing. No `android.*` class. |
 | `Locate.kt` (`:core`) | The Map tab's first open (2026-09-21): the four cities as a box, the two-mile radius, `firstOpenAction` (the same five lines as the web and the iPhone), and `LocateFlagStore` — one boolean, written atomically, and the only thing any of this keeps. Our own card comes first and **only** its "Use my location" button asks Android, for `ACCESS_COARSE_LOCATION` alone; Back is "Not now"; a fix outside the four cities moves nothing and says so. No `android.*` class. **The fix itself** comes from `MainActivity`: a last-known one from the network, passive or GPS provider, and — when the phone has none, which is what a fresh install looks like — **one** requested update, given up on after ten seconds and always unregistered. |
-| `MapLayers.kt` (`:core`) | What may be drawn and what never may: the seven help groups, `mapDrawable`, the per-layer styles by **token name**, the zoom rules, the greenway phase dashes, the reading order, and the layer store. |
+| `MapLayers.kt` (`:core`) | What may be drawn and what never may: the eight help groups (category audit, 2026-09-22), the outlines layer, `mapDrawable`, the per-layer styles by **token name**, the zoom rules, the greenway phase dashes, the reading order, and the layer store. |
 | `Language.kt` (`:core`) | `pickLanguage`: the first of the phone's own languages this app carries words for. |
 | `MapStyle.kt` (`:core`) | The `subway` style, everything that is not pixels: zoom bands with hysteresis, the `--tr-*` palette and the quiet basemap **as numbers**, `resolveTransitStyle`, the network-file decoders, per-run simplification, offsets, corner rounding, badge anchors, the round-robin badge claim with the trunk-badge nudge, 48 dp hit testing, the reading-order caps, `netFilesWanted`. A port of `apps/ios/Sources/HelpCore/MapStyle.swift`. |
 | `MapList.kt` (`:core`) | The transport part of "See this map as a list". It is never told the style, which is why the list is identical in both. |
@@ -426,7 +460,7 @@ Ported 2026-09-22 from `apps/web/src/{dirwords,dirscreen,directions}.ts` and the
 | file | what it is |
 |---|---|
 | `DirWords.kt` (`:core`) | Every sentence a plan is made of, the overlay as data, the start decision, and the follow-along arithmetic. Pure, no Android, no state. |
-| `Intersections.kt` (`:core`) | "Two streets that cross", resolved on this phone from the geometry `map/base.json` and `map/streets.json` already carry. |
+| `Intersections.kt` (`:core`) | "Two streets that cross", resolved on this phone from the geometry `map/base.json` and `map/streets.json` already carry. Built by the navigation rebuild and used here unchanged. |
 | `DirectionsScreen.kt` (`:app`) | The screen: the start card, the three states of the work, the itinerary cards, the steps, the follow-along. |
 | `MapView.kt` (`:app`) | `route`, `localCamera`, `dotsOn` — the route overlay and the camera a trip's map uses. |
 
@@ -453,10 +487,11 @@ other screen. `dirStart` is the decision as a table — a typed ZIP wins over a 
 fix — and `dirFromWords` turns it into the one line that says where the trip begins. It is never a coordinate:
 "From where you are", "From ZIP 48201", "From Woodward & Warren".
 
-`Intersections.kt` answers the typed text with one junction, a short list to pick from (each named by the end of
-the street it is at), the middle of one street, "those two do not cross", or "we don't know that street". Every
-line of it runs here, over files the phone already has; what is typed lives in one field and never reaches a
-file, a link or a report.
+The field itself is `CrossBox`, the navigation rebuild's own control, reused with nothing added: this screen
+just puts it above "Use my location" instead of below. `Intersections.kt` answers the typed text with one
+junction, a short list to pick from (each named by the end of the street it is at), the middle of one street,
+"those two do not cross", or "we don't know that street". Every line of it runs here, over files the phone
+already has; what is typed lives in one field on the activity and never reaches a file, a link or a report.
 
 ### Traceless, and private when it has to be
 
@@ -507,9 +542,10 @@ The **numbered step list is the source of truth** and the map is the extra, as e
 one of them — no placeholder unfilled, no raw key, both ends of the range present, Western digits, and nothing
 that calls a route safe or lit (with `dir.caveat`, the sentence that says the opposite, named as the one
 exception so that removing it cannot pass). It also pins the start-decision table and the overlay data model.
-`IntersectionsTest` is the cross-street table. `ParityTest` reads every `dir.*` key out of the web's own source
-and checks that all four strings files carry it, and holds a trip out of the retained stack. All of it is
-`:core`, so `HELP313_NO_ANDROID=1 ./gradlew :core:test` runs it on a plain JDK.
+`ParityTest` reads every `dir.*` key out of the web's own source and checks that all four strings files carry
+it, and holds a trip out of the retained stack; the cross-street table is the navigation rebuild's own
+`IntersectionsTest`, which this branch left alone. All of it is `:core`, so
+`HELP313_NO_ANDROID=1 ./gradlew :core:test` runs it on a plain JDK.
 
 ### What the emulator run found
 
