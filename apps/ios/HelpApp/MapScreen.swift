@@ -279,7 +279,7 @@ struct MapSurface: View {
                     MapPainter.draw(scene, into: ctx, size: size)
                 }
             }
-            .onAppear { model.resize(geo.size) }
+            .onAppear { model.openAt = here.point; model.resize(geo.size) }
             .onChange(of: geo.size) { _, s in model.resize(s) }
             .contentShape(Rectangle())
             .gesture(drag)

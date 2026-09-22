@@ -9,7 +9,7 @@ import { hoodIndex, hoodList, hoodPage, hoodRows, loadIndicators, outline, type 
 import { hoodAt, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
 import { icon } from './icons.js';
 import { MapView, focusRadius, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
-import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, positionOutcome, rememberLocateAnswered, requestPosition } from './locate.js';
+import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, rememberLocateAnswered, requestPosition } from './locate.js';
 import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
 import { loadLayers, loadStyle, mapStyle, saveStyle, toggleLayer, type MapStyle } from './layers.js';
 import { LAYER_STYLE } from './layerstyle.js';
@@ -538,7 +538,7 @@ function mapTab(): string {
   // On a phone this is one column, exactly as before (.maptop and .mapside are display:contents). On a laptop
   // the map sits beside the switcher and the list, and stays put while the list scrolls.
   return `<main class="wide"><h1 class="page" tabindex="-1">${T('tab.map')}</h1><p class="lede">${T('map.lede')}</p>
-    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), fit: CITY, cover: true })}
+    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), fit: CITY, cover: true, open: openingView(here) })}
     <div class="mapside">${subwayKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
     ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map(layerSource).join(' · ')}<br>${T('map.layer_filtered')}</p>` : ''}
     ${g ? `<h2>${T('gw.title')}</h2><button class="feature" ${go({ v: 'greenway' })}><span class="rowic big">${icon('path')}</span><span class="rowtx"><strong>${T('gw.title')}</strong><small>${T('rec.gw_sub', { count: openCount })}</small></span>${icon('chevron', 'turn dim')}</button>` : ''}
@@ -656,12 +656,12 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
+function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
   // Every map but the Map tab's always draws the greenway; there, it is a layer a person switches on.
   const segments = o.segments === false ? [] : bundle?.greenway?.segments ?? [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, open: o.open, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),

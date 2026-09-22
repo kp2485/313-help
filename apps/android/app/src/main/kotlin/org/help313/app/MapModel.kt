@@ -216,10 +216,23 @@ object MapModel {
 
     // -- the camera ------------------------------------------------------------------------------------------
 
+    /**
+     * Where the map OPENS: a point already known (allowed earlier, or the centre of a typed ZIP) or, with none,
+     * nothing at all — and then [openingView] hands back the civic anchor (Locate.kt). Set by the screen before
+     * the first layout. It is a view, not a person: nothing here is written down or sent.
+     */
+    @Volatile var openAt: LatLon? = null
+
+    /** The camera the tab opens at, for a box of this size. Pure, and the same on all three clients. */
+    fun openingCamera(width: Double, height: Double): MapCamera {
+        val (centre, radius) = openingView(openAt)
+        return MapCamera.forRadius(centre, radius, width, height)
+    }
+
     fun resize(width: Double, height: Double) {
         if (width <= 1 || height <= 1) return
         camera = if (!everMoved || camera.width <= 1) {
-            MapCamera.fitting(cityCorners, width, height, cover = true)
+            openingCamera(width, height)
         } else {
             camera.resized(width, height).clamped()
         }
@@ -241,8 +254,13 @@ object MapModel {
         camera = camera.pinched(dx, dy, factor, atX, atY)
     }
 
+    /**
+     * The whole area, one tap away: the reset button still shows all four cities, whatever the map opened at
+     * (DECISIONS 2026-09-22). It counts as a move now — before, `everMoved = false` meant the next layout refit
+     * the region, which since 2026-09-22 would instead throw the person back to the anchor they just left.
+     */
     fun reset() {
-        everMoved = false
+        everMoved = true
         camera = MapCamera.fitting(cityCorners, camera.width, camera.height, cover = true)
     }
 

@@ -16,6 +16,7 @@
 package org.help313.app
 
 import org.help313.query.LatLon
+import org.help313.query.SERVICE_AREAS
 import java.io.File
 
 // ---- the four cities, as a box ---------------------------------------------------------------------------------
@@ -45,6 +46,36 @@ fun inServiceArea(p: LatLon, slack: Double = 0.0): Boolean = inServiceArea(p.lat
 
 /** Two miles, in metres. The shorter side of the map spans twice this: four miles across, the walk-and-bus city. */
 const val LOCATE_RADIUS_METERS = 3218.688
+
+/**
+ * Where a map of Detroit looks when nobody has said where they are (Kyle, 2026-09-22: "the initial map
+ * presentation needs to be much more zoomed in"; DECISIONS 2026-09-22).
+ *
+ * The point is **Detroit City Hall** — the Coleman A. Young Municipal Center — which the app already carries, in
+ * code, as the civic reference point of the `detroit` service area (`SERVICE_AREAS` in
+ * apps/android/query/.../Areas.kt, the Kotlin copy of packages/query/src/areas.ts). Reused rather than re-typed,
+ * so there is one Detroit-centre number on all three clients; and it is the published address of a public
+ * building, which says nothing about anybody.
+ */
+val MAP_ANCHOR: LatLon = SERVICE_AREAS.getValue("detroit").point!!
+
+/**
+ * Two and a half miles, in metres: the anchor view is a little wider than the you-are-here view, because the
+ * anchor is the city's front door and not where the person actually is.
+ */
+const val ANCHOR_RADIUS_METERS = 4023.36
+
+/**
+ * The opening view of the Map tab, as a point and a radius — the one decision behind "how far out does the map
+ * open?", so the first view and "centre on me" are the same arithmetic ([MapCamera.forRadius]) with a different
+ * centre. A location already known — allowed earlier, or the centre of a ZIP a person typed — wins and keeps
+ * today's two-mile view; with none, the map opens on the anchor instead of the whole four-city region.
+ *
+ * Pure, and the same three lines on all three clients (`openingView` in apps/web/src/locate.ts and
+ * apps/ios/Sources/HelpCore/Locate.swift). Nothing is stored: it is arithmetic about a view.
+ */
+fun openingView(here: LatLon?): Pair<LatLon, Double> =
+    if (here != null) here to LOCATE_RADIUS_METERS else MAP_ANCHOR to ANCHOR_RADIUS_METERS
 
 // ---- what the tab does when it opens ----------------------------------------------------------------------------
 

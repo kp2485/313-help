@@ -144,6 +144,97 @@ class LocateCameraTest {
     }
 }
 
+/**
+ * The anchor view: what the Map tab opens at when nobody has said where they are (DECISIONS 2026-09-22). The same
+ * numbers as apps/web/test/locate.test.ts and apps/ios/Tests/HelpCoreTests/LocateTests.swift.
+ */
+class AnchorViewTest {
+
+    /** A 375 dp phone, and a laptop-sized box, as the three clients each measure them. */
+    private val phoneW = 343.0
+    private val phoneH = 384.0
+    private val laptopW = 600.0
+    private val laptopH = 640.0
+    private fun metresAcrossShortSide(c: MapCamera): Double =
+        min(c.width, c.height) * MapProjection.METERS_PER_UNIT / c.scale
+    private fun metresPerDp(c: MapCamera): Double = MapProjection.METERS_PER_UNIT / c.scale
+
+    @Test
+    fun `the anchor is the civic point the app already carries`() {
+        // Detroit City Hall (Coleman A. Young Municipal Center) — the `detroit` service area's reference point.
+        assertEquals(42.3293, MAP_ANCHOR.lat, 1e-9)
+        assertEquals(-83.0452, MAP_ANCHOR.lon, 1e-9)
+        assertTrue(inServiceArea(MAP_ANCHOR))
+        assertEquals(4023.36, ANCHOR_RADIUS_METERS, 0.001)          // two and a half miles, in metres
+    }
+
+    @Test
+    fun `with no location it is the anchor, and with one it is the two-mile view`() {
+        val (centre, radius) = openingView(null)
+        assertEquals(MAP_ANCHOR, centre)
+        assertEquals(ANCHOR_RADIUS_METERS, radius, 1e-9)
+        val here = LatLon(42.3487, -83.0567)
+        val (known, knownRadius) = openingView(here)
+        assertEquals(here, known)
+        assertEquals(LOCATE_RADIUS_METERS, knownRadius, 1e-9)
+    }
+
+    @Test
+    fun `five miles across the shorter side, portrait or landscape`() {
+        val (centre, radius) = openingView(null)
+        for (size in listOf(phoneW to phoneH, phoneH to phoneW, laptopW to laptopH)) {
+            val cam = MapCamera.forRadius(centre, radius, size.first, size.second)
+            assertEquals(8046.72, metresAcrossShortSide(cam), 1.0)
+        }
+    }
+
+    @Test
+    fun `puts the middle on the anchor`() {
+        val (centre, radius) = openingView(null)
+        val cam = MapCamera.forRadius(centre, radius, phoneW, phoneH)
+        assertEquals(MapProjection.pointX(MAP_ANCHOR), cam.centerX, 1e-9)
+        assertEquals(MapProjection.pointY(MAP_ANCHOR), cam.centerY, 1e-9)
+    }
+
+    @Test
+    fun `stays inside the zoom and pan limits`() {
+        val (centre, radius) = openingView(null)
+        for (size in listOf(phoneW to phoneH, laptopW to laptopH, 0.0 to 0.0)) {
+            val cam = MapCamera.forRadius(centre, radius, size.first, size.second)
+            assertTrue(cam.scale.isFinite())
+            assertTrue(cam.scale >= MapCamera.MIN_SCALE)
+            assertTrue(cam.scale <= MapCamera.MAX_SCALE)
+            assertTrue(abs(cam.centerX) <= MapCamera.PAN_LIMIT_X + 1e-9)
+            assertTrue(abs(cam.centerY) <= MapCamera.PAN_LIMIT_Y + 1e-9)
+        }
+    }
+
+    /**
+     * docs/MAP-STYLE.md section 5: mid is 12 < mpp <= 30, where the street classes and their names are drawn. The
+     * four-city fit it replaces sat in `far`, above 30, where every street is a hairline.
+     */
+    @Test
+    fun `opens in the mid band, where streets are drawn and named`() {
+        val (centre, radius) = openingView(null)
+        val onPhone = MapCamera.forRadius(centre, radius, phoneW, phoneH)
+        val onLaptop = MapCamera.forRadius(centre, radius, laptopW, laptopH)
+        assertTrue(metresPerDp(onPhone) <= 30)
+        assertTrue(metresPerDp(onLaptop) <= 15)
+        assertEquals(ZoomBand.MID, zoomBand(metresPerDp(onPhone)))
+    }
+
+    /** The whole four-city region is still what the reset button shows, and it is much further out than this. */
+    @Test
+    fun `the region fit is still there and is further out`() {
+        val (centre, radius) = openingView(null)
+        val anchor = MapCamera.forRadius(centre, radius, phoneW, phoneH)
+        val region = MapCamera.fitting(
+            listOf(LatLon(42.255, -83.29), LatLon(42.45, -82.91)), phoneW, phoneH, cover = true,
+        )
+        assertTrue(metresPerDp(region) > 2 * metresPerDp(anchor))
+    }
+}
+
 class LocateFlagStoreTest {
 
     private fun tempDir(): File {
