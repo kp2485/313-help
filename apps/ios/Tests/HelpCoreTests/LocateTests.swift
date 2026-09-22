@@ -133,10 +133,20 @@ final class AnchorViewTests: XCTestCase {
 
     func testTheAnchorIsTheCivicPointTheAppAlreadyCarries() {
         // Detroit City Hall (Coleman A. Young Municipal Center) — the `detroit` service area's reference point.
-        XCTAssertEqual(mapAnchor.lat, 42.3293, accuracy: 1e-9)
-        XCTAssertEqual(mapAnchor.lon, -83.0452, accuracy: 1e-9)
+        XCTAssertEqual(cityHall.lat, 42.3293, accuracy: 1e-9)
+        XCTAssertEqual(cityHall.lon, -83.0452, accuracy: 1e-9)
+        // …nudged 0.6 mile up Woodward, so the two-mile box does not spend a third of its height on the river.
+        // Exactly `MAP_ANCHOR` in apps/web/src/locate.ts (2026-09-22).
+        XCTAssertEqual(mapAnchor.lat, 42.3366, accuracy: 1e-9)
+        XCTAssertEqual(mapAnchor.lon, -83.0514, accuracy: 1e-9)
         XCTAssertTrue(inServiceArea(mapAnchor))
-        XCTAssertEqual(anchorRadiusMeters, 4023.36, accuracy: 0.001)      // two and a half miles, in metres
+        // The nudge really is 0.6 mile on the bearing the constant names, and it really is north-west.
+        let dy = (mapAnchor.lat - cityHall.lat) * 111320, dx = (mapAnchor.lon - cityHall.lon) * 111320 * cos(42.35 * .pi / 180)
+        XCTAssertEqual(hypot(dx, dy) / 1609.344, anchorNudgeMiles, accuracy: 0.02)
+        XCTAssertEqual(atan2(dx, dy) * 180 / .pi, anchorBearingDegrees, accuracy: 0.5)
+        // One radius people can learn: two miles here and two miles on "centre on me" (Kyle, 2026-09-22).
+        XCTAssertEqual(anchorRadiusMeters, locateRadiusMeters, accuracy: 1e-9)
+        XCTAssertEqual(anchorRadiusMeters, 3218.688, accuracy: 0.001)
     }
 
     func testWithNoLocationItIsTheAnchorAndWithOneItIsTheTwoMileView() {
@@ -149,11 +159,11 @@ final class AnchorViewTests: XCTestCase {
         XCTAssertEqual(known.radiusMeters, locateRadiusMeters, accuracy: 1e-9)
     }
 
-    func testSpansFiveMilesAcrossTheShorterSidePortraitOrLandscape() {
+    func testSpansFourMilesAcrossTheShorterSidePortraitOrLandscape() {
         let v = openingView(nil)
         for size in [phone, (w: phone.h, h: phone.w), laptop] {
             let cam = MapCamera.forRadius(v.center, radiusMeters: v.radiusMeters, width: size.w, height: size.h)
-            XCTAssertEqual(metresAcrossShortSide(cam), 8046.72, accuracy: 1)
+            XCTAssertEqual(metresAcrossShortSide(cam), 2 * locateRadiusMeters, accuracy: 1)
         }
     }
 

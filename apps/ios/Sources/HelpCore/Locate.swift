@@ -39,16 +39,40 @@ public let locateRadiusMeters = 3218.688
 /// Where a map of Detroit looks when nobody has said where they are (Kyle, 2026-09-22: "the initial map
 /// presentation needs to be much more zoomed in"; DECISIONS 2026-09-22).
 ///
-/// The point is **Detroit City Hall** — the Coleman A. Young Municipal Center — which the app already carries,
+/// The place is **Detroit City Hall** — the Coleman A. Young Municipal Center — which the app already carries,
 /// in code, as the civic reference point of the `detroit` service area (`serviceAreas` in
-/// apps/ios/Sources/DetroitQuery/Areas.swift, the Swift copy of packages/query/src/areas.ts). Reused rather than
-/// re-typed, so there is one Detroit-centre number on all three clients; and it is the published address of a
-/// public building, which says nothing about anybody.
-public let mapAnchor: LatLon = serviceAreas["detroit"]!.point!
+/// apps/ios/Sources/DetroitQuery/Areas.swift, the Swift copy of packages/query/src/areas.ts). It is the
+/// published address of a public building, which says nothing about anybody.
+public let cityHall: LatLon = serviceAreas["detroit"]!.point!
 
-/// Two and a half miles, in metres: the anchor view is a little wider than the you-are-here view, because the
-/// anchor is the city's front door and not where the person actually is.
-public let anchorRadiusMeters = 4023.36
+/// How far north-west along Woodward the opening view is nudged, in miles, and the bearing of Woodward from
+/// downtown measured off the map (Campus Martius to New Center): 31.9° west of north.
+public let anchorNudgeMiles = 0.6, anchorBearingDegrees = -31.9
+
+/// The centre of the opening view: **0.6 mile up Woodward from City Hall**, which is Grand Circus Park.
+///
+/// City Hall itself sits about a third of a mile from the river, so a two-mile box centred on it spends a third
+/// of its height on Windsor and on the diagonal hatching that means "not our area" — a map whose lower half
+/// answers nothing. Nudging the centre up Woodward puts the whole box on the city while keeping the same
+/// landmark, and Woodward is the direction to nudge along because it is the street the box is being read from.
+///
+/// The number is pinned here rather than computed at run time so the three clients cannot drift, and it is
+/// exactly `MAP_ANCHOR` in apps/web/src/locate.ts:
+/// lat 42.3293 + 0.6·cos(31.9°)·1609.344/111320, lon −83.0452 − 0.6·sin(31.9°)·1609.344/(111320·cos 42.35°).
+public let mapAnchor = LatLon(lat: 42.3366, lon: -83.0514)
+
+/// Two miles, as everywhere else (Kyle, 2026-09-22: "always a 2-mile radius"). It used to be two and a half
+/// here, on the reasoning that the anchor is the city's front door rather than where the person is; Kyle's
+/// answer is that one radius people can learn is worth more than that distinction.
+public let anchorRadiusMeters = locateRadiusMeters
+
+/// **The ten-second timeout is gone** (Kyle, 2026-09-22). Two of the first people this app is for are a survivor
+/// whose service has been cut off and a person without housing and without signal, and on a phone with no
+/// network a cold GPS fix is a walk outside and a few minutes of sky — not ten seconds. Giving up at ten and
+/// saying "we couldn't get your location" was the app telling the truth about its own patience and a lie about
+/// the phone's. So the ask runs on, and after ten seconds the screen says what is happening and what would help,
+/// with the cross-street and ZIP ways in beside it the whole time, and a **Stop** that is a real button.
+public let locateSlowSeconds = 10.0
 
 /// The opening view of the Map tab, as a point and a radius — the one decision behind "how far out does the map
 /// open?", so the first view and "centre on me" are the same arithmetic (`MapCamera.forRadius`) with a different

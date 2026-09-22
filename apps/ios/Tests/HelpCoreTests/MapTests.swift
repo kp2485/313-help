@@ -443,20 +443,27 @@ final class MapLayerStoreTests: XCTestCase {
         return d
     }
 
-    func testAFirstOpenShowsTheGreenwayParksAndTheBuses() throws {
+    /// Navigation audit 2026-09-22, H2: the Map tab used to open with no help on it at all — the one tab named
+    /// after the thing on it opened without the thing. All eight help groups and the parks now; the greenway
+    /// and the bus routes are one tap away in the switcher (Kyle, 2026-09-22).
+    func testAFirstOpenShowsEveryKindOfHelpAndTheParks() throws {
         let store = MapLayerStore(dir: try tempDir())
         XCTAssertEqual(store.on, defaultMapLayers)
-        XCTAssertTrue(store.isOn("place:greenway"))
+        XCTAssertEqual(defaultMapLayers.count, 9)
+        for group in mapGroups { XCTAssertTrue(store.isOn("help:" + group.id), "the Map tab opens with help on it") }
+        XCTAssertTrue(store.isOn("place:parks"))
+        XCTAssertFalse(store.isOn("place:greenway"))
+        XCTAssertFalse(store.isOn("go:ddot_routes"))
         XCTAssertFalse(store.isOn("go:ddot_stops"))
     }
 
     func testTheChoiceIsRememberedOnThisPhoneAndNowhereElse() throws {
         let dir = try tempDir()
         let first = MapLayerStore(dir: dir)
-        XCTAssertTrue(first.toggle("help:food"))
-        XCTAssertTrue(first.toggle("place:parks"))
+        XCTAssertTrue(first.toggle("go:qline"))          // off by default: switching it on, and written down
+        XCTAssertTrue(first.toggle("place:parks"))       // on by default: switching it off, and written down
         let again = MapLayerStore(dir: dir)
-        XCTAssertTrue(again.isOn("help:food"))
+        XCTAssertTrue(again.isOn("go:qline"))
         XCTAssertFalse(again.isOn("place:parks"))
         XCTAssertTrue(FileManager.default.fileExists(atPath: dir.appendingPathComponent("map-layers.json").path),
                       "the choice is a file in the app's own state directory, never UserDefaults")

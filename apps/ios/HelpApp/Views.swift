@@ -339,13 +339,29 @@ struct HomeView: View {
                         Spacer()
                     }.card(padding: 14)
                 }.buttonStyle(.plain)
-                NavRow(title: L.t("home.help_title"), symbol: "heart", subtitle: L.t("home.help_sub")) { HelpView() }
+                // "Find free help" SELECTS the Help tab. It used to push a second copy of `HelpView` inside
+                // Home's own stack — two live instances of one screen with different Back behaviour, and the
+                // Help tab in the bar did not light up (navigation audit 2026-09-22, H7).
+                TabRow(tab: .help, title: L.t("home.help_title"), symbol: "heart", subtitle: L.t("home.help_sub"))
+                // The order of docs/05 and of the audit's one-Home recommendation (§4.2), written out here
+                // rather than filtered out of `needs`, so what is on the screen is the order on this line and
+                // cannot drift with that list (audit M2: the filter rendered declaration order, which led with
+                // "A place to sleep").
                 LazyVGrid(columns: tileColumns, spacing: 10) {
-                    ForEach(needs.filter { ["food", "shelter", "doctor", "drugs", "job", "narcan"].contains($0.id) }) { n in
+                    ForEach(quickNeeds) { n in
                         NavTile(title: L.t("quick." + n.id), symbol: n.symbol) { NeedView(need: n) }
                     }
                 }
-                NavRow(title: L.t("saved.title"), symbol: "bookmark", subtitle: L.t("saved.sub")) { SavedView() }
+                // The three tiles the web app has and the iPhone did not (audit M1): the Map, the whole park
+                // system, and the person's own area. Saved places moved to Help → More, where the web keeps
+                // them, so Home has one entry to a screen rather than two (audit L1).
+                LazyVGrid(columns: tileColumns, spacing: 10) {
+                    TabTile(tab: .map, title: L.t("tab.map"), symbol: "map", subtitle: L.t("home.map_sub"))
+                    if !b.parks.isEmpty {
+                        NavTile(title: L.t("rec.title"), symbol: "tree") { ParksView() }
+                    }
+                    TabTile(tab: .hoods, title: L.t("home.hoods_title"), symbol: "square.grid.2x2", subtitle: L.t("home.hoods_sub"))
+                }
                 // When this phone last got updates, and the two screens that say what the app keeps and sends.
                 VStack(alignment: .leading, spacing: 8) {
                     Text(L.t("home.updated", ["when": prettyDate(b.index.generatedAt)]))
@@ -398,6 +414,10 @@ struct HelpView: View {
                     }
                 }
             }
+            // Browse by type: the web's 19 chips, folded away the same way (audit C2). Without it the iPhone
+            // had no browse path at all, so showers and the places for young people could only be reached by
+            // already knowing a name to type into Search.
+            BrowseSection()
             // "More", where the web app keeps saved places and "Add a place that helps" (docs/04).
             SectionHead(text: L.t("help.more"))
             NavRow(title: L.t("saved.title"), symbol: "bookmark", subtitle: L.t("saved.sub")) { SavedView() }
