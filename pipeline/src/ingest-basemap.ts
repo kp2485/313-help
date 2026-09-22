@@ -87,9 +87,52 @@ export function worstSafety(a: number, b: number): number {
   return ((a | b) & 3) | bucket(2) | bucket(4) | bucket(6);
 }
 
+/** Metres between two [lon, lat] points, near enough for this latitude. */
+export const metresApart = (a: Pt, b: Pt): number =>
+  Math.hypot((b[0] - a[0]) * 111320 * Math.cos((42.4 * Math.PI) / 180), (b[1] - a[1]) * 110574);
+
+/**
+ * TIGER does not share a node between the two pieces of a street either side of an intersection: measured on
+ * Highland Park, consecutive pieces of one street end 6-17 m apart (Ford St at 2nd Ave: 12 m). Keying an
+ * endpoint by its exact rounded coordinate, as this used to, therefore never joined them, and a street came out
+ * as a dozen two-point lines with a dozen labels. So ends are snapped first: every endpoint within SNAP_M of one
+ * already seen is treated as the same place. 2 m is under half a lane and well under a block.
+ */
+export const SNAP_M = 2;
+/** A gap a chain may step over when the next piece plainly carries the same street on: metres, and the two
+ *  cosines that make "carries on" mean something — 25 degrees of turn, and 40 degrees off straight ahead. */
+export const BRIDGE_M = 20, BRIDGE_COS = Math.cos((25 * Math.PI) / 180), BRIDGE_AHEAD = Math.cos((40 * Math.PI) / 180);
+const KLON = Math.cos((42.4 * Math.PI) / 180);
+/** Unit vector from a to b, with longitude squeezed so a bearing means what it looks like on the screen. */
+export const unit = (a: Pt, b: Pt): Pt => { const x = (b[0] - a[0]) * KLON, y = b[1] - a[1], L = Math.hypot(x, y) || 1; return [x / L, y / L]; };
+const dot = (a: Pt, b: Pt) => a[0] * b[0] + a[1] * b[1];
+
+/** Group endpoints that are within `tol` metres of each other; returns a key function over them. */
+export function snapper(points: Pt[], tol = SNAP_M): (pt: Pt) => string {
+  const cell = tol / 100000;                                   // a grid coarser than tol, in degrees
+  const buckets = new Map<string, { at: Pt; id: number }[]>();
+  const ids = new Map<string, number>();
+  const bucket = (pt: Pt) => `${Math.floor(pt[0] / cell)},${Math.floor(pt[1] / cell)}`;
+  const exact = (pt: Pt) => `${pt[0]},${pt[1]}`;
+  const find = (pt: Pt): number | null => {
+    const [bx, by] = bucket(pt).split(',').map(Number) as [number, number];
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++)
+      for (const c of buckets.get(`${bx + dx},${by + dy}`) ?? []) if (metresApart(pt, c.at) <= tol) return c.id;
+    return null;
+  };
+  for (const pt of points) {
+    if (ids.has(exact(pt))) continue;
+    const hit = find(pt);
+    const id = hit ?? ids.size;
+    ids.set(exact(pt), id);
+    if (hit === null) (buckets.get(bucket(pt)) ?? buckets.set(bucket(pt), []).get(bucket(pt))!).push({ at: pt, id });
+  }
+  return (pt: Pt) => String(ids.get(exact(pt)) ?? `?${exact(pt)}`);
+}
+
 /** Join block-long pieces of the same street end to end, so there are fewer lines and better labels. */
 export function mergeChains(roads: Road[]): Road[] {
-  const key = (pt: Pt) => `${Math.round(pt[0] * SCALE)},${Math.round(pt[1] * SCALE)}`;
+  const key = snapper(roads.flatMap((r) => [r.line[0]!, r.line[r.line.length - 1]!]));
   const groups = new Map<string, Road[]>();
   for (const r of roads) { const k = `${r.cls}|${r.name}`; (groups.get(k) ?? groups.set(k, []).get(k)!).push(r); }
   const out: Road[] = [];
@@ -101,20 +144,45 @@ export function mergeChains(roads: Road[]): Road[] {
     const drop = (pt: Pt, i: number) => ends.get(key(pt))?.delete(i);
     lines.forEach((l, i) => { add(l[0]!, i); add(l[l.length - 1]!, i); });
     const used = new Uint8Array(lines.length);
-    const take = (pt: Pt): { line: Pt[]; safety: number } | null => {
+    const at = (j: number, front: boolean) => (front ? lines[j]![0]! : lines[j]![lines[j]!.length - 1]!);
+    const claim = (j: number, pt: Pt, forwards: boolean): { line: Pt[]; safety: number } => {
+      const l = lines[j]!; used[j] = 1; drop(l[0]!, j); drop(l[l.length - 1]!, j);
+      return { line: forwards ? l : [...l].reverse(), safety: pieces[j]!.safety ?? 0 };
+    };
+    const take = (pt: Pt, heading: Pt | null): { line: Pt[]; safety: number } | null => {
       for (const j of ends.get(key(pt)) ?? []) {
         if (used[j]) continue;
-        const l = lines[j]!; used[j] = 1; drop(l[0]!, j); drop(l[l.length - 1]!, j);
-        return { line: key(l[0]!) === key(pt) ? l : [...l].reverse(), safety: pieces[j]!.safety ?? 0 };
+        return claim(j, pt, key(lines[j]![0]!) === key(pt));
       }
-      return null;
+      // Nothing shares this end. TIGER leaves a gap of one intersection between its pieces (6-20 m on the
+      // Highland Park streets), so look for a piece that starts a few metres ahead and carries straight on:
+      // near enough, pointing the same way, and lying ahead rather than beside. A street on the far side of a
+      // boulevard, or the other carriageway of one, fails the second or third test and stays a separate line.
+      if (!heading) return null;
+      let best: { j: number; front: boolean; d: number } | null = null;
+      for (let j = 0; j < lines.length; j++) {
+        if (used[j]) continue;
+        for (const front of [true, false]) {
+          const e = at(j, front), d = metresApart(pt, e);
+          if (d > BRIDGE_M || d < 1e-9) continue;
+          const other = front ? lines[j]![1]! : lines[j]![lines[j]!.length - 2]!;
+          const far = front ? lines[j]![lines[j]!.length - 1]! : lines[j]![0]!;
+          // Points the same way, and goes on ahead: the far end of the candidate must be further along, which
+          // is what tells the next block of a street from the other carriageway of the same boulevard.
+          if (dot(heading, unit(e, other)) < BRIDGE_COS || dot(heading, unit(pt, far)) < BRIDGE_AHEAD) continue;
+          if (!best || d < best.d) best = { j, front, d };
+        }
+      }
+      return best ? claim(best.j, pt, best.front) : null;
     };
+    const headEnd = (l: Pt[]) => unit(l[l.length - 2]!, l[l.length - 1]!);
+    const headStart = (l: Pt[]) => unit(l[1]!, l[0]!);
     lines.forEach((l, i) => {
       if (used[i]) return;
       used[i] = 1; drop(l[0]!, i); drop(l[l.length - 1]!, i);
       let chain = [...l], safety = pieces[i]!.safety ?? 0;
-      for (let nx = take(chain[chain.length - 1]!); nx; nx = take(chain[chain.length - 1]!)) { chain.push(...nx.line.slice(1)); safety = worstSafety(safety, nx.safety); }
-      for (let nx = take(chain[0]!); nx; nx = take(chain[0]!)) { chain = [...[...nx.line].reverse().slice(0, -1), ...chain]; safety = worstSafety(safety, nx.safety); }
+      for (let nx = take(chain[chain.length - 1]!, headEnd(chain)); nx; nx = take(chain[chain.length - 1]!, headEnd(chain))) { chain.push(...nx.line.slice(1)); safety = worstSafety(safety, nx.safety); }
+      for (let nx = take(chain[0]!, headStart(chain)); nx; nx = take(chain[0]!, headStart(chain))) { chain = [...[...nx.line].reverse().slice(0, -1), ...chain]; safety = worstSafety(safety, nx.safety); }
       out.push({ cls, name, line: chain, safety });
     });
   }
@@ -219,6 +287,75 @@ export function insideRings(pt: Pt, rings: Pt[][]): boolean {
   return inside;
 }
 
+/**
+ * Cut a line at a city boundary and keep the side asked for.
+ *
+ * The old rule — keep a TIGER line only if its MIDDLE vertex is inside one of the three cities — threw away
+ * every street whose TIGER feature runs on past the city line, which is exactly the through streets: measured
+ * on 2026-09-22, 16.6% of Highland Park's 97 km of street had nothing drawn for it, including most of Woodward
+ * Ave, John R St, Brush St, 3rd St, Glendale Ave and the Davison, because the City of Detroit's own roads layer
+ * stops dead at the city line (0 Woodward vertices inside Highland Park) and TIGER's piece was being dropped.
+ * Clipping instead of dropping gives one authority on each side of the line and no gap between them.
+ */
+export function clipToRings(line: Pt[], rings: Pt[][], keepInside: boolean): Pt[][] {
+  // Most of Detroit is nowhere near these three outlines, so a line whose box misses every ring's box needs no
+  // work at all: it is wholly outside, and that answer is exact.
+  const box = (pts: Pt[]) => [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))] as const;
+  const lb = box(line);
+  const near = rings.filter((r) => { const rb = box(r); return rb[0] <= lb[2] && rb[2] >= lb[0] && rb[1] <= lb[3] && rb[3] >= lb[1]; });
+  if (!near.length) return keepInside ? [] : [line];
+  const out: Pt[][] = [];
+  let run: Pt[] = [];
+  const push = () => { if (run.length > 1) out.push(run); run = []; };
+  for (let i = 0; i + 1 < line.length; i++) {
+    const a = line[i]!, b = line[i + 1]!;
+    const ts = [0];
+    for (const ring of near) for (let j = 0, k = ring.length - 1; j < ring.length; k = j++) {
+      const c = ring[k]!, d = ring[j]!;
+      const rx = b[0] - a[0], ry = b[1] - a[1], sx = d[0] - c[0], sy = d[1] - c[1];
+      const den = rx * sy - ry * sx;
+      if (Math.abs(den) < 1e-15) continue;
+      const qx = c[0] - a[0], qy = c[1] - a[1];
+      const t = (qx * sy - qy * sx) / den, u = (qx * ry - qy * rx) / den;
+      if (t > 1e-9 && t < 1 - 1e-9 && u >= 0 && u <= 1) ts.push(t);
+    }
+    ts.push(1);
+    ts.sort((x, y) => x - y);
+    const at = (t: number): Pt => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    for (let s = 0; s + 1 < ts.length; s++) {
+      const t0 = ts[s]!, t1 = ts[s + 1]!;
+      if (t1 - t0 < 1e-12) continue;
+      if (insideRings(at((t0 + t1) / 2), near) === keepInside) {
+        if (!run.length) run.push(at(t0));
+        run.push(at(t1));
+      } else push();
+    }
+  }
+  push();
+  return out.map((l) => l.filter((pt, i) => i === 0 || metresApart(pt, l[i - 1]!) > 0.05)).filter((l) => l.length > 1);
+}
+
+/**
+ * TIGER publishes one row per NAME an edge carries, so the same geometry comes back twice or more: in the
+ * Highland Park box, 114 of 794 distinct geometries arrive under two names ("Tyler St" and "Tyler Ave",
+ * "Woodward Ave" and "State Hwy 1"). Drawn as they arrive, every street in the three cities is drawn twice and
+ * labelled twice, and half the pieces cannot join the City's own piece across the line because they are typed
+ * differently. One geometry keeps one name: the one the City of Detroit's layer uses for the street next door,
+ * then a real name over a route number, then whichever sorts first so the file is the same every build.
+ */
+export function pickNames(rows: { line: Pt[]; name: string; cls: number }[], cityNames: Set<string>): { line: Pt[]; name: string; cls: number }[] {
+  const byShape = new Map<string, { line: Pt[]; name: string; cls: number }[]>();
+  for (const r of rows) {
+    const k = r.line.map((p) => `${Math.round(p[0] * SCALE)},${Math.round(p[1] * SCALE)}`).join(';');
+    (byShape.get(k) ?? byShape.set(k, []).get(k)!).push(r);
+  }
+  const rank = (n: string) => (cityNames.has(n) ? 0 : /\b(State|Interstate|US) Hwy \d/.test(n) ? 2 : 1);
+  return [...byShape.values()].map((group) => {
+    const best = [...group].sort((a, b) => rank(a.name) - rank(b.name) || a.cls - b.cls || a.name.localeCompare(b.name))[0]!;
+    return { line: best.line, name: best.name, cls: Math.min(...group.map((g) => g.cls)) };
+  });
+}
+
 async function tigerQuery(layer: string, where: string, extra = ''): Promise<any[]> {
   const all: any[] = [];
   for (let offset = 0; ; offset += 2000) {
@@ -231,8 +368,8 @@ async function tigerQuery(layer: string, where: string, extra = ''): Promise<any
   }
 }
 
-/** The four city outlines, and every named street whose middle lies in Hamtramck, Highland Park or Dearborn. */
-async function neighbors(): Promise<{ outlines: Pt[][]; roads: Road[] }> {
+/** The four city outlines, and every named street with any part in Hamtramck, Highland Park or Dearborn. */
+async function neighbors(cityNames: Set<string>): Promise<{ outlines: Pt[][]; rings: Pt[][]; roads: Road[] }> {
   const names = ['Detroit', ...NEIGHBOR_CITIES].map((n) => `'${n}'`).join(',');
   const places = await tigerQuery(TIGER_PLACES, `STATE='26' AND BASENAME IN (${names})`);
   if (places.length !== 4) throw new Error(`basemap: expected 4 city outlines from TIGER, got ${places.length}. Not overwriting the last good files.`);
@@ -241,16 +378,21 @@ async function neighbors(): Promise<{ outlines: Pt[][]; roads: Road[] }> {
   const nearRings = near.flatMap((f) => ringsOf(f.geometry));
   const all = nearRings.flat(), env = { xmin: Math.min(...all.map((q) => q[0])), ymin: Math.min(...all.map((q) => q[1])), xmax: Math.max(...all.map((q) => q[0])), ymax: Math.max(...all.map((q) => q[1])), spatialReference: { wkid: 4326 } };
   const box = `&geometry=${encodeURIComponent(JSON.stringify(env))}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects`;
-  const roads: Road[] = [];
+  const raw: { line: Pt[]; name: string; cls: number }[] = [];
   for (const layer of TIGER_ROADS) {
     for (const f of await tigerQuery(layer, '1=1', box)) {
       const cls = tigerClass(f.properties?.MTFCC), name = tigerName(f.properties?.NAME);
       if (cls === null || (!name && cls !== 0)) continue;
-      for (const line of linesOf(f.geometry)) if (line.length > 1 && insideRings(line[Math.floor(line.length / 2)]!, nearRings)) roads.push({ cls, name, line });
+      for (const line of linesOf(f.geometry)) if (line.length > 1) raw.push({ cls, name, line });
     }
   }
+  // One name per geometry first (TIGER sends each edge once per name), then cut each line at the city line and
+  // keep the part inside. A street that runs on into Detroit keeps the blocks that are in the neighbour city
+  // instead of being thrown away whole.
+  const roads: Road[] = [];
+  for (const r of pickNames(raw, cityNames)) for (const line of clipToRings(r.line, nearRings, true)) roads.push({ cls: r.cls, name: r.name, line });
   if (roads.length < 1000) throw new Error(`basemap: only ${roads.length} neighbor-city streets parsed. Not overwriting the last good files.`);
-  return { outlines, roads };
+  return { outlines, rings: nearRings, roads };
 }
 
 /**
@@ -272,15 +414,21 @@ export function packRoads(roads: Road[], origin: Pt, tol: number): { names: stri
 async function main() {
   const dir = p('data/ingested/basemap');
   const [roadFeats, parkFeats, cityFeats] = [await geojson(ROADS, `OBJECTID,RDNAME,NFC,FCC,${SAFETY_FIELDS.join(',')}`, 2000), await geojson(PARKS, 'ObjectId,park_name', 1000), await geojson(BOUNDARY, 'FID', 10)];
-  const roads: Road[] = [];
+  const city: Road[] = [];
   for (const f of roadFeats) {
     const a = f.properties ?? {}, cls = NFC[String(a.NFC ?? '0').trim()] ?? 4, name = roadName(a.RDNAME);
     if (!name && cls !== 0) continue;                        // unnamed alleys and turn lanes; freeway ramps stay
     const safety = roadSafety(a);
-    for (const line of linesOf(f.geometry)) if (line.length > 1) roads.push({ cls, name, line, safety });
+    for (const line of linesOf(f.geometry)) if (line.length > 1) city.push({ cls, name, line, safety });
   }
-  if (roads.length < 20000) throw new Error(`basemap: only ${roads.length} roads parsed. Not overwriting the last good files.`);
-  const near = await neighbors();
+  if (city.length < 20000) throw new Error(`basemap: only ${city.length} roads parsed. Not overwriting the last good files.`);
+  const near = await neighbors(new Set(city.map((r) => r.name).filter(Boolean)));
+  // One authority on each side of the city line: TIGER inside the three neighbour cities, the City of Detroit's
+  // own layer outside. The City's layer reaches about 0.95 km into Highland Park and a few metres into
+  // Hamtramck; clipping that away is what stops the same block being drawn, and labelled, twice.
+  const roads: Road[] = [];
+  for (const r of city) for (const line of clipToRings(r.line, near.rings, false)) roads.push({ ...r, line });
+  const clipped = city.length - roads.length;
   roads.push(...near.roads);
 
   rmSync(dir, { recursive: true, force: true });
@@ -318,7 +466,7 @@ async function main() {
   // carry a byte of 0 — "this file told us nothing" — and the graph falls back to street class there.
   compact(`${dir}/source.json`, { name: 'City of Detroit open data (Detroit roads and parks); US Census Bureau TIGER (city outlines; Hamtramck, Highland Park and Dearborn streets)', urls: { roads: ROADS, parks: PARKS, boundary: BOUNDARY, tiger_places: TIGER_PLACES, tiger_roads: TIGER_ROADS }, last_edited: sources, grid: GRID, scale: SCALE, safety_fields: [...SAFETY_FIELDS] });
   const withSafety = roads.filter((r) => (r.safety ?? 0) > 0).length;
-  console.log(`basemap: ${roads.length} road pieces -> ${big.roads.length} main-road lines in base.json, ${byCell.size} cells; ${parks.length} parks; crossings for ${Object.keys(cross).length} greenway segments; ${withSafety} pieces carry the City's safety fields`);
+  console.log(`basemap: ${roads.length} road pieces -> ${big.roads.length} main-road lines in base.json, ${byCell.size} cells; ${parks.length} parks; crossings for ${Object.keys(cross).length} greenway segments; ${withSafety} pieces carry the City's safety fields; ${near.roads.length} pieces from TIGER inside the three neighbour cities, ${clipped >= 0 ? clipped : 0} City pieces net change from clipping at the city line`);
 }
 
 if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/ingest-basemap.ts')) {
