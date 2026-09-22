@@ -2,8 +2,9 @@
 
 Three Gradle modules:
 
-- **`query/`** — the rules for open now, next times, badges, ranking, search and greenway distances. It is a
-  Kotlin copy of `packages/query`, held to the same `schema/fixtures` the web app and the iPhone app are held to.
+- **`query/`** — the rules for open now, next times, badges, ranking, search, greenway distances and, since
+  2026-09-22, **the street graph, walking directions and whole trip plans**. It is a Kotlin copy of
+  `packages/query`, held to the same `schema/fixtures` the web app and the iPhone app are held to.
   Plain Kotlin/JVM with **no dependencies at all**, so it runs in a unit test on a laptop and compiles unchanged
   into the app. **Compiled and green.**
 - **`core/`** — no sources of its own. It compiles the app's *android-free* files (`Ed25519.kt`, `Verify.kt`,
@@ -32,6 +33,18 @@ Three Gradle modules:
 > listing detail, Urgent help and Home in Arabic, all screenshotted. Five real errors were found and fixed; they
 > are listed under "What the first compile found", and two of them would have broken the app on every phone
 > below Android 15.
+>
+> **State on 2026-09-22.** **The directions rules are ported.** `:query` gains `Streets.kt`, `Walk.kt` and
+> `TransitPlan.kt`, a case-for-case Kotlin copy of `packages/query/src/{streets,walk,transit-plan}.ts`, so the
+> thirteen cases the Kotlin fixture runner had been counting as skipped now run: **203 of 203 fixture cases, 0
+> failed, 0 skipped**. The graph this builds from the real committed basemap is the same graph the web builds,
+> to the node: 23,863 nodes, 40,342 edges, 45 components, largest 99.5%, 21,057 crossings and 13,987 snapped
+> ends. **Measured on the emulator** (`app_process`, ART, AOSP `android-35` arm64): the graph builds in **308 ms
+> cold and 163 ms warm**, and a walking route is **4 ms median, 20 ms worst** over five cross-city pairs — well
+> inside the study's 1–2 s estimate for a cheap phone, and the "Getting the map ready" state stays, because a
+> cheap phone is not this Mac's emulator. Totals now: **27 + 257 + 257 JUnit tests and 203 fixture cases, 0
+> failures**. The debug APK is **2,214,319 bytes (2.11 MiB)** on a clean build, up from 1.84 MiB. **No screen
+> uses any of this yet** — the directions UI is the web's `directions-web` branch and is not ported.
 >
 > **State on 2026-09-21 (second entry).** The optional **"subway" map style** of `docs/MAP-STYLE.md` is built, as
 > the third client after the web and the iPhone: one line per route in the tone the pipeline gave it, badges,
@@ -79,9 +92,10 @@ Three Gradle modules:
 Everything in this section was run on 2026-09-20 and passed, the `:app` lines included. From `apps/android`:
 
 ```sh
-./gradlew :query:test             # 16 tests: every case in schema/fixtures, plus tz (and the pre-1987 clamp),
-                                  # phone, and the JSON reader including its depth and length caps
-./gradlew :query:runFixtures      # the same 190 cases with no test framework on the classpath
+./gradlew :query:test             # 27 tests: every case in schema/fixtures, plus tz (and the pre-1987 clamp),
+                                  # phone, the JSON reader including its depth and length caps, and the
+                                  # directions rules against the real committed basemap (RoutingRealTest)
+./gradlew :query:runFixtures      # the same 203 cases with no test framework on the classpath
 ./gradlew :core:test              # 174 tests: Ed25519 vs RFC 8032, small-order keys, the real bundle's signature,
                                   # the network and path rules, the report queue, which screens are private, the report
                                   # hash and schema, what cannot be saved, the needs parity test, the map's arithmetic,
@@ -322,7 +336,8 @@ style a person can pick has to work the first time with no signal too. Left out:
 **signed** index before a byte of it is decoded, wherever it came from — the verified copy on this phone, the
 APK snapshot, or the published origin, in that order (`BundleStore.verifiedBytes`). A clean debug APK went from
 1,282,907 bytes (1.22 MiB) to 1,675,641 bytes (1.60 MiB): 846 KB of map JSON, compressed; with the network files
-and the subway code it is **1,927,566 bytes (1.84 MiB)**.
+and the subway code it is **1,927,566 bytes (1.84 MiB)**; with the directions rules of 2026-09-22 it is
+**2,214,319 bytes (2.11 MiB)**.
 
 ### Still to do on this tab
 
@@ -333,6 +348,63 @@ and the subway code it is **1,927,566 bytes (1.84 MiB)**.
 - After the map style changes, the layers screen is rebuilt and TalkBack's focus starts again from the top of it;
   the change itself is announced.
 - `standard` has no high-contrast variant on Android (the web and the iPhone have one).
+
+## Directions: the street graph, walking and trip plans
+
+Ported 2026-09-22 from `packages/query/src/{streets,walk,transit-plan}.ts`, case for case. The spec is
+`schema/query-spec.md` under "Streets graph", "Walking directions" and "Trip plans"; the fixtures are
+`schema/fixtures/14-streets-walk.json` (9 cases) and `15-trip-plans.json` (4 cases), the thirteen the Kotlin
+runner used to count as skipped.
+
+| file | what it is |
+|---|---|
+| `Streets.kt` (`:query`) | The noded, routable graph. Decodes the bundle's drawn street files, splits every polyline where it crosses another, pulls a dangling end onto a line within 12 m, and lays the result out as CSR. Plus the City's safety byte, the edge geometry a route is drawn from, `nearestEdgePoint`, and the graph cache. |
+| `Walk.kt` (`:query`) | A* over **half-edges**, so a turn costs something; the safety and class penalty tables; the compass and turn words; the step list and the drawn line. |
+| `TransitPlan.kt` (`:query`) | The stops-and-routes network, and `plan()` — walking, walk-ride-walk and one change, ranked together by one cost model. |
+| `Directions.kt` (`:core`) | The app's *holding* of the graph: which files it is built from, the one key it is cached under, and the states a screen can be in. |
+
+**Three things the port had to get exactly right**, because a rounded metre that differs in the last digit is a
+failed fixture:
+
+- **`edgeLen`, `edgeTA` and `edgeTB` are `Float`, not `Double`**, because the TypeScript stores them in
+  `Float32Array`s. Widening them changes distances in the sixth digit and the rounded output with them.
+- **Grid and pair keys are `Long`.** JavaScript's `cx * 100000 + cy` is a double; in Detroit's metre
+  coordinates `cx` is about −34,000, so the same expression overflows a Kotlin `Int` and silently buckets two
+  distant streets together.
+- **Every map whose iteration order reaches a result is a `LinkedHashMap`.** A JS `Map` iterates in insertion
+  order, and the order splits are discovered decides a stable sort's ties, which decides the graph.
+
+### What it costs, measured
+
+On the **real committed basemap** (`RoutingRealTest`, the Kotlin mirror of
+`packages/query/test/routing-real.test.ts`): 23,863 nodes, 40,342 edges, 45 components, largest 99.5%, dead ends
+7.8%, 21,057 crossings and 13,987 snapped ends — the same numbers the web gets, which is the strongest evidence
+the port is faithful. 9,543 stops and 81 routes, 37 with a published headway; a stop within 400 m of 92% of our
+listings.
+
+| where | graph build | a walking route |
+|---|---|---|
+| JVM, this Mac (`:query:test`) | 126 ms | median 2 ms, max 11 ms over 20 listing pairs |
+| **emulator, ART, AOSP `android-35` arm64** | **308 ms cold, 163 ms warm** | **median 4 ms, max 20 ms** over five cross-city pairs |
+
+Measured with `app_process` on the emulator over `:query` dexed by `d8`, on the same `map/base.json` and 58
+cells of `map/streets.json` the app ships. The study estimated 1–2 s for the build on a cheap phone; this
+emulator runs on Apple Silicon and is **not** a cheap phone, so the **"Getting the map ready" state stays** —
+`Directions.State.Building` is emitted before any work and the screen never draws a route from a half-built
+graph.
+
+The build happens **once per bundle**. `Directions.graphKey` is the sha256 of the *signed index's own* sha256 for
+`map/base.json` and `map/streets.json` and nothing else: the index has already been verified against a pinned
+key, so its hashes are the trustworthy ones, no file is re-hashed, a category file changing is not a new graph,
+and nothing about a person is in the key. `StreetGraphCache` holds two. The work runs on `Work.io`, never the
+main thread and never the network thread.
+
+**Nothing here touches the network, the clock or a person's location.** It is arithmetic on files the app has
+already downloaded and already checked the signature of, which is the whole point: no origin, no destination and
+no query ever leaves the phone (DECISIONS 2026-09-22).
+
+**No screen uses any of it yet.** The directions UI — entry points, the traceless screen, itinerary cards, the
+route overlay, the numbered step list, follow-along — is the web's `directions-web` branch and is not ported.
 
 ## What the first compile found
 
@@ -666,7 +738,7 @@ declared library and it is test-only; it never reaches a phone. Everything Gradl
 2026-09-20 was Apache-2.0 (Gradle 8.11.1, the Kotlin 2.0.21 plugin and standard library, `org.jetbrains:annotations`)
 except two test-only jars: JUnit 4.13.2 under the Eclipse Public Licence 1.0 and its `hamcrest-core` 1.3 under
 BSD-3-Clause. EPL-1.0 is not permissive — flagged for Kyle, and already Open in `docs/DECISIONS.md`. It is not
-distributed, and `./gradlew :query:runFixtures` runs all 190 fixture cases with no test framework on the
+distributed, and `./gradlew :query:runFixtures` runs all 203 fixture cases with no test framework on the
 classpath at all (CI runs that too), so dropping JUnit would cost only the `:core` and `:app` unit tests.
 
 **minSdk 24 (Android 7.0, 2016).** Nothing in the app needs more. Going to 21 would reach a few more phones but
