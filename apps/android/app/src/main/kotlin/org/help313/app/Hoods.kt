@@ -268,6 +268,16 @@ class Indicators(
     val neighborhoods: List<Hood>,
     /** Greenway stretch id to the neighborhoods it runs through. */
     val segments: Map<String, List<String>>,
+    // ---- added 2026-09-22 with the city pages and the Areas layer (Areas.kt). All of these default to empty, so
+    // a bundle built before them decodes exactly as it did and every screen that existed behaves as it did.
+    /** The four cities, in the order the bundle publishes them. */
+    val cities: List<CityRow> = emptyList(),
+    /** One whole-city page each, with its own `panels` allow-list. */
+    val areas: List<Area> = emptyList(),
+    /** Source key to the source, for the per-panel source lines on a city page. */
+    val areaSources: Map<String, AreaSource> = emptyMap(),
+    val pavementYear: Int? = null,
+    val permitYears: List<Int> = emptyList(),
 ) {
     fun hood(id: String): Hood? = neighborhoods.firstOrNull { it.id == id }
 
@@ -326,6 +336,11 @@ fun decodeIndicators(bytes: ByteArray): Indicators {
         city = city,
         neighborhoods = (j["neighborhoods"]?.arr ?: emptyList()).map { Hood.fromJson(it) },
         segments = segments,
+        cities = (j["cities"]?.arr ?: emptyList()).map { CityRow.fromJson(it) },
+        areas = (j["areas"]?.arr ?: emptyList()).map { Area.fromJson(it) },
+        areaSources = (j["area_sources"]?.obj ?: emptyMap()).mapValues { AreaSource.fromJson(it.value) },
+        pavementYear = j["pavement_year"]?.int,
+        permitYears = (j["permit_years"]?.arr ?: emptyList()).mapNotNull { it.int },
     )
 }
 
