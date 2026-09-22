@@ -90,3 +90,23 @@ sources:
     url: https://dwihn.org/sites/default/files/providers-practitioners/provider-directory.csv
     license: unstated   # public provider directory; used only to match programs and find their own websites
     mode: stage
+
+# ---------------------------------------------------------------------------------------------------------
+# NOT LISTINGS. The four-city pages (docs/13, "The four cities"; DECISIONS 2026-09-22) are built from regional
+# and federal layers that become NUMBERS, never rows in the directory, so they have no entry above: like the
+# map, parks, ZIP and neighborhood layers, they are named at the top of their own ingest script,
+# pipeline/src/ingest-cities.ts (`pnpm ingest:cities`), with each one's licence quoted there and in docs/02.
+# Recorded here so the registry names them too:
+#
+#   SEMCOG, Pavement Condition 2003 to 2024 (PASER)   road condition   SEMCOG Copyright License Agreement
+#   SEMCOG, park_poly_2023_view                       parks + acres    SEMCOG Copyright License Agreement
+#   SEMCOG, mcd_2020                                  2020 Census housing units and vacant units, per city
+#   U.S. Census Bureau, Building Permits Survey       new homes permitted, per permit-issuing place
+#   U.S. Census Bureau, TIGERweb places               the four city outlines (already used by the map)
+#   Wayne County, Parcels_AssessmentData              a parcel count, as a denominator. Counts only: the layer
+#                                                     holds OwnerName and OwnerAddress and we never ask for them
+#
+# SEMCOG's agreement is accepted as it stands, indemnification clause included, for every panel that uses its
+# data (Kyle, DECISIONS 2026-09-22), and its required notice is printed on every SEMCOG-sourced panel.
+# BS&A Online, which runs assessing, tax and permits for all three smaller cities, prohibits automated access
+# in its own terms: we do not read it, we do not deep-link it, and the panels it would have fed are absent.

@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import type { Alert, BundleRow } from '@313help/query';
 import { p, readCsv, sha256, today, writeJson, type CsvRow } from './util.js';
 import { loadSources } from './ingest-arcgis.js';
-import { buildIndicators, NEAR_MILES } from './indicators.js';
+import { buildAreas, buildIndicators, NEAR_MILES } from './indicators.js';
 import { GRID } from './ingest-basemap.js';
 import { fromIngested, fromSeed, toHsds, type Normalized } from './normalize.js';
 import { retiredPath } from './ingest-ids.js';
@@ -162,13 +162,26 @@ export async function build(opts: BuildOptions = {}) {
     // The crash layer's licence makes its notice a condition of use wherever the data appears, so the notice
     // travels with the numbers into the bundle and no app has to hard-code it (pipeline/src/ingest-crashes.ts).
     const crashSource = cr ? { crashes: { name: cr.source.name, url: cr.source.page, last_edited: cr.source.last_edited, license: cr.source.license, license_url: cr.source.license_url, notice: cr.source.license_notice } } : {};
+    // City pages for the four cities (docs/13, DECISIONS 2026-09-22), added to the same file so "Find my area"
+    // needs one fetch and one signature. ADDITIVE: `neighborhoods`, `sources` and `city` are untouched byte for
+    // byte, so an older client — and the iPhone and Android apps until they mirror this — keeps printing
+    // exactly what it printed. A client that knows nothing of `areas` simply never opens one.
+    const citiesFile = p('data/ingested/cities.json'), ct = existsSync(citiesFile) ? JSON.parse(readFileSync(citiesFile, 'utf8')) : null;
+    const areaDoc = ct ? buildAreas({
+      cities: ct.cities, sources: { ...ct.sources, detroit_parks: existsSync(parksFile) ? { ...JSON.parse(readFileSync(parksFile, 'utf8')).source, license: 'Unstated (the City portal publishes a disclaimer only)' } : undefined },
+      rows: live,
+      detroitParks: existsSync(parksFile) ? JSON.parse(readFileSync(parksFile, 'utf8')).parks : [],
+      ...(cr ? { crashes: cr.city_by_name, crashSource: { name: cr.source.name, url: cr.source.page, license: cr.source.license, license_url: cr.source.license_url, notice: cr.source.license_notice, last_edited: cr.source.last_edited, records_from: cr.source.records_from } } : {}),
+    }) : null;
     const doc = { sources: { neighborhoods: h.source, ...st.sources, ...(pts?.sources ?? {}), ...crashSource }, stats_fetched_at: st.fetched_at, first_year: st.first_year, partial_year: st.partial_year, near_miles: NEAR_MILES, origin: [GRID.lon0, GRID.lat0], city: st.city, city_parcels: st.city_parcels, issue_types: st.issue_types,
       ...(cr ? { crash_years: cr.years, city_crashes: cr.city.window, crash_records_from: cr.source.records_from } : {}),
-      ...(st.current ? { city_now: st.current.city, fire_types: st.fire_types, roads_years: st.roads_years, vacant_period: st.vacant_period } : {}), ...ind };
+      ...(st.current ? { city_now: st.current.city, fire_types: st.fire_types, roads_years: st.roads_years, vacant_period: st.vacant_period } : {}), ...ind,
+      ...(areaDoc ? { cities: areaDoc.cities, areas: areaDoc.areas, area_sources: areaDoc.area_sources, paser: ct.paser, pavement_year: ct.pavement_year, permit_years: ct.permit_years } : {}) };
     putCompact('indicators/neighborhoods.json', doc);
     counts.neighborhoods = ind.neighborhoods.length;
+    if (areaDoc) counts.city_pages = areaDoc.areas.length;
     // Committed on publish, without the outlines, so the history of every number is in git (docs/13).
-    if (opts.hsdsDir !== null) writeJson(p('data/indicators/neighborhoods.json'), { ...doc, neighborhoods: ind.neighborhoods.map(({ rings: _rings, ...n }) => n) });
+    if (opts.hsdsDir !== null) writeJson(p('data/indicators/neighborhoods.json'), { ...doc, neighborhoods: ind.neighborhoods.map(({ rings: _rings, ...n }) => n), ...(areaDoc ? { areas: areaDoc.areas.map(({ rings: _rings, ...a }) => a) } : {}) });
   }
   const zipsFile = p('data/ingested/city_zips.json');
   if (existsSync(zipsFile)) put('places/zips.json', JSON.parse(readFileSync(zipsFile, 'utf8')));
