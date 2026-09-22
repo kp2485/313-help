@@ -88,6 +88,8 @@ private fun queryOf(raw: Json?): Query {
     )
 }
 
+private fun latLon(j: Json): LatLon = LatLon(j["lat"]?.num ?: 0.0, j["lon"]?.num ?: 0.0)
+
 /** Finds schema/fixtures by walking up from the working directory, or -Dfixtures.dir=... */
 fun fixturesDir(): File {
     System.getProperty("fixtures.dir")?.let { return File(it) }
@@ -112,6 +114,29 @@ fun runFixtures(dir: File = fixturesDir()): FixtureResult {
         val rows = (fx["rows"]?.arr ?: emptyList()).map { mergedRow(it) }
         val alerts = (fx["alerts"]?.arr ?: emptyList()).map { Alert.fromJson(it) }
         val segments = (fx["segments"]?.arr ?: emptyList()).map { Segment.fromJson(it) }
+
+        // Directions: one graph per fixture file, built once with and once without the City's safety fields.
+        val streets = (fx["streets"]?.arr ?: emptyList()).map { PackedStreets.fromJson(it) }
+        val graphs = HashMap<Boolean, StreetGraph>()
+        fun graphOf(noSafety: Boolean): StreetGraph = graphs.getOrPut(noSafety) {
+            buildStreetGraph(
+                if (noSafety) streets.map { it.withoutSafety() } else streets,
+                if (noSafety) "${file.name}:bare" else file.name,
+            )
+        }
+        val transit = (fx["transit"]?.arr ?: emptyList()).map {
+            TransitLayerFiles(
+                stops = PackedPoints.fromJson(it["stops"]!!),
+                routes = PackedRoutes.fromJson(it["routes"]!!),
+                serves = it["serves"]?.let { s ->
+                    PackedServes(
+                        s["route_ids"]?.arr?.map { r -> r.str ?: "" } ?: emptyList(),
+                        s["serves"]?.arr?.map { r -> r.arr.mapNotNull { v -> v.int } } ?: emptyList(),
+                    )
+                },
+            )
+        }
+        val network = if (transit.isNotEmpty()) buildTransitNetwork(transit) else null
 
         for (c in fx["cases"]?.arr ?: emptyList()) {
             val name = "${file.name} - ${c["name"]?.str}"
@@ -183,9 +208,30 @@ fun runFixtures(dir: File = fixturesDir()): FixtureResult {
                     )
                     if (!matches(hit?.segment?.id, expect)) fail(hit?.segment?.id)
                 }
-                // A case whose `fn` this port does not implement yet - the directions rules land in
-                // TypeScript first (schema/query-spec.md "Directions") and are ported afterwards. Counted and
-                // printed, never silently passed, so the number falling through is visible in CI.
+                // Directions (schema/query-spec.md). `no_safety` drops the street files' safety array, which is
+                // what an older bundle looks like.
+                "streetGraph" -> {
+                    val g = graphOf(c["no_safety"]?.bool ?: false)
+                    val got = mapOf(
+                        "nodes" to g.nodeCount, "edges" to g.edgeCount, "crossings" to g.stats.crossings,
+                        "snapped" to g.stats.snapped, "components" to g.stats.components,
+                        "largest" to g.stats.largestComponent, "dead_ends" to g.stats.deadEnds,
+                        "skipped" to g.stats.skipped,
+                    )
+                    if (!matches(got, expect)) fail(got)
+                }
+                "walk" -> {
+                    val g = graphOf(c["no_safety"]?.bool ?: false)
+                    val got = walkSummary(walkRoute(g, latLon(c["from"]!!), latLon(c["to"]!!)))
+                    if (!matches(got, expect)) fail(got)
+                }
+                "plan" -> {
+                    val g = graphOf(c["no_safety"]?.bool ?: false)
+                    val got = plan(g, network!!, latLon(c["from"]!!), latLon(c["to"]!!)).map { planSummary(it) }
+                    if (!matches(got, expect)) fail(got)
+                }
+                // A case whose `fn` this port does not implement yet. Counted and printed, never silently
+                // passed, so the number falling through is visible in CI.
                 else -> { skipped++; ran-- }
             }
         }

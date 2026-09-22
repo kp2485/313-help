@@ -51,6 +51,7 @@ kotlin.sourceSets["main"].kotlin.include(
     "org/help313/app/Hoods.kt",          // the neighborhood numbers: the decode, where a point falls, the index order
     "org/help313/app/Zip.kt",            // a typed ZIP: what counts as one, and the point at the middle of it
     "org/help313/app/Propose.kt",        // what a proposal is, its closed body, and the queue's rules
+    "org/help313/app/Directions.kt",     // which files the street graph is built from, its one key, its states
 )
 
 // Why the four new names above (Android review, 2026-09-20). :core used to cover Ed25519, Verify, ReportModel and
