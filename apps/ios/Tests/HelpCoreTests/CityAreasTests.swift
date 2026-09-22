@@ -172,7 +172,9 @@ final class CityAreasTests: XCTestCase {
 
     // MARK: - the built bundle, when there is one
 
-    /// `data/bundle/v1` is never committed, so this skips on a fresh clone and runs after `pnpm build:bundle`.
+    /// `data/bundle/v1` is never committed, so the two cases below **skip** on a fresh clone and on Linux CI,
+    /// and run after `pnpm build:bundle` — the same convention as `RoutingRealTests` and `HoodTests`. An
+    /// absent bundle is not a failure: it is a checkout that has not built one.
     private static let built: Indicators? = {
         let url = root.appendingPathComponent("data/bundle/v1/indicators/neighborhoods.json")
         guard let d = try? Data(contentsOf: url) else { return nil }
@@ -182,9 +184,17 @@ final class CityAreasTests: XCTestCase {
         .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         .deletingLastPathComponent().deletingLastPathComponent()
 
-    func testTheShippedAreasKeepTheirOwnRules() throws {
-        let d = try XCTUnwrap(Self.built, "no built bundle in this checkout — run `pnpm build:bundle`")
+    /// The built bundle's numbers, or a skip. Never a failure: `data/bundle/v1` is never committed.
+    private func builtIndicators() throws -> Indicators {
+        guard let d = Self.built else {
+            throw XCTSkip("no built bundle in this checkout — run `pnpm build:bundle`")
+        }
         try XCTSkipUnless(d.areas?.isEmpty == false, "this bundle carries no city pages yet")
+        return d
+    }
+
+    func testTheShippedAreasKeepTheirOwnRules() throws {
+        let d = try builtIndicators()
         let areas = d.areas ?? []
         XCTAssertEqual(Set(d.cityRows.map(\.id)), Set(areas.filter { $0.kind == "city" }.map(\.id)),
                        "every city row has a page and every city page is listed")
@@ -218,8 +228,7 @@ final class CityAreasTests: XCTestCase {
      year, and holds the notice to whatever the source published byte for byte.
      */
     func testSemcogsNoticeRidesOnItsOwnPanels() throws {
-        let d = try XCTUnwrap(Self.built, "no built bundle in this checkout — run `pnpm build:bundle`")
-        try XCTSkipUnless(d.areas?.isEmpty == false, "this bundle carries no city pages yet")
+        let d = try builtIndicators()
         var seen: Set<String> = []
         for a in d.areas ?? [] {
             for panel in a.panels {
