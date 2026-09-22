@@ -48,6 +48,23 @@ fun transitAppDestination(row: BundleRow): String? {
     return null
 }
 
+/**
+ * Where **our own** directions would go: the place's own published point, or null.
+ *
+ * Null for a sensitive listing, exactly as [mapsDestination] is — a domestic-violence or mental-health-crisis row
+ * carries no coordinate in the first place — and null for a row that publishes an address and no point at all,
+ * because the planner needs somewhere to route to and this app never turns an address into a coordinate by asking
+ * anybody. Those rows still get the link-outs under "Other apps", which hand the address over as written.
+ *
+ * Nothing about the person is in this: it is the destination and only the destination (Route.Directions).
+ */
+fun ownDirectionsPoint(row: BundleRow): org.help313.query.LatLon? {
+    if (isSensitive(row.category)) return null
+    val lat = row.lat ?: return null
+    val lon = row.lon ?: return null
+    return org.help313.query.LatLon(lat, lon)
+}
+
 /** A listing with no published phone number shows no Call button at all, rather than one that does nothing. */
 fun hasPhone(row: BundleRow): Boolean = row.phones.isNotEmpty()
 

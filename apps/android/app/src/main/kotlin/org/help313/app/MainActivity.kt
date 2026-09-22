@@ -58,9 +58,31 @@ class MainActivity : Activity() {
     var nearZip: String? = null
     var zipWanted = false
 
+    /**
+     * A junction somebody typed ("Woodward & Warren"), in their own words, for the one line that says where a trip
+     * starts. The point it resolved to is [near] like any other; this is only how to say it.
+     *
+     * The third way to answer "where are you?", beside a fix and a ZIP, and the only one that needs no satellite
+     * and no signal at all: it is worked out on this phone from the streets the bundle already carries
+     * (Intersections.kt). Memory only, exactly like [nearZip] — never a file, never a link, never a Route.
+     */
+    var nearCross: String? = null
+
+    /** A point a person named by typing a junction. The list sorts from it exactly as it does from a fix. */
+    fun useCross(point: LatLon, words: String) {
+        near = point
+        nearCross = words
+        nearZip = null
+        zipWanted = false
+        locationRefused = false
+        locateOutside = false
+        render()
+    }
+
     /** A typed ZIP becomes the point the list is sorted from. The point is the middle of the ZIP, not a person. */
     fun useZip(zip: String, point: LatLon) {
         nearZip = zip
+        nearCross = null
         near = point
         zipWanted = false
         locationRefused = false
@@ -72,6 +94,7 @@ class MainActivity : Activity() {
     /** "Stop using this ZIP": back to the whole city, and nothing about it is left anywhere. */
     fun clearZip() {
         nearZip = null
+        nearCross = null
         near = null
         zipWanted = false
         render()
@@ -137,6 +160,9 @@ class MainActivity : Activity() {
     }
 
     private val stack = ArrayList<Route>()
+
+    /** The kind of screen drawn last, so that "left Directions" is a thing this activity can know. */
+    private var lastDrawn: Route? = null
     private lateinit var content: FrameLayout
     private lateinit var tabs: LinearLayout
     /** Holds the tab row, or the sideways scroller around it at the largest text sizes. See rebuildTabs. */
@@ -198,6 +224,9 @@ class MainActivity : Activity() {
         if (store.onChange != null) store.onChange = null
         MapModel.onChange = null
         HoodRepo.onChange = null
+        // A trip is never carried over an activity's death, finishing or not: the plan, the steps, the position
+        // watch and the view the follow-along was drawing into all go now.
+        DirectionsScreen.close(this)
         if (isFinishing) {
             // Really leaving: the route stack, the background thread and the loader all go. Nothing about this
             // session outlives it (docs/08, "cleared on exit").
@@ -366,6 +395,11 @@ class MainActivity : Activity() {
         // NoSuchMethodError on the first screen (found by the first :app compile, 2026-09-20). Indexing binds to
         // List.get, which has always been there.
         val route = stack[stack.size - 1]
+        // Leaving Directions ends the trip: the plan, the chosen way, the current step and the position watch all
+        // go. "Leaving" is a screen that WAS Directions and now is not, which is why the last one drawn is
+        // remembered rather than the stack being asked — opening Directions draws the screen behind it first.
+        if (lastDrawn is Route.Directions && route !is Route.Directions) DirectionsScreen.close(this)
+        lastDrawn = route
         // One place decides whether this screen may be photographed, so a screen added later cannot forget. See
         // Route.isPrivate and apps/android/README.md for why this is per-screen rather than for the whole app.
         keepOutOfScreenshots(Route.isPrivate(route))
@@ -713,6 +747,8 @@ class MainActivity : Activity() {
             locateOutside = true
         } else {
             near = LatLon(found.latitude, found.longitude)
+            // A fix is not a junction somebody typed: the words that said where they were go with it.
+            nearCross = null
             locationRefused = false
             locateOutside = false
             // In memory only, as everywhere else: the map moves there, and nothing is written down or sent.

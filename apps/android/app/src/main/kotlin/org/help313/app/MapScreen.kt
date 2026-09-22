@@ -266,7 +266,9 @@ object MapScreen {
      */
     private fun fillCard(a: MainActivity, host: FrameLayout, selection: MapSelection?, select: (MapSelection?) -> Unit) {
         host.removeAllViews()
-        if (selection == null) return
+        // A trip's marker opens no card: it is a TalkBack node on the Directions map and nothing else, and that
+        // map has no card at all (MapSelection.TripStop).
+        if (selection == null || selection is MapSelection.TripStop) return
         val card = UI.card(a)
         // A trunk by Rosa Parks Transit Center lists seventeen routes, and at the largest text size a route card is
         // tall too: the card scrolls inside itself and never takes more than half the map.
@@ -320,6 +322,16 @@ object MapScreen {
                             },
                         )
                     }
+                    // Our own directions, from the map's own card: the fourth and last way in, and the same one
+                    // (DECISIONS 2026-09-22). The destination is all that is carried.
+                    ownDirectionsPoint(row)?.let { at ->
+                        card.addView(
+                            UI.button(
+                                a, L.t("dir.open"), description = L.t("dir.open_label", "name" to row.name),
+                                backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink,
+                            ) { a.push(Route.Directions(at.lat, at.lon, row.name)) },
+                        )
+                    }
                     card.addView(
                         UI.button(a, L.t("map.details"), description = L.t("map.details") + L.t("list.sep") + row.name) {
                             a.push(Route.Detail(row.id, row.category))
@@ -327,6 +339,9 @@ object MapScreen {
                     )
                 }
             }
+            // Unreachable: the Directions map opens no card at all, and the guard at the top of this function says
+            // so. Named rather than left to an `else`, so that a selection added later cannot fall through here.
+            is MapSelection.TripStop -> Unit
             is MapSelection.Park -> head(L.t("map.park"), selection.name)
             is MapSelection.Stop -> head(selection.layer, selection.name.ifEmpty { selection.layer })
             is MapSelection.Route -> head(selection.layer, selection.name.ifEmpty { selection.layer })

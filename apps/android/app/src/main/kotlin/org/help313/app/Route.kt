@@ -70,6 +70,29 @@ sealed class Route {
     /** One listing. The category rides along so that [isPrivate] can answer before the bundle has loaded. */
     class Detail(val rowId: String, val category: String) : Route()
 
+    /**
+     * Our own directions to one place, computed on this phone (DECISIONS 2026-09-22).
+     *
+     * **The destination is carried and nothing else.** Where the person is starting from is never in a route: it
+     * is a field on the screen that dies with the process, exactly as `here` does in the web app. The name is the
+     * place's own, for the heading and for the last step ("Walk 0.1 mi to …").
+     *
+     * [secure] is set when this screen was reached from "Get somewhere safe now": that list says nothing about why
+     * a person opened it, and a route drawn to a police station or an emergency room in the recents thumbnail
+     * would say it for them. It turns on FLAG_SECURE and "Leave this page fast", the same pair every other private
+     * screen gets.
+     *
+     * A Directions screen is never put back after a recreation, secure or not ([keepable]): rebuilding the
+     * activity is not a navigation, and a trip on the screen when somebody else picks the phone up is the app
+     * deciding to show it again.
+     */
+    class Directions(
+        val lat: Double,
+        val lon: Double,
+        val name: String,
+        val secure: Boolean = false,
+    ) : Route()
+
     companion object {
 
         /**
@@ -88,8 +111,15 @@ sealed class Route {
             is Category -> CATEGORIES.firstOrNull { it.first == route.categoryId }?.second?.category
                 ?.let { isPrivate(it) } == true
             is Detail -> isPrivate(route.category)
+            is Directions -> route.secure
             else -> false
         }
+
+        /**
+         * True for a screen that must not be put back after a recreation — every private one, and every Directions
+         * screen. A trip is a thing a person is doing right now, not a place in the app they were at.
+         */
+        fun isTraceless(route: Route): Boolean = route is Directions || isPrivate(route)
 
         /**
          * True for the one screen that is drawn under the status bar. Every other screen is padded clear of the
@@ -107,7 +137,7 @@ sealed class Route {
 
         /**
          * The part of a back stack that may be put back after a recreation: everything up to, but not including,
-         * the first private screen.
+         * the first traceless screen — a private one, or a Directions screen.
          *
          * A recreation is not a navigation. If the system rebuilds the activity while a domestic-violence screen is
          * open — because the phone's language changed, or it went into multi-window, or the process was trimmed and
@@ -117,7 +147,7 @@ sealed class Route {
          * list. (Handling the common configuration changes in the activity means this path is rare to begin with.)
          */
         fun keepable(stack: List<Route>): List<Route> {
-            val at = stack.indexOfFirst { isPrivate(it) }
+            val at = stack.indexOfFirst { isTraceless(it) }
             val kept = if (at < 0) stack else stack.subList(0, at)
             return if (kept.isEmpty()) listOf(Home) else kept.toList()
         }
