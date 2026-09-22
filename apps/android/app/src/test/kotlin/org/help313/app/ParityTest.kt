@@ -557,7 +557,7 @@ class ParityTest {
         val line = "$id group=$group first=${list(head, "first")} steps=${flag(head, "stepsOnly")} " +
             "sensitive=${flag(head, "sensitive")} exit=${flag(head, "quickExit")} " +
             "intro=${value(head, "intro") ?: "-"} " +
-            "empty=${value(head, "emptyKey") ?: "-"} $query also=${alsoLine(head)}"
+            "empty=${value(head, "emptyKey") ?: "-"} $query cats=${list(head, "categories")} also=${alsoLine(head)}"
         return Parsed(id, line, refine)
     }
 

@@ -395,7 +395,7 @@ final class ParityTests: XCTestCase {
             \(id) group=\(group) first=\(list(head, "first")) steps=\(head.contains("stepsOnly: true")) \
             sensitive=\(head.contains("sensitive: true")) quickExit=\(head.contains("quickExit: true")) \
             intro=\(value(head, "intro") ?? "-") \
-            empty=\(value(head, "emptyKey") ?? "-") \(query) also=\(alsoLine(head))
+            empty=\(value(head, "emptyKey") ?? "-") \(query) cats=\(list(head, "categories")) also=\(alsoLine(head))
             """
         return Parsed(id: id, group: group, intro: value(head, "intro"), emptyKey: value(head, "emptyKey"),
                       refine: refines, line: line)

@@ -186,7 +186,11 @@ precinct buildings and 36 Detroit engine houses are ingested from two City ArcGI
 `pipeline/src/ingest-safe.ts`; Hamtramck's and Highland Park's one station each come from those cities' own sites
 as ordinary seed rows. Dearborn's site refuses this pipeline's fetcher, so its four stations are a steward job
 (docs/CHECKS-2026-09-22.md), not a guess. Both slugs live on the existing **health** map layer rather than a layer
-of their own, because a new layer needs a colour of its own in three clients' map palettes.
+of their own, because a new layer needs a colour of its own in three clients' map palettes. The `safe_now` need,
+the `categories` field it uses and the `inCategories` rule that narrows the rows are in **all three clients**
+(`apps/web/src/needs.ts`, `apps/ios/HelpApp/Help.swift` + `Sources/HelpCore/MapLayers.swift`,
+`apps/android/.../Needs.kt` + `MapLayers.kt`); the parity tests on both phones now compare `categories` too, so
+the list of kinds cannot drift in one app.
 
 *Added 2026-09-20 (DECISIONS):* `health.er` and `health.urgent`. A row may now carry a **city and a point but no
 street address** — Wayne County's naloxone and test-strip stations publish exactly that — and a coordinate is never
