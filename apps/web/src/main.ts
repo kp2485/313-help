@@ -15,7 +15,7 @@ import { forgetCrossings, resolveCrossing, type CrossOutcome } from './intersect
 import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, inCategories, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
 import { loadLayers, loadStyle, mapStyle, saveStyle, toggleLayer, type MapStyle } from './layers.js';
 import { LAYER_STYLE } from './layerstyle.js';
-import { styleSwitchHtml, subwayKeyHtml } from './stylepanel.js';
+import { mapKeyHtml, styleSwitchHtml } from './stylepanel.js';
 import { mapListHtml } from './maplist.js';
 import { createRouter, hashFor, type View } from './router.js';
 import { CONFIRM, LISTING_KINDS, PLACE_KINDS, build as buildReport, clearQueue, flush, preparePhoto, queuedCount, queuedTargets, resetInstallSecret, submit, uploadPhoto } from './report.js';
@@ -474,8 +474,9 @@ function layerMenu(): { group: string; items: { id: string; icon: string; name: 
     ...(bundle?.parks?.length ? [{ id: 'place:parks', icon: 'rec', name: layerName('place:parks') }] : []),
     ...(bundle?.greenway ? [{ id: 'place:greenway', icon: 'path', name: layerName('place:greenway') }] : []),
   ];
-  // The outlines. Off by default on the Map tab, where the job is "what is near me?"; the Areas tab opens with
-  // them on, because there the job is "tell me about this part of the city" (audit §3.1).
+  // The outlines. ON by default since 2026-09-22 (Kyle: "The user needs to be able to see the boundaries of the
+  // neighborhoods on the map"): a neighbourhood edge is the ground every other answer stands on, and it was the
+  // one thing on this tab a person had to find the switcher to get. Drawn as a hairline, under every dot.
   const areas = mapAreas().length ? [{ id: 'place:areas', icon: 'district', name: layerName('place:areas') }] : [];
   const go2 = (bundle?.transit?.layers ?? []).map((l) => ({ id: 'go:' + l.id, icon: 'transit', name: layerName('go:' + l.id, l.name), ...(LAYER_STYLE['go:' + l.id]?.dense ? { note: t('map.layer_zoom') } : {}) }));
   return [{ group: 'map.group_help', items: help }, { group: 'map.group_places', items: [...places, ...areas] }, { group: 'map.group_go', items: go2 }].filter((s) => s.items.length > 0);
@@ -621,11 +622,20 @@ function styleProblems(): string {
 }
 /** The two radio buttons (stylepanel.ts); hidden when the bundle has nothing to choose between. */
 const styleSwitch = () => styleSwitchHtml({ offered: hasSubway(), style: styleNow, T, problems: styleProblems() });
-/** What the lines mean, in words, under the map: only in the subway style, only for what is switched on. */
-function subwayKey(): string {
-  if (styleOn() !== 'subway' || !subwayMod) return '';
-  const qline = Object.values(netNow()).find((n) => n.system === 'qline');
-  return subwayKeyHtml({ on: (id) => layerOn('go:' + id), derived: qline?.routes.some((r) => r.derived), t });
+/**
+ * What the lines mean, in words, under the map: only for what is switched on.
+ *
+ * The dotted boundary line is in it whenever the outlines layer is on, in EITHER map style — boundaries are
+ * drawn the same way in both — and it is named with the same words as the switcher (`layer.place.areas`), so the
+ * tick box and the key cannot drift apart. The transport rows are the subway style's, as before.
+ */
+function mapKey(): string {
+  const subway = styleOn() === 'subway' && !!subwayMod;
+  const qline = subway ? Object.values(netNow()).find((n) => n.system === 'qline') : undefined;
+  return mapKeyHtml({
+    on: (id) => subway && layerOn('go:' + id), derived: qline?.routes.some((r) => r.derived),
+    areas: layerOn('place:areas') && mapAreas().length ? layerName('place:areas') : '', t,
+  });
 }
 const netNow = (): Record<string, import('./subway.js').Net> => Object.fromEntries((bundle?.transit?.layers ?? []).flatMap((l) => { const d = l.net && netFiles.get(layerKey(l.net.file)); return d && d !== 'loading' && d !== 'failed' && !Array.isArray(d) ? [[l.id, d]] : []; }));
 function layerSwitcher(): string {
@@ -639,6 +649,9 @@ function layerList(rows: Ranked[], over: Overlay[]): string {
   const parks = layerOn('place:parks') ? [...(bundle?.parks ?? [])].sort((a, b) => (here ? milesBetween(here, a) - milesBetween(here, b) : a.name.localeCompare(b.name))) : [];
   return mapListHtml({
     rows, overlays: over, parks, segments: layerOn('place:greenway') ? bundle?.greenway?.segments ?? [] : [],
+    // The outlines, by name, whenever that layer is on — the Areas tab has always listed them in words, and a
+    // person who opens "See this map as a list" on the Map tab is asking the same question.
+    areas: layerOn('place:areas') ? mapAreas() : [], areasLabel: layerName('place:areas'),
     problems: (bundle?.transit?.layers ?? []).map((l) => layerProblem('go:' + l.id)),
     T, t, owner, icon, card: (r) => card(r), segmentRow: (s) => rowLink({ v: 'segment', id: s.id }, 'path', s.name, t('gw.' + s.phase), true), allParks: `<button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.all_parks', { count: parks.length })}</button>`,
   });
@@ -666,7 +679,7 @@ function mapTab(): string {
   // the map sits beside the switcher and the list, and stays put while the list scrolls.
   return `<main class="wide"><h1 class="page" tabindex="-1">${T('tab.map')}</h1><p class="lede">${T('map.lede')}</p>
     <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), areas: layerOn('place:areas') ? mapAreas() : undefined, fit: CITY, cover: true, open: openingView(here) })}
-    <div class="mapside">${subwayKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
+    <div class="mapside">${mapKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
     ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map(layerSource).join(' · ')}<br>${T('map.layer_filtered')}</p>` : ''}
     ${parks.length ? `<h2>${T('rec.title')}</h2>${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => parkRow(p, mi)).join('')}</ul>` : ''}
       <button class="btn ghost" ${go({ v: 'parks' })}>${T('rec.see_all')}</button>` : ''}

@@ -9,6 +9,7 @@ import type { Segment } from '@313help/query';
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
 import { MAP_GROUPS, mapDrawable } from './needs.js';
 import type { MapStyle } from './layers.js';
+import { BOUNDARY_SELECTED_WIDTH, BOUNDARY_WASH_ALPHA, boundaryStyle } from './bounds.js';
 import type { SubwayData, SubwayPainter } from './subway.js';
 
 // ---- world coordinates: flat projection around Detroit; one unit = one degree of latitude ----------------
@@ -165,7 +166,8 @@ export interface MapRoute {
 /** A city or neighbourhood outline on the map (audit §1; Kyle, 2026-09-22). It is a SHAPE and a NAME and
  *  nothing else: no dot, no listing, no number. `sub` is the council district, or the city's own name for a
  *  whole-city area; `go` is the ordinary `data-go` payload, absent for an area that has no page yet. */
-export const AREA_DETAIL_MPP = 14;
+// (There used to be an `AREA_DETAIL_MPP = 14` here: the zoom a neighbourhood outline first appeared at. It is
+// gone — every outline is drawn in every band now, at the weight `boundaryStyle` gives it: bounds.ts.)
 export interface MapArea { id: string; name: string; sub: string; rings: { lat: number; lon: number }[][]; go?: string }
 
 /** What is under a point on the map: a card to show, a subway glyph to choose, an area to select — or nothing. */
@@ -1017,7 +1019,7 @@ export class MapView {
   private draw(): void {
     const c = this.ctx, { w, h } = this, mpp = M_PER_UNIT / this.s;                        // meters per pixel
     const view: Box = this.viewBox();
-    const col = { out: css('--map-out'), outInk: css('--map-out-ink'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus'), gwOpen: css('--gw-open'), gwBuild: css('--gw-build'), gwFund: css('--gw-fund'), gwPlan: css('--gw-plan'), gwCase: css('--gw-case'), routeWalk: css('--route-walk'), routeRide: css('--route-ride') };
+    const col = { out: css('--map-out'), outInk: css('--map-out-ink'), land: css('--map-land'), park: css('--map-park'), parkInk: css('--map-park-ink'), bnd: css('--map-bnd'), road: css('--map-road'), main: css('--map-main'), fwy: css('--map-fwy'), ink: css('--map-ink'), halo: css('--map-land'), brand: css('--brand'), muted: css('--muted'), strong: css('--ink'), surface: css('--surface'), focus: css('--focus'), gwOpen: css('--gw-open'), gwBuild: css('--gw-build'), gwFund: css('--gw-fund'), gwPlan: css('--gw-plan'), gwCase: css('--gw-case'), routeWalk: css('--route-walk'), routeRide: css('--route-ride') };
     // Subway style (docs/MAP-STYLE.md): the painter works the frame out first, because its badges and names
     // outrank street names and because the basemap under it is quietened. `sub` is null in `standard`, and
     // every line below that mentions it then does exactly what it did before there was a second style.
@@ -1083,29 +1085,40 @@ export class MapView {
       c.beginPath(); for (const ring of this.spec.outline) { ring.forEach((q, i) => (i ? c.lineTo(this.X(wx(q.lon)), this.Y(wy(q.lat))) : c.moveTo(this.X(wx(q.lon)), this.Y(wy(q.lat))))); c.closePath(); }
       c.globalAlpha = 0.12; c.fillStyle = col.brand; c.fill(); c.globalAlpha = 1; c.strokeStyle = col.strong; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.stroke(); c.setLineDash([]);
     }
-    // City and neighbourhood outlines (`place:areas`). A thin line and a name, and — for the one that was
-    // tapped — a wash of the land colour so the tap can be seen. **Never a fill that carries a value**: docs/13
-    // rule 1 forbids a choropleth, and a map that shades an area by a number is a league table with a picture on
-    // it. The line is the same weight whatever the area is, so nothing here says one place is more than another.
-    const areaLabels: { name: string; x: number; y: number }[] = [];
+    // City and neighbourhood outlines (`place:areas`; Kyle, 2026-09-22: "The user needs to be able to see the
+    // boundaries of the neighborhoods on the map"). A line and — from mid zoom — a name, and, for the one that
+    // was tapped, a wash so the tap can be seen. **Never a fill that carries a value**: docs/13 rule 1 forbids a
+    // choropleth, and a map that shades an area by a number is a league table with a picture on it.
+    //
+    // Every outline is drawn in EVERY band now. Until today a neighbourhood appeared only under 14 m/px, so the
+    // Map tab — which opens on the whole city — showed four city edges and nothing else, and the 205 outlines a
+    // person came for were invisible at the only zoom they ever saw. What stops 205 dotted outlines being a mesh
+    // is not hiding them: it is the WEIGHT. At city zoom the line is 0.6 px, thinner than the thinnest street the
+    // map draws there (1.6), with a 1-on-3-off dot; it reads as a faint lattice, and the dots, the transit lines
+    // and the greenway all sit above it. `boundaryStyle` (bounds.ts) is the whole table, shared with the ports.
+    const areaLabels: { name: string; x: number; y: number; d: number }[] = [];
     if (this.areas.length) {
+      const bs = boundaryStyle(mpp);
       const trace = (rings: Float32Array[]) => { c.beginPath(); for (const r of rings) { this.trace(r); c.closePath(); } };
-      // A neighbourhood is drawn only from the zoom at which its own name fits (audit §3.3); below that, the
-      // four city outlines alone, because 205 dashed outlines at city zoom are a mesh, not a map. The number is
-      // the label rule itself: a name needs about 70 px, and a Detroit neighbourhood is about a kilometre
-      // across, so it earns its outline at 1000/70 ≈ 14 metres per pixel.
-      const detailed = mpp < AREA_DETAIL_MPP;
-      const shown = this.areas.filter((a) => touches(a.box, view) && (detailed || a.area.id.startsWith('city_')));
+      const shown = this.areas.filter((a) => touches(a.box, view));
       for (const a of shown) {
-        const on = a.area.id === this.areaSel;
-        if (on) { trace(a.rings); c.globalAlpha = 0.08; c.fillStyle = col.brand; c.fill('evenodd'); c.globalAlpha = 1; }
-        // Dashed, so a boundary is never mistaken for a street: the map is full of grey lines and an area edge
-        // is not one of them. The selected one goes solid, heavier and in the focus colour.
-        c.setLineDash(on ? [] : [6, 4]); c.strokeStyle = on ? col.focus : col.muted; c.lineWidth = on ? 3 : 1.6;
+        const on = a.area.id === this.areaSel, city = a.area.id.startsWith('city_');
+        if (on) { trace(a.rings); c.globalAlpha = BOUNDARY_WASH_ALPHA; c.fillStyle = col.brand; c.fill('evenodd'); c.globalAlpha = 1; }
+        // Dashed, so a boundary is never mistaken for a street: the map is full of grey lines and an area edge is
+        // not one of them, and under forced colours the dash is the only thing left that says so. A city is drawn
+        // a touch heavier than a neighbourhood — weight, never colour and never a fill. The selected one goes
+        // solid, heavier still and in the focus colour.
+        c.setLineDash(on ? [] : bs.dash); c.strokeStyle = on ? col.focus : col.bnd; c.lineWidth = on ? BOUNDARY_SELECTED_WIDTH : city ? bs.cityWidth : bs.width;
         trace(a.rings); c.stroke(); c.setLineDash([]);
         const wide = (a.box[2] - a.box[0]) * this.s;
-        if (wide > 70) { const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2); if (x > 0 && x < w && y > 0 && y < h) areaLabels.push({ name: a.area.name, x, y }); }
+        if (bs.names && wide > bs.nameMinPx) {
+          const x = this.X((a.box[0] + a.box[2]) / 2), y = this.Y((a.box[1] + a.box[3]) / 2);
+          if (x > 0 && x < w && y > 0 && y < h) areaLabels.push({ name: a.area.name, x, y, d: Math.hypot(x - w / 2, y - h / 2) });
+        }
       }
+      // Nearest the middle of the screen first, and no more than the band's cap: downtown has a dozen outlines in
+      // one frame, and a name that loses the collision test is dropped rather than shrunk or overlapped.
+      areaLabels.sort((p, q) => p.d - q.d); areaLabels.length = Math.min(areaLabels.length, bs.nameCap);
     }
     // Transport layers a person switched on (bus routes, the streetcar, bike lanes, stations). They are drawn
     // under the greenway and under the listing dots, so switching a layer on never hides the thing a screen is

@@ -138,16 +138,24 @@ One tab replaces Recreation and Transit. Top to bottom:
 1. **The map**, drawn on the phone from the signed bundle as before — no tile server, no map company, nothing sent.
 2. **"What to show on the map"** — a layer switcher of real `<input type="checkbox">` in labelled `<fieldset>`s, in three groups:
    - *Free help*: one layer per group of our own listings, **derived from the category taxonomy** (`MAP_GROUPS` in `apps/web/src/needs.ts`): free food · shelters and day centers · health, Narcan and all-night stations (`health` + `harm` + `safe`, since 2026-09-22) · libraries, rec centers and internet (`rec` + `connect`) · jobs and school · kids and teens (`kids` + `youth`) · clothes, showers and pets (`goods` + `hygiene` + `pets`) · money, housing, papers and rides. Eight groups since the category audit of 2026-09-22 (`docs/CATEGORY-AUDIT-2026-09-22.md`): every label names what is in its layer, so nothing surprising sits in one. Every top-level category belongs to exactly one group (a test checks it).
-   - *Parks and paths*: City parks · the Joe Louis Greenway · city and neighborhood outlines. Parks first
+   - *Parks and paths*: City parks · the Joe Louis Greenway · **Neighborhood and city boundaries**. Parks first
      (Kyle, 2026-09-22: the greenway is one component of the park system, not the headline).
-     The **outlines** layer draws the four city boundaries and the 205 Detroit neighborhoods — a thin dashed
-     line, a name from the zoom at which it fits (about 14 m per pixel; below that, the four cities alone), and
-     a light wash on the one that was tapped. **Never a fill that carries a value**: docs/13's first honesty
-     rule forbids a choropleth, so an outline may be drawn and named and never shaded by a number. The layer is
-     handed no listing at all, so no sensitive row can reach it. A tap opens the same bottom card every other
-     feature uses, with "See details" to that area's page.
+     The **boundaries** layer draws the four city outlines and the 205 Detroit neighborhoods, **at every zoom**
+     and **on by default** (Kyle, 2026-09-22: "The user needs to be able to see the boundaries of the
+     neighborhoods on the map"). A dotted line in a colour of its own (`--map-bnd`, never a street colour), at
+     a weight and a dash that come from one shared table — `boundaryStyle` in `apps/web/src/bounds.ts`,
+     **docs/MAP-STYLE.md section 15**, which is what the iPhone and Android ports implement: a 0.9 px hairline
+     with no names at city zoom, 1.1 px with the names that fit (at most 12 a frame) from 30 m per pixel, 1.8 px
+     with names under 12; a city outline is drawn a touch heavier than a neighborhood's, and the one that was
+     tapped goes solid in the focus colour with a light wash. Boundaries draw **under the listing dots, the
+     transit lines and the greenway and over the streets and the parks**, so switching them on never hides the
+     help. **Never a fill that carries a value**: docs/13's first honesty rule forbids a choropleth, so an
+     outline may be drawn and named and never shaded by a number. The layer is handed no listing at all, so no
+     sensitive row can reach it. A tap opens the same bottom card every other feature uses, with "See details"
+     to that area's page, and the text list carries the area names in words. Screenshots:
+     `docs/img/map-boundaries/`.
    - *Getting around*: DDOT bus routes and stops · SMART bus routes and stops · QLINE · People Mover · MoGo bike stations · bike lanes · train and bus stations · intercity bus stops · park and ride lots.
-   The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. **A first visit starts with every help layer on and City parks on; the greenway, the outlines and the bus routes off** (2026-09-22, audit H2 — the tab used to open as a street map with a green line on it and not one place that helps). A remembered choice always wins.
+   The choice is remembered **on this phone only** (`apps/web/src/layers.ts`, IndexedDB, like the language and saved places) and is never sent. **A first visit starts with every help layer on, City parks on and the boundaries on; the greenway and the bus routes off** (2026-09-22, audit H2 — the tab used to open as a street map with a green line on it and not one place that helps; the boundaries joined the defaults later the same day). A remembered choice always wins — and a phone that already had a remembered list gains the boundaries **exactly once**, through a version marker beside the list (`layers_v`, `LAYERS_VERSION` in `apps/web/src/layers.ts`), so an existing user sees them without having any other choice reset and can still switch them off for good.
 3. **"See this map as a list"** — everything switched on, in words: the help listings as cards, greenway stretches as rows, park names, and each transport layer's route and stop names with a count. Nothing on the map is reachable only by looking at it.
 4. Then the rest of what Recreation and Transit carried: **Parks and paths** (the nearest parks as rows to their own pages, and "See all parks and paths"), recreation centers and libraries, trip planners, fares, free rides, transit phone numbers, and the MoGo Access Pass. The trip-planner list names the **Transit app** ("live DDOT and SMART buses on your phone") beside DDOT's own planner, as a link-out to transitapp.com like every other; the same link appears in the **"Rides to the doctor or cheaper bus fare"** link-outs, where it leads, because it is the free thing that answers "when is my bus coming?". Neither says DDOT or SMART recommends it: SMART's own page lists Transit among third-party apps that receive SMART data, DDOT's pages could not be read (`docs/research/2026-09-20/transit-app.md`), and we state only what an owner page states.
 

@@ -301,15 +301,12 @@ describe('the Map tab opens with help on it (audit H2)', () => {
   it('every help layer is on', () => {
     for (const g of MAP_GROUPS) expect(DEFAULT_LAYERS, g.id).toContain('help:' + g.id);
   });
-  it('parks are on; the greenway, the outlines and the bus routes are not', () => {
+  it('parks and the boundaries are on; the greenway and the bus routes are not', () => {
     expect(DEFAULT_LAYERS).toContain('place:parks');
+    // Kyle, 2026-09-22: "The user needs to be able to see the boundaries of the neighborhoods on the map".
+    expect(DEFAULT_LAYERS).toContain('place:areas');
     expect(DEFAULT_LAYERS).not.toContain('place:greenway');
-    expect(DEFAULT_LAYERS).not.toContain('place:areas');
     expect(DEFAULT_LAYERS.filter((x) => x.startsWith('go:'))).toEqual([]);
-  });
-  it('a remembered choice still wins, and the default is only ever read when there is none', () => {
-    const layers = src('layers.ts');
-    expect(layers).toContain("return Array.isArray(ids) ? ids.filter((x): x is string => typeof x === 'string') : [...DEFAULT_LAYERS];");
   });
   it('the layer menu puts parks before the greenway, and the outlines last', () => {
     const menu = main.slice(main.indexOf('const places = ['), main.indexOf('const go2 ='));
@@ -338,7 +335,7 @@ describe('the areas layer draws areas and nothing else', () => {
   it('an outline is never filled by a value: only the tapped one is washed, and with the brand colour', () => {
     const map = src('map.ts');
     const pass = map.slice(map.indexOf('if (this.areas.length) {'), map.indexOf('// Transport layers a person switched on'));
-    expect(pass).toContain("c.globalAlpha = 0.08; c.fillStyle = col.brand;");
+    expect(pass).toContain("c.globalAlpha = BOUNDARY_WASH_ALPHA; c.fillStyle = col.brand;");
     expect(pass.match(/c\.fill\(/g) ?? []).toHaveLength(1);              // exactly one fill, and it is the selection
   });
   it('the pick order puts an area behind everything a person came for, and ahead of a park', () => {

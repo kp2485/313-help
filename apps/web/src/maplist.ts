@@ -8,6 +8,10 @@ export interface MapListInput<R, S extends { id: string; name: string; phase: st
   rows: readonly R[];                                                     // help listings on the map, ranked
   overlays: readonly { label: string; lines: readonly { name: string }[]; points: readonly { name: string }[] }[];   // transport layers that are on and held
   parks: readonly { name: string }[]; segments: readonly S[];
+  /** The neighbourhood and city outlines the map is drawing, when that layer is on — the same words the map puts
+   *  over them, for a person who is reading the list instead of the picture (and for a screen reader, which the
+   *  canvas cannot serve). `areasLabel` is the section's heading, the switcher's own wording. */
+  areas?: readonly { name: string }[]; areasLabel?: string;
   /** A layer that is switched on but could not be read says so here too, not only in the switcher: the list is
    *  where a person looks when the map shows nothing. HTML, already escaped. */
   problems: readonly string[];
@@ -26,6 +30,7 @@ export function mapListHtml<R, S extends { id: string; name: string; phase: stri
     o.rows.length ? `<h3>${T('map.list_help', { count: o.rows.length })}</h3><ul class="cards">${o.rows.slice(0, 20).map((r) => o.card(r)).join('')}</ul>${o.rows.length > 20 ? `<p class="foot">${T('map.list_more', { count: o.rows.length - 20 })}</p>` : ''}` : '',
     o.segments.length ? `<h3>${T('gw.title')}</h3><ul class="rows">${o.segments.map((s) => o.segmentRow(s)).join('')}</ul>` : '',
     o.parks.length ? `<h3>${T('rec.parks')} <span class="count">${o.parks.length}</span></h3>${names(o.parks.map((p) => p.name), 30)}${o.allParks}` : '',
+    o.areas?.length && o.areasLabel ? `<h3>${escHtml(o.areasLabel)} <span class="count">${o.areas.length}</span></h3>${names(o.areas.map((a) => a.name), 30)}` : '',
     ...o.overlays.map((ov) => {
       const list = [...ov.lines.map((l) => l.name), ...ov.points.map((q) => q.name)].filter(Boolean);
       const count = ov.lines.length + ov.points.length;
