@@ -237,6 +237,22 @@ export interface MapSpec {
    *  land colour so a tap can be seen, which carries no number and means nothing but "this one". */
   areas?: MapArea[];
   selected?: string;
+  /**
+   * What the page is told when an outline is tapped (the Areas tab). Handed one, this map stops drawing the
+   * bottom "See details" card for an area and hands the tap over instead: on that tab a tap is not a card, it
+   * is the area's own page opening under a shrinking map (Kyle, 2026-09-22). Every other map — the Map tab
+   * included — is handed nothing here and keeps the card it has always drawn.
+   */
+  onArea?: (id: string) => void;
+  /** Open on this outline rather than on `fit` or `open`: `cameraForArea`, above. The Areas tab's whole point. */
+  openArea?: { lat: number; lon: number }[][];
+  /**
+   * HTML for controls at the HEAD of the map's own control stack, above the zoom keys (the Areas tab's
+   * Map/List switch). It comes from the caller, which builds it out of strings/*.json — the same trust this
+   * file already extends to every word on the map, and the reason a caller can put a `data-` hook on it and
+   * have the app's own click handling pick it up.
+   */
+  lead?: string;
   overlays?: Overlay[];                         // switched-on transport layers, already loaded (Map tab)
   /** One chosen itinerary, drawn over everything else (the Directions screen). */
   route?: MapRoute;
@@ -274,6 +290,17 @@ export function focusRadius(key: string, lat: number, lon: number, radiusMeters:
   const view = live.get(key);
   if (!view) return false;
   view.radiusTo(lat, lon, radiusMeters);
+  return true;
+}
+/**
+ * Pick out one outline on a map that is on screen now and glide to it: the wash on the shape, and the camera
+ * `cameraForArea` works out. Used when the answer to "which area am I in?" lands after the map has already
+ * opened, and when a row in the list beside the map is chosen. Nothing is stored; nothing is sent.
+ */
+export function focusArea(key: string, id: string, rings: readonly { lat: number; lon: number }[][]): boolean {
+  const view = live.get(key);
+  if (!view) return false;
+  view.areaTo(id, rings);
   return true;
 }
 let mapNo = 0;                                          // one id per map on the screen, for aria-describedby
@@ -332,6 +359,51 @@ export function cameraForRadius(center: { lat: number; lon: number }, radiusMete
   const across = Math.max(1, radiusMeters * 2);
   const s = Math.max(S_MIN, Math.min(S_MAX, (side * M_PER_UNIT) / across));
   return { cx: Math.max(-PAN_X, Math.min(PAN_X, wx(center.lon))), cy: Math.max(-PAN_Y, Math.min(PAN_Y, wy(center.lat))), s };
+}
+
+/**
+ * How much room is left around an outline when a map is asked to show that outline and nothing else, and how
+ * close such a map may ever get (Kyle, 2026-09-22: "a map view … zoomed into the polygon of the neighborhood
+ * that the user is in"). Both are named here, once, because the iPhone and Android apps have to use the same
+ * two numbers or the three clients open the Areas tab on three different pictures.
+ *
+ * - `AREA_FIT_MARGIN` — 8 %: the outline's own box, grown by 8 % on every side, is what has to fit. Enough that
+ *   the dashed edge is never flush against the frame, small enough that a neighbourhood still fills the screen.
+ * - `AREA_MIN_MPP` — 4 metres per pixel: the closest this camera will ever open, whatever it was handed. The
+ *   smallest of the City's 205 outlines is a few blocks across; fitting it exactly would open on a picture of
+ *   six houses with no streets a person could recognise. The map's own limit is 0.6 m/px (`S_MAX`) and a person
+ *   can still zoom all the way in by hand — this is only where it OPENS.
+ *
+ * A whole city is handled by the other end of the same clamp: `S_MIN` is 90 m per pixel, so Detroit cannot open
+ * wider than the camera has ever allowed.
+ */
+export const AREA_FIT_MARGIN = 0.08, AREA_MIN_MPP = 4;
+/**
+ * The camera that shows one area's outline: fit its rings, with `AREA_FIT_MARGIN` of room, inside the box.
+ *
+ * Pure — rings in, camera out — and portrait or landscape is decided by the box it is handed, so the same
+ * neighbourhood fits whichever way the phone is held. `Math.min` of the two axes, so the WHOLE outline is on
+ * screen (unlike `cover`, which fills the box and lets the long axis run off it): an area map that cut the top
+ * off Rosedale Park would be answering a different question.
+ *
+ * Handed nothing — an area the bundle carries no outline for — it returns null, and the caller keeps the view it
+ * already had. Never a guess, and never a camera pointed at 0°N 0°E.
+ */
+export function cameraForArea(rings: readonly { lat: number; lon: number }[][], viewport: { w: number; h: number }): Cam | null {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const ring of rings) for (const q of ring) {
+    const x = wx(q.lon), y = wy(q.lat);
+    if (x < minX) minX = x; if (x > maxX) maxX = x;
+    if (y < minY) minY = y; if (y > maxY) maxY = y;
+  }
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) return null;
+  const w = Math.max(1, viewport.w), h = Math.max(1, viewport.h), grow = 1 + AREA_FIT_MARGIN * 2;
+  // A point, or a sliver: give it something to be wide, so the division below is never by zero.
+  const spanX = Math.max(maxX - minX, 1 / M_PER_UNIT) * grow, spanY = Math.max(maxY - minY, 1 / M_PER_UNIT) * grow;
+  const fit = Math.min(w / spanX, h / spanY);
+  // The clamps, in this order: never closer than AREA_MIN_MPP, never outside the camera's own two limits.
+  const s = Math.max(S_MIN, Math.min(S_MAX, M_PER_UNIT / AREA_MIN_MPP, fit));
+  return { cx: Math.max(-PAN_X, Math.min(PAN_X, (minX + maxX) / 2)), cy: Math.max(-PAN_Y, Math.min(PAN_Y, (minY + maxY) / 2)), s };
 }
 
 /** Drag: the map follows the finger, and the middle never leaves the four cities by more than a screen or two. */
@@ -448,7 +520,7 @@ export class MapView {
     this.canvas.setAttribute('aria-describedby', help.id);
     const btn = (act: string, text: string, label: string, cls = '') => `<button type="button" class="${cls}" data-map-act="${act}" aria-label="${esc(label)}">${text}</button>`;
     const tools = document.createElement('div'); tools.className = 'maptools';
-    tools.innerHTML = btn('in', '+', S.zoomIn) + btn('out', '&minus;', S.zoomOut) + btn('reset', '&#8982;', S.reset) + btn('big', '&#10530;', S.bigger);
+    tools.innerHTML = (spec.lead ?? '') + btn('in', '+', S.zoomIn) + btn('out', '&minus;', S.zoomOut) + btn('reset', '&#8982;', S.reset) + btn('big', '&#10530;', S.bigger);
     // Moving the map by dragging is not the only way to move it (WCAG 2.5.7): these four buttons do the same,
     // one tap at a time, for anyone who cannot hold and drag. They are also what a switch or a head pointer uses.
     const pad = document.createElement('div'); pad.className = 'mappan';
@@ -483,7 +555,42 @@ export class MapView {
    */
   private goal: Cam | null = null;
   radiusTo(lat: number, lon: number, radiusMeters: number): void {
-    const to = cameraForRadius({ lat, lon }, radiusMeters, this.w, this.h);
+    this.glide(cameraForRadius({ lat, lon }, radiusMeters, this.w, this.h));
+  }
+  /** Highlight one outline and glide to it (`focusArea`). An area with no rings moves nothing: the wash still
+   *  goes on, because "this one" is true whether or not the bundle can draw it. */
+  areaTo(id: string, rings: readonly { lat: number; lon: number }[][]): void {
+    this.areaSel = id;
+    // The outline is REMEMBERED, not just travelled to. A map built into a flex column a moment ago has not
+    // been laid out yet — the first live run at 375 px measured its frame at 24 px wide — and fitting an
+    // outline into a box that size gives the widest camera there is, which is the whole region: the opposite of
+    // what was asked for. So every resize re-frames the same outline until a person moves the map themselves,
+    // which also means the framing survives turning the phone over.
+    this.wantArea = rings;
+    const to = this.w && this.h ? cameraForArea(rings, { w: this.w, h: this.h }) : null;
+    if (to) this.glide(to); else this.redraw();
+    this.settle();
+  }
+  /**
+   * One frame later, check that the box we measured is the box the page really has.
+   *
+   * A map built into a flex column and measured in the same breath can be handed a rect the browser has not
+   * finished working out — 24 px wide, on the first live run of the Areas tab — and a `ResizeObserver` never
+   * fires for it, because from the observer's side nothing ever changed. So the box is read once more when the
+   * frame is certainly settled, and only a real difference causes a refit: a good camera is left alone, mid
+   * journey and all.
+   */
+  private settle(): void {
+    requestAnimationFrame(() => {
+      if (!this.wantArea) return;
+      const r = this.canvas.parentElement?.getBoundingClientRect();
+      if (r && r.width && r.height && (Math.abs(r.width - this.w) > 1 || Math.abs(r.height - this.h) > 1)) this.resize();
+    });
+  }
+  private wantArea: readonly { lat: number; lon: number }[][] | null = null;
+  /** A person's own hand on the map wins over any outline it was framing: from here it is their view. */
+  private theirs(): void { this.wantArea = null; }
+  private glide(to: Cam): void {
     if (this.slow.matches) { this.goal = null; this.put(to); return; }
     this.goal = to;
     const from = this.cam(); let u = 0;
@@ -515,15 +622,24 @@ export class MapView {
       const saved = cameras.get(this.spec.key);
       // `home` is the whole of `fit` and stays that way — it is what the reset button (&#8982;) goes back to, so
       // the four cities are one tap away however the map opened. `open` only changes where it opens.
-      const o = this.spec.open;
-      Object.assign(this, saved ?? (o ? cameraForRadius(o, o.radiusMeters, this.w, this.h) : this.home)); this.touched = !!saved;
+      // An area to open on (the Areas tab) beats a radius, which beats the whole of `fit`.
+      const o = this.spec.open, ar = this.spec.openArea && cameraForArea(this.spec.openArea, { w: this.w, h: this.h });
+      Object.assign(this, saved ?? ar ?? (o ? cameraForRadius(o, o.radiusMeters, this.w, this.h) : this.home)); this.touched = !!saved;
     } else if (!this.touched) { this.resize(true); return; }     // the box changed size before anyone moved the map: fit again
+    // An outline this map is framing: fit it again in the box it now really has. No glide — a resize is not a
+    // journey, and a map that slid about every time the keyboard opened would be unusable.
+    if (this.wantArea) {
+      const to = cameraForArea(this.wantArea, { w: this.w, h: this.h });
+      // A journey started from the wrong box is over: the destination has changed, so stop travelling to the
+      // old one. Without this the glide's own frames land after the refit and undo it.
+      if (to) { this.stopMotion(); this.goal = null; this.cx = to.cx; this.cy = to.cy; this.s = to.s; this.touched = true; }
+    }
     this.redraw();
   }
   private cam(): Cam { return { cx: this.cx, cy: this.cy, s: this.s }; }
   private put(cam: Cam): void { this.cx = cam.cx; this.cy = cam.cy; this.s = cam.s; this.touched = true; this.redraw(); }
-  private zoomAt(f: number, px = this.w / 2, py = this.h / 2): void { this.put(zoomAbout(this.cam(), f, px, py, this.w, this.h)); }
-  private pan(dx: number, dy: number): void { this.put(panCam(this.cam(), dx, dy)); }
+  private zoomAt(f: number, px = this.w / 2, py = this.h / 2): void { this.theirs(); this.put(zoomAbout(this.cam(), f, px, py, this.w, this.h)); }
+  private pan(dx: number, dy: number): void { this.theirs(); this.put(panCam(this.cam(), dx, dy)); }
   // -- movement that carries on after the finger has gone: the fling, and the animated double-tap zoom.
   // One at a time, always stoppable, and never started at all under Reduce Motion (WCAG 2.3.3).
   private now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
@@ -560,6 +676,7 @@ export class MapView {
   }
   private cancelPick(): void { if (this.tapWait) { clearTimeout(this.tapWait); this.tapWait = 0; } }
   private tool(act: string | undefined, S: MapSpec['strings']): void {
+    if (act && act !== 'big') this.theirs();
     const step = 0.35 * Math.min(this.w, this.h);
     if (act === 'in') this.zoomAt(1.6); else if (act === 'out') this.zoomAt(1 / 1.6);
     else if (act === 'left') this.pan(step, 0); else if (act === 'right') this.pan(-step, 0);
@@ -614,7 +731,7 @@ export class MapView {
     // A finger or a mouse puts the keyboard's ring away: it is the keyboard's cursor, and nothing about
     // pointing at the map changed.
     const when = (e: { timeStamp?: number }) => (typeof e.timeStamp === 'number' && e.timeStamp > 0 ? e.timeStamp : this.now());
-    c.addEventListener('pointerdown', (e) => { if (this.ringId) { this.ringId = ''; this.redraw(); }
+    c.addEventListener('pointerdown', (e) => { this.theirs(); if (this.ringId) { this.ringId = ''; this.redraw(); }
       // A finger on the map stops whatever the map was still doing on its own, at once and where it is.
       this.stopMotion();
       c.setPointerCapture(e.pointerId);
@@ -860,7 +977,13 @@ export class MapView {
     if (!hit) return;
     // A tapped outline stays highlighted, and the highlight lives HERE rather than in the page: telling the page
     // would redraw it, and a redraw throws the map away — taking the card that was just opened with it.
-    if (hit.kind === 'area') { this.areaSel = hit.id; this.redraw(); return card(hit.title, hit.sub, hit.go); }
+    if (hit.kind === 'area') {
+      this.areaSel = hit.id; this.redraw();
+      // The Areas tab takes the tap itself (`onArea`): there the answer to a tap is the area's own page, not a
+      // card offering to open it. Everywhere else the card is what it has always been.
+      if (this.spec.onArea) { this.spec.onArea(hit.id); return; }
+      return card(hit.title, hit.sub, hit.go);
+    }
     card(hit.title, hit.sub, hit.go, hit.dir);
   }
   /**

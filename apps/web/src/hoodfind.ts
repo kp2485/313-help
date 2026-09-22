@@ -65,6 +65,19 @@ export function hoodAt(list: readonly Hood[], origin: [number, number], p: Point
 }
 
 /**
+ * The AREA a point is in: the Detroit neighborhood that holds it, or — for a point in Hamtramck, Highland Park
+ * or Dearborn, none of which publishes neighborhood outlines — the city that holds it. Neighborhoods are asked
+ * first, so a Detroit point is never answered with "Detroit" when the app has a better answer for it, and the
+ * three other cities stop being the dead end the navigation audit found (C1).
+ *
+ * Null when no outline holds the point, which is still a real answer: the screen says so, and nothing is ever
+ * given to the nearest shape. `cities` is `Area[]`, which extends `Hood`, so the same ray casting serves both.
+ */
+export function areaAt(hoods: readonly Hood[], cities: readonly Hood[], origin: [number, number], p: Point): Hood | null {
+  return hoodAt(hoods, origin, p) ?? hoodAt(cities, origin, p);
+}
+
+/**
  * A typed ZIP. The bundle carries one point per ZIP — its centre — and a ZIP covers more than one neighborhood,
  * so this answers with the neighborhood that centre falls in and the screen says as much (`hood.mine_zip`).
  * An empty list when the centre is outside every Detroit outline. It returns a list, not one neighborhood,

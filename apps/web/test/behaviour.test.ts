@@ -229,7 +229,7 @@ describe('the map has a roving focus, and it is allowed nowhere the map is not',
     const src = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
     // The ring is the keyboard's cursor: a finger or a mouse puts it away, and so does leaving the picture.
     expect(src).toContain("c.addEventListener('blur', () => { if (this.ringId) { this.ringId = ''; this.redraw(); } });");
-    expect(src).toContain("c.addEventListener('pointerdown', (e) => { if (this.ringId) { this.ringId = ''; this.redraw(); }");
+    expect(src).toContain("c.addEventListener('pointerdown', (e) => { this.theirs(); if (this.ringId) { this.ringId = ''; this.redraw(); }");
     // 2.4.11: a ring at the very edge of the canvas is a ring that is obscured, so the map moves first.
     expect(src).toContain('if (cx < m || cy < m || cx > this.w - m || cy > this.h - m) this.pan(this.w / 2 - cx, this.h / 2 - cy);');
     // 2.4.13: 3 px of ring with 1.5 px of casing either side, so it keeps its 3:1 over a street or a park.

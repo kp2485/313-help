@@ -367,8 +367,8 @@ describe('the areas layer draws areas and nothing else', () => {
     expect(walk.map((f) => f.id)).toEqual(['s1', 's2', 'a2', 'a1', 'd2', 'd1']);
   });
   it('the Areas tab opens on the map, with the areas on and nothing else', () => {
-    expect(main).toContain("key: 'areastab'");
-    const tab = main.slice(main.indexOf("key: 'areastab'"), main.indexOf("key: 'areastab'") + 200);
+    expect(main).toContain("const AREAS_MAP_KEY = 'areastab'");
+    const tab = main.slice(main.indexOf('key: AREAS_MAP_KEY'), main.indexOf('key: AREAS_MAP_KEY') + 400);
     for (const forbidden of ['dots:', 'overlays:', 'segments: true', 'subway:']) expect(tab, forbidden).not.toContain(forbidden);
   });
 });

@@ -474,9 +474,11 @@ describe('the Map tab opens on the anchor, not on the region', () => {
     expect(tab[0]).toContain('open: openingView(here)');
     // Two maps open on where the person is: the Map tab, and the Areas tab's map of the outlines (Kyle,
     // 2026-09-22 — the rule is about all of them, not about one tab).
-    const areas = main.split('\n').filter((l) => l.includes("key: 'areastab'"));
+    expect(main).toContain("const AREAS_MAP_KEY = 'areastab'");
+    const areas = main.split('\n').filter((l) => l.includes('key: AREAS_MAP_KEY'));
     expect(areas).toHaveLength(1);
-    expect(areas[0]).toContain('open: openingView(here)');
+    // The Areas map's opening view is on the next line of the same call (the call is too long for one line).
+    expect(main.slice(main.indexOf('key: AREAS_MAP_KEY'), main.indexOf('key: AREAS_MAP_KEY') + 400)).toContain('open: openingView(here)');
     // The maps that are about one subject — a listing, a stretch of greenway, a park, a neighbourhood — keep
     // fitting their subject, and never take the opening view.
     expect(main.match(/open: openingView\(/g)).toHaveLength(2);

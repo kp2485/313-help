@@ -273,10 +273,14 @@ describe('what "your neighborhood" leaves behind: nothing', () => {
     expect(findSrc).toContain('export function hoodAt(list: readonly Hood[], origin: [number, number], p: Point): Hood | null');
   });
   it('the screen keeps the answer in memory only, and asks for a location the one way the app already asks', () => {
-    const tab = main.slice(main.indexOf('function hoodsTab()'), main.indexOf('function hoodSaid('));
-    for (const forbidden of ['idbSet', 'localStorage', 'sessionStorage', 'fetch(', 'pushState', 'replaceState', 'navigate(']) {
+    const tab = main.slice(main.indexOf('const AREAS_MAP_KEY'), main.indexOf('function hoodSaid('));
+    for (const forbidden of ['idbSet', 'localStorage', 'sessionStorage', 'fetch(', 'pushState', 'replaceState']) {
       expect(tab, forbidden).not.toContain(forbidden);
     }
+    // The one thing that may reach the browser's history is an AREA's own id, and only because a person opened
+    // it — by tapping its outline on the map, or its row in the list. Both go through the same one call, and
+    // there is no other navigation on this tab at all.
+    expect([...tab.matchAll(/navigate\(([^)]*)\)/g)].map((m) => m[1])).toEqual(["{ v: 'hood', id }"]);
     // No new permission pattern: the same chip (and the same remembered refusal) as every list screen. Once
     // there IS a location, the chip's own "Sorted by distance from you" would be a claim about a list that is
     // in ABC order, so what stays is its Stop button — the same button, with the same handler.

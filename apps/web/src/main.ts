@@ -6,9 +6,10 @@ import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang
 import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
 import { areaById, areaPage, hoodIndex, hoodList, hoodRows, hoodView, loadHoodView, loadIndicators, outline, saveHoodView, type Area, type Hood, type HoodView, type Indicators, type Ui } from './hoods.js';
-import { hoodAt, hoodOrder as hoodOrderOf, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
+import { areaAt, hoodOrder as hoodOrderOf, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
+import { areasLanding, stripAt, stripSettling, stripStart, type AreasLanding, type StripScroll } from './areas.js';
 import { icon } from './icons.js';
-import { MapView, focusRadius, loadLayer, loadMap, loadNet, loadedBase, type LayerData, type MapArea, type MapDot, type MapRoute, type MapSpec, type Overlay } from './map.js';
+import { MapView, focusArea, focusRadius, loadLayer, loadMap, loadNet, loadedBase, type LayerData, type MapArea, type MapDot, type MapRoute, type MapSpec, type Overlay } from './map.js';
 import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, rememberLocateAnswered, requestPosition, type LocateAsk } from './locate.js';
 import { forgetCrossings, resolveCrossing, type CrossOutcome } from './intersections.js';
 import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, inCategories, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
@@ -49,8 +50,18 @@ let crossOpen = false, crossText = '', crossOut: CrossOutcome | null = null, cro
 // no service can take minutes to find itself, so the ask no longer gives up at ten seconds: it says what is
 // happening, offers the two ways in that need no satellite, and can be cancelled.
 let locAsk: LocateAsk | null = null, locSlow = false;
-// Which view the Areas tab is showing: the map of the outlines, or the same screen's list. This visit only.
-let hoodsView: 'map' | 'list' = 'map';
+// Which face the Areas tab is showing on a PHONE: the map of the outlines, or the same screen's list. A
+// variable that dies with the page — nothing on this phone is written to, and nothing reaches the URL — so the
+// map is the default every launch (Kyle, 2026-09-22). A laptop is shown both at once and never reads this.
+let areasView: 'map' | 'list' = 'map';
+// The one piece of selection the Areas tab keeps: the area whose page was last opened. It picks the outline out
+// on the map and marks the row in the list. An id from the bundle, about a place, never about a person.
+let areaPick = '';
+// True for exactly one render: the answer to "which area am I in?" has just arrived, so the map is built at the
+// opening view and then GLIDES to the outline instead of simply appearing on it.
+let areasGlide = false;
+// The collapsing strip on an area page (areas.ts). Memory only, and reset every time a page opens.
+let strip: StripScroll = stripStart();
 let savedIds: string[] = [];                             // listing ids saved on this phone (saved.ts); never sent
 let proposed: { state: 'sent' | 'queued'; ref?: string } | null = null, proposeError = false;
 let missing: string[] = [];                              // which "Add a place" fields were left empty, for the error text
@@ -907,7 +918,7 @@ const directionsScreen = (): string =>
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
 const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
-function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; route?: MapRoute; me?: boolean; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; areas?: MapArea[]; selected?: string; overlays?: Overlay[]; segments?: boolean; parks?: boolean }): string {
+function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; route?: MapRoute; me?: boolean; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; areas?: MapArea[]; selected?: string; overlays?: Overlay[]; segments?: boolean; parks?: boolean; openArea?: MapSpec['openArea']; onArea?: MapSpec['onArea']; lead?: string }): string {
   // The greenway is drawn when a map is ASKED to draw it, and not otherwise (Kyle, 2026-09-22; audit §6).
   //
   // It used to be the other way round: every map in the app drew it unless a caller opted out, and only the
@@ -918,7 +929,7 @@ function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapS
   const segments = o.segments ? bundle?.greenway?.segments ?? [] : [];
   const phase = Object.fromEntries(['open', 'under_construction', 'funded', 'planned'].map((ph) => [ph, t('gw.' + ph)]));
   mapSpecs.push({
-    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, route: o.route, open: o.open, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, areas: o.areas, selected: o.selected, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
+    key: o.key, label: o.label, segments, focus: o.focus, dots: o.dots, route: o.route, open: o.open, minMeters: o.minMeters, cover: o.cover, quiet: o.quiet, outline: o.outline, areas: o.areas, selected: o.selected, openArea: o.openArea, onArea: o.onArea, lead: o.lead, overlays: o.overlays, parks: o.parks, style: o.style, subway: o.subway,
     me: here && !hereZip ? here : null,                       // a typed ZIP is not where the person is
     fit: o.fit?.length ? o.fit : segPoints(segments),
     segGo: (id) => JSON.stringify({ v: 'segment', id } satisfies View),
@@ -938,7 +949,7 @@ function mountMaps(): void {
   // there after the view exists rather than written into the page: the frame is the only box on the screen that
   // is certainly the map, at every width and in both layouts.
   if (locateCard) {
-    const frame = app.querySelector<HTMLElement>('.maptop .mapbox .mapframe');
+    const frame = app.querySelector<HTMLElement>('.maptop .mapbox .mapframe, main.areasfull .mapbox .mapframe');
     if (frame) frame.insertAdjacentHTML('beforeend', locateCardHtml({ title: t('map.locate_title'), body: t('map.locate_body'), yes: t('map.locate_yes'), no: t('map.locate_no'), cross: t('loc.cross') }, esc));
     else locateCard = false;
   }
@@ -948,12 +959,28 @@ function mountMaps(): void {
 // One path for every way of asking — the chip on a list, the chip beside the map, and the card the Map tab opens
 // the first time. They behave identically, because they are the same four lines.
 
-/** True when the screen on top is the Map tab, which is the only screen whose map is moved by a fix. */
+/** True when the screen on top is the Map tab, whose map is moved by a fix. */
 const onMapTab = (): boolean => { const v = stack[stack.length - 1]; return !!v && v.v === 'tab' && v.tab === 'map'; };
+/** True when the screen on top is the Areas tab with its map showing, whose map is moved by a fix too — but to
+ *  an OUTLINE, not to a radius: there the question is "which part of the city am I in?" (Kyle, 2026-09-22). */
+const onAreasMap = (): boolean => { const v = stack[stack.length - 1]; return !!v && v.v === 'tab' && v.tab === 'hoods' && areasFace() !== 'list'; };
+/** True when a fix would move something: the two screens above. */
+const onLocatingTab = (): boolean => onMapTab() || onAreasMap();
 
-/** Show two miles around a point on the Map tab's map, if that map is on the screen. */
+/** Show two miles around a point on the Map tab's map, or glide the Areas map to the outline the point is in. */
 function centreMapOn(p: { lat: number; lon: number }): boolean {
+  if (onAreasMap()) return glideToArea(p);
   return onMapTab() && focusRadius('maptab', p.lat, p.lon, LOCATE_RADIUS_M);
+}
+/** The Areas tab's answer to a fix: the outline that holds it, picked out and travelled to. Null outlines and
+ *  a point no outline holds move nothing — the screen says so in words instead (`areasNote`). */
+function glideToArea(p: { lat: number; lon: number }): boolean {
+  const d = indicators;
+  if (!d) return false;
+  const a = areaAt(d.neighborhoods, d.areas ?? [], d.origin, p);
+  if (!a) return false;
+  areaPick = a.id;
+  return focusArea(AREAS_MAP_KEY, a.id, outline(a, d.origin));
 }
 
 /**
@@ -1008,8 +1035,10 @@ function useCross(p: { lat: number; lon: number }, words: string): void {
   locDenied = zipUnknown = zipOpen = locateOutside = false;
   crossOpen = false; crossText = ''; crossOut = null;
   refocusSel = '[data-loc="off"]';
+  areasGlide = true;
   redraw();
   const moved = centreMapOn(here);
+  areasGlide = false;
   announce(t(moved ? 'map.locate_centered' : 'loc.cross_using', { where: words }));
 }
 
@@ -1027,12 +1056,14 @@ function locationArrived(pos: GeolocationPosition): void {
     redraw(); announce(t('map.locate_outside'));
     return;
   }
-  const moving = onMapTab();
+  const moving = onLocatingTab();
   here = { lat, lon }; hereZip = ''; hereCross = '';
   locDenied = zipUnknown = zipOpen = locateOutside = false;
   refocusSel = '[data-loc="off"]';
+  areasGlide = true;
   redraw();
   const moved = centreMapOn(here);
+  areasGlide = false;
   announce(t(moved && moving ? 'map.locate_centered' : 'loc.on_say'));
 }
 
@@ -1054,7 +1085,7 @@ function mapTabOpened(): void {
   locateChecked = true;
   void (async () => {
     const act = firstOpenAction(await locateAnswered(), await locatePermission(), !!hereZip);
-    if (!onMapTab()) return;                                   // the person moved on while we were asking
+    if (!onLocatingTab()) return;                              // the person moved on while we were asking
     if (act === 'centreOnZip' || act === 'centreOnPerson') {
       // A ZIP is already a point; a permission already given needs no card, only a fix.
       if (here) { const p = here; if (centreMapOn(p)) announce(t(hereZip ? 'loc.zip_using' : 'map.locate_centered', { zip: hereZip })); }
@@ -1145,7 +1176,9 @@ function addScreen(): string {
 // when one of these screens opens, so nothing on the crisis path waits for them.
 const hoodUi = (d: Indicators): Ui => ({
   t, esc, own: owner, date: prettyDate, icon: (name: string) => icon(name), link: (url: string, label: string) => ext(url, label, 'link'), go: (view: object) => go(view as View),
-  map: (h: Hood) => mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), quiet: false, outline: outline(h, d.origin), fit: outline(h, d.origin).flat(), minMeters: 900 }),
+  // An area page's map is no longer drawn in the middle of it: it is the strip the page scrolls under
+  // (`areaStrip`, below), so the page's own components ask for nothing here.
+  map: () => '',
   // The "nearest" rows name and open the listing their distance belongs to. The numbers file and the listings
   // are two files under one signature, so an id from the older of the two may name a row that has since been
   // archived: the row then says the distance and nothing more, rather than offering a page that is not there.
@@ -1158,28 +1191,97 @@ function hoodsReady(): Indicators | null {
 }
 const hoodsWaiting = () => `<main><h1 class="page" tabindex="-1">${T('hood.title')}</h1><p class="empty">${T(indicators === null ? 'hood.unavailable' : 'home.loading')}</p></main>`;
 /**
- * The Neighborhoods tab. "Your neighborhood" is worked out here, on this phone, from the position the person
- * has already shared this visit (or the centre of the ZIP they typed) and the outlines the bundle already
- * carries — `hoodAt` in hoodfind.ts. Nothing is sent, nothing is written: `here` is a variable that dies with
- * the page, and the only thing that ever reaches the browser's history is a neighborhood's own id, and only
- * when the person taps the row.
+ * The Areas tab (Kyle, 2026-09-22, verbatim: "The Neighborhood home should be a map view by default showing the
+ * full screen map zoomed into the polygon of the neighborhood that the user is in, with a list option up in the
+ * top right for mobile users and next to the map for laptop web users.").
+ *
+ * **Three faces, one screen, one piece of selection state.**
+ *
+ * - `map`   — a phone with the map showing: the map IS the tab. It fills the viewport under the top bar and
+ *             above the tab bar, so Urgent help and the language control never leave and the tab bar is still
+ *             there. Deliberately NOT the full-screen dialog `.big`, which covers the page and makes the rest
+ *             of it inert: this is the tab's ordinary state, drawn with the same frame, canvas and controls.
+ * - `list`  — a phone with the index showing: the screen the tab used to land on.
+ * - `split` — a laptop (≥ 64 rem, the width at which the tab bar is already a side rail): the map on the left
+ *             filling the height, the list on the right scrolling on its own, and no toggle at all. The column
+ *             widths are the Map tab's own rules (`.maptop` / `.mapside`).
+ *
+ * The one thing the tab remembers is which of `map` and `list` a phone is on, in a variable that dies with the
+ * page — **the map is the default every launch**, which is what Kyle asked for. Nothing here is written to this
+ * phone at all, and nothing reaches the URL.
+ *
+ * "Your area" is still worked out here, on this phone, from the position shared this visit (or the centre of a
+ * typed ZIP) against the outlines the bundle already carries. Nothing is sent and nothing is written: `here`
+ * dies with the page, and the only thing that reaches the browser's history is an area's own id, and only when
+ * the person opens it.
  */
-function hoodsTab(): string {
+const AREAS_MAP_KEY = 'areastab';
+/** Which face is showing. A laptop is never offered the toggle, because it is shown both things at once. */
+const areasFace = (): 'split' | 'map' | 'list' => (wide.matches ? 'split' : areasView);
+/** The area a point is in: a Detroit neighborhood first, then one of the four city outlines (hoodfind.ts). */
+const myArea = (d: Indicators): Hood | null =>
+  here ? (hereZip ? hoodsForZip(d.neighborhoods, d.origin, here)[0] ?? null : areaAt(d.neighborhoods, d.areas ?? [], d.origin, here)) : null;
+/**
+ * The Map/List switch: one control, two real buttons, each with `aria-pressed`, so a screen reader is told
+ * which view is showing instead of being handed a word whose meaning changes underneath it. It rides at the
+ * head of the map's own control stack (`MapSpec.lead`) — top-right, visually first, above the zoom keys, 44 px
+ * tall. The stack is laid out with `inset-inline-end`, so on an Arabic screen it mirrors to the top-LEFT with
+ * everything else: the corner a right-to-left reader starts from, which is what Kyle's "top right" means there.
+ *
+ * On the list face there is no map to put it on, so the same markup is drawn at the top of the list: the same
+ * place on the screen, the same two buttons, the same handler.
+ */
+function areasSwitch(face: 'map' | 'list'): string {
+  const b = (id: 'map' | 'list', key: string) =>
+    `<button type="button" class="areasw" data-areasview="${id}" aria-pressed="${face === id}">${T(key)}</button>`;
+  return `<div class="areaswitch" role="group" aria-label="${T('hood.switch_label')}">${b('map', 'hood.switch_map')}${b('list', 'hood.switch_list')}</div>`;
+}
+/** The tab's map: the outlines and nothing else, opening on the area this phone already knows about. */
+function areasMap(d: Indicators, mine: Hood | null, lead: string): string {
+  const areas = mapAreas();
+  if (!areas.length) return `<p class="foot">${T('home.loading')}</p>`;
+  const on = (areaPick ? areaById(d, areaPick) : null) ?? mine;
+  const rings = on ? outline(on, d.origin) : undefined;
+  return mapBox({
+    key: AREAS_MAP_KEY, label: t('map.label_areas'), areas, selected: on?.id ?? '', fit: CITY, cover: true,
+    open: openingView(here),
+    // `areasGlide` is the one moment the camera is NOT handed the outline: an answer has just arrived, the map
+    // is being built again from scratch, and the polygon is somewhere to travel to rather than to open on.
+    openArea: areasGlide ? undefined : rings,
+    // A tap on this tab is not a card offering to open a page; it IS the page opening (Kyle, 2026-09-22).
+    onArea: (id) => { areaPick = id; navigate({ v: 'hood', id }); },
+    lead,
+  });
+}
+function areasTab(): string {
   const d = hoodsReady();
   if (!d) return hoodsWaiting();
   wantAreas();
-  const mine = here ? (hereZip ? hoodsForZip(d.neighborhoods, d.origin, here)[0] ?? null : hoodAt(d.neighborhoods, d.origin, here)) : null;
-  // A second map, with only outlines on it: no dots, no listings, no transport, nothing that could be drawn
-  // from a number. It opens where the Map tab opens — on the person, then on a typed junction or ZIP, then on
-  // City Hall — and with the area they are in already picked out, so their own page is two taps away.
-  const areas = mapAreas();
-  const mapHtml = areas.length
-    ? mapBox({ key: 'areastab', label: t('map.label_areas'), areas, selected: mine?.id ?? '', fit: CITY, cover: true, open: openingView(here) })
-    : `<p class="foot">${T('home.loading')}</p>`;
-  // The ordinary location chip, until there is a location: then the answer above it is the whole point, and the
-  // chip's own line ("Sorted by distance from you") would be a claim about a list that is in ABC order. What
-  // stays is the button that turns it off, which is the same button, with the same handler, as everywhere else.
-  return hoodIndex(d, hoodUi(d), { order: hoodOrder, query: hoodQuery, located: !!here, zip: hereZip, mine, locHtml: here ? '' : locChip(), view: hoodsView, mapHtml, near: here });
+  const mine = myArea(d);
+  const land = areasLanding({ located: !!here, area: !!mine, outside: locateOutside });
+  const face = areasFace();
+  const ui = hoodUi(d);
+  const opts = { order: hoodOrder, query: hoodQuery, located: !!here, zip: hereZip, mine, locHtml: here ? '' : locChip(), near: here, pick: areaPick };
+  if (face === 'split') {
+    return `<main class="wide areas"><h1 class="vh" tabindex="-1">${T('hood.title')}</h1>
+      <div class="maptop"><div class="areasstage">${areasMap(d, mine, '')}${areasNote(land, mine)}</div>
+      <div class="mapside">${hoodIndex(d, ui, { ...opts, view: 'column', mapHtml: '', switchHtml: '' })}</div></div></main>`;
+  }
+  if (face === 'list') return hoodIndex(d, ui, { ...opts, view: 'list', mapHtml: '', switchHtml: areasSwitch('list') });
+  // The map face: the map, the switch on it, the area a person is in named over it — and, until there is one,
+  // the three ways in underneath (location, cross street, ZIP). That strip is also where a fix from outside the
+  // four cities says so, in the sentence the app already uses: "The map stays on the city."
+  //
+  // The location CARD, on a browser that will still show a prompt, is the app's own card and goes inside the
+  // map's frame after the view exists (`mountMaps`), exactly as on the Map tab.
+  return `<main class="areasfull"><h1 class="vh" tabindex="-1">${T('hood.title')}</h1>
+    <div class="areasstage">${areasMap(d, mine, areasSwitch('map'))}${areasNote(land, mine)}</div>
+    ${here ? '' : `<div class="areasask">${locChip()}</div>`}</main>`;
+}
+/** What is said over the map: the area a person is in. Nothing when there is none — the ways in are below the
+ *  map then, and they carry their own sentence for a spot outside the four cities. */
+function areasNote(land: AreasLanding, mine: Hood | null): string {
+  return land === 'area' && mine ? `<p class="areasnote">${icon('pin', 'sm')} ${esc(t('hood.here_is', { name: ' ' })).replace(' ', owner(mine.name))}</p>` : '';
 }
 /** "14 neighborhoods", for the live region under the box. Silent until something has been typed. */
 function hoodSaid(d: Indicators): string {
@@ -1196,7 +1298,59 @@ function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string;
   // both and `areaPage` draws whichever it found, from the same components (hoods.ts, DECISIONS 2026-09-22).
   const h = areaById(d, v.id);
   // An id nobody knows (an old link, a typo): the whole list, under the tab's own name, never a half-built page.
-  return h ? { title: h.name, ownTitle: true, html: areaPage(h, d, ui, hoodViewNow, hoodSeriesOff) } : { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
+  if (!h) return { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
+  // The page wears the map as a strip at the top (Kyle, 2026-09-22) — and it wears it whichever door it was
+  // opened by, so a refresh of `#/n/<id>` lands on exactly the state a tap landed on.
+  const html = areaPage(h, d, ui, hoodViewNow, hoodSeriesOff).replace(/^<main>/, `<main class="areapage">${areaStrip(h, d)}`);
+  return { title: h.name, ownTitle: true, html };
+}
+/**
+ * The map strip an area page wears (Kyle, 2026-09-22: "tapping on a neighborhood full screen should then
+ * animate-shrink the map to the top (with a back button top left) and have the bottom portion of the screen
+ * display all the neighborhood content"; then "I want the map to disappear as the user scrolls down and have it
+ * still there when they scroll up").
+ *
+ * What it is: the same outlines map the tab lands on, `AREAS_STRIP_VH` % of the viewport tall, stuck to the top
+ * of the page with the area's own page scrolling under it. On it, at the top-START — the top-left of an English
+ * screen, the top-right of an Arabic one, because the map is the only thing in this app that never mirrors and
+ * a control bar is not the map — a real Back button and the area's name. Back is also the way back to the whole
+ * map, so there is no second "expand" control to learn: the one button says where it goes.
+ *
+ * Tapping another outline in the strip swaps the page underneath without a full-screen detour: it is an
+ * ordinary navigation to that area's own `#/n/<id>`, which redraws this same strip around a different page.
+ *
+ * On a laptop there is no strip at all — the two-column layout keeps the tall map in its own column and the
+ * page takes the column the list was in (style.css). A strip would throw away the width that is the whole
+ * reason the laptop layout exists.
+ */
+function areaStrip(h: Hood, d: Indicators): string {
+  const rings = outline(h, d.origin), areas = mapAreas();
+  const map = areas.length
+    ? mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), areas, selected: h.id,
+        fit: rings.flat().length ? rings.flat() : CITY, openArea: rings, minMeters: 900,
+        onArea: (id) => { if (id !== h.id) { areaPick = id; navigate({ v: 'hood', id }); } } })
+    : '';
+  return `<div class="areastrip">${map}<div class="areabar"><button class="iconbtn" data-back aria-label="${T('hood.back_map')}">${icon('back', 'turn')}</button><strong class="areabarname">${owner(h.name)}</strong></div></div>`;
+}
+/**
+ * The collapsing strip: the class that says whether it is shut, put on the page after every redraw.
+ *
+ * The scroll listener itself is installed once, at the bottom of this file, and looks the page up each time —
+ * a redraw builds a new `<main>`, and a class on a node that has left the document collapses nothing. `stripAt`
+ * (areas.ts) is the whole of the thinking; this toggles one class, so nothing is drawn again, no map is
+ * destroyed, and the page's scroll position is never touched by us. The content moves because the strip's own
+ * height changed, which is the point of a collapsing toolbar, and `scrollY` — what the state machine reads — is
+ * not affected by that.
+ *
+ * Why not `animation-timeline: scroll()`, which would be cheaper still: a scroll timeline ties a size to how
+ * far down a page is, and it has no notion of direction. "Gone when you read down, back the moment you turn
+ * round" cannot be written in one, so it is written here.
+ */
+function watchStrip(): void {
+  const page = app.querySelector<HTMLElement>('main.areapage');
+  // No strip on this screen, or a laptop, where the map keeps a column of its own and nothing collapses.
+  if (!page || wide.matches) { strip = stripStart(); return; }
+  page.classList.toggle('shut', strip.state === 'shut');
 }
 // What this app keeps and sends, in plain words (docs/08). Everything here is true of the code; tests check the parts
 // that can be checked (no storage writes in main.ts, closed report fields, no IP in the Worker).
@@ -1270,7 +1424,7 @@ function render(focus = true): void {
   let title: string | undefined, body: string, exit = false, ownTitle = false;
   // Without a list, only the screens that don't need one: the urgent numbers and the overdose steps.
   const standsAlone = v.v === 'urgent' || v.v === 'privacy' || (v.v === 'need' && !!NEEDS.find((x) => x.id === v.id)?.stepsOnly);
-  if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' && shownTabs().some((x) => x.id === v.tab) ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'map' ? mapTab() : tab === 'hoods' ? hoodsTab() : eventsTab(); }
+  if (v.v === 'tab' || (!bundle && !standsAlone)) { const tab = v.v === 'tab' && shownTabs().some((x) => x.id === v.tab) ? v.tab : 'home'; body = !bundle || tab === 'home' ? homeTab() : tab === 'help' ? helpTab() : tab === 'map' ? mapTab() : tab === 'hoods' ? areasTab() : eventsTab(); }
   else if (v.v === 'urgent') { title = t('strip.more'); body = urgent(); }
   else if (v.v === 'about') { title = t('about.title'); body = about(); }
   else if (v.v === 'privacy') { title = t('privacy.title'); body = privacy(); }
@@ -1300,6 +1454,11 @@ function render(focus = true): void {
   const nav = tabBar(active), head = topBar(title, exit, ownTitle, showLang), skip = `<button class="skip" data-skip>${T('skip.main')}</button>`;
   // Wide: the rail (leftmost), then the bar above the page, then the page. Narrow: the bar, the page, and the tab
   // bar along the bottom. Either way the order the keyboard walks is the order the eye reads.
+  // The Areas tab's map face makes the page itself a column so the map can take what is left of the viewport.
+  // A class, not `:has()`: the class is on the element in the same breath as its own markup, where a `:has()`
+  // on an ancestor may not be applied until the engine gets round to it — and the map, measuring its frame the
+  // moment it is built, was handed a 24 px box (found on the first live run at 375 px).
+  app.classList.toggle('areasmap', v.v === 'tab' && v.tab === 'hoods' && areasFace() === 'map');
   app.innerHTML = skip + (wide.matches ? nav + head + body : head + body + nav);
   // Every screen has its own title, so a browser tab, a window list and a voice control command all name the screen
   // a person is on (WCAG 2.4.2).
@@ -1319,7 +1478,8 @@ function render(focus = true): void {
   // just reopened). A caller who already asked for somewhere still wins.
   const dirSel = dirMod?.takeRefocus();
   if (dirSel && !refocusSel) refocusSel = dirSel;
-  if (v.v === 'tab' && v.tab === 'map') mapTabOpened();
+  if (v.v === 'tab' && (v.tab === 'map' || v.tab === 'hoods')) mapTabOpened();
+  watchStrip();
   if (focus) {
     window.scrollTo(0, 0); app.querySelector<HTMLElement>(v.v === 'search' && !searchText ? '#q' : 'h1')?.focus({ preventScroll: true });
     // On a traceless screen the window's title says only what the screen is for, so the live region says which
@@ -1352,7 +1512,7 @@ function navigate(view: View): void {
 }
 
 app.addEventListener('click', async (ev) => {
-  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-locate],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry],[data-cross-pick],[data-hoodview-map],[data-dir],[data-dir-pick],[data-dir-act]');
+  const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-reset-key],[data-clear-queue],[data-retry],[data-go],[data-back],[data-exit],[data-loc],[data-locate],[data-share],[data-report],[data-listmap],[data-save],[data-saved-clear],[data-add-again],[data-skip],[data-layer-retry],[data-net-retry],[data-cross-pick],[data-areasview],[data-dir],[data-dir-pick],[data-dir-act]');
   if (!el) return;
   // Directions: one entry point for every affordance in the app — a listing, a results row, the urgent sheet's
   // "Get somewhere safe now" list, the map's bottom card. The payload is the destination and nothing else.
@@ -1437,7 +1597,14 @@ app.addEventListener('click', async (ev) => {
     const at = Number(el.dataset.crossPick), many = crossOut?.kind === 'choices' ? crossOut : null, c = many?.choices[at];
     if (many && c) useCross(c.point, crossWords(many, at));
   }
-  else if (el.dataset.hoodviewMap) { hoodsView = el.dataset.hoodviewMap === 'map' ? 'map' : 'list'; refocusSel = '[data-hoodview-map]'; render(false); announce(t(hoodsView === 'map' ? 'map.shown' : 'map.hidden')); }
+  // The Map/List switch (phones only; a laptop is shown both). The choice lives in a variable that dies with
+  // the page — nothing is written anywhere — and the cursor lands on the button that was just pressed, which is
+  // in the same place on the screen in either view.
+  else if (el.dataset.areasview) {
+    areasView = el.dataset.areasview === 'list' ? 'list' : 'map';
+    refocusSel = `[data-areasview="${areasView}"]`;
+    render(false); announce(t(areasView === 'map' ? 'hood.say_map' : 'hood.say_list'));
+  }
   else if (el.dataset.loc === 'on') { locateOutside = false; askForLocation(); }
   // The Map tab's card. "Use my location" asks the browser FIRST, inside the click, because that is what makes it
   // a gesture — remembering that the card was answered is a write to IndexedDB, and awaiting it here would hand
@@ -1474,6 +1641,34 @@ document.addEventListener('keydown', (ev) => {
   if (ev.key !== 'Escape' || !locateCard) return;
   ev.preventDefault();
   closeLocateCard();
+});
+// The strip's one scroll listener, installed once and never removed: it does nothing at all unless an area
+// page is on screen. Passive, and no frame is waited for — the work is one comparison and, at most, one class
+// toggle, and `scrollY` costs no layout. A listener that waited for a frame would also do nothing on a page the
+// browser has stopped painting, which is exactly when a person turns back to it.
+let stripChangedAt = 0;
+window.addEventListener('scroll', () => {
+  const page = app.querySelector<HTMLElement>('main.areapage');
+  if (!page || wide.matches) return;
+  const y = window.scrollY, at = Date.now();
+  // The page is still rearranging itself after the last change (areas.ts, `stripSettling`): the move is the
+  // document getting shorter, not a person turning round. The top of the page is never ambiguous, so it is the
+  // one thing that still answers.
+  if (y > 0 && stripSettling(stripChangedAt, at)) { strip = { ...strip, y, pivot: y }; return; }
+  const next = stripAt(strip, y);
+  if (next.state !== strip.state) stripChangedAt = at;
+  strip = next;
+  page.classList.toggle('shut', next.state === 'shut');
+}, { passive: true });
+// Escape on an area page is the strip's Back button: the page closes and the map is whole again (Kyle,
+// 2026-09-22). It answers only when nothing else has taken Escape first — the location card above, and the
+// map's own full-screen Escape, which is only listening while a map IS full screen.
+document.addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Escape' || locateCard || ev.defaultPrevented) return;
+  const v = stack[stack.length - 1];
+  if (!v || v.v !== 'hood' || !app.querySelector('main.areapage')) return;
+  ev.preventDefault();
+  app.querySelector<HTMLElement>('.areabar [data-back]')?.click();
 });
 // N and P step through the directions, the same two keys the map's own features answer to, and only while the
 // step list itself has the cursor — which is the exception 2.1.4 makes for a single-character shortcut. A
@@ -1610,9 +1805,12 @@ app.addEventListener('submit', (ev) => {
   if ('cross' in form.dataset) { resolveTyped(String(new FormData(form).get('cross') ?? '').trim()); return; }
   if (!('zip' in form.dataset)) return;
   const zip = String(new FormData(form).get('zip') ?? '').trim(), c = bundle?.zips?.[zip];
-  if (c) { here = { lat: c[0], lon: c[1] }; hereZip = zip; zipOpen = zipUnknown = locDenied = false; refocusSel = '[data-loc="off"]'; }
+  if (c) { here = { lat: c[0], lon: c[1] }; hereZip = zip; zipOpen = zipUnknown = locDenied = locateOutside = false; refocusSel = '[data-loc="off"]'; }
   else { zipUnknown = true; refocusSel = '.zipform input'; }
+  areasGlide = true;
   redraw();
+  if (here) centreMapOn(here);
+  areasGlide = false;
   announce(t(zipUnknown ? 'loc.zip_unknown' : 'loc.zip_using', { zip }));
 });
 
