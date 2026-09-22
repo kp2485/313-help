@@ -1,0 +1,248 @@
+{
+ "description": "The streets graph and walking directions (schema/query-spec.md). A grid with one crossing street, one dangling end 8 m short of Main St, a freeway that crosses but never joins, an unnamed line that is never routed on, and one street in its own piece of the graph.",
+ "streets": [
+  {
+   "origin": [
+    -83.1,
+    42.36
+   ],
+   "names": [
+    "Main St",
+    "First Ave",
+    "Second Ave",
+    "Quiet St",
+    "I-375",
+    "Stub Ct",
+    "Far Ln"
+   ],
+   "roads": [
+    [
+     2,
+     0,
+     [
+      0,
+      0,
+      0,
+      540
+     ]
+    ],
+    [
+     4,
+     1,
+     [
+      -365,
+      180,
+      730,
+      0
+     ]
+    ],
+    [
+     4,
+     2,
+     [
+      -365,
+      360,
+      730,
+      0
+     ]
+    ],
+    [
+     4,
+     3,
+     [
+      146,
+      180,
+      0,
+      81,
+      -73,
+      54,
+      73,
+      45
+     ]
+    ],
+    [
+     0,
+     4,
+     [
+      -365,
+      270,
+      730,
+      0
+     ]
+    ],
+    [
+     4,
+     5,
+     [
+      10,
+      450,
+      172,
+      0
+     ]
+    ],
+    [
+     4,
+     6,
+     [
+      61,
+      90,
+      182,
+      0
+     ]
+    ],
+    [
+     4,
+     -1,
+     [
+      -243,
+      0,
+      0,
+      90
+     ]
+    ]
+   ],
+   "safety": [
+    253,
+    84,
+    84,
+    84,
+    253,
+    84,
+    84,
+    0
+   ]
+  }
+ ],
+ "cases": [
+  {
+   "name": "the noded graph is the size the geometry says it is",
+   "fn": "streetGraph",
+   "now": "2026-09-22T16:00:00Z",
+   "expect": {
+    "nodes": 14,
+    "edges": 13,
+    "crossings": 4,
+    "snapped": 3,
+    "components": 2,
+    "largest": 12,
+    "dead_ends": 9,
+    "skipped": 2
+   }
+  },
+  {
+   "name": "without the safety array the same files give the same graph",
+   "fn": "streetGraph",
+   "now": "2026-09-22T16:00:00Z",
+   "no_safety": true,
+   "expect": {
+    "nodes": 14,
+    "edges": 13,
+    "crossings": 4,
+    "snapped": 3,
+    "components": 2,
+    "largest": 12,
+    "dead_ends": 9,
+    "skipped": 2
+   }
+  },
+  {
+   "name": "a grid corner to a grid corner, on the calm street",
+   "fn": "walk",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.3618,
+    "lon": -83.103525
+   },
+   "to": {
+    "lat": 42.363599,
+    "lon": -83.096475
+   },
+   "expect": "start First Ave east 410 > left Quiet St north 250 > slight_right Second Ave east 170 | 830 m, off 0/0"
+  },
+  {
+   "name": "the same two corners with no safety fields: straight down the main road",
+   "fn": "walk",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.3618,
+    "lon": -83.103525
+   },
+   "to": {
+    "lat": 42.363599,
+    "lon": -83.096475
+   },
+   "no_safety": true,
+   "expect": "start First Ave east 290 > left Main St north 200 > right Second Ave east 290 | 780 m, off 0/0"
+  },
+  {
+   "name": "straight up one street, with no turn in it",
+   "fn": "walk",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.36018,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.365219,
+    "lon": -83.1
+   },
+   "expect": "start Main St north 560 | 560 m, off 0/2"
+  },
+  {
+   "name": "snaps to the street from 30 m away and says how far off it started",
+   "fn": "walk",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.362699,
+    "lon": -83.099635
+   },
+   "to": {
+    "lat": 42.364499,
+    "lon": -83.098177
+   },
+   "expect": "start Main St north 200 > right Stub Ct east 140 | 340 m, off 30/0"
+  },
+  {
+   "name": "a street in its own piece of the graph cannot be reached",
+   "fn": "walk",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.3609,
+    "lon": -83.098541
+   },
+   "to": {
+    "lat": 42.363599,
+    "lon": -83.096475
+   },
+   "expect": null
+  },
+  {
+   "name": "nothing within two kilometres of the start",
+   "fn": "walk",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.41399,
+    "lon": -83.02707
+   },
+   "to": {
+    "lat": 42.363599,
+    "lon": -83.096475
+   },
+   "expect": null
+  },
+  {
+   "name": "both ends on one edge",
+   "fn": "walk",
+   "now": "2026-09-22T16:00:00Z",
+   "from": {
+    "lat": 42.36018,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.362699,
+    "lon": -83.099635
+   },
+   "expect": "start Main St north 280 | 280 m, off 0/30"
+  }
+ ]
+}

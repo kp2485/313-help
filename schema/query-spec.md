@@ -150,3 +150,318 @@ How old the phone's copy of the list is. It says nothing about any listing: it t
 | the published index says `retired: true` | `retired` — "This list is no longer being updated. Call 211." No report buttons. |
 
 Only a person retires the directory, by publishing a final list marked retired. No timer and no heartbeat ever does.
+
+---
+
+# Directions
+
+Everything below runs on the device, on files the app already downloads and already checks against the signed
+index. **No origin, no destination and no query ever leaves the phone** (DECISIONS 2026-09-22). There are no
+driving directions: the City's Roads layer publishes no one-way field, so we could not give them honestly.
+
+Three rules bind every client and are not negotiable in a port:
+
+1. **Never real-time.** We hold no vehicle positions, no departure times and no timetable. A route's published
+   headway is the only time-like fact we carry.
+2. **Never "safe" or "accessible".** We have no sidewalk, curb-ramp or lighting data at all. A client may say
+   what we used — streets, and the City's own High Injury Network — and nothing more.
+3. **We route to the street outside, not to the door.** Every result carries `startOffMetres` /
+   `endOffMetres` (`start_off_metres` / `end_off_metres` on an itinerary), and the screen says so.
+
+## Streets graph
+
+`packages/query/src/streets.ts`. Mirrored as `Streets.swift` and `Streets.kt`.
+
+### Projection
+
+One fixed reference latitude for the whole service area, so three clients get the same metre value for the
+same two points:
+
+| constant | value |
+|---|---|
+| `REF_LAT` | 42.35 |
+| `M_PER_DEG_LAT` | 111132 |
+| `M_PER_DEG_LON` | `111320 × cos(REF_LAT)` |
+| `STREET_SCALE` | 1e5 (the packing every map file uses) |
+
+### Build constants
+
+| constant | value | what it does |
+|---|---|---|
+| `CELL_M` | 200 | grid cell the crossing search buckets segments into |
+| `NODE_TOL_M` | 1 | two points this close are one node |
+| `SNAP_M` | 12 | a dangling polyline end is pulled onto a line this close |
+| `MIN_EDGE_M` | 0.01 | shorter than this is not an edge |
+| `STREET_GRAPH_VERSION` | 1 | part of the cache key; bump it when any constant here changes |
+
+### What is in the graph
+
+Only **walkable, named** lines: `isWalkable(s) = s.cls !== 0 && s.name !== ''`. Class 0 is freeway and ramp,
+which nobody walks; an unnamed line is one we could not describe in an instruction, so we never route on it
+(95.6% of the polylines are named).
+
+**Grade separation, and the rule for it.** The map has no bridge or tunnel field, so a crossing of two lines is
+assumed to be a junction. `mayJoin(clsA, clsB)` returns false when **either** line is class 0, so no
+freeway-over-street or street-over-freeway crossing can ever become a junction — and class 0 is not in the
+walking graph at all. **Residual error, stated:** a *street* bridge over another street — the rail viaducts,
+the Rouge crossings, a service drive over a sunken street — still becomes a junction. The real-data test
+`packages/query/test/streets-real.test.ts` counts them; it is a known limit, not a silent one.
+
+### Steps
+
+1. Decode every street file (`decodeStreets`) and project to metres. Order is the file's order.
+2. Bucket every segment into the `CELL_M` grid.
+3. **Crossings**: inside each cell, test each pair of segments from different polylines for a proper
+   intersection; both get a split at the crossing point. Order of discovery does not matter — splits are sorted
+   per polyline by `(segment index, t)` before edges are made.
+4. **Dangling ends**: for each polyline end, find the nearest segment of another polyline within `SNAP_M` and
+   split *that* line at our endpoint (the other line is pulled to us, never the reverse).
+5. **Nodes**: assigned in polyline order, deduped within `NODE_TOL_M`. Two clients therefore build the same
+   node numbering from the same files.
+6. **Edges**: consecutive nodes along each polyline, with the metre length and the polyline's way (name, class,
+   safety byte). Undirected: each edge appears once from each end, in CSR (`head`, `edgeTo`, `edgeLen`,
+   `edgeWay`), with `twinHalf` pointing at the same edge walked the other way.
+
+**An edge is a piece of a real street, not a straight chord between two junctions.** Each way keeps its own
+vertices (`wayPts`, flat metres) and each edge records where it starts and ends along that way
+(`edgeSegA`/`edgeTA` → `edgeSegB`/`edgeTB`). `edgeGeometry(g, half)` returns the vertices actually walked, in
+travel order, with the two ends forced to the node coordinates — which also hides the up-to-12 m step a
+snapped dangling end would otherwise draw. `sliceByFraction(pts, t0, t1)` cuts a part of that list by fraction
+of its own length, which is how a route that starts or ends part-way along an edge is drawn. Snapping measures
+against this geometry too, so `EdgePoint.t` is a fraction of the edge's **length**, not of a chord.
+
+### The safety byte
+
+One byte per polyline, carried in the street file as a top-level `safety: number[]` **parallel to `roads`**
+(same length, same order). It is additive: a client that does not know the key ignores it, and a bundle built
+before 2026-09-22 has none. Source: the City of Detroit Roads layer — the same layer and the same licence the
+street geometry already comes from.
+
+| bits | field | values |
+|---|---|---|
+| 0 | `HIN_2021` | on the City's High Injury Network |
+| 1 | `HighSeverity` | the City's high-severity marking |
+| 2–3 | `LANES` | 0 unknown, 1 = 1–2, 2 = 3–4, 3 = 5 or more |
+| 4–5 | `POSTED_SPE` | 0 unknown, 1 = ≤ 25, 2 = 30–35, 3 = 40 or more |
+| 6–7 | `AADT` | 0 unknown, 1 = < 5,000, 2 = 5,000–20,000, 3 = > 20,000 |
+
+A byte of 0 means "this file told us nothing". `StreetGraph.hasSafety` is true only when a source file actually
+carried the array, which is what decides between the two penalty tables below.
+
+### Caching
+
+`cachedStreetGraph(sha256, build)`. The key is `${STREET_GRAPH_VERSION}:${sha256}` where the hash is the map
+file's own SHA-256 — the one already in the signed index. Nothing about a person is in the key. Two graphs are
+kept (`STREET_GRAPH_CACHE_SIZE`); building is ~200 ms on a laptop and 1–2 s on a cheap phone, once per bundle.
+
+### Signatures
+
+```ts
+decodeStreets(file: PackedStreets): Street[]
+buildStreetGraph(files: PackedStreets[], key?: string): StreetGraph
+cachedStreetGraph(sha256: string, build: () => StreetGraph): StreetGraph
+clearStreetGraphCache(): void
+nearestEdgePoint(g: StreetGraph, pt: {lat, lon}, maxMetres = 2000): EdgePoint | null
+mayJoin(clsA: number, clsB: number): boolean
+isWalkable(s: {cls: number, name: string}): boolean
+safetyByte({hin?, highSeverity?, lanes?, speed?, aadt?}): number
+safetyHin(b) | safetyHighSeverity(b) | safetyLanes(b) | safetySpeed(b) | safetyAadt(b)
+```
+
+`PackedStreets = { origin: [lon, lat], names: string[], roads: [cls, nameIdx, encoded][], safety?: number[] }`
+— exactly the shape of `map/base.json` and of each cell inside `map/streets.json`.
+
+**How a client loads it.** `map/base.json` is one `PackedStreets`; `map/streets.json` is
+`{ grid, cells: { "c_X_Y": PackedStreets } }`. Pass the base file and every cell the client holds, in a stable
+order (the base first, then the cell keys sorted), and use the index's own SHA-256 of those files as the cache
+key. Both files are already fetched, checksum-verified and kept on the device for the map, so directions cost
+no new bytes at all.
+
+`EdgePoint = { half, from, to, t, x, y, offMetres }`: the half-edge, its two nodes, how far along, the point in
+metres, and how far off the street the asked-for point was.
+
+`StreetGraph.stats = { polylines, skipped, crossings, snapped, components, largestComponent, deadEnds, buildMs }`
+— numbers for tests, never for a screen.
+
+## Walking directions
+
+`packages/query/src/walk.ts`.
+
+### Cost
+
+`cost(edge) = metres × (1 + penalty(way))`, and A* uses straight-line distance as its heuristic, which stays
+admissible because the penalty is never negative.
+
+**When the file carries safety bytes** (`hasSafety`), the penalty is the sum, capped at `SAFETY_PENALTY.cap`:
+
+| term | value |
+|---|---|
+| `hin` | 0.35 |
+| `high_severity` | 0.20 |
+| `lanes` (by bucket 0–3) | 0, 0, 0.10, 0.20 |
+| `speed` (by bucket 0–3) | 0, 0, 0.10, 0.25 |
+| `aadt` (by bucket 0–3) | 0, 0, 0.05, 0.15 |
+| `cap` | 0.60 |
+
+A cap of 0.60 says plainly what we are willing to do: walk up to 60% further to stay off the streets the City
+itself marks as where people get hurt. That is the City's judgement, not ours.
+
+**When it does not** (an older bundle, or an ingest the City refused), the penalty is by street class alone:
+`CLASS_PENALTY = [0, 0.15, 0.10, 0.05, 0]` for classes 0–4.
+
+**A turn costs `TURN_PENALTY_M = 40` metres of walking** when the street's name changes. On Detroit's grid
+every route between two corners is exactly the same length, so with no turn penalty the tie is broken
+arbitrarily and a person is handed a staircase of fifteen turns instead of three streets — measured: the
+study's sample route went from 14 steps to 8. It never changes the distance that is **reported**; it decides
+which of several equally long routes is the one described.
+
+### Search
+
+The state is a **half-edge** — "walking along this edge, in this direction" — not a node, because that is what
+makes a turn cost anything. Both ends are snapped with `nearestEdgePoint`; state `2 × edgeCount` is the virtual
+start and `2 × edgeCount + 1` the goal. From the start, both directions of the start edge are entered, and the
+goal is entered directly when both ends sit on one edge. Turning round in the middle of a street
+(`twinHalf`) is not allowed. The heuristic is the straight line from where a state leaves you standing to the
+goal, which stays admissible because no cost is negative.
+
+Returns `null` when either end is further than `maxSnapMetres` (default 2000) from any street, or when the two
+ends are in different pieces of the graph (0.5% of nodes are).
+
+### Steps and wording
+
+A step is a fact, never a sentence: `{ street, bearing, turn, metres }`. Consecutive edges with the same street
+name are one step.
+
+- `bearing`: eight winds, each 45° wide — `north, northeast, east, southeast, south, southwest, west,
+  northwest` — from the direction of the step's first edge.
+- `turn`: from the signed change of heading, positive to the right. `< 20°` `straight`; `< 45°`
+  `slight_left`/`slight_right`; `≤ 135°` `left`/`right`; `≤ 160°` `sharp_left`/`sharp_right`; more `around`.
+  The **first** step's turn is `null`.
+
+The client writes the sentence ("Walk north on Woodward Ave for 0.3 mi; turn right onto Warren Ave"). The rules
+never produce prose, and no client may add a word about safety, sidewalks, lighting or accessibility.
+
+### Signatures
+
+```ts
+walkRoute(g, from: {lat, lon}, to: {lat, lon}, opts?: { maxSnapMetres?: number }): WalkRoute | null
+routeBetween(g, a: EdgePoint, b: EdgePoint, from?, to?): WalkRoute | null
+metresBetween(p, q): number
+bearingWord(dx, dy): Bearing
+turnWord(deltaDeg): Turn
+wayPenalty(g, way): number
+WALK_M_PER_S = 1.33   WALK_M_PER_MIN = 80
+```
+
+`WalkRoute = { metres, straightMetres, seconds, steps, polyline, startOffMetres, endOffMetres, settled }`.
+`polyline` is `[lon, lat]` from the snapped start to the snapped end — never to either door.
+
+## Trip plans
+
+`packages/query/src/transit-plan.ts`. Kyle, 2026-09-22: *"I want integrated walking and bus routes for the best
+user experience."* So there is **one** entry point. Walking on its own is one of the candidates it ranks, and
+every walking leg — to the stop, between two stops at a change, from the stop — is a real A* walk on the street
+graph, so the walking distance and the drawn line are the streets a person actually walks.
+
+```ts
+buildTransitNetwork(layers: TransitLayer[]): TransitNetwork
+plan(g: StreetGraph, net: TransitNetwork, from: {lat, lon}, to: {lat, lon}, opts?: PlanOptions): Itinerary[]
+stopsNear(net, pt, metres = ACCESS_M): { stop: number; metres: number }[]
+minutesRange(minutes: number): [number, number]
+```
+
+`TransitLayer = { stops: PackedPoints, routes: PackedRoutes, serves?: PackedServes }` — the bundle's own files:
+`map/transit/<id>.json`, `<routes id>.net.json`, `<stops id>.net.json` (docs/MAP-STYLE.md §10). Stop and route
+numbers in a `TransitNetwork` are global across every layer passed in, which is what makes a DDOT↔SMART change
+possible: the two agencies never share a stop id.
+
+### The cost model
+
+Minutes, and only minutes. There is no clock in it.
+
+| constant | value | meaning |
+|---|---|---|
+| `WALK_M_PER_MIN` | 80 | walking pace (1.33 m/s) |
+| `BUS_M_PER_MIN` | 280 | an average city bus, stops included (~17 km/h). **An average, never a schedule.** |
+| `WAIT_FRACTION_OF_HEADWAY` | 0.5 | boarding wait = half the published headway |
+| `DEFAULT_WAIT_MIN` | 15 | the assumed wait where no headway is published (SMART, QLINE, People Mover) |
+| `CHANGE_PENALTY_MIN` | 5 | the cost of changing vehicle, on top of wait and walk |
+| `MAX_CHANGES` | 1 | **hard cap.** A plan with more changes and no times is a maze, not advice |
+| `ACCESS_M` | 400 | straight-line radius for access stops (92% of listings have one) |
+| `MAX_ACCESS_STOPS` | 8 | access stops considered at each end |
+| `TRANSFER_WALK_M` | 150 | longest walk at a change |
+| `MAX_WALK_ONLY_M` | 4828 | walking alone is always offered up to 3 miles |
+| `MAX_PLANS` | 3 | how many itineraries come back |
+
+**Where a change can happen.** At the same stop, or at any stop within `TRANSFER_WALK_M` on foot — which
+covers the `interchanges` groups in a `.net.json` file (stops of two or more routes within 75 m) without
+needing them, and covers a DDOT↔SMART change, which no interchange group can, because the two agencies never
+share a stop id. The walk between the two stops is a routed walk like any other, so a "change" that the
+streets cannot actually join is never offered.
+
+`minutes = Σ walk metres ÷ 80 + Σ ride metres ÷ 280 + Σ wait + changes × 5`, where each ride's wait is
+`headway ÷ 2` when the agency publishes one and `DEFAULT_WAIT_MIN` when it does not. Half a headway is what
+makes a frequent route beat an infrequent one honestly: DDOT's 12-minute route costs 6 minutes of waiting, its
+70-minute route costs 35.
+
+Ride distance is the sum of straight-line distances between consecutive stops of the pattern — the owner's own
+stop order, never a guess about direction.
+
+### Ranking
+
+`minutes`, then fewer changes, then less walking, then fewer ride stops, then the first route's id. One
+itinerary per *sequence of routes*: the same routes never come back twice, and pure walking counts as `walk`.
+
+### The wording contract
+
+- The estimate leaves as a **range** and a client must show it as one: `range: [lo, hi]` from `minutesRange`,
+  `lo = max(5, floor(0.85 m ÷ 5) × 5)`, `hi = ceil(1.25 m ÷ 5) × 5`, at least 5 minutes wide. "About 25 to 40
+  minutes." **Never a single number, never a clock time, never an arrival time.**
+- `headway_minutes` may only be read out as the agency's own sentence — "about every 45 minutes on a weekday" —
+  and only when it is a number. `wait_minutes` is our assumption and is **not** shown as a time.
+- No leg may be called safe, accessible, lit or step-free.
+- The last walking leg ends at the street: the screen says "then about N m to the building" from
+  `end_off_metres`.
+- The owner's own trip planner stays on the screen beside ours, as the checked alternative.
+
+### Shapes
+
+```ts
+WalkLeg = { kind: 'walk', metres, minutes, steps: WalkStep[], polyline, to_stop?, from_stop? }
+RideLeg = { kind: 'ride', route_id, route_short, route_long, agency, headway_minutes: number | null,
+            from_stop: {index, name}, to_stop: {index, name}, stops, metres, minutes, wait_minutes, polyline }
+Itinerary = { legs: PlanLeg[], changes, walk_metres, ride_metres, minutes, range: [lo, hi],
+              start_off_metres, end_off_metres }
+```
+
+`plan()` returns `[]` when nothing works — nothing within walking distance, and no route within one change. A
+client says so; it never invents a leg.
+
+## Fixtures for the directions
+
+`schema/fixtures/14-streets-walk.json` and `15-trip-plans.json`. Two new keys at the top of a fixture file:
+`streets` (an array of `PackedStreets`, exactly the bundle's own shape) and `transit` (an array of
+`TransitLayer`). Three new `fn` kinds, and a case may carry `from` / `to` (`{lat, lon}`) and `no_safety`
+(build the graph as though the files carried no `safety` array — what an older bundle looks like).
+
+| `fn` | what it compares |
+|---|---|
+| `streetGraph` | `{ nodes, edges, crossings, snapped, components, largest, dead_ends, skipped }`, exactly |
+| `walk` | one string, or `null` when there is no route |
+| `plan` | one string per itinerary, in rank order |
+
+The strings, which are the contract between the three implementations:
+
+```
+walk   "<turn|start> <street> <bearing> <metres/10>  >  … | <metres/10> m, off <start>/<end>"
+plan   "<leg> > <leg> > … [<lo>-<hi>]"
+leg    "walk <metres/10>m"  |  "ride <route_id> <n>st every <headway>"  |  "ride <route_id> <n>st no-headway"
+```
+
+Metres are rounded to the nearest 10 so a port never fails on a last digit; the two off-street distances are
+rounded to the metre, because they are what a person is told ("then about 40 m to the building").
+
+**The native runners skip an `fn` they do not implement yet**, count it, and print the count
+(`fixtures: N cases, 0 failed, 13 skipped`). That is what lets the rules land in TypeScript first and the Swift
+and Kotlin ports follow in their own pull requests — but a skipped case is never a passed one, and the
+TypeScript suite runs every case in every file.
