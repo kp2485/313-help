@@ -61,6 +61,38 @@ final class FixtureTests: XCTestCase {
         return q
     }
 
+    // ---- directions (schema/query-spec.md "Streets graph", "Walking directions", "Trip plans") ----
+    // The one wording of a result all three runners compare. Metres are rounded to 10 so a port never fails on
+    // a last-digit difference; the two off-street distances are to the metre, because they are what a person is
+    // told ("then about 40 m to the building").
+    func r10(_ m: Double) -> Int { Int((m / 10).rounded()) * 10 }
+
+    func walkSummary(_ r: WalkRoute?) -> String? {
+        guard let r else { return nil }
+        let steps = r.steps.map { "\($0.turn?.rawValue ?? "start") \($0.street) \($0.bearing.rawValue) \(r10($0.metres))" }
+        return "\(steps.joined(separator: " > ")) | \(r10(r.metres)) m, off \(Int(r.startOffMetres.rounded()))/\(Int(r.endOffMetres.rounded()))"
+    }
+
+    func planSummary(_ p: Itinerary) -> String {
+        let legs = p.legs.map { leg -> String in
+            switch leg {
+            case .walk(let w): return "walk \(r10(w.metres))m"
+            case .ride(let r):
+                let head = r.headwayMinutes.map { "every \(numberWord($0))" } ?? "no-headway"
+                return "ride \(r.routeId) \(r.stops)st \(head)"
+            }
+        }
+        return "\(legs.joined(separator: " > ")) [\(p.range.lo)-\(p.range.hi)]"
+    }
+
+    /// A headway prints the way JSON wrote it: `10`, not `10.0`.
+    func numberWord(_ d: Double) -> String { d == d.rounded() ? String(Int(d)) : String(d) }
+
+    func latLon(_ o: Any?) -> LatLon? {
+        guard let m = o as? [String: Double], let lat = m["lat"], let lon = m["lon"] else { return nil }
+        return LatLon(lat: lat, lon: lon)
+    }
+
     func testEveryFixture() throws {
         let files = try FileManager.default.contentsOfDirectory(atPath: Self.dir.path).filter { $0.hasSuffix(".json") }.sorted()
         XCTAssertGreaterThanOrEqual(files.count, 10, "fixtures not found at \(Self.dir.path)")
@@ -70,6 +102,21 @@ final class FixtureTests: XCTestCase {
             let rows = try ((fx["rows"] as? [[String: Any]]) ?? []).map(row)
             let alerts = try decode([Alert].self, fx["alerts"] ?? [])
             let segments = try decode([Segment].self, fx["segments"] ?? [])
+
+            // Directions: one graph per fixture file, built once with and once without the City's safety
+            // fields. The map files spell their own keys, so they use the plain decoder.
+            let plain = directionsDecoder()
+            let streets = try plain.decode([PackedStreets].self, from: JSONSerialization.data(withJSONObject: fx["streets"] ?? []))
+            let transit = try plain.decode([TransitLayer].self, from: JSONSerialization.data(withJSONObject: fx["transit"] ?? []))
+            var built: [Bool: StreetGraph] = [:]
+            func graphOf(_ noSafety: Bool) -> StreetGraph {
+                if let g = built[noSafety] { return g }
+                let g = buildStreetGraph(noSafety ? streets.map(\.withoutSafety) : streets,
+                                         key: "\(file)\(noSafety ? ":bare" : "")")
+                built[noSafety] = g
+                return g
+            }
+            let network = transit.isEmpty ? nil : buildTransitNetwork(transit)
             for c in fx["cases"] as! [[String: Any]] {
                 let name = "\(file) — \(c["name"] as! String)"
                 let now = parseInstant(c["now"] as! String)!
@@ -109,6 +156,27 @@ final class FixtureTests: XCTestCase {
                 case "nearestSegment":
                     let hit = nearestSegment(LatLon(lat: r!.lat!, lon: r!.lon!), segments, openOnly: c["openOnly"] as? Bool ?? false, maxMiles: c["maxMiles"] as? Double ?? .infinity)
                     ok = hit?.segment.id == expect as? String || (hit == nil && expect is NSNull)
+                case "streetGraph":
+                    let g = graphOf(c["no_safety"] as? Bool ?? false)
+                    let got: [String: Int] = [
+                        "nodes": g.nodeCount, "edges": g.edgeCount, "crossings": g.stats.crossings,
+                        "snapped": g.stats.snapped, "components": g.stats.components,
+                        "largest": g.stats.largestComponent, "dead_ends": g.stats.deadEnds, "skipped": g.stats.skipped,
+                    ]
+                    let want = (expect as! [String: Any]).mapValues { ($0 as! NSNumber).intValue }
+                    ok = got == want
+                    if !ok { failures.append("\(name): got \(got.sorted { $0.key < $1.key })"); ran += 1; continue }
+                case "walk":
+                    let g = graphOf(c["no_safety"] as? Bool ?? false)
+                    let got = walkSummary(walkRoute(g, from: latLon(c["from"])!, to: latLon(c["to"])!))
+                    let want = expect is NSNull ? nil : expect as? String
+                    ok = got == want
+                    if !ok { failures.append("\(name): got \(got ?? "nil")"); ran += 1; continue }
+                case "plan":
+                    let g = graphOf(c["no_safety"] as? Bool ?? false)
+                    let got = plan(g, network!, from: latLon(c["from"])!, to: latLon(c["to"])!).map(planSummary)
+                    ok = got == expect as? [String]
+                    if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
                 // A case whose `fn` this port does not implement yet — the directions rules land in TypeScript
                 // first (schema/query-spec.md "Directions") and are ported afterwards. Counted and printed,
                 // never silently passed, so the number falling through is visible in CI.
@@ -120,6 +188,9 @@ final class FixtureTests: XCTestCase {
         }
         print("fixtures: \(ran) cases, \(failures.count) failed, \(skipped) skipped (not implemented here yet)")
         XCTAssertGreaterThan(ran, 80)
+        // Every `fn` the spec has is implemented here now, directions included (2026-09-22). A new one lands in
+        // TypeScript first and falls through to `default` until it is ported; this is what makes that visible.
+        XCTAssertEqual(skipped, 0, "\(skipped) fixture cases are not implemented in the Swift port")
         XCTAssertEqual(failures, [], failures.joined(separator: "\n"))
     }
 
