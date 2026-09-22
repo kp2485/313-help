@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CATEGORIES, MAP_GROUPS, NEEDS, PRIVATE_TOPS, SENSITIVE, TABS, isPrivate, isSensitive, mapDrawable } from '../src/needs.js';
+import { CATEGORIES, MAP_GROUPS, NEEDS, PRIVATE_TOPS, SENSITIVE, TABS, inCategories, isPrivate, isSensitive, mapDrawable } from '../src/needs.js';
 import { hashFor, isPrivateCat } from '../src/router.js';
 import { rank, type BundleRow } from '@313help/query';
 import { LINKS } from '../src/links.js';
@@ -787,6 +787,97 @@ describe('a daytime clubhouse is not a crisis line: `health.support` (audit K3)'
     // The DWIHN crisis line and the DWIHN Care Center are crisis services and keep health.mental.
     for (const id of ['sal_dwihn_care_center', 'sal_dwihn_crisis_line']) {
       expect(seed.split('\n').find((l) => l.startsWith(id + ','))!, id).toContain(',health.mental,');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------
+// "Get somewhere safe now" (DECISIONS 2026-09-22, Kyle's plan decision 3)
+// ---------------------------------------------------------------------------------------------------
+describe('"Get somewhere safe now": one list of the doors that are open at 3am', () => {
+  const safe = NEEDS.find((n) => n.id === 'safe_now')!;
+  const night = new Date('2026-09-22T03:30:00-04:00');
+  const rows = [
+    listing({ id: 'sal_dpd_11th', category: 'safe.police', lat: 42.4255, lon: -83.0513, phones: [{ number: '313-596-1100', label: 'Station desk' }] }),
+    listing({ id: 'sal_dfd_engine_1', category: 'safe.fire', lat: 42.3378, lon: -83.0540 }),
+    listing({ id: 'sal_henry_ford_er', category: 'health.er', lat: 42.3669, lon: -83.0826, phones: [{ number: '313-916-1545' }] }),
+    // Must never be dragged in: an ordinary clinic, and the two kinds that hide where they are.
+    listing({ id: 'sal_clinic', category: 'health.clinic', lat: 42.36, lon: -83.07 }),
+    listing({ id: 'sal_dv', category: 'shelter.dv' }),
+    listing({ id: 'sal_crisis', category: 'health.mental', lat: 42.35, lon: -83.06 }),
+  ];
+
+  it('is the three kinds of place that are open all night, and nothing else', () => {
+    expect(safe.categories).toEqual(['safe.police', 'safe.fire', 'health.er']);
+    expect(inCategories(rows, safe.categories!).map((r) => r.id)).toEqual(['sal_dpd_11th', 'sal_dfd_engine_1', 'sal_henry_ford_er']);
+    // A parent slug takes its children with it, the way `rank` reads one.
+    expect(inCategories(rows, ['safe']).map((r) => r.id)).toEqual(['sal_dpd_11th', 'sal_dfd_engine_1']);
+  });
+
+  it('sorts by distance when the phone knows where it is, and by one fixed order when it does not', () => {
+    const near = { lat: 42.4200, lon: -83.0500 };                       // a few blocks from the 11th Precinct
+    const pool = inCategories(rows, safe.categories!);
+    expect(rank(pool, { near }, night).map((r) => r.row.id)).toEqual(['sal_dpd_11th', 'sal_henry_ford_er', 'sal_dfd_engine_1']);
+    // With no location every row is in the same band, so the order is the rows' own ids: settled, never random.
+    const blind = rank(pool, {}, night).map((r) => r.row.id);
+    expect(blind).toEqual([...blind].sort());
+    expect(rank(pool, {}, night).every((r) => r.miles === null)).toBe(true);
+  });
+
+  it('shows all three as open in the middle of the night', () => {
+    for (const r of inCategories(rows, safe.categories!)) expect(rank([r], {}, night)[0]!.open.state, r.id).toBe('open');
+  });
+
+  it('leads with 911 and sits below the hotlines, never above one', () => {
+    expect(safe.first).toEqual(['emg_911']);
+    expect(safe.group).toBe('now');
+    // On the urgent sheet the call buttons are unchanged and the new row is the last thing on the screen.
+    const sheet = main.slice(main.indexOf('function urgent()'), main.indexOf('function need('));
+    expect(sheet).toContain("['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_avalon', 'emg_211'].map(callButton)");
+    expect(sheet.indexOf("id: 'safe_now'")).toBeGreaterThan(sheet.indexOf("id: 'overdose_now'"));
+    expect(sheet.indexOf("id: 'safe_now'")).toBeGreaterThan(sheet.indexOf('.map(callButton)'));
+  });
+
+  it('leaves no trace: no hash, and the browser is told only that this is a screen for finding help', () => {
+    expect(hashFor({ v: 'need', id: 'safe_now' }, () => false)).toBeNull();
+    expect(hashFor({ v: 'urgent' }, () => false)).toBeNull();
+    expect(main).toContain("need: 'title.find'");
+  });
+
+  it('is an ordinary listing once a person opens one: a station can be saved, shared and mapped', () => {
+    for (const c of ['safe.police', 'safe.fire']) {
+      expect(isSensitive(c), c).toBe(false);
+      expect(isPrivate(c), c).toBe(false);
+      expect(canSave(c), c).toBe(true);
+      expect(canShare(c), c).toBe(true);
+    }
+    // One map layer, and it is the one the emergency rooms are already on.
+    expect(MAP_GROUPS.filter((g) => g.tops.includes('safe')).map((g) => g.id)).toEqual(['health']);
+    expect(mapDrawable(rows, ['safe', 'health']).map((r) => r.id)).toEqual(['sal_dpd_11th', 'sal_dfd_engine_1', 'sal_henry_ford_er', 'sal_clinic']);
+  });
+
+  it('says the same things in all four languages, and never names domestic violence on the screen', () => {
+    for (const l of LANGS) {
+      for (const k of ['need.safe_now', 'safe_now.intro', 'safe_now.home', 'urgent.safe_sub']) {
+        expect(table(l)[k], `${l} ${k}`).toBeTypeOf('string');
+        expect(table(l)[k], `${l} ${k}`).not.toMatch(/\{\w+\}/);           // no placeholder to get wrong
+        // The sheet is traceless, so nothing on it may name what brought a person to it.
+        expect(table(l)[k]!.toLowerCase(), `${l} ${k}`).not.toMatch(/domestic|violencia|عنف|নির্যাতন/);
+      }
+    }
+    expect(table('en')['safe_now.intro']).toBe('These places are open all night and have a phone you can use. If you are in danger, call 911 first.');
+    expect(table('en')['safe_now.home']).toBe('If it is not safe at home, a police station or a hospital can help you call a shelter.');
+    expect(main).toContain('n.id === \'safe_now\' ? `<p class="foot">${T(\'safe_now.home\')}</p>`');
+  });
+
+  it('every Detroit station in the bundle came from the City, with the City\'s own date on it', () => {
+    const yaml = readFileSync(join(root, 'data/sources.yaml'), 'utf8');
+    for (const id of ['detroit_police_precincts', 'detroit_fire_stations']) expect(yaml).toContain(`- id: ${id}`);
+    for (const f of ['detroit_police_precincts', 'detroit_fire_stations']) {
+      const csv = readFileSync(join(root, `data/ingested/${f}.csv`), 'utf8').trim().split('\n');
+      expect(csv.length).toBeGreaterThan(10);
+      // Every row carries the layer's last-edited date, which is what the badge on it prints.
+      for (const line of csv.slice(1)) expect(line, f).toMatch(/,20\d\d-\d\d-\d\d,20\d\d-\d\d-\d\d$/);
     }
   });
 });

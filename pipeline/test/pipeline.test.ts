@@ -128,9 +128,11 @@ describe('row validation', () => {
     expect(errs({ what: 'Contact Jane Smith for a food box' })).toMatch(/personal contact/);
     expect(errs({ eligibility: 'Email jane@example.org first' })).toMatch(/personal contact/);
   });
-  it('knows 47 categories, each once (docs/03)', () => {
-    expect(KNOWN_CATEGORIES.length).toBe(47);
-    expect(new Set(KNOWN_CATEGORIES).size).toBe(47);
+  it('knows 49 categories, each once (docs/03)', () => {
+    expect(KNOWN_CATEGORIES.length).toBe(49);
+    expect(new Set(KNOWN_CATEGORIES).size).toBe(49);
+    // Added 2026-09-22 (Kyle's plan decision 3): somewhere open all night with a phone a person can use.
+    for (const c of ['safe.police', 'safe.fire']) expect(KNOWN_CATEGORIES).toContain(c);
     // Added 2026-09-22 (category audit K3): ongoing mental-health support that is not a crisis service. It is a
     // kind of its own precisely so that it is NOT health.mental, which is sensitive and hides its address.
     expect(KNOWN_CATEGORIES).toContain('health.support');

@@ -276,6 +276,16 @@ object Screens {
         // The list goes into the column this screen has already built, so the intro and the emergency numbers
         // above it stay above it. Building a fresh column here dropped both, which on "I need to talk to someone"
         // meant 988 was not on the screen at all (found while adding the daytime places, 2026-09-22).
+        // A screen that mixes categories ("Get somewhere safe now") has no query of its own: it names the kinds,
+        // and the rows are narrowed before the one ranking call that orders the whole mixed list.
+        if (need.categories.isNotEmpty()) {
+            listBody(a, col, Query(), need.emptyKey, need.sensitive, only = need.categories)
+            // One quiet line under the list. It names no kind of danger, so the screen stays as blank about why
+            // a person opened it as the urgent sheet it hangs off (docs/08).
+            if (need.id == "safe_now") col.addView(UI.text(a, L.t("safe_now.home"), 15f, R.color.muted, topDp = 12))
+            return UI.scroller(a, col)
+        }
+
         need.query?.let { q ->
             listBody(a, col, q, need.emptyKey, need.sensitive)
             // The second list, under its own heading, after the first (docs/05 ordering). Its rows are ordinary
@@ -324,6 +334,9 @@ object Screens {
         emptyKey: String? = null,
         sensitive: Boolean = false,
         locationChip: Boolean = true,
+        /** Several categories in one list ("Get somewhere safe now"): the rows are narrowed by `inCategories`
+         *  (MapLayers.kt) before one `rank` call orders them. Empty on every other screen. */
+        only: List<String> = emptyList(),
     ) {
         val bundle = a.store.bundle
         if (bundle == null) {
@@ -361,7 +374,8 @@ object Screens {
         // regardless, so nothing below can print a distance. What `sensitive` turns off is the screen: the
         // location button, the "using your location" line and the mileage.
         val q = query.copy(near = a.near)
-        val ranked = rank(bundle.rows, q, a.now(), bundle.alerts)
+        val pool = if (only.isEmpty()) bundle.rows else inCategories(bundle.rows, only)
+        val ranked = rank(pool, q, a.now(), bundle.alerts)
         if (ranked.isEmpty()) {
             col.addView(UI.text(a, L.t(emptyKey ?: "results.none"), 17f, R.color.muted, topDp = 16))
             return
@@ -570,6 +584,12 @@ object Screens {
             if (e.id == "emg_911" || e.id == "emg_988") continue
             col.addView(UI.callButton(a, e.label, e.number) { a.dial(e.number) })
         }
+
+        // The last row on the sheet, under every number: docs/05's ordering does not move (DECISIONS 2026-09-22).
+        val safe = UI.tappableCard(a, L.t("need.safe_now")) { a.push(Route.Need("safe_now")) }
+        safe.addView(UI.text(a, L.t("need.safe_now"), 18f, R.color.ink, bold = true))
+        safe.addView(UI.text(a, L.t("urgent.safe_sub"), 16f, R.color.muted, topDp = 2))
+        col.addView(safe)
         return UI.scroller(a, col)
     }
 

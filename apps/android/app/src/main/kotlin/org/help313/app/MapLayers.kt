@@ -25,7 +25,9 @@ class MapGroup(val id: String, val tops: List<String>)
 val mapGroups: List<MapGroup> = listOf(
     MapGroup("food", listOf("food")),
     MapGroup("shelter", listOf("shelter")),
-    MapGroup("health", listOf("health", "harm")),
+    // Police and fire stations ride with the emergency rooms they are listed beside (DECISIONS 2026-09-22). A
+    // layer of their own would need a colour of its own in three clients' map palettes.
+    MapGroup("health", listOf("health", "harm", "safe")),
     MapGroup("rec", listOf("rec", "connect")),
     MapGroup("work", listOf("jobs", "learn")),
     MapGroup("kids", listOf("kids", "youth")),
@@ -64,6 +66,20 @@ fun <T> mapDrawable(rows: List<T>, tops: List<String>, category: (T) -> String, 
 
 fun mapDrawable(rows: List<org.help313.query.BundleRow>, tops: List<String>): List<org.help313.query.BundleRow> =
     mapDrawable(rows, tops, { it.category }, { it.lat != null && it.lon != null })
+
+/**
+ * The rows a screen that mixes categories draws from (`Need.categories` in Needs.kt, `inCategories` in
+ * apps/web/src/needs.ts and apps/ios/Sources/HelpCore/MapLayers.swift). A category matches whole or as a parent,
+ * the same way `:query` matches one.
+ *
+ * It lives here, in a file `:core` compiles on a plain JDK, because "Get somewhere safe now" is an urgent screen
+ * and the one thing it must never do is show a listing that hides where it is.
+ */
+fun <T> inCategories(rows: List<T>, cats: List<String>, category: (T) -> String): List<T> =
+    rows.filter { row -> val c = category(row); cats.any { c == it || c.startsWith("$it.") } }
+
+fun inCategories(rows: List<org.help313.query.BundleRow>, cats: List<String>): List<org.help313.query.BundleRow> =
+    inCategories(rows, cats) { it.category }
 
 // ---- the layers on offer, and how each one is drawn ----------------------------------------------------------------
 

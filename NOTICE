@@ -224,7 +224,9 @@ URGENT NUMBERS (each from its owner's own page)
 MAPS, ZIP CODES AND NEIGHBORHOOD PAGES
 
 City of Detroit open data (data.detroitmi.gov):
-  Roads, city parks, the city boundary, ZIP code areas, neighborhoods
+  Roads (their names and class, and the City's own HIN_2021, HighSeverity, LANES,
+    POSTED_SPE and AADT fields, which the offline walking directions use to prefer
+    calmer streets), city parks, the city boundary, ZIP code areas, neighborhoods
   Joe Louis Greenway route segments and study area
   Assessor: property sales, parcels
   Buildings, Safety Engineering and Environmental Department (BSEED): building

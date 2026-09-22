@@ -178,7 +178,14 @@ class ParityTest {
     fun theNeighborhoodPageHasTheWebsPanelsInTheWebsOrder() {
         val web = text("apps/web/src/hoods.ts")
         val crash = web.substringAfter("export function crashPanel").substringBefore("export function hoodPage")
-        val page = web.substringAfter("export function hoodPage").replace("\${crashPanel(h, d, ui)}", crash)
+        // `hoodPage`'s OWN body, and nothing after it. Since 2026-09-22 the same file also holds `cityPage`,
+        // which reuses several of these headings for the four city pages — and this phone has no city page yet
+        // (docs/13, "The four cities"). Reading to the end of the file would add the city page's panels to the
+        // neighborhood page's and compare the sum against one screen. The next top-level `export` is where the
+        // function ends, so the bound is structure rather than a guess at a comment. The crash panel is spliced
+        // in afterwards, because the text being spliced carries exports of its own.
+        val hoodBody = web.substringAfter("export function hoodPage").substringBefore("\nexport ")
+        val page = hoodBody.replace("\${crashPanel(h, d, ui)}", crash)
         fun keysAfter(marker: String, body: String) =
             Regex(Regex.escape(marker) + "\\$\\{T\\('(hood\\.[a-z_.]+)'").findAll(body).map { it.groupValues[1] }.toList()
 
@@ -557,7 +564,7 @@ class ParityTest {
         val line = "$id group=$group first=${list(head, "first")} steps=${flag(head, "stepsOnly")} " +
             "sensitive=${flag(head, "sensitive")} exit=${flag(head, "quickExit")} " +
             "intro=${value(head, "intro") ?: "-"} " +
-            "empty=${value(head, "emptyKey") ?: "-"} $query also=${alsoLine(head)}"
+            "empty=${value(head, "emptyKey") ?: "-"} $query cats=${list(head, "categories")} also=${alsoLine(head)}"
         return Parsed(id, line, refine)
     }
 

@@ -109,7 +109,7 @@ describe('needs list', () => {
   });
   it('911 and 988 are hardcoded', () => expect(HARDCODED).toEqual({ emg_911: '911', emg_988: '988' }));
   it('urgent needs come first on the Help tab, and urgent numbers are one tap from every screen', () => {
-    expect(NEEDS.filter((n) => n.group === 'now').map((n) => n.id)).toEqual(['overdose_now', 'shelter', 'unsafe', 'talk', 'drugs', 'assault']);
+    expect(NEEDS.filter((n) => n.group === 'now').map((n) => n.id)).toEqual(['overdose_now', 'shelter', 'unsafe', 'talk', 'drugs', 'assault', 'safe_now']);
     expect(main).toContain("<h2>${T('help.now')}</h2>${rows('now')}<h2>${T('help.soon')}</h2>${tiles('soon')}<h2>${T('help.later')}</h2>${tiles('later')}");
     expect(main).toMatch(/quickExit \? `<button class="exit" data-exit>[^`]+` : urgentBtn/);
   });
@@ -534,7 +534,8 @@ describe('map', () => {
   // `rank`, which bands the row by the public reference point of the area it serves and hands back miles: null.
   it('a DV listing shows the area it serves in words, and never a distance', () => {
     // The location is no longer withheld from `rank` on a no-distance screen; the screen is what withholds.
-    expect(main).toContain('rank(bundle!.rows, { ...query, ...(here ? { near: here } : {}) }, now(), bundle!.alerts)');
+    expect(main).toContain('rank(pool, { ...query, ...(here ? { near: here } : {}) }, now(), bundle!.alerts)');
+    expect(main).toContain('const pool = opts.only ? inCategories(bundle!.rows, opts.only) : bundle!.rows;');
     // The mileage pill is still gated by the screen AND by miles being null.
     expect(main).toContain("showDistance && r.miles !== null ? `<span class=\"pill plain\">${T('miles'");
     // The area pill, and the one sentence, come from strings; neither names a place.
@@ -711,9 +712,11 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     const src = readFileSync(join(root, 'pipeline/src/validate.ts'), 'utf8');
     const block = src.slice(src.indexOf('export const KNOWN_CATEGORIES = ['), src.indexOf('] as const;'));
     const known = [...block.matchAll(/'([a-z_.]+)'/g)].map((m) => m[1]!);
-    expect(known.length).toBe(47);
+    expect(known.length).toBe(49);
     const hits = (q: string | undefined, c: string) => !!q && (c === q || c.startsWith(q + '.'));
-    const needQueries = NEEDS.flatMap((n) => [n.query?.category, n.also?.query.category, ...(n.refine ?? []).map((r) => r.query?.category)]);
+    // A need reaches a category through its own query, a refinement's, a second list's, or — for a screen that
+    // mixes kinds, like "Get somewhere safe now" — through `categories`.
+    const needQueries = NEEDS.flatMap((n) => [n.query?.category, n.also?.query.category, ...(n.categories ?? []), ...(n.refine ?? []).map((r) => r.query?.category)]);
     const chipQueries = CATEGORIES.map((c) => c.query.category);
     const fromNeed = (c: string) => needQueries.some((q) => hits(q, c));
     const unreachable = known.filter((c) => !fromNeed(c) && !chipQueries.some((q) => hits(q, c)));

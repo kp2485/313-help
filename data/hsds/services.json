@@ -4676,6 +4676,164 @@
   "assured_date": "2026-09-20"
  },
  {
+  "id": "ee57ee44-000a-50fa-92dd-1258ee8badfc",
+  "name": "Fire station",
+  "status": "active",
+  "description": "A fire station. Firefighters are there all day and night, but they go out on calls.",
+  "url": "https://hamtramckcity.gov/departments/fire/",
+  "organization": {
+   "id": "cf28f573-0fb8-59b1-94fc-f44b74291e80",
+   "name": "Hamtramck Fire Department",
+   "description": "Hamtramck Fire Department",
+   "x_detroit": {
+    "id": "org_hamtramck_fire"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "adbcbbbf-82b9-57cd-85f3-f1910361f746",
+    "location": {
+     "id": "470c6dfb-499f-50f5-b004-d6f90b4f2009",
+     "name": "Hamtramck Fire Department",
+     "location_type": "physical",
+     "latitude": 42.398772,
+     "longitude": -83.062815,
+     "addresses": [
+      {
+       "id": "cb4b5c26-933e-5f72-a0e1-42a1277ffd81",
+       "address_1": "2625 Caniff Street",
+       "city": "Hamtramck",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_city_of_hamtramck_fire_station"
+     }
+    },
+    "phones": [
+     {
+      "id": "9f94eeed-304a-5b49-8f0a-99e224a5dc49",
+      "number": "313-305-4503",
+      "description": "Fire station"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_city_of_hamtramck_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": "2026-09-22",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "City of Hamtramck website",
+      "url": "https://hamtramckcity.gov/departments/fire/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_city_of_hamtramck_fire_station",
+   "category": "safe.fire"
+  },
+  "assured_date": "2026-09-22"
+ },
+ {
+  "id": "1928d07a-28f0-5318-9344-43252670541b",
+  "name": "Police station",
+  "status": "active",
+  "description": "A police station. Someone is there all day and night, and there is a phone you can use.",
+  "url": "https://hamtramckcity.gov/departments/police/",
+  "organization": {
+   "id": "b916b244-846f-5eb5-b6f5-a7c10d4dd4e8",
+   "name": "Hamtramck Police Department",
+   "description": "Hamtramck Police Department",
+   "x_detroit": {
+    "id": "org_hamtramck_police"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "94f40c8e-e0c2-5d49-9d10-e9bcb4142e4c",
+    "location": {
+     "id": "0fdb906b-34c1-54d1-9109-73a8fd23eb57",
+     "name": "Hamtramck Police Department",
+     "location_type": "physical",
+     "latitude": 42.399177,
+     "longitude": -83.052605,
+     "addresses": [
+      {
+       "id": "4cc129ae-6813-5f13-890b-7aa52f7ba86a",
+       "address_1": "3401 Evaline Street",
+       "city": "Hamtramck",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_city_of_hamtramck_police_station"
+     }
+    },
+    "phones": [
+     {
+      "id": "eba6e1fe-f517-5a5e-967c-071fc695ea77",
+      "number": "313-800-5281",
+      "description": "Front desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_city_of_hamtramck_police_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": "2026-09-22",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "City of Hamtramck website",
+      "url": "https://hamtramckcity.gov/departments/police/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_city_of_hamtramck_police_station",
+   "category": "safe.police"
+  },
+  "assured_date": "2026-09-22"
+ },
+ {
   "id": "0de0ac7c-1466-5eaa-a6de-fed4836bf8f7",
   "name": "Help paying a Dearborn water bill",
   "status": "active",
@@ -4947,6 +5105,164 @@
    "category": "housing.owner"
   },
   "assured_date": "2026-09-20"
+ },
+ {
+  "id": "359c48cc-0d25-578d-bae3-aaa851422406",
+  "name": "Fire station",
+  "status": "active",
+  "description": "A fire station. Firefighters are there all day and night, but they go out on calls.",
+  "url": "https://www.highlandparkmi.gov/services/fire-department/",
+  "organization": {
+   "id": "56bff268-cf91-5116-8626-068086112511",
+   "name": "Highland Park Fire Department",
+   "description": "Highland Park Fire Department",
+   "x_detroit": {
+    "id": "org_highland_park_fire"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f99a9516-5df0-55cb-8c3d-86dc3352c6f2",
+    "location": {
+     "id": "ea22d005-8009-5f61-8318-47de0967352b",
+     "name": "Highland Park Fire Department",
+     "location_type": "physical",
+     "latitude": 42.405649,
+     "longitude": -83.096596,
+     "addresses": [
+      {
+       "id": "2a298dee-536f-5720-a6e5-211aec5097a8",
+       "address_1": "25 Gerald",
+       "city": "Highland Park",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_city_of_highland_park_fire_station"
+     }
+    },
+    "phones": [
+     {
+      "id": "0dac8750-f441-5e3c-84ad-819c88f5564a",
+      "number": "313-852-3221",
+      "description": "Fire station"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_city_of_highland_park_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": "2026-09-22",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "City of Highland Park website",
+      "url": "https://www.highlandparkmi.gov/services/fire-department/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_city_of_highland_park_fire_station",
+   "category": "safe.fire"
+  },
+  "assured_date": "2026-09-22"
+ },
+ {
+  "id": "9376a15a-2d44-5ed4-a420-42921f23c665",
+  "name": "Police station",
+  "status": "active",
+  "description": "A police station. Someone is there all day and night, and there is a phone you can use.",
+  "url": "https://www.highlandparkmi.gov/services/police-department/",
+  "organization": {
+   "id": "0a716915-4d3d-57cb-8b14-2db87e0e21af",
+   "name": "Highland Park Police Department",
+   "description": "Highland Park Police Department",
+   "x_detroit": {
+    "id": "org_highland_park_police"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "28ec4cfa-fb32-5a4b-9312-75970c997c90",
+    "location": {
+     "id": "6acb10bc-37b2-5fc7-9e8b-215d5d120894",
+     "name": "Highland Park Police Department",
+     "location_type": "physical",
+     "latitude": 42.398794,
+     "longitude": -83.103822,
+     "addresses": [
+      {
+       "id": "612da9be-d389-5a5e-8a53-65469c4f0e4d",
+       "address_1": "13233 Hamilton",
+       "city": "Highland Park",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_city_of_highland_park_police_station"
+     }
+    },
+    "phones": [
+     {
+      "id": "e463fa77-f5d9-5545-b886-09c2de6b2cb5",
+      "number": "313-852-7338",
+      "description": "Patrol desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_city_of_highland_park_police_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": "2026-09-22",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "City of Highland Park website",
+      "url": "https://www.highlandparkmi.gov/services/police-department/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_city_of_highland_park_police_station",
+   "category": "safe.police"
+  },
+  "assured_date": "2026-09-22"
  },
  {
   "id": "4ca2b3cb-d723-522d-831f-32f9b4ec1d98",
@@ -11049,6 +11365,1898 @@
   "assured_date": "2026-09-20"
  },
  {
+  "id": "6273a38a-b8d9-56cb-a3c9-ad4ee32a30fd",
+  "name": "Fire station",
+  "status": "active",
+  "description": "A fire station. Firefighters are there all day and night, but they go out on calls.",
+  "organization": {
+   "id": "c96514a6-1d08-5950-8e76-a8333d2fb70b",
+   "name": "Detroit Fire Department",
+   "description": "Detroit Fire Department",
+   "x_detroit": {
+    "id": "org_detroit_fire"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "7c667389-b88a-5483-a540-14fa542246db",
+    "location": {
+     "id": "2a00bb88-59a5-5bb4-95f8-63a1775d7f3c",
+     "name": "Engine 1 fire station",
+     "location_type": "physical",
+     "latitude": 42.337875,
+     "longitude": -83.054082,
+     "addresses": [
+      {
+       "id": "7fdcaa24-3655-5d5c-9724-920f3dfa282e",
+       "address_1": "111 W Montcalm Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48201",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_1_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_1_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b1572d4f-4f45-500d-984a-a98371017103",
+    "location": {
+     "id": "d8d01ac2-2ac9-5231-94df-d7c1eff4c841",
+     "name": "Engine 17 fire station",
+     "location_type": "physical",
+     "latitude": 42.364789,
+     "longitude": -83.073589,
+     "addresses": [
+      {
+       "id": "bf1c06fc-118e-5e10-b2f4-5eb61a7475f5",
+       "address_1": "6100 Second Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_17_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_17_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "4ca60bb8-cbdc-5425-8b60-8c116b7a77ad",
+    "location": {
+     "id": "ea581939-e296-5bc6-8e20-35dc096d1472",
+     "name": "Engine 23 fire station",
+     "location_type": "physical",
+     "latitude": 42.375532,
+     "longitude": -83.036357,
+     "addresses": [
+      {
+       "id": "e74a0351-4db3-5bde-846a-7cb6e927cdcb",
+       "address_1": "1818 E Grand Boulevard",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48211",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_23_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_23_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0c6079d3-9785-511d-85f2-bad1d1c3bcd3",
+    "location": {
+     "id": "205fd918-a2ee-55ec-a70d-86c580e185d2",
+     "name": "Engine 27 fire station",
+     "location_type": "physical",
+     "latitude": 42.311364,
+     "longitude": -83.093353,
+     "addresses": [
+      {
+       "id": "3fa4477e-c8b2-59f7-b738-18c0c19baf9a",
+       "address_1": "4700 W Fort Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_27_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_27_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "68a72cae-2805-59e0-9a74-c62f4048b371",
+    "location": {
+     "id": "7aa0e077-8fe5-509d-9297-f6c1fe1beadc",
+     "name": "Engine 30 fire station",
+     "location_type": "physical",
+     "latitude": 42.412714,
+     "longitude": -83.170243,
+     "addresses": [
+      {
+       "id": "7905ef16-aaa8-5c10-9279-9caec89fde5e",
+       "address_1": "16543 Meyers Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48235",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_30_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_30_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2347e7be-2508-55b2-ace7-4f091188c234",
+    "location": {
+     "id": "9bfb36aa-0f5f-562f-a6cd-8b56b0e5a168",
+     "name": "Engine 31 fire station",
+     "location_type": "physical",
+     "latitude": 42.348401,
+     "longitude": -83.110941,
+     "addresses": [
+      {
+       "id": "596c1b06-5c5f-59d9-91c4-3e68c3e1071c",
+       "address_1": "1697 W Grand Boulevard",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48208",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_31_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_31_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "72035f34-9773-5780-916a-14c2c45fe016",
+    "location": {
+     "id": "d0c2ec93-a8b7-5b69-9d4a-37a25619a985",
+     "name": "Engine 32 fire station",
+     "location_type": "physical",
+     "latitude": 42.368213,
+     "longitude": -82.966741,
+     "addresses": [
+      {
+       "id": "3f60bf6e-0834-5b3c-82ab-824c7b766e3a",
+       "address_1": "11740 E Jefferson Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48214",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_32_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_32_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5175e65f-8e9f-5ef5-a70e-29c97fb3edda",
+    "location": {
+     "id": "cde3969e-bcab-5485-8b03-514eb56377da",
+     "name": "Engine 33 fire station",
+     "location_type": "physical",
+     "latitude": 42.300478,
+     "longitude": -83.126851,
+     "addresses": [
+      {
+       "id": "6e1dfee2-087c-5ede-8e1b-c7ee33e2a5e1",
+       "address_1": "1041 Lawndale Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_33_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_33_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7dcf72a0-191b-5ee4-9fe3-5d0066a29b4f",
+    "location": {
+     "id": "541a16bb-4269-50df-af25-702c1d76d8ee",
+     "name": "Engine 34 fire station",
+     "location_type": "physical",
+     "latitude": 42.346459,
+     "longitude": -83.13206,
+     "addresses": [
+      {
+       "id": "672c5207-97aa-503c-bb4c-b526bc013fd5",
+       "address_1": "6345 Livernois Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_34_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_34_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5cd4fef6-9a3d-5260-9665-25108ed5db06",
+    "location": {
+     "id": "5b10b63d-56b1-5a44-916c-29feb5753b7d",
+     "name": "Engine 35 fire station",
+     "location_type": "physical",
+     "latitude": 42.385358,
+     "longitude": -83.080867,
+     "addresses": [
+      {
+       "id": "dbd01e7c-5e79-5fdc-a346-a7f4adb5ceae",
+       "address_1": "111 Kenilworth Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_35_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_35_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "424955de-acc9-5ab5-a2cd-dc8017eec812",
+    "location": {
+     "id": "8a00050d-8550-5c34-9736-7b50c77ceaee",
+     "name": "Engine 37 fire station",
+     "location_type": "physical",
+     "latitude": 42.317558,
+     "longitude": -83.12758,
+     "addresses": [
+      {
+       "id": "7591952b-73c5-519c-a408-ce112837c7a9",
+       "address_1": "2820 Central Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_37_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_37_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "75ccec02-769f-5c85-9669-c3172e0976d5",
+    "location": {
+     "id": "8d0ebcae-81f3-5ce7-ae3c-c09f9be7116b",
+     "name": "Engine 39 fire station",
+     "location_type": "physical",
+     "latitude": 42.372242,
+     "longitude": -83.100485,
+     "addresses": [
+      {
+       "id": "d2309b07-70d3-5e86-bb06-b17e7ff524cf",
+       "address_1": "8700 14th Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_39_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_39_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f5a0d6c0-4099-594f-8876-968d7a2cbfd3",
+    "location": {
+     "id": "390c0d16-1649-5d88-848d-fc82455c4ae2",
+     "name": "Engine 40 fire station",
+     "location_type": "physical",
+     "latitude": 42.393438,
+     "longitude": -83.133834,
+     "addresses": [
+      {
+       "id": "e256ff50-bf01-5d5b-a2dd-3f188a630452",
+       "address_1": "13939 Dexter Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48238",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_40_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_40_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c15c3e0e-af33-5e40-a258-346ae87554f3",
+    "location": {
+     "id": "d95edda4-7ba2-5ab4-97b1-dc03fe02787a",
+     "name": "Engine 41 fire station",
+     "location_type": "physical",
+     "latitude": 42.379931,
+     "longitude": -83.003244,
+     "addresses": [
+      {
+       "id": "74d82c60-e71c-5ea1-b512-bfee85185bfb",
+       "address_1": "5000 Rohns Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48213",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_41_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_41_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "e5dfb06b-7241-5ba3-892e-338270a1f6c2",
+    "location": {
+     "id": "54c1ee0b-7936-5101-9901-733063ba4a98",
+     "name": "Engine 42 fire station",
+     "location_type": "physical",
+     "latitude": 42.366807,
+     "longitude": -83.139357,
+     "addresses": [
+      {
+       "id": "53c34c0f-9c7d-5514-b804-4497c2e8bdaf",
+       "address_1": "6324 W Chicago Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48204",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_42_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_42_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "38ef3896-18c4-53cb-9e8d-d32747c23653",
+    "location": {
+     "id": "00dfe772-49a0-5ae0-a905-b9533c753f07",
+     "name": "Engine 44 fire station",
+     "location_type": "physical",
+     "latitude": 42.432001,
+     "longitude": -83.103128,
+     "addresses": [
+      {
+       "id": "f5807527-0e50-54c9-aded-103a69959b0b",
+       "address_1": "35 W 7 Mile Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_44_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_44_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "a1d60fbd-e2f3-50e0-b4af-863fc48a7e05",
+    "location": {
+     "id": "b332cbff-4685-57f4-8c46-49b4027ec94c",
+     "name": "Engine 46 fire station",
+     "location_type": "physical",
+     "latitude": 42.399112,
+     "longitude": -83.0037,
+     "addresses": [
+      {
+       "id": "44b4d205-61ed-58ba-b89b-754d5d5c026b",
+       "address_1": "10101 Knodell Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48213",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_46_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_46_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c1988e9a-e109-5ab8-b01c-4cace4ec00c4",
+    "location": {
+     "id": "11a8f2ab-8d21-5199-84d0-390406df7c20",
+     "name": "Engine 48 fire station",
+     "location_type": "physical",
+     "latitude": 42.273015,
+     "longitude": -83.15882,
+     "addresses": [
+      {
+       "id": "3321e1c6-1dab-5a21-80e4-4d78fab95d6c",
+       "address_1": "2300 S Fort Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48217",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_48_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_48_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5d90d992-915c-51bb-bf7f-52aa710f1d28",
+    "location": {
+     "id": "5cf4640d-2a65-5660-ba3d-40ef12566e70",
+     "name": "Engine 50 fire station",
+     "location_type": "physical",
+     "latitude": 42.420674,
+     "longitude": -82.985893,
+     "addresses": [
+      {
+       "id": "5ef25e14-2112-5a21-bdf0-d44162294a42",
+       "address_1": "12985 Houston Whittier Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48205",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_50_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_50_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "22831801-de84-52fc-ad39-83a536a05b91",
+    "location": {
+     "id": "cc1721c7-ab52-5e72-be3d-80611f7aa797",
+     "name": "Engine 51 fire station",
+     "location_type": "physical",
+     "latitude": 42.425039,
+     "longitude": -83.14079,
+     "addresses": [
+      {
+       "id": "06ddbefe-812a-5e9e-b850-499872eee76e",
+       "address_1": "18236 Livernois Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48221",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_51_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_51_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "89ce2365-8dd1-5598-b7b9-7c55f461bda9",
+    "location": {
+     "id": "7b130f5c-de41-548e-a112-5d5a641252b7",
+     "name": "Engine 52 fire station",
+     "location_type": "physical",
+     "latitude": 42.396976,
+     "longitude": -82.956324,
+     "addresses": [
+      {
+       "id": "8af43e76-b3c9-5e4b-822b-7836c643cbeb",
+       "address_1": "5029 Manistique Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48224",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_52_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_52_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "17092898-bc84-5676-9d88-cf2b79fde88f",
+    "location": {
+     "id": "3880547f-68f6-5358-bfca-912e6c5a7b74",
+     "name": "Engine 53 fire station",
+     "location_type": "physical",
+     "latitude": 42.401108,
+     "longitude": -83.199116,
+     "addresses": [
+      {
+       "id": "4b250992-af6c-515a-9332-f190920fcf14",
+       "address_1": "15127 Greenfield Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48227",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_53_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_53_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f82b7fa8-3cd7-5620-b874-e2619139ca85",
+    "location": {
+     "id": "1a002014-c41f-52a0-a973-325bbcf0d39c",
+     "name": "Engine 54 fire station",
+     "location_type": "physical",
+     "latitude": 42.413498,
+     "longitude": -83.249314,
+     "addresses": [
+      {
+       "id": "bc002e29-9fb3-5f38-b3bd-58dd65c8049f",
+       "address_1": "16825 Trinity Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_54_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_54_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c28c350e-3805-5bfc-9301-5c7318ef39db",
+    "location": {
+     "id": "506046d6-b503-526a-9375-304f764ab62e",
+     "name": "Engine 55 fire station",
+     "location_type": "physical",
+     "latitude": 42.358147,
+     "longitude": -83.217387,
+     "addresses": [
+      {
+       "id": "3bf14a69-dc49-5802-a10d-a02574a3a048",
+       "address_1": "18140 Joy Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_55_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_55_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b0277e50-678c-5a49-8798-a7388e7c05d7",
+    "location": {
+     "id": "198ebb9e-25e3-5088-b6ef-84f011db54ec",
+     "name": "Engine 56 fire station",
+     "location_type": "physical",
+     "latitude": 42.42996,
+     "longitude": -83.063223,
+     "addresses": [
+      {
+       "id": "623ff7b5-2e42-5253-a5a4-8df169b08977",
+       "address_1": "18601 Ryan Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48234",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_56_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_56_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "063d1289-bc36-5cbe-ad01-7e8d325340fe",
+    "location": {
+     "id": "47785587-027f-581d-9d09-0e08aa3248f5",
+     "name": "Engine 57 fire station",
+     "location_type": "physical",
+     "latitude": 42.387028,
+     "longitude": -83.246282,
+     "addresses": [
+      {
+       "id": "4b478ad9-ad43-5b44-a648-efadc40a136c",
+       "address_1": "13960 Burt Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48223",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_57_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_57_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "cda9a463-af07-518f-8f8b-8515fb2f35d0",
+    "location": {
+     "id": "d48f16dc-a495-5e9e-a434-14bb662a4642",
+     "name": "Engine 58 fire station",
+     "location_type": "physical",
+     "latitude": 42.417314,
+     "longitude": -82.954674,
+     "addresses": [
+      {
+       "id": "5ce2336d-0f7d-56e5-ae98-c1eae155317f",
+       "address_1": "10801 Whittier Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48224",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_58_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_58_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5225f4b8-c135-59a8-9514-37676786f8a4",
+    "location": {
+     "id": "95bb527d-858c-5cf9-8bf0-8bc79030fc46",
+     "name": "Engine 59 fire station",
+     "location_type": "physical",
+     "latitude": 42.423078,
+     "longitude": -83.2182,
+     "addresses": [
+      {
+       "id": "19c33ea7-f54b-596f-8dfb-e0989d5bcbb9",
+       "address_1": "17800 Curtis Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48235",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_59_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_59_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8ac0045a-fbcb-5dca-a83f-79eb63941f9d",
+    "location": {
+     "id": "c6718c2f-6506-561d-9cb0-bdd1fec4c08b",
+     "name": "Engine 6 fire station",
+     "location_type": "physical",
+     "latitude": 42.35019,
+     "longitude": -83.041984,
+     "addresses": [
+      {
+       "id": "dd9274d8-76b0-54bb-a98b-036ec8cd595c",
+       "address_1": "3050 Russell Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_6_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_6_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7946fc83-7d62-5bc9-8035-7cbf2cbdd118",
+    "location": {
+     "id": "971ec393-f618-5690-b83d-4fd9ec2e4a09",
+     "name": "Engine 60 fire station",
+     "location_type": "physical",
+     "latitude": 42.440257,
+     "longitude": -83.005254,
+     "addresses": [
+      {
+       "id": "d87a2720-4484-5d67-ae1e-d07cedfbe1a0",
+       "address_1": "19701 Hoover Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48205",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_60_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_60_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "560f7d5b-669a-5cdf-b384-22a0cf690333",
+    "location": {
+     "id": "fdf7e101-3a2d-5b38-bc07-620ffc353e7e",
+     "name": "Engine 9 fire station",
+     "location_type": "physical",
+     "latitude": 42.347146,
+     "longitude": -83.013138,
+     "addresses": [
+      {
+       "id": "9d7ad8a9-4277-5ce1-b860-56fa48eb7923",
+       "address_1": "3737 E Lafayette Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_engine_9_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_engine_9_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "84da02dd-1dce-5bfc-9081-ec5a38a37978",
+    "location": {
+     "id": "1cd62b40-dceb-5f39-890e-3382221b9e1b",
+     "name": "Ladder 14 fire station",
+     "location_type": "physical",
+     "latitude": 42.362749,
+     "longitude": -82.992297,
+     "addresses": [
+      {
+       "id": "bb254f69-d615-5772-9caa-92c9f3a4c5a6",
+       "address_1": "2200 Crane Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48214",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_ladder_14_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_ladder_14_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "ac99648b-afd3-573b-bae8-bad02af00535",
+    "location": {
+     "id": "c23833a4-e836-5af6-8a9f-a5feb119c8c3",
+     "name": "Ladder 19 fire station",
+     "location_type": "physical",
+     "latitude": 42.389481,
+     "longitude": -82.994013,
+     "addresses": [
+      {
+       "id": "9a4b49b2-cd56-5dd8-973a-df62e87a57a3",
+       "address_1": "10645 Shoemaker Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48213",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_ladder_19_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_ladder_19_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "9a732abb-a9f0-5617-bcb3-d753cdea7b33",
+    "location": {
+     "id": "16f5fed6-76b6-5b18-8fa3-a43af9338b8b",
+     "name": "Ladder 20 fire station",
+     "location_type": "physical",
+     "latitude": 42.348894,
+     "longitude": -83.063608,
+     "addresses": [
+      {
+       "id": "690255e0-2383-58a9-8eba-d96a30161726",
+       "address_1": "433 W Alexandrine Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48201",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_ladder_20_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_ladder_20_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "78c7a27b-2c43-5c16-b231-b094cf6d4d2b",
+    "location": {
+     "id": "5e86f18d-56f5-53df-996f-3501e82ddc86",
+     "name": "Ladder 22 fire station",
+     "location_type": "physical",
+     "latitude": 42.338569,
+     "longitude": -83.133757,
+     "addresses": [
+      {
+       "id": "fd5e87a0-222b-5c84-ac46-4dba34045eb4",
+       "address_1": "6830 McGraw Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48210",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_ladder_22_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_ladder_22_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "23b63d78-8060-51d0-8a78-03da4427cce9",
+    "location": {
+     "id": "52dd3d95-5d3e-5144-832d-2c3ca05f9558",
+     "name": "Ladder 30 fire station",
+     "location_type": "physical",
+     "latitude": 42.422688,
+     "longitude": -83.038755,
+     "addresses": [
+      {
+       "id": "3c0792d3-7625-5192-9759-e4fade798ffd",
+       "address_1": "17475 Mount Elliott Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48212",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dfd_ladder_30_fire_station"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dfd_ladder_30_fire_station",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "Ring the bell. If no one answers, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Detroit Fire Department Fire Stations layer",
+      "url": "https://detroitmi.gov/departments/detroit-fire-department",
+      "last_edited": "2024-02-24"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_fire_stations",
+   "category": "safe.fire"
+  }
+ },
+ {
   "id": "2f9ea12e-b8a4-5e6e-94c0-549ced21bece",
   "name": "Nutrition Pantry",
   "status": "active",
@@ -16109,6 +18317,664 @@
    "category": "rec.center"
   },
   "assured_date": "2026-09-18"
+ },
+ {
+  "id": "9038c316-524a-546f-945c-b3dad8932f86",
+  "name": "Police station",
+  "status": "active",
+  "description": "A police station. Someone is there all day and night, and there is a phone you can use.",
+  "organization": {
+   "id": "44026827-d9ef-52d0-ad86-3718426e9864",
+   "name": "Detroit Police Department",
+   "description": "Detroit Police Department",
+   "x_detroit": {
+    "id": "org_detroit_police"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f370fb35-f640-5b56-a465-bcd19cf9bbb5",
+    "location": {
+     "id": "5f5478d7-e041-5fb1-b001-4a4ba0345e28",
+     "name": "Detroit Police 10th Precinct",
+     "location_type": "physical",
+     "latitude": 42.376565,
+     "longitude": -83.138559,
+     "addresses": [
+      {
+       "id": "34404b5f-8fb9-5674-8729-7ebf843f1bdb",
+       "address_1": "12000 Livernois Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48206",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_10th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "a0b1df2a-3ccf-5229-ae88-12dc326ebebd",
+      "number": "313-596-1000",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_10th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0db09f1c-0302-59c1-9a27-7ced9ef81b49",
+    "location": {
+     "id": "88a9db96-4394-5763-8ec8-8eea420d8856",
+     "name": "Detroit Police 11th Precinct",
+     "location_type": "physical",
+     "latitude": 42.425554,
+     "longitude": -83.051314,
+     "addresses": [
+      {
+       "id": "7b74c8f5-ba12-534b-9d23-6c1b4fd1b9fc",
+       "address_1": "5100 E. Nevada Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48234",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_11th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "25184bc2-d870-53f1-ba1e-2c641ff60cfd",
+      "number": "313-596-1100",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_11th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f9088787-80bd-5cfe-9d2b-36306833b4f6",
+    "location": {
+     "id": "b97a7929-2d38-5891-aaba-20394810c416",
+     "name": "Detroit Police 12th Precinct",
+     "location_type": "physical",
+     "latitude": 42.431508,
+     "longitude": -83.118652,
+     "addresses": [
+      {
+       "id": "8987e094-e3ba-52a2-a146-00a5cfc6a729",
+       "address_1": "1441 W. Seven Mile Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_12th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "80f9f23f-a854-5aaf-b0c2-0df7ba814679",
+      "number": "313-596-1200",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_12th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "bdd6ef8a-1005-5fa7-85b6-f481553a9e63",
+    "location": {
+     "id": "887dea9d-0402-5eeb-8733-ad7f79806db2",
+     "name": "Detroit Police 2nd Precinct",
+     "location_type": "physical",
+     "latitude": 42.385556,
+     "longitude": -83.180016,
+     "addresses": [
+      {
+       "id": "ccc32ae9-0568-5f05-a830-d043cceca03e",
+       "address_1": "13530 Lesure Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48227",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_2nd_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "b5989449-8f60-55f4-8e30-cf8840981d8d",
+      "number": "313-596-5200",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_2nd_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5f1a9361-84d0-5d37-9c35-02c3529e5ff3",
+    "location": {
+     "id": "8cd819a5-67ab-59e3-92fe-8d825a708f5f",
+     "name": "Detroit Police 3rd Precinct",
+     "location_type": "physical",
+     "latitude": 42.367778,
+     "longitude": -83.081327,
+     "addresses": [
+      {
+       "id": "c4086939-a788-513b-bfa2-69ef485b902c",
+       "address_1": "2875 W. Grand Boulevard",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48202",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_3rd_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "f5f169c1-c92d-57bd-b0f1-35d39d3159ed",
+      "number": "313-596-5300",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_3rd_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8594e02e-0a51-557c-b172-b1dc05789927",
+    "location": {
+     "id": "0959c46a-ce96-5da3-b19e-4ceab4d28c07",
+     "name": "Detroit Police 4th Precinct",
+     "location_type": "physical",
+     "latitude": 42.311537,
+     "longitude": -83.093059,
+     "addresses": [
+      {
+       "id": "7f7edd5d-0856-59e7-ba77-d20b29449bba",
+       "address_1": "4700 W. Fort Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48209",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_4th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "a39ca935-7f4b-56fd-8663-c5e62c3d490d",
+      "number": "313-596-5400",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_4th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "38835691-9852-5862-8edc-439170e4d6be",
+    "location": {
+     "id": "2095a855-15da-5732-85dd-cc210e955e63",
+     "name": "Detroit Police 5th Precinct",
+     "location_type": "physical",
+     "latitude": 42.381781,
+     "longitude": -82.966019,
+     "addresses": [
+      {
+       "id": "b2789301-8dfb-521f-a87d-e09ab30d3e99",
+       "address_1": "3500 Conner Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48215",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_5th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "3502becb-3b23-521b-ac94-aa74cbf24d3d",
+      "number": "313-596-5500",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_5th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "53310446-89db-53d6-bee5-1e5d4a49664c",
+    "location": {
+     "id": "f8831d1c-207f-5d40-a173-20c769bd680f",
+     "name": "Detroit Police 6th Precinct",
+     "location_type": "physical",
+     "latitude": 42.37182,
+     "longitude": -83.226872,
+     "addresses": [
+      {
+       "id": "e31ecb5a-03cd-5de8-91b6-79cafda3b109",
+       "address_1": "11450 Warwick Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48228",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_6th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "268cd781-ccab-5764-88cf-072937898bd5",
+      "number": "313-596-5600",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_6th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7adfe022-1298-5e06-9bc6-83d2e394816e",
+    "location": {
+     "id": "dd6c1ba4-9320-5a3a-8ac2-15cde2c95fc2",
+     "name": "Detroit Police 7th Precinct",
+     "location_type": "physical",
+     "latitude": 42.355286,
+     "longitude": -83.034884,
+     "addresses": [
+      {
+       "id": "eeb6fd6d-6e83-5223-acc1-f67683f02585",
+       "address_1": "3501 Chene Street",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48207",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_7th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "bde0878b-2e27-544f-996f-a37f6a29c1f0",
+      "number": "313-596-5700",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_7th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "430ee078-4179-5189-92ce-ec6fe4e88d3a",
+    "location": {
+     "id": "3b32e189-c38c-52a2-9bbf-5c2e4646cd73",
+     "name": "Detroit Police 8th Precinct",
+     "location_type": "physical",
+     "latitude": 42.41426,
+     "longitude": -83.254774,
+     "addresses": [
+      {
+       "id": "a8c398f7-1752-5924-8357-7b14325f4ad7",
+       "address_1": "21555 W. McNichols Road",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48219",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_8th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "54691419-11d7-51be-b68e-c3b5bb927ea1",
+      "number": "313-596-5800",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_8th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "3fc90c8d-4264-5028-8eed-160b939681dd",
+    "location": {
+     "id": "f3231b2d-1fd9-586a-a3ad-69e104b55317",
+     "name": "Detroit Police 9th Precinct",
+     "location_type": "physical",
+     "latitude": 42.409465,
+     "longitude": -82.995107,
+     "addresses": [
+      {
+       "id": "9d6db869-907c-5408-8583-32185b598136",
+       "address_1": "11187 Gratiot Avenue",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48213",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_dpd_detroit_police_9th_precinct"
+     }
+    },
+    "phones": [
+     {
+      "id": "db882f74-471f-57e3-8afc-84962cc3364d",
+      "number": "313-596-5900",
+      "description": "Station desk"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_dpd_detroit_police_9th_precinct",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "notice": "If you are in danger, call 911.",
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "City of Detroit Police Precinct Buildings layer",
+      "url": "https://detroitmi.gov/departments/police-department",
+      "last_edited": "2018-07-19"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_detroit_police_precincts",
+   "category": "safe.police"
+  }
  },
  {
   "id": "2b3a8015-85bc-553e-baa7-9debf515f70b",
