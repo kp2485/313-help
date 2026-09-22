@@ -32403,5 +32403,666 @@
   "seg_west_riverfront_rosa_parks_to_grand_boulevard": [
    "nbh_west_side_industrial"
   ]
- }
+ },
+ "cities": [
+  {
+   "id": "city_detroit",
+   "name": "Detroit",
+   "kind": "city",
+   "children": "neighborhood"
+  },
+  {
+   "id": "city_hamtramck",
+   "name": "Hamtramck",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_highland_park",
+   "name": "Highland Park",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_dearborn",
+   "name": "Dearborn",
+   "kind": "city",
+   "children": "none"
+  }
+ ],
+ "areas": [
+  {
+   "id": "city_detroit",
+   "name": "Detroit",
+   "city": "city_detroit",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.38304,
+    -83.10224
+   ],
+   "help": {
+    "total": 457,
+    "by": {
+     "food": 133,
+     "health": 65,
+     "harm": 82,
+     "shelter": 8,
+     "utilities": 4,
+     "hygiene": 5,
+     "youth": 18,
+     "rec": 19,
+     "jobs": 31,
+     "learn": 17,
+     "treatment": 27,
+     "housing": 10,
+     "legal": 8,
+     "ids": 3,
+     "money": 13,
+     "goods": 3,
+     "kids": 1,
+     "connect": 2,
+     "transport": 3,
+     "pets": 2
+    },
+    "nearest_miles": {
+     "food": 0.3,
+     "clinic": 1,
+     "narcan": 1.1,
+     "indoors": 0.9
+    },
+    "nearest_id": {
+     "food": "sal_cass_community_free_meals_and_food_pantry",
+     "clinic": "sal_huda_clinic",
+     "narcan": "sal_hr_11320_dexter",
+     "indoors": "sal_detroit_parks_joseph_walker_williams_center"
+    },
+    "none_listed_yet": [],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 302,
+    "rec_centers": 16,
+    "greenway_open": 0
+   },
+   "park_acres": 4968,
+   "parcels": 377940,
+   "roads_bands": {
+    "pieces": 29111,
+    "miles": 1044.9,
+    "good_pct": 26,
+    "fair_pct": 43,
+    "poor_pct": 31
+   },
+   "vacancy": {
+    "housing_units": 309913,
+    "vacant": 55638,
+    "pct": 18,
+    "population": 639111
+   },
+   "permits_by_year": [
+    {
+     "year": 2021,
+     "buildings": 36,
+     "units": 1023,
+     "months_reported": 12
+    },
+    {
+     "year": 2022,
+     "buildings": 54,
+     "units": 1379,
+     "months_reported": 12
+    },
+    {
+     "year": 2023,
+     "buildings": 514,
+     "units": 1225,
+     "months_reported": 12
+    },
+    {
+     "year": 2024,
+     "buildings": 650,
+     "units": 1919,
+     "months_reported": 12
+    },
+    {
+     "year": 2025,
+     "buildings": 923,
+     "units": 2620,
+     "months_reported": 12
+    }
+   ],
+   "crashes": {
+    "walk": 2024,
+    "bike": 664,
+    "severe": 630
+   },
+   "years": {},
+   "panels": [
+    "help",
+    "parks",
+    "crashes",
+    "roads",
+    "vacancy",
+    "permits"
+   ],
+   "sources": {
+    "parks": "src_detroit_parks",
+    "crashes": "src_semcog_crashes",
+    "roads": "src_semcog_pavement",
+    "vacancy": "src_census_vacancy",
+    "permits": "src_census_bps"
+   },
+   "missing": []
+  },
+  {
+   "id": "city_hamtramck",
+   "name": "Hamtramck",
+   "city": "city_hamtramck",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.39537,
+    -83.05594
+   ],
+   "help": {
+    "total": 19,
+    "by": {
+     "food": 2,
+     "health": 3,
+     "harm": 6,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 1,
+     "jobs": 1,
+     "learn": 0,
+     "treatment": 3,
+     "housing": 1,
+     "legal": 0,
+     "ids": 0,
+     "money": 2,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 0.4,
+     "clinic": 0.2,
+     "narcan": 0.3,
+     "indoors": 0.5
+    },
+    "nearest_id": {
+     "food": "sal_detroit_friendship_nutrition_pantry",
+     "clinic": "sal_wayne_county_hamtramck_health_center",
+     "narcan": "sal_wws_hamtramck_hamtramck_city_hall",
+     "indoors": "sal_hamtramck_public_library"
+    },
+    "none_listed_yet": [],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 3,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "park_acres": 15,
+   "parcels": 6876,
+   "roads_bands": {
+    "pieces": 244,
+    "miles": 12.4,
+    "good_pct": 44,
+    "fair_pct": 36,
+    "poor_pct": 20
+   },
+   "vacancy": {
+    "housing_units": 8911,
+    "vacant": 772,
+    "pct": 9,
+    "population": 28433
+   },
+   "permits_by_year": [
+    {
+     "year": 2021,
+     "buildings": 0,
+     "units": 0,
+     "months_reported": 0
+    },
+    {
+     "year": 2022,
+     "buildings": 4,
+     "units": 4,
+     "months_reported": 12
+    },
+    {
+     "year": 2023,
+     "buildings": 5,
+     "units": 5,
+     "months_reported": 12
+    },
+    {
+     "year": 2024,
+     "buildings": 7,
+     "units": 7,
+     "months_reported": 12
+    },
+    {
+     "year": 2025,
+     "buildings": 4,
+     "units": 4,
+     "months_reported": 12
+    }
+   ],
+   "crashes": {
+    "walk": 69,
+    "bike": 29,
+    "severe": 15
+   },
+   "years": {},
+   "panels": [
+    "help",
+    "parks",
+    "crashes",
+    "roads",
+    "vacancy",
+    "permits"
+   ],
+   "sources": {
+    "parks": "src_semcog_parks",
+    "crashes": "src_semcog_crashes",
+    "roads": "src_semcog_pavement",
+    "vacancy": "src_census_vacancy",
+    "permits": "src_census_bps"
+   },
+   "missing": [
+    {
+     "panel": "sales",
+     "why": "not_published"
+    },
+    {
+     "panel": "blight",
+     "why": "not_published"
+    },
+    {
+     "panel": "demolitions",
+     "why": "not_published"
+    },
+    {
+     "panel": "issues",
+     "why": "not_published"
+    },
+    {
+     "panel": "fires",
+     "why": "not_published"
+    },
+    {
+     "panel": "rentals",
+     "why": "not_published"
+    },
+    {
+     "panel": "vacant_reg",
+     "why": "not_published"
+    }
+   ]
+  },
+  {
+   "id": "city_highland_park",
+   "name": "Highland Park",
+   "city": "city_highland_park",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.40523,
+    -83.09765
+   ],
+   "help": {
+    "total": 13,
+    "by": {
+     "food": 1,
+     "health": 1,
+     "harm": 3,
+     "shelter": 1,
+     "utilities": 0,
+     "hygiene": 1,
+     "youth": 1,
+     "rec": 0,
+     "jobs": 2,
+     "learn": 0,
+     "treatment": 2,
+     "housing": 1,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 0.6,
+     "clinic": 0.2,
+     "narcan": 0.2,
+     "indoors": 1.8
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_prayer_temple_of",
+     "clinic": "sal_ruth_ellis_ruth_ellis_health_and_wellness_center",
+     "narcan": "sal_wws_highland_park_ruth_ellis_health_and_wellness_center",
+     "indoors": "sal_hamtramck_public_library"
+    },
+    "none_listed_yet": [],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 4,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "park_acres": 13,
+   "parcels": 6334,
+   "roads_bands": {
+    "pieces": 769,
+    "miles": 21,
+    "good_pct": 16,
+    "fair_pct": 46,
+    "poor_pct": 38
+   },
+   "vacancy": {
+    "housing_units": 5137,
+    "vacant": 1220,
+    "pct": 24,
+    "population": 8977
+   },
+   "crashes": {
+    "walk": 28,
+    "bike": 12,
+    "severe": 9
+   },
+   "years": {},
+   "panels": [
+    "help",
+    "parks",
+    "crashes",
+    "roads",
+    "vacancy"
+   ],
+   "sources": {
+    "parks": "src_semcog_parks",
+    "crashes": "src_semcog_crashes",
+    "roads": "src_semcog_pavement",
+    "vacancy": "src_census_vacancy"
+   },
+   "missing": [
+    {
+     "panel": "permits",
+     "why": "none_recorded"
+    },
+    {
+     "panel": "sales",
+     "why": "not_published"
+    },
+    {
+     "panel": "blight",
+     "why": "not_published"
+    },
+    {
+     "panel": "demolitions",
+     "why": "not_published"
+    },
+    {
+     "panel": "issues",
+     "why": "not_published"
+    },
+    {
+     "panel": "fires",
+     "why": "not_published"
+    },
+    {
+     "panel": "rentals",
+     "why": "not_published"
+    },
+    {
+     "panel": "vacant_reg",
+     "why": "not_published"
+    }
+   ]
+  },
+  {
+   "id": "city_dearborn",
+   "name": "Dearborn",
+   "city": "city_dearborn",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.31306,
+    -83.21149
+   ],
+   "help": {
+    "total": 53,
+    "by": {
+     "food": 7,
+     "health": 13,
+     "harm": 9,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 1,
+     "jobs": 5,
+     "learn": 10,
+     "treatment": 0,
+     "housing": 3,
+     "legal": 0,
+     "ids": 0,
+     "money": 3,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 1,
+     "pets": 1
+    },
+    "nearest_miles": {
+     "food": 0.6,
+     "clinic": 1.9,
+     "narcan": 0.9,
+     "indoors": 0.3
+    },
+    "nearest_id": {
+     "food": "sal_city_of_liquid_nutrition_for_older_adults_in_dearborn",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_dearborn_university_of_michigan_dearborn_college_of_busi",
+     "indoors": "sal_dearborn_public_henry_ford_centennial_library"
+    },
+    "none_listed_yet": [],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 49,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "park_acres": 853,
+   "parcels": 34379,
+   "roads_bands": {
+    "pieces": 2600,
+    "miles": 141.1,
+    "good_pct": 13,
+    "fair_pct": 52,
+    "poor_pct": 35
+   },
+   "vacancy": {
+    "housing_units": 39334,
+    "vacant": 2399,
+    "pct": 6,
+    "population": 109976
+   },
+   "permits_by_year": [
+    {
+     "year": 2021,
+     "buildings": 23,
+     "units": 23,
+     "months_reported": 12
+    },
+    {
+     "year": 2022,
+     "buildings": 24,
+     "units": 24,
+     "months_reported": 12
+    },
+    {
+     "year": 2023,
+     "buildings": 21,
+     "units": 21,
+     "months_reported": 1
+    },
+    {
+     "year": 2024,
+     "buildings": 26,
+     "units": 26,
+     "months_reported": 0
+    },
+    {
+     "year": 2025,
+     "buildings": 22,
+     "units": 22,
+     "months_reported": 12
+    }
+   ],
+   "crashes": {
+    "walk": 147,
+    "bike": 122,
+    "severe": 41
+   },
+   "years": {},
+   "panels": [
+    "help",
+    "parks",
+    "crashes",
+    "roads",
+    "vacancy",
+    "permits"
+   ],
+   "sources": {
+    "parks": "src_semcog_parks",
+    "crashes": "src_semcog_crashes",
+    "roads": "src_semcog_pavement",
+    "vacancy": "src_census_vacancy",
+    "permits": "src_census_bps"
+   },
+   "missing": [
+    {
+     "panel": "sales",
+     "why": "not_published"
+    },
+    {
+     "panel": "blight",
+     "why": "not_published"
+    },
+    {
+     "panel": "demolitions",
+     "why": "not_published"
+    },
+    {
+     "panel": "issues",
+     "why": "not_published"
+    },
+    {
+     "panel": "fires",
+     "why": "not_published"
+    },
+    {
+     "panel": "rentals",
+     "why": "not_published"
+    },
+    {
+     "panel": "vacant_reg",
+     "why": "not_published"
+    }
+   ]
+  }
+ ],
+ "area_sources": {
+  "src_detroit_parks": {
+   "name": "City of Detroit parks layer",
+   "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0",
+   "last_edited": "2026-09-14",
+   "license": "Unstated (the City portal publishes a disclaimer only)"
+  },
+  "src_semcog_crashes": {
+   "name": "SEMCOG — Crash Locations, 2015-2024",
+   "url": "https://maps-semcog.opendata.arcgis.com/datasets/SEMCOG::crash-locations-2015-2024",
+   "license": "SEMCOG Copyright License Agreement",
+   "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+   "notice": "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.",
+   "last_edited": "2025-10-08",
+   "records_from": "Michigan State Police (CJIC) police-reported crashes, published by SEMCOG"
+  },
+  "src_semcog_pavement": {
+   "name": "SEMCOG — Pavement Condition 2003 to 2024 (PASER)",
+   "url": "https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/Pavement_Condition_2003_to_2024/FeatureServer/80",
+   "page": "https://maps-semcog.opendata.arcgis.com/",
+   "license": "SEMCOG Copyright License Agreement",
+   "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+   "notice": "Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.",
+   "last_edited": "2025-02-25",
+   "records_from": "Michigan's Transportation Asset Management Council"
+  },
+  "src_census_vacancy": {
+   "name": "SEMCOG — 2020 Census totals by community",
+   "url": "https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/mcd_2020/FeatureServer/0",
+   "page": "https://maps-semcog.opendata.arcgis.com/",
+   "license": "SEMCOG Copyright License Agreement",
+   "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+   "notice": "Copyright © 2024 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.",
+   "last_edited": "2024-12-13",
+   "records_from": "the 2020 U.S. Census"
+  },
+  "src_census_bps": {
+   "name": "U.S. Census Bureau — Building Permits Survey, annual place totals",
+   "url": "https://www2.census.gov/econ/bps/Place/Midwest%20Region/",
+   "page": "https://www.census.gov/construction/bps/",
+   "license": "No licence stated; a work of the United States government (17 U.S.C. §105)",
+   "last_edited": "2026-09-22",
+   "records_from": "the permit-issuing place"
+  },
+  "src_semcog_parks": {
+   "name": "SEMCOG — Parks and amenities",
+   "url": "https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/park_poly_2023_view/FeatureServer/0",
+   "page": "https://maps-semcog.opendata.arcgis.com/",
+   "license": "SEMCOG Copyright License Agreement",
+   "license_url": "https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement",
+   "notice": "Copyright © 2026 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.",
+   "last_edited": "2026-09-15"
+  }
+ },
+ "paser": {
+  "poor": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "fair": [
+   5,
+   6,
+   7
+  ],
+  "good": [
+   8,
+   9,
+   10
+  ]
+ },
+ "pavement_year": 2024,
+ "permit_years": [
+  2021,
+  2022,
+  2023,
+  2024,
+  2025
+ ]
 }

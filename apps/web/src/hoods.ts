@@ -33,12 +33,49 @@ export interface Hood {
   crashes?: CrashCounts;
 }
 interface Source { name: string; url: string; last_edited: string }
+/**
+ * A city page (docs/13, "The four cities"; DECISIONS 2026-09-22). It is a `Hood` with extra keys, because it is
+ * the same page drawn with the same components — the outline map, the help panel, the nearest rows and the
+ * crash panel are shared code, not a copy.
+ *
+ * Two things are NOT shared, and both are properties of the data:
+ *   `panels` is an allow-list. This file draws a panel because the area lists it, never because a number is
+ *   present — so "Dearborn does not publish blight tickets" is a fact in the bundle, not a habit of the web.
+ *   `sources` names a source PER PANEL. Detroit's parks come from the City and Hamtramck's from SEMCOG; two
+ *   numbers that share a word never share a source line.
+ */
+export interface AreaSource { name: string; url: string; license: string; license_url?: string; notice?: string; last_edited: string; records_from?: string }
+export interface MissingPanel { panel: string; why: 'not_published' | 'none_recorded' }
+export interface PermitYear { year: number; buildings: number; units: number; months_reported: number }
+export interface Area extends Hood {
+  city: string; kind: 'city' | 'neighborhood';
+  panels: string[]; sources: Record<string, string>; missing: MissingPanel[];
+  park_acres?: number;
+  roads_bands?: { pieces: number; miles: number; good_pct: number; fair_pct: number; poor_pct: number };
+  vacancy?: { housing_units: number; vacant: number; pct: number; population: number };
+  permits_by_year?: PermitYear[];
+}
+export interface CityRow { id: string; name: string; kind: 'city'; children: 'neighborhood' | 'none' }
 export interface Indicators {
   sources: { neighborhoods: Source; sales: Source; permits: Source; blight?: Source; demolitions?: Source; issues?: Source; parcels?: Source; snap?: Source; bus_stops?: Source; rentals?: Source; fires?: Source; pavement?: Source; vacant?: Source; crashes?: Source };
   city_parcels?: number; issue_types?: string[]; fire_types?: string[]; city_now?: NowStats; roads_years?: [number, number]; vacant_period?: [string, string];
   crash_years?: [number, number]; city_crashes?: CrashCounts; crash_records_from?: string;
   stats_fetched_at: string; first_year: number; partial_year: number;
   near_miles: number; origin: [number, number]; city: Record<string, YearStats>; neighborhoods: Hood[]; segments: Record<string, string[]>;
+  /** Added 2026-09-22, all optional: a bundle built before the city pages carries none of them and every screen
+   *  that existed before behaves exactly as it did. */
+  cities?: CityRow[]; areas?: Area[]; area_sources?: Record<string, AreaSource>;
+  pavement_year?: number; permit_years?: number[];
+}
+
+/** The page for an id, whichever kind of area it names. `null` for an id this bundle does not carry. */
+export function areaById(d: Indicators, id: string): Hood | Area | null {
+  return d.neighborhoods.find((n) => n.id === id) ?? d.areas?.find((a) => a.id === id) ?? null;
+}
+export const isArea = (h: Hood | Area): h is Area => Array.isArray((h as Area).panels);
+/** One entry point for `#/n/<id>`: a Detroit neighborhood page, or a city page, drawn from the same components. */
+export function areaPage(h: Hood | Area, d: Indicators, ui: Ui, view: HoodView = 'table', off: ReadonlySet<string> = new Set()): string {
+  return isArea(h) ? cityPage(h, d, ui, view, off) : hoodPage(h, d, ui, view, off);
 }
 
 const FILE = 'indicators/neighborhoods.json';
@@ -141,7 +178,9 @@ export function hoodIndex(d: Indicators, ui: Ui, o: { order: HoodOrder; query: s
     <p class="vh" id="hoodsay" role="status" aria-live="polite"></p>
     <fieldset class="hoodorder"><legend>${T('hood.group_label')}</legend><div class="kinds">${radio('abc', 'hood.group_abc')}${radio('district', 'hood.group_district')}</div></fieldset>
     <div id="hoodlist">${hoodRows(d, ui, o)}</div>
-    <p class="foot">${T('hood.only_detroit')}</p>
+    ${(d.cities ?? []).length ? `<h2>${T('city.list_head')}</h2><p class="foot">${T('city.list_note')}</p>
+      <ul class="rows">${(d.cities ?? []).map((c) => `<li><button class="row" ${ui.go({ v: 'hood', id: c.id })}><span class="rowic">${ui.icon('district')}</span><span class="rowtx"><strong>${ui.own(c.name)}</strong></span></button></li>`).join('')}</ul>`
+      : `<p class="foot">${T('hood.only_detroit')}</p>`}
     <ul class="rows"><li><button class="row" ${ui.go({ v: 'hoods', lens: 'jlg' })}><span class="rowtx"><strong>${T('hood.lens_jlg')}</strong><small>${T('hood.lens_jlg_sub')}</small></span></button></li></ul>
     <p class="foot">${T('hood.describe')}</p></main>`;
 }
@@ -348,5 +387,114 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui, view: HoodView = 'table
     ${crashPanel(h, d, ui)}
 
     <h2>${T('hood.sources_head')}</h2><ul class="srcs">${[d.sources.sales, d.sources.permits, d.sources.rentals, d.sources.blight, d.sources.demolitions, d.sources.issues, d.sources.fires, d.sources.vacant, d.sources.pavement, d.sources.parcels, d.sources.snap, d.sources.bus_stops, d.sources.crashes, d.sources.neighborhoods].filter((x): x is Source => !!x).map(src).join('')}<li>${T('hood.source_ours')}</li></ul>
+    <p class="foot">${T('hood.left_out')}</p></main>`;
+}
+
+// ---- city pages (docs/13, "The four cities"; DECISIONS 2026-09-22) ----------------------------------------
+//
+// Hamtramck, Highland Park and Dearborn publish nothing per neighborhood — none of them runs an open-data
+// portal — so their page is the whole city, built from regional and federal sources that cover all four cities
+// with one method. Detroit gets a city page too, so the Areas layer has somewhere to send a tap inside Detroit
+// that is not already on a neighborhood.
+//
+// The rules this function keeps:
+//   * It draws a panel ONLY if `h.panels` lists it. A number that is in the data but not in the allow-list is
+//     not drawn; a panel in the allow-list with no number is a bug the tests catch, not a blank box.
+//   * Every panel prints its OWN source, with its own date, and its own required notice. Nothing inherits.
+//   * `missing` is said in one plain sentence. Absent, never zero, never an empty chart.
+//   * No number from another city appears anywhere. There is no cross-city comparison on this page at all.
+
+/** The allow-list, in the order the page draws them. A key not in here can never be drawn. */
+export const CITY_PANELS = ['help', 'parks', 'crashes', 'roads', 'vacancy', 'permits'] as const;
+
+/** The source line for one panel: the owner, when it was last edited, whose records they are, and the notice
+ *  that owner requires. The notice is the owner's own sentence, so it stays in their words and their language. */
+function panelSource(h: Area, d: Indicators, ui: Ui, panel: string): string {
+  const s = d.area_sources?.[h.sources[panel] ?? ''];
+  if (!s) return '';
+  return `<p class="foot">${ui.link(s.url, s.name)} <small>${ui.esc(ui.t('hood.updated', { date: ui.date(s.last_edited) }))}</small></p>
+    ${s.records_from ? `<p class="foot">${slot(ui, 'city.records_from', 'who', s.records_from)}</p>` : ''}
+    ${s.notice ? `<p class="foot" lang="en">${ui.esc(s.notice)}</p>` : ''}`;
+}
+
+/** A city's crash panel: the same counts and the same words as a neighborhood's, with this area's own source. */
+function cityCrashPanel(h: Area, d: Indicators, ui: Ui): string {
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const num = (n: number) => new Intl.NumberFormat(locale()).format(n);
+  const show = (c: Count | undefined) => (c === undefined ? T('hood.none_recorded') : c === 'lt5' ? T('hood.lt5') : num(c));
+  const line = (label: string, k: keyof CrashCounts) => `<li><span>${label}</span><span>${show(h.crashes?.[k])}</span></li>`;
+  const [from, to] = d.crash_years ?? ['', ''];
+  return `<h2>${T('hood.crash_head')}</h2><div class="panel"><p>${T('hood.crash_lede', { from, to })}</p>
+    <ul class="hours">${line(T('hood.crash_walk'), 'walk')}${line(T('hood.crash_bike'), 'bike')}${line(T('hood.crash_severe'), 'severe')}</ul>
+    <p class="foot">${T('hood.crash_note')}</p>${panelSource(h, d, ui, 'crashes')}</div>`;
+}
+
+/** New homes permitted, by year. A plain table, and a chart when there are three years to draw. */
+function permitPanel(h: Area, d: Indicators, ui: Ui, view: HoodView, off: ReadonlySet<string>): string {
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const rows = h.permits_by_year ?? [];
+  const num = (n: number) => new Intl.NumberFormat(locale()).format(n);
+  const max = Math.max(1, ...rows.map((r) => r.units));
+  const table = `<table class="years"><caption>${T('city.permits_caption')}</caption><thead><tr><th scope="col">${T('hood.year')}</th><th scope="col">${T('city.permits_units')}</th><th scope="col">${T('city.permits_buildings')}</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr><th scope="row">${r.year}</th><td><span class="bar" aria-hidden="true" style="width:${Math.max(3, Math.round((r.units / max) * 100))}%"></span><span>${ui.esc(num(r.units))}</span></td><td>${ui.esc(num(r.buildings))}</td></tr>`).join('')}</tbody></table>`;
+  // A year the city did not report in full is named, with the number of months it did report: the Census Bureau
+  // estimates the rest, and a page that prints the number has to say so rather than pass it off as a count.
+  const partial = rows.filter((r) => r.months_reported < 12)
+    .map((r) => `<p class="foot">${T('city.permits_partial', { year: r.year, city: h.name, months: r.months_reported })}</p>`).join('');
+  const series: ChartSeries[] = [{ key: 'permits', tone: 'a', label: ui.t('city.permits_units'), points: rows.map((r) => ({ year: String(r.year), count: r.units, partial: r.months_reported < 12 })) }];
+  return `<h2>${T('city.permits_head')}</h2><div class="panel"><p>${T('city.permits_lede', { city: h.name })}</p>
+    ${yearGroup(ui, { id: 'permits', view, name: 'city.chart_name_permits', off, series, tables: table })}
+    <p class="foot">${T('city.permits_note')}</p>${partial}${panelSource(h, d, ui, 'permits')}</div>`;
+}
+
+/**
+ * One city page. Same components as a neighborhood page; the panels are whatever this area's allow-list says,
+ * in the fixed order of `CITY_PANELS`, and nothing else.
+ */
+export function cityPage(h: Area, d: Indicators, ui: Ui, view: HoodView = 'table', off: ReadonlySet<string> = new Set()): string {
+  const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  const num = (n: number) => new Intl.NumberFormat(locale()).format(n);
+  const on = (panel: string) => h.panels.includes(panel);
+  const cats = Object.entries(h.help.by).filter(([, n]) => n > 0);
+  const detroit = (d.cities ?? []).find((c) => c.id === h.id)?.children === 'neighborhood';
+  const notPublished = h.missing.filter((m) => m.why === 'not_published').map((m) => ui.t('city.missing.' + m.panel));
+  const noneRecorded = h.missing.filter((m) => m.why === 'none_recorded');
+  const years = d.permit_years ?? [];
+
+  const help = `<h2>${T('hood.help_head')}</h2>
+    <p>${T(h.help.total === 1 ? 'city.help_count_one' : h.help.total === 0 ? 'city.help_none' : 'city.help_count', { count: h.help.total, city: h.name })}</p>
+    ${cats.length ? `<ul class="hours">${cats.map(([c, n]) => `<li><span>${T('add.cat.' + (c === 'shelter' ? 'shelter.emergency' : c))}</span><span>${ui.esc(num(n))}</span></li>`).join('')}</ul>` : ''}
+    ${h.help.none_listed_yet.length ? `<p class="foot">${T('hood.none_listed', { kinds: h.help.none_listed_yet.map((c) => ui.t('hood.kind.' + c)).join(', ') })}</p>` : ''}
+    <div class="panel"><p>${T('hood.thin')}</p><div class="stackbtns"><button class="btn ghost" ${ui.go({ v: 'add' })}>${T('add.title')}</button></div></div>
+    <h3 class="sub">${T('city.nearest_head')}</h3><ul class="hours">${['food', 'clinic', 'narcan', 'indoors'].map((k) => nearestRow(h, ui, k)).join('')}</ul>
+    <p class="foot">${T('city.nearest_note')}</p>
+    <p class="foot">${T('hood.source_ours')}</p>`;
+
+  const parks = `<h2>${T('city.parks_head')}</h2><div class="panel">
+    <ul class="hours"><li><span>${T('city.parks_count')}</span><span>${ui.esc(num(h.places.parks))}</span></li>${h.park_acres !== undefined ? `<li><span>${T('city.parks_acres')}</span><span>${ui.esc(num(h.park_acres))}</span></li>` : ''}</ul>
+    <p class="foot">${T(detroit ? 'city.parks_note_detroit' : 'city.parks_note_semcog')}</p>${panelSource(h, d, ui, 'parks')}</div>`;
+
+  const b = h.roads_bands;
+  const roads = !b ? '' : `<h2>${T('city.roads_head')}</h2><div class="panel"><p>${T('city.roads_lede', { city: h.name, year: d.pavement_year ?? '' })}</p>
+    <ul class="hours">${([['good', b.good_pct], ['fair', b.fair_pct], ['poor', b.poor_pct]] as const).map(([k, pct]) => `<li><span>${T('city.roads_' + k)}</span><span>${T('city.roads_pct', { pct })}</span></li>`).join('')}</ul>
+    <p class="foot">${T('city.roads_miles', { miles: b.miles.toFixed(1) })}</p>
+    <p class="foot">${T('city.roads_note')}</p>${panelSource(h, d, ui, 'roads')}</div>`;
+
+  const v = h.vacancy;
+  const vacancy = !v ? '' : `<h2>${T('city.vacancy_head')}</h2><div class="panel">
+    <p>${T('city.vacancy_lede', { city: h.name, vacant: num(v.vacant), units: num(v.housing_units) })}</p>
+    <ul class="hours"><li><span>${T('city.vacancy_share')}</span><span>${T('city.vacancy_pct', { pct: v.pct })}</span></li></ul>
+    <p class="foot">${T('city.vacancy_note')}</p>${panelSource(h, d, ui, 'vacancy')}</div>`;
+
+  const drawn: Record<string, string> = { help, parks, crashes: cityCrashPanel(h, d, ui), roads, vacancy, permits: permitPanel(h, d, ui, view, off) };
+  const sources = [...new Set(Object.values(h.sources))].map((k) => d.area_sources?.[k]).filter((s): s is AreaSource => !!s);
+  return `<main><p class="org">${T('city.kind')}</p>
+    <p class="banner plain">${T('hood.describe')}</p>${ui.map(h)}
+    ${detroit ? `<p class="foot">${T('city.detroit_children')}</p><ul class="rows"><li><button class="row" ${ui.go({ v: 'tab', tab: 'hoods' })}><span class="rowtx"><strong>${T('city.see_neighborhoods')}</strong></span></button></li></ul>`
+      : `<p class="foot">${T('city.no_neighborhoods', { city: h.name })}</p><p class="foot">${T('city.regional', { city: h.name })}</p>`}
+    ${CITY_PANELS.filter(on).map((k) => drawn[k] ?? '').join('')}
+    ${noneRecorded.map((m) => `<p class="foot">${T('city.' + m.panel + '_none', { city: h.name, from: years[0] ?? '', to: years[years.length - 1] ?? '' })}</p>`).join('')}
+    ${notPublished.length ? `<p class="foot">${slot(ui, 'city.missing', 'list', notPublished.join(', '), { city: h.name })}</p>` : ''}
+    <h2>${T('hood.sources_head')}</h2><ul class="srcs">${sources.map((s) => `<li>${ui.link(s.url, s.name)} <small>${T('hood.updated', { date: ui.date(s.last_edited) })}</small></li>`).join('')}<li>${T('hood.source_ours')}</li></ul>
     <p class="foot">${T('hood.left_out')}</p></main>`;
 }

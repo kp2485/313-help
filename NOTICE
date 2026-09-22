@@ -9,8 +9,9 @@ Apache-2.0 covers the source code only. The third-party data files under
 data/ingested/ and data/seed/ are NOT licensed under Apache-2.0: each keeps its
 publisher's terms, as recorded in data/sources.yaml, data/ingested/transit/source.json
 and this file. In particular data/ingested/transit/intercity_bus.json is
-CC BY-NC 4.0 (attribution, non-commercial), and the SEMCOG crash aggregate in
-data/ingested/crashes.json is used under SEMCOG's Copyright License Agreement.
+CC BY-NC 4.0 (attribution, non-commercial), and the SEMCOG aggregates in
+data/ingested/crashes.json and data/ingested/cities.json are used under SEMCOG's
+Copyright License Agreement.
 The carve-out is spelled out in data/LICENSE-DATA.md.
 
 Every listing in the app names its own source and the date it was checked; this file
@@ -240,6 +241,54 @@ US Census Bureau (TIGER/Line and TIGERweb; public domain):
   Streets in Hamtramck, Highland Park and Dearborn
   ZIP Code Tabulation Areas for Dearborn ZIP codes
 
+THE FOUR CITY PAGES (Detroit, Hamtramck, Highland Park, Dearborn)
+
+  Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without
+    Permission is Prohibited.
+  Southeast Michigan Council of Governments (SEMCOG) supplies four of the six
+    layers behind the city pages, and the notice above is printed on every panel
+    that uses one of them:
+      Pavement Condition 2003 to 2024 (PASER street ratings), published for
+        Michigan's Transportation Asset Management Council, who are named on
+        the panel
+      Parks and amenities
+      2020 Census totals by community, from which the "empty homes" count comes;
+        the counts underneath are the U.S. Census Bureau's and are named as such
+      Crash Locations, 2015-2024 (see "Safe streets" below)
+    SEMCOG's Copyright License Agreement
+    (https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement)
+    is ACCEPTED AS IT STANDS -- the perpetual royalty-free grant, the required
+    notice, the disclaimer of warranties and the one-way indemnification clause
+    -- for every panel that uses SEMCOG data (Kyle, 2026-09-22; recorded in
+    docs/DECISIONS.md). Section 1(b) grants no third-party rights, so where the
+    records are somebody else's they are named on the panel, and either owner's
+    objection removes the layer.
+
+  U.S. Census Bureau (works of the United States government; no licence is
+    stated on either page):
+      Building Permits Survey, annual place files -- "new homes permitted".
+        New privately-owned residential construction only, counted by the
+        office that issues the permit.
+      TIGERweb places -- the four city outlines and each city's own internal
+        point.
+    We read published files, not the Census Data API. If that ever changes, the
+    API's terms require this notice on the panel: "This product uses the Census
+    Bureau Data API but is not endorsed or certified by the Census Bureau."
+
+  Wayne County, Parcels and assessment data -- a parcel count only, used as a
+    denominator. The County's GIS page states no licence, only a disclaimer.
+    The layer holds owner names and addresses; we ask its server for counts and
+    never for those fields.
+
+  Absent on purpose, never shown as zero: home sales, blight tickets,
+    demolitions, reported problems, building fires, rental certificates and
+    vacant registrations outside Detroit. No public, machine-readable,
+    name-free source exists for any of them, and BS&A Online -- which runs
+    assessing, tax and permits for all three smaller cities -- prohibits
+    automated access in its own terms. We do not read it and do not deep-link
+    it. Each city page says in one sentence what it therefore cannot show.
+
+
 Pedestrian and bicycle crash counts ("Safe streets"):
   Copyright © 2025 SEMCOG. All Rights Reserved. Reproduction or Use Without
     Permission is Prohibited.
@@ -254,10 +303,10 @@ Pedestrian and bicycle crash counts ("Safe streets"):
     names SEMCOG and the State Police); a one-way clause under which the user indemnifies
     SEMCOG; and a clause granting no third-party rights, which is why MSP's
     position matters. The layer is read by hand about once a year and kept as
-    counts only, and both bodies are named on the panel. Open for Kyle: accept
-    the agreement including its indemnification clause knowingly, or remove the
-    layer. If SEMCOG or MSP objects the layer is deleted and the panel
-    disappears.
+    counts only, and both bodies are named on the panel. The agreement was
+    accepted as it stands, indemnification clause included, on 2026-09-22
+    (docs/DECISIONS.md). If SEMCOG or MSP objects the layer is deleted and the
+    panel disappears.
 
 
 THE ELEVEN TRANSPORT LAYERS ON THE MAP
