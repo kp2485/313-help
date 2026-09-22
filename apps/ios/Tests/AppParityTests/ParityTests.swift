@@ -408,6 +408,89 @@ final class ParityTests: XCTestCase {
                       refine: refines, line: line)
     }
 
+    // MARK: - the navigation audit of 2026-09-22
+
+    /// Browse by type (audit C2). The iPhone had **no** browse path at all, so the shower and young-people
+    /// listings could only be reached by typing a name into Search. These are the web's `CATEGORIES`, id for id
+    /// and in the web's order, and every chip has words in `strings/en.json`.
+    func testBrowseChipsMatchTheWebApp() throws {
+        let src = try text("apps/web/src/needs.ts")
+        guard let start = src.range(of: "export const CATEGORIES"), let end = src.range(of: "export const TABS")
+        else { return XCTFail("could not read CATEGORIES from apps/web/src/needs.ts") }
+        let web = String(src[start.lowerBound..<end.lowerBound])
+            .components(separatedBy: "{ id: '").dropFirst().compactMap { $0.split(separator: "'").first.map(String.init) }
+        let ios = try text("apps/ios/HelpApp/Browse.swift")
+        guard let s2 = ios.range(of: "let browseCategories"), let e2 = ios.range(of: "\n]\n", range: s2.upperBound..<ios.endIndex)
+        else { return XCTFail("could not read browseCategories from apps/ios/HelpApp/Browse.swift") }
+        let mine = String(ios[s2.upperBound..<e2.lowerBound])
+            .components(separatedBy: "    (\"").dropFirst().compactMap { $0.split(separator: "\"").first.map(String.init) }
+        XCTAssertEqual(mine, web, "the iPhone's browse chips differ from apps/web/src/needs.ts CATEGORIES")
+        XCTAssertEqual(web.count, 19)
+        let en = try strings("strings/en.json")
+        for id in mine { XCTAssertNotNil(en["cat.\(id)"], "strings/en.json has no cat.\(id)") }
+    }
+
+    /// The six quick needs on Home, in the audit's order (§4.2) and the web's. The iPhone used to filter the
+    /// needs array by a set of six ids, which rendered them in declaration order, so "A place to sleep"
+    /// outranked "Food" on the one screen docs/05 says must lead with food (audit M2).
+    func testHomesQuickNeedsAreInTheWebsOrder() throws {
+        let main = try text("apps/web/src/main.ts")
+        guard let r = main.range(of: "const quick = [") else { return XCTFail("could not read `quick` from apps/web/src/main.ts") }
+        let line = String(main[r.upperBound...].prefix(while: { $0 != "]" }))
+        let web = line.components(separatedBy: "'").enumerated().filter { $0.offset % 2 == 1 }.map(\.element)
+        let ios = try text("apps/ios/HelpApp/Browse.swift")
+        guard let r2 = ios.range(of: "let quickNeedIds = [") else { return XCTFail("could not read quickNeedIds") }
+        let mine = String(ios[r2.upperBound...].prefix(while: { $0 != "]" }))
+            .components(separatedBy: "\"").enumerated().filter { $0.offset % 2 == 1 }.map(\.element)
+        XCTAssertEqual(mine, web, "Home's six quick needs differ from apps/web/src/main.ts")
+        XCTAssertEqual(mine.first, "food", "docs/05: Home leads with food")
+        XCTAssertEqual(mine.count, 6)
+    }
+
+    /// The Map tab opens with help on it (audit H2). One constant per client; this is the iPhone's held to the
+    /// web's `DEFAULT_LAYERS`.
+    func testTheMapOpensWithTheSameLayersAsTheWeb() throws {
+        let web = try text("apps/web/src/layers.ts")
+        guard let r = web.range(of: "DEFAULT_LAYERS") else { return XCTFail("could not read DEFAULT_LAYERS") }
+        let line = String(web[r.upperBound...].prefix(while: { $0 != "]" }))
+        let ids = line.components(separatedBy: "'").enumerated().filter { $0.offset % 2 == 1 }.map(\.element)
+        let swift = try text("apps/ios/Sources/HelpCore/MapLayers.swift")
+        guard let r2 = swift.range(of: "public let defaultMapLayers = [") else { return XCTFail("could not read defaultMapLayers") }
+        let mine = String(swift[r2.upperBound...].prefix(while: { $0 != "]" }))
+            .components(separatedBy: "\"").enumerated().filter { $0.offset % 2 == 1 }.map(\.element)
+        XCTAssertEqual(mine, ids, "the iPhone's first-open map layers differ from apps/web/src/layers.ts")
+        XCTAssertTrue(mine.contains { $0.hasPrefix("help:") }, "the Map tab must open with help on it (audit H2)")
+    }
+
+    /// One tab set on all three clients: Home · Help · Map · Areas, with Events hiding itself while the bundle
+    /// carries none (audit §4.1).
+    func testTheTabSetMatchesTheWebApp() throws {
+        let web = try text("apps/web/src/needs.ts")
+        guard let r = web.range(of: "export const TABS = [") else { return XCTFail("could not read TABS") }
+        let line = String(web[r.upperBound...].prefix(while: { $0 != "]" }))
+        let ids = line.components(separatedBy: "{ id: '").dropFirst().compactMap { $0.split(separator: "'").first.map(String.init) }
+        let swift = try text("apps/ios/HelpApp/Views.swift")
+        guard let r2 = swift.range(of: "enum Tab: Hashable { case ") else { return XCTFail("could not read AppNav.Tab") }
+        let mine = String(swift[r2.upperBound...].prefix(while: { $0 != "}" }))
+            .components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        XCTAssertEqual(mine, ids, "the iPhone's tabs differ from apps/web/src/needs.ts TABS")
+    }
+
+    /// Home has one entry to each screen (audit L1) and does not push a second copy of the Help tab (audit H7).
+    /// `HomeView` is read as text, which is enough to see which of the two kinds of control it uses.
+    func testHomeSelectsTheHelpTabAndKeepsSavedUnderHelp() throws {
+        let src = try text("apps/ios/HelpApp/Views.swift")
+        guard let r = src.range(of: "struct HomeView: View"), let e = src.range(of: "struct AgeBanner", range: r.upperBound..<src.endIndex)
+        else { return XCTFail("could not read HomeView") }
+        let home = String(src[r.lowerBound..<e.lowerBound])
+        XCTAssertTrue(home.contains("TabRow(tab: .help"), "Home's \"Find free help\" must select the Help tab, not push a second HelpView")
+        XCTAssertFalse(home.contains("{ HelpView() }"), "Home pushes a second copy of the Help tab (audit H7)")
+        XCTAssertFalse(home.contains("SavedView()"), "Saved places belong under Help → More, once (audit L1)")
+        for want in ["TabTile(tab: .map", "TabTile(tab: .hoods", "ParksView()"] {
+            XCTAssertTrue(home.contains(want), "Home is missing \(want) (audit M1)")
+        }
+    }
+
     // MARK: - reading the two files
 
     private func webNeeds() throws -> [Parsed] {

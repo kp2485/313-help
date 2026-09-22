@@ -59,6 +59,20 @@ public func mapsURL(_ row: BundleRow) -> URL? {
     return c.url
 }
 
+/// Apple Maps, pointed at a destination that is not a listing — a City park (HelpApp/Browse.swift). The same
+/// rule and the same strict escaping: the street address the City publishes, else the coordinate it publishes,
+/// and **never an origin**. A coordinate passed to the maps app is still never printed as if it were an address.
+public func mapsURL(address: String?, lat: Double, lon: Double) -> URL? {
+    let dest = (address?.isEmpty == false) ? "\(address!), Detroit, MI" : "\(lat),\(lon)"
+    guard let pair = queryPair("daddr", dest) else { return nil }
+    var c = URLComponents()
+    c.scheme = "https"
+    c.host = "maps.apple.com"
+    c.path = "/"
+    c.percentEncodedQuery = pair
+    return c.url
+}
+
 /// The Transit link itself, or nil when we would be offering one that cannot work. Transit documents no https
 /// universal link and no behaviour when the app is missing, so the screen also asks iOS whether anything can open
 /// the scheme (`canOpen`, which is `UIApplication.canOpenURL` with `transit` in `LSApplicationQueriesSchemes`)
