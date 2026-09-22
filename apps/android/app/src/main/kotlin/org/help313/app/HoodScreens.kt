@@ -372,6 +372,11 @@ object HoodScreens {
         HoodRepo.onChange = { a.render() }
         HoodRepo.want(a.store)
         val d = HoodRepo.data
+        // `#/n/<id>` is one entry point for both kinds of area: one of Detroit's 205 neighborhoods, or one of the
+        // four whole-city pages, drawn from the same pieces (Areas.kt; DECISIONS 2026-09-22).
+        if (d != null) {
+            (areaById(d, id) as? AreaPage.OfCity)?.let { return AreaScreens.page(a, it.area, d) }
+        }
         val h = d?.hood(id)
         if (d == null || h == null) {
             val col = UI.column(a, 16)

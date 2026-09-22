@@ -40,8 +40,10 @@ object Screens {
         is Route.Map -> MapScreen.tab(a)
         is Route.MapLayers -> MapScreen.layers(a)
         is Route.MapList -> MapScreen.list(a)
-        is Route.Hoods -> HoodScreens.index(a, route.lens)
+        is Route.Hoods -> AreaScreens.tab(a, route.lens)
         is Route.Hood -> HoodScreens.page(a, route.hoodId)
+        is Route.Parks -> ParkScreens.screen(a)
+        is Route.Park -> ParkScreens.page(a, route.parkId)
         is Route.Add -> AddScreen.view(a)
         is Route.Stretch -> {
             // A route outlives a draw, so the stretch is looked up again: the bundle may have been refreshed since.
@@ -107,6 +109,16 @@ object Screens {
 
     // ---- Home ----------------------------------------------------------------------------------------------
 
+    /**
+     * **One Home, on all three clients** (audit §4.2, 2026-09-22), top to bottom: hero, the bundle-age banner,
+     * search, alerts, Find free help, six quick needs in one fixed order, three tiles, About.
+     *
+     * What moved. The **Urgent help button is no longer in the page body** — it is in the app bar on every screen
+     * now (MainActivity.rebuildTopBar, audit H6), which is a strictly better answer than one button on one screen.
+     * **Search arrived**, because Android had none at all. The quick needs went from **four to six**: "Help with
+     * drugs or alcohol" and "A job or training" were missing. And the greenway's tile became **Parks and paths**
+     * (Kyle, direction b).
+     */
     fun home(a: MainActivity): View {
         val col = UI.column(a, 16)
         col.addView(UI.text(a, L.t("app.name"), 28f, R.color.brand, bold = true))
@@ -114,12 +126,13 @@ object Screens {
 
         noteBar(a, col)
 
-        // Urgent help is reachable from every screen, and 911 and 988 are always the first two. It is added here,
-        // above the "still checking the list" line and before any listing, because 911 and 988 are hardcoded
-        // (audit A5) and need no bundle at all: making a person in trouble wait on a signature check would be the
-        // one delay in this app that could actually hurt someone. Nothing below this line is shown until the
-        // bundle's signature has passed.
-        col.addView(UI.button(a, L.t("strip.more"), topDp = 16) { a.push(Route.Urgent) })
+        // Search by name or street: the first control on Home, where the web and the iPhone put it, now that it is
+        // not one of six tabs. The same words are the app bar's short button on every screen.
+        col.addView(
+            UI.button(a, L.t("search.open"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink, topDp = 16) {
+                a.push(Route.Search)
+            },
+        )
 
         if (a.store.bundle == null) {
             col.addView(UI.text(a, if (a.store.loadFailed) L.t("home.no_data") else L.t("home.loading"), 17f, R.color.muted, topDp = 16))
@@ -129,31 +142,12 @@ object Screens {
             return UI.scroller(a, col)
         }
 
-        col.addView(UI.sectionHead(a, L.t("home.help_title")))
-        col.addView(UI.text(a, L.t("home.help_sub"), 16f, R.color.muted))
-        for (key in listOf("quick.food", "quick.shelter", "quick.doctor", "quick.narcan")) {
-            val needId = when (key) {
-                "quick.food" -> "food"; "quick.shelter" -> "shelter"; "quick.doctor" -> "doctor"; else -> "narcan"
-            }
-            val card = UI.tappableCard(a, L.t(key)) { a.push(Route.Need(needId)) }
-            card.addView(UI.text(a, L.t(key), 18f, R.color.ink, bold = true))
-            col.addView(card)
-        }
-
-        col.addView(UI.button(a, L.t("home.see_all"), topDp = 16) { a.go(Route.Help) })
-
-        // The neighborhood numbers, from Home as well as from their own tab (docs/13; they are not in the crisis
-        // path, so they sit below the four needs and the "See all" button, never above them).
-        if (HoodRepo.offered(a.store)) {
-            val hoods = UI.tappableCard(a, L.t("home.hoods_title")) { a.go(Route.Hoods()) }
-            hoods.addView(UI.text(a, L.t("home.hoods_title"), 18f, R.color.ink, bold = true))
-            hoods.addView(UI.text(a, L.t("home.hoods_sub"), 16f, R.color.muted, topDp = 2))
-            col.addView(hoods)
-        }
-
+        // Alerts before the needs, newest first: something that is happening today outranks a standing list.
         val alerts = a.store.bundle?.alerts.orEmpty().filter { it.status == "published" && it.kind != "cancellation" }
         if (alerts.isNotEmpty()) {
-            col.addView(UI.sectionHead(a, L.t("alert.from")))
+            // The heading used to be `alert.from`, which is "Starts {when}" — so the section read literally
+            // "Starts {when}" with the placeholder still in it (audit M3).
+            col.addView(UI.sectionHead(a, L.t("home.events")))
             for (al in alerts.take(5)) {
                 val card = UI.card(a)
                 card.addView(UI.text(a, al.title.orEmpty(), 17f, R.color.ink, bold = true))
@@ -162,10 +156,44 @@ object Screens {
             }
         }
 
+        col.addView(UI.sectionHead(a, L.t("home.help_title")))
+        col.addView(UI.text(a, L.t("home.help_sub"), 16f, R.color.muted))
+        col.addView(UI.button(a, L.t("home.help_title"), topDp = 8) { a.go(Route.Help) })
+
+        // **Six, in this order**, the same six and the same order as the web and the iPhone (docs/05).
+        for ((key, needId) in QUICK_NEEDS) {
+            val card = UI.tappableCard(a, L.t(key)) { a.push(Route.Need(needId)) }
+            card.addView(UI.text(a, L.t(key), 18f, R.color.ink, bold = true))
+            col.addView(card)
+        }
+
+        col.addView(UI.button(a, L.t("home.see_all"), topDp = 16) { a.go(Route.Help) })
+
+        // Three tiles, below the needs and never above them: none of them is in the crisis path.
+        tile(a, col, L.t("tab.map"), L.t("home.map_sub")) { a.go(Route.Map) }
+        if (HoodRepo.offered(a.store)) {
+            tile(a, col, L.t("home.hoods_title"), L.t("home.hoods_sub")) { a.go(Route.Hoods()) }
+        }
+        if (ParkRepo.offered(a.store)) {
+            // This used to be the Joe Louis Greenway, with a live count of open stretches — a number that changes
+            // as the City builds, on the tile that read as the app's headline (Kyle, direction b).
+            tile(a, col, L.t("rec.title"), L.t("rec.lede")) {
+                ParkScreens.reset()
+                a.push(Route.Parks)
+            }
+        }
+
         col.addView(UI.button(a, L.t("about.title"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink, topDp = 20) {
             a.push(Route.About)
         })
         return UI.scroller(a, col)
+    }
+
+    private fun tile(a: MainActivity, col: LinearLayout, title: String, sub: String, onTap: () -> Unit) {
+        val card = UI.tappableCard(a, title) { onTap() }
+        card.addView(UI.text(a, title, 18f, R.color.ink, bold = true))
+        card.addView(UI.text(a, sub, 16f, R.color.muted, topDp = 2))
+        col.addView(card)
     }
 
     /** The bundle-age line, on every list and listing. It says nothing about any listing. */
@@ -205,10 +233,16 @@ object Screens {
             col.addView(card)
         }
 
-        // "Add a place that helps", where the web puts it (`help.more`) and on the same condition: a retired list
-        // takes no proposals, because nobody is left to check them (schema/query-spec.md "Bundle age").
+        // "Saved places" and "Add a place that helps", where the web puts them (`help.more`). Saved stopped being
+        // a tab with the move to four (audit H5): it is a return visit, not a front door.
+        col.addView(UI.sectionHead(a, L.t("help.more")))
+        val savedCard = UI.tappableCard(a, L.t("saved.title")) { a.push(Route.Saved) }
+        savedCard.addView(UI.text(a, L.t("saved.title"), 18f, R.color.ink, bold = true))
+        savedCard.addView(UI.text(a, L.t("saved.sub"), 16f, R.color.muted, topDp = 2))
+        col.addView(savedCard)
+
+        // A retired list takes no proposals, because nobody is left to check them (query-spec "Bundle age").
         if (!a.retired()) {
-            col.addView(UI.sectionHead(a, L.t("help.more")))
             val add = UI.tappableCard(a, L.t("add.title")) {
                 AddScreen.reset()
                 a.push(Route.Add)

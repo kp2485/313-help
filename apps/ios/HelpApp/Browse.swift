@@ -251,16 +251,26 @@ struct ParkView: View {
                     Text(L.t("rec.no_address")).font(.subheadline).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
                 }
             }.card()
+            // Our own directions first (DECISIONS 2026-09-22); the maps-app link keeps its place under
+            // "Other apps", where the screen says the app will see the place.
+            DirectionsButton(name: park.name, lat: park.lat, lon: park.lon, primary: true)
             if let url = parkMapsURL(park) {
-                Link(destination: url) {
-                    HStack(spacing: 10) { Image(systemName: "mappin.and.ellipse"); Text(L.t("detail.directions")).fontWeight(.semibold); Spacer() }
-                        .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
-                        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+                DisclosureGroup(L.t("dir.other_apps")) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Link(destination: url) {
+                            HStack(spacing: 10) { Image(systemName: "mappin.and.ellipse"); Text(L.t("detail.directions")).fontWeight(.semibold); Spacer() }
+                                .foregroundStyle(Color.brand).padding(.horizontal, 16).padding(.vertical, 13)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
+                                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.line, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(L.t("detail.directions_label", ["name": park.name]))
+                        Text(L.t("dir.other_apps_note")).font(.footnote).foregroundStyle(Color.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L.t("detail.directions_label", ["name": park.name]))
+                .font(.subheadline.weight(.semibold)).tint(Color.brand)
                 Text(L.t("detail.directions_note")).font(.footnote).foregroundStyle(Color.muted)
             }
             if let gw {

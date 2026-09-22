@@ -31,7 +31,14 @@ struct MapScene {
     /// The stretch a person is looking at: drawn bright, with the rest dimmed.
     var focus: String?
     var dots: [DrawnDot] = []
+    /// City and neighbourhood outlines (`place:areas`), already narrowed to what this zoom draws.
+    var areas: [AreaOutline] = []
+    /// The outline a tap chose: a wash of the land colour and a solid line, so the tap can be seen. Never a fill
+    /// that carries a value — docs/13's first honesty rule forbids a choropleth.
+    var areaSelected = ""
     var me: LatLon?
+    /// The whole trip a Directions screen is showing: the walking and riding legs, and their markers.
+    var route: DrawnRoute?
     /// Reduce Transparency: no faint fills, no dimming — everything at full strength.
     var plainColors = false
     /// Nil in `standard`. In `subway`: the networks, the palette's switches and the board a tap reads.
@@ -123,6 +130,26 @@ enum MapPainter {
             }
         }
 
+        // City and neighbourhood outlines (`place:areas`). A thin dashed line and a name, and — for the one that
+        // was tapped — a wash of the brand colour so the tap can be seen. **Never a fill that carries a value**:
+        // docs/13 rule 1 forbids a choropleth, and a map that shades an area by a number is a league table with
+        // a picture on it. The line is the same weight whatever the area is, so nothing here says one place is
+        // more than another. Dashed, so a boundary is never mistaken for a street.
+        var areaLabels: [(name: String, x: Double, y: Double)] = []
+        for a in s.areas {
+            var shape = Path()
+            for ring in a.rings { trace(ring, cam: cam, into: &shape, close: true) }
+            let on = a.id == s.areaSelected
+            if on { ctx.fill(shape, with: .color(Color.brand.opacity(s.plainColors ? 0.16 : 0.08)), style: FillStyle(eoFill: true)) }
+            ctx.stroke(shape, with: .color(on ? MapColor.focus : MapColor.areaLine),
+                       style: StrokeStyle(lineWidth: on ? 3 : 1.6, lineJoin: .round, dash: on ? [] : [6, 4]))
+            let wide = a.box.width * cam.scale
+            if wide > areaLabelMinPoints {
+                let x = cam.screenX(a.box.centerX), y = cam.screenY(a.box.centerY)
+                if x > 0, x < w, y > 0, y < h { areaLabels.append((a.name, x, y)) }
+            }
+        }
+
         // The transport layers a person switched on. Drawn under the greenway and under the listing dots, so
         // switching a layer on never hides the thing this screen is about.
         for o in s.overlays where !o.data.lines.isEmpty && !o.subway {
@@ -147,7 +174,8 @@ enum MapPainter {
 
         drawGreenway(s, cam: cam, view: view, mpp: mpp, size: size, ctx: ctx)
         drawNames(labels, s, cam: cam, view: view, mpp: mpp, size: size, ctx: ctx, occupied: plan?.occupied ?? [],
-                  ink: quiet.map { Color(rgb: $0.ink) }, parkInk: quiet.map { Color(rgb: $0.parkInk) }, parkHalo: quiet.map { Color(rgb: $0.park) })
+                  ink: quiet.map { Color(rgb: $0.ink) }, parkInk: quiet.map { Color(rgb: $0.parkInk) },
+                  parkHalo: quiet.map { Color(rgb: $0.park) }, areaLabels: areaLabels)
 
         // Stops and stations. A dense layer waits for the zoom (thousands of bus stops are a smear, not places);
         // the list below the map shows every one of them at any zoom.
@@ -165,6 +193,11 @@ enum MapPainter {
         }
 
         if let sub = s.subway, let plan { SubwayPainter.drawGlyphs(plan, s, sub, into: ctx) }
+
+        // The trip, when this map is a Directions map: the walking legs solid in the walk token, the rides in
+        // the agency's own colour with the ride dash, each over a casing, and the leg a person is on drawn
+        // thicker (RouteOverlay.swift).
+        if let route = s.route { RoutePainter.drawLines(route, cam: cam, into: ctx) }
 
         // Our own listings, one colour per help group — and a white edge, so a dot is a dot on any ground.
         for d in s.dots {
@@ -184,6 +217,9 @@ enum MapPainter {
             ctx.fill(circle, with: .color(MapColor.me))
             ctx.stroke(circle, with: .color(Color.surface), lineWidth: 3)
         }
+
+        // Start, end, board and alight: last, so nothing is ever drawn over the four places that matter.
+        if let route = s.route { RoutePainter.drawMarks(route, cam: cam, size: size, into: ctx) }
     }
 
     // MARK: - the greenway, drawn like a transit line
@@ -254,7 +290,9 @@ enum MapPainter {
 
     private static func drawNames(_ labels: [(name: String, points: [Double], cls: Int)], _ s: MapScene,
                                   cam: MapCamera, view: MapBox, mpp: Double, size: CGSize, ctx: GraphicsContext,
-                                  occupied: [LabelRect] = [], ink: Color? = nil, parkInk: Color? = nil, parkHalo: Color? = nil) {
+                                  occupied: [LabelRect] = [], ink: Color? = nil, parkInk: Color? = nil,
+                                  parkHalo: Color? = nil,
+                                  areaLabels: [(name: String, x: Double, y: Double)] = []) {
         // A name takes a row of small circles along its text, so a slanted name only blocks the space it covers.
         var taken: [(x: Double, y: Double, r: Double)] = []
         // The subway style's badges, pills and terminals are already placed and outrank a street name: each is
@@ -293,6 +331,17 @@ enum MapPainter {
             named.append((l.name, spot.x, spot.y))
             drawLabel(resolved, at: CGPoint(x: spot.x, y: spot.y), angle: spot.a,
                       ink: ink ?? MapColor.ink, halo: MapColor.land, ctx: ctx)
+        }
+
+        // An area's name, over its middle. It goes through the same "is there room?" test as every other name,
+        // so an outline never writes over a street name, and it is drawn before the parks so the bigger thing
+        // wins (the web draws them in exactly this order).
+        for a in areaLabels {
+            let text = Text(a.name).font(.system(size: 13, weight: .bold))
+            let tw = width(of: "area:" + a.name, size: 13, text: text, ctx: ctx)
+            guard room(a.x, a.y, 0, tw, 13) else { continue }
+            drawLabel(ctx.resolve(text), at: CGPoint(x: a.x, y: a.y), angle: 0,
+                      ink: MapColor.areaInk, halo: MapColor.land, ctx: ctx)
         }
 
         guard let base = s.base, mpp < 7, s.drawParks else { return }

@@ -34,6 +34,39 @@ Three Gradle modules:
 > are listed under "What the first compile found", and two of them would have broken the app on every phone
 > below Android 15.
 >
+> **State on 2026-09-22 (second entry).** **The navigation rebuild of
+> `docs/NAVIGATION-AUDIT-2026-09-22.md` is built on Android**, which is item 2 of the port; the directions UI is a
+> separate follow-up once `directions-web` lands.
+>
+> - **Four tabs — Home · Help · Map · Areas** (audit H5). Search and Saved were tabs here and on neither of the
+>   other two clients; Search is now the first control on Home and a short button in the app bar, and Saved is a
+>   row under **Help → More**. Four labels fit at 320 px in all four languages, which six never did.
+> - **Urgent help is in the app bar on every screen** (audit H6). It had exactly two entry points before — Home's
+>   page body and the Map tab's chip — so from Help, a need, a listing or an area it took a trip back to Home.
+>   The two screens without the bar are the Map tab, which carries the same control as a floating chip, and a
+>   private screen, whose one pinned control is "Leave this page fast".
+> - **The Map tab opens with help on it** (audit H2): all eight help groups and City parks, with the greenway, the
+>   outlines and the bus routes off. A remembered choice still wins.
+> - **"Type a cross street"** (`Intersections.kt`, `:core`): a person who will not or cannot share a location
+>   types "Woodward and Warren" and the phone works the junction out from the streets the signed bundle already
+>   carries. Nothing is sent, and the typed text is memory only. The ask now runs **five minutes** with "Still
+>   looking…" and **Stop looking** after ten seconds, and the opening view is City Hall nudged 0.6 mile up
+>   Woodward at **two miles**, the same three numbers as the web.
+> - **The Areas tab lands on a map** (audit §3): the four city outlines with the person's own area picked out, the
+>   index behind "See this map as a list", and one virtual accessibility node per outline. **Hamtramck, Highland
+>   Park and Dearborn have a page** instead of being told by name that they are not in Detroit (audit C1):
+>   `Areas.kt` carries the `panels` allow-list, and a city page draws a panel because the area lists it, never
+>   because a number is present.
+> - **"Parks and paths"** replaced the greenway's Home tile (Kyle, direction b): 302 City parks, nearest first
+>   with a location and A to Z without one, each with a page; the recreation centers; and the greenway as **one
+>   row**. A park went from a dead end to two taps.
+>
+> Totals now: **27 + 305 + 305 JUnit tests and 203 fixture cases, 0 failures** (`:core` runs 332 of them on a
+> plain JDK with `HELP313_NO_ANDROID=1`, `:query` included). `:app:lint` passes and the debug APK is
+> **2,270,463 bytes (2.17 MiB)** on a clean build, up from 2.11 MiB — no new file ships in it, only code.
+> Walked on the emulator in English and Arabic and at font scale 2.0, with a `uiautomator` dump per screen
+> confirming Urgent help on Home, a listing detail, the Areas tab, a city page and a park page.
+>
 > **State on 2026-09-22.** **The directions rules are ported.** `:query` gains `Streets.kt`, `Walk.kt` and
 > `TransitPlan.kt`, a case-for-case Kotlin copy of `packages/query/src/{streets,walk,transit-plan}.ts`, so the
 > thirteen cases the Kotlin fixture runner had been counting as skipped now run: **203 of 203 fixture cases, 0
@@ -169,7 +202,7 @@ company, nothing sent, and it works with no signal at all** (DECISIONS 2026-09-1
 |---|---|
 | `MapData.kt` (`:core`) | The projection, the delta decoder for `map/base.json`, `map/streets.json` and the eleven `map/transit/*.json` layers, the camera with its clamps, the flick, and hit testing. No `android.*` class. |
 | `Locate.kt` (`:core`) | The Map tab's first open (2026-09-21): the four cities as a box, the two-mile radius, `firstOpenAction` (the same five lines as the web and the iPhone), and `LocateFlagStore` — one boolean, written atomically, and the only thing any of this keeps. Our own card comes first and **only** its "Use my location" button asks Android, for `ACCESS_COARSE_LOCATION` alone; Back is "Not now"; a fix outside the four cities moves nothing and says so. No `android.*` class. **The fix itself** comes from `MainActivity`: a last-known one from the network, passive or GPS provider, and — when the phone has none, which is what a fresh install looks like — **one** requested update, given up on after ten seconds and always unregistered. |
-| `MapLayers.kt` (`:core`) | What may be drawn and what never may: the seven help groups, `mapDrawable`, the per-layer styles by **token name**, the zoom rules, the greenway phase dashes, the reading order, and the layer store. |
+| `MapLayers.kt` (`:core`) | What may be drawn and what never may: the eight help groups (category audit, 2026-09-22), the outlines layer, `mapDrawable`, the per-layer styles by **token name**, the zoom rules, the greenway phase dashes, the reading order, and the layer store. |
 | `Language.kt` (`:core`) | `pickLanguage`: the first of the phone's own languages this app carries words for. |
 | `MapStyle.kt` (`:core`) | The `subway` style, everything that is not pixels: zoom bands with hysteresis, the `--tr-*` palette and the quiet basemap **as numbers**, `resolveTransitStyle`, the network-file decoders, per-run simplification, offsets, corner rounding, badge anchors, the round-robin badge claim with the trunk-badge nudge, 48 dp hit testing, the reading-order caps, `netFilesWanted`. A port of `apps/ios/Sources/HelpCore/MapStyle.swift`. |
 | `MapList.kt` (`:core`) | The transport part of "See this map as a list". It is never told the style, which is why the list is identical in both. |

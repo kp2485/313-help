@@ -104,6 +104,20 @@ object MapScreen {
                 a.askForLocation()
             },
         )
+        // **The third choice** (Kyle, 2026-09-22): a person who will not, or cannot, share a location can still
+        // say where they are, in the way people in Detroit actually say it. It asks the system for nothing: the
+        // junction is worked out on this phone from the streets the signed bundle already carries
+        // (Intersections.kt). The card closes, the field opens, and the card is not shown again — saying where you
+        // are is an answer to it (locateCardClick).
+        row.addView(
+            UI.button(a, L.t("loc.cross"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
+                val effect = locateCardClick(LocateCardAnswer.CROSS)
+                if (effect.openCrossStreet) a.crossWanted = true
+                if (effect.remember) a.locateFlags.markAnswered()
+                if (effect.close) a.locateCard = false
+                a.render()
+            },
+        )
         row.addView(
             UI.button(a, L.t("map.locate_no"), backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink) {
                 a.closeLocateCard()
@@ -208,6 +222,25 @@ object MapScreen {
         }
         // Our own card, before any system dialog: below the top row of controls, so "Urgent help" stays reachable.
         if (a.locateCard) column.addView(locateCard(a))
+        // The cross street, when it has been asked for or is in use. On a white card over the map, because it is a
+        // field and a list of choices and neither reads over a city (Intersections.kt; DECISIONS 2026-09-22).
+        if (a.crossWanted || a.crossText != null) {
+            val field = UI.card(a, padding = 14, topDp = 8)
+            CrossBox.add(a, field)
+            column.addView(field)
+        }
+        // Five minutes of listening, with one line after ten seconds and a way to stop.
+        if (a.locateSlow) {
+            column.addView(UI.pill(a, L.t("loc.slow"), R.drawable.pill_warn, R.color.warn_ink))
+            if (a.canStopLooking) {
+                column.addView(
+                    chip(a, L.t("loc.slow_stop")) {
+                        a.stopLookingForLocation()
+                        column.announceForAccessibility(L.t("loc.slow_stopped"))
+                    },
+                )
+            }
+        }
         if (a.locationRefused) {
             // Once Android has stopped putting the dialog up, the words say where the switch is — said once, on
             // the screen, with no deep link and no second prompt (docs/08: never nag).
@@ -464,9 +497,13 @@ object MapScreen {
                 g.tops.contains(it.category.substringBefore('.')) && it.lat != null && !isSensitive(it.category)
             }
         }.map { "help:" + it.id }
+        // Parks first and the greenway second, because the greenway is one path inside a 302-park system and not
+        // the headline it used to be (Kyle, direction b; DECISIONS 2026-09-22). The outlines join the group as an
+        // off-by-default layer, so a tap on an area opens the same page anywhere in the app (audit §3).
         val places = buildList {
-            if (a.store.bundle?.segments.orEmpty().isNotEmpty()) add("place:greenway")
             if (MapModel.parks.isNotEmpty()) add("place:parks")
+            if (a.store.bundle?.segments.orEmpty().isNotEmpty()) add("place:greenway")
+            if (HoodRepo.offered(a.store)) add(AREAS_LAYER)
         }
         val going = MapModel.transitLayers.map { "go:" + it.id }
 
