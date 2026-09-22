@@ -56,6 +56,12 @@ class MapScene {
     var dots: List<DrawnDot> = emptyList()
     var me: org.help313.query.LatLon? = null
 
+    /** The `place:areas` layer: the four city outlines, and the 205 neighborhoods once a name would fit. */
+    var areas: List<DrawnArea> = emptyList()
+
+    /** The one outline a tap picked out. A wash of the brand colour, and never anything about a number. */
+    var areaPick: String? = null
+
     /** One chosen trip, drawn over everything else on the map (DirWords.dirRoute). Null on every other screen. */
     var route: DirRoute? = null
 }
@@ -88,6 +94,13 @@ class MapView(context: Context) : View(context) {
     var overlays: List<MapOverlay> = emptyList()
     var greenwayOn = true
     var parksOn = true
+
+    /**
+     * The `place:areas` layer (DECISIONS 2026-09-22), off by default like every other place layer that is not
+     * parks. When it is on, the outlines are drawn, a tap on one opens that area's page, and the keyboard walks
+     * them between the greenway and the dots — the three things PR #22 wrote down and did not draw.
+     */
+    var areasOn = false
 
     /** Our own listing dots. Off on a map that is about one trip: the trip's own markers are what it shows. */
     var dotsOn = true
@@ -294,13 +307,14 @@ class MapView(context: Context) : View(context) {
                 val x = e.x / density.toDouble()
                 val y = e.y / density.toDouble()
                 val scene = subway
+                val areas = if (areasOn) MapModel.areasFor(cameraNow().metersPerPoint) else emptyList()
                 onSelect(
                     if (scene == null) {
-                        MapModel.pick(x, y, overlays, greenwayOn, parksOn)
+                        MapModel.pick(x, y, overlays, greenwayOn, parksOn, areas)
                     } else {
                         // A person taps what they see: the glyphs and the shifted lines of the last frame.
                         MapModel.pick(
-                            x, y, overlays, greenwayOn, parksOn,
+                            x, y, overlays, greenwayOn, parksOn, areas,
                             glyph = { painter.pickGlyph(x, y) },
                             line = { painter.pickLine(x, y, MapModel.camera) },
                         )
@@ -600,7 +614,7 @@ class MapView(context: Context) : View(context) {
         // on it is what the screen is about (DECISIONS 2026-09-22).
         route?.let { return routeFeatures(it, cam) }
         val key = "${MapModel.version}|${cam.centerX}|${cam.centerY}|${cam.scale}|${cam.width}|${cam.height}|" +
-            "$greenwayOn|${MapModel.selection?.key}|${subway != null}|${L.current()}"
+            "$greenwayOn|$areasOn|${MapModel.selection?.key}|${subway != null}|${L.current()}"
         if (key == featuresKey) return featuresHeld
         val existing = standardFeatures(cam)
         val scene = subway
@@ -738,6 +752,42 @@ class MapView(context: Context) : View(context) {
             }
         }
         val view = cam.visible
+        // **Then the areas** — [MAP_WALK_ORDER] is segment, area, dot: the walk goes from the biggest thing to the
+        // smallest, which is the reverse of the tail of the pick order, where a tap goes from the smallest to the
+        // biggest. Cities before the neighborhoods inside them, A to Z within each, so what a screen reader walks
+        // and what a finger finds agree.
+        if (areasOn) {
+            val walkable = MapModel.areasFor(cam.metersPerPoint)
+                .sortedWith(compareBy({ if (it.isCity) 0 else 1 }, { it.name }))
+            for (area in walkable) {
+                var minX = Double.POSITIVE_INFINITY
+                var maxX = Double.NEGATIVE_INFINITY
+                var minY = Double.POSITIVE_INFINITY
+                var maxY = Double.NEGATIVE_INFINITY
+                for (ring in area.rings) for (p in ring) {
+                    val px = MapProjection.pointX(p)
+                    val py = MapProjection.pointY(p)
+                    if (px < minX) minX = px
+                    if (px > maxX) maxX = px
+                    if (py < minY) minY = py
+                    if (py > maxY) maxY = py
+                }
+                if (!minX.isFinite() || !MapBox(minX, minY, maxX, maxY).intersects(view)) continue
+                val x0 = max(6.0, min(cam.screenX(minX), cam.screenX(maxX)))
+                val x1 = min(cam.width - 6, max(cam.screenX(minX), cam.screenX(maxX)))
+                val y0 = max(6.0, min(cam.screenY(minY), cam.screenY(maxY)))
+                val y1 = min(cam.height - 6, max(cam.screenY(minY), cam.screenY(maxY)))
+                out.add(
+                    MapFeature(
+                        id = "area:" + area.id,
+                        label = joinParts(listOf(area.name, L.t("map.label_areas"))),
+                        selection = MapSelection.Area(area.id),
+                        cx = (x0 + x1) / 2, cy = (y0 + y1) / 2,
+                        halfWidth = max(22.0, (x1 - x0) / 2), halfHeight = max(22.0, (y1 - y0) / 2),
+                    ),
+                )
+            }
+        }
         val onScreen = MapModel.dots.filter { view.contains(it.x, it.y) }
         val near = placesInReadingOrder(onScreen, cam.centerX, cam.centerY, { it.x }, { it.y }, { it.name })
         for (d in near.take(40)) {
@@ -767,6 +817,8 @@ class MapView(context: Context) : View(context) {
         scene.segments = if (greenwayOn) MapModel.segments else emptyList()
         scene.focus = (MapModel.selection as? MapSelection.Stretch)?.id
         scene.dots = if (dotsOn) MapModel.dots else emptyList()
+        scene.areas = if (areasOn) MapModel.areasFor(cameraNow().metersPerPoint) else emptyList()
+        scene.areaPick = (MapModel.selection as? MapSelection.Area)?.id
         scene.me = here
         scene.route = route
         draw(scene, canvas)
@@ -885,6 +937,21 @@ class MapView(context: Context) : View(context) {
                 for (r in visible[cls]) if (r.name.isNotEmpty()) labels.add(r to cls)
             }
         }
+
+        // **The outlines of the four cities and the 205 neighborhoods** (`place:areas`), when that layer is on.
+        //
+        // This closes the gap PR #22 left: the layer, its pick order and its keyboard walk were all written down
+        // in Areas.kt and offered in the switcher, and the canvas drew nothing at all — a person could switch
+        // "Neighborhoods and cities" on and the map would not change.
+        //
+        // **Every outline, in every band** (docs/MAP-STYLE.md section 15): dashed lines whose weight comes from
+        // [boundaryStyle], a city heavier than a neighbourhood and nothing else telling them apart. Drawn here —
+        // step 4½, over the ground, the parks and the streets, and under the transport layers, the greenway, the
+        // dots and the labels — because an outline is the ground a person is reading and never the thing they
+        // came for: switching boundaries on can never hide a place that helps.
+        // **No choropleth, ever** (docs/13, rule 1): the only fill is a wash on the one outline that was tapped,
+        // and it carries no number.
+        drawAreas(s, cam, view, mpp, w, h, c)
 
         // The transport layers a person switched on. Drawn under the greenway and under the listing dots, so
         // switching a layer on never hides the thing this screen is about. A casing first, exactly as the greenway
@@ -1115,6 +1182,89 @@ class MapView(context: Context) : View(context) {
         }
     }
 
+    // ---- the outlines of the four cities and the 205 neighborhoods -----------------------------------------------
+
+    /**
+     * The `place:areas` layer, drawn to the band table of docs/MAP-STYLE.md section 15 ([boundaryStyle]). Every
+     * outline, in every band; a city outline is heavier than a neighbourhood's and that is the **only** thing
+     * that tells them apart — never a colour, and never a fill. The names are [areaNameCandidates]', placed in
+     * [drawNames] with the streets and the parks so they compete for the same space.
+     *
+     * The one outline a tap chose gets an 8 % wash of the brand colour. That is the only fill this layer has, and
+     * it says "this is the one you tapped" and nothing else: **no choropleth, ever** (docs/13, rule 1). Nothing
+     * here is handed a number about an area — [DrawnArea] carries an id, a name, a flag and its rings.
+     */
+    private fun drawAreas(s: MapScene, cam: MapCamera, view: MapBox, mpp: Double, w: Float, h: Float, c: Canvas) {
+        if (s.areas.isEmpty()) return
+        val style = boundaryStyle(mpp)
+        // The dash is ABSOLUTE, never multiplied by the line width the way a transit dash is: a thin line whose
+        // dash scales with it stops being dashed, and the dashed texture is what says "this is not a street".
+        val dash = android.graphics.DashPathEffect(style.dash.map { it.toFloat() }.toFloatArray(), 0f)
+        for (area in s.areas) {
+            val path = Path()
+            path.fillType = Path.FillType.EVEN_ODD
+            var on = false
+            for (ring in area.rings) {
+                if (ring.size < 2) continue
+                for ((i, p) in ring.withIndex()) {
+                    val x = cam.screenX(MapProjection.pointX(p)).toFloat()
+                    val y = cam.screenY(MapProjection.pointY(p)).toFloat()
+                    if (x >= -40 && y >= -40 && x <= w + 40 && y <= h + 40) on = true
+                    if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                }
+                path.close()
+            }
+            if (!on) continue
+            val picked = area.id == s.areaPick
+            if (picked) {
+                // The one outline that was tapped: a wash of the brand colour over its rings. **A selection,
+                // never a value** — nothing here is handed a number about an area (docs/13, rule 1).
+                fill.color = (palette.brand and 0x00FFFFFF) or ((BOUNDARY_WASH_ALPHA * 255).toInt() shl 24)
+                c.drawPath(path, fill)
+            }
+            stroke.color = if (picked) palette.brand else palette.boundary
+            stroke.strokeWidth = (if (picked) BOUNDARY_SELECTED_WIDTH else if (area.isCity) style.cityWidth else style.width).toFloat()
+            // Solid for the chosen one; dashed for every other, city and neighbourhood alike — **the only
+            // difference between a city and a neighbourhood is weight**, never colour and never a fill.
+            stroke.pathEffect = if (picked) null else dash
+            c.drawPath(path, stroke)
+            stroke.pathEffect = null
+        }
+    }
+
+    /**
+     * Which boundaries carry their name this frame: the ones whose outline is at least [BoundaryStyle.nameMinPx]
+     * wide on screen, **nearest the middle of the screen first**, at most [BoundaryStyle.nameCap] of them. The
+     * name itself still goes through the map's own collision test in [drawNames], so one that does not fit is
+     * dropped — never shrunk, never overlapped.
+     */
+    private fun areaNameCandidates(s: MapScene, cam: MapCamera, style: BoundaryStyle): List<Triple<String, Double, Double>> {
+        if (!style.names || s.areas.isEmpty()) return emptyList()
+        val out = ArrayList<Pair<Double, Triple<String, Double, Double>>>()
+        for (area in s.areas) {
+            if (area.name.isEmpty()) continue
+            var minX = Double.POSITIVE_INFINITY
+            var maxX = Double.NEGATIVE_INFINITY
+            var minY = Double.POSITIVE_INFINITY
+            var maxY = Double.NEGATIVE_INFINITY
+            for (ring in area.rings) for (p in ring) {
+                val px = MapProjection.pointX(p)
+                val py = MapProjection.pointY(p)
+                if (px < minX) minX = px
+                if (px > maxX) maxX = px
+                if (py < minY) minY = py
+                if (py > maxY) maxY = py
+            }
+            if (!minX.isFinite()) continue
+            if ((maxX - minX) * cam.scale < style.nameMinPx) continue
+            val x = cam.screenX((minX + maxX) / 2)
+            val y = cam.screenY((minY + maxY) / 2)
+            if (x <= 0 || y <= 0 || x >= cam.width || y >= cam.height) continue
+            out.add(hypot(x - cam.width / 2, y - cam.height / 2) to Triple(area.name, x, y))
+        }
+        return out.sortedBy { it.first }.take(style.nameCap).map { it.second }
+    }
+
     // ---- the greenway, drawn like a transit line ---------------------------------------------------------------
 
     private fun drawGreenway(
@@ -1269,6 +1419,21 @@ class MapView(context: Context) : View(context) {
             val y = spot[1] + uy * at
             named.add(Triple(name, x, y))
             drawLabel(c, name, x, y, spot[2], inkColor, palette.land, size)
+        }
+
+        // **Area names, after the streets and before the parks**, so the bigger thing wins the space
+        // (docs/MAP-STYLE.md section 15.1). Horizontal, never rotated, and left to right on an Arabic screen like
+        // every other name on this map — the map itself never mirrors (section 8). The candidates were already
+        // capped and ordered nearest the middle of the screen first; `room` is what decides the rest, so a name
+        // that does not fit is dropped rather than shrunk or overlapped.
+        for ((name, x, y) in areaNameCandidates(s, cam, boundaryStyle(mpp))) {
+            textFill.textSize = 13f
+            textHalo.textSize = 13f
+            textFill.textSkewX = 0f
+            textHalo.textSkewX = 0f
+            val tw = textWidth("area:$name", 13f, textFill).toDouble()
+            if (!room(x, y, 0.0, tw, 13.0)) continue
+            drawLabel(c, name, x, y, 0.0, palette.boundary, palette.land, 13f)
         }
 
         val base = s.base ?: return

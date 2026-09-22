@@ -877,8 +877,13 @@ boundaries for ever; adding the layer on every load instead would mean nobody co
       and the list section are in `MapScreen.swift`. `areasDrawn` no longer takes a zoom and
       `areaDetailMetersPerPoint` is gone. Tests: `HelpCoreTests/BoundariesTests.swift`, the contrast pairs in
       `MapStyleTests`, and `AppParityTests` reads this table out of `bounds.ts` and out of `Boundaries.swift`.
-- [ ] Android: the same in `MapStyle.kt` / `MapPalette.kt`, the pass in the same place, the marker in the
-      app-private state file.
+- [x] Android (2026-09-22): `app/src/main/kotlin/org/help313/app/Bounds.kt` in `:core` (the band table and the
+      token in four modes), `MapPalette.boundary`, `map_bnd` / `map_bnd_more` in `res/values{,-night}/colors.xml`,
+      the pass in `MapView.drawAreas` with the names in `drawNames` between the streets and the parks,
+      `defaultMapLayers` gains the layer and `LAYERS_VERSION` / `migrateLayers` do the once-only migration in
+      `files/map-layers.json`, the key row in `MapScreen.mapKey` and the list section in `MapScreen.list`.
+      `drawnAreas` no longer takes a zoom and `AREAS_NAME_METERS_PER_DP` is gone. Held to this table by
+      `ParityTest`, which reads `apps/web/src/bounds.ts`.
 - Four things to get right, because they are where the web went wrong first: the dash is **absolute** and its
   "on" length is never under the stroke width; names are **capped and nearest-first**, not "whatever fits"; the
   migration marker must be written by **every** write of the layer list, not only by the migration; and the

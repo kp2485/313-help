@@ -175,6 +175,13 @@ object HoodScreens {
      */
     private var byDistrict = false
 
+    /**
+     * **Nearest first**, the index's third order (DECISIONS 2026-09-22). Offered only while a location or a typed
+     * ZIP is known, and dropped the moment it is not: an order that cannot be computed is never left switched on.
+     * Still not a ranking — see [hoodsNearest].
+     */
+    private var byNear = false
+
     /** Large text stacks every table row instead of laying it across the screen. */
     private fun stacked(a: MainActivity): Boolean = a.resources.configuration.fontScale > 1.3f
 
@@ -262,15 +269,24 @@ object HoodScreens {
         box: android.widget.EditText,
     ) {
         toggle.removeAllViews()
-        for ((key, wanted) in listOf("hood.group_abc" to false, "hood.group_district" to true)) {
-            val on = byDistrict == wanted
+        // "Nearest first" is offered only while there is a point to measure from, and is switched off again the
+        // moment there is not: the list never claims an order it cannot compute.
+        if (a.near == null) byNear = false
+        val orders = buildList {
+            if (a.near != null) add("hood.order_near" to "near")
+            add("hood.group_abc" to "abc")
+            add("hood.group_district" to "district")
+        }
+        for ((key, wanted) in orders) {
+            val on = (if (byNear) "near" else if (byDistrict) "district" else "abc") == wanted
             val b = UI.button(
                 a, L.t(key),
                 backgroundId = if (on) R.drawable.pill_brand else R.drawable.pill_soft,
                 textColorId = if (on) R.color.brand_ink else R.color.brand_soft_ink,
                 topDp = 6,
             ) {
-                byDistrict = wanted
+                byNear = wanted == "near"
+                byDistrict = wanted == "district"
                 drawToggle(a, toggle, out, d, list, box)
                 drawList(a, out, d, list, box.text.toString())
             }
@@ -351,7 +367,12 @@ object HoodScreens {
             out.addView(UI.text(a, L.t("hood.find_none"), 17f, R.color.muted, topDp = 12))
             return
         }
-        if (byDistrict) {
+        val from = a.near
+        if (byNear && from != null) {
+            // One group, no headings: a letter or a district over a distance-ordered list would be a heading that
+            // lies about the order under it (docs/13; the same rule as the web's `groupHoods`).
+            for (h in hoodsNearest(found, from)) out.addView(nameCard(a, h))
+        } else if (byDistrict) {
             for (g in hoodsByDistrict(found)) {
                 out.addView(sub(a, if (g.district == null) L.t("hood.no_district") else L.t("hood.district", "n" to g.district.toString())))
                 for (h in g.items) out.addView(nameCard(a, h))

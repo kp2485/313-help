@@ -396,6 +396,13 @@ class MainActivity : Activity() {
             closeLocateCard()
             return
         }
+        // An area page opened in place on the Areas tab is the innermost thing on screen, and it is not a pushed
+        // screen: Back closes it and leaves the map whole again, exactly as the strip's own Back button does
+        // (Kyle, 2026-09-22; AreaScreens.onBack).
+        if (current() is Route.Hoods && AreaScreens.onBack()) {
+            render()
+            return
+        }
         if (current() is Route.Map && MapModel.selection != null) {
             MapModel.selection = null
             render()

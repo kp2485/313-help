@@ -54,6 +54,8 @@ kotlin.sourceSets["main"].kotlin.include(
     "org/help313/app/Directions.kt",     // which files the street graph is built from, its one key, its states
     "org/help313/app/Intersections.kt",  // "Woodward and Warren": the parser, the crossings, the 120 m merge
     "org/help313/app/Areas.kt",          // the four cities and the 205 outlines: the pages, the layer, the pick
+    "org/help313/app/AreasHome.kt",      // the Areas tab: what it lands on, and the strip that collapses as you read
+    "org/help313/app/Bounds.kt",         // how a boundary is drawn at every zoom: the band table and its one colour
     "org/help313/app/Parks.kt",          // the 302 parks: what one is, and the only two orders a list may have
     "org/help313/app/DirWords.kt",       // every sentence a trip plan is made of, the overlay, the start decision
 )

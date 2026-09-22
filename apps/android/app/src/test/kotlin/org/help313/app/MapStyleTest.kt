@@ -78,14 +78,19 @@ class MapStyleChoiceTest {
         val dir = tempDir()
         File(dir, "map-layers.json").writeText("""["go:mogo","place:parks"]""")
         val store = MapLayerStore(dir)
-        assertEquals(listOf("go:mogo", "place:parks"), store.on)
+        // A file from before the version marker gains the boundaries layer **once**, at the end, and nothing else
+        // is touched (docs/MAP-STYLE.md section 15.4). The marker is written back at the same moment, so a person
+        // who then switches the boundaries off is never migrated again — the next store reads the list as it is.
+        assertEquals(listOf("go:mogo", "place:parks", AREAS_LAYER), store.on)
         assertEquals(MapStyle.STANDARD, store.style)
+        store.set(listOf("go:mogo", "place:parks"))
+        assertEquals("the migration ran a second time", listOf("go:mogo", "place:parks"), MapLayerStore(dir).on)
     }
 
     @Test
     fun aStyleNobodyKnowsReadsAsStandard() {
         val dir = tempDir()
-        File(dir, "map-layers.json").writeText("""{"on":["go:mogo"],"style":"neon"}""")
+        File(dir, "map-layers.json").writeText("""{"v":2,"on":["go:mogo"],"style":"neon"}""")
         val store = MapLayerStore(dir)
         assertEquals(MapStyle.STANDARD, store.style)
         assertEquals(listOf("go:mogo"), store.on)

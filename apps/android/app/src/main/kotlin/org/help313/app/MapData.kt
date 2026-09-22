@@ -390,6 +390,64 @@ data class MapCamera(
                 max(height, 1.0),
             ).clamped()
         }
+
+        /**
+         * How much room is left around an outline when a map is asked to show that outline and nothing else, and
+         * how close such a map may ever get (Kyle, 2026-09-22: "a map view … zoomed into the polygon of the
+         * neighborhood that the user is in"). Both are named here, once, because the three clients have to use
+         * the same two numbers or the Areas tab opens on three different pictures.
+         *
+         * - [AREA_FIT_MARGIN] — 8 %: the outline's own box, grown by 8 % on every side, is what has to fit.
+         *   Enough that the dashed edge is never flush against the frame, small enough that a neighbourhood still
+         *   fills the screen.
+         * - [AREA_MIN_MPP] — 4 metres per dp: the closest this camera will ever open, whatever it was handed. The
+         *   smallest of the City's 205 outlines is a few blocks across; fitting it exactly would open on a
+         *   picture of six houses with no streets a person could recognise. The map's own limit is 0.6 m/dp
+         *   ([MAX_SCALE]) and a person can still zoom all the way in by hand — this is only where it OPENS.
+         *
+         * A whole city is handled by the other end of the same clamp: [MIN_SCALE] is 90 m per dp, so Detroit
+         * cannot open wider than the camera has ever allowed.
+         */
+        const val AREA_FIT_MARGIN = 0.08
+        const val AREA_MIN_MPP = 4.0
+
+        /**
+         * The camera that shows one area's outline: fit its rings, with [AREA_FIT_MARGIN] of room, inside the box.
+         * The port of `cameraForArea` in apps/web/src/map.ts, held to its cases by AreasHomeTest.
+         *
+         * Pure — rings in, camera out — and portrait or landscape is decided by the box it is handed, so the same
+         * neighbourhood fits whichever way the phone is held. The SMALLER of the two fits, so the WHOLE outline is
+         * on screen (unlike `cover`, which fills the box and lets the long axis run off it): an area map that cut
+         * the top off Rosedale Park would be answering a different question.
+         *
+         * Handed nothing — an area the bundle carries no outline for — it returns null, and the caller keeps the
+         * view it already had. Never a guess, and never a camera pointed at 0°N 0°E.
+         */
+        fun forArea(rings: List<List<LatLon>>, width: Double, height: Double): MapCamera? {
+            var minX = Double.POSITIVE_INFINITY
+            var maxX = Double.NEGATIVE_INFINITY
+            var minY = Double.POSITIVE_INFINITY
+            var maxY = Double.NEGATIVE_INFINITY
+            for (ring in rings) for (q in ring) {
+                val x = MapProjection.pointX(q)
+                val y = MapProjection.pointY(q)
+                if (x < minX) minX = x
+                if (x > maxX) maxX = x
+                if (y < minY) minY = y
+                if (y > maxY) maxY = y
+            }
+            if (!minX.isFinite() || !minY.isFinite()) return null
+            val w = max(1.0, width)
+            val h = max(1.0, height)
+            val grow = 1 + AREA_FIT_MARGIN * 2
+            // A point, or a sliver: give it something to be wide, so the division below is never by zero.
+            val spanX = max(maxX - minX, 1 / MapProjection.METERS_PER_UNIT) * grow
+            val spanY = max(maxY - minY, 1 / MapProjection.METERS_PER_UNIT) * grow
+            val fit = min(w / spanX, h / spanY)
+            // The clamps, in this order: never closer than AREA_MIN_MPP, never outside the camera's own two limits.
+            val s = max(MIN_SCALE, min(MAX_SCALE, min(MapProjection.METERS_PER_UNIT / AREA_MIN_MPP, fit)))
+            return MapCamera((minX + maxX) / 2, (minY + maxY) / 2, s, w, h).clamped()
+        }
     }
 }
 

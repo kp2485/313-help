@@ -42,6 +42,15 @@ object MapScreen {
         map.subway = MapModel.subwayScene(a, a.store)
         map.greenwayOn = MapModel.isOn(a, "place:greenway")
         map.parksOn = MapModel.isOn(a, "place:parks")
+        // The outlines the switcher has always offered and the canvas never drew (PR #22's gap). The numbers file
+        // is asked for here, because a layer that is on must have something to draw.
+        map.areasOn = MapModel.isOn(a, AREAS_LAYER)
+        if (map.areasOn) {
+            // Set after MainActivity.render cleared it, and only while this tab is the screen: a view that has been
+            // thrown away is never called back into.
+            HoodRepo.onChange = { if (a.current() is Route.Map) map.invalidate() }
+            HoodRepo.want(a.store)
+        }
         map.here = a.near
         // Where the map opens if this is the first layout of this launch: a location already known, or — with
         // none — the civic anchor (Locate.kt, DECISIONS 2026-09-22). Never stored; it dies with the process.
@@ -376,6 +385,19 @@ object MapScreen {
             // so. Named rather than left to an `else`, so that a selection added later cannot fall through here.
             is MapSelection.TripStop -> Unit
             is MapSelection.Park -> head(L.t("map.park"), selection.name)
+            // One outline of the `place:areas` layer. The card names it, says which city it is in or which
+            // council district, and offers the one area page the whole app shares.
+            is MapSelection.Area -> HoodRepo.data?.let { d ->
+                areaById(d, selection.id)?.let { page ->
+                    head(L.t("map.label_areas"), page.name)
+                    card.addView(UI.text(a, AreaScreens.subLine(d, page), 15f, R.color.muted, topDp = 2))
+                    card.addView(
+                        UI.button(a, L.t("hood.about_area"), description = L.t("hood.about_area") + L.t("list.sep") + page.name) {
+                            a.push(Route.Hood(page.id))
+                        },
+                    )
+                }
+            }
             is MapSelection.Stop -> head(selection.layer, selection.name.ifEmpty { selection.layer })
             is MapSelection.Route -> head(selection.layer, selection.name.ifEmpty { selection.layer })
             is MapSelection.Line -> routeCard(a, card, selection)
@@ -530,6 +552,7 @@ object MapScreen {
             col.addView(UI.sectionHead(a, L.t(headKey)))
             for (id in ids) col.addView(layerRow(a, id))
         }
+        mapKey(a, col)
         // Flipping a switch redraws this screen, because a layer that fails to load grows a "Try again" under its
         // own row. Redrawing must not throw the person back to the top of a list of twenty: the position is kept
         // for as long as the process lives, and it is a scroll offset, not a fact about anybody.
@@ -609,11 +632,22 @@ object MapScreen {
             }
         }
         col.addView(box)
+    }
 
-        if (chosen != MapStyle.SUBWAY) return
+    /**
+     * **The key under the map, in either style** (docs/MAP-STYLE.md section 15.5). It used to live inside the
+     * style group, so it appeared only on a bundle that carries network files and only in `subway`; the boundary
+     * row has to be there whenever the boundaries are drawn, which is by default, so the key is its own thing now.
+     */
+    private fun mapKey(a: MainActivity, col: LinearLayout) {
+        val chosen = MapModel.style(a)
         fun on(id: String) = MapModel.isOn(a, "go:$id")
-        val bus = on("ddot_routes") || on("smart_routes")
-        val lines = listOf(
+        val bus = (chosen == MapStyle.SUBWAY) && (on("ddot_routes") || on("smart_routes"))
+        // **The boundary row is in either style** (docs/MAP-STYLE.md section 15.5), under the one `map.key`
+        // heading it shares with the subway rows, and it carries the layer's own name so the switcher, the key
+        // and the list can never drift.
+        val boundary = if (MapModel.isOn(a, AREAS_LAYER)) listOf(Triple("bnd", "layer.place.areas", true)) else emptyList()
+        val subwayRows = if (chosen != MapStyle.SUBWAY) emptyList() else listOf(
             Triple("frequent", "map.key_frequent", bus), Triple("local", "map.key_local", bus),
             Triple("smart", "map.key_smart", on("smart_routes")), Triple("trunk", "map.key_trunk", bus),
             Triple("station", "map.key_station", on("ddot_stops") || on("smart_stops") || on("qline") || on("people_mover")),
@@ -621,7 +655,8 @@ object MapScreen {
             Triple("end", "map.key_end", bus || on("qline")),
             Triple("qline", "map.key_qline", on("qline")), Triple("dpm", "map.key_dpm", on("people_mover")),
             Triple("bike", "map.key_bike", on("bike_lanes")),
-        ).filter { it.third }
+        )
+        val lines = (boundary + subwayRows).filter { it.third }
         if (lines.isEmpty()) return
         val key = UI.card(a)
         key.addView(UI.text(a, L.t("map.key"), 16f, R.color.ink, bold = true))
@@ -734,6 +769,16 @@ object MapScreen {
             col.addView(UI.sectionHead(a, L.t("rec.parks")))
             // Park, route and stop names are written by the City, never by us: one run of their words.
             col.addView(UI.text(a, names(parks.map { it.name }, 30), 16f, R.color.ink))
+        }
+        // **The boundaries, in words** (docs/MAP-STYLE.md section 15.5). A picture that some people cannot see is
+        // an extra, never the answer: whenever the layer is on, the names it draws are here too, under the same
+        // heading the switcher and the key use, bounded at 30 exactly as the parks section is.
+        if (MapModel.isOn(a, AREAS_LAYER)) {
+            val areaNames = HoodRepo.data?.let { d -> drawnAreas(d).map { it.name }.filter { it.isNotEmpty() } }.orEmpty()
+            if (areaNames.isNotEmpty()) {
+                col.addView(UI.sectionHead(a, L.t("layer.place.areas")))
+                col.addView(UI.text(a, names(areaNames, 30), 16f, R.color.ink))
+            }
         }
         // The transport layers, from the STANDARD layer files only. `mapListSections` (MapList.kt, `:core`) is never
         // told the map style, so this list is the same list, to the character, in both (docs/MAP-STYLE.md section 9).

@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import org.help313.query.LatLon
@@ -46,12 +47,26 @@ class AreaOutlineView(
     context: Context,
     private val areas: List<DrawnArea>,
     private val selectedId: String? = null,
+    /**
+     * Where this map OPENS: the rings of one outline, framed with [MapCamera.AREA_FIT_MARGIN] of room and never
+     * closer than [MapCamera.AREA_MIN_MPP] ([MapCamera.forArea] — the same camera as the web's `cameraForArea`).
+     * Null opens on all the outlines it was handed, which is the whole city.
+     */
+    private val openRings: List<List<LatLon>>? = null,
+    /**
+     * Where this map opens when there is no outline to frame: a point and a radius in metres — the app's one
+     * opening view ([openingView], Locate.kt), which is a location already known or the civic anchor. Without it
+     * the map opens on everything it was handed, which is the four cities at arm's length.
+     */
+    private val openAt: Pair<LatLon, Double>? = null,
+    /** True for the tab's own landing and for the strip: fill the box given rather than take a fixed shape. */
+    private val fillsBox: Boolean = false,
     private val onPick: ((DrawnArea) -> Unit)? = null,
 ) : View(context) {
 
     /** The single-outline case the old still view covered: one ring list, no tap, no name. */
     constructor(context: Context, rings: List<List<LatLon>>) :
-        this(context, listOf(DrawnArea("one", "", true, rings)), "one", null)
+        this(context, listOf(DrawnArea("one", "", true, rings)), "one", null, null, false, null)
 
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -67,6 +82,9 @@ class AreaOutlineView(
 
     private var camera: org.help313.app.MapCamera? = null
 
+    /** Which outline is picked out: the one a keyboard has walked to, else the one the screen chose. */
+    private val shownId: String? get() = walked ?: selectedId
+
     init {
         isClickable = onPick != null
         isFocusable = onPick != null
@@ -76,23 +94,43 @@ class AreaOutlineView(
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         val w = MeasureSpec.getSize(widthSpec)
+        if (fillsBox) {
+            // The tab's landing and the strip: whatever room the parent gave, filled. A map that is the screen.
+            setMeasuredDimension(w, MeasureSpec.getSize(heightSpec))
+            return
+        }
         // A fixed shape, not a fixed height in text: the picture carries no words that have to grow. The words
         // under it do, and at 200 % text the search box below is still on the first screen.
         setMeasuredDimension(w, (w * if (onPick == null) 0.58f else 0.92f).toInt())
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        // A new box is a new opening view, not the old camera stretched: the outline is framed again.
+        camera = null
+    }
+
     private fun cameraFor(): org.help313.app.MapCamera? {
         val density = resources.displayMetrics.density.toDouble()
+        if (width == 0 || height == 0) return null
+        val w = width / density
+        val h = height / density
+        // Zoomed into the polygon, when there is one to zoom into (Kyle, 2026-09-22). Handed no rings — or rings
+        // the bundle does not carry — it falls back to all the outlines it was given, and never to a guess.
+        openRings?.let { rings -> org.help313.app.MapCamera.forArea(rings, w, h)?.let { return it } }
+        // No polygon to frame: the app's one opening view — a location already known, or the civic anchor.
+        openAt?.let { (at, radius) -> return org.help313.app.MapCamera.forRadius(at, radius, w, h) }
         val points = areas.flatMap { it.rings.flatten() }
-        if (points.isEmpty() || width == 0 || height == 0) return null
-        return org.help313.app.MapCamera.fitting(points, width / density, height / density, minMeters = 900.0)
+        if (points.isEmpty()) return null
+        return org.help313.app.MapCamera.fitting(points, w, h, minMeters = 900.0)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val density = resources.displayMetrics.density
-        val cam = cameraFor() ?: return
+        val cam = camera ?: cameraFor() ?: return
         camera = cam
+        val style = boundaryStyle(cam.metersPerPoint)
         for (area in areas) {
             val path = Path()
             path.fillType = Path.FillType.EVEN_ODD
@@ -107,38 +145,52 @@ class AreaOutlineView(
             }
             // The one selected outline gets a light wash of the brand colour. It carries NO number: it says
             // "this is the one you tapped" and nothing else (docs/13, rule 1 — no choropleth, ever).
-            if (area.id == selectedId) {
+            val picked = area.id == shownId
+            if (picked) {
                 fill.color = UI.color(context, R.color.brand_soft)
                 canvas.drawPath(path, fill)
             }
-            stroke.color = UI.color(context, if (area.isCity) R.color.brand else R.color.muted)
-            stroke.strokeWidth = (if (area.isCity) 2f else 1.2f) * density
-            // A neighborhood is a thin dashed line, a city a solid one, so the two are told apart without colour.
-            stroke.pathEffect = if (area.isCity) null else android.graphics.DashPathEffect(floatArrayOf(6f * density, 4f * density), 0f)
+            // **The same table as the Map tab** ([boundaryStyle], docs/MAP-STYLE.md section 15): a boundary is one
+            // thing wherever it is drawn, and the only difference between a city and a neighbourhood is weight.
+            // The dash is absolute in dp, never scaled by the stroke width.
+            stroke.color = if (picked) UI.color(context, R.color.brand) else UI.color(context, R.color.map_bnd)
+            stroke.strokeWidth =
+                (if (picked) BOUNDARY_SELECTED_WIDTH else if (area.isCity) style.cityWidth else style.width).toFloat() * density
+            stroke.pathEffect =
+                if (picked) null
+                else android.graphics.DashPathEffect(style.dash.map { (it * density).toFloat() }.toFloatArray(), 0f)
             canvas.drawPath(path, stroke)
         }
         stroke.pathEffect = null
-        // Names last, over every outline, so one is never drawn under the next area's edge.
-        if (onPick == null) return
-        label.textSize = 11f * density
-        halo.textSize = 11f * density
-        halo.strokeWidth = 3f * density
+        // Names last, over every outline, so one is never drawn under the next area's edge. The band decides
+        // whether there are any, and the one that was tapped is always named — the card under the map names it
+        // anyway, and a person who has just chosen a shape should see which one they chose.
+        if (onPick == null || !style.names) return
+        label.textSize = 13f * density
+        halo.textSize = 13f * density
+        halo.strokeWidth = 3.5f * density
         halo.color = UI.color(context, R.color.map_land)
-        label.color = UI.color(context, R.color.ink)
-        // **The label rule** (DECISIONS 2026-09-22): a neighborhood is named only from the zoom at which its name
-        // fits — about 70 dp of name over an area about a kilometre across. Below that, the four cities alone, and
-        // the one outline that was tapped, which the card under the map names anyway.
-        //
-        // The neighborhood *outlines* are still drawn here, unlike on the Map tab's layer, because picking one is
-        // this tab's whole job and a canvas that showed four shapes would have nothing to pick. What the rule
-        // governs is the words, which are what would otherwise be 205 names on top of one another.
-        val named = cam.metersPerPoint <= AREAS_NAME_METERS_PER_DP
-        for (area in areas) {
-            if (area.name.isEmpty()) continue
-            if (!area.isCity && !named && area.id != selectedId) continue
-            val box = centreOf(area, cam, density) ?: continue
-            canvas.drawText(area.name, box.first, box.second, halo)
-            canvas.drawText(area.name, box.first, box.second, label)
+        label.color = UI.color(context, R.color.map_bnd)
+        // Nearest the middle of the screen first, capped, exactly as the Map tab's pass is.
+        val middleX = width / 2f
+        val middleY = height / 2f
+        val wanted = areas
+            .filter { it.name.isNotEmpty() }
+            .mapNotNull { a -> centreOf(a, cam, density)?.let { Triple(a, it.first, it.second) } }
+            .sortedBy { kotlin.math.hypot(it.second - middleX, it.third - middleY) }
+            .take(style.nameCap)
+        // A name that does not fit is dropped, never shrunk and never drawn over another one — the same rule the
+        // Map tab's own pass follows. Without it the first live run drew "Brus[h Park]" through "Douglass" and
+        // "Downtown" through "Greektown" (emulator, 2026-09-22).
+        val placed = ArrayList<android.graphics.RectF>()
+        for ((area, x, y) in wanted) {
+            if (x < 0 || y < 0 || x > width || y > height) continue
+            val half = label.measureText(area.name) / 2 + 4 * density
+            val box = android.graphics.RectF(x - half, y - 9f * density, x + half, y + 9f * density)
+            if (placed.any { android.graphics.RectF.intersects(it, box) }) continue
+            placed.add(box)
+            canvas.drawText(area.name, x, y, halo)
+            canvas.drawText(area.name, x, y, label)
         }
     }
 
@@ -150,16 +202,118 @@ class AreaOutlineView(
         return (cam.screenX(MapProjection.x(lon)) * density).toFloat() to (cam.screenY(MapProjection.y(lat)) * density).toFloat()
     }
 
+    // ---- fingers ------------------------------------------------------------------------------------------
+
+    /**
+     * Drag to look around, pinch to zoom, tap to open. The same three gestures the Map tab has, over the same
+     * camera arithmetic ([MapCamera.panned], [MapCamera.zoomed]) — a landing that opened zoomed into one polygon
+     * and could not be moved would be a picture of a neighborhood rather than a map of the city.
+     */
+    private val gestures = android.view.GestureDetector(
+        context,
+        object : android.view.GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean = true
+
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
+                val cam = camera ?: return false
+                val density = resources.displayMetrics.density.toDouble()
+                camera = cam.panned(-dx / density, -dy / density)
+                invalidate()
+                return true
+            }
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                performClick()
+                val pick = onPick ?: return false
+                val cam = camera ?: return false
+                val density = resources.displayMetrics.density
+                val lat = MapProjection.lat(cam.mapY((e.y / density).toDouble()))
+                val lon = MapProjection.lon(cam.mapX((e.x / density).toDouble()))
+                // The smallest outline holding the tap wins, so a neighborhood beats the city it sits inside.
+                areaHit(areas, lat, lon)?.let { pick(it) }
+                return true
+            }
+        },
+    )
+
+    private val pinch = android.view.ScaleGestureDetector(
+        context,
+        object : android.view.ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: android.view.ScaleGestureDetector): Boolean {
+                val cam = camera ?: return false
+                val density = resources.displayMetrics.density.toDouble()
+                camera = cam.zoomed(detector.scaleFactor.toDouble(), detector.focusX / density, detector.focusY / density)
+                invalidate()
+                return true
+            }
+        },
+    )
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val pick = onPick ?: return false
-        if (event.action != MotionEvent.ACTION_UP) return true
-        val cam = camera ?: return true
-        val density = resources.displayMetrics.density
-        val lat = MapProjection.lat(cam.mapY((event.y / density).toDouble()))
-        val lon = MapProjection.lon(cam.mapX((event.x / density).toDouble()))
-        // The smallest outline holding the tap wins, so a neighborhood beats the city it sits inside (Areas.kt).
-        areaHit(areas, lat, lon)?.let { pick(it) }
+        if (onPick == null) return false
+        // A map inside a scrolling page keeps the gesture it was given: without this a drag across the strip is
+        // taken by the page under it and the map never moves.
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) parent?.requestDisallowInterceptTouchEvent(true)
+        pinch.onTouchEvent(event)
+        if (!pinch.isInProgress) gestures.onTouchEvent(event)
+        if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
+            parent?.requestDisallowInterceptTouchEvent(false)
+        }
         return true
+    }
+
+    override fun performClick(): Boolean = super.performClick()
+
+    // ---- a hardware keyboard ---------------------------------------------------------------------------------
+
+    /** Which outline N and P have walked to, if any. A view state, never written anywhere. */
+    private var walked: String? = null
+
+    /**
+     * **N and P walk the outlines, Enter opens one** — the same two keys the Map tab's own features answer to
+     * (MapView.onKeyDown), and they keep working inside the strip, which is where a keyboard user swaps pages.
+     * The walk is the same order a screen reader is given: the cities, then the neighborhoods, A to Z in each.
+     */
+    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent): Boolean {
+        if (onPick == null || order.isEmpty()) return super.onKeyDown(keyCode, event)
+        val step = when (keyCode) {
+            android.view.KeyEvent.KEYCODE_N -> 1
+            android.view.KeyEvent.KEYCODE_P -> -1
+            android.view.KeyEvent.KEYCODE_ENTER, android.view.KeyEvent.KEYCODE_DPAD_CENTER -> {
+                val at = order.firstOrNull { it.id == (walked ?: selectedId) } ?: return super.onKeyDown(keyCode, event)
+                onPick.invoke(at)
+                return true
+            }
+            else -> return super.onKeyDown(keyCode, event)
+        }
+        val at = order.indexOfFirst { it.id == (walked ?: selectedId) }
+        val next = order[if (at < 0) (if (step > 0) 0 else order.size - 1) else (at + step + order.size) % order.size]
+        walked = next.id
+        invalidate()
+        announceForAccessibility(next.name)
+        return true
+    }
+
+    /**
+     * Put a screen reader's cursor back on one outline's own node — what Back from an area page does, so the
+     * person who opened a polygon is returned to it rather than to the top of the screen.
+     */
+    fun focusOutline(id: String) {
+        val at = order.indexOfFirst { it.id == id }
+        if (at < 0) return
+        // **Only when something is listening.** `requestSendAccessibilityEvent` walks up to the ViewRootImpl and
+        // throws `IllegalStateException: Accessibility off` when no service is running — so on every phone with
+        // TalkBack switched off, which is nearly all of them, pressing Back crashed the app (emulator,
+        // 2026-09-22). An announcement nobody is listening to is not worth a crash, or an event.
+        val manager = context.getSystemService(Context.ACCESSIBILITY_SERVICE)
+            as? android.view.accessibility.AccessibilityManager
+        if (manager?.isEnabled != true) return
+        @Suppress("DEPRECATION")
+        val ev = AccessibilityEvent.obtain(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
+        ev.packageName = context.packageName
+        ev.className = android.widget.Button::class.java.name
+        ev.setSource(this, at)
+        parent?.requestSendAccessibilityEvent(this, ev)
     }
 
     // ---- what a screen reader walks ---------------------------------------------------------------------------
@@ -192,7 +346,7 @@ class AreaOutlineView(
             node.isFocusable = true
             node.isClickable = true
             node.isVisibleToUser = true
-            node.isSelected = area.id == selectedId
+            node.isSelected = area.id == shownId
             node.addAction(AccessibilityNodeInfo.ACTION_CLICK)
             node.setParent(this@AreaOutlineView)
             // Without this the node has no source and the framework drops it, so the whole map stays one opaque
@@ -233,115 +387,320 @@ class AreaOutlineView(
 
 object AreaScreens {
 
-    /** Which of the tab's two views is showing. In memory for the life of this process; it is about a screen. */
+    /**
+     * Which of the tab's two faces is showing. **The map is the default every time the tab opens** (Kyle,
+     * 2026-09-22): this is a field on an object that lives as long as the process, it is never written to a file
+     * and never put in a Route, and [reset] puts it back. The choice is about a screen, and it dies with the
+     * launch.
+     */
     private var asList = false
 
-    /** Which outline is picked out, when a person has tapped one. Never written down. */
+    /** Which outline is picked out. Never written down: it is worked out again from a fix that never leaves. */
     private var picked: String? = null
 
-    /** The index's order. "Nearest first" is offered only while a location or a ZIP is known. */
-    private var order: String = "abc"
+    /** The area whose page is open UNDER THE STRIP, in place, on this same tab. Null is the landing map. */
+    private var openId: String? = null
+
+    /** Set for exactly one draw: announce the page that just opened and put the cursor on its heading. */
+    private var announceOpen = false
+
+    /** Set for exactly one draw: announce which face the switch just moved to. */
+    private var announceSwitch = false
+
+    /** Set for exactly one draw after Back: the outline a screen reader's cursor is returned to. */
+    private var focusBackTo: String? = null
 
     fun reset() {
         asList = false
         picked = null
-        order = "abc"
+        openId = null
+        announceOpen = false
+        announceSwitch = false
+        focusBackTo = null
+    }
+
+    /**
+     * **System Back closes the area page and leaves the map whole again**, which is exactly what the Back button
+     * in the strip does — one control, one meaning (Kyle, 2026-09-22). True when there was something to close.
+     *
+     * Called from MainActivity.onBackPressed before the route stack is touched, because the page is not a pushed
+     * screen: it is this tab wearing a strip.
+     */
+    fun onBack(): Boolean {
+        val was = openId ?: return false
+        // The highlight stays: a person who comes back from an area's page is returned to that area's outline.
+        picked = was
+        openId = null
+        announceOpen = false
+        focusBackTo = was
+        return true
     }
 
     private fun heading(v: View) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) v.isAccessibilityHeading = true
     }
 
+    /** No motion at all when the phone's animator scale is zero — the same question MapView asks. */
+    private fun animationsOn(a: MainActivity): Boolean = try {
+        android.provider.Settings.Global.getFloat(
+            a.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f,
+        ) != 0f
+    } catch (_: Throwable) {
+        true
+    }
+
     // ---- the tab ------------------------------------------------------------------------------------------------
 
     /**
-     * **One screen, two views, one control.** The map is the landing; "See this map as a list" swaps to the index
-     * that has always been here, and "See this list as a map" swaps back — the same wording the Map tab uses.
+     * **The Areas tab IS a map** (Kyle, 2026-09-22; DECISIONS 2026-09-22). It lands full screen on the polygon the
+     * person is standing in, the list is one control away, and opening an area shrinks the map to a strip with the
+     * page scrolling under it.
+     *
+     * The map fills the tab under the app bar and above the tab bar — Urgent help, Search and the four tabs all
+     * stay where they are, and nothing is made inert. It is deliberately not the Map tab's edge-to-edge treatment:
+     * a tab that takes the app bar away is not a tab.
      */
     fun tab(a: MainActivity, lens: String?): View {
         HoodRepo.onChange = { a.render() }
         HoodRepo.want(a.store)
         val d = HoodRepo.data
-        if (d == null || lens != null || asList) {
-            // The index is the same screen's second view. The greenway lens keeps its URL-reachable screen and is
-            // never the landing (audit §6).
-            val inner = HoodScreens.index(a, lens)
-            if (d == null || lens != null) return inner
-            return withSwitch(a, inner, toList = false)
+        // The greenway lens keeps its own screen and is never the landing (audit §6); with no numbers yet there is
+        // no outline to draw, so the index says so in words.
+        if (d == null || lens != null) return HoodScreens.index(a, lens)
+        openId?.let { id ->
+            areaById(d, id)?.let { return areaPageInPlace(a, d, it) }
+            // An id this bundle no longer carries: back to the map rather than half a page.
+            openId = null
         }
-        return withSwitch(a, mapView(a, d), toList = true)
+        if (asList) return listFace(a)
+        return mapFace(a, d)
     }
 
-    /** The one control that swaps the two views, pinned above whichever one is showing. */
-    private fun withSwitch(a: MainActivity, inner: View, toList: Boolean): View {
-        val wrap = UI.column(a)
-        val button = UI.button(
-            a, L.t(if (toList) "map.list_title" else "map.list_as_map"),
-            backgroundId = R.drawable.pill_soft, textColorId = R.color.brand_soft_ink, topDp = 0,
-        ) {
-            asList = toList
-            a.render()
-        }
-        button.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,
+    /**
+     * **The Map | List switch**: two real buttons, 48 dp, each saying whether it is the one showing rather than
+     * handing a screen reader a word whose meaning changes underneath it.
+     *
+     * It is laid out with `gravity = END`, so it sits in the top-right corner of an English screen and mirrors to
+     * the top-left of an Arabic one — the corner a right-to-left reader starts from, which is what Kyle's "top
+     * right" means there. The web does the same thing with `inset-inline-end`.
+     */
+    private fun switchRow(a: MainActivity, onMap: Boolean): View {
+        val row = LinearLayout(a)
+        row.orientation = LinearLayout.HORIZONTAL
+        row.gravity = android.view.Gravity.END
+        row.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
         )
-        wrap.addView(button)
-        inner.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
-        wrap.addView(inner)
+        for ((wantList, key) in listOf(false to "hood.switch_map", true to "hood.switch_list")) {
+            val on = onMap != wantList
+            val b = UI.button(
+                a, L.t(key),
+                // Which one is showing is in the words a screen reader reads, not only in the colour of a pill.
+                description = joinParts(listOf(L.t("hood.switch_label"), L.t(key))),
+                backgroundId = if (on) R.drawable.pill_brand else R.drawable.pill_soft,
+                textColorId = if (on) R.color.brand_ink else R.color.brand_soft_ink,
+                topDp = 0,
+            ) {
+                if (asList == wantList) return@button
+                asList = wantList
+                announceSwitch = true
+                a.render()
+            }
+            b.isSelected = on
+            b.minWidth = UI.dp(a, AREAS_BAR_PX)
+            b.minHeight = UI.dp(a, AREAS_BAR_PX)
+            b.minimumHeight = UI.dp(a, AREAS_BAR_PX)
+            b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15f)
+            val p = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            p.marginStart = UI.dp(a, 6)
+            b.layoutParams = p
+            row.addView(b)
+        }
+        // Said out loud on the switch, because the whole screen changes under a person who cannot see it change.
+        if (announceSwitch) {
+            announceSwitch = false
+            row.post { row.announceForAccessibility(L.t(if (asList) "hood.say_list" else "hood.say_map")) }
+        }
+        return row
+    }
+
+    /** The list face: the index that has always been here, with the switch above it in the same corner. */
+    private fun listFace(a: MainActivity): View {
+        val wrap = UI.column(a)
+        val head = UI.column(a)
+        head.setPaddingRelative(UI.dp(a, 12), UI.dp(a, 8), UI.dp(a, 12), UI.dp(a, 4))
+        head.addView(switchRow(a, onMap = false))
+        wrap.addView(head)
+        val index = HoodScreens.index(a, null)
+        index.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
+        wrap.addView(index)
         return wrap
     }
 
-    /** The landing: the outlines, the person's own area when we know it, and the card a tap opens. */
-    private fun mapView(a: MainActivity, d: Indicators): View {
-        val col = UI.column(a, 16)
-        val head = UI.text(a, L.t("tab.hoods_wide"), 24f, R.color.ink, bold = true)
-        heading(head)
-        col.addView(head)
-        col.addView(UI.text(a, L.t("hood.index_intro"), 16f, R.color.ink, topDp = 6))
-
-        // A location or a typed ZIP already known this visit picks the person's own area out for them, so the page
-        // is two taps away. Nothing new is asked of anybody: the first-open card belongs to the Map tab, and a
-        // second copy of it here would be a second permission pattern, which docs/05 forbids.
+    /**
+     * **The landing.** A full-screen map of the outlines and nothing else, opened zoomed to the person's own
+     * polygon when their area is known — the Detroit neighborhood that holds the point, else the city that does
+     * ([areaAt]) — highlighted and named. Unknown: the location card over the anchor view, which moves to the
+     * polygon the moment it is answered. Outside the four cities: the plain message, and the map stays.
+     */
+    private fun mapFace(a: MainActivity, d: Indicators): View {
         val here = a.near
         val mine = if (here == null) null else areaAt(d, here)
         if (picked == null) picked = mine?.id
+        val land = areasLanding(located = here != null, area = mine != null, outside = a.locateOutside)
 
-        // The 205 outlines are drawn from the zoom at which a name fits; on this one small canvas that is the four
-        // cities, plus the neighborhoods once a city has been picked.
-        val inDetroit = picked?.let { id -> d.neighborhoods.any { it.id == id } } == true
-        val areas = if (inDetroit || mine is AreaPage.OfNeighborhood) drawnAreas(d, 1.0) else drawnAreas(d, 99.0)
-        val map = AreaOutlineView(a, areas, picked) { hit ->
-            picked = hit.id
-            a.render()
-        }
-        val lp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        lp.topMargin = UI.dp(a, 12)
-        map.layoutParams = lp
-        col.addView(map)
+        val on = picked?.let { areaById(d, it) } ?: mine
+        val root = FrameLayout(a)
+        root.setBackgroundColor(UI.color(a, R.color.app_bg))
+        val map = areaMap(a, d, on, onPick = { hit -> openArea(a, hit.id) })
+        root.addView(
+            map,
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT),
+        )
 
-        // The card under the map: the name, a sub-line, and "See details". The same shape as the Map tab's card.
-        picked?.let { id ->
-            areaById(d, id)?.let { page ->
-                val card = UI.card(a)
-                card.addView(UI.text(a, page.name, 20f, R.color.ink, bold = true))
-                card.addView(UI.text(a, subLine(d, page), 15f, R.color.muted, topDp = 2))
-                card.addView(
-                    UI.button(a, L.t("hood.about_area")) { a.push(Route.Hood(id)) },
-                )
-                col.addView(card)
+        // Over the map, never across it: a column of WRAP_CONTENT height that is not itself clickable, so every
+        // finger that misses a control lands on the city underneath.
+        val over = UI.column(a)
+        over.setPaddingRelative(UI.dp(a, 12), UI.dp(a, 8), UI.dp(a, 12), UI.dp(a, 8))
+        over.addView(switchRow(a, onMap = true))
+        when (land) {
+            // "You are in Eastern Market", over the polygon it is about.
+            AreasLanding.AREA -> on?.let { over.addView(UI.pill(a, L.t("hood.here_is", "name" to it.name))) }
+            // The plain message. The map is never taken away: it stays on the city under it.
+            AreasLanding.OUTSIDE ->
+                over.addView(UI.pill(a, L.t("map.locate_outside"), R.drawable.pill_warn, R.color.warn_ink))
+            // Nobody has said where they are: the three ways in, on a card over the anchor view. Nothing new is
+            // asked of anybody — the same card and the same refusals as every other screen that offers it.
+            AreasLanding.ASK -> {
+                val card = UI.card(a, padding = 14, topDp = 8)
+                card.addView(UI.text(a, L.t("hood.mine_head"), 17f, R.color.ink, bold = true))
+                ParkScreens.locationControls(a, card)
+                over.addView(card)
             }
         }
-
-        if (here == null) {
-            col.addView(UI.sectionHead(a, L.t("hood.mine_head")))
-            ParkScreens.locationControls(a, col)
-        } else if (mine == null) {
-            col.addView(UI.text(a, L.t("hood.mine_outside"), 15f, R.color.muted, topDp = 10))
+        root.addView(
+            over,
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+        )
+        // Back from an area page puts a screen reader's cursor on that area's own outline, not at the top of a
+        // screen it has already read.
+        focusBackTo?.let { id ->
+            focusBackTo = null
+            map.post { map.focusOutline(id) }
         }
+        return root
+    }
 
-        col.addView(UI.text(a, L.t("hood.index_sources"), 14f, R.color.muted, topDp = 14))
-        col.addView(UI.text(a, L.t("hood.describe"), 14f, R.color.muted, topDp = 6))
-        return UI.scroller(a, col)
+    /** One outline map: the layer, the highlight, and the camera that frames the chosen polygon. */
+    private fun areaMap(
+        a: MainActivity,
+        d: Indicators,
+        on: AreaPage?,
+        onPick: (DrawnArea) -> Unit,
+    ): AreaOutlineView {
+        // All 205 outlines, always, unlike the Map tab's layer: picking one is this tab's whole job, and a canvas
+        // that showed four shapes would have nothing to pick. What the label rule governs is the NAMES, which
+        // AreaOutlineView applies at the zoom it ends up at (boundaryStyle, docs/MAP-STYLE.md section 15).
+        val areas = drawnAreas(d)
+        val rings = on?.let { hoodRings(it.hood, d.origin) }?.takeIf { r -> r.any { it.size >= 2 } }
+        return AreaOutlineView(a, areas, on?.id, rings, openingView(a.near), true, onPick)
+    }
+
+    /** A tap on a polygon IS the page opening (Kyle, 2026-09-22), in place, on this same tab. */
+    private fun openArea(a: MainActivity, id: String) {
+        picked = id
+        openId = id
+        announceOpen = true
+        a.render()
+    }
+
+    /**
+     * **The area page, in place.** The map shrinks to a strip at the top of the tab, [AREAS_STRIP_VH] % of the
+     * viewport, with the polygon framed and highlighted and a Back button in its top-START corner; the whole area
+     * page scrolls under it, and reading down collapses the strip to its [AREAS_BAR_PX] dp bar ([AreaStripLayout]).
+     *
+     * Tapping another outline in the strip swaps the page under it, which is the same call a tap on the landing
+     * makes. Back — the button, or the system's — leaves the map whole again with the highlight where it was.
+     */
+    private fun areaPageInPlace(a: MainActivity, d: Indicators, area: AreaPage): View {
+        val body = when (area) {
+            is AreaPage.OfNeighborhood -> HoodScreens.page(a, area.id)
+            is AreaPage.OfCity -> page(a, area.area, d)
+        }
+        val scroller = body as? android.widget.ScrollView
+            ?: UI.scroller(a, UI.column(a).also { it.addView(body) })
+
+        val strip = FrameLayout(a)
+        strip.setBackgroundColor(UI.color(a, R.color.app_bg))
+        val map = areaMap(a, d, area, onPick = { hit -> if (hit.id != area.id) openArea(a, hit.id) })
+        strip.addView(
+            map,
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT),
+        )
+        strip.addView(
+            bar(a, area),
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, UI.dp(a, AREAS_BAR_PX)),
+        )
+
+        val wrap = AreaStripLayout(a, strip, scroller)
+        // The heading of the page that just opened is where a screen reader's cursor belongs — not the top of a
+        // screen that has not changed, and not the strip, which is where it already was.
+        if (announceOpen) {
+            announceOpen = false
+            wrap.post {
+                wrap.announceForAccessibility(area.name)
+                firstHeading(scroller)?.performAccessibilityAction(
+                    AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null,
+                )
+            }
+        }
+        // The map arrives rather than travels when the phone's animator scale is zero (WCAG 2.3.3, and the
+        // Android half of the web's Reduce Motion rule).
+        if (animationsOn(a)) {
+            map.alpha = 0f
+            map.animate().alpha(1f).setDuration(AREAS_SHRINK_MS.toLong()).start()
+        }
+        return wrap
+    }
+
+    /** The pinned bar: Back in the top-START corner, and the area's name beside it. */
+    private fun bar(a: MainActivity, area: AreaPage): View {
+        val row = LinearLayout(a)
+        row.orientation = LinearLayout.HORIZONTAL
+        row.gravity = android.view.Gravity.CENTER_VERTICAL
+        row.setBackgroundColor(UI.color(a, R.color.surface))
+        row.setPaddingRelative(UI.dp(a, 8), 0, UI.dp(a, 12), 0)
+        val back = UI.button(
+            a, L.t("hood.back_map"), backgroundId = R.drawable.pill_soft,
+            textColorId = R.color.brand_soft_ink, topDp = 0,
+        ) {
+            if (onBack()) a.render()
+        }
+        back.minWidth = UI.dp(a, AREAS_BAR_PX)
+        back.minimumHeight = UI.dp(a, AREAS_BAR_PX)
+        back.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14f)
+        back.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT,
+        )
+        row.addView(back)
+        val name = UI.text(a, area.name, 17f, R.color.ink, bold = true)
+        name.setSingleLine(true)
+        name.ellipsize = android.text.TextUtils.TruncateAt.END
+        val p = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+        p.marginStart = UI.dp(a, 8)
+        name.layoutParams = p
+        heading(name)
+        row.addView(name)
+        return row
+    }
+
+    /** The first line of words on a page, which on every one of these pages is its heading. */
+    private fun firstHeading(v: View): View? {
+        if (v is TextView && v.text.isNotEmpty()) return v
+        if (v is ViewGroup) {
+            for (i in 0 until v.childCount) firstHeading(v.getChildAt(i))?.let { return it }
+        }
+        return null
     }
 
     /** "District 5" for a neighborhood, the city's own name for a whole-city area. */

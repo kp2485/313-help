@@ -949,6 +949,15 @@ class SubwayKeySample(context: Context, private val kind: String) : View(context
                 pen.color = palette.transit(TransitToken.BIKE); pen.strokeWidth = 1.5f
                 c.drawLine(6f, y - 2f, 38f, y - 2f, pen); c.drawLine(6f, y + 2f, 38f, y + 2f, pen)
             }
+            // A neighbourhood or city boundary, in **either** map style (docs/MAP-STYLE.md section 15.5): the
+            // dotted texture and the plum, at the near band's own weight, so the sample is the thing on the map.
+            "bnd" -> {
+                flat.color = palette.boundary
+                flat.strokeWidth = 2.2f
+                flat.pathEffect = DashPathEffect(floatArrayOf(6f, 3f), 0f)
+                c.drawLine(6f, y, 38f, y, flat)
+                flat.pathEffect = null
+            }
         }
         c.restore()
     }

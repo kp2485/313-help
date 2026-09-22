@@ -267,21 +267,23 @@ class DrawnArea(val id: String, val name: String, val isCity: Boolean, val rings
 }
 
 /**
- * The outlines to draw at this zoom: the four cities always, the 205 neighborhoods only from the zoom at which a
- * name fits ([AREAS_NAME_METERS_PER_DP]). Below that zoom the city outlines alone, which is the label rule doing
- * the work rather than a second threshold that could drift from it.
+ * The outlines the layer draws: the four cities and all 205 neighborhoods, **at every zoom**.
+ *
+ * It used to hide the neighborhoods above 14 m per dp, on the reasoning that a name that does not fit should not
+ * be promised. The Map tab opens on the whole city, so in practice a person saw four city edges and none of the
+ * 205 they had come to find (Kyle, 2026-09-22: "The user needs to be able to see the boundaries of the
+ * neighborhoods on the map"; docs/MAP-STYLE.md section 15). What keeps 205 outlines from being a mesh is now
+ * **weight** — [boundaryStyle] — and the NAMES are what the zoom still governs, capped at twelve a frame.
  */
-fun drawnAreas(d: Indicators, metersPerPoint: Double): List<DrawnArea> {
+fun drawnAreas(d: Indicators): List<DrawnArea> {
     val out = ArrayList<DrawnArea>()
     for (a in d.areas) {
         if (!a.isCity || a.hood.rings.isEmpty()) continue
         out.add(DrawnArea(a.id, a.name, true, hoodRings(a.hood, d.origin)))
     }
-    if (metersPerPoint <= AREAS_NAME_METERS_PER_DP) {
-        for (h in d.neighborhoods) {
-            if (h.rings.isEmpty()) continue
-            out.add(DrawnArea(h.id, h.name, false, hoodRings(h, d.origin)))
-        }
+    for (h in d.neighborhoods) {
+        if (h.rings.isEmpty()) continue
+        out.add(DrawnArea(h.id, h.name, false, hoodRings(h, d.origin)))
     }
     return out
 }

@@ -558,12 +558,18 @@ class ParityTest {
         val web = text("apps/web/src/layers.ts")
         val wanted = Regex("DEFAULT_LAYERS = \\[([^\\]]*)\\]").find(web)?.groupValues?.get(1)
         assertNotNull("could not read DEFAULT_LAYERS from apps/web/src/layers.ts", wanted)
-        val webIds = Regex("'([\\w:]+)'").findAll(wanted!!).map { it.groupValues[1] }.toList()
+        // The web names the boundaries layer by its constant rather than by its string, so the constant is read
+        // as the id it stands for.
+        val webIds = Regex("'([\\w:]+)'|(AREAS_LAYER)").findAll(wanted!!)
+            .map { it.groupValues[1].ifEmpty { AREAS_LAYER } }.toList()
         assertEquals("the two apps open on different layers", webIds, defaultMapLayers)
         assertTrue(defaultMapLayers.contains("place:parks"))
         assertFalse(defaultMapLayers.contains("place:greenway"))
-        assertFalse(defaultMapLayers.contains(AREAS_LAYER))
+        // **On by default since 2026-09-22** (docs/MAP-STYLE.md section 15.4): the Map tab opens on the whole
+        // city, and a person who came to see their neighbourhood saw four city edges and none of the 205.
+        assertTrue(defaultMapLayers.contains(AREAS_LAYER))
         assertFalse(defaultMapLayers.contains("go:ddot_routes"))
+        assertTrue("the web's LAYERS_VERSION moved", web.contains("LAYERS_VERSION = 2"))
     }
 
     /**
@@ -647,6 +653,209 @@ class ParityTest {
                 assertNotNull("strings/$lang.json has no $k", s[k])
             }
         }
+    }
+
+    /**
+     * **The Areas tab's numbers and words, held to the web's** (Kyle, 2026-09-22; DECISIONS 2026-09-22).
+     *
+     * Six constants and eight strings. If apps/web/src/areas.ts or apps/web/src/map.ts moves one of them, this
+     * fails until Android moves with it — which is the only thing keeping three clients from opening the Areas
+     * tab on three different pictures. The behaviour behind the numbers is AreasHomeTest, which ports the web's
+     * own cases; this test is about the numbers themselves.
+     */
+    @Test
+    fun theAreasTabIsTheSameSixNumbersAndEightWordsAsTheWebs() {
+        val areas = text("apps/web/src/areas.ts")
+        assertTrue(
+            "the web's four strip numbers moved",
+            areas.contains("AREAS_STRIP_VH = 38, AREAS_BAR_PX = 48, AREAS_TURN_PX = 8, AREAS_SHRINK_MS = 240"),
+        )
+        assertEquals(38, AREAS_STRIP_VH)
+        assertEquals(48, AREAS_BAR_PX)
+        assertEquals(8, AREAS_TURN_PX)
+        assertEquals(240, AREAS_SHRINK_MS)
+        assertTrue("the web's settling period moved", areas.contains("AREAS_SETTLE_MS = AREAS_SHRINK_MS + 80"))
+        assertEquals(AREAS_SHRINK_MS + 80, AREAS_SETTLE_MS)
+
+        val map = text("apps/web/src/map.ts")
+        assertTrue("the web's camera numbers moved", map.contains("AREA_FIT_MARGIN = 0.08, AREA_MIN_MPP = 4"))
+        assertEquals(0.08, MapCamera.AREA_FIT_MARGIN, 0.0)
+        assertEquals(4.0, MapCamera.AREA_MIN_MPP, 0.0)
+
+        // The eight words the tab is made of, in every language, with their placeholders intact.
+        for (lang in LANGS) {
+            val s = strings("strings/$lang.json")
+            for (k in listOf(
+                "hood.list_head", "hood.switch_label", "hood.switch_map", "hood.switch_list",
+                "hood.say_map", "hood.say_list", "hood.back_map", "hood.here_is",
+            )) {
+                assertNotNull("strings/$lang.json has no $k", s[k])
+            }
+            // A switch button sits in a 48 dp corner of the map: neither word may be a sentence.
+            assertTrue("$lang hood.switch_list is too long for the control", s["hood.switch_list"]!!.length <= 12)
+            assertTrue("$lang hood.here_is lost its {name}", s["hood.here_is"]!!.contains("{name}"))
+        }
+    }
+
+    /**
+     * The Areas tab's own rules can store nothing, send nothing and navigate nowhere: they are handed three
+     * booleans and a scroll offset, and they hand back a word (docs/08). The same guard the web puts on areas.ts.
+     */
+    @Test
+    fun theAreasTabsRulesCannotStoreOrSendAnything() {
+        val src = text("apps/android/app/src/main/kotlin/org/help313/app/AreasHome.kt")
+        for (forbidden in listOf("java.io", "File(", "SharedPreferences", "import android.", "Http", "Net.", "Route(")) {
+            assertFalse("AreasHome.kt mentions $forbidden", src.contains(forbidden))
+        }
+        // And :core compiles it, so `HELP313_NO_ANDROID=1 ./gradlew :core:test` really runs every case above.
+        assertTrue(
+            "AreasHome.kt is not in the :core source list",
+            text("apps/android/core/build.gradle.kts").contains("org/help313/app/AreasHome.kt"),
+        )
+    }
+
+    /**
+     * **The boundary band table is the web's, row for row** (docs/MAP-STYLE.md section 15.1).
+     *
+     * These are the *third* set of numbers — twice strengthened from screenshots — and the spec says in as many
+     * words that a porter must copy the table rather than an earlier draft. So this reads the web's own
+     * `bounds.ts` and holds every number in it, rather than restating them and hoping.
+     */
+    @Test
+    fun theBoundaryBandTableIsTheWebs() {
+        val web = text("apps/web/src/bounds.ts")
+        assertTrue("the web's band cut points moved", web.contains("BOUNDARY_MID_MPP = 30, BOUNDARY_NEAR_MPP = 12"))
+        assertEquals(30.0, BOUNDARY_MID_MPP, 0.0)
+        assertEquals(12.0, BOUNDARY_NEAR_MPP, 0.0)
+        assertEquals(BoundaryBand.CITY, boundaryBand(30.001))
+        assertEquals(BoundaryBand.MID, boundaryBand(30.0))
+        assertEquals(BoundaryBand.MID, boundaryBand(12.0))
+        assertEquals(BoundaryBand.NEAR, boundaryBand(11.999))
+
+        // The three rows, as the web writes them.
+        assertTrue(web.contains("width: 1.1, cityWidth: 1.5, dash: [2, 2], names: false"))
+        assertTrue(web.contains("width: 1.6, cityWidth: 2.4, dash: [3, 3], names: true"))
+        assertTrue(web.contains("width: 2.2, cityWidth: 3, dash: [6, 3], names: true"))
+        val city = boundaryStyle(40.0)
+        val mid = boundaryStyle(20.0)
+        val near = boundaryStyle(5.0)
+        assertEquals(listOf(1.1, 1.6, 2.2), listOf(city.width, mid.width, near.width))
+        assertEquals(listOf(1.5, 2.4, 3.0), listOf(city.cityWidth, mid.cityWidth, near.cityWidth))
+        assertEquals(listOf(listOf(2.0, 2.0), listOf(3.0, 3.0), listOf(6.0, 3.0)), listOf(city.dash, mid.dash, near.dash))
+        assertEquals(listOf(false, true, true), listOf(city.names, mid.names, near.names))
+
+        // The cap and the floor, and the selection's own weight and wash.
+        assertTrue(web.contains("BOUNDARY_NAME_CAP = 12, BOUNDARY_NAME_MIN_PX = 70"))
+        assertEquals(12, BOUNDARY_NAME_CAP)
+        assertEquals(70.0, BOUNDARY_NAME_MIN_PX, 0.0)
+        assertEquals(0, city.nameCap)
+        assertEquals(12, mid.nameCap)
+        assertEquals(12, near.nameCap)
+        assertTrue(web.contains("BOUNDARY_WASH_ALPHA = 0.08, BOUNDARY_SELECTED_WIDTH = 4"))
+        assertEquals(0.08, BOUNDARY_WASH_ALPHA, 0.0)
+        assertEquals(4.0, BOUNDARY_SELECTED_WIDTH, 0.0)
+
+        // Two rules the spec says are where the web went wrong first.
+        for (s in listOf(city, mid, near)) {
+            assertTrue("${s.band}: the dash's ON length is shorter than the stroke", s.dash[0] >= s.cityWidth - 0.5)
+            assertTrue("${s.band}: a dash that is not a dash", s.dash.size == 2 && s.dash.all { it > 0 })
+        }
+        // At city zoom a boundary is still thinner than the thinnest street drawn there (floor 1.6).
+        assertTrue("a city-band boundary is as thick as a road", city.width < 1.6)
+    }
+
+    /**
+     * The boundary token, in four modes, with the contrast floor of docs/MAP-STYLE.md section 15.2 — and the two
+     * values the app actually draws with, held to the same stylesheet the rest of the map's colours are.
+     */
+    @Test
+    fun theBoundaryColourIsTheWebsAndClearsItsFloor() {
+        val css = text("apps/web/src/style.css")
+        assertTrue("the web's light value moved", css.contains("--map-bnd:#7a5588"))
+        assertTrue("the web's dark value moved", css.contains("--map-bnd:#a98cbb"))
+        assertTrue("the web's light + contrast value moved", css.contains("--map-bnd:#5a3a6b"))
+        assertTrue("the web's dark + contrast value moved", css.contains("--map-bnd:#cdb4da"))
+        assertEquals("#7a5588", BoundaryPalette.color(MapScheme.LIGHT).hex)
+        assertEquals("#a98cbb", BoundaryPalette.color(MapScheme.DARK).hex)
+        assertEquals("#5a3a6b", BoundaryPalette.color(MapScheme.LIGHT, true).hex)
+        assertEquals("#cdb4da", BoundaryPalette.color(MapScheme.DARK, true).hex)
+
+        // The same four values are in the resources the app draws with, so the two can never drift.
+        fun resources(path: String): Map<String, String> =
+            Regex("<color name=\"([a-z_0-9]+)\">(#[0-9A-Fa-f]{6})</color>").findAll(text(path))
+                .associate { it.groupValues[1] to it.groupValues[2].lowercase() }
+        val day = resources("apps/android/app/src/main/res/values/colors.xml")
+        val night = resources("apps/android/app/src/main/res/values-night/colors.xml")
+        assertEquals("#7a5588", day["map_bnd"])
+        assertEquals("#5a3a6b", day["map_bnd_more"])
+        assertEquals("#a98cbb", night["map_bnd"])
+        assertEquals("#cdb4da", night["map_bnd_more"])
+
+        // **The floor is 3.00 against everything a boundary is ever drawn over**, in all four modes.
+        for (scheme in MapScheme.values()) for (more in listOf(false, true)) {
+            val bnd = BoundaryPalette.color(scheme, more)
+            val land = if (more) TransitPalette.landMoreContrast(scheme) else TransitPalette.land(scheme)
+            val park = TransitPalette.park(scheme)
+            for ((what, bg) in listOf("land" to land, "park" to park)) {
+                assertTrue(
+                    "$scheme more=$more: boundary on $what is ${RGB.contrast(bnd, bg)}",
+                    RGB.contrast(bnd, bg) >= 3.0,
+                )
+            }
+        }
+        // And it is deliberately NOT a street colour: it has to be a step away from all three greys.
+        val day2 = resources("apps/android/app/src/main/res/values/colors.xml")
+        for (street in listOf("map_road", "map_main", "map_fwy")) {
+            assertTrue(
+                "the boundary wears $street",
+                !day2.getValue(street).equals(day2.getValue("map_bnd"), ignoreCase = true),
+            )
+        }
+    }
+
+    /**
+     * **On by default, and migrated exactly once** (docs/MAP-STYLE.md section 15.4). The three cases the spec
+     * names, and the one rule that is easy to get wrong: every write stamps the marker, not only the migration.
+     */
+    @Test
+    fun theBoundariesLayerIsOnByDefaultAndMigratesOnce() {
+        assertTrue("place:areas is not in the defaults", defaultMapLayers.contains(AREAS_LAYER))
+        assertEquals(2, LAYERS_VERSION)
+        // A list from before the marker gains it, at the end, with nothing else touched.
+        val old = listOf("help:food", "place:parks")
+        assertEquals(old + AREAS_LAYER, migrateLayers(old, 0))
+        // A list already at this version is handed back untouched — including one that switched it OFF.
+        assertEquals(old, migrateLayers(old, LAYERS_VERSION))
+        assertEquals(old + AREAS_LAYER, migrateLayers(old + AREAS_LAYER, LAYERS_VERSION))
+        // It is never added twice.
+        assertEquals(old + AREAS_LAYER, migrateLayers(old + AREAS_LAYER, 0))
+        // The cap still applies, and the layer that was just added is what survives it (the web's `slice(-30)`).
+        val full = migrateLayers((1..30).map { "help:$it" }, 0)
+        assertEquals(30, full.size)
+        assertEquals(AREAS_LAYER, full.last())
+        // Every write stamps the marker.
+        val store = text("apps/android/app/src/main/kotlin/org/help313/app/MapLayers.kt")
+        assertTrue("write() does not stamp the version", store.contains("\"{\\\"v\\\":\" + LAYERS_VERSION"))
+    }
+
+    /**
+     * **The Map tab draws the outlines it offers.** PR #22 added the `place:areas` layer, its pick order and its
+     * keyboard walk, and the canvas drew nothing at all — switching "Neighborhoods and cities" on changed the map
+     * by not one pixel. The three places that closes the gap are named here so it cannot quietly reopen.
+     */
+    @Test
+    fun theMapTabDrawsPicksAndWalksTheAreaOutlines() {
+        val view = text("apps/android/app/src/main/kotlin/org/help313/app/MapView.kt")
+        assertTrue("the canvas does not draw the outlines", view.contains("drawAreas(s, cam, view, mpp, w, h, c)"))
+        assertTrue("the layer flag is gone", view.contains("var areasOn = false"))
+        assertTrue("the keyboard does not walk the outlines", view.contains("MapSelection.Area(area.id)"))
+        val model = text("apps/android/app/src/main/kotlin/org/help313/app/MapModel.kt")
+        assertTrue("a tap does not find an outline", model.contains("areaHit(areas,"))
+        val screen = text("apps/android/app/src/main/kotlin/org/help313/app/MapScreen.kt")
+        assertTrue("the Map tab never switches the layer on", screen.contains("MapModel.isOn(a, AREAS_LAYER)"))
+        // The pick order and the walk order are still the ones :core tests, and the walk is the tail reversed.
+        assertEquals(listOf("dot", "glyph", "stop", "greenway", "route", "area", "park"), MAP_PICK_ORDER)
+        assertEquals(listOf("segment", "area", "dot"), MAP_WALK_ORDER)
     }
 
     /** One anchor and one radius, the same three numbers on all three clients. */
