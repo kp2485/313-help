@@ -11,7 +11,7 @@ class FixtureTest {
     @Test
     fun everyFixture() {
         val r = runFixtures()
-        println("fixtures: ${r.ran} cases, ${r.failures.size} failed")
+        println("fixtures: ${r.ran} cases, ${r.failures.size} failed, ${r.skipped} skipped (not implemented here yet)")
         assertTrue("only ${r.ran} cases ran; the fixtures did not load", r.ran > 80)
         assertEquals(emptyList<String>(), r.failures)
     }

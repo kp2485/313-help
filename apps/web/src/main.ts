@@ -5,7 +5,7 @@ import {
 import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang } from './i18n.js';
 import { phoneParts, telHref } from './phone.js';
 import { cached, refresh, type Bundle } from './data.js';
-import { hoodIndex, hoodList, hoodPage, hoodRows, hoodView, loadHoodView, loadIndicators, outline, saveHoodView, type Hood, type HoodView, type Indicators, type Ui } from './hoods.js';
+import { areaById, areaPage, hoodIndex, hoodList, hoodRows, hoodView, loadHoodView, loadIndicators, outline, saveHoodView, type Hood, type HoodView, type Indicators, type Ui } from './hoods.js';
 import { hoodAt, hoodsForZip, matchHoods, type HoodOrder } from './hoodfind.js';
 import { icon } from './icons.js';
 import { MapView, focusRadius, loadLayer, loadNet, type LayerData, type MapDot, type MapSpec, type Overlay } from './map.js';
@@ -891,9 +891,11 @@ function hoodScreen(v: Extract<View, { v: 'hoods' | 'hood' }>): { title: string;
   if (!d) return { title: t('hood.title'), ownTitle: false, html: hoodsWaiting() };
   const ui = hoodUi(d);
   if (v.v === 'hoods') return { title: t(v.lens === 'jlg' ? 'hood.lens_jlg' : 'hood.title'), ownTitle: false, html: hoodList(d, ui, v.lens) };
-  const h = d.neighborhoods.find((x) => x.id === v.id);
+  // `#/n/<id>` serves a Detroit neighborhood (`nbh_…`) and a city page (`city_…`) alike: `areaById` looks in
+  // both and `areaPage` draws whichever it found, from the same components (hoods.ts, DECISIONS 2026-09-22).
+  const h = areaById(d, v.id);
   // An id nobody knows (an old link, a typo): the whole list, under the tab's own name, never a half-built page.
-  return h ? { title: h.name, ownTitle: true, html: hoodPage(h, d, ui, hoodViewNow, hoodSeriesOff) } : { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
+  return h ? { title: h.name, ownTitle: true, html: areaPage(h, d, ui, hoodViewNow, hoodSeriesOff) } : { title: t('hood.title'), ownTitle: false, html: hoodList(d, ui) };
 }
 // What this app keeps and sends, in plain words (docs/08). Everything here is true of the code; tests check the parts
 // that can be checked (no storage writes in main.ts, closed report fields, no IP in the Worker).

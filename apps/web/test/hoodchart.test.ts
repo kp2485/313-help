@@ -85,7 +85,7 @@ describe('Table | Chart, above every year panel that has enough years', () => {
     expect(main).toContain("refocusSel = '#' + el.id;");
     expect(main).toContain("void saveHoodView(next).then((v) => { hoodViewNow = v; render(false); announce(t('hood.view_say', { name: t('hood.view_' + v) })); });");
     expect(main).toContain('hoodViewNow = await loadHoodView();');
-    expect(main).toContain('hoodPage(h, d, ui, hoodViewNow, hoodSeriesOff)');
+    expect(main).toContain('areaPage(h, d, ui, hoodViewNow, hoodSeriesOff)');
     // One flag for every panel on the page: there is a single piece of state, not one per panel.
     expect([...main.matchAll(/hoodViewNow/g)]).toHaveLength(4);
   });

@@ -38,7 +38,7 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 | **Staying power** *(lead with these)* | Residential sales: count and median price | Property Sales | Per year, with small-number suppression |
 | | Active rental certificates of compliance per 1,000 parcels (rentals that passed City inspection, in force today) | `bseed_active_residential_compliance_certificates` (counts only) | Today's number + "many rentals never register, so low can mean uninspected, not few" |
 | | Tax foreclosures, eviction filings | Wayne County Treasurer / court data — **to find; may need a records request** | Per year |
-| **Safe streets** | Crashes involving people walking or biking, and how many of those killed or seriously hurt someone | SEMCOG "Crash Locations, 2015-2024" (`crash2024_10year`); the records are the Michigan State Police's. **Licence stated and not yet accepted knowingly: SEMCOG's portal-wide [Copyright License Agreement](https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement) — a perpetual royalty-free licence to reproduce and publish, a required copyright notice NOTICE carries and the panel does not print yet, a one-way indemnification clause, and no third-party rights. Open for Kyle, DECISIONS 2026-09-20.** The City's own Traffic Crashes layer holds 2011 only | Plain counts over one 5-year window, with the years on screen, beside the whole-city number. Never a rate |
+| **Safe streets** | Crashes involving people walking or biking, and how many of those killed or seriously hurt someone | SEMCOG "Crash Locations, 2015-2024" (`crash2024_10year`); the records are the Michigan State Police's. **Licence accepted as it stands on 2026-09-22 (DECISIONS), indemnification clause included: SEMCOG's portal-wide [Copyright License Agreement](https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement) — a perpetual royalty-free licence to reproduce and publish, a required copyright notice printed on the panel itself, a one-way indemnification clause, and no third-party rights, which is why the State Police are named on the panel.** The City's own Traffic Crashes layer holds 2011 only | Plain counts over one 5-year window, with the years on screen, beside the whole-city number. Never a rate |
 | **Health context** | Physical inactivity, poor mental health days, etc. | CDC PLACES (tract) | Map only, labeled "modeled estimate, about two years old — background, not a result" |
 
 **Deliberately left out: crime.** A per-neighborhood crime panel stigmatizes blocks, feeds the people-reporting dynamic doc 11 designs out, and adds nothing the City's own dashboard doesn't already show. If a partner insists, it appears only at council-district scale, never per neighborhood. Crashes are not an exception to this: "Safe streets" counts what happened on the streets, says nothing about who was at fault, and is a road-design number, not a crime number.
@@ -57,7 +57,7 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 ## Architecture
 
 - `pipeline/src/ingest-neighborhoods.ts` (`pnpm ingest:neighborhoods`) reads the neighborhood outlines and asks the City's server for per-neighborhood, per-year statistics (and today's rental, vacant-registration and street-rating numbers), into `data/ingested/neighborhoods.json` and `data/ingested/city_stats.json`, and the SNAP-store and bus-stop points into `data/ingested/city_points.json`. All layer URLs are at the top of that file. The nightly job re-reads them on the 1st of each month; a change comes as a pull request. `pipeline/src/indicators.ts` joins them with our listings, parks and the greenway at each bundle build.
-- `pipeline/src/ingest-crashes.ts` (`pnpm ingest:crashes`) reads SEMCOG's crash layer once a year, by hand, and writes counts per neighborhood and year into `data/ingested/crashes.json`. It is **not** in the nightly job: the layer gains a year at a time, and the indemnification clause in SEMCOG's Copyright License Agreement is unsettled (docs/OPERATIONS, DECISIONS 2026-09-20).
+- `pipeline/src/ingest-crashes.ts` (`pnpm ingest:crashes`) reads SEMCOG's crash layer once a year, by hand, and writes counts per neighborhood and year into `data/ingested/crashes.json`. It is **not** in the nightly job: the layer gains a year at a time (docs/OPERATIONS). SEMCOG's Copyright License Agreement, indemnification clause and all, was accepted on 2026-09-22 (DECISIONS).
 - Output: one bundle file, `indicators/neighborhoods.json` (citywide numbers, lenses and all 205 neighborhoods). Each build also commits a copy without the outlines to `data/indicators/neighborhoods.json`, so every number's history is in git.
 - **`help.nearest_id` (2026-09-22): which listing each "nearest" distance belongs to**, so a neighborhood page can open it instead of stating a distance nobody can act on. Same four keys as `help.nearest_miles`, each the `sal_` id of the very listing that number was measured to, or `null` exactly where the distance is `null`:
 
@@ -105,6 +105,115 @@ case for case to `HelpCore/HoodChart.swift` and to `hoodChartModel` in Android's
 cases in all three test suites. It is drawn with no library anywhere: inline SVG on the web (which carries a
 `<title>` per point and prints), Swift Charts on the iPhone (for the VoiceOver audio graph the framework gives for
 free), and a plain `Canvas` on Android with one `AccessibilityNodeProvider` node per point.
+
+## The four cities (2026-09-22)
+
+**Detroit, Hamtramck, Highland Park and Dearborn each have a city page.** Kyle, 2026-09-22 (DECISIONS): build
+and ship them now. The research behind this is `docs/research/2026-09-22-neighborhoods-three-cities.md`, read in
+full before anything here was written.
+
+**Why a whole-city page and not neighborhoods.** None of the other three cities runs an open-data portal, and
+none of them publishes a named sub-city geography a resident lives in. Hamtramck's charter makes the city **one
+ward**; Highland Park's three council districts exist and are drawn nowhere; Dearborn's only tiling polygons are
+a garden-judging geography and a sewer-maintenance geography, neither of which is a neighborhood. Hamtramck is
+2.1 square miles and Highland Park 3.0: split four ways, nearly every count would fall under the small-number
+rule anyway. **We never invent a name or draw an outline of our own.** Dearborn's 27 Census tracts stay a later,
+separate decision; SEMCOG's tract-to-city field is a dominant-MCD label rather than a containment (it over-counts
+Detroit by 64,000 people and under-counts Dearborn by 21,000), so a tract page would have to assign tracts from
+Census geometry first, and write the rule down.
+
+**A city page is a different kind of page from a neighborhood page, and it says so.** Every non-Detroit page
+carries one fixed line: *"These numbers come from regional and national lists, because {city} does not publish
+its own. They are not the same measurements as Detroit's neighborhood pages, so do not read the two side by
+side."* There is **no cross-city comparison anywhere** — no table of four cities, no "Detroit median vs
+Hamtramck," nothing sorted by anything. Each city is read on its own (honesty rule 1).
+
+### The panels, and where each one comes from
+
+| Panel | Detroit | Hamtramck | Highland Park | Dearborn | Source printed on the panel |
+|---|---|---|---|---|---|
+| Help nearby, and the nearest food / clinic / Narcan / indoor place | ● | ● | ● | ● | Our own directory |
+| Parks, and acres | ● | ● | ● | ● | Detroit: the City's own parks layer. Others: SEMCOG parks |
+| Safe streets (walking and biking crashes) | ● | ● | ● | ● | SEMCOG; records from the Michigan State Police |
+| Street condition (PASER good / fair / poor) | ● | ● | ● | ● | SEMCOG, for Michigan's Transportation Asset Management Council |
+| Empty homes (2020 Census) | ● | ● | ● | ● | SEMCOG's `mcd_2020`; the counts are the 2020 Census's |
+| New homes permitted | ● | ● | **—** | ● | U.S. Census Bureau, Building Permits Survey |
+| Homes sold, blight tickets, buildings torn down, problems reported, building fires, rental inspections, registered empty buildings | ● (per neighborhood) | — | — | — | Detroit only. **Absent, not zero, not blank** |
+
+Measured on 2026-09-22, and every number on the page:
+Detroit 302 parks / 4,968 acres, 1,044.9 rated miles (26% good, 43% fair, 31% poor), 55,638 of 309,913 homes
+empty, 2,620 homes permitted in 2025. Hamtramck 3 parks / 15 acres, 12.4 rated miles (44/36/20), 772 of 8,911
+empty, 4 homes permitted. Highland Park 4 parks / 13 acres, 21.0 rated miles (16/46/38), 1,220 of 5,137 empty.
+Dearborn 49 parks / 853 acres, 141.1 rated miles (13/52/35), 2,399 of 39,334 empty, 22 homes permitted.
+
+**Highland Park's permits panel is absent for a different reason from the rest, and says so.** The Building
+Permits Survey recorded no new home authorised there in any published year. That is a real fact, so the page
+prints the sentence — *"The Census Bureau recorded no new homes permitted in Highland Park in any year from 2021
+to 2025, so there is no chart here."* — rather than five zeros beside Detroit's 2,620, which would be a
+comparison the data cannot carry. In the bundle it is `missing: [{ panel: "permits", why: "none_recorded" }]`,
+which is not the same value as `why: "not_published"`.
+
+### Honesty rules that are specific to these pages
+
+1. **The allow-list decides, not the numbers.** Each area carries `panels`, an explicit list, and a client draws
+   a panel **because the area lists it**, never because a number happens to be present or absent. "Dearborn
+   publishes no blight tickets" is therefore a fact in the signed bundle, not a habit of one client.
+2. **Sources are per area, per panel.** `Indicators.sources` — the flat map all 205 neighborhoods share — stays
+   exactly as it was and is still right for them. City pages use `areas[].sources`, which names a source key per
+   panel, interned in `area_sources`. Detroit's parks come from the City and Hamtramck's from SEMCOG: two
+   numbers that share a word never share a source line.
+3. **SEMCOG's notice is printed on every SEMCOG-sourced panel**, in SEMCOG's own English, marked `lang="en"`,
+   never machine-translated. On a city page that is four panels: parks, crashes, street condition and empty
+   homes. It is not printed on the Census permits panel, which is not SEMCOG's.
+4. **Suppression is unchanged in scope.** Crash counts — counts of people hurt — keep "fewer than 5" and stay
+   five-year totals. Parks, acres, rated miles, homes, permits and parcels are the real number however small
+   (DECISIONS 2026-09-22): three parks is `3`.
+5. **"Empty homes" is not Detroit's "registered empty buildings."** One counts homes with nobody in them on one
+   day in 2020; the other counts owners who filed a registration in the past twelve months. Same word, different
+   fact, and the panel says which.
+6. **PASER's three groups are the raters' own.** We never average the ten ratings into a score, and the shares
+   are of *rated miles*, adding to exactly 100. A street on a city line is counted for both cities, and the
+   panel says so.
+7. **Help nearby counts what is inside the city outline**, not within half a mile of it: half a mile outside
+   Hamtramck is Detroit, and Detroit's listings are not Hamtramck's. The "nearest" rows are measured over every
+   listing, so the nearest pantry to the middle of Hamtramck may be in Detroit — which is the useful answer, and
+   the page says it. `canBeNearest` still refuses a sensitive or private listing.
+
+### What we will not read, and will not link
+
+**BS&A Online** runs assessing, tax and permits for all three smaller cities and its terms prohibit any
+automated access, and purport to prohibit linking without written consent. We do not scrape it, we do not "check
+it by hand at scale," and we do not deep-link it from a listing. That one paragraph is what closes off sales and
+local permits for the three cities. **Dearborn's DearbornConnect** service-request layer carries reporter names
+and free text and is excluded on principle (docs/11). **HUD's USPS vacancy data** answered an honest request
+with an empty body at every URL, so we have no licence text for it at all and do not use it; the 2020 Census
+count answers the same question with no licence problem. **Highland Park's CLEMIS crime map** is recorded here
+only so nobody proposes it: docs/13 leaves crime out, and that does not change because a different city
+publishes it.
+
+### Architecture
+
+- `pipeline/src/ingest-cities.ts` (`pnpm ingest:cities`, by hand) reads the six layers into
+  `data/ingested/cities.json`. Every count is added up by the owner's own server; no parcel, park or road record
+  is downloaded and no name field is ever requested. SEMCOG gains a pavement year each January and the Building
+  Permits Survey an annual file each spring.
+- `buildAreas` in `pipeline/src/indicators.ts` joins them with our listings and the crash totals at each bundle
+  build, and writes `cities[]`, `areas[]` and `area_sources` into the **same** `indicators/neighborhoods.json`.
+  One file means one fetch, one signature and one place the honesty rules are enforced.
+- **Additive, and tested as such.** `neighborhoods`, `sources` and `city` are byte-for-byte what they were, so
+  the iPhone and Android apps — which do not know about city pages yet — keep printing exactly what they
+  printed. Cost: the file goes from 75.8 to 77.4 KB gzipped, and it is still downloaded only when an area screen
+  opens.
+- The web draws it at `#/n/city_<slug>`: the address the Neighborhoods tab has always had, so no route was
+  invented and `#/c/` stays the categories tab. `areaById` finds either kind of id and `areaPage` draws
+  whichever it found, from the same components (`apps/web/src/hoods.ts`).
+- The four ids, for the Map tab's Areas layer and for the other clients: **`city_detroit`, `city_hamtramck`,
+  `city_highland_park`, `city_dearborn`.** A tap inside Detroit should prefer the neighborhood outline over the
+  city outline — most specific first.
+- **The iPhone and Android apps must mirror the models and the panels** before they show a city page: the `Area`
+  model with its `panels` allow-list, `missing` with both reasons, per-panel `sources` out of `area_sources`,
+  the SEMCOG notice on the four SEMCOG panels, and the six panels in the order `CITY_PANELS` fixes. Until then
+  they ignore `areas` entirely, which is exactly what an older client does.
 
 ## Order of work
 

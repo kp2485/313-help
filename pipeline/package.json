@@ -21,6 +21,7 @@
     "ingest:basemap": "tsx src/ingest-basemap.ts",
     "ingest:transit": "tsx src/ingest-transit.ts",
     "ingest:crashes": "tsx src/ingest-crashes.ts",
+    "ingest:cities": "tsx src/ingest-cities.ts",
     "ingest:mymap": "tsx src/ingest-mymap.ts",
     "ingest:safe": "tsx src/ingest-safe.ts",
     "alert:new": "tsx src/alert-new.ts",

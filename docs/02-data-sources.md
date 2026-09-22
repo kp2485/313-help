@@ -99,14 +99,52 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 | SEMCOG, "Crash Locations, 2015-2024" | Pedestrian and bicycle crash counts for the "Safe streets" panel; the records are the **Michigan State Police's** (CJIC) | A | `pnpm ingest:crashes`, by hand about once a year. **Licence stated, and not yet accepted knowingly.** SEMCOG's portal carries a [Copyright License Agreement](https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement) covering everything it publishes: a perpetual, royalty-free licence to reproduce, modify and publish; a **required** notice, "Copyright © \<year\> SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.", which NOTICE carries and which is owed on the Safe streets panel, where it is not printed yet; a **one-way indemnification clause**; and no third-party rights, which is why MSP's position matters. Counts only; nothing about a crash beyond the year survives the read. **Open for Kyle:** accept the agreement including the indemnification clause, or remove the layer. If SEMCOG or MSP objects, one file is deleted and the panel disappears (DECISIONS 2026-09-20) |
 | Transit (transitapp.com) | Nothing — a **link-out only**, using their documented URL scheme | — | We take no data at all and fetch nothing from their servers. Their page states no terms and no branding rule; asking them is owed |
 
+### The four-city pages (added 2026-09-22)
+
+Read by `pnpm ingest:cities` (`pipeline/src/ingest-cities.ts`, by hand) into `data/ingested/cities.json`. These
+become **numbers on a city page**, never rows in the directory. Every count is added up by the owner's own
+server: no parcel, park or road record is downloaded and no name field is ever requested.
+
+| Source | What | Tier | Licence exactly as stated | Notes |
+|---|---|---|---|---|
+| SEMCOG, `Pavement_Condition_2003_to_2024` (layer 80) | PASER 1–10 per piece of road, per year, with a left and right community code | A | SEMCOG Copyright License Agreement (below). The layer itself carries **no `copyrightText`** | Published for Michigan's **Transportation Asset Management Council**, who are named on the panel. The three groups (good 8–10, fair 5–7, poor 1–4) are the owner's, never ours. A road on a city line counts for both cities, and the panel says so. New year each January |
+| SEMCOG, `park_poly_2023_view` | Park polygons with acres, owner and ~45 amenity flags, keyed by community | A | Same agreement; no `copyrightText` | Richer than Detroit's own parks layer, which has no amenities — but **Detroit's panel stays on the City's own layer**, because that is the list the rest of the app already draws. Count and acres only so far |
+| SEMCOG, `mcd_2020` | 2020 Census population, housing units, **vacant units** and vacancy rate, per community | A | Same agreement; the counts underneath are the **2020 U.S. Census's**, named on the panel | The one four-city answer to "how many homes are empty". **Not** the same fact as Detroit's vacant-building registrations, and the panel says which. HUD's USPS vacancy data is deliberately not used (below) |
+| U.S. Census Bureau, **Building Permits Survey**, annual place files | New privately-owned housing **units authorised by building permits**, per permit-issuing place, split 1 / 2 / 3–4 / 5+ | A | **No licence stated**; a work of the United States government, not subject to domestic copyright (17 U.S.C. §105) | Plain comma-delimited text, no key, no blocking. Matched on **state and place code, never on a name** — Highland Park is also a city in Illinois, in the same file. `Number of Months Rep` is carried and printed: under 12 means the place did not report every month and the Bureau imputed the rest. **New residential construction only** |
+| U.S. Census Bureau, **TIGERweb** places | The four city outlines and each place's published internal point | A | **No licence stated**; a federal work (17 U.S.C. §105); data.gov tags the TIGER tract series CC0-1.0 | Already used for the map's boundary; read again here at a finer tolerance, because a 2.1-square-mile city simplified for a region map is no longer its own shape |
+| Wayne County, `Parcels_AssessmentData` | A **parcel count** per city, as a denominator | A | **None stated** — the County GIS page carries a disclaimer only | The layer holds `OwnerName` and `OwnerAddress`. **Server-side statistics only; neither field is ever put in `outFields`.** The count is a denominator, not a panel |
+
+**SEMCOG's Copyright License Agreement is accepted as it stands** — the perpetual royalty-free grant, the
+required notice, the disclaimer of warranties **and the one-way indemnification clause** — for every panel that
+uses SEMCOG data (Kyle, DECISIONS 2026-09-22: *"Do everything, stop blocking on SEMCOG."*). That closes the Open
+row of 2026-09-20; the email to SEMCOG is now a courtesy, not a gate. The required notice, with the layer's own
+year in it, is printed **on every SEMCOG-sourced panel** and in NOTICE. Section 1(b) grants no third-party
+rights, and two of the four layers carry somebody else's records (the State Police's, the Census Bureau's), so
+both are named on their panels and either owner's objection removes the layer.
+
+**If we ever call the Census *Data API*** (we do not today — the files above are plain published downloads), its
+terms require the notice *"This product uses the Census Bureau Data API but is not endorsed or certified by the
+Census Bureau."* on the panel. Written down here, and in NOTICE, so nobody has to rediscover it.
+
+**Closed doors, recorded so they are not reopened by accident.** **BS&A Online** runs assessing, tax and permits
+for Dearborn, Hamtramck and Highland Park; its terms prohibit *"any software, including scripts, bots, automated
+processes"* from scraping it and purport to prohibit linking without written consent. We do not read it, we do
+not check it by hand at scale, and we do not deep-link it. **DearbornConnect**, the city's service-request
+layer, carries reporter names and free text: excluded on principle (docs/11), and it publishes no name-free
+aggregate. **HUD's USPS vacancy data** returned an empty body to an honest request at every URL — dataset page,
+portal, login and licence page — so we have no licence text at all and it stays out. **NFIRS was retired on
+2026-01-31** and none of the three cities publishes fire data, so a fire panel outside Detroit is absent, never
+zero. None of the three cities runs an open-data portal of any kind.
+
 ## Ingestion strategy summary
 
 1. **Seed CSVs in the repo are the first pipeline** (`data/seed/*.csv`, maintained by stewards by pull request). A **page watcher** on DHD's public program pages is planned (not built yet): it would hash the relevant section nightly and open a steward task when it changes. We never auto-publish from a watched page. There is no DHD spreadsheet and none is planned; if any org later volunteers a feed, it plugs in as one more source.
 2. **Open data ingesters** (all read-only; output is committed, so a change shows up as a git diff):
    - `pnpm ingest:opendata` runs three: the ArcGIS layers in `data/sources.yaml` (DHD stations → `data/ingested/`; rec centers → staged only in `data/staging/`), the Joe Louis Greenway segments, and the City's events, parks and ZIP areas.
    - `pnpm ingest:neighborhoods`: the 205 neighborhoods and their public-data numbers (doc 13).
-   - `pnpm ingest:basemap`: streets, parks and the city boundary for the app's map.
+   - `pnpm ingest:basemap`: streets, parks and the city boundary for the app's map. Since 2026-09-22 the City Roads layer is also read for the five fields the offline walking directions weigh — **`HIN_2021`** and **`HighSeverity`** (the City's own High Injury Network and high-severity marking), **`LANES`**, **`POSTED_SPE`** and **`AADT`** — packed as one byte per polyline into a `safety` array beside `roads` (schema/query-spec.md, "The safety byte"). Same layer, same licence, no new source and nothing new asked of the City: `outFields` grew by five names. It costs about 2.5 bytes per polyline raw and **4.7 KB gzipped across every street file**, the drawn geometry is unchanged byte for byte, and a client that does not know the key ignores it. TIGER publishes none of the five, so the three neighbour cities' streets carry a byte of 0 — unknown — and the routing rules fall back to street class there.
    - `pnpm ingest:mymap`: Wayne County's Well Wayne naloxone and test-strip stations.
+   - `pnpm ingest:cities` (by hand): the four-city page numbers — SEMCOG pavement and parks, the 2020 Census municipal totals, the Census Building Permits Survey, TIGER outlines and a Wayne County parcel count (doc 13, "The four cities").
    - `pnpm ingest:transit` (monthly, by hand) and `pnpm ingest:crashes` (yearly, by hand): the 11 transport layers and the "Safe streets" counts. Both stay out of the nightly job on purpose (DECISIONS 2026-09-20).
    - `pnpm ingest:treatment`: SAMHSA's treatment directory and OTP list with DWIHN's provider list — staging and matching only; `check:sources` still decides what goes live.
    Libraries and precincts are not ingested yet.

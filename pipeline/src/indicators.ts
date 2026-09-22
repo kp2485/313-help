@@ -70,6 +70,119 @@ export interface NeighborhoodIndicators {
   crashes?: CrashCounts;
 }
 
+// ---- city pages (docs/13, "The four cities"; DECISIONS 2026-09-22) ----------------------------------------
+//
+// A city page is the SAME page as a neighborhood page, drawn from the same components, with two differences
+// that are properties of the data rather than of the screen:
+//
+//   1. `panels` is an explicit ALLOW-LIST. A client draws a panel because the area lists it, never because a
+//      number happens to be there or missing. That is what makes "absent, not zero" a fact about the bundle
+//      instead of a habit of one client — and it is what a test can hold.
+//   2. `sources` is PER PANEL, not one flat map for everybody. Detroit's roads come from the City and
+//      Hamtramck's from SEMCOG; two numbers that share a word must never share a source line. The strings
+//      themselves are interned in `area_sources` so each one appears in the bundle once.
+//
+// Nothing here ranks or compares cities, and no number from one city is ever printed on another's page.
+
+/** Which Detroit-only panels a city's public sources cannot support, and the two honest reasons why. */
+export interface MissingPanel { panel: string; why: 'not_published' | 'none_recorded' }
+/** A source, interned in `area_sources` and named by key on each panel that uses it. */
+export interface AreaSource { name: string; url: string; license: string; license_url?: string; notice?: string; last_edited: string; records_from?: string }
+/**
+ * One page that is not a Detroit neighborhood. It is a `NeighborhoodIndicators` with extra keys, on purpose:
+ * every client already knows how to draw the shared half (outline, help, nearest), so a city page costs no new
+ * drawing code — only the allow-list and the panels below.
+ */
+export interface AreaIndicators extends NeighborhoodIndicators {
+  city: string;                                      // the city this area belongs to (itself, for a city page)
+  kind: 'city' | 'neighborhood';                     // `tract` and `district` are reserved and unused
+  panels: string[];                                  // the allow-list: the ONLY panels a client may draw
+  sources: Record<string, string>;                   // panel -> key in `area_sources`
+  missing: MissingPanel[];                           // what this city's public sources do not support
+  park_acres?: number;
+  roads_bands?: { pieces: number; miles: number; good_pct: number; fair_pct: number; poor_pct: number };
+  vacancy?: { housing_units: number; vacant: number; pct: number; population: number };
+  permits_by_year?: { year: number; buildings: number; units: number; months_reported: number }[];
+}
+/** The index row for the Areas layer and the city list: a name and where its page is. Carries no indicator. */
+export interface CityRow { id: string; name: string; kind: 'city'; children: 'neighborhood' | 'none' }
+
+/** Is this point inside the area's own outline? A city page counts what is IN the city, not within half a mile
+ *  of it — half a mile outside Hamtramck is Detroit, and Detroit's listings are not Hamtramck's. */
+const insideAny = (pt: { lat: number; lon: number }, rings: Pt[][]) => rings.some((r) => pointInRing([pt.lon, pt.lat], r));
+
+export function buildAreas(input: {
+  cities: {
+    id: string; name: string; children: 'neighborhood' | 'none'; center: Pt; rings: Pt[][];
+    parks?: { count: number; acres: number }; roads?: AreaIndicators['roads_bands'];
+    vacancy?: { housing_units: number; vacant: number; pct: number; population: number; land_acres: number };
+    parcels?: number; permits: NonNullable<AreaIndicators['permits_by_year']>;
+  }[];
+  sources: Record<string, AreaSource>;               // the keys ingest-cities.ts writes: parks, roads, vacancy, permits, …
+  rows: BundleRow[];
+  /** Detroit's own parks layer, already in the bundle: Detroit's parks panel stays on the City's own numbers. */
+  detroitParks?: { lat: number; lon: number; acres?: number }[];
+  /** Per-city crash totals from ingest-crashes.ts, keyed by the city NAME SEMCOG uses. */
+  crashes?: Record<string, { window: CrashCounts }>;
+  crashSource?: AreaSource;
+}): { cities: CityRow[]; areas: AreaIndicators[]; area_sources: Record<string, AreaSource> } {
+  const located = input.rows.filter((r) => r.status === 'active' && r.lat !== undefined && r.lon !== undefined);
+  const used: Record<string, AreaSource> = {};
+  const key = (name: string, src: AreaSource | undefined) => { if (!src) return null; used[name] = src; return name; };
+  const areas = input.cities.map((c) => {
+    const inCity = located.filter((r) => insideAny({ lat: r.lat!, lon: r.lon! }, c.rings));
+    const by = Object.fromEntries(HELP_TOPS.map((t) => [t, inCity.filter((r) => r.category === t || r.category.startsWith(t + '.')).length]));
+    const center = { lat: c.center[1], lon: c.center[0] };
+    // The nearest listed food, clinic, Narcan and indoor place are measured over EVERY listing, not only this
+    // city's: from the middle of Hamtramck the nearest pantry may be in Detroit, and saying so is the useful
+    // answer. `nearestPicks` carries the guard that keeps a sensitive or private row off a public page.
+    const nearest = nearestPicks(center, located);
+    const detroit = c.children === 'neighborhood';
+    const parksInCity = detroit && input.detroitParks ? input.detroitParks.filter((q) => insideAny(q, c.rings)) : null;
+    const parkCount = parksInCity ? parksInCity.length : c.parks?.count;
+    const parkAcres = parksInCity ? Math.round(parksInCity.reduce((s, q) => s + (q.acres ?? 0), 0)) : c.parks?.acres;
+    const crashes = input.crashes?.[c.name]?.window;
+    // The allow-list. A panel is listed only where this city has a source for it; `missing` says why for the rest.
+    const panels: string[] = ['help'];
+    const sources: Record<string, string> = {};
+    const missing: MissingPanel[] = [];
+    const add = (panel: string, ok: unknown, srcKey: string | null) => { if (ok && srcKey) { panels.push(panel); sources[panel] = srcKey; } };
+    add('parks', parkCount !== undefined, key(detroit ? 'src_detroit_parks' : 'src_semcog_parks', detroit ? input.sources.detroit_parks : input.sources.parks));
+    add('crashes', crashes, key('src_semcog_crashes', input.crashSource));
+    add('roads', c.roads, key('src_semcog_pavement', input.sources.roads));
+    add('vacancy', c.vacancy, key('src_census_vacancy', input.sources.vacancy));
+    // A permits panel needs a year with a number in it. Highland Park authorised no new home in any published
+    // year, so it gets no chart and one sentence saying exactly that — never a row of zeros beside Detroit's.
+    const anyPermits = c.permits.some((y) => y.units > 0 || y.buildings > 0);
+    add('permits', anyPermits, key('src_census_bps', input.sources.permits));
+    if (!anyPermits && c.permits.length) missing.push({ panel: 'permits', why: 'none_recorded' });
+    if (!detroit) for (const panel of ['sales', 'blight', 'demolitions', 'issues', 'fires', 'rentals', 'vacant_reg']) missing.push({ panel, why: 'not_published' });
+    return {
+      id: c.id, name: c.name, city: c.id, kind: 'city' as const, district: null,
+      center: [c.center[1], c.center[0]] as [number, number],
+      rings: c.rings.map((r) => encodeLine(r, [GRID.lon0, GRID.lat0])),
+      help: {
+        total: inCity.length, by, nearest_miles: nearest.miles, nearest_id: nearest.ids,
+        none_listed_yet: ['food', 'health', 'harm'].filter((t) => by[t] === 0),
+        coverage_checked: false,
+      },
+      places: { parks: parkCount ?? 0, rec_centers: inCity.filter((r) => r.category === 'rec.center').length, greenway_open: 0 },
+      ...(parkAcres !== undefined ? { park_acres: parkAcres } : {}),
+      ...(c.parcels ? { parcels: c.parcels } : {}),
+      ...(c.roads ? { roads_bands: c.roads } : {}),
+      ...(c.vacancy ? { vacancy: { housing_units: c.vacancy.housing_units, vacant: c.vacancy.vacant, pct: c.vacancy.pct, population: c.vacancy.population } } : {}),
+      ...(anyPermits ? { permits_by_year: c.permits } : {}),
+      ...(crashes ? { crashes } : {}),
+      years: {},                                     // a city page has no per-year City series of its own
+      panels, sources, missing,
+    };
+  });
+  return {
+    cities: input.cities.map((c) => ({ id: c.id, name: c.name, kind: 'city' as const, children: c.children })),
+    areas, area_sources: used,
+  };
+}
+
 /** 0 when the point is inside; otherwise miles to the nearest edge. */
 export function milesToArea(pt: { lat: number; lon: number }, rings: Pt[][]): number {
   if (rings.some((r) => pointInRing([pt.lon, pt.lat], r))) return 0;

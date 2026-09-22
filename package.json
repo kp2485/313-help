@@ -19,6 +19,7 @@
     "ingest:basemap": "pnpm --filter @313help/pipeline ingest:basemap",
     "ingest:transit": "pnpm --filter @313help/pipeline ingest:transit",
     "ingest:crashes": "pnpm --filter @313help/pipeline ingest:crashes",
+    "ingest:cities": "pnpm --filter @313help/pipeline ingest:cities",
     "check:emergency": "pnpm --filter @313help/pipeline check:emergency",
     "check:sources": "pnpm --filter @313help/pipeline check:sources",
     "tasks:sync": "pnpm --filter @313help/pipeline tasks:sync",
