@@ -15,17 +15,26 @@ export function styleSwitchHtml(o: { offered: boolean; style: MapStyle; T: (key:
   return `<fieldset class="mapstyle"><legend>${o.T('map.style')}</legend><div class="kinds">${radio('standard')}${radio('subway')}</div>${o.problems ?? ''}</fieldset>`;
 }
 
-/** What the lines mean, in words, each with a small drawn sample: only for what is switched on. The QLINE's line
- *  is a drawing through its stations, and the key says so whenever the data marks it `derived` (or has not
- *  arrived yet); if a real track ever ships, only the first sentence is shown. */
-export function subwayKeyHtml(o: { on: (layer: string) => boolean; derived?: boolean; t: (key: string) => string }): string {
+/**
+ * What the lines on the map mean, in words, each with a small drawn sample: only for what is switched on.
+ *
+ * Two things live in it. The dotted **boundary** line, whenever the outlines layer is on — in either map style,
+ * because boundaries are drawn the same way in both (`areas` is the row's own words, or '' for no row) — and, in
+ * the subway style, the transport rows. The QLINE's line is a drawing through its stations, and the key says so
+ * whenever the data marks it `derived` (or has not arrived yet); if a real track ever ships, only the first
+ * sentence is shown. One heading over the lot: two "What the lines mean" headings would be two keys.
+ */
+export function mapKeyHtml(o: { on: (layer: string) => boolean; derived?: boolean; areas?: string; t: (key: string) => string }): string {
   const bus = o.on('ddot_routes') || o.on('smart_routes'), rail = o.on('qline') || o.on('people_mover');
-  if (!bus && !rail) return '';
   const qline = o.derived === false ? o.t('map.key_qline').split(/[.।]\s/)[0]! : o.t('map.key_qline');
+  // A line layer with no network of its own (bike lanes, MoGo) says nothing here on its own: that was true
+  // before the boundary row existed and it stays true. The boundary row is its own reason for a key.
   const rows: [string, string, boolean][] = [
+    ['bnd', o.areas ?? '', !!o.areas],
     ['freq', o.t('map.key_frequent'), bus], ['local', o.t('map.key_local'), bus], ['smart', o.t('map.key_smart'), o.on('smart_routes')], ['trunk', o.t('map.key_trunk'), bus],
     ['stop', o.t('map.key_station'), bus || rail || o.on('ddot_stops') || o.on('smart_stops')], ['change', o.t('map.key_change'), bus], ['end', o.t('map.key_end'), bus || o.on('qline')],
     ['qline', qline, o.on('qline')], ['dpm', o.t('map.key_dpm'), o.on('people_mover')], ['bike', o.t('map.key_bike'), o.on('bike_lanes')],
-  ];
-  return `<h2 class="keyh">${escHtml(o.t('map.key'))}</h2><ul class="gwkey trkey">${rows.filter((r) => r[2]).map(([cls, text]) => `<li><i class="${cls}"></i>${escHtml(text)}</li>`).join('')}</ul>`;
+  ].filter((r, i) => r[2] && (i === 0 || bus || rail)) as [string, string, boolean][];
+  if (!rows.length) return '';
+  return `<h2 class="keyh">${escHtml(o.t('map.key'))}</h2><ul class="gwkey trkey">${rows.map(([cls, text]) => `<li><i class="${cls}"></i>${escHtml(text)}</li>`).join('')}</ul>`;
 }

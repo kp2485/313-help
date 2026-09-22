@@ -20,6 +20,13 @@
      four cities: a faint fill was 1.20:1 and could not be seen at all, so the area is drawn as a texture whose
      own lines clear 3:1 instead (DECISIONS 2026-09-20). */
   --map-out:#e2e9e4; --map-out-ink:#768079; --map-land:#f7f9f6; --map-park:#c4e3c9; --map-park-ink:#1d5a31; --map-road:#747d77; --map-main:#666f69; --map-fwy:#926c16; --map-ink:#2b3a32;
+  /* Neighbourhood and city boundaries (bounds.ts; Kyle, 2026-09-22). Deliberately NOT a street colour: the roads
+     are all within a step of each other in grey-green and an administrative edge is not one of them. A plum that
+     clears 3:1 against the land (5.70), a park (4.36) and the ground outside the four cities (4.88) — 5.77 / 4.20
+     / 6.75 in the dark theme — while the thin stroke and the dash keep it quiet under the help. It sits about
+     where a main road sits against the land (4.91) on purpose: one notch paler than that and, at mid zoom over
+     the help dots, it was not a line anyone could see (screenshots, 2026-09-22). */
+  --map-bnd:#7a5588;
   /* The greenway is drawn like a transit line: one width, a casing, a colour and a dash per phase. */
   --gw-open:#0b6b43; --gw-build:#c2701a; --gw-fund:#2f6f9e; --gw-plan:#7d8c84; --gw-case:#ffffff;
   /* One chosen trip, drawn on the Directions screen (DECISIONS 2026-09-22). A walking leg is solid in its own
@@ -48,6 +55,7 @@
   --brand:#4fcf93; --brand-ink:#04140c; --brand-strong:#86e6b6; --brand-soft:#15311f; --brand-soft-ink:#a6ebc8;
   --warn-bg:#33270a; --warn-ink:#ffd98a; --danger:#e26a6a; --danger-ink:#1a0505; --focus:#8ab8ff; --shadow:none;
   --map-out:#060b09; --map-out-ink:#76827a; --map-land:#141f19; --map-park:#1c3b27; --map-park-ink:#9fdcb4; --map-road:#75827a; --map-main:#88968d; --map-fwy:#a3863a; --map-ink:#d5e2da;
+  --map-bnd:#a98cbb;
   --gw-open:#4fcf93; --gw-build:#e3974a; --gw-fund:#6aa9d6; --gw-plan:#8ea79a; --gw-case:#0a110e;
   --route-walk:#ff8ad4; --route-ride:#73c2ff;
   --lyr-bus:#7aa7ff; --lyr-smart:#4fd1c5; --lyr-rail:#c79bff; --lyr-bike:#fb923c;
@@ -334,6 +342,8 @@ ul.plain { list-style: disc; padding-inline-start: 1.25rem; display: grid; gap: 
 .trkey i.qline { height:.4375rem; border-radius:.25rem; border-block:2px solid var(--tr-rail); background:repeating-linear-gradient(90deg,var(--tr-rail) 0 .3125rem,var(--tr-fill) .3125rem .5625rem); }
 .trkey i.dpm { height:.5rem; background:var(--tr-dpm); } .trkey i.dpm::after { content:"\203A\2002\203A\2002\203A"; position:absolute; inset:0; display:grid; place-items:center; font:700 .625rem/1 system-ui,sans-serif; color:var(--tr-fill); direction:ltr; unicode-bidi:isolate; }
 .trkey i.bike { height:.3125rem; border-radius:0; background:none; border-block:1.5px solid var(--tr-bike); }
+/* The boundary sample: the dotted hairline the map draws, at the weight the mid band uses. */
+.trkey i.bnd { height:.125rem; border-radius:0; background:repeating-linear-gradient(90deg,var(--map-bnd) 0 .25rem,transparent .25rem .5rem); }
 /* A route named on a map card is a button that chooses it: 44 px tall, Latin names left to right in every language. */
 .mappick.route { align-items:flex-start; } .routebtns { display:flex; flex-wrap:wrap; gap:.375rem; width:100%; } .routebtns .chip { min-height:2.75rem; }
 .maplist { margin-top:.25rem; } .maplistbody { margin-top:.875rem; } .maplistbody h3 { margin-top:1.25rem; } .maplistbody h3:first-child { margin-top:0; }
@@ -528,7 +538,7 @@ main:focus { outline:none; }
   :root {
     --ink:#000000; --muted:#26332c; --edge:#3c4a43; --line:#8ea39a;
     --map-out:#e8eeea; --map-out-ink:#4e5853; --map-land:#ffffff; --map-park:#d8efdc; --map-park-ink:#0d3f1f;
-    --map-road:#4f5a54; --map-main:#333c37; --map-fwy:#6a4d08; --map-ink:#101a15;
+    --map-road:#4f5a54; --map-main:#333c37; --map-fwy:#6a4d08; --map-ink:#101a15; --map-bnd:#5a3a6b;
     --route-walk:#7a0f52; --route-ride:#003e6b;
     --tr-0:#9b0c23; --tr-1:#1e3a8a; --tr-2:#0b4f4a; --tr-3:#5f330d; --tr-4:#831843; --tr-5:#1e293b; --tr-dpm:#581c5f; --tr-bike:#14532d;
   }
@@ -537,7 +547,7 @@ main:focus { outline:none; }
   :root {
     --ink:#ffffff; --muted:#d4e2d9; --edge:#9db3a7; --line:#4c5f55;
     --map-out:#000000; --map-out-ink:#a9b8b0; --map-land:#0c1512; --map-park:#123020; --map-park-ink:#cdf0da;
-    --map-road:#a4b3aa; --map-main:#c9d8ce; --map-fwy:#dcc079; --map-ink:#f2f8f4;
+    --map-road:#a4b3aa; --map-main:#c9d8ce; --map-fwy:#dcc079; --map-ink:#f2f8f4; --map-bnd:#cdb4da;
     --route-walk:#ffb3e2; --route-ride:#a8d4ff;
     --tr-0:#ffa099; --tr-1:#a8c5ff; --tr-2:#8be6dd; --tr-3:#f0c596; --tr-4:#ffb3d7; --tr-5:#dbe3ee; --tr-dpm:#f0c0f7; --tr-bike:#a7f3c5;
   }
@@ -551,6 +561,9 @@ main:focus { outline:none; }
   :root {
     --map-out:Canvas; --map-out-ink:GrayText; --map-land:Canvas; --map-park:Canvas; --map-park-ink:GrayText;
     --map-road:GrayText; --map-main:CanvasText; --map-fwy:LinkText; --map-ink:CanvasText;
+    /* A boundary keeps a system colour like everything else; what tells it from a street there is its DASH,
+       which no forced-colours mode touches (1.4.1 again: colour is never the only carrier). */
+    --map-bnd:GrayText;
     --gw-open:Highlight; --gw-build:CanvasText; --gw-fund:LinkText; --gw-plan:GrayText; --gw-case:Canvas;
     --lyr-bus:LinkText; --lyr-smart:CanvasText; --lyr-rail:Highlight; --lyr-bike:GrayText;
     --route-walk:Highlight; --route-ride:LinkText;

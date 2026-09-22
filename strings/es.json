@@ -609,7 +609,7 @@
   "layer.help.paperwork": "Dinero, vivienda, papeles y transporte",
   "layer.place.greenway": "Joe Louis Greenway",
   "layer.place.parks": "Parques de la ciudad",
-  "layer.place.areas": "Contornos de ciudades y barrios",
+  "layer.place.areas": "Límites de barrios y ciudades",
   "layer.go.ddot_routes": "Rutas de autobús DDOT",
   "layer.go.ddot_stops": "Paradas de autobús DDOT",
   "layer.go.smart_routes": "Rutas de autobús SMART",

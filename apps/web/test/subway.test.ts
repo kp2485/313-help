@@ -10,7 +10,7 @@ import { LAYER_STYLE } from '../src/layerstyle.js';
 import { mapStyle } from '../src/layers.js';
 import { decodeLayer, esc, wx, wy, type MapSpec, type Overlay } from '../src/map.js';
 import { mapListHtml } from '../src/maplist.js';
-import { styleSwitchHtml, subwayKeyHtml } from '../src/stylepanel.js';
+import { mapKeyHtml, styleSwitchHtml } from '../src/stylepanel.js';
 import { plannerFor, TRANSIT } from '../src/transit.js';
 import * as S from '../src/subway.js';
 import { baseSpec, framesOf, overlaysFor, serveBasemap } from './mapfixture.js';
@@ -55,7 +55,7 @@ describe('the map style is a choice, and the choice defaults to what people alre
     expect(styleSwitchHtml({ offered: true, style: 'subway', T: t, problems: '<p class="banner warn">x</p>' })).toMatch(/<\/div><p class="banner warn">x<\/p><\/fieldset>$/);
   });
   it('the key says each line in words, only for what is on, and says the QLINE is drawn between its stations while the data marks it so', () => {
-    const key = (on: string[], derived?: boolean) => subwayKeyHtml({ on: (l) => on.includes(l), derived, t });
+    const key = (on: string[], derived?: boolean) => mapKeyHtml({ on: (l: string) => on.includes(l), derived, t });
     expect(key(['mogo', 'bike_lanes'])).toBe('');
     const bus = key(['ddot_routes']);
     for (const k of ['map.key_frequent', 'map.key_local', 'map.key_trunk', 'map.key_station', 'map.key_change', 'map.key_end']) expect(bus).toContain(en[k]);
