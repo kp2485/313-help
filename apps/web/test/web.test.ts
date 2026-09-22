@@ -368,6 +368,9 @@ describe('the other languages', () => {
   const SAME_ON_PURPOSE = new Set(['map.route_card' /* "{name} · {agency}": two names and a dot */, 'app.name', 'detail.source_line', 'hood.kind.harm', 'miles', 'gw.title', 'layer.place.greenway',
     'layer.go.people_mover', 'link.food.wic.title', 'link.food.wic.label', 'link.food.double_up.title', 'link.benefits.ser.title',
     'clock.am', 'clock.pm', 'list.sep',
+    // "{year}, {label}: {count}" — a chart mark's own label is three holes, a comma and a colon, and every one
+    // of the three is already in the reader's language. Spanish and Bengali punctuate it the same way.
+    'hood.chart_bar',
     // The four cities' own names. A city keeps its name in Spanish; the Arabic and Bengali tables transliterate
     // them, which this loop only ever checks against the English.
     'area.detroit', 'area.dearborn', 'area.hamtramck', 'area.highland_park']);
@@ -992,7 +995,8 @@ describe('privacy and copy rules, checked against the source', () => {
       expect(lines.length, name).toBeGreaterThan(0);
       for (const l of lines) expect(l, name).not.toMatch(/fetch\(|pushState|location\.|href=/);
     }
-    expect(main).toMatch(/if \(view\.v === 'tab'\) \{ searchText = ''; hoodQuery = ''; \}/);
+    // A tab is a fresh start: the search box, the neighborhood filter, and which chart lines were switched off.
+    expect(main).toMatch(/if \(view\.v === 'tab'\) \{ searchText = ''; hoodQuery = ''; hoodSeriesOff\.clear\(\); \}/);
     expect(main).toMatch(/<input id="q"[^>]*autocomplete="off"/);
     // The ZIP field names its purpose so a browser can fill it in (WCAG 1.3.5); we still never store or send it.
     expect(main).toMatch(/<input name="zip"[^>]*autocomplete="postal-code"/);

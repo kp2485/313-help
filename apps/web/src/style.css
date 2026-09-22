@@ -443,3 +443,85 @@ main:focus { outline:none; }
      keeps the whole "(https://…)" together and the right way round, in every language. */
   a[href^="http"]::after { content:" (" attr(href) ")"; font-size:.85em; word-break:break-all; direction:ltr; unicode-bidi:isolate; }
 }
+
+/* ---- a year panel as a picture (docs/13, 2026-09-22) -------------------------------------------------------
+   Table | Chart above every year panel, and the chart itself. The chart is inline SVG built from the same
+   numbers as the table beside it: no canvas (a canvas has no text to read and prints as a blur), no library,
+   no script. The table is still in the page in chart view — `.vh` only hides it from the eye — so a screen
+   reader has every number whichever view is chosen.
+
+   The two fills are two IDENTITIES (homes sold, permits), never two ends of a scale: nothing here says good or
+   bad. They are told apart by three things at once, so colour is never the only carrier (WCAG 1.4.1): each
+   small multiple has its own caption over it, the second fill carries a hatch, and both are in the key. */
+:root {
+  /* Validated against the surface in both themes with the categorical checks (green ΔE 26.7 normal / 24.4
+     deutan from the blue, both over 3:1 on the card). */
+  --chart-a:#0b6b43; --chart-b:#1d4ed8; --chart-lt5:#47584f; --chart-grid:#d9e3dc; --chart-ink:#47584f;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --chart-a:#35a870; --chart-b:#5b8de0; --chart-lt5:#a3b5aa; --chart-grid:#25362d; --chart-ink:#a3b5aa;
+} }
+/* "Increase contrast" deliberately steps outside the categorical lightness band: at this setting contrast with
+   the card wins over the even-lightness rule, and the hatch and the captions still carry identity. */
+@media (prefers-contrast: more) { :root { --chart-a:#064e31; --chart-b:#142f9e; --chart-lt5:#26332c; --chart-grid:#8ea39a; --chart-ink:#26332c; } }
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) { :root { --chart-a:#57c894; --chart-b:#7fb0ff; --chart-lt5:#d4e2d9; --chart-grid:#4c5f55; --chart-ink:#d4e2d9; } }
+@media (forced-colors: active) { :root { --chart-a:CanvasText; --chart-b:LinkText; --chart-lt5:GrayText; --chart-grid:GrayText; --chart-ink:CanvasText; } }
+
+.viewpick { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0 .25rem; }
+.viewpick .pick { font-size:.9375rem; }
+.hoodchart { margin:.75rem 0 0; padding:0; }
+.hoodsvg { display:block; width:100%; height:auto; overflow:visible; }
+/* Recessive grid, hairline and solid; the data is the only loud thing. */
+.hoodsvg .gl,.hoodsvg .ax { stroke:var(--chart-grid); stroke-width:1; fill:none; }
+.hoodsvg .ax { stroke:var(--chart-ink); }
+.hoodsvg .tk,.hoodsvg .yr { fill:var(--chart-ink); font-size:11px; font-family:inherit; font-variant-numeric:tabular-nums; }
+/* Each series has a colour, a line pattern AND a marker shape, so the two are still two with no colour at all
+   (WCAG 1.4.1): a solid line with round points, and a dashed line with diamonds. */
+.hoodsvg .ln { fill:none; stroke-width:2; stroke-linecap:round; }
+.hoodsvg .ln.ta { stroke:var(--chart-a); }
+.hoodsvg .ln.tb { stroke:var(--chart-b); stroke-dasharray:7 4; }
+/* The piece of a line that runs to or from a year whose count is hidden: it is drawn, because the year happened
+   and a gap would read as a zero, and it is drawn DIFFERENTLY, because nobody knows where it really goes. */
+.hoodsvg .ln.unsure { stroke-dasharray:1 3; stroke-width:1.5; }
+.hoodsvg .mk.ta { fill:var(--chart-a); }
+.hoodsvg .mk.tb { fill:var(--chart-b); }
+/* A count the pipeline hid: the series' own shape, hollow, at a FIXED height. There is no value to measure and
+   no number to read off it (docs/13, honesty rule 2). */
+.hoodsvg .mk.hollow { fill:var(--surface); stroke-width:1.5; }
+.hoodsvg .mk.hollow.ta { stroke:var(--chart-a); }
+.hoodsvg .mk.hollow.tb { stroke:var(--chart-b); }
+/* The number at a point, on hover and on keyboard focus. It is decoration: the same words are in the point's own
+   accessible name, in its `<title>`, and in the table. */
+.hoodsvg .pt { outline:none; }
+.hoodsvg .tip { opacity:0; }
+.hoodsvg .tip rect { fill:var(--chart-ink); }
+.hoodsvg .tip text { fill:var(--surface); font-size:10px; font-family:inherit; font-variant-numeric:tabular-nums; }
+.hoodsvg .pt:hover .tip,.hoodsvg .pt:focus-visible .tip { opacity:1; }
+.hoodsvg .pt:focus-visible .mk { stroke:var(--focus); stroke-width:2.5; }
+@media (prefers-reduced-motion:no-preference) { .hoodsvg .tip { transition:opacity .12s; } }
+/* The key. With two series it is two real checkboxes, so the keyboard and screen readers already work and
+   nothing has to be invented; the last one left on is disabled, and the line under it says why. */
+.chartkey { display:flex; flex-wrap:wrap; gap:.5rem 1rem; margin:.375rem 0 .25rem; padding:0; border:0; list-style:none; font-size:.9375rem; color:var(--ink); }
+.chartkey legend { font-size:.875rem; color:var(--muted); padding:0; margin-bottom:.25rem; }
+.chartkey.plain { color:var(--muted); font-size:.875rem; }
+.chartkey li,.keybox { display:flex; align-items:center; gap:.375rem; }
+.keybox { min-height:2.75rem; cursor:pointer; }
+.keybox input { accent-color:var(--brand); width:1.125rem; height:1.125rem; margin:0; }
+.keybox:has(input:disabled) { cursor:default; color:var(--muted); }
+.chartkey .sw { width:1rem; height:1rem; border-radius:99rem; forced-color-adjust:none; }
+.chartkey .sw.ta { background:var(--chart-a); }
+/* The second series' key sample is its own shape, turned on its point, not a second circle. */
+.chartkey .sw.tb { background:var(--chart-b); border-radius:2px; rotate:45deg; width:.875rem; height:.875rem; }
+.chartkey .sw.hollow { background:none; border:1.5px solid var(--chart-lt5); }
+/* Forced colours and print keep the two lines apart by their dash and their shape, which survive both. */
+@media (forced-colors: active) {
+  .hoodsvg .mk.hollow { fill:Canvas; }
+  .hoodsvg .tip rect { fill:CanvasText; }
+  .chartkey .sw { border:1px solid CanvasText; }
+}
+@media print {
+  .hoodsvg .ln.ta,.hoodsvg .mk.ta { stroke:#000; fill:#000; }
+  .hoodsvg .ln.tb,.hoodsvg .mk.tb { stroke:#000; fill:#fff; }
+  .hoodsvg .mk { stroke:#000; stroke-width:1.5; }
+  .hoodsvg .tip { display:none; }
+}

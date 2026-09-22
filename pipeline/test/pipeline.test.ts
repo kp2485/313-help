@@ -14,7 +14,7 @@ import { recheckTask, syncTasks } from '../src/tasks-sync.js';
 import { addNeighborZips, toZipCenters } from '../src/ingest-city.js';
 import { importInto, lineToRows, parseSchedule } from '../src/import-lines.js';
 import { buildIndicators, canBeNearest, milesToArea, nearestMiles, nearestPicks } from '../src/indicators.js';
-import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
+import { FIRE_TYPES, ISSUE_TYPES, isBuildingFire, nameKey, pathMidpoint, plainCount, roadShare, roadsByHood, sqlIn, suppress, toNeighborhoods, uncountedFireTypes } from '../src/ingest-neighborhoods.js';
 import { makeAlert } from '../src/alert-new.js';
 import { checkEmergencyRow } from '../src/check-emergency.js';
 import { addressOnPage, fetchPage, isChallenge, listingOnPage, pageText, phone2OnItsPage, phoneOnPage, phonesOn, streetKey } from '../src/page-match.js';
@@ -753,6 +753,10 @@ describe('neighborhood indicators (docs/13)', () => {
   });
   it('small numbers are hidden before anything is stored', () => {
     expect(suppress(4, 90000, 1000)).toEqual({ count: 'lt5' });
+    // The two series that no longer hide a small count: a 3 is a 3, and the median keeps its ten-sale rule.
+    expect(plainCount(3, 90000, 1000)).toEqual({ count: 3, cost: 1000 });
+    expect(plainCount(0)).toEqual({ count: 0 });
+    expect(plainCount(12, 90000.4)).toEqual({ count: 12, median: 90000 });
     expect(suppress(9, 90000)).toEqual({ count: 9 });
     expect(suppress(10, 90000.4)).toEqual({ count: 10, median: 90000 });
   });
@@ -815,14 +819,19 @@ describe('neighborhood indicators (docs/13)', () => {
     for (const years of Object.values<any>(st.neighborhoods)) for (const y of Object.values<any>(years)) for (const k of ['blight', 'demolitions', 'issues']) if (y[k] !== undefined && y[k] !== 'lt5') expect(y[k]).toBeGreaterThanOrEqual(5);
     expect(JSON.stringify(st)).not.toMatch(/owner|inspector|taxpayer/i);
   });
-  it('the committed City numbers cover all 205 neighborhoods, hold no count under 5, and no names of buyers or sellers', () => {
+  it('the committed City numbers cover all 205 neighborhoods and hold no names of buyers or sellers', () => {
     const h = JSON.parse(readFileSync(p('data/ingested/neighborhoods.json'), 'utf8')), st = readFileSync(p('data/ingested/city_stats.json'), 'utf8');
     expect(h.neighborhoods).toHaveLength(205);
     expect(h.neighborhoods.filter((n: any) => n.jlg_study_area).length).toBeGreaterThan(20);
+    // **Home sales and building permits state their real count, however small** (Kyle, 2026-09-22 — DECISIONS):
+    // both are public transaction records the City already publishes with the address on them, so a 3 is a 3.
+    // A MEDIAN price still needs ten sales, because the middle of three moves with any one of them.
+    let small = 0;
     for (const years of Object.values<any>(JSON.parse(st).neighborhoods)) for (const y of Object.values<any>(years)) {
-      for (const k of ['sales', 'permits']) if (y[k] !== undefined && y[k] !== 'lt5') expect(y[k]).toBeGreaterThanOrEqual(5);
+      for (const k of ['sales', 'permits']) if (y[k] !== undefined) { expect(y[k]).not.toBe('lt5'); if (y[k] < 5) small++; }
       if (y.median_price !== undefined) expect(y.sales).toBeGreaterThanOrEqual(10);
     }
+    expect(small, 'the whole point: small counts are now stated').toBeGreaterThan(0);
     expect(st).not.toMatch(/grantor|grantee|parcel_id|"address"/);
     expect(readFileSync(p('pipeline/src/ingest-neighborhoods.ts'), 'utf8')).not.toMatch(/outFields: '[^']*(grantor|grantee|address)/);
   });

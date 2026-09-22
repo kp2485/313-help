@@ -41,4 +41,10 @@
     <color name="grp_kids">#D8B4FE</color>
     <color name="grp_things">#FDBA74</color>
     <color name="grp_paperwork">#CBD5E1</color>
+    <!-- The two chart fills on a neighborhood page (docs/13, 2026-09-22). Two identities — homes sold,
+         permits — never two ends of a scale: nothing here says good or bad. Byte for byte the web's
+         chart-a and chart-b tokens, checked for contrast against the card and for distance from each
+         other in both themes and under colour-blind simulation. -->
+    <color name="chart_a">#35A870</color>
+    <color name="chart_b">#5B8DE0</color>
 </resources>

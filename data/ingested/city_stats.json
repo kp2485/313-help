@@ -3,42 +3,42 @@
   "sales": {
    "name": "City of Detroit Assessor: property sales",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/assessor_property_sales_view/FeatureServer/0",
-   "last_edited": "2026-09-18"
+   "last_edited": "2026-09-21"
   },
   "permits": {
    "name": "City of Detroit BSEED: building permits",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/bseed_building_permits/FeatureServer/0",
-   "last_edited": "2026-09-19"
+   "last_edited": "2026-09-22"
   },
   "blight": {
    "name": "City of Detroit: blight tickets",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/blight_tickets/FeatureServer/0",
-   "last_edited": "2026-09-18"
+   "last_edited": "2026-09-22"
   },
   "demolitions": {
    "name": "City of Detroit: completed demolitions",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_completed_demolitions/FeatureServer/0",
-   "last_edited": "2026-09-18"
+   "last_edited": "2026-09-21"
   },
   "issues": {
    "name": "Improve Detroit: issues people reported to the City",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/improve_detroit/FeatureServer/0",
-   "last_edited": "2026-09-18"
+   "last_edited": "2026-09-22"
   },
   "parcels": {
    "name": "City of Detroit Assessor: parcels",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/parcel_file_current/FeatureServer/0",
-   "last_edited": "2026-09-18"
+   "last_edited": "2026-09-21"
   },
   "rentals": {
    "name": "City of Detroit BSEED: active rental certificates of compliance",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/bseed_active_residential_compliance_certificates/FeatureServer/0",
-   "last_edited": "2026-09-19"
+   "last_edited": "2026-09-22"
   },
   "fires": {
    "name": "Detroit Fire Department: fire incidents",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Fire_Incidents/FeatureServer/0",
-   "last_edited": "2026-09-19"
+   "last_edited": "2026-09-22"
   },
   "pavement": {
    "name": "City of Detroit: street pavement ratings",
@@ -48,7 +48,7 @@
   "vacant": {
    "name": "City of Detroit BSEED: vacant property registrations",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/bseed_vacant_property_registrations/FeatureServer/0",
-   "last_edited": "2026-09-19"
+   "last_edited": "2026-09-22"
   }
  },
  "issue_types": [
@@ -284,7 +284,7 @@
   "nbh_yorkshire_woods": 1759
  },
  "city_parcels": 377940,
- "fetched_at": "2026-09-19",
+ "fetched_at": "2026-09-22",
  "first_year": 2019,
  "partial_year": 2026,
  "city": {
@@ -366,15 +366,15 @@
    "fires": 2245
   },
   "2026": {
-   "sales": 3819,
-   "median_price": 86900,
-   "permits": 4275,
-   "permit_cost": 2102688590,
-   "blight": 38945,
-   "demolitions": 317,
-   "issues": 12742,
-   "issue_days": 8,
-   "fires": 1206
+   "sales": 3833,
+   "median_price": 86500,
+   "permits": 4296,
+   "permit_cost": 2105055657,
+   "blight": 39247,
+   "demolitions": 319,
+   "issues": 12899,
+   "issue_days": 9,
+   "fires": 1216
   }
  },
  "neighborhoods": {
@@ -459,8 +459,8 @@
    "2026": {
     "blight": 411,
     "demolitions": 25,
-    "issues": 118,
-    "issue_days": 4,
+    "issues": 121,
+    "issue_days": 5,
     "fires": 11,
     "sales": 22,
     "median_price": 30000,
@@ -473,21 +473,23 @@
     "blight": 10,
     "issues": 13,
     "issue_days": 9,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 2,
+    "permit_cost": 70000
    },
    "2020": {
     "blight": 59,
     "issues": 7,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 4,
+    "permit_cost": 254000
    },
    "2021": {
     "blight": 10,
     "issues": 6,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 5,
     "permit_cost": 101152
    },
@@ -497,28 +499,31 @@
     "issue_days": 220,
     "fires": "lt5",
     "sales": 8,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 64500
    },
    "2023": {
     "blight": 57,
     "issues": 13,
     "issue_days": 79,
-    "sales": "lt5"
+    "sales": 3
    },
    "2024": {
     "blight": 22,
     "issues": 18,
     "issue_days": 9,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 3,
+    "permit_cost": 118722
    },
    "2025": {
     "blight": 22,
     "issues": 12,
     "issue_days": 1,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 4,
+    "permit_cost": 197587
    },
    "2026": {
     "blight": "lt5",
@@ -599,7 +604,7 @@
    },
    "2026": {
     "blight": 125,
-    "issues": 96,
+    "issues": 97,
     "issue_days": 8,
     "fires": "lt5",
     "sales": 27,
@@ -683,14 +688,14 @@
     "permit_cost": 2734982
    },
    "2026": {
-    "blight": 599,
+    "blight": 601,
     "issues": 201,
     "issue_days": 9,
     "fires": 8,
     "sales": 84,
     "median_price": 201500,
-    "permits": 107,
-    "permit_cost": 7210559
+    "permits": 108,
+    "permit_cost": 7212989
    }
   },
   "nbh_barton_mcfarland": {
@@ -772,9 +777,9 @@
     "permit_cost": 3361674
    },
    "2026": {
-    "blight": 762,
+    "blight": 768,
     "demolitions": "lt5",
-    "issues": 185,
+    "issues": 186,
     "issue_days": 15,
     "fires": 15,
     "sales": 53,
@@ -944,7 +949,7 @@
     "permit_cost": 1114082
    },
    "2026": {
-    "blight": 143,
+    "blight": 155,
     "issues": 32,
     "issue_days": 5,
     "fires": "lt5",
@@ -1033,9 +1038,9 @@
     "permit_cost": 2787556
    },
    "2026": {
-    "blight": 913,
+    "blight": 915,
     "demolitions": "lt5",
-    "issues": 171,
+    "issues": 174,
     "issue_days": 12,
     "fires": 16,
     "sales": 87,
@@ -1199,7 +1204,7 @@
    },
    "2026": {
     "blight": 33,
-    "issues": 63,
+    "issues": 65,
     "issue_days": 8,
     "sales": 16,
     "median_price": 336000,
@@ -1286,15 +1291,15 @@
     "permit_cost": 2954977
    },
    "2026": {
-    "blight": 370,
+    "blight": 372,
     "demolitions": "lt5",
-    "issues": 59,
+    "issues": 61,
     "issue_days": 10,
     "fires": 12,
-    "sales": 39,
-    "median_price": 56000,
-    "permits": 51,
-    "permit_cost": 3222905
+    "sales": 40,
+    "median_price": 56750,
+    "permits": 53,
+    "permit_cost": 3279837
    }
   },
   "nbh_brightmoor": {
@@ -1376,9 +1381,9 @@
     "permit_cost": 2212797
    },
    "2026": {
-    "blight": 1134,
+    "blight": 1146,
     "demolitions": 16,
-    "issues": 271,
+    "issues": 274,
     "issue_days": 8,
     "fires": 20,
     "sales": 48,
@@ -1408,7 +1413,7 @@
     "issues": 28,
     "issue_days": 36,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 41,
     "permit_cost": 25407541
    },
@@ -1425,7 +1430,7 @@
     "issues": 30,
     "issue_days": 109,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 44,
     "permit_cost": 67244923
    },
@@ -1434,7 +1439,7 @@
     "issues": 27,
     "issue_days": 28,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 21,
     "permit_cost": 45133003
    },
@@ -1443,13 +1448,13 @@
     "issues": 65,
     "issue_days": 5,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 17,
     "permit_cost": 17345908
    },
    "2026": {
     "blight": 65,
-    "issues": 46,
+    "issues": 48,
     "issue_days": 3,
     "fires": "lt5",
     "permits": 12,
@@ -1533,10 +1538,10 @@
     "permit_cost": 1799759
    },
    "2026": {
-    "blight": 20,
+    "blight": 22,
     "demolitions": "lt5",
     "issues": 38,
-    "issue_days": 10,
+    "issue_days": 8,
     "fires": "lt5",
     "sales": 25,
     "median_price": 100000,
@@ -1621,7 +1626,7 @@
     "blight": 140,
     "issues": 17,
     "issue_days": 15,
-    "fires": "lt5",
+    "fires": 5,
     "sales": 12,
     "median_price": 62500,
     "permits": 12,
@@ -1644,14 +1649,15 @@
     "issue_days": 31,
     "fires": 7,
     "sales": 7,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 287503
    },
    "2021": {
     "blight": 121,
     "demolitions": 5,
     "issues": 5,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 8,
     "permit_cost": 109065
    },
@@ -1671,7 +1677,7 @@
     "demolitions": 5,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 10,
     "permit_cost": 347695
    },
@@ -1696,11 +1702,12 @@
    },
    "2026": {
     "blight": 151,
-    "issues": 15,
+    "issues": 17,
     "issue_days": 19,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 1,
+    "permit_cost": 20800
    }
   },
   "nbh_cadillac_heights": {
@@ -1783,7 +1790,7 @@
     "blight": 135,
     "demolitions": 7,
     "issues": 76,
-    "issue_days": 9,
+    "issue_days": 10,
     "fires": 7,
     "sales": 21,
     "median_price": 34000,
@@ -1871,7 +1878,7 @@
    "2026": {
     "blight": 94,
     "demolitions": "lt5",
-    "issues": 53,
+    "issues": 51,
     "issue_days": 5,
     "fires": 9,
     "sales": 9,
@@ -1885,15 +1892,16 @@
     "demolitions": "lt5",
     "issues": 9,
     "fires": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 4,
+    "permit_cost": 11693326
    },
    "2020": {
     "blight": 9,
     "demolitions": 10,
     "issues": 5,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 1289894
    },
@@ -1903,7 +1911,8 @@
     "issues": 11,
     "issue_days": 22,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 492886
    },
    "2022": {
     "blight": 23,
@@ -1911,7 +1920,8 @@
     "issues": 11,
     "issue_days": 12,
     "fires": 5,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 2265000
    },
    "2023": {
     "blight": 16,
@@ -1919,7 +1929,7 @@
     "issues": 12,
     "issue_days": 14,
     "fires": 7,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 19,
     "permit_cost": 12787348
    },
@@ -1929,7 +1939,7 @@
     "issues": 17,
     "issue_days": 25,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 13809000
    },
@@ -1938,16 +1948,17 @@
     "demolitions": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 11,
     "permit_cost": 107331002
    },
    "2026": {
-    "blight": 40,
+    "blight": 43,
     "demolitions": "lt5",
-    "issues": 8,
+    "issues": 10,
+    "issue_days": 19,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 63752505
    }
@@ -2028,7 +2039,7 @@
     "blight": 87,
     "issues": 59,
     "issue_days": 4,
-    "fires": "lt5",
+    "fires": 5,
     "sales": 13,
     "median_price": 95000,
     "permits": 8,
@@ -2116,7 +2127,7 @@
    "2026": {
     "blight": 423,
     "demolitions": "lt5",
-    "issues": 176,
+    "issues": 178,
     "issue_days": 5,
     "fires": 12,
     "sales": 37,
@@ -2205,7 +2216,7 @@
    "2026": {
     "blight": 233,
     "demolitions": "lt5",
-    "issues": 115,
+    "issues": 116,
     "issue_days": 4,
     "fires": 7,
     "sales": 8,
@@ -2382,7 +2393,7 @@
    "2026": {
     "blight": 143,
     "demolitions": "lt5",
-    "issues": 38,
+    "issues": 39,
     "issue_days": 8,
     "fires": "lt5",
     "sales": 9,
@@ -2405,7 +2416,7 @@
     "blight": 67,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 9,
     "permit_cost": 80511
    },
@@ -2462,11 +2473,12 @@
    },
    "2026": {
     "blight": 71,
-    "issues": 17,
+    "issues": 19,
     "issue_days": 20,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 4,
+    "permits": 2,
+    "permit_cost": 31505
    }
   },
   "nbh_claytown": {
@@ -2548,7 +2560,7 @@
     "permit_cost": 2619027
    },
    "2026": {
-    "blight": 562,
+    "blight": 589,
     "demolitions": "lt5",
     "issues": 168,
     "issue_days": 13,
@@ -2640,7 +2652,7 @@
    "2026": {
     "blight": 486,
     "demolitions": "lt5",
-    "issues": 90,
+    "issues": 93,
     "issue_days": 9,
     "fires": 10,
     "sales": 33,
@@ -2655,7 +2667,7 @@
     "demolitions": 9,
     "issues": 8,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 9,
     "permit_cost": 154819
    },
@@ -2665,7 +2677,8 @@
     "issues": 7,
     "fires": "lt5",
     "sales": 9,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 58290
    },
    "2021": {
     "blight": 151,
@@ -2693,7 +2706,8 @@
     "fires": "lt5",
     "sales": 19,
     "median_price": 40000,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 10000
    },
    "2024": {
     "blight": 114,
@@ -2703,7 +2717,8 @@
     "fires": "lt5",
     "sales": 16,
     "median_price": 45000,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 25257
    },
    "2025": {
     "blight": 116,
@@ -2718,10 +2733,10 @@
    },
    "2026": {
     "blight": 162,
-    "issues": 13,
+    "issues": 14,
     "issue_days": 25,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 6,
     "permit_cost": 45813741
    }
@@ -2807,7 +2822,7 @@
    "2026": {
     "blight": 326,
     "demolitions": "lt5",
-    "issues": 71,
+    "issues": 70,
     "issue_days": 12,
     "fires": 16,
     "sales": 36,
@@ -2878,7 +2893,7 @@
     "demolitions": "lt5",
     "issues": 9,
     "fires": 9,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 13,
     "permit_cost": 3873338
    },
@@ -2887,7 +2902,7 @@
     "demolitions": "lt5",
     "issues": 9,
     "fires": 8,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 23,
     "permit_cost": 6338033
    },
@@ -2897,7 +2912,7 @@
     "issues": 15,
     "issue_days": 21,
     "fires": 8,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 13,
     "permit_cost": 5447236
    },
@@ -2907,7 +2922,7 @@
     "issues": 19,
     "issue_days": 44,
     "fires": 9,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 28,
     "permit_cost": 21968013
    },
@@ -2917,7 +2932,7 @@
     "issues": 12,
     "issue_days": 25,
     "fires": 12,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 11,
     "permit_cost": 1901950
    },
@@ -2927,7 +2942,7 @@
     "issues": 11,
     "issue_days": 25,
     "fires": 6,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 16,
     "permit_cost": 1016580
    },
@@ -2937,7 +2952,7 @@
     "issues": 19,
     "issue_days": 3,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 19,
     "permit_cost": 4665867
    },
@@ -2946,7 +2961,7 @@
     "issues": 14,
     "issue_days": 12,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 8,
     "permit_cost": 624276
    }
@@ -2957,7 +2972,7 @@
     "issues": 31,
     "issue_days": 10,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 101,
     "permit_cost": 53929817
    },
@@ -2966,7 +2981,7 @@
     "issues": 24,
     "issue_days": 13,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 42,
     "permit_cost": 47949099
    },
@@ -2983,7 +2998,7 @@
     "issues": 67,
     "issue_days": 35,
     "fires": 7,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 76,
     "permit_cost": 494917502
    },
@@ -3003,7 +3018,7 @@
     "issues": 52,
     "issue_days": 11,
     "fires": 6,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 42,
     "permit_cost": 30720895
    },
@@ -3018,12 +3033,12 @@
    },
    "2026": {
     "blight": 98,
-    "issues": 65,
+    "issues": 66,
     "issue_days": 6,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": 19,
-    "permit_cost": 58255364
+    "sales": 2,
+    "permits": 20,
+    "permit_cost": 58270364
    }
   },
   "nbh_cornerstone_village": {
@@ -3105,9 +3120,9 @@
     "permit_cost": 10079755
    },
    "2026": {
-    "blight": 497,
+    "blight": 501,
     "demolitions": "lt5",
-    "issues": 165,
+    "issues": 172,
     "issue_days": 5,
     "fires": 17,
     "sales": 65,
@@ -3193,12 +3208,12 @@
     "permit_cost": 776365
    },
    "2026": {
-    "blight": 610,
-    "issues": 109,
+    "blight": 617,
+    "issues": 110,
     "issue_days": 11,
     "fires": 8,
-    "sales": 70,
-    "median_price": 89500,
+    "sales": 71,
+    "median_price": 89000,
     "permits": 47,
     "permit_cost": 655151
    }
@@ -3233,7 +3248,7 @@
     "issues": 26,
     "issue_days": 38,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 18,
     "permit_cost": 5031458
    },
@@ -3259,7 +3274,7 @@
     "issues": 11,
     "issue_days": 2,
     "fires": 7,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 11,
     "permit_cost": 7958401
    },
@@ -3351,10 +3366,10 @@
     "permit_cost": 673181
    },
    "2026": {
-    "blight": 192,
-    "issues": 58,
+    "blight": 193,
+    "issues": 57,
     "issue_days": 4,
-    "fires": 6,
+    "fires": 7,
     "sales": 16,
     "median_price": 45500,
     "permits": 14,
@@ -3442,7 +3457,7 @@
    "2026": {
     "blight": 174,
     "demolitions": "lt5",
-    "issues": 43,
+    "issues": 41,
     "issue_days": 16,
     "fires": "lt5",
     "sales": 22,
@@ -3468,7 +3483,7 @@
     "issues": 12,
     "issue_days": 27,
     "fires": 21,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 17,
     "permit_cost": 1197959
    },
@@ -3508,7 +3523,7 @@
     "issues": 37,
     "issue_days": 17,
     "fires": 13,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 16,
     "permit_cost": 1541356
    },
@@ -3518,17 +3533,18 @@
     "issues": 33,
     "issue_days": 7,
     "fires": 13,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 22,
     "permit_cost": 35730545
    },
    "2026": {
     "blight": 138,
     "demolitions": 9,
-    "issues": 22,
-    "issue_days": 7,
+    "issues": 23,
+    "issue_days": 13,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 710039
    }
   },
   "nbh_denby": {
@@ -3623,7 +3639,7 @@
    "2019": {
     "blight": 15,
     "issues": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 11,
     "permit_cost": 2380911
    },
@@ -3638,14 +3654,14 @@
     "blight": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 7,
     "permit_cost": 362492
    },
    "2022": {
     "blight": 6,
     "issues": 8,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 7,
     "permit_cost": 1530991
    },
@@ -3653,7 +3669,7 @@
     "blight": 9,
     "issues": 10,
     "issue_days": 137,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 6,
     "permit_cost": 1374319
    },
@@ -3661,7 +3677,7 @@
     "blight": 24,
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 15,
     "permit_cost": 1977946
    },
@@ -3669,7 +3685,7 @@
     "blight": 45,
     "issues": 5,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 7,
     "permit_cost": 303849
    },
@@ -3688,8 +3704,9 @@
     "issues": 13,
     "issue_days": 8,
     "fires": 9,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 4,
+    "permits": 4,
+    "permit_cost": 280926
    },
    "2020": {
     "blight": 136,
@@ -3697,8 +3714,9 @@
     "issues": 13,
     "issue_days": 34,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 3,
+    "permit_cost": 33960
    },
    "2021": {
     "blight": 57,
@@ -3715,7 +3733,7 @@
     "issues": 16,
     "issue_days": 24,
     "fires": 16,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 8,
     "permit_cost": 152139
    },
@@ -3735,7 +3753,7 @@
     "issues": 26,
     "issue_days": 13,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 10,
     "permit_cost": 76837
    },
@@ -3749,11 +3767,11 @@
     "permit_cost": 7125727
    },
    "2026": {
-    "blight": 117,
-    "issues": 21,
+    "blight": 118,
+    "issues": 22,
     "issue_days": 12,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 11,
     "permit_cost": 335911
    }
@@ -3837,15 +3855,15 @@
     "permit_cost": 4886340
    },
    "2026": {
-    "blight": 788,
+    "blight": 795,
     "demolitions": 5,
-    "issues": 216,
+    "issues": 207,
     "issue_days": 16,
     "fires": 21,
-    "sales": 70,
-    "median_price": 77500,
-    "permits": 90,
-    "permit_cost": 5927678
+    "sales": 72,
+    "median_price": 74000,
+    "permits": 91,
+    "permit_cost": 5966178
    }
   },
   "nbh_downtown": {
@@ -3906,9 +3924,9 @@
     "permit_cost": 487298078
    },
    "2026": {
-    "blight": 125,
+    "blight": 126,
     "issues": 69,
-    "issue_days": 6,
+    "issue_days": 7,
     "fires": 9,
     "permits": 115,
     "permit_cost": 362664972
@@ -3921,7 +3939,7 @@
     "issues": 16,
     "issue_days": 8,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 56244
    },
@@ -3930,15 +3948,16 @@
     "demolitions": 31,
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 3,
+    "permit_cost": 22751
    },
    "2021": {
     "blight": 33,
     "demolitions": "lt5",
     "issues": 5,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 5,
     "permit_cost": 103535
    },
@@ -3947,7 +3966,7 @@
     "demolitions": 16,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 12,
     "permit_cost": 111799
    },
@@ -3959,7 +3978,8 @@
     "fires": "lt5",
     "sales": 19,
     "median_price": 54000,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 13540
    },
    "2024": {
     "blight": 46,
@@ -3974,7 +3994,7 @@
     "blight": 47,
     "demolitions": "lt5",
     "issues": 8,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 17,
     "permit_cost": 142169
    },
@@ -3985,7 +4005,8 @@
     "issue_days": 14,
     "fires": "lt5",
     "sales": 5,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 4000
    }
   },
   "nbh_east_english_village": {
@@ -4060,7 +4081,7 @@
     "permit_cost": 10992161
    },
    "2026": {
-    "blight": 160,
+    "blight": 161,
     "issues": 78,
     "issue_days": 9,
     "fires": 6,
@@ -4149,9 +4170,9 @@
     "permit_cost": 9972571
    },
    "2026": {
-    "blight": 405,
+    "blight": 406,
     "demolitions": 7,
-    "issues": 127,
+    "issues": 128,
     "issue_days": 13,
     "fires": 10,
     "sales": 22,
@@ -4295,7 +4316,7 @@
     "permit_cost": 632438
    },
    "2026": {
-    "blight": 179,
+    "blight": 180,
     "demolitions": "lt5",
     "issues": 60,
     "issue_days": 9,
@@ -4313,7 +4334,7 @@
     "issues": 23,
     "issue_days": 4,
     "fires": 14,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 17,
     "permit_cost": 24459073
    },
@@ -4322,7 +4343,7 @@
     "demolitions": "lt5",
     "issues": 9,
     "fires": 9,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 14,
     "permit_cost": 19236203
    },
@@ -4378,7 +4399,7 @@
    },
    "2026": {
     "blight": 41,
-    "issues": 15,
+    "issues": 16,
     "issue_days": 14,
     "fires": "lt5",
     "sales": 7,
@@ -4429,7 +4450,8 @@
     "fires": 8,
     "sales": 16,
     "median_price": 82000,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 58406
    },
    "2024": {
     "blight": 88,
@@ -4458,7 +4480,8 @@
     "issue_days": 9,
     "fires": "lt5",
     "sales": 5,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 9422
    }
   },
   "nbh_elmwood_park": {
@@ -4475,7 +4498,7 @@
     "issues": 18,
     "issue_days": 32,
     "fires": 12,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 36,
     "permit_cost": 18407544
    },
@@ -4484,7 +4507,7 @@
     "issues": 28,
     "issue_days": 20,
     "fires": 26,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 54,
     "permit_cost": 24424094
    },
@@ -4501,7 +4524,7 @@
     "issues": 35,
     "issue_days": 132,
     "fires": 21,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 47,
     "permit_cost": 8458396
    },
@@ -4518,16 +4541,16 @@
     "issues": 45,
     "issue_days": 4,
     "fires": 28,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 37,
     "permit_cost": 3305606
    },
    "2026": {
-    "blight": 15,
-    "issues": 44,
+    "blight": 16,
+    "issues": 46,
     "issue_days": 4,
     "fires": 17,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 17,
     "permit_cost": 961684
    }
@@ -4610,7 +4633,7 @@
     "permit_cost": 1217356
    },
    "2026": {
-    "blight": 510,
+    "blight": 529,
     "demolitions": "lt5",
     "issues": 80,
     "issue_days": 9,
@@ -4698,14 +4721,14 @@
     "permit_cost": 829186
    },
    "2026": {
-    "blight": 362,
+    "blight": 364,
     "issues": 114,
     "issue_days": 2,
     "fires": 8,
     "sales": 52,
     "median_price": 101000,
-    "permits": 28,
-    "permit_cost": 405105
+    "permits": 29,
+    "permit_cost": 414833
    }
   },
   "nbh_far_west_detroit": {
@@ -4781,8 +4804,8 @@
     "permit_cost": 228516
    },
    "2026": {
-    "blight": 229,
-    "issues": 64,
+    "blight": 230,
+    "issues": 66,
     "issue_days": 8,
     "fires": "lt5",
     "sales": 29,
@@ -4873,7 +4896,7 @@
     "blight": 399,
     "demolitions": 5,
     "issues": 94,
-    "issue_days": 4,
+    "issue_days": 5,
     "fires": 9,
     "sales": 51,
     "median_price": 70000,
@@ -4963,7 +4986,8 @@
     "fires": 5,
     "sales": 28,
     "median_price": 66000,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 25167
    }
   },
   "nbh_fitzgerald_marygrove": {
@@ -5045,9 +5069,9 @@
     "permit_cost": 9208216
    },
    "2026": {
-    "blight": 625,
+    "blight": 627,
     "demolitions": "lt5",
-    "issues": 182,
+    "issues": 183,
     "issue_days": 6,
     "fires": 16,
     "sales": 59,
@@ -5170,13 +5194,15 @@
     "blight": 5,
     "issues": 5,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 284200
    },
    "2023": {
     "blight": 26,
     "issues": "lt5",
     "fires": 8,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 60000
    },
    "2024": {
     "blight": 20,
@@ -5220,7 +5246,7 @@
     "issues": 53,
     "issue_days": 18,
     "fires": 18,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 12,
     "permit_cost": 418210
    },
@@ -5279,11 +5305,11 @@
    "2026": {
     "blight": 165,
     "demolitions": "lt5",
-    "issues": 49,
+    "issues": 52,
     "issue_days": 13,
     "fires": 7,
-    "sales": 17,
-    "median_price": 26500,
+    "sales": 18,
+    "median_price": 35750,
     "permits": 11,
     "permit_cost": 137495
    }
@@ -5372,8 +5398,8 @@
     "issues": 38,
     "issue_days": 14,
     "fires": 20,
-    "sales": 12,
-    "median_price": 64000,
+    "sales": 13,
+    "median_price": 60000,
     "permits": 22,
     "permit_cost": 288468
    }
@@ -5457,12 +5483,12 @@
     "permit_cost": 97890119
    },
    "2026": {
-    "blight": 598,
+    "blight": 604,
     "demolitions": "lt5",
-    "issues": 133,
+    "issues": 134,
     "issue_days": 7,
-    "fires": 23,
-    "sales": 69,
+    "fires": 24,
+    "sales": 70,
     "median_price": 60000,
     "permits": 42,
     "permit_cost": 671734
@@ -5545,15 +5571,15 @@
     "permit_cost": 504152
    },
    "2026": {
-    "blight": 232,
+    "blight": 257,
     "demolitions": "lt5",
     "issues": 27,
     "issue_days": 15,
     "fires": "lt5",
     "sales": 23,
     "median_price": 97000,
-    "permits": 29,
-    "permit_cost": 10567321
+    "permits": 30,
+    "permit_cost": 10567921
    }
   },
   "nbh_garden_view": {
@@ -5561,7 +5587,8 @@
     "blight": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 150000
    },
    "2020": {
     "blight": "lt5",
@@ -5575,18 +5602,21 @@
    "2022": {
     "blight": 17,
     "fires": 9,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 3000000
    },
    "2023": {
     "issues": "lt5",
     "fires": 12,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 9311
    },
    "2024": {
     "blight": 8,
     "issues": "lt5",
     "fires": 6,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 425000
    },
    "2025": {
     "blight": "lt5",
@@ -5680,7 +5710,7 @@
    "2026": {
     "blight": 133,
     "demolitions": "lt5",
-    "issues": 28,
+    "issues": 29,
     "issue_days": 21,
     "fires": 6,
     "sales": 10,
@@ -5708,7 +5738,8 @@
     "blight": 93,
     "issues": 6,
     "fires": 16,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 48048000
    },
    "2022": {
     "blight": 267,
@@ -5825,7 +5856,7 @@
    },
    "2026": {
     "blight": 324,
-    "issues": 84,
+    "issues": 86,
     "issue_days": 14,
     "fires": 8,
     "sales": 16,
@@ -5910,9 +5941,9 @@
     "permit_cost": 18896731
    },
    "2026": {
-    "blight": 174,
+    "blight": 176,
     "demolitions": "lt5",
-    "issues": 28,
+    "issues": 29,
     "issue_days": 10,
     "fires": "lt5",
     "sales": 18,
@@ -5995,14 +6026,14 @@
     "permit_cost": 619597
    },
    "2026": {
-    "blight": 170,
+    "blight": 174,
     "issues": 117,
     "issue_days": 7,
     "fires": "lt5",
     "sales": 13,
     "median_price": 150000,
-    "permits": 18,
-    "permit_cost": 414904
+    "permits": 19,
+    "permit_cost": 422404
    }
   },
   "nbh_grandmont_1": {
@@ -6080,7 +6111,7 @@
     "issues": 39,
     "issue_days": 3,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 21,
     "permit_cost": 210132
    }
@@ -6162,7 +6193,7 @@
     "permit_cost": 761708
    },
    "2026": {
-    "blight": 152,
+    "blight": 153,
     "demolitions": "lt5",
     "issues": 64,
     "issue_days": 23,
@@ -6190,7 +6221,7 @@
     "issues": 19,
     "issue_days": 20,
     "fires": 16,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 26,
     "permit_cost": 13888282
    },
@@ -6210,7 +6241,7 @@
     "issues": 53,
     "issue_days": 52,
     "fires": 24,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 17,
     "permit_cost": 664565
    },
@@ -6220,7 +6251,7 @@
     "issues": 40,
     "issue_days": 30,
     "fires": 16,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 16,
     "permit_cost": 921419
    },
@@ -6249,9 +6280,9 @@
     "blight": 119,
     "demolitions": "lt5",
     "issues": 56,
-    "issue_days": 7,
+    "issue_days": 10,
     "fires": 6,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 26,
     "permit_cost": 838711
    }
@@ -6334,13 +6365,13 @@
    "2026": {
     "blight": 135,
     "demolitions": "lt5",
-    "issues": 56,
+    "issues": 61,
     "issue_days": 8,
     "fires": "lt5",
     "sales": 10,
     "median_price": 41000,
-    "permits": 17,
-    "permit_cost": 151071
+    "permits": 18,
+    "permit_cost": 229680
    }
   },
   "nbh_gratiot_findlay": {
@@ -6422,10 +6453,10 @@
     "permit_cost": 452166
    },
    "2026": {
-    "blight": 189,
+    "blight": 191,
     "demolitions": "lt5",
-    "issues": 58,
-    "issue_days": 9,
+    "issues": 59,
+    "issue_days": 10,
     "fires": "lt5",
     "sales": 8,
     "permits": 28,
@@ -6512,13 +6543,13 @@
    "2026": {
     "blight": 291,
     "demolitions": "lt5",
-    "issues": 117,
-    "issue_days": 7,
+    "issues": 122,
+    "issue_days": 8,
     "fires": 7,
     "sales": 14,
     "median_price": 68500,
-    "permits": 25,
-    "permit_cost": 369532
+    "permits": 26,
+    "permit_cost": 419532
    }
   },
   "nbh_greektown": {
@@ -6557,7 +6588,8 @@
    "2024": {
     "blight": 12,
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 153500
    },
    "2025": {
     "blight": 6
@@ -6565,7 +6597,8 @@
    "2026": {
     "blight": "lt5",
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 5000
    }
   },
   "nbh_green_acres": {
@@ -6646,8 +6679,8 @@
     "fires": 5,
     "sales": 13,
     "median_price": 242000,
-    "permits": 31,
-    "permit_cost": 1216536
+    "permits": 32,
+    "permit_cost": 1222499
    }
   },
   "nbh_greenfield": {
@@ -6729,9 +6762,9 @@
     "permit_cost": 1250069
    },
    "2026": {
-    "blight": 572,
+    "blight": 579,
     "demolitions": "lt5",
-    "issues": 90,
+    "issues": 92,
     "issue_days": 4,
     "fires": 12,
     "sales": 61,
@@ -6747,23 +6780,25 @@
     "issues": 11,
     "issue_days": 8,
     "fires": 8,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 3,
+    "permit_cost": 136047
    },
    "2020": {
     "blight": 118,
     "demolitions": 5,
     "issues": 7,
     "fires": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 4,
+    "permit_cost": 36700
    },
    "2021": {
     "blight": 24,
     "demolitions": 19,
     "issues": 6,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 5,
     "permit_cost": 78827
    },
@@ -6773,8 +6808,9 @@
     "issues": 13,
     "issue_days": 40,
     "fires": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 1,
+    "permit_cost": 22094
    },
    "2023": {
     "blight": 158,
@@ -6782,7 +6818,7 @@
     "issues": 12,
     "issue_days": 21,
     "fires": "lt5",
-    "sales": "lt5"
+    "sales": 3
    },
    "2024": {
     "blight": 73,
@@ -6800,12 +6836,12 @@
     "issues": 33,
     "issue_days": 7,
     "fires": 7,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 5,
     "permit_cost": 47095
    },
    "2026": {
-    "blight": 41,
+    "blight": 46,
     "demolitions": 7,
     "issues": 26,
     "issue_days": 8,
@@ -6974,7 +7010,7 @@
     "permit_cost": 284083
    },
    "2026": {
-    "blight": 80,
+    "blight": 104,
     "issues": 24,
     "issue_days": 10,
     "sales": 14,
@@ -7064,7 +7100,7 @@
    "2026": {
     "blight": 129,
     "demolitions": "lt5",
-    "issues": 43,
+    "issues": 44,
     "issue_days": 6,
     "fires": 5,
     "sales": 10,
@@ -7080,7 +7116,8 @@
     "issues": 15,
     "issue_days": 11,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 3608600
    },
    "2020": {
     "blight": 14,
@@ -7088,8 +7125,9 @@
     "issues": 36,
     "issue_days": 38,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 1,
+    "permit_cost": 3942
    },
    "2021": {
     "blight": 14,
@@ -7097,7 +7135,7 @@
     "issues": 13,
     "issue_days": 25,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 5,
     "permit_cost": 190940
    },
@@ -7107,8 +7145,9 @@
     "issues": 39,
     "issue_days": 39,
     "fires": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 2,
+    "permit_cost": 905274
    },
    "2023": {
     "blight": 117,
@@ -7116,8 +7155,9 @@
     "issues": 30,
     "issue_days": 15,
     "fires": 6,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 4,
+    "permit_cost": 249900
    },
    "2024": {
     "blight": 67,
@@ -7125,7 +7165,7 @@
     "issues": 22,
     "issue_days": 14,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 13,
     "permit_cost": 92157210
    },
@@ -7135,15 +7175,16 @@
     "issues": 21,
     "issue_days": 4,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 6,
     "permit_cost": 106963
    },
    "2026": {
     "blight": 63,
     "issues": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 1,
+    "permit_cost": 19000
    }
   },
   "nbh_harmony_village": {
@@ -7222,8 +7263,8 @@
     "permit_cost": 308218
    },
    "2026": {
-    "blight": 362,
-    "issues": 27,
+    "blight": 364,
+    "issues": 29,
     "issue_days": 11,
     "fires": "lt5",
     "sales": 46,
@@ -7360,8 +7401,9 @@
     "issues": 18,
     "issue_days": 19,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 4,
+    "permit_cost": 330403
    },
    "2024": {
     "blight": 51,
@@ -7388,7 +7430,8 @@
     "issue_days": 3,
     "sales": 13,
     "median_price": 269000,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 38581
    }
   },
   "nbh_holcomb_community": {
@@ -7470,9 +7513,9 @@
     "permit_cost": 424890
    },
    "2026": {
-    "blight": 518,
-    "issues": 113,
-    "issue_days": 5,
+    "blight": 524,
+    "issues": 112,
+    "issue_days": 6,
     "fires": 9,
     "sales": 24,
     "median_price": 60500,
@@ -7486,7 +7529,7 @@
     "issues": 22,
     "issue_days": 5,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 10,
     "permit_cost": 168558
    },
@@ -7494,7 +7537,7 @@
     "blight": 32,
     "issues": 9,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 14,
     "permit_cost": 5291971
    },
@@ -7512,7 +7555,7 @@
     "issues": 21,
     "issue_days": 56,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 12,
     "permit_cost": 192351
    },
@@ -7520,7 +7563,7 @@
     "blight": 65,
     "issues": 35,
     "issue_days": 14,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 10,
     "permit_cost": 1847184
    },
@@ -7528,7 +7571,7 @@
     "blight": 63,
     "issues": 31,
     "issue_days": 8,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 13,
     "permit_cost": 301763
    },
@@ -7538,7 +7581,7 @@
     "issues": 36,
     "issue_days": 9,
     "fires": 7,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 9,
     "permit_cost": 240421
    },
@@ -7547,7 +7590,7 @@
     "issues": 17,
     "issue_days": 4,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 5,
     "permit_cost": 5683049
    }
@@ -7557,7 +7600,7 @@
     "blight": "lt5",
     "issues": 8,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 1566000
    },
@@ -7574,7 +7617,7 @@
     "issues": 13,
     "issue_days": 36,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 13,
     "permit_cost": 53324442
    },
@@ -7583,7 +7626,7 @@
     "issues": 21,
     "issue_days": 264,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 8,
     "permit_cost": 974655
    },
@@ -7592,7 +7635,7 @@
     "issues": 28,
     "issue_days": 266,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 9,
     "permit_cost": 55938413
    },
@@ -7601,7 +7644,7 @@
     "issues": 21,
     "issue_days": 35,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 11,
     "permit_cost": 3752462
    },
@@ -7610,7 +7653,7 @@
     "issues": 11,
     "issue_days": 3,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 13,
     "permit_cost": 3693840
    },
@@ -7618,7 +7661,7 @@
     "blight": 18,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 7,
     "permit_cost": 1991807
    }
@@ -7704,8 +7747,8 @@
    "2026": {
     "blight": 452,
     "demolitions": "lt5",
-    "issues": 61,
-    "issue_days": 8,
+    "issues": 63,
+    "issue_days": 7,
     "fires": 8,
     "sales": 17,
     "median_price": 84000,
@@ -7791,7 +7834,7 @@
     "permit_cost": 213240
    },
    "2026": {
-    "blight": 204,
+    "blight": 205,
     "issues": 40,
     "issue_days": 16,
     "fires": "lt5",
@@ -7807,7 +7850,7 @@
     "issues": 20,
     "issue_days": 7,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 31,
     "permit_cost": 913655
    },
@@ -7844,7 +7887,7 @@
     "issues": 46,
     "issue_days": 26,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 25,
     "permit_cost": 1395493
    },
@@ -7956,13 +7999,13 @@
    "2026": {
     "blight": 441,
     "demolitions": "lt5",
-    "issues": 233,
-    "issue_days": 12,
+    "issues": 235,
+    "issue_days": 14,
     "fires": 13,
     "sales": 19,
     "median_price": 217500,
-    "permits": 56,
-    "permit_cost": 10229858
+    "permits": 57,
+    "permit_cost": 10239735
    }
   },
   "nbh_jamison": {
@@ -7982,7 +8025,7 @@
     "issues": 44,
     "issue_days": 14,
     "fires": 10,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 10,
     "permit_cost": 197066
    },
@@ -8044,8 +8087,8 @@
    "2026": {
     "blight": 138,
     "demolitions": 6,
-    "issues": 67,
-    "issue_days": 11,
+    "issues": 68,
+    "issue_days": 10,
     "fires": 8,
     "sales": 11,
     "median_price": 52000,
@@ -8131,9 +8174,9 @@
     "permit_cost": 7411208
    },
    "2026": {
-    "blight": 426,
+    "blight": 428,
     "demolitions": "lt5",
-    "issues": 83,
+    "issues": 84,
     "issue_days": 5,
     "fires": 5,
     "sales": 25,
@@ -8154,25 +8197,29 @@
     "blight": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 17180
    },
    "2021": {
     "blight": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 3198889
    },
    "2022": {
     "blight": 8,
     "issues": "lt5",
     "fires": 7,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 228000
    },
    "2023": {
     "blight": 23,
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 500000
    },
    "2024": {
     "blight": 39,
@@ -8188,7 +8235,8 @@
     "blight": 12,
     "issues": 8,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 6905
    }
   },
   "nbh_joseph_berry_sub": {
@@ -8196,7 +8244,7 @@
     "blight": 16,
     "issues": 6,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 6,
     "permit_cost": 10875138
    },
@@ -8211,7 +8259,7 @@
     "blight": 12,
     "issues": 11,
     "issue_days": 137,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 5,
     "permit_cost": 229180
    },
@@ -8220,13 +8268,14 @@
     "issues": 5,
     "fires": "lt5",
     "sales": 6,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 38977
    },
    "2023": {
     "blight": 7,
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 6,
     "permit_cost": 139167
    },
@@ -8234,7 +8283,7 @@
     "blight": 9,
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 7,
     "permit_cost": 408595
    },
@@ -8242,8 +8291,9 @@
     "blight": 19,
     "issues": 6,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 2,
+    "permit_cost": 31690
    },
    "2026": {
     "blight": 6,
@@ -8333,7 +8383,7 @@
    "2026": {
     "blight": 390,
     "demolitions": "lt5",
-    "issues": 109,
+    "issues": 110,
     "issue_days": 12,
     "fires": 14,
     "sales": 28,
@@ -8361,7 +8411,8 @@
     "issue_days": 16,
     "fires": "lt5",
     "sales": 9,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 34801
    },
    "2021": {
     "blight": 191,
@@ -8381,7 +8432,8 @@
     "fires": "lt5",
     "sales": 13,
     "median_price": 37935,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 186055
    },
    "2023": {
     "blight": 244,
@@ -8410,7 +8462,8 @@
     "issue_days": 2,
     "fires": "lt5",
     "sales": 9,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 41100
    },
    "2026": {
     "blight": 132,
@@ -8518,7 +8571,7 @@
     "issues": 32,
     "issue_days": 10,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 14,
     "permit_cost": 1709648
    },
@@ -8572,7 +8625,7 @@
    },
    "2026": {
     "blight": 16,
-    "issues": 45,
+    "issues": 48,
     "issue_days": 6,
     "fires": "lt5",
     "permits": 13,
@@ -8659,7 +8712,7 @@
    "2026": {
     "blight": 145,
     "demolitions": "lt5",
-    "issues": 28,
+    "issues": 30,
     "issue_days": 10,
     "fires": 7,
     "sales": 16,
@@ -8743,7 +8796,7 @@
    },
    "2026": {
     "blight": 91,
-    "issues": 67,
+    "issues": 68,
     "issue_days": 13,
     "fires": "lt5",
     "sales": 14,
@@ -8832,12 +8885,12 @@
    "2026": {
     "blight": 228,
     "demolitions": "lt5",
-    "issues": 42,
+    "issues": 40,
     "issue_days": 16,
     "fires": "lt5",
     "sales": 9,
-    "permits": 15,
-    "permit_cost": 501040
+    "permits": 16,
+    "permit_cost": 512290
    }
   },
   "nbh_mapleridge": {
@@ -8919,13 +8972,13 @@
     "permit_cost": 824601
    },
    "2026": {
-    "blight": 376,
+    "blight": 380,
     "demolitions": 9,
-    "issues": 108,
+    "issues": 109,
     "issue_days": 10,
     "fires": 16,
-    "sales": 32,
-    "median_price": 57000,
+    "sales": 33,
+    "median_price": 59000,
     "permits": 30,
     "permit_cost": 403627
    }
@@ -8947,7 +9000,7 @@
    "2021": {
     "blight": 7,
     "issues": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 19,
     "permit_cost": 486870
    },
@@ -8962,7 +9015,8 @@
     "blight": 24,
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 58952
    },
    "2024": {
     "blight": 15,
@@ -8975,12 +9029,12 @@
     "blight": 41,
     "demolitions": "lt5",
     "issues": 5,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 20,
     "permit_cost": 418997
    },
    "2026": {
-    "blight": 10,
+    "blight": 11,
     "issues": 6,
     "fires": "lt5",
     "permits": 8,
@@ -9066,8 +9120,8 @@
    },
    "2026": {
     "blight": 116,
-    "issues": 48,
-    "issue_days": 5,
+    "issues": 50,
+    "issue_days": 6,
     "fires": 7,
     "sales": 29,
     "median_price": 150000,
@@ -9082,7 +9136,7 @@
     "issues": 51,
     "issue_days": 8,
     "fires": 13,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 29,
     "permit_cost": 7719009
    },
@@ -9123,7 +9177,7 @@
     "issues": 57,
     "issue_days": 34,
     "fires": 28,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 39,
     "permit_cost": 1029324
    },
@@ -9150,10 +9204,10 @@
    "2026": {
     "blight": 190,
     "demolitions": 5,
-    "issues": 94,
-    "issue_days": 7,
-    "fires": "lt5",
-    "sales": "lt5",
+    "issues": 103,
+    "issue_days": 9,
+    "fires": 6,
+    "sales": 2,
     "permits": 23,
     "permit_cost": 790277
    }
@@ -9249,7 +9303,7 @@
     "issues": 40,
     "issue_days": 12,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 11,
     "permit_cost": 96264
    },
@@ -9311,7 +9365,7 @@
     "permit_cost": 248097
    },
    "2026": {
-    "blight": 68,
+    "blight": 70,
     "issues": 12,
     "issue_days": 4,
     "sales": 5,
@@ -9325,7 +9379,8 @@
     "issues": 10,
     "issue_days": 8,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 40000
    },
    "2020": {
     "blight": "lt5",
@@ -9335,26 +9390,29 @@
    "2021": {
     "blight": "lt5",
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 57000
    },
    "2022": {
     "blight": "lt5",
     "demolitions": 5,
     "issues": 8,
     "fires": 7,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 450000
    },
    "2023": {
     "blight": 36,
     "issues": 8,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 11700000
    },
    "2024": {
     "blight": 40,
     "issues": 5,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 14,
     "permit_cost": 9238129
    },
@@ -9363,14 +9421,16 @@
     "demolitions": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 6,
     "permit_cost": 112571487
    },
    "2026": {
     "blight": 10,
-    "issues": 9,
-    "permits": "lt5"
+    "issues": 10,
+    "issue_days": 10,
+    "permits": 4,
+    "permit_cost": 10738776
    }
   },
   "nbh_medical_center": {
@@ -9426,7 +9486,8 @@
    },
    "2026": {
     "blight": 21,
-    "issues": 9,
+    "issues": 10,
+    "issue_days": 1,
     "fires": "lt5",
     "permits": 10,
     "permit_cost": 4330070
@@ -9437,20 +9498,22 @@
     "blight": 37,
     "issues": 10,
     "issue_days": 9,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 1,
+    "permit_cost": 10853
    },
    "2020": {
     "blight": 5,
     "issues": 8,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 2,
+    "permit_cost": 25600
    },
    "2021": {
     "blight": 6,
     "issues": 6,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 5,
     "permit_cost": 131361
    },
@@ -9458,18 +9521,20 @@
     "blight": 16,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 4,
+    "permits": 3,
+    "permit_cost": 5750
    },
    "2023": {
     "blight": 10,
     "issues": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 4,
+    "permit_cost": 66660
    },
    "2024": {
     "issues": 9,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 58690
    },
@@ -9477,15 +9542,17 @@
     "blight": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 4,
+    "permit_cost": 58804
    },
    "2026": {
-    "blight": 9,
+    "blight": 13,
     "issues": 11,
     "issue_days": 9,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 165579
    }
   },
   "nbh_mexicantown": {
@@ -9500,14 +9567,16 @@
    "2020": {
     "blight": 7,
     "issues": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 2,
+    "permit_cost": 1000000
    },
    "2021": {
     "blight": 28,
     "issues": 9,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 3,
+    "permit_cost": 11000
    },
    "2022": {
     "blight": 106,
@@ -9519,15 +9588,16 @@
    "2023": {
     "blight": 19,
     "issues": 8,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 5,
     "permit_cost": 1866087
    },
    "2024": {
     "blight": 60,
     "issues": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 3,
+    "permit_cost": 119383
    },
    "2025": {
     "blight": 31,
@@ -9542,8 +9612,9 @@
     "blight": 20,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 1,
+    "permit_cost": 25000
    }
   },
   "nbh_michigan_martin": {
@@ -9564,7 +9635,7 @@
     "issues": 14,
     "issue_days": 4,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 5,
     "permit_cost": 24201
    },
@@ -9613,16 +9684,16 @@
     "issues": 16,
     "issue_days": 2,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 7,
     "permit_cost": 93850
    },
    "2026": {
-    "blight": 60,
+    "blight": 61,
     "issues": 11,
     "issue_days": 11,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 9,
     "permit_cost": 205074
    }
@@ -9633,7 +9704,7 @@
     "issues": 42,
     "issue_days": 7,
     "fires": 33,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 86,
     "permit_cost": 178941265
    },
@@ -9643,7 +9714,7 @@
     "issues": 37,
     "issue_days": 41,
     "fires": 32,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 78,
     "permit_cost": 397371279
    },
@@ -9652,7 +9723,7 @@
     "issues": 34,
     "issue_days": 24,
     "fires": 38,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 62,
     "permit_cost": 37445989
    },
@@ -9662,7 +9733,7 @@
     "issues": 34,
     "issue_days": 26,
     "fires": 40,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 54,
     "permit_cost": 32682860
    },
@@ -9672,7 +9743,7 @@
     "issues": 53,
     "issue_days": 27,
     "fires": 24,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 72,
     "permit_cost": 30461042
    },
@@ -9681,7 +9752,7 @@
     "issues": 51,
     "issue_days": 21,
     "fires": 35,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 64,
     "permit_cost": 65331374
    },
@@ -9690,18 +9761,18 @@
     "issues": 59,
     "issue_days": 6,
     "fires": 57,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 115,
     "permit_cost": 38641228
    },
    "2026": {
-    "blight": 115,
-    "issues": 54,
+    "blight": 116,
+    "issues": 55,
     "issue_days": 18,
     "fires": 15,
-    "sales": "lt5",
-    "permits": 54,
-    "permit_cost": 31837331
+    "sales": 1,
+    "permits": 55,
+    "permit_cost": 33597331
    }
   },
   "nbh_midwest": {
@@ -9783,9 +9854,9 @@
     "permit_cost": 5174254
    },
    "2026": {
-    "blight": 696,
-    "demolitions": 15,
-    "issues": 223,
+    "blight": 704,
+    "demolitions": 16,
+    "issues": 224,
     "issue_days": 14,
     "fires": 28,
     "sales": 70,
@@ -9902,7 +9973,7 @@
     "blight": 34,
     "issues": "lt5",
     "fires": 6,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 17,
     "permit_cost": 2267921
    },
@@ -9984,7 +10055,8 @@
     "issue_days": 37,
     "sales": 13,
     "median_price": 89000,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 19334
    },
    "2024": {
     "blight": 152,
@@ -10181,10 +10253,10 @@
     "permit_cost": 3202347
    },
    "2026": {
-    "blight": 720,
+    "blight": 724,
     "demolitions": "lt5",
-    "issues": 281,
-    "issue_days": 6,
+    "issues": 285,
+    "issue_days": 7,
     "fires": 11,
     "sales": 93,
     "median_price": 125900,
@@ -10271,10 +10343,10 @@
     "permit_cost": 544856
    },
    "2026": {
-    "blight": 330,
+    "blight": 332,
     "demolitions": "lt5",
     "issues": 128,
-    "issue_days": 12,
+    "issue_days": 11,
     "fires": 7,
     "sales": 76,
     "median_price": 70000,
@@ -10452,11 +10524,11 @@
    "2026": {
     "blight": 303,
     "demolitions": 8,
-    "issues": 71,
+    "issues": 74,
     "issue_days": 16,
-    "fires": 16,
-    "sales": 25,
-    "median_price": 62000,
+    "fires": 17,
+    "sales": 26,
+    "median_price": 61000,
     "permits": 19,
     "permit_cost": 582991
    }
@@ -10523,7 +10595,7 @@
     "issues": 13,
     "issue_days": 11,
     "fires": 11,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 17,
     "permit_cost": 33615798
    },
@@ -10532,7 +10604,7 @@
     "issues": 12,
     "issue_days": 39,
     "fires": 6,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 13,
     "permit_cost": 37898618
    },
@@ -10540,7 +10612,7 @@
     "blight": 11,
     "issues": "lt5",
     "fires": 13,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 20,
     "permit_cost": 115631770
    },
@@ -10549,7 +10621,7 @@
     "issues": 14,
     "issue_days": 60,
     "fires": 14,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 13,
     "permit_cost": 31952744
    },
@@ -10574,13 +10646,13 @@
     "issues": 30,
     "issue_days": 4,
     "fires": 13,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 22,
     "permit_cost": 4823960
    },
    "2026": {
     "blight": 17,
-    "issues": 31,
+    "issues": 32,
     "issue_days": 10,
     "fires": 6,
     "permits": 13,
@@ -10666,15 +10738,15 @@
     "permit_cost": 789473
    },
    "2026": {
-    "blight": 530,
+    "blight": 532,
     "demolitions": 13,
-    "issues": 155,
+    "issues": 157,
     "issue_days": 9,
     "fires": 10,
     "sales": 27,
     "median_price": 55000,
-    "permits": 61,
-    "permit_cost": 712958
+    "permits": 62,
+    "permit_cost": 718958
    }
   },
   "nbh_north_campau": {
@@ -10684,7 +10756,7 @@
     "issues": 22,
     "issue_days": 8,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 5,
     "permit_cost": 69930
    },
@@ -10694,8 +10766,9 @@
     "issues": 14,
     "issue_days": 20,
     "fires": 10,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 4,
+    "permits": 2,
+    "permit_cost": 33000
    },
    "2021": {
     "blight": 56,
@@ -10703,7 +10776,8 @@
     "issues": "lt5",
     "fires": 7,
     "sales": 5,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 55875
    },
    "2022": {
     "blight": 134,
@@ -10748,7 +10822,7 @@
    "2026": {
     "blight": 50,
     "demolitions": "lt5",
-    "issues": 12,
+    "issues": 13,
     "issue_days": 15,
     "fires": 8,
     "sales": 10,
@@ -10764,7 +10838,7 @@
     "issues": 15,
     "issue_days": 5,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 28,
     "permit_cost": 9354467
    },
@@ -10774,7 +10848,7 @@
     "issues": 14,
     "issue_days": 23,
     "fires": 6,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 23,
     "permit_cost": 14639120
    },
@@ -10793,7 +10867,7 @@
     "issues": 40,
     "issue_days": 48,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 39,
     "permit_cost": 17218497
    },
@@ -10803,7 +10877,7 @@
     "issues": 47,
     "issue_days": 36,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 43,
     "permit_cost": 5121681
    },
@@ -10812,7 +10886,7 @@
     "issues": 35,
     "issue_days": 17,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 41,
     "permit_cost": 37434581
    },
@@ -10822,16 +10896,16 @@
     "issues": 28,
     "issue_days": 4,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 36,
     "permit_cost": 40416999
    },
    "2026": {
     "blight": 46,
-    "issues": 28,
+    "issues": 29,
     "issue_days": 2,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 33,
     "permit_cost": 6669976
    }
@@ -10915,15 +10989,15 @@
     "permit_cost": 4528967
    },
    "2026": {
-    "blight": 202,
+    "blight": 205,
     "demolitions": "lt5",
-    "issues": 119,
+    "issues": 121,
     "issue_days": 12,
     "fires": 5,
     "sales": 14,
     "median_price": 164500,
-    "permits": 41,
-    "permit_cost": 3969827
+    "permits": 42,
+    "permit_cost": 4049827
    }
   },
   "nbh_north_rosedale_park": {
@@ -11000,7 +11074,7 @@
    },
    "2026": {
     "blight": 138,
-    "issues": 70,
+    "issues": 72,
     "issue_days": 5,
     "fires": "lt5",
     "sales": 22,
@@ -11106,8 +11180,9 @@
     "issues": 16,
     "issue_days": 10,
     "fires": 12,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 4,
+    "permits": 2,
+    "permit_cost": 25000
    },
    "2020": {
     "blight": 182,
@@ -11115,7 +11190,7 @@
     "issues": 14,
     "issue_days": 25,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 5,
     "permit_cost": 144411
    },
@@ -11172,7 +11247,7 @@
     "permit_cost": 266759
    },
    "2026": {
-    "blight": 54,
+    "blight": 57,
     "demolitions": "lt5",
     "issues": 23,
     "issue_days": 22,
@@ -11279,7 +11354,7 @@
     "issues": 13,
     "issue_days": 5,
     "fires": 6,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 8,
     "permit_cost": 81697
    },
@@ -11308,7 +11383,7 @@
     "issues": 17,
     "issue_days": 59,
     "fires": 7,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 17,
     "permit_cost": 732178
    },
@@ -11346,11 +11421,11 @@
     "blight": 109,
     "demolitions": "lt5",
     "issues": 49,
-    "issue_days": 13,
+    "issue_days": 14,
     "fires": 6,
     "sales": 5,
-    "permits": 8,
-    "permit_cost": 54875039
+    "permits": 9,
+    "permit_cost": 54896174
    }
   },
   "nbh_oak_grove_district_1": {
@@ -11359,7 +11434,7 @@
     "demolitions": "lt5",
     "issues": 14,
     "issue_days": 13,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 631017
    },
@@ -11367,8 +11442,9 @@
     "blight": 18,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 4,
+    "permits": 1,
+    "permit_cost": 100
    },
    "2021": {
     "blight": 46,
@@ -11385,7 +11461,7 @@
     "issues": 10,
     "issue_days": 15,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 7,
     "permit_cost": 1175749
    },
@@ -11394,7 +11470,7 @@
     "demolitions": "lt5",
     "issues": 8,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 7,
     "permit_cost": 348805
    },
@@ -11421,7 +11497,7 @@
     "blight": 37,
     "issues": 9,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 6,
     "permit_cost": 153110
    }
@@ -11497,7 +11573,7 @@
    },
    "2026": {
     "blight": 40,
-    "issues": 32,
+    "issues": 33,
     "issue_days": 5,
     "fires": "lt5",
     "sales": 6,
@@ -11584,8 +11660,8 @@
     "permit_cost": 5933926
    },
    "2026": {
-    "blight": 754,
-    "demolitions": 10,
+    "blight": 755,
+    "demolitions": 11,
     "issues": 132,
     "issue_days": 19,
     "fires": 25,
@@ -11606,7 +11682,8 @@
     "blight": 34,
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 28000
    },
    "2021": {
     "blight": 26,
@@ -11625,7 +11702,8 @@
    "2023": {
     "blight": 40,
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 410000
    },
    "2024": {
     "blight": 38,
@@ -11645,7 +11723,8 @@
    "2026": {
     "blight": 47,
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 327031
    }
   },
   "nbh_o_hair_park": {
@@ -11748,7 +11827,7 @@
     "blight": 35,
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 6,
     "permit_cost": 74345
    },
@@ -11803,7 +11882,7 @@
     "issues": 15,
     "issue_days": 6,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 7,
     "permit_cost": 101722
    }
@@ -11887,9 +11966,9 @@
     "permit_cost": 9964238
    },
    "2026": {
-    "blight": 593,
+    "blight": 595,
     "demolitions": 5,
-    "issues": 143,
+    "issues": 145,
     "issue_days": 7,
     "fires": 22,
     "sales": 94,
@@ -11928,7 +12007,7 @@
     "issues": 26,
     "issue_days": 24,
     "fires": 11,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 11,
     "permit_cost": 4335750
    },
@@ -11937,14 +12016,16 @@
     "issues": 26,
     "issue_days": 29,
     "fires": 15,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 1762000
    },
    "2024": {
     "blight": 805,
     "issues": 20,
     "issue_days": 12,
     "fires": 13,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 3030500
    },
    "2025": {
     "blight": 88,
@@ -11952,15 +12033,17 @@
     "issue_days": 6,
     "fires": 8,
     "sales": 5,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 707501
    },
    "2026": {
-    "blight": 58,
+    "blight": 61,
     "issues": 21,
     "issue_days": 13,
     "fires": 9,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 1,
+    "permit_cost": 1580
    }
   },
   "nbh_palmer_woods": {
@@ -11995,7 +12078,7 @@
     "issues": 24,
     "issue_days": 182,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 14,
     "permit_cost": 626124
    },
@@ -12004,7 +12087,7 @@
     "issues": 25,
     "issue_days": 101,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 20,
     "permit_cost": 1123174
    },
@@ -12031,7 +12114,7 @@
     "issues": 26,
     "issue_days": 4,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 12,
     "permit_cost": 512164
    }
@@ -12044,7 +12127,8 @@
     "issue_days": 6,
     "fires": 6,
     "sales": 7,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 2471
    },
    "2020": {
     "blight": 35,
@@ -12052,7 +12136,8 @@
     "issue_days": 15,
     "fires": "lt5",
     "sales": 7,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 10300
    },
    "2021": {
     "blight": 172,
@@ -12081,7 +12166,8 @@
     "issue_days": 21,
     "fires": 9,
     "sales": 9,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 14435
    },
    "2024": {
     "blight": 146,
@@ -12108,8 +12194,9 @@
     "demolitions": "lt5",
     "issues": 7,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 4,
+    "permit_cost": 26056
    }
   },
   "nbh_pembroke": {
@@ -12187,7 +12274,7 @@
    },
    "2026": {
     "blight": 63,
-    "issues": 22,
+    "issues": 23,
     "issue_days": 8,
     "fires": "lt5",
     "sales": 8,
@@ -12202,16 +12289,18 @@
     "issues": 15,
     "issue_days": 6,
     "fires": 6,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 1,
+    "permit_cost": 727
    },
    "2020": {
     "blight": 119,
     "demolitions": "lt5",
     "issues": 6,
     "fires": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 4,
+    "permit_cost": 44857
    },
    "2021": {
     "blight": 179,
@@ -12227,7 +12316,8 @@
     "issues": 12,
     "issue_days": 39,
     "fires": 8,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 12423
    },
    "2023": {
     "blight": 276,
@@ -12235,7 +12325,7 @@
     "issues": 18,
     "issue_days": 118,
     "fires": 17,
-    "sales": "lt5"
+    "sales": 4
    },
    "2024": {
     "blight": 169,
@@ -12243,7 +12333,7 @@
     "issues": 20,
     "issue_days": 21,
     "fires": 10,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 6,
     "permit_cost": 79659
    },
@@ -12253,17 +12343,17 @@
     "issues": 15,
     "issue_days": 3,
     "fires": 11,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 12,
     "permit_cost": 21354747
    },
    "2026": {
-    "blight": 32,
+    "blight": 35,
     "demolitions": "lt5",
-    "issues": 11,
+    "issues": 12,
     "issue_days": 15,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 7,
     "permit_cost": 4591000
    }
@@ -12347,8 +12437,8 @@
    "2026": {
     "blight": 116,
     "demolitions": "lt5",
-    "issues": 40,
-    "issue_days": 11,
+    "issues": 39,
+    "issue_days": 13,
     "fires": "lt5",
     "sales": 22,
     "median_price": 60500,
@@ -12435,8 +12525,8 @@
     "permit_cost": 335017
    },
    "2026": {
-    "blight": 293,
-    "issues": 56,
+    "blight": 295,
+    "issues": 54,
     "issue_days": 17,
     "fires": 7,
     "sales": 15,
@@ -12604,10 +12694,10 @@
     "permit_cost": 273267
    },
    "2026": {
-    "blight": 218,
+    "blight": 220,
     "demolitions": "lt5",
-    "issues": 79,
-    "issue_days": 18,
+    "issues": 78,
+    "issue_days": 20,
     "fires": 10,
     "sales": 16,
     "median_price": 45000,
@@ -12693,7 +12783,7 @@
    },
    "2026": {
     "blight": 69,
-    "issues": 52,
+    "issues": 53,
     "issue_days": 3,
     "fires": "lt5",
     "sales": 10,
@@ -12781,10 +12871,10 @@
     "permit_cost": 689487
    },
    "2026": {
-    "blight": 300,
+    "blight": 302,
     "demolitions": "lt5",
     "issues": 72,
-    "issue_days": 8,
+    "issue_days": 9,
     "fires": 8,
     "sales": 25,
     "median_price": 64000,
@@ -12810,7 +12900,8 @@
     "issue_days": 19,
     "fires": 8,
     "sales": 6,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 76277
    },
    "2021": {
     "blight": 159,
@@ -12870,7 +12961,7 @@
    "2026": {
     "blight": 225,
     "demolitions": "lt5",
-    "issues": 45,
+    "issues": 46,
     "issue_days": 14,
     "fires": "lt5",
     "sales": 11,
@@ -12886,7 +12977,7 @@
     "issues": 30,
     "issue_days": 9,
     "fires": 9,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 19,
     "permit_cost": 354613379
    },
@@ -12896,7 +12987,7 @@
     "issues": 15,
     "issue_days": 23,
     "fires": 16,
-    "sales": "lt5",
+    "sales": 2,
     "permits": 23,
     "permit_cost": 52672596
    },
@@ -12906,7 +12997,7 @@
     "issues": 29,
     "issue_days": 24,
     "fires": 8,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 34,
     "permit_cost": 48568401
    },
@@ -12952,12 +13043,12 @@
     "permit_cost": 35419398
    },
    "2026": {
-    "blight": 203,
+    "blight": 207,
     "demolitions": "lt5",
-    "issues": 58,
-    "issue_days": 9,
+    "issues": 66,
+    "issue_days": 10,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 14,
     "permit_cost": 5544773
    }
@@ -12971,7 +13062,8 @@
     "fires": 8,
     "sales": 10,
     "median_price": 23750,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 124073
    },
    "2020": {
     "blight": 55,
@@ -12999,7 +13091,7 @@
     "issues": 21,
     "issue_days": 23,
     "fires": 7,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 12,
     "permit_cost": 197724
    },
@@ -13037,10 +13129,10 @@
    "2026": {
     "blight": 86,
     "demolitions": "lt5",
-    "issues": 51,
-    "issue_days": 12,
+    "issues": 50,
+    "issue_days": 13,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 10,
     "permit_cost": 140690
    }
@@ -13126,7 +13218,7 @@
    "2026": {
     "blight": 262,
     "demolitions": "lt5",
-    "issues": 91,
+    "issues": 92,
     "issue_days": 14,
     "fires": 8,
     "sales": 34,
@@ -13142,7 +13234,8 @@
     "issues": 15,
     "issue_days": 6,
     "fires": 5,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 43352
    },
    "2020": {
     "blight": 108,
@@ -13150,8 +13243,9 @@
     "issues": 10,
     "issue_days": 35,
     "fires": 7,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 2,
+    "permit_cost": 11000
    },
    "2021": {
     "blight": 74,
@@ -13160,7 +13254,8 @@
     "issue_days": 24,
     "fires": "lt5",
     "sales": 6,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 66910
    },
    "2022": {
     "blight": 148,
@@ -13168,8 +13263,9 @@
     "issues": 28,
     "issue_days": 44,
     "fires": 6,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 3,
+    "permit_cost": 19200
    },
    "2023": {
     "blight": 226,
@@ -13177,7 +13273,7 @@
     "issues": 17,
     "issue_days": 17,
     "fires": 6,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 50460
    },
@@ -13195,8 +13291,9 @@
     "demolitions": 9,
     "issues": 6,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 3,
+    "permit_cost": 252739
    },
    "2026": {
     "blight": 54,
@@ -13204,8 +13301,9 @@
     "issues": 10,
     "issue_days": 23,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 3,
+    "permit_cost": 33983
    }
   },
   "nbh_regent_park": {
@@ -13287,15 +13385,15 @@
     "permit_cost": 1056779
    },
    "2026": {
-    "blight": 539,
+    "blight": 541,
     "demolitions": "lt5",
-    "issues": 163,
-    "issue_days": 20,
+    "issues": 164,
+    "issue_days": 21,
     "fires": 29,
     "sales": 70,
     "median_price": 61500,
-    "permits": 42,
-    "permit_cost": 535648
+    "permits": 43,
+    "permit_cost": 585648
    }
   },
   "nbh_riverbend": {
@@ -13316,7 +13414,7 @@
     "issues": 142,
     "issue_days": 21,
     "fires": 21,
-    "sales": "lt5",
+    "sales": 3,
     "permits": 10,
     "permit_cost": 2646562
    },
@@ -13465,14 +13563,15 @@
     "permit_cost": 100160
    },
    "2026": {
-    "blight": 159,
+    "blight": 161,
     "demolitions": "lt5",
     "issues": 42,
     "issue_days": 8,
     "fires": 9,
     "sales": 11,
     "median_price": 50000,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 201667
    }
   },
   "nbh_rivertown": {
@@ -13610,8 +13709,8 @@
     "permit_cost": 834829
    },
    "2026": {
-    "blight": 139,
-    "issues": 106,
+    "blight": 141,
+    "issues": 107,
     "issue_days": 3,
     "fires": "lt5",
     "sales": 21,
@@ -13625,55 +13724,63 @@
     "blight": 5,
     "issues": 32,
     "issue_days": 14,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 4,
+    "permit_cost": 53217
    },
    "2020": {
     "issues": 33,
     "issue_days": 18,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 80000
    },
    "2021": {
     "blight": "lt5",
     "issues": 17,
     "issue_days": 24,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 3,
+    "permit_cost": 116460
    },
    "2022": {
     "blight": "lt5",
     "issues": 34,
     "issue_days": 25,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 4,
+    "permit_cost": 65275
    },
    "2023": {
     "blight": "lt5",
     "issues": 37,
     "issue_days": 18,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 1,
+    "permits": 3,
+    "permit_cost": 412884
    },
    "2024": {
     "blight": "lt5",
     "issues": 31,
     "issue_days": 9,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 76302
    },
    "2025": {
     "blight": "lt5",
     "issues": 20,
     "issue_days": 3,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 77000
    },
    "2026": {
     "blight": "lt5",
     "demolitions": "lt5",
     "issues": 25,
     "issue_days": 5,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 2,
+    "permit_cost": 12016581
    }
   },
   "nbh_russell_industrial": {
@@ -13695,7 +13802,8 @@
    },
    "2022": {
     "blight": 10,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 300000
    },
    "2023": {
     "blight": 17,
@@ -13705,12 +13813,14 @@
    "2024": {
     "blight": 17,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 24250
    },
    "2025": {
     "blight": "lt5",
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 74000
    },
    "2026": {
     "blight": "lt5",
@@ -13797,7 +13907,7 @@
     "blight": 143,
     "demolitions": "lt5",
     "issues": 63,
-    "issue_days": 3,
+    "issue_days": 4,
     "fires": 7,
     "sales": 25,
     "median_price": 148000,
@@ -13876,12 +13986,13 @@
     "permit_cost": 147014
    },
    "2026": {
-    "blight": 40,
+    "blight": 42,
     "issues": 21,
     "issue_days": 24,
     "fires": "lt5",
     "sales": 8,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 79994
    }
   },
   "nbh_schaefer_7_8_lodge": {
@@ -14047,15 +14158,15 @@
     "permit_cost": 14079664
    },
    "2026": {
-    "blight": 679,
+    "blight": 681,
     "demolitions": "lt5",
-    "issues": 123,
+    "issues": 124,
     "issue_days": 10,
     "fires": 8,
     "sales": 41,
     "median_price": 80000,
-    "permits": 36,
-    "permit_cost": 1312491
+    "permits": 37,
+    "permit_cost": 1323841
    }
   },
   "nbh_schulze": {
@@ -14134,11 +14245,11 @@
    },
    "2026": {
     "blight": 427,
-    "issues": 90,
+    "issues": 92,
     "issue_days": 6,
     "fires": 7,
-    "sales": 62,
-    "median_price": 160450,
+    "sales": 63,
+    "median_price": 161000,
     "permits": 44,
     "permit_cost": 104553879
    }
@@ -14158,7 +14269,7 @@
     "blight": 24,
     "issues": 12,
     "issue_days": 13,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 7,
     "permit_cost": 133113
    },
@@ -14290,8 +14401,8 @@
     "permit_cost": 6457490
    },
    "2026": {
-    "blight": 78,
-    "issues": 40,
+    "blight": 79,
+    "issues": 41,
     "issue_days": 4,
     "fires": "lt5",
     "sales": 12,
@@ -14377,7 +14488,7 @@
    },
    "2026": {
     "blight": 90,
-    "issues": 34,
+    "issues": 37,
     "issue_days": 5,
     "sales": 8,
     "permits": 10,
@@ -14437,7 +14548,7 @@
     "issues": 34,
     "issue_days": 7,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 19,
     "permit_cost": 541776
    },
@@ -14452,11 +14563,11 @@
     "permit_cost": 456996
    },
    "2026": {
-    "blight": 12,
+    "blight": 13,
     "issues": 33,
-    "issue_days": 5,
+    "issue_days": 6,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 13,
     "permit_cost": 612244
    }
@@ -14470,7 +14581,8 @@
     "fires": 10,
     "sales": 19,
     "median_price": 28000,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 133312
    },
    "2020": {
     "blight": 57,
@@ -14555,7 +14667,8 @@
     "fires": "lt5",
     "sales": 12,
     "median_price": 48500,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 20000
    },
    "2020": {
     "blight": 47,
@@ -14707,12 +14820,12 @@
     "permit_cost": 40154922
    },
    "2026": {
-    "blight": 269,
-    "issues": 147,
+    "blight": 278,
+    "issues": 148,
     "issue_days": 5,
     "fires": 14,
-    "sales": 30,
-    "median_price": 116750,
+    "sales": 31,
+    "median_price": 117000,
     "permits": 29,
     "permit_cost": 1278973
    }
@@ -14721,12 +14834,14 @@
    "2019": {
     "blight": "lt5",
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 80000
    },
    "2020": {
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 227103000
    },
    "2021": {
     "blight": "lt5",
@@ -14782,7 +14897,7 @@
    "2021": {
     "blight": 22,
     "issues": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 7,
     "permit_cost": 2579766
    },
@@ -14794,25 +14909,28 @@
    },
    "2023": {
     "issues": 6,
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 10000
    },
    "2024": {
     "blight": 12,
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 13236724
    },
    "2025": {
     "blight": 11,
     "issues": "lt5",
-    "sales": "lt5",
+    "sales": 1,
     "permits": 5,
     "permit_cost": 38457190
    },
    "2026": {
     "blight": "lt5",
     "issues": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 1,
+    "permit_cost": 1368625
    }
   },
   "nbh_the_eye": {
@@ -14890,7 +15008,7 @@
    },
    "2026": {
     "blight": 162,
-    "issues": 37,
+    "issues": 38,
     "issue_days": 3,
     "fires": "lt5",
     "sales": 20,
@@ -14905,19 +15023,21 @@
     "issues": "lt5",
     "fires": "lt5",
     "sales": 5,
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 20249
    },
    "2020": {
     "blight": 5,
     "issues": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 4,
+    "permits": 2,
+    "permit_cost": 29800
    },
    "2021": {
     "blight": 7,
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 3,
     "permits": 5,
     "permit_cost": 73535
    },
@@ -14925,14 +15045,16 @@
     "blight": 5,
     "issues": "lt5",
     "sales": 7,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 84249
    },
    "2023": {
     "blight": 84,
     "issues": "lt5",
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 3,
+    "permits": 3,
+    "permit_cost": 28125
    },
    "2024": {
     "blight": 29,
@@ -14944,14 +15066,16 @@
    "2025": {
     "blight": 40,
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 41206
    },
    "2026": {
     "blight": "lt5",
     "issues": 7,
     "fires": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 4,
+    "permit_cost": 47237
    }
   },
   "nbh_university_district": {
@@ -15027,7 +15151,7 @@
    },
    "2026": {
     "blight": 32,
-    "issues": 68,
+    "issues": 70,
     "issue_days": 4,
     "fires": "lt5",
     "sales": 28,
@@ -15040,25 +15164,29 @@
    "2019": {
     "blight": 17,
     "issues": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 2,
+    "permit_cost": 14100
    },
    "2020": {
     "blight": "lt5",
     "issues": "lt5",
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 180000
    },
    "2021": {
     "blight": "lt5",
     "issues": 6,
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 1,
+    "permit_cost": 10000
    },
    "2022": {
     "blight": 14,
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 109000
    },
    "2023": {
     "blight": 23,
@@ -15069,8 +15197,9 @@
    "2024": {
     "blight": 29,
     "issues": "lt5",
-    "sales": "lt5",
-    "permits": "lt5"
+    "sales": 2,
+    "permits": 3,
+    "permit_cost": 54150
    },
    "2025": {
     "blight": 7,
@@ -15080,7 +15209,8 @@
    "2026": {
     "blight": 10,
     "issues": 8,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 26000
    }
   },
   "nbh_virginia_park_community": {
@@ -15164,11 +15294,11 @@
    "2026": {
     "blight": 188,
     "demolitions": "lt5",
-    "issues": 106,
+    "issues": 111,
     "issue_days": 17,
     "fires": 5,
-    "sales": 27,
-    "median_price": 130000,
+    "sales": 28,
+    "median_price": 127500,
     "permits": 34,
     "permit_cost": 5211049
    }
@@ -15256,7 +15386,7 @@
     "demolitions": "lt5",
     "issues": 80,
     "issue_days": 11,
-    "fires": 10,
+    "fires": 11,
     "sales": 20,
     "median_price": 65000,
     "permits": 22,
@@ -15342,9 +15472,9 @@
     "permit_cost": 431232
    },
    "2026": {
-    "blight": 151,
+    "blight": 153,
     "demolitions": "lt5",
-    "issues": 48,
+    "issues": 49,
     "issue_days": 7,
     "fires": 7,
     "sales": 17,
@@ -15432,12 +15562,12 @@
     "permit_cost": 681346
    },
    "2026": {
-    "blight": 493,
+    "blight": 502,
     "demolitions": "lt5",
-    "issues": 114,
+    "issues": 118,
     "issue_days": 12,
     "fires": 11,
-    "sales": 56,
+    "sales": 57,
     "median_price": 75000,
     "permits": 42,
     "permit_cost": 1554062
@@ -15522,9 +15652,9 @@
     "permit_cost": 1362928
    },
    "2026": {
-    "blight": 1192,
+    "blight": 1193,
     "demolitions": 6,
-    "issues": 353,
+    "issues": 354,
     "issue_days": 13,
     "fires": 33,
     "sales": 226,
@@ -15543,18 +15673,21 @@
    "2020": {
     "issues": "lt5",
     "fires": 5,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 155000
    },
    "2021": {
     "blight": "lt5",
     "issues": "lt5",
     "fires": 5,
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 57500
    },
    "2022": {
     "blight": "lt5",
     "fires": 5,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 4698000
    },
    "2023": {
     "blight": "lt5",
@@ -15564,7 +15697,8 @@
     "blight": 7,
     "issues": "lt5",
     "fires": 6,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 726398
    },
    "2025": {
     "blight": 7,
@@ -15657,7 +15791,7 @@
     "permit_cost": 269485
    },
    "2026": {
-    "blight": 99,
+    "blight": 100,
     "demolitions": "lt5",
     "issues": 31,
     "issue_days": 13,
@@ -15835,7 +15969,7 @@
    "2026": {
     "blight": 235,
     "demolitions": 11,
-    "issues": 118,
+    "issues": 122,
     "issue_days": 8,
     "fires": 8,
     "sales": 22,
@@ -15862,7 +15996,8 @@
     "fires": "lt5",
     "sales": 15,
     "median_price": 55000,
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 22804
    },
    "2021": {
     "blight": 218,
@@ -15916,7 +16051,7 @@
    },
    "2026": {
     "blight": 37,
-    "issues": 21,
+    "issues": 23,
     "issue_days": 12,
     "fires": 6,
     "sales": 13,
@@ -15988,7 +16123,8 @@
     "issues": 23,
     "issue_days": 2,
     "fires": "lt5",
-    "permits": "lt5"
+    "permits": 4,
+    "permit_cost": 46445000
    }
   },
   "nbh_west_village": {
@@ -16007,7 +16143,7 @@
     "issues": 18,
     "issue_days": 17,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 4,
     "permits": 19,
     "permit_cost": 1176343
    },
@@ -16016,7 +16152,7 @@
     "issues": 16,
     "issue_days": 26,
     "fires": "lt5",
-    "sales": "lt5",
+    "sales": 2,
     "permits": 18,
     "permit_cost": 1018850
    },
@@ -16059,7 +16195,7 @@
    "2026": {
     "blight": 138,
     "issues": 38,
-    "issue_days": 5,
+    "issue_days": 6,
     "fires": "lt5",
     "sales": 5,
     "permits": 21,
@@ -16140,8 +16276,8 @@
     "permit_cost": 112405
    },
    "2026": {
-    "blight": 58,
-    "issues": 32,
+    "blight": 59,
+    "issues": 33,
     "issue_days": 10,
     "fires": "lt5",
     "sales": 5,
@@ -16229,8 +16365,8 @@
    "2026": {
     "blight": 109,
     "demolitions": "lt5",
-    "issues": 64,
-    "issue_days": 15,
+    "issues": 61,
+    "issue_days": 16,
     "fires": 6,
     "sales": 12,
     "median_price": 128000,
@@ -16311,14 +16447,14 @@
     "permit_cost": 1009400
    },
    "2026": {
-    "blight": 188,
-    "issues": 60,
+    "blight": 192,
+    "issues": 61,
     "issue_days": 5,
     "fires": "lt5",
     "sales": 27,
     "median_price": 130000,
-    "permits": 33,
-    "permit_cost": 21002197
+    "permits": 34,
+    "permit_cost": 21004390
    }
   },
   "nbh_woodbridge": {
@@ -16328,7 +16464,7 @@
     "issues": 52,
     "issue_days": 5,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 41,
     "permit_cost": 4048402
    },
@@ -16337,7 +16473,7 @@
     "demolitions": "lt5",
     "issues": 21,
     "issue_days": 15,
-    "sales": "lt5",
+    "sales": 4,
     "permits": 36,
     "permit_cost": 5740418
    },
@@ -16346,7 +16482,7 @@
     "issues": 28,
     "issue_days": 23,
     "fires": 5,
-    "sales": "lt5",
+    "sales": 1,
     "permits": 39,
     "permit_cost": 2310401
    },
@@ -16392,7 +16528,7 @@
    },
    "2026": {
     "blight": 107,
-    "issues": 42,
+    "issues": 43,
     "issue_days": 4,
     "fires": "lt5",
     "sales": 6,
@@ -16479,13 +16615,13 @@
     "permit_cost": 227679
    },
    "2026": {
-    "blight": 355,
+    "blight": 358,
     "demolitions": "lt5",
     "issues": 78,
     "issue_days": 11,
     "fires": 16,
-    "sales": 41,
-    "median_price": 69000,
+    "sales": 42,
+    "median_price": 68500,
     "permits": 23,
     "permit_cost": 261354
    }
@@ -16495,7 +16631,8 @@
     "issues": "lt5"
    },
    "2020": {
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 7000
    },
    "2022": {
     "fires": "lt5"
@@ -16527,18 +16664,21 @@
    },
    "2023": {
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 648400
    },
    "2024": {
     "issues": "lt5",
-    "permits": "lt5"
+    "permits": 3,
+    "permit_cost": 12580000
    },
    "2025": {
     "permits": 6,
     "permit_cost": 48536416
    },
    "2026": {
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 33194
    }
   },
   "nbh_brewster_homes": {
@@ -16564,24 +16704,29 @@
    },
    "2026": {
     "blight": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 2678
    }
   },
   "nbh_waterworks_park": {
    "2020": {
     "blight": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 485130
    },
    "2021": {
     "blight": "lt5",
-    "permits": "lt5"
+    "permits": 2,
+    "permit_cost": 260000
    },
    "2022": {
     "blight": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 450000
    },
    "2023": {
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 1000000
    },
    "2024": {
     "blight": "lt5"
@@ -16591,7 +16736,8 @@
    },
    "2026": {
     "blight": "lt5",
-    "permits": "lt5"
+    "permits": 1,
+    "permit_cost": 62300
    }
   }
  },
@@ -16600,13 +16746,13 @@
   2024
  ],
  "vacant_period": [
-  "2025-09-19",
-  "2026-09-16"
+  "2025-09-22",
+  "2026-09-21"
  ],
  "current": {
   "city": {
-   "rental_certs": 12276,
-   "vacant_reg": 1493,
+   "rental_certs": 12269,
+   "vacant_reg": 1514,
    "roads": {
     "pieces": 15442,
     "miles": 825.9,
@@ -16625,7 +16771,7 @@
    },
    "nbh_fiskhorn": {
     "rental_certs": 44,
-    "vacant_reg": "lt5",
+    "vacant_reg": 6,
     "roads": {
      "pieces": 13,
      "miles": 1.1,
@@ -16650,15 +16796,6 @@
      "poor_pct": 18
     }
    },
-   "nbh_san_bernardo": {
-    "rental_certs": 30,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": 20,
-     "miles": 0.7,
-     "poor_pct": 48
-    }
-   },
    "nbh_joy_schaefer": {
     "rental_certs": 20,
     "vacant_reg": "lt5",
@@ -16666,6 +16803,15 @@
      "pieces": 12,
      "miles": 1,
      "poor_pct": 0
+    }
+   },
+   "nbh_san_bernardo": {
+    "rental_certs": 30,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": 20,
+     "miles": 0.7,
+     "poor_pct": 48
     }
    },
    "nbh_state_fair": {
@@ -16687,8 +16833,8 @@
     }
    },
    "nbh_the_eye": {
-    "rental_certs": 52,
-    "vacant_reg": 7,
+    "rental_certs": 53,
+    "vacant_reg": 8,
     "roads": {
      "pieces": 21,
      "miles": 0.9,
@@ -16722,7 +16868,7 @@
    },
    "nbh_barton_mcfarland": {
     "rental_certs": 190,
-    "vacant_reg": 21,
+    "vacant_reg": 22,
     "roads": {
      "pieces": 148,
      "miles": 8.7,
@@ -16738,15 +16884,6 @@
      "poor_pct": 89
     }
    },
-   "nbh_denby": {
-    "rental_certs": 82,
-    "vacant_reg": 5,
-    "roads": {
-     "pieces": 36,
-     "miles": 1.5,
-     "poor_pct": 12
-    }
-   },
    "nbh_weatherby": {
     "rental_certs": 50,
     "vacant_reg": "lt5",
@@ -16754,6 +16891,15 @@
      "pieces": 10,
      "miles": 0.6,
      "poor_pct": 0
+    }
+   },
+   "nbh_denby": {
+    "rental_certs": 82,
+    "vacant_reg": 5,
+    "roads": {
+     "pieces": 36,
+     "miles": 1.5,
+     "poor_pct": 12
     }
    },
    "nbh_joseph_berry_sub": {
@@ -16769,8 +16915,8 @@
     }
    },
    "nbh_crary_st_marys": {
-    "rental_certs": 184,
-    "vacant_reg": 14,
+    "rental_certs": 183,
+    "vacant_reg": 15,
     "roads": {
      "pieces": 61,
      "miles": 4.5,
@@ -16787,7 +16933,7 @@
    },
    "nbh_grand_river_i96": {
     "rental_certs": 49,
-    "vacant_reg": 15,
+    "vacant_reg": 16,
     "roads": {
      "pieces": 139,
      "miles": 7.2,
@@ -16811,6 +16957,15 @@
      "poor_pct": 7
     }
    },
+   "nbh_regent_park": {
+    "rental_certs": 206,
+    "vacant_reg": 22,
+    "roads": {
+     "pieces": 78,
+     "miles": 4.8,
+     "poor_pct": 11
+    }
+   },
    "nbh_littlefield_community": {
     "rental_certs": 23,
     "vacant_reg": "lt5",
@@ -16820,24 +16975,6 @@
      "poor_pct": 12
     }
    },
-   "nbh_regent_park": {
-    "rental_certs": 208,
-    "vacant_reg": 22,
-    "roads": {
-     "pieces": 78,
-     "miles": 4.8,
-     "poor_pct": 11
-    }
-   },
-   "nbh_nolan": {
-    "rental_certs": 123,
-    "vacant_reg": 16,
-    "roads": {
-     "pieces": 135,
-     "miles": 8.5,
-     "poor_pct": 47
-    }
-   },
    "nbh_corktown": {
     "rental_certs": 37,
     "vacant_reg": "lt5",
@@ -16845,6 +16982,15 @@
      "pieces": 169,
      "miles": 7,
      "poor_pct": 22
+    }
+   },
+   "nbh_nolan": {
+    "rental_certs": 123,
+    "vacant_reg": 17,
+    "roads": {
+     "pieces": 135,
+     "miles": 8.5,
+     "poor_pct": 47
     }
    },
    "nbh_harmony_village": {
@@ -16874,15 +17020,6 @@
      "poor_pct": 49
     }
    },
-   "nbh_west_village": {
-    "rental_certs": 23,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": 17,
-     "miles": 1.1,
-     "poor_pct": 0
-    }
-   },
    "nbh_aviation_sub": {
     "rental_certs": 35,
     "vacant_reg": "lt5",
@@ -16892,9 +17029,18 @@
      "poor_pct": 4
     }
    },
+   "nbh_west_village": {
+    "rental_certs": 22,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": 17,
+     "miles": 1.1,
+     "poor_pct": 0
+    }
+   },
    "nbh_conner_creek": {
     "rental_certs": 101,
-    "vacant_reg": 10,
+    "vacant_reg": 11,
     "roads": {
      "pieces": 55,
      "miles": 3.5,
@@ -16910,13 +17056,13 @@
      "poor_pct": 36
     }
    },
-   "nbh_nardin_park": {
-    "rental_certs": 40,
-    "vacant_reg": 8,
+   "nbh_riverdale": {
+    "rental_certs": 41,
+    "vacant_reg": 5,
     "roads": {
-     "pieces": 132,
-     "miles": 6.4,
-     "poor_pct": 27
+     "pieces": 38,
+     "miles": 1.6,
+     "poor_pct": 32
     }
    },
    "nbh_outer_drive_hayes": {
@@ -16928,13 +17074,13 @@
      "poor_pct": 27
     }
    },
-   "nbh_riverdale": {
-    "rental_certs": 41,
-    "vacant_reg": 5,
+   "nbh_nardin_park": {
+    "rental_certs": 39,
+    "vacant_reg": 8,
     "roads": {
-     "pieces": 38,
-     "miles": 1.6,
-     "poor_pct": 32
+     "pieces": 132,
+     "miles": 6.4,
+     "poor_pct": 27
     }
    },
    "nbh_russell_woods": {
@@ -17017,7 +17163,7 @@
    },
    "nbh_krainz_woods": {
     "rental_certs": 78,
-    "vacant_reg": "lt5",
+    "vacant_reg": 5,
     "roads": {
      "pieces": 34,
      "miles": 1.7,
@@ -17052,7 +17198,7 @@
     }
    },
    "nbh_hawthorne_park": {
-    "rental_certs": 24,
+    "rental_certs": 23,
     "vacant_reg": "lt5",
     "roads": {
      "pieces": 24,
@@ -17069,14 +17215,6 @@
      "poor_pct": 29
     }
    },
-   "nbh_mexicantown": {
-    "rental_certs": "lt5",
-    "roads": {
-     "pieces": 53,
-     "miles": 1.9,
-     "poor_pct": 50
-    }
-   },
    "nbh_university_district": {
     "rental_certs": 14,
     "vacant_reg": "lt5",
@@ -17084,6 +17222,14 @@
      "pieces": 26,
      "miles": 1.2,
      "poor_pct": 45
+    }
+   },
+   "nbh_mexicantown": {
+    "rental_certs": "lt5",
+    "roads": {
+     "pieces": 53,
+     "miles": 1.9,
+     "poor_pct": 50
     }
    },
    "nbh_pulaski": {
@@ -17095,20 +17241,20 @@
      "poor_pct": 7
     }
    },
-   "nbh_fox_creek": {
-    "rental_certs": 59,
-    "vacant_reg": 8,
-    "roads": {
-     "pieces": 55,
-     "miles": 4.3,
-     "poor_pct": 38
-    }
-   },
    "nbh_garden_homes": {
     "rental_certs": 83,
     "vacant_reg": 6,
     "roads": {
      "pieces": "lt5"
+    }
+   },
+   "nbh_fox_creek": {
+    "rental_certs": 58,
+    "vacant_reg": 8,
+    "roads": {
+     "pieces": 55,
+     "miles": 4.3,
+     "poor_pct": 38
     }
    },
    "nbh_butler": {
@@ -17203,7 +17349,7 @@
    },
    "nbh_northeast_central_district": {
     "rental_certs": 45,
-    "vacant_reg": 6,
+    "vacant_reg": 8,
     "roads": {
      "pieces": 26,
      "miles": 1.7,
@@ -17220,8 +17366,8 @@
     }
    },
    "nbh_boynton": {
-    "rental_certs": 68,
-    "vacant_reg": 12,
+    "rental_certs": 66,
+    "vacant_reg": 13,
     "roads": {
      "pieces": 104,
      "miles": 4.3,
@@ -17229,7 +17375,7 @@
     }
    },
    "nbh_new_center_commons": {
-    "rental_certs": 23,
+    "rental_certs": 24,
     "vacant_reg": 5,
     "roads": {
      "pieces": 34,
@@ -17257,7 +17403,7 @@
    },
    "nbh_evergreen_outer_drive": {
     "rental_certs": 167,
-    "vacant_reg": 5,
+    "vacant_reg": 6,
     "roads": {
      "pieces": 66,
      "miles": 4.3,
@@ -17265,7 +17411,7 @@
     }
    },
    "nbh_blackstone_park": {
-    "rental_certs": 53,
+    "rental_certs": 54,
     "vacant_reg": 5,
     "roads": {
      "pieces": 7,
@@ -17283,7 +17429,7 @@
    },
    "nbh_yorkshire_woods": {
     "rental_certs": 143,
-    "vacant_reg": 20,
+    "vacant_reg": 19,
     "roads": {
      "pieces": 35,
      "miles": 1.3,
@@ -17291,7 +17437,7 @@
     }
    },
    "nbh_schaefer_7_8_lodge": {
-    "rental_certs": 100,
+    "rental_certs": 99,
     "vacant_reg": 14,
     "roads": {
      "pieces": 117,
@@ -17318,7 +17464,7 @@
    },
    "nbh_midtown": {
     "rental_certs": 130,
-    "vacant_reg": 12,
+    "vacant_reg": 13,
     "roads": {
      "pieces": 289,
      "miles": 12.2,
@@ -17398,21 +17544,12 @@
     }
    },
    "nbh_college_park": {
-    "rental_certs": 181,
+    "rental_certs": 184,
     "vacant_reg": 18,
     "roads": {
      "pieces": 60,
      "miles": 4.6,
      "poor_pct": 25
-    }
-   },
-   "nbh_elijah_mccoy": {
-    "rental_certs": 40,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": 84,
-     "miles": 3.9,
-     "poor_pct": 61
     }
    },
    "nbh_southfield_plymouth": {
@@ -17422,6 +17559,15 @@
      "pieces": 16,
      "miles": 0.6,
      "poor_pct": 0
+    }
+   },
+   "nbh_elijah_mccoy": {
+    "rental_certs": 40,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": 84,
+     "miles": 3.9,
+     "poor_pct": 61
     }
    },
    "nbh_airport_sub": {
@@ -17442,7 +17588,7 @@
     }
    },
    "nbh_brightmoor": {
-    "rental_certs": 335,
+    "rental_certs": 336,
     "vacant_reg": 43,
     "roads": {
      "pieces": 249,
@@ -17452,7 +17598,7 @@
    },
    "nbh_conant_gardens": {
     "rental_certs": 15,
-    "vacant_reg": 5,
+    "vacant_reg": 6,
     "roads": {
      "pieces": 21,
      "miles": 0.8,
@@ -17461,11 +17607,20 @@
    },
    "nbh_west_end": {
     "rental_certs": 40,
-    "vacant_reg": 10,
+    "vacant_reg": 11,
     "roads": {
      "pieces": 95,
      "miles": 6.5,
      "poor_pct": 29
+    }
+   },
+   "nbh_greenwich": {
+    "rental_certs": 28,
+    "vacant_reg": 7,
+    "roads": {
+     "pieces": 49,
+     "miles": 2.9,
+     "poor_pct": 40
     }
    },
    "nbh_martin_park": {
@@ -17484,15 +17639,6 @@
      "pieces": 61,
      "miles": 2.9,
      "poor_pct": 35
-    }
-   },
-   "nbh_greenwich": {
-    "rental_certs": 28,
-    "vacant_reg": 7,
-    "roads": {
-     "pieces": 49,
-     "miles": 2.9,
-     "poor_pct": 40
     }
    },
    "nbh_east_village": {
@@ -17585,7 +17731,7 @@
     }
    },
    "nbh_elmwood_park": {
-    "rental_certs": 124,
+    "rental_certs": 123,
     "vacant_reg": "lt5",
     "roads": {
      "pieces": 131,
@@ -17603,7 +17749,7 @@
     }
    },
    "nbh_mount_olivet": {
-    "rental_certs": 46,
+    "rental_certs": 45,
     "vacant_reg": 9,
     "roads": {
      "pieces": 48,
@@ -17647,6 +17793,15 @@
      "poor_pct": 68
     }
    },
+   "nbh_cornerstone_village": {
+    "rental_certs": 260,
+    "vacant_reg": 24,
+    "roads": {
+     "pieces": 161,
+     "miles": 8.4,
+     "poor_pct": 39
+    }
+   },
    "nbh_seven_mile_rouge": {
     "rental_certs": 71,
     "vacant_reg": "lt5",
@@ -17654,15 +17809,6 @@
      "pieces": 61,
      "miles": 3.1,
      "poor_pct": 74
-    }
-   },
-   "nbh_cornerstone_village": {
-    "rental_certs": 261,
-    "vacant_reg": 24,
-    "roads": {
-     "pieces": 161,
-     "miles": 8.4,
-     "poor_pct": 39
     }
    },
    "nbh_eastern_market": {
@@ -17711,6 +17857,7 @@
    },
    "nbh_pride_area_community": {
     "rental_certs": 38,
+    "vacant_reg": "lt5",
     "roads": {
      "pieces": 27,
      "miles": 1.2,
@@ -17763,7 +17910,7 @@
     }
    },
    "nbh_greenfield_grand_river": {
-    "rental_certs": 58,
+    "rental_certs": 57,
     "vacant_reg": "lt5",
     "roads": {
      "pieces": 21,
@@ -17789,6 +17936,15 @@
      "poor_pct": 0
     }
    },
+   "nbh_brush_park": {
+    "rental_certs": 13,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": 41,
+     "miles": 1.6,
+     "poor_pct": 11
+    }
+   },
    "nbh_campau_banglatown": {
     "rental_certs": 6,
     "vacant_reg": "lt5",
@@ -17798,13 +17954,11 @@
      "poor_pct": 8
     }
    },
-   "nbh_brush_park": {
-    "rental_certs": 13,
+   "nbh_south_of_six": {
+    "rental_certs": 57,
     "vacant_reg": "lt5",
     "roads": {
-     "pieces": 41,
-     "miles": 1.6,
-     "poor_pct": 11
+     "pieces": "lt5"
     }
    },
    "nbh_chadsey_condon": {
@@ -17816,13 +17970,6 @@
      "poor_pct": 31
     }
    },
-   "nbh_south_of_six": {
-    "rental_certs": 57,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": "lt5"
-    }
-   },
    "nbh_mapleridge": {
     "rental_certs": 90,
     "vacant_reg": 13,
@@ -17830,6 +17977,15 @@
      "pieces": 102,
      "miles": 6.4,
      "poor_pct": 15
+    }
+   },
+   "nbh_bagley": {
+    "rental_certs": 265,
+    "vacant_reg": 38,
+    "roads": {
+     "pieces": 114,
+     "miles": 6.2,
+     "poor_pct": 33
     }
    },
    "nbh_claytown": {
@@ -17841,17 +17997,8 @@
      "poor_pct": 27
     }
    },
-   "nbh_bagley": {
-    "rental_certs": 267,
-    "vacant_reg": 36,
-    "roads": {
-     "pieces": 114,
-     "miles": 6.2,
-     "poor_pct": 33
-    }
-   },
    "nbh_fitzgerald_marygrove": {
-    "rental_certs": 164,
+    "rental_certs": 166,
     "vacant_reg": 35,
     "roads": {
      "pieces": 130,
@@ -17877,6 +18024,15 @@
      "poor_pct": 31
     }
    },
+   "nbh_berg_lahser": {
+    "rental_certs": 71,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": 33,
+     "miles": 2.1,
+     "poor_pct": 41
+    }
+   },
    "nbh_mcnichols_evergreen": {
     "rental_certs": 11,
     "vacant_reg": "lt5",
@@ -17895,17 +18051,8 @@
      "poor_pct": 44
     }
    },
-   "nbh_berg_lahser": {
-    "rental_certs": 71,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": 33,
-     "miles": 2.1,
-     "poor_pct": 41
-    }
-   },
    "nbh_bethune_community": {
-    "rental_certs": 241,
+    "rental_certs": 238,
     "vacant_reg": 37,
     "roads": {
      "pieces": 83,
@@ -17922,15 +18069,6 @@
      "poor_pct": 53
     }
    },
-   "nbh_jamison": {
-    "rental_certs": 25,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": 22,
-     "miles": 1,
-     "poor_pct": 73
-    }
-   },
    "nbh_eden_gardens": {
     "rental_certs": 19,
     "vacant_reg": 8,
@@ -17940,8 +18078,17 @@
      "poor_pct": 61
     }
    },
+   "nbh_jamison": {
+    "rental_certs": 25,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": 22,
+     "miles": 1,
+     "poor_pct": 73
+    }
+   },
    "nbh_von_steuben": {
-    "rental_certs": 121,
+    "rental_certs": 122,
     "vacant_reg": 19,
     "roads": {
      "pieces": 36,
@@ -17949,15 +18096,8 @@
      "poor_pct": 3
     }
    },
-   "nbh_grandmont_1": {
-    "rental_certs": 28,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": "lt5"
-    }
-   },
    "nbh_gratiot_woods": {
-    "rental_certs": 47,
+    "rental_certs": 48,
     "vacant_reg": 9,
     "roads": {
      "pieces": 18,
@@ -17972,6 +18112,13 @@
      "pieces": 14,
      "miles": 0.9,
      "poor_pct": 33
+    }
+   },
+   "nbh_grandmont_1": {
+    "rental_certs": 27,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": "lt5"
     }
    },
    "nbh_ravendale": {
@@ -18070,7 +18217,7 @@
    },
    "nbh_castle_rouge": {
     "rental_certs": 61,
-    "vacant_reg": 5,
+    "vacant_reg": 6,
     "roads": {
      "pieces": 9,
      "miles": 0.7
@@ -18084,15 +18231,6 @@
      "poor_pct": 34
     }
    },
-   "nbh_grand_river_st_marys": {
-    "rental_certs": 36,
-    "vacant_reg": "lt5",
-    "roads": {
-     "pieces": 32,
-     "miles": 2.2,
-     "poor_pct": 63
-    }
-   },
    "nbh_rosedale_park": {
     "rental_certs": 27,
     "vacant_reg": 8,
@@ -18100,6 +18238,15 @@
      "pieces": 36,
      "miles": 2.4,
      "poor_pct": 33
+    }
+   },
+   "nbh_grand_river_st_marys": {
+    "rental_certs": 36,
+    "vacant_reg": "lt5",
+    "roads": {
+     "pieces": 32,
+     "miles": 2.2,
+     "poor_pct": 63
     }
    },
    "nbh_wayne_state": {
@@ -18164,7 +18311,7 @@
     }
    },
    "nbh_virginia_park_community": {
-    "rental_certs": 100,
+    "rental_certs": 101,
     "vacant_reg": 9,
     "roads": {
      "pieces": 105,
@@ -18174,7 +18321,7 @@
    },
    "nbh_dexter_linwood": {
     "rental_certs": 167,
-    "vacant_reg": 37,
+    "vacant_reg": 36,
     "roads": {
      "pieces": 216,
      "miles": 12.3,
@@ -18189,13 +18336,6 @@
      "poor_pct": 49
     }
    },
-   "nbh_garden_view": {
-    "rental_certs": 104,
-    "roads": {
-     "pieces": 8,
-     "miles": 0.6
-    }
-   },
    "nbh_marina_district": {
     "rental_certs": "lt5",
     "vacant_reg": "lt5",
@@ -18203,6 +18343,13 @@
      "pieces": 10,
      "miles": 0.4,
      "poor_pct": 100
+    }
+   },
+   "nbh_garden_view": {
+    "rental_certs": 104,
+    "roads": {
+     "pieces": 8,
+     "miles": 0.6
     }
    },
    "nbh_pershing": {
@@ -18231,8 +18378,8 @@
     }
    },
    "nbh_farwell": {
-    "rental_certs": 158,
-    "vacant_reg": 13,
+    "rental_certs": 159,
+    "vacant_reg": 14,
     "roads": {
      "pieces": 152,
      "miles": 8.1,

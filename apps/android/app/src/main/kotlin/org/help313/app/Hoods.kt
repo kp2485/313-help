@@ -747,3 +747,224 @@ fun hoodSourceOrder(d: Indicators): List<HoodSource> = listOf(
  */
 fun hoodCategoryKey(category: String): String =
     "add.cat." + (if (category == "shelter") "shelter.emergency" else category)
+
+// ---- a year panel drawn as a picture (docs/13, 2026-09-22) -----------------------------------------------------
+//
+// Kyle, 2026-09-22: "for the longitudinal data, we should give the user the option on page to switch between a
+// table and chart view for relevant data" — and, later the same day, lines rather than bars, with "Homes sold" and
+// "Building permits" on the SAME chart and selectable, and a year whose count is hidden VISIBLE rather than
+// dropped. This is the Kotlin half of `apps/web/src/hoodchart.ts` and of `HelpCore/HoodChart.swift`, ported case
+// for case and held to the same numbers in HoodChartTest.
+//
+// The rules docs/13 sets, and how each one survives being drawn:
+//
+//  1. **No ranking, no comparison with another neighborhood.** A chart holds ONE neighborhood's own years: no
+//     whole-city line, no trend line, no colour that means good or bad. Two colours are two identities, never a
+//     scale, and there is ONE y-axis, never two.
+//  2. **A hidden count is never drawn at a value.** `lt5` — which since 2026-09-22 means blight tickets,
+//     demolitions, reported problems and fires, but no longer home sales or building permits (DECISIONS) —
+//     becomes a HOLLOW marker at a fixed height, so the year is visibly there and its number is visibly not.
+//     [HOOD_MARKER_FRACTION] is the only thing that turns a hidden count into geometry. The line goes on through
+//     it as a dotted piece, so a hidden year is never a gap that reads as zero.
+//  3. **The axis never labels a value under 5 as if it were exact**: [HoodChartModel.ticks] holds 0 and then
+//     nothing below 5, and a marker always sits below the first tick over zero.
+//  4. **The table is the source of truth**, and stays on the screen for TalkBack either way (HoodScreens.kt).
+
+/** Which way a neighborhood's year panels are drawn. **Table is the default**, on every platform. */
+enum class HoodViewChoice { TABLE, CHART }
+
+/** Whatever was stored, read safely: only the exact word "chart" is chart; anything else is a table. */
+fun hoodViewOf(stored: String?): HoodViewChoice = if (stored == "chart") HoodViewChoice.CHART else HoodViewChoice.TABLE
+
+/** One year of one series, exactly as the bundle gives it: a number, the hidden `lt5`, or nothing recorded. */
+class HoodChartPoint(val year: String, val count: HoodCount?, val soFar: Boolean = false)
+
+/** Which of the two identities a series wears: a colour, a marker shape and a line pattern, all three. */
+enum class HoodTone { A, B }
+
+/** One series before it is measured against the others. [key] is what a checkbox switches. */
+class HoodSeries(val key: String, val tone: HoodTone, val label: String, val points: List<HoodChartPoint>)
+
+enum class HoodPointKind { VALUE, HIDDEN, NONE }
+
+/** A year of a series, placed. [frac] is its height as a share of the top of the axis, 0 to 1. */
+class HoodPlotPoint(
+    val year: String,
+    val index: Int,
+    val soFar: Boolean,
+    val kind: HoodPointKind,
+    /** The number, when there is one to show. Never set for a hidden year — that is the point of it. */
+    val value: Int?,
+    val frac: Double,
+)
+
+/** A piece of the line between two neighbouring years. [dotted] where one of its ends is a hidden count. */
+class HoodSegment(val from: Int, val to: Int, val dotted: Boolean)
+
+class HoodSeriesModel(
+    val key: String,
+    val tone: HoodTone,
+    val label: String,
+    val points: List<HoodPlotPoint>,
+    val segments: List<HoodSegment>,
+    /** The years the pipeline hid. A hollow marker each — never a value. */
+    val markers: List<String>,
+    /** The years with nothing recorded at all: a place on the axis, no marker, and a break in the line. */
+    val blanks: List<String>,
+    /** The tallest year, for the summary sentence; null when there is nothing to draw. */
+    val peakYear: String?,
+    val peakValue: Int?,
+)
+
+class HoodChartModel(
+    val years: List<String>,
+    val series: List<HoodSeriesModel>,
+    /** The top of the axis. At least 5, so the drawn area never implies a scale finer than suppression. */
+    val top: Int,
+    /** 0, then every labelled value. Never 1 to 4 (rule 3). */
+    val ticks: List<Int>,
+)
+
+/**
+ * How high a hidden year's marker sits, as a share of the plot: a CONSTANT — ten of the web's ninety-six drawing
+ * units — and the same on all three apps, so nothing about the marker comes from the count it stands for. It is
+ * always below the first tick over zero, because the axis step is at least a quarter of the top.
+ */
+const val HOOD_MARKER_FRACTION: Double = 10.0 / 96.0
+
+/** 1, 2, 5, 10, 20, 50, … — the only step sizes an axis may use, so a tick is always a round number. */
+fun hoodAxisStep(max: Int): Int {
+    var scale = 1
+    repeat(12) {
+        for (s in intArrayOf(1, 2, 5)) {
+            val step = s * scale
+            if ((max + step - 1) / step <= 4) return step
+        }
+        scale *= 10
+    }
+    return scale
+}
+
+/**
+ * The whole picture, worked out from the rows — no pixels yet, so the same arithmetic runs in a JVM test and on a
+ * phone. Only the series that are switched on are handed in, so the axis follows what is on the screen.
+ */
+fun hoodChartModel(series: List<HoodSeries>): HoodChartModel {
+    val years = series.firstOrNull()?.points?.map { it.year } ?: emptyList()
+    val max = series.flatMap { s -> s.points.mapNotNull { it.count?.value } }.maxOrNull() ?: 0
+    val step = hoodAxisStep(maxOf(max, 1))
+    val top = maxOf(5, ((max + step - 1) / step) * step)
+    val ticks = ArrayList<Int>()
+    var t = 0
+    while (t <= top) {
+        if (t == 0 || t >= 5) ticks.add(t)
+        t += step
+    }
+    if (ticks.lastOrNull() != top) ticks.add(top)
+
+    return HoodChartModel(
+        years = years,
+        top = top,
+        ticks = ticks,
+        series = series.map { s ->
+            val points = s.points.mapIndexed { index, p ->
+                val n = p.count?.value
+                when {
+                    n != null -> HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.VALUE, n, n.toDouble() / top)
+                    p.count != null -> HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.HIDDEN, null, HOOD_MARKER_FRACTION)
+                    else -> HoodPlotPoint(p.year, index, p.soFar, HoodPointKind.NONE, null, 0.0)
+                }
+            }
+            // The line runs between two neighbouring years whenever both have something. A year with nothing
+            // recorded breaks it, because joining across one would draw a number nobody counted.
+            val segments = ArrayList<HoodSegment>()
+            for (i in 0 until maxOf(0, points.size - 1)) {
+                val a = points[i]
+                val b = points[i + 1]
+                if (a.kind == HoodPointKind.NONE || b.kind == HoodPointKind.NONE) continue
+                segments.add(HoodSegment(i, i + 1, a.kind == HoodPointKind.HIDDEN || b.kind == HoodPointKind.HIDDEN))
+            }
+            // The tallest year, and the EARLIEST of them when two are equal, so one bundle always names one year.
+            var peak: HoodPlotPoint? = null
+            for (p in points) if (p.kind == HoodPointKind.VALUE && (peak == null || p.value!! > peak.value!!)) peak = p
+            HoodSeriesModel(
+                key = s.key, tone = s.tone, label = s.label, points = points, segments = segments,
+                markers = points.filter { it.kind == HoodPointKind.HIDDEN }.map { it.year },
+                blanks = points.filter { it.kind == HoodPointKind.NONE }.map { it.year },
+                peakYear = peak?.year, peakValue = peak?.value,
+            )
+        },
+    )
+}
+
+/**
+ * Whether a series is worth offering a chart of at all: three years with something in them, and at least one of
+ * those a number there is a point to draw. Two points is a line between two dots, not a shape worth a control.
+ */
+fun hoodChartable(points: List<HoodChartPoint>): Boolean =
+    points.count { it.count != null } >= 3 && points.any { it.count?.value != null }
+
+/**
+ * Which series are drawn, given what has been switched off. **Never nothing**: the last one left on cannot be
+ * switched off, so the chart is never an empty pair of axes, and its control is disabled with a line saying why.
+ */
+fun hoodShownSeries(all: List<HoodSeries>, off: Set<String>): List<HoodSeries> {
+    val on = all.filter { it.key !in off }
+    return if (on.isEmpty()) all.take(1) else on
+}
+
+/**
+ * Which years get a label under the axis: every one while they fit, then every other one once there are more than
+ * six, so a year is never drawn over its neighbour at a large font scale.
+ */
+fun hoodAxisYears(years: List<String>): List<String> {
+    if (years.size <= 6) return years
+    // Counting back from the LAST year, not forward from the first: stepping forward and then adding the last as
+    // well puts two labels side by side whenever the count is even, and "2025 2026" ran into each other at a font
+    // scale of 2 (emulator, 2026-09-22). The first year comes back only when it is not next to the earliest kept.
+    val keep = HashSet<Int>()
+    var i = years.size - 1
+    while (i >= 0) { keep.add(i); i -= 2 }
+    if (!keep.contains(0) && (keep.minOrNull() ?: 0) >= 2) keep.add(0)
+    return years.filterIndexed { index, _ -> keep.contains(index) }
+}
+
+/** One count of one neighborhood, year by year, in the order the table prints — the web's `seriesOf`. */
+fun hoodChartSeries(h: Hood, d: Indicators, count: (HoodYear) -> HoodCount?): List<HoodChartPoint> =
+    d.years.map { y -> HoodChartPoint(y, count(h.year(y)), y.toIntOrNull() == d.partialYear) }
+
+/**
+ * What one point says on its own: "2023, Homes sold: 14", "2021, Torn down: fewer than 5". The sentences are the
+ * app's own words, handed in, exactly as [hoodCountText] takes them.
+ */
+fun hoodPointText(p: HoodPlotPoint, label: String, words: (String, Map<String, String>) -> String): String {
+    val year = if (p.soFar) words("hood.so_far", mapOf("year" to p.year)) else p.year
+    val count = when (p.kind) {
+        HoodPointKind.VALUE -> hoodNumber(p.value!!)
+        HoodPointKind.HIDDEN -> words("hood.lt5", emptyMap())
+        HoodPointKind.NONE -> words("hood.none_recorded", emptyMap())
+    }
+    return words("hood.chart_bar", mapOf("year" to year, "label" to label, "count" to count))
+}
+
+/**
+ * The sentence under the picture: what is drawn, over which years, the biggest year of each series, and — only
+ * when there is one — that some years are hidden and are NOT drawn at a value. A fact about this neighborhood's
+ * own years, never a trend: these numbers describe and do not explain (docs/13, honesty rule 4).
+ */
+fun hoodChartSummary(m: HoodChartModel, words: (String, Map<String, String>) -> String): String {
+    val most = m.series.joinToString(words("list.sep", emptyMap())) { s ->
+        val year = s.peakYear
+        val value = s.peakValue
+        if (year == null || value == null) {
+            words("hood.chart_peak_none", mapOf("label" to s.label))
+        } else {
+            words("hood.chart_peak", mapOf("label" to s.label, "count" to hoodNumber(value), "year" to year))
+        }
+    }
+    val line = words(
+        "hood.chart_summary",
+        mapOf("from" to (m.years.firstOrNull() ?: ""), "to" to (m.years.lastOrNull() ?: ""), "most" to most),
+    )
+    return if (m.series.none { it.markers.isNotEmpty() }) line else line + " " + words("hood.chart_lt5_note", emptyMap())
+}

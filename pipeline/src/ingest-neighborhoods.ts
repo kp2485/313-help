@@ -16,8 +16,13 @@
 //
 // We never download a sale or a permit record, so buyer and seller names never reach this repo. The rental,
 // fire and vacant-building layers carry addresses and (vacant) owner names: we only ever ask them for counts.
-// Small numbers are dropped here, before anything is written: a count under 5 is stored as "lt5", and a median
-// needs 10 sales.
+// Small numbers are dropped here, before anything is written — but only where docs/13's honesty rule 2 still
+// applies. **Home sales and building permits state their real count, however small** (Kyle, 2026-09-22): both are
+// public transaction records the City already publishes with the address on them, so hiding a 3 protected nobody
+// and only made a page say less than the source it cites. Everything that could identify a person, and every
+// count the City itself suppresses, is unchanged: crashes, blight tickets, demolitions, reported problems, fires,
+// rental certificates, vacant registrations and street ratings all still become "lt5" under five. A median price
+// still needs ten sales, because a middle of three is a shaky statistic whoever publishes it.
 
 import { writeFileSync } from 'node:fs';
 import { p, slug, writeJson, today } from './util.js';
@@ -107,9 +112,21 @@ export function toNeighborhoods(features: any[], studyRings: Pt[][]): Neighborho
   }).filter((n): n is Neighborhood => !!n).sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** Honesty rule 2 (docs/13), applied before anything is stored. */
+/** Honesty rule 2 (docs/13), applied before anything is stored. For the series that still hide a small count. */
 export function suppress(n: number, median?: number | null, cost?: number | null): { count: Count; median?: number; cost?: number } {
   if (n < 5) return { count: 'lt5' };
+  return { count: n, ...(median != null && n >= 10 ? { median: Math.round(median) } : {}), ...(cost != null ? { cost: Math.round(cost) } : {}) };
+}
+
+/**
+ * The same shape, for the two series that no longer hide a small count: **home sales and building permits**
+ * (Kyle, 2026-09-22 — DECISIONS). A count of three is written as 3.
+ *
+ * The ten-sale rule on the MEDIAN stays: a count is a count, but the middle of three sales is a statistic that
+ * moves with any one of them, and the panel says "too few sales to show a price" rather than print it. The page
+ * carries one plain sentence — "Small numbers change a lot from year to year." — in place of the hiding.
+ */
+export function plainCount(n: number, median?: number | null, cost?: number | null): { count: Count; median?: number; cost?: number } {
   return { count: n, ...(median != null && n >= 10 ? { median: Math.round(median) } : {}), ...(cost != null ? { cost: Math.round(cost) } : {}) };
 }
 
@@ -199,9 +216,9 @@ async function stats(hoods: Neighborhood[]): Promise<void> {
     for (const f of fi.features ?? []) put(f.attributes.neighborhood, y, { fires: suppress(f.attributes.n).count });
     const ci = suppress(isAll.features?.[0]?.attributes.n ?? 0, isAll.features?.[0]?.attributes.median);
     const conditions: YearStats = { blight: suppress(blAll.features?.[0]?.attributes.n ?? 0).count, demolitions: suppress(deAll.features?.[0]?.attributes.n ?? 0).count, issues: ci.count, ...(ci.median !== undefined ? { issue_days: ci.median } : {}), fires: suppress(fiAll.features?.[0]?.attributes.n ?? 0).count };
-    for (const f of s.features ?? []) { const r = suppress(f.attributes.n, f.attributes.median); put(f.attributes.neighborhood, y, { sales: r.count, ...(r.median ? { median_price: r.median } : {}) }); }
-    for (const f of b.features ?? []) { const r = suppress(f.attributes.n, null, f.attributes.cost); put(f.attributes.neighborhood, y, { permits: r.count, ...(r.cost ? { permit_cost: r.cost } : {}) }); }
-    const cs = suppress(sAll.features?.[0]?.attributes.n ?? 0, sAll.features?.[0]?.attributes.median), cb = suppress(bAll.features?.[0]?.attributes.n ?? 0, null, bAll.features?.[0]?.attributes.cost);
+    for (const f of s.features ?? []) { const r = plainCount(f.attributes.n, f.attributes.median); put(f.attributes.neighborhood, y, { sales: r.count, ...(r.median ? { median_price: r.median } : {}) }); }
+    for (const f of b.features ?? []) { const r = plainCount(f.attributes.n, null, f.attributes.cost); put(f.attributes.neighborhood, y, { permits: r.count, ...(r.cost ? { permit_cost: r.cost } : {}) }); }
+    const cs = plainCount(sAll.features?.[0]?.attributes.n ?? 0, sAll.features?.[0]?.attributes.median), cb = plainCount(bAll.features?.[0]?.attributes.n ?? 0, null, bAll.features?.[0]?.attributes.cost);
     city[y] = { sales: cs.count, ...(cs.median ? { median_price: cs.median } : {}), permits: cb.count, ...(cb.cost ? { permit_cost: cb.cost } : {}), ...conditions };
     console.log(`stats ${y}: city sales ${cs.count} (median ${cs.median ?? 'n/a'}), permits ${cb.count}, blight tickets ${conditions.blight}, demolitions ${conditions.demolitions}, issues ${conditions.issues} (median ${conditions.issue_days ?? 'n/a'} days), building fires ${conditions.fires}`);
     await new Promise((r) => setTimeout(r, 300));

@@ -46,7 +46,7 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 ## Honesty rules (every one is a build-time check or a fixed piece of page copy)
 
 1. **No league tables.** No "best/worst neighborhoods" ranking anywhere. Each neighborhood is compared to itself over time first, then to the city median. Sorting the citywide table by a "badness" column is not offered.
-2. **Small numbers are suppressed.** Any count under 5 in a period shows as "fewer than 5"; medians need at least 10 sales. A neighborhood with 40 homes will otherwise swing wildly and mislead.
+2. **Small numbers are suppressed — where suppression protects somebody.** Revised 2026-09-22 (Kyle: "just use the actual number, there is no need to truncate or round anything"; DECISIONS). **Home sales and building permits state their real count, however small**: both are public transaction records the City already publishes with the address on them, so hiding a 3 protected nobody and only made our page say less than the source it cites. The page carries one plain sentence instead — "Small numbers change a lot from year to year." Everything else is unchanged and still shows "fewer than 5" under five: crashes (which are about people, and where the identification risk docs/11 designs against is real), blight tickets, completed demolitions, reported problems, building fires, rental certificates, vacant registrations and rated street pieces. **A median still needs at least 10 sales**, because the middle of three moves with any one of them; the count beside it is shown whatever it is.
 3. **Rates need denominators we can defend.** Per-parcel or per-housing-unit from the City's parcel layer / ACS; never per "resident" from stale counts without saying the year.
 4. **Descriptive, never causal.** Fixed copy on every page: "These numbers describe what happened here. They can't tell you why." Particularly for the greenway lens: the route wasn't placed at random, and before/after differences are not the greenway's "effect."
 5. **Enforcement is not the same as condition.** Blight tickets measure where inspectors went as much as where blight is. Said on the chart, not in a footnote.
@@ -77,6 +77,34 @@ A public page per neighborhood ("How is Bagley doing?") plus a citywide view, in
 - Heavy layers (blight tickets, permits) are added up by the City's server; raw records are never downloaded, let alone shipped to the browser.
 - The pages are screens inside the app, `#/n` and `#/n/nbh_…`, drawn from that one signed file, which is downloaded only when a neighborhood screen opens. **Since 2026-09-22 `#/n` is a tab of its own** (docs/05): the same address, now the fourth tab, with an index that finds the person's own neighborhood on the device (`apps/web/src/hoodfind.ts`, cases in `schema/neighborhoods/points.json`), a search over the 205 names, and the list A–Z or by council district — never in an order any number could set. Charts follow one small, accessible chart style (large type, labeled directly, works without color).
 - In the app: neighborhood pages are **not** in the crisis path — no need screen, no urgent sheet and no listing leads to one, and the numbers are still downloaded only when one of these screens opens. They are reachable from the **Neighborhoods tab** (2026-09-22; before that only from About, which is where Kyle found them buried), from Home's third tile, from one line on About, from a greenway segment ("About this neighborhood"), and by URL for partners. The web app and the iPhone app both have them, each with a Neighborhoods tab of its own (iPhone, 2026-09-21: the same panels, in the same order, with the same numbers and the same words; the rules are `apps/ios/Sources/HelpCore/Hoods.swift` and the screens are `apps/ios/HelpApp/HoodsScreen.swift`). **Android has them too since 2026-09-22**, as its own Neighborhoods tab, drawn from the same signed file with the same panels in the same order; where a point falls is `Zip.kt` and `Hoods.kt` in its `:core` module, held to the shared cases in `schema/neighborhoods/points.json`, and the whole file rides in the APK so the tab works with no signal. One Android caveat worth stating: that app only ever asks for a coarse location, which Android fuzzes onto a grid of a kilometre or two, so "Your neighborhood" there can name the neighborhood next door — a typed ZIP is the exact way to ask. `data/indicators/greenway_access.json` comes from `pipeline/src/access-report.ts`: after a bundle build, run `npx tsx src/access-report.ts` from `pipeline/` (there is no pnpm script for it).
+
+**Table or chart (2026-09-22).** Every by-year panel with three years of numbers in it can be read as a table or
+as a picture, and **Table is the default**: the table carries every number, and the picture carries none the table
+does not. The chart is **one pair of axes with a line per series** — homes sold and building permits together, at
+Kyle's request, because reading them apart was the thing the panel exists to prevent. One y-axis, never two: two
+scales on one chart is a way of making any two lines say whatever you like, and both of these are counts of the
+same kind. The key is **two real toggles** (checkboxes on the web and Android, switches on the iPhone), both on to
+begin with, either switchable off, and **never both**: the last one on is disabled and the panel says "One line
+has to stay on." Each line is told apart by three things at once — its colour, the shape of its point (a circle
+and a diamond) and the pattern of its line (solid and dashed) — so the two are still two in grayscale, in print,
+under forced colours and to a reader who sees no difference between the hues. Years run across, counts up from
+zero, ticks at round numbers, and **no trend line, no whole-city line and no other neighborhood anywhere on it**.
+
+**A count the pipeline hid is visible and is not a value** (Kyle, 2026-09-22: "the graphs are not showing counts
+fewer than 5"). It is a HOLLOW marker of the series' own shape at a fixed height — a tenth of the plot, the same
+constant on all three apps, always below the first tick over zero — and the line runs on through it as a dotted
+piece, so the year is plainly there, its number is plainly not, and the gap never reads as a zero. The axis is
+built so that it never labels a value between 0 and 5, and there is no code path from a hidden count to a length.
+Since the change to honesty rule 2 above, the series that can still carry one are blight tickets, demolitions,
+reported problems and fires; sales and permits state their number.
+
+The chart shows **counts**; prices and permit costs stay in the table, and the chart view says so in one line.
+Every point carries its own accessible name — "2023, Homes sold: 14" — and its value on hover and on keyboard
+focus. The model (points, segments, markers, ticks, the summary sentence) is `apps/web/src/hoodchart.ts`, ported
+case for case to `HelpCore/HoodChart.swift` and to `hoodChartModel` in Android's `Hoods.kt`, and held to the same
+cases in all three test suites. It is drawn with no library anywhere: inline SVG on the web (which carries a
+`<title>` per point and prints), Swift Charts on the iPhone (for the VoiceOver audio graph the framework gives for
+free), and a plain `Canvas` on Android with one `AccessibilityNodeProvider` node per point.
 
 ## Order of work
 

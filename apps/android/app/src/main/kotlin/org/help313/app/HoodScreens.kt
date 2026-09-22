@@ -17,6 +17,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
+import android.graphics.RectF
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -24,7 +26,12 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityNodeProvider
 import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import org.help313.query.BundleRow
 import org.help313.query.LatLon
@@ -360,6 +367,8 @@ object HoodScreens {
     // ---- one neighborhood -----------------------------------------------------------------------------------
 
     fun page(a: MainActivity, id: String): View {
+        yearGroups.clear()
+        seriesOff.clear()
         HoodRepo.onChange = { a.render() }
         HoodRepo.want(a.store)
         val d = HoodRepo.data
@@ -499,6 +508,203 @@ object HoodScreens {
         return hoodNearestListing(h, kind) { id -> rows.firstOrNull { it.id == id } }
     }
 
+
+    // ---- table or chart (2026-09-22) --------------------------------------------------------------------------
+
+    /**
+     * One group of year panels: the Table | Chart control, then the picture or the tables.
+     *
+     * **The table is never traded away for a picture.** With TalkBack running it stays under the chart, because an
+     * Android view that is not on the screen is not in the accessibility tree either — there is no "read it but do
+     * not show it" here the way the web's `.vh` class has one. That is also why Table is the default: it is the
+     * view that carries every number.
+     *
+     * The control appears only where a chart could say something: three years with something in them and at least
+     * one number to draw ([hoodChartable]). A neighborhood with two years of sales keeps its table.
+     *
+     * Only the body is rebuilt when the choice changes, never the whole screen, so the radio that was just chosen
+     * keeps the focus and nothing above it moves.
+     */
+    private fun yearGroup(
+        a: MainActivity,
+        col: LinearLayout,
+        chartNameKey: String,
+        h: Hood,
+        d: Indicators,
+        series: List<HoodSeriesSpec>,
+        tables: (LinearLayout) -> Unit,
+    ) {
+        val drawable = series
+            .map { HoodSeries(it.key, it.tone, it.label, hoodChartSeries(h, d, it.count)) }
+            .filter { hoodChartable(it.points) }
+        if (drawable.isEmpty()) {
+            tables(col)
+            return
+        }
+
+        col.addView(UI.text(a, L.t("hood.view_label"), 15f, R.color.muted, topDp = 12))
+        val group = RadioGroup(a)
+        group.orientation = RadioGroup.HORIZONTAL
+        group.contentDescription = L.t("hood.view_label")
+        val body = UI.column(a)
+
+        fun draw() {
+            body.removeAllViews()
+            if (MapModel.hoodView(a) == HoodViewChoice.CHART) chart(a, body, chartNameKey, drawable, tables) else tables(body)
+        }
+
+        val buttons = ArrayList<RadioButton>()
+        for (choice in listOf(HoodViewChoice.TABLE, HoodViewChoice.CHART)) {
+            val b = RadioButton(a)
+            b.id = View.generateViewId()
+            b.text = L.t("hood.view_" + if (choice == HoodViewChoice.TABLE) "table" else "chart")
+            b.setTextColor(UI.color(a, R.color.ink))
+            b.buttonTintList = android.content.res.ColorStateList.valueOf(UI.color(a, R.color.brand))
+            b.minimumHeight = UI.dp(a, 48)
+            b.setPaddingRelative(UI.dp(a, 6), UI.dp(a, 6), UI.dp(a, 16), UI.dp(a, 6))
+            // Which view is on is in the words a screen reader reads, not only in the dot beside them.
+            b.contentDescription = joinParts(listOf(L.t("hood.view_label"), b.text.toString()))
+            buttons.add(b)
+            group.addView(b)
+            if (MapModel.hoodView(a) == choice) group.check(b.id)
+        }
+        // One choice covers every panel on the page, so every other panel is redrawn too — and its own radios are
+        // moved to match, without their listener firing back (`syncing`). Only the bodies are rebuilt: the radio
+        // that was just tapped keeps the focus and nothing above it moves.
+        yearGroups.add {
+            syncing = true
+            group.check(buttons[if (MapModel.hoodView(a) == HoodViewChoice.CHART) 1 else 0].id)
+            syncing = false
+            draw()
+        }
+        group.setOnCheckedChangeListener { _, checkedId ->
+            if (syncing) return@setOnCheckedChangeListener
+            val next = if (buttons[1].id == checkedId) HoodViewChoice.CHART else HoodViewChoice.TABLE
+            MapModel.setHoodView(a, next)
+            for (redraw in yearGroups.toList()) redraw()
+            group.announceForAccessibility(
+                L.t("hood.view_say", "name" to L.t("hood.view_" + if (next == HoodViewChoice.CHART) "chart" else "table")),
+            )
+        }
+        col.addView(group)
+        col.addView(body)
+        draw()
+    }
+
+    /**
+     * Every year group drawn on the page that is open, so that one Table | Chart choice moves all of them at once
+     * — there is one flag, not one per panel (docs/13, 2026-09-22). Cleared when a page is built; a page that is
+     * thrown away takes its closures with it.
+     */
+    private val yearGroups = ArrayList<() -> Unit>()
+    /**
+     * Which chart lines are switched off, on the page that is open. A way of looking at a page, never a fact
+     * about anybody: memory only, cleared when a page is built, never written down and never sent.
+     */
+    private val seriesOff = HashSet<String>()
+
+    /** One series a panel can draw: its key, which identity it wears, its name, and which count it reads. */
+    private class HoodSeriesSpec(
+        val key: String,
+        val tone: HoodTone,
+        val label: String,
+        val count: (HoodYear) -> HoodCount?,
+    )
+    /** True while a radio is being moved to match the flag, so its listener does not write the flag back. */
+    private var syncing = false
+
+    /** The picture, the key under it, and the sentence that says what it shows. */
+    private fun chart(
+        a: MainActivity,
+        body: LinearLayout,
+        chartNameKey: String,
+        drawable: List<HoodSeries>,
+        tables: (LinearLayout) -> Unit,
+    ) {
+        val shown = hoodShownSeries(drawable, seriesOff)
+        val m = hoodChartModel(shown)
+        val card = UI.card(a, topDp = 8)
+        card.contentDescription = L.t(
+            chartNameKey,
+            "from" to (m.years.firstOrNull() ?: ""),
+            "to" to (m.years.lastOrNull() ?: ""),
+        )
+        val view = HoodChartView(a, m) { tone -> UI.color(a, if (tone == HoodTone.A) R.color.chart_a else R.color.chart_b) }
+        val p = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        p.topMargin = UI.dp(a, 4)
+        view.layoutParams = p
+        card.addView(view)
+
+        // The key: one real checkbox per line, with its own sample. The last one left on is disabled and the line
+        // under it says why, so the chart can never become an empty pair of axes. One line needs no key at all —
+        // the panel's own name already says what is drawn.
+        if (drawable.size > 1) {
+            card.addView(UI.text(a, L.t("hood.chart_show"), 14f, R.color.muted, topDp = 10))
+            for (s in drawable) {
+                val on = shown.any { it.key == s.key }
+                val only = on && shown.size == 1
+                val box = android.widget.CheckBox(a)
+                box.text = s.label
+                box.isChecked = on
+                box.isEnabled = !only
+                box.setTextColor(UI.color(a, if (only) R.color.muted else R.color.ink))
+                box.buttonTintList = android.content.res.ColorStateList.valueOf(UI.color(a, R.color.brand))
+                box.minimumHeight = UI.dp(a, 48)
+                box.contentDescription = joinParts(listOf(L.t("hood.chart_show"), s.label, if (only) L.t("hood.chart_only_one") else null))
+                box.setOnCheckedChangeListener { _, checked ->
+                    if (checked) seriesOff.remove(s.key) else seriesOff.add(s.key)
+                    box.announceForAccessibility(
+                        L.t(if (checked) "hood.chart_series_on" else "hood.chart_series_off", "name" to s.label),
+                    )
+                    body.removeAllViews()
+                    chart(a, body, chartNameKey, drawable, tables)
+                }
+                val row = LinearLayout(a)
+                row.orientation = LinearLayout.HORIZONTAL
+                row.gravity = android.view.Gravity.CENTER_VERTICAL
+                row.addView(box)
+                row.addView(swatch(a, UI.color(a, if (s.tone == HoodTone.A) R.color.chart_a else R.color.chart_b), s.tone, hollow = false))
+                card.addView(row)
+            }
+            if (shown.size == 1) card.addView(UI.text(a, L.t("hood.chart_only_one"), 14f, R.color.muted, topDp = 2))
+        }
+        if (m.series.any { it.markers.isNotEmpty() }) {
+            card.addView(keyRow(a, UI.color(a, R.color.muted), L.t("hood.chart_lt5"), HoodTone.A, hollow = true))
+        }
+        card.addView(UI.text(a, hoodChartSummary(m) { k, args -> L.t(k, args) }, 14f, R.color.muted, topDp = 10))
+        body.addView(card)
+        // With TalkBack on, the table stays under the picture: it is the source of truth and is never hidden.
+        if (touchExploration(a)) tables(body)
+    }
+
+    private fun keyRow(a: MainActivity, color: Int, words: String, tone: HoodTone, hollow: Boolean): View {
+        val row = LinearLayout(a)
+        row.orientation = LinearLayout.HORIZONTAL
+        row.gravity = android.view.Gravity.CENTER_VERTICAL
+        val p = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        p.topMargin = UI.dp(a, 6)
+        row.layoutParams = p
+        row.addView(swatch(a, color, tone, hollow))
+        row.addView(UI.text(a, words, 14f, R.color.muted))
+        return row
+    }
+
+    /** The series' own marker, drawn at key size. */
+    private fun swatch(a: MainActivity, color: Int, tone: HoodTone, hollow: Boolean): View {
+        val v = HoodKeySwatch(a, color, tone, hollow)
+        val p = LinearLayout.LayoutParams(UI.dp(a, 16), UI.dp(a, 16))
+        p.marginEnd = UI.dp(a, 8)
+        p.marginStart = UI.dp(a, 2)
+        v.layoutParams = p
+        return v
+    }
+
+    /** Whether a screen reader is exploring by touch, which is when the tables stay under the pictures. */
+    private fun touchExploration(a: MainActivity): Boolean {
+        val m = a.getSystemService(Context.ACCESSIBILITY_SERVICE) as? android.view.accessibility.AccessibilityManager
+        return m?.isTouchExplorationEnabled == true
+    }
+
     // ---- "Building, and whether people can stay" ---------------------------------------------------------------
 
     /**
@@ -508,15 +714,33 @@ object HoodScreens {
     private fun moneyPanel(a: MainActivity, col: LinearLayout, h: Hood, d: Indicators) {
         col.addView(UI.sectionHead(a, L.t("hood.money_head")))
         col.addView(UI.text(a, L.t("hood.money_lede"), 16f, R.color.ink))
-        yearTable(
-            a, col, L.t("hood.sales_caption"), L.t("hood.median"), L.t("hood.sales"), L.t("hood.too_few"),
-            hoodYearRows(h, d, { it.medianPrice }, count = { it.sales }),
-        ) { hoodMoney(it) }
-        yearTable(
-            a, col, L.t("hood.permits_caption"), L.t("hood.permit_cost"), L.t("hood.permits"), L.t("hood.too_few_permits"),
-            hoodYearRows(h, d, { it.permitCost }, count = { it.permits }),
-        ) { hoodBigMoney(it) }
+        yearGroup(
+            a, col, "hood.chart_name_money", h, d,
+            listOf(
+                HoodSeriesSpec("sales", HoodTone.A, L.t("hood.sales")) { y: HoodYear -> y.sales },
+                HoodSeriesSpec("permits", HoodTone.B, L.t("hood.permits")) { y: HoodYear -> y.permits },
+            ),
+        ) { into ->
+            yearTable(
+                a, into, L.t("hood.sales_caption"), L.t("hood.median"), L.t("hood.sales"), L.t("hood.too_few"),
+                hoodYearRows(h, d, { it.medianPrice }, count = { it.sales }),
+            ) { hoodMoney(it) }
+            yearTable(
+                a, into, L.t("hood.permits_caption"), L.t("hood.permit_cost"), L.t("hood.permits"), L.t("hood.too_few_permits"),
+                hoodYearRows(h, d, { it.permitCost }, count = { it.permits }),
+            ) { hoodBigMoney(it) }
+        }
         col.addView(UI.text(a, L.t("hood.money_note"), 14f, R.color.muted, topDp = 10))
+        col.addView(UI.text(a, L.t("hood.small_numbers"), 14f, R.color.muted, topDp = 6))
+        // Where the prices went: the picture counts homes and permits, the table keeps the money. It appears and
+        // disappears with the choice, so it is registered alongside the panels rather than fixed at build time.
+        val moneyNote = UI.text(a, L.t("hood.chart_money_note"), 14f, R.color.muted, topDp = 6)
+        fun syncMoneyNote() {
+            moneyNote.visibility = if (MapModel.hoodView(a) == HoodViewChoice.CHART) View.VISIBLE else View.GONE
+        }
+        syncMoneyNote()
+        yearGroups.add { syncMoneyNote() }
+        col.addView(moneyNote)
         if (d.sources["rentals"] != null) {
             col.addView(
                 pairRow(
@@ -534,26 +758,34 @@ object HoodScreens {
         if (d.sources["blight"] == null) return
         col.addView(UI.sectionHead(a, L.t("hood.cond_head")))
         col.addView(UI.text(a, L.t("hood.cond_lede"), 16f, R.color.ink))
-        yearTable(
-            a, col, L.t("hood.blight_caption"), L.t("hood.blight_rate"), L.t("hood.blight"), L.t("hood.too_few_permits"),
-            hoodYearRows(h, d, { hoodRate(it.blight, h.parcels) }, { hoodRate(it.blight, d.cityParcels) }, { it.blight }),
-        ) { hoodFixed(it, 0) }
+        yearGroup(a, col, "hood.chart_name_blight", h, d, listOf(HoodSeriesSpec("blight", HoodTone.A, L.t("hood.blight")) { y: HoodYear -> y.blight })) { into ->
+            yearTable(
+                a, into, L.t("hood.blight_caption"), L.t("hood.blight_rate"), L.t("hood.blight"), L.t("hood.too_few_permits"),
+                hoodYearRows(h, d, { hoodRate(it.blight, h.parcels) }, { hoodRate(it.blight, d.cityParcels) }, { it.blight }),
+            ) { hoodFixed(it, 0) }
+        }
         col.addView(UI.text(a, L.t("hood.blight_note"), 14f, R.color.muted, topDp = 6))
-        yearTable(
-            a, col, L.t("hood.demo_caption"), L.t("hood.demolitions"), null, L.t("hood.lt5_or_none"),
-            hoodYearRows(h, d, { it.demolitions?.value?.toDouble() }),
-        ) { hoodNumber(it) }
-        yearTable(
-            a, col, L.t("hood.issues_caption"), L.t("hood.issue_days"), L.t("hood.issues"), L.t("hood.too_few_permits"),
-            hoodYearRows(h, d, { it.issueDays }, count = { it.issues }),
-        ) { L.t("hood.days", "n" to hoodNumber(it)) }
+        yearGroup(a, col, "hood.chart_name_demo", h, d, listOf(HoodSeriesSpec("demo", HoodTone.A, L.t("hood.demolitions")) { y: HoodYear -> y.demolitions })) { into ->
+            yearTable(
+                a, into, L.t("hood.demo_caption"), L.t("hood.demolitions"), null, L.t("hood.lt5_or_none"),
+                hoodYearRows(h, d, { it.demolitions?.value?.toDouble() }),
+            ) { hoodNumber(it) }
+        }
+        yearGroup(a, col, "hood.chart_name_issues", h, d, listOf(HoodSeriesSpec("issues", HoodTone.A, L.t("hood.issues")) { y: HoodYear -> y.issues })) { into ->
+            yearTable(
+                a, into, L.t("hood.issues_caption"), L.t("hood.issue_days"), L.t("hood.issues"), L.t("hood.too_few_permits"),
+                hoodYearRows(h, d, { it.issueDays }, count = { it.issues }),
+            ) { L.t("hood.days", "n" to hoodNumber(it)) }
+        }
         col.addView(UI.text(a, L.t("hood.issues_note", "types" to d.issueTypes.joinToString(L.t("list.sep"))), 14f, R.color.muted, topDp = 6))
 
         if (d.sources["fires"] != null) {
-            yearTable(
-                a, col, L.t("hood.fire_caption"), L.t("hood.blight_rate"), L.t("hood.fires"), L.t("hood.too_few_permits"),
-                hoodYearRows(h, d, { hoodRate(it.fires, h.parcels) }, { hoodRate(it.fires, d.cityParcels) }, { it.fires }),
-            ) { hoodFixed(it, 1) }
+            yearGroup(a, col, "hood.chart_name_fires", h, d, listOf(HoodSeriesSpec("fires", HoodTone.A, L.t("hood.fires")) { y: HoodYear -> y.fires })) { into ->
+                yearTable(
+                    a, into, L.t("hood.fire_caption"), L.t("hood.blight_rate"), L.t("hood.fires"), L.t("hood.too_few_permits"),
+                    hoodYearRows(h, d, { hoodRate(it.fires, h.parcels) }, { hoodRate(it.fires, d.cityParcels) }, { it.fires }),
+                ) { hoodFixed(it, 1) }
+            }
             col.addView(UI.text(a, L.t("hood.fire_note"), 14f, R.color.muted, topDp = 6))
             col.addView(UI.text(a, L.t("hood.fire_types"), 14f, R.color.muted, topDp = 6))
             col.addView(UI.text(a, d.fireTypes.joinToString(L.t("list.sep")), 14f, R.color.muted, topDp = 2))
@@ -821,5 +1053,247 @@ object HoodScreens {
         rest.layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, (1.0 - width).toFloat())
         line.addView(rest)
         return line
+    }
+}
+
+// ---- a year panel drawn as a picture (docs/13, 2026-09-22) -----------------------------------------------------
+
+/**
+ * The whole chart: one pair of axes, one line per series switched on, a point at every year, and a hollow marker
+ * at every year the pipeline hid. A plain [View] with a [Canvas] and no library at all, like every other drawing
+ * in this app (the map, the outline above).
+ *
+ * **TalkBack gets a node per point**, not one picture: "2023, Homes sold: 14", "2021, Torn down: fewer than 5",
+ * through the platform [AccessibilityNodeProvider] — the same mechanism MapView uses, for the same reason (there
+ * is no AndroidX here). The table is still on the screen under it whenever TalkBack is running.
+ *
+ * A year the pipeline hid is NOT at a value: it is a HOLLOW marker at a fixed height ([HOOD_MARKER_FRACTION], the
+ * same constant on all three apps), below the first tick over zero, and the line goes on through it as a dotted
+ * piece — so the year is visibly there, its number is visibly not, and the gap never reads as a zero.
+ */
+private class HoodChartView(
+    context: Context,
+    private val model: HoodChartModel,
+    private val colorOf: (HoodTone) -> Int,
+) : View(context) {
+
+    private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+    private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
+    private val ink = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val nodes = Nodes()
+    private var accessibilityFocus = Int.MIN_VALUE
+    /** Every point on the chart, in reading order, with where it was last drawn — for the TalkBack nodes. */
+    private val marks = ArrayList<Pair<HoodSeriesModel, HoodPlotPoint>>()
+    private val boxes = ArrayList<Rect>()
+
+    init {
+        isFocusable = false
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+        contentDescription = L.t("hood.chart_plot")
+    }
+
+    override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+        val w = MeasureSpec.getSize(widthSpec)
+        // Taller at a large font scale, because the year labels and the tick labels grow with the text.
+        val scale = resources.configuration.fontScale.coerceIn(1f, 2f)
+        setMeasuredDimension(w, (resources.displayMetrics.density * 130f * scale).toInt())
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        marks.clear()
+        boxes.clear()
+        val dp = resources.displayMetrics.density
+        val text = 12f * dp * resources.configuration.fontScale.coerceIn(1f, 2f)
+        ink.textSize = text
+        val gutter = ink.measureText(hoodNumber(model.top)) + 6f * dp
+        val bottom = height - (text + 6f * dp)
+        val plot = bottom - 6f * dp
+        val left = gutter + 8f * dp
+        val right = width - 8f * dp
+
+        // The grid: hairline, solid, one step off the surface. The data is the only loud thing on here.
+        stroke.strokeWidth = 1f * dp
+        stroke.pathEffect = null
+        stroke.color = UI.color(context, R.color.line)
+        ink.color = UI.color(context, R.color.muted)
+        ink.textAlign = Paint.Align.RIGHT
+        for (t in model.ticks) {
+            val y = bottom - (t.toFloat() / model.top) * plot
+            canvas.drawLine(gutter, y, right, y, stroke)
+            canvas.drawText(hoodNumber(t), gutter - 4f * dp, y + text * 0.35f, ink)
+        }
+
+        val n = maxOf(1, model.years.size)
+        fun xOf(i: Int) = if (n == 1) (left + right) / 2f else left + i * (right - left) / (n - 1)
+        fun yOf(frac: Double) = bottom - (frac * plot).toFloat()
+
+        // The lines first, so the points sit on top of them.
+        for (s in model.series) {
+            stroke.color = colorOf(s.tone)
+            for (g in s.segments) {
+                val a = s.points[g.from]
+                val b = s.points[g.to]
+                stroke.strokeWidth = if (g.dotted) 1.5f * dp else 2f * dp
+                stroke.pathEffect = when {
+                    g.dotted -> android.graphics.DashPathEffect(floatArrayOf(1f * dp, 3f * dp), 0f)
+                    s.tone == HoodTone.B -> android.graphics.DashPathEffect(floatArrayOf(7f * dp, 4f * dp), 0f)
+                    else -> null
+                }
+                canvas.drawLine(xOf(a.index), yOf(a.frac), xOf(b.index), yOf(b.frac), stroke)
+            }
+        }
+        stroke.pathEffect = null
+
+        val r = 4f * dp
+        for (s in model.series) {
+            for (p in s.points) {
+                if (p.kind == HoodPointKind.NONE) continue
+                val x = xOf(p.index)
+                val y = yOf(p.frac)
+                val hollow = p.kind == HoodPointKind.HIDDEN
+                fill.color = if (hollow) UI.color(context, R.color.surface) else colorOf(s.tone)
+                stroke.color = colorOf(s.tone)
+                stroke.strokeWidth = 1.5f * dp
+                if (s.tone == HoodTone.A) {
+                    canvas.drawCircle(x, y, r, fill)
+                    if (hollow) canvas.drawCircle(x, y, r, stroke)
+                } else {
+                    val path = Path()
+                    path.moveTo(x, y - r); path.lineTo(x + r, y); path.lineTo(x, y + r); path.lineTo(x - r, y); path.close()
+                    canvas.drawPath(path, fill)
+                    if (hollow) canvas.drawPath(path, stroke)
+                }
+                marks.add(s to p)
+                // A touch target a finger can find, not the 8dp dot itself.
+                val pad = 14f * dp
+                boxes.add(Rect((x - pad).toInt(), (y - pad).toInt(), (x + pad).toInt(), (y + pad).toInt()))
+            }
+        }
+
+        // The years under the axis, thinned so none is drawn over its neighbour, and never off the edge.
+        var shown = hoodAxisYears(model.years)
+        if (resources.configuration.fontScale > 1.3f && shown.size > 3) {
+            shown = listOf(shown.first(), shown[shown.size / 2], shown.last())
+        }
+        ink.textAlign = Paint.Align.CENTER
+        for ((i, y) in model.years.withIndex()) {
+            if (y !in shown) continue
+            val half = ink.measureText(y) / 2f
+            canvas.drawText(y, xOf(i).coerceIn(half + 1f * dp, width - half - 1f * dp), height - 2f * dp, ink)
+        }
+        // The axis itself, over the feet of everything.
+        stroke.color = UI.color(context, R.color.muted)
+        stroke.strokeWidth = 1f * dp
+        canvas.drawLine(gutter, bottom, right, bottom, stroke)
+    }
+
+    override fun getAccessibilityNodeProvider(): AccessibilityNodeProvider = nodes
+
+    /** One virtual node per point, in the order the series and years run. */
+    private inner class Nodes : AccessibilityNodeProvider() {
+
+        private val host = View.NO_ID
+
+        override fun createAccessibilityNodeInfo(virtualViewId: Int): AccessibilityNodeInfo? {
+            if (virtualViewId == host) {
+                val node = AccessibilityNodeInfo.obtain(this@HoodChartView)
+                onInitializeAccessibilityNodeInfo(node)
+                for (i in marks.indices) node.addChild(this@HoodChartView, i)
+                return node
+            }
+            val mark = marks.getOrNull(virtualViewId) ?: return null
+            val node = AccessibilityNodeInfo.obtain(this@HoodChartView, virtualViewId)
+            node.packageName = context.packageName
+            node.className = TextView::class.java.name
+            node.contentDescription = hoodPointText(mark.second, mark.first.label) { k, args -> L.t(k, args) }
+            node.setParent(this@HoodChartView)
+            node.setSource(this@HoodChartView, virtualViewId)
+            node.isEnabled = true
+            node.isFocusable = true
+            node.isVisibleToUser = true
+            node.addAction(
+                if (accessibilityFocus == virtualViewId) {
+                    AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS
+                } else {
+                    AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS
+                },
+            )
+            node.isAccessibilityFocused = accessibilityFocus == virtualViewId
+            val r = boxes.getOrNull(virtualViewId) ?: Rect(0, 0, width, height)
+            @Suppress("DEPRECATION")
+            node.setBoundsInParent(r)
+            val offset = IntArray(2)
+            getLocationOnScreen(offset)
+            node.setBoundsInScreen(Rect(r.left + offset[0], r.top + offset[1], r.right + offset[0], r.bottom + offset[1]))
+            return node
+        }
+
+        override fun performAction(virtualViewId: Int, action: Int, arguments: android.os.Bundle?): Boolean {
+            if (virtualViewId == host) return performAccessibilityAction(action, arguments)
+            if (marks.getOrNull(virtualViewId) == null) return false
+            return when (action) {
+                AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS -> {
+                    accessibilityFocus = virtualViewId
+                    send(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
+                    true
+                }
+                AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS -> {
+                    if (accessibilityFocus != virtualViewId) return false
+                    accessibilityFocus = Int.MIN_VALUE
+                    send(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED)
+                    true
+                }
+                else -> false
+            }
+        }
+
+        private fun send(id: Int, type: Int) {
+            if (!isShown) return
+            val event = AccessibilityEvent.obtain(type)
+            event.packageName = context.packageName
+            event.className = TextView::class.java.name
+            event.setSource(this@HoodChartView, id)
+            parent?.requestSendAccessibilityEvent(this@HoodChartView, event)
+        }
+    }
+}
+
+/**
+ * The little shape beside a line of the key: the series' own marker, drawn rather than filled, so the key looks
+ * like the picture it explains — a circle for the first line, a diamond for the second, hollow for "fewer than 5".
+ */
+private class HoodKeySwatch(
+    context: Context,
+    private val color: Int,
+    private val tone: HoodTone,
+    private val hollow: Boolean,
+) : View(context) {
+
+    private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+    private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+
+    init {
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        val dp = resources.displayMetrics.density
+        val cx = width / 2f
+        val cy = height / 2f
+        val r = minOf(width, height) / 2f - 1.5f * dp
+        fill.color = if (hollow) UI.color(context, R.color.surface) else color
+        stroke.color = color
+        stroke.strokeWidth = 1.5f * dp
+        if (tone == HoodTone.A) {
+            canvas.drawCircle(cx, cy, r, fill)
+            if (hollow) canvas.drawCircle(cx, cy, r, stroke)
+        } else {
+            val path = Path()
+            path.moveTo(cx, cy - r); path.lineTo(cx + r, cy); path.lineTo(cx, cy + r); path.lineTo(cx - r, cy); path.close()
+            canvas.drawPath(path, fill)
+            if (hollow) canvas.drawPath(path, stroke)
+        }
     }
 }

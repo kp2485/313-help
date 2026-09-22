@@ -321,9 +321,16 @@ final class HoodTests: XCTestCase {
         // Every id is an `nbh_` slug, exactly once (CLAUDE.md: ids are stable slugs and are never reused).
         XCTAssertTrue(d.neighborhoods.allSatisfy { $0.id.hasPrefix("nbh_") })
         XCTAssertEqual(Set(d.neighborhoods.map(\.id)).count, d.neighborhoods.count)
-        // And a hidden count really is in there, so the suppression path is exercised by the real file.
-        let hidden = d.neighborhoods.contains { h in h.years.values.contains { $0.sales == .suppressed } }
-        XCTAssertTrue(hidden, "the real file carries suppressed counts")
+        // Home sales and building permits state their real count, however small (Kyle, 2026-09-22 — DECISIONS):
+        // both are public transaction records, and hiding a 3 protected nobody. A hidden count is still in the
+        // file for the series that count what people did to a place rather than what they bought, so the
+        // suppression path is exercised by the real file either way.
+        XCTAssertFalse(d.neighborhoods.contains { h in h.years.values.contains { $0.sales == .suppressed || $0.permits == .suppressed } },
+                       "sales and permits no longer hide a small count")
+        XCTAssertTrue(d.neighborhoods.contains { h in h.years.values.contains { ($0.sales?.shown ?? 9) < 5 } },
+                      "and a small one really is stated")
+        XCTAssertTrue(d.neighborhoods.contains { h in h.years.values.contains { $0.demolitions == .suppressed || $0.blight == .suppressed } },
+                      "the real file still carries suppressed counts elsewhere")
     }
 
     /// The bundle's copy carries the outlines, so every one of the 205 can be drawn and searched. It is not

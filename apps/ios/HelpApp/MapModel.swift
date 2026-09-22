@@ -209,6 +209,11 @@ final class MapModel {
     // -- how the transport layers are drawn (docs/MAP-STYLE.md). `standard` is the default; the choice lives in the
     // same excluded-from-backup file as the layer list, is never sent, and is never in a report.
     private(set) var style: MapStyleChoice
+    // -- table or chart on a neighborhood's year panels (docs/13, 2026-09-22). Not about the map, but the same
+    // kind of fact — a way of showing something, chosen on this phone — so it lives in the same excluded-from-
+    // backup file, is never sent, and is never in a report. It is here because this is the object every screen
+    // already has, and there is one choice for the whole app.
+    private(set) var hoodView: HoodViewChoice
     /// The zoom band, with its 5 % hysteresis, so a pinch hovering on an edge does not flicker.
     private(set) var band: ZoomBand = .far
     private(set) var nets: [String: PreparedNet] = [:]
@@ -219,7 +224,7 @@ final class MapModel {
     @ObservationIgnored let board = SubwayBoard()
     @ObservationIgnored var lastSubwayTap: (at: CGPoint, hit: String)?
 
-    init() { layersOn = store.on; style = store.style }
+    init() { layersOn = store.on; style = store.style; hoodView = store.hoodView }
 
     // MARK: the style
     /// Applies at once. Nothing already held is loaded again; `subway` asks for the network files it needs
@@ -230,6 +235,13 @@ final class MapModel {
         style = next
         if next == .standard, isSubwaySelection { selection = nil }
     }
+    /// Applies at once, to every year panel on every neighborhood page.
+    func setHoodView(_ next: HoodViewChoice) {
+        guard next != hoodView else { return }
+        store.setHoodView(next)
+        hoodView = next
+    }
+
     private var isSubwaySelection: Bool {
         switch selection {
         case .line, .trunk, .station, .interchange, .hub: return true

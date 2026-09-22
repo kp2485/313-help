@@ -196,19 +196,24 @@ public final class MapLayerStore {
     /// under the same rules: on this phone only, never in a backup, never sent. Anything that is not exactly
     /// "subway" reads as `standard`, which is the default.
     public private(set) var style: MapStyleChoice
+    /// Table or chart on a neighborhood's year panels (docs/13, 2026-09-22). It is not about the map at all, but
+    /// it is the same KIND of fact — a way of showing something, chosen on this phone — so it lives in the same
+    /// file under the same rules: this phone only, never in a backup, never sent. Anything that is not exactly
+    /// "chart" reads as `table`, which is the default.
+    public private(set) var hoodView: HoodViewChoice
 
     /// What the file holds since 2026-09-21. Before that it was a bare list of layer ids, which is still read.
-    private struct Saved: Codable { var on: [String]; var style: String? }
+    private struct Saved: Codable { var on: [String]; var style: String?; var hoodView: String? }
 
     public init(dir: URL) {
         file = dir.appendingPathComponent("map-layers.json")
         let d = DeviceState.read(file)
         if let d, let saved = try? JSONDecoder().decode(Saved.self, from: d) {
-            on = Array(saved.on.prefix(30)); style = mapStyle(saved.style)
+            on = Array(saved.on.prefix(30)); style = mapStyle(saved.style); hoodView = hoodViewChoice(saved.hoodView)
         } else if let d, let list = try? JSONDecoder().decode([String].self, from: d) {
-            on = list; style = .standard
+            on = list; style = .standard; hoodView = .table
         } else {
-            on = defaultMapLayers; style = .standard
+            on = defaultMapLayers; style = .standard; hoodView = .table
         }
     }
 
@@ -231,8 +236,15 @@ public final class MapLayerStore {
         return write()
     }
 
+    /// One choice for every year panel on every neighborhood page. Returns false only when it could not be written
+    /// down; the control still moves, because a preference that does not survive a relaunch is still a preference.
+    @discardableResult public func setHoodView(_ next: HoodViewChoice) -> Bool {
+        hoodView = next
+        return write()
+    }
+
     private func write() -> Bool {
-        guard let d = try? JSONEncoder().encode(Saved(on: on, style: style.rawValue)) else { return false }
+        guard let d = try? JSONEncoder().encode(Saved(on: on, style: style.rawValue, hoodView: hoodView.rawValue)) else { return false }
         do { try DeviceState.write(d, to: file); return true } catch { return false }
     }
 }

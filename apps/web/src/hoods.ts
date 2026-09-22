@@ -7,6 +7,7 @@
 // are drawn in ONE panel so neither is shown without the other; "none listed yet" describes our list, not the place.
 
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
+import { chartModel, chartSummary, chartSvg, chartable, shownSeries, type ChartPoint, type ChartSeries } from './hoodchart.js';
 import { groupHoods, matchHoods, type HoodOrder } from './hoodfind.js';
 import { isPrivate } from './needs.js';
 import { locale } from './i18n.js';
@@ -165,6 +166,74 @@ function yearsTable(h: Hood, d: Indicators, ui: Ui, o: { value: (y: YearStats) =
       return `<tr><th scope="row">${Number(y) === d.partial_year ? ui.esc(ui.t('hood.so_far', { year: y })) : y}</th><td>${v === undefined ? `<small>${ui.esc(o.missing)}</small>` : `<span class="bar" aria-hidden="true" style="width:${Math.max(3, Math.round((v / max) * 100))}%"></span><span>${ui.esc(o.fmt(v))}</span>`}</td>${o.count ? `<td>${ui.esc(count(o.count(h.years[y] ?? {})))}</td>` : ''}<td>${cv === undefined ? '' : ui.esc(o.fmt(cv))}</td></tr>`; }).join('')}</tbody></table>`;
 }
 
+// ---- table or chart (2026-09-22) --------------------------------------------------------------------------------
+
+/** Which way the year panels are drawn. **Table is the default**, and the table is in the page either way. */
+export type HoodView = 'table' | 'chart';
+/** Whatever was stored, read safely: only the exact word "chart" is chart; anything else is a table. */
+export const hoodView = (stored: unknown): HoodView => (stored === 'chart' ? 'chart' : 'table');
+export async function loadHoodView(): Promise<HoodView> { return hoodView(await idbGet<unknown>('hoodview')); }
+export async function saveHoodView(v: HoodView): Promise<HoodView> { const next = hoodView(v); await idbSet('hoodview', next); return next; }
+
+/** The years of one count, in the table's own order, ready for `chartModel`. */
+export function seriesOf(h: Hood, d: Indicators, count: (y: YearStats) => Count | undefined): ChartPoint[] {
+  return Object.keys(d.city).sort().map((y) => ({ year: y, count: count(h.years[y] ?? {}), partial: Number(y) === d.partial_year }));
+}
+
+/**
+ * Table | Chart: two real radio buttons in a named group, so the arrow keys already move between them and a screen
+ * reader says "radio button, 1 of 2". One choice covers every panel on the page (`main.ts` keeps it, in the same
+ * place as the map layer choices — on this device, never sent), and the cursor stays where it was after switching.
+ */
+function viewPick(ui: Ui, id: string, view: HoodView): string {
+  const radio = (v: HoodView) =>
+    `<label class="pick"><input type="radio" id="hv-${id}-${v}" name="hoodview-${id}" value="${v}" data-hoodview="${v}"${view === v ? ' checked' : ''}><span>${ui.esc(ui.t('hood.view_' + v))}</span></label>`;
+  return `<div class="viewpick" role="radiogroup" aria-label="${ui.esc(ui.t('hood.view_label'))}">${radio('table')}${radio('chart')}</div>`;
+}
+
+/**
+ * One group of year panels, drawn the way this device asked for.
+ *
+ * Whichever way that is, **the tables are in the page**: in chart view they are only visually hidden, and the
+ * picture points at them with `aria-describedby`, so a screen reader reaches every number without having to find
+ * the control first. The picture adds nothing the table does not already say.
+ *
+ * The control appears only when there is something a chart could show — three years with something in them and at
+ * least one number to draw (`chartable`). A neighborhood with two years of sales keeps its table and is offered
+ * nothing else.
+ */
+function yearGroup(ui: Ui, o: { id: string; view: HoodView; name: string; tables: string; series: ChartSeries[]; off: ReadonlySet<string> }): string {
+  const drawable = o.series.filter((s) => chartable(s.points));
+  if (!drawable.length) return o.tables;
+  const tables = `<div class="yeartables${o.view === 'chart' ? ' vh' : ''}" id="${o.id}-rows">${o.tables}</div>`;
+  if (o.view !== 'chart') return `${viewPick(ui, o.id, o.view)}${tables}`;
+
+  // One chart, one pair of axes, and only the series that are switched on — so the axis follows what is on the
+  // screen. `shownSeries` refuses to leave nothing: the last one on stays on.
+  // The set is keyed "<panel>:<series>", because two panels may name a series the same way.
+  const offHere = new Set(drawable.filter((sx) => o.off.has(`${o.id}:${sx.key}`)).map((sx) => sx.key));
+  const shown = shownSeries(drawable, offHere);
+  const m = chartModel(shown);
+  const years = drawable[0]!.points.map((p) => p.year);
+  const lastOn = shown.length === 1;
+  /** One key entry. With two series it is a real checkbox; with one there is nothing to choose. */
+  const toggle = (sx: ChartSeries) => {
+    const on = shown.some((x) => x.key === sx.key), only = on && lastOn;
+    return `<label class="keybox"><input type="checkbox" data-hoodseries="${o.id}:${sx.key}"${on ? ' checked' : ''}${only ? ' disabled aria-describedby="' + o.id + '-only"' : ''}><span class="sw t${sx.tone}" aria-hidden="true"></span>${ui.esc(sx.label)}</label>`;
+  };
+  const key = drawable.length > 1
+    ? `<fieldset class="chartkey"><legend>${ui.esc(ui.t('hood.chart_show'))}</legend>${drawable.map(toggle).join('')}</fieldset>
+       ${lastOn ? `<p class="foot" id="${o.id}-only">${ui.esc(ui.t('hood.chart_only_one'))}</p>` : ''}`
+    : '';
+  const marker = m.series.some((sx) => sx.markers.length)
+    ? `<ul class="chartkey plain"><li><span class="sw hollow" aria-hidden="true"></span>${ui.esc(ui.t('hood.chart_lt5'))}</li></ul>` : '';
+  return `${viewPick(ui, o.id, o.view)}
+    <figure class="hoodchart" role="group" aria-label="${ui.esc(ui.t(o.name, { from: years[0] ?? '', to: years[years.length - 1] ?? '' }))}" aria-describedby="${o.id}-sum ${o.id}-rows">
+      ${chartSvg(ui, m)}${key}${marker}
+      <figcaption class="foot" id="${o.id}-sum">${ui.esc(chartSummary(ui, m))}</figcaption>
+    </figure>${tables}`;
+}
+
 /** SEMCOG asks for this sentence wherever their data is reproduced, and it is theirs, so it stays in their
  *  words: the same English on an Arabic, Bengali or Spanish screen, marked `lang="en"` so a screen reader says
  *  it in an English voice (WCAG 3.1.2), never machine-translated. The year is the year of the crash layer we
@@ -222,8 +291,11 @@ export function nearestRow(h: Hood, ui: Ui, k: string): string {
   return `<li class="golink"><button ${ui.go({ v: 'detail', id: r.id })} aria-label="${label}"><span>${T(kind)}</span><span class="goto">${ui.own(r.name)} · ${ui.esc(distance)}</span></button></li>`;
 }
 
-export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
+export function hoodPage(h: Hood, d: Indicators, ui: Ui, view: HoodView = 'table', off: ReadonlySet<string> = new Set()): string {
   const T = (k: string, p?: Record<string, string | number>) => ui.esc(ui.t(k, p));
+  /** A count series for the chart view: the same column the table already prints, by year. */
+  const series = (key: string, tone: 'a' | 'b', label: string, count: (y: YearStats) => Count | undefined): ChartSeries =>
+    ({ key, tone, label: ui.t(label), points: seriesOf(h, d, count) });
   const near = (k: string) => nearestRow(h, ui, k);
   const cats = Object.entries(h.help.by).filter(([, n]) => n > 0);
   const src = (s: Source) => `<li>${ui.link(s.url, s.name)} <small>${T('hood.updated', { date: ui.date(s.last_edited) })}</small></li>`;
@@ -249,18 +321,26 @@ export function hoodPage(h: Hood, d: Indicators, ui: Ui): string {
     <p class="foot">${T('hood.snap_note')}</p>` : ''}
 
     <h2>${T('hood.money_head')}</h2><div class="panel"><p>${T('hood.money_lede')}</p>
-      ${yearsTable(h, d, ui, { value: (y) => y.median_price, count: (y) => y.sales, fmt: money, head: ui.t('hood.median'), countHead: ui.t('hood.sales'), missing: ui.t('hood.too_few'), caption: ui.t('hood.sales_caption') })}
-      ${yearsTable(h, d, ui, { value: (y) => y.permit_cost, count: (y) => y.permits, fmt: bigMoney, head: ui.t('hood.permit_cost'), countHead: ui.t('hood.permits'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.permits_caption') })}
+      ${yearGroup(ui, { id: 'money', view, name: 'hood.chart_name_money',
+        off, series: [series('sales', 'a', 'hood.sales', (y) => y.sales), series('permits', 'b', 'hood.permits', (y) => y.permits)],
+        tables: `${yearsTable(h, d, ui, { value: (y) => y.median_price, count: (y) => y.sales, fmt: money, head: ui.t('hood.median'), countHead: ui.t('hood.sales'), missing: ui.t('hood.too_few'), caption: ui.t('hood.sales_caption') })}
+      ${yearsTable(h, d, ui, { value: (y) => y.permit_cost, count: (y) => y.permits, fmt: bigMoney, head: ui.t('hood.permit_cost'), countHead: ui.t('hood.permits'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.permits_caption') })}` })}
       <p class="foot">${T('hood.money_note')}</p>
+      <p class="foot">${T('hood.small_numbers')}</p>
+      ${view === 'chart' ? `<p class="foot">${T('hood.chart_money_note')}</p>` : ''}
       ${d.sources.rentals ? `${row(T('hood.rentals'), per1000(h.now?.rental_certs), cityPer1000(d.city_now?.rental_certs))}<p class="foot">${T('hood.rentals_note')}</p>` : ''}</div>
 
     ${d.sources.blight ? `<h2>${T('hood.cond_head')}</h2><div class="panel"><p>${T('hood.cond_lede')}</p>
-      ${yearsTable(h, d, ui, { value: (y) => rate(y.blight, h.parcels), cityValue: (y) => rate(y.blight, d.city_parcels), count: (y) => y.blight, fmt: (n) => n.toFixed(0), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.blight'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.blight_caption') })}
+      ${yearGroup(ui, { id: 'blight', view, name: 'hood.chart_name_blight', off, series: [series('blight', 'a', 'hood.blight', (y) => y.blight)],
+        tables: yearsTable(h, d, ui, { value: (y) => rate(y.blight, h.parcels), cityValue: (y) => rate(y.blight, d.city_parcels), count: (y) => y.blight, fmt: (n) => n.toFixed(0), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.blight'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.blight_caption') }) })}
       <p class="foot">${T('hood.blight_note')}</p>
-      ${yearsTable(h, d, ui, { value: (y) => (typeof y.demolitions === 'number' ? y.demolitions : undefined), fmt: (n) => String(n), head: ui.t('hood.demolitions'), countHead: '', missing: ui.t('hood.lt5_or_none'), caption: ui.t('hood.demo_caption') })}
-      ${yearsTable(h, d, ui, { value: (y) => y.issue_days, count: (y) => y.issues, fmt: (n) => ui.t('hood.days', { n }), head: ui.t('hood.issue_days'), countHead: ui.t('hood.issues'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.issues_caption') })}
+      ${yearGroup(ui, { id: 'demo', view, name: 'hood.chart_name_demo', off, series: [series('demo', 'a', 'hood.demolitions', (y) => y.demolitions)],
+        tables: yearsTable(h, d, ui, { value: (y) => (typeof y.demolitions === 'number' ? y.demolitions : undefined), fmt: (n) => String(n), head: ui.t('hood.demolitions'), countHead: '', missing: ui.t('hood.lt5_or_none'), caption: ui.t('hood.demo_caption') }) })}
+      ${yearGroup(ui, { id: 'issues', view, name: 'hood.chart_name_issues', off, series: [series('issues', 'a', 'hood.issues', (y) => y.issues)],
+        tables: yearsTable(h, d, ui, { value: (y) => y.issue_days, count: (y) => y.issues, fmt: (n) => ui.t('hood.days', { n }), head: ui.t('hood.issue_days'), countHead: ui.t('hood.issues'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.issues_caption') }) })}
       <p class="foot">${slot(ui, 'hood.issues_note', 'types', (d.issue_types ?? []).join(', '))}</p>
-      ${d.sources.fires ? `${yearsTable(h, d, ui, { value: (y) => rate(y.fires, h.parcels), cityValue: (y) => rate(y.fires, d.city_parcels), count: (y) => y.fires, fmt: (n) => n.toFixed(1), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.fires'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.fire_caption') })}
+      ${d.sources.fires ? `${yearGroup(ui, { id: 'fires', view, name: 'hood.chart_name_fires', off, series: [series('fires', 'a', 'hood.fires', (y) => y.fires)],
+        tables: yearsTable(h, d, ui, { value: (y) => rate(y.fires, h.parcels), cityValue: (y) => rate(y.fires, d.city_parcels), count: (y) => y.fires, fmt: (n) => n.toFixed(1), head: ui.t('hood.blight_rate'), countHead: ui.t('hood.fires'), missing: ui.t('hood.too_few_permits'), caption: ui.t('hood.fire_caption') }) })}
       <p class="foot">${T('hood.fire_note')}</p><details class="foot"><summary>${T('hood.fire_types')}</summary><p>${ui.own((d.fire_types ?? []).join('; '))}</p></details>` : ''}
       ${d.sources.vacant ? `${row(T('hood.vacant', { from: ui.date(d.vacant_period?.[0] ?? ''), to: ui.date(d.vacant_period?.[1] ?? '') }), per1000(h.now?.vacant_reg), cityPer1000(d.city_now?.vacant_reg))}<p class="foot">${T('hood.vacant_note')}</p>` : ''}
       ${d.sources.pavement ? `${row(T('hood.roads', { from: d.roads_years?.[0] ?? '', to: d.roads_years?.[1] ?? '' }), roadsValue, cityRoads?.poor_pct !== undefined ? T('hood.city_pct', { pct: cityRoads.poor_pct }) : '')}<p class="foot">${T('hood.roads_note')}</p>` : ''}</div>` : ''}

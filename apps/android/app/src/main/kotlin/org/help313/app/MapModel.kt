@@ -191,6 +191,17 @@ object MapModel {
         version++
     }
 
+    // -- table or chart on a neighborhood's year panels (docs/13, 2026-09-22) -----------------------------------
+    // Not about the map, but it lives in the same file under the same rules, and this is the object every screen
+    // already reaches for. One choice for the whole app.
+
+    fun hoodView(context: Context): HoodViewChoice = layers(context).hoodView
+
+    fun setHoodView(context: Context, next: HoodViewChoice) {
+        layers(context).setHoodView(next)
+        version++
+    }
+
     // -- the map style -----------------------------------------------------------------------------------------
 
     fun style(context: Context): MapStyle = layers(context).style
