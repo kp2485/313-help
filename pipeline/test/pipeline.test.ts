@@ -243,6 +243,16 @@ describe('open-data ingester', () => {
     const ids = (fs: object[]) => Object.fromEntries(toRows(src, null, fs, '2026-09-18').rows.map((r) => [r.name, r.sal_id]));
     expect(ids([b, a])).toEqual(ids([a, b]));
   });
+  it('a two-field ref keeps two rows that share a name, and a renumbered layer keeps its ids (the City food map)', () => {
+    const food: Source = { id: 'city_food_map', name: 'x', kind: 'arcgis', url: 'x', id_prefix: 'cfm', fields: { name: 'Name', address: 'Address', ref: 'Name+Address' } };
+    const icna = (oid: number, addr: string) => feat({ OBJECTID: oid, Name: 'ICNA Relief Muslim Family Services', Address: addr });
+    const first = toRows(food, null, [icna(1, '1 Main'), icna(2, '9 Oak')], '2026-09-23');
+    expect(first.rows.map((r) => r.record_ref).sort()).toEqual(['ICNA Relief Muslim Family Services|1 Main', 'ICNA Relief Muslim Family Services|9 Oak']);
+    // The City overwrites the layer and the OBJECTIDs change: the ids must not.
+    const prior = { ids: new Map(first.rows.map((r) => [r.record_ref!, r.sal_id!])), retired: [] };
+    const again = toRows(food, null, [icna(40, '9 Oak'), icna(41, '1 Main')], '2026-09-24', prior);
+    expect(Object.fromEntries(again.rows.map((r) => [r.address_1, r.sal_id]))).toEqual(Object.fromEntries(first.rows.map((r) => [r.address_1, r.sal_id])));
+  });
   it('a layer that suddenly lost most of its rows does not overwrite the last good file', () => {
     expect(sharpDrop(40, 12)).toBe(true);
     expect(sharpDrop(40, 30)).toBe(false);
