@@ -57,6 +57,22 @@ export interface BoundaryStyle {
 export const BOUNDARY_NAME_CAP = 12, BOUNDARY_NAME_MIN_PX = 70;
 
 /**
+ * The Areas tab's map, where the outlines ARE the subject (Kyle, 2026-09-23: "the borders on the areas map should
+ * be more prominently visible on the selection map by default"). docs/MAP-STYLE.md 15.7.
+ *
+ * On the Map tab a boundary sits under the streets, dashed and thin. On the Areas map a person is choosing an
+ * outline, so the outline leads: **solid**, and heavier in every band (city 1.8 / 2.6, mid 2.4 / 3.2, near
+ * 3.0 / 3.6 — neighbourhood / city), while the streets under it are drawn in the quietened basemap (never under
+ * `prefers-contrast: more`). The tapped outline keeps `BOUNDARY_SELECTED_WIDTH`, its focus colour and its wash.
+ */
+const AREAS_MAP_WIDTHS: Record<BoundaryBand, [number, number]> = { city: [1.8, 2.6], mid: [2.4, 3.2], near: [3.0, 3.6] };
+export function areasMapBoundaryStyle(mpp: number): BoundaryStyle {
+  const s = boundaryStyle(mpp);
+  const [width, cityWidth] = AREAS_MAP_WIDTHS[s.band];
+  return { ...s, width, cityWidth, dash: [] };
+}
+
+/**
  * Band → style. The whole table, in one place.
  *
  * | band | m/px | neighbourhood | city | dash | names |
@@ -89,3 +105,4 @@ export function boundaryStyle(mpp: number): BoundaryStyle {
   if (band === 'mid') return { band, width: 1.6, cityWidth: 2.4, dash: [3, 3], names: true, nameCap: BOUNDARY_NAME_CAP, nameMinPx: BOUNDARY_NAME_MIN_PX };
   return { band, width: 2.2, cityWidth: 3, dash: [6, 3], names: true, nameCap: BOUNDARY_NAME_CAP, nameMinPx: BOUNDARY_NAME_MIN_PX };
 }
+

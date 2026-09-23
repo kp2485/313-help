@@ -97,8 +97,8 @@ fun stripStart(): StripScroll = StripScroll(StripState.OPEN, 0, 0)
  * - At the top of the page the strip is always open. Nothing else is honest: a person who has scrolled all the
  *   way back has asked for the map.
  * - Reading DOWN more than [AREAS_TURN_PX] past the last turn shuts it, so the page gets the whole screen.
- * - Scrolling UP more than [AREAS_TURN_PX] past the last turn opens it again — the moment the direction
- *   reverses, not only at the top, which is what every collapsing toolbar does and what Kyle asked for.
+ * - Scrolling back UP does NOT open it: the map returns only at the top of the page (Kyle, 2026-09-23). The
+ *   bar with Back and the name stays the whole time.
  *
  * [y] is in **dp**, not pixels: the turn threshold is a distance a thumb travels, and a pixel is a different
  * distance on every phone. The caller divides by the display density before it gets here.
@@ -112,5 +112,5 @@ fun stripAt(was: StripScroll, y: Int): StripScroll {
     val wasDown = was.pivot <= was.y
     val pivot = if (down == wasDown) was.pivot else was.y     // a turn moves the pivot to where it happened
     if (abs(top - pivot) < AREAS_TURN_PX) return StripScroll(was.state, top, pivot)
-    return StripScroll(if (down) StripState.SHUT else StripState.OPEN, top, pivot)
+    return StripScroll(if (down) StripState.SHUT else was.state, top, pivot)
 }

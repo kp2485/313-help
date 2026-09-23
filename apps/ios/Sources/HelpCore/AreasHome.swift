@@ -82,8 +82,8 @@ public func stripStart() -> StripScroll { StripScroll(state: .open, y: 0, pivot:
  - At the top of the page the strip is always open. Nothing else is honest: a person who has scrolled all the way
    back has asked for the map.
  - Reading DOWN more than `areasTurnPoints` past the last turn shuts it, so the page gets the whole screen.
- - Scrolling UP more than `areasTurnPoints` past the last turn opens it again — the moment the direction
-   reverses, not only at the top.
+ - Scrolling back UP does NOT open it: the map returns only at the top of the page (Kyle, 2026-09-23). The bar
+   with Back and the name stays the whole time.
  */
 public func stripAt(_ was: StripScroll, y: Double) -> StripScroll {
     let top = max(0, y)
@@ -94,7 +94,7 @@ public func stripAt(_ was: StripScroll, y: Double) -> StripScroll {
     let wasDown = was.pivot <= was.y
     let pivot = down == wasDown ? was.pivot : was.y          // a turn moves the pivot to where it happened
     if abs(top - pivot) < areasTurnPoints { return StripScroll(state: was.state, y: top, pivot: pivot) }
-    return StripScroll(state: down ? .shut : .open, y: top, pivot: pivot)
+    return StripScroll(state: down ? .shut : was.state, y: top, pivot: pivot)
 }
 
 // MARK: - the camera that frames one area

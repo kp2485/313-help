@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!--
+  Release. The same as Info.plist without the local-network exception: a released app talks to one HTTPS origin and
+  nothing else. The DC_ values come from the Release build configuration and are placeholders until Kyle sets them;
+  Scripts/preflight.sh fails the build while they are.
+-->
+<dict>
+	<key>DCRelease</key>
+	<string>$(DC_RELEASE)</string>
+	<key>DCBundleBase</key>
+	<string>$(DC_BUNDLE_BASE)</string>
+	<key>DCApiBase</key>
+	<string>$(DC_API_BASE)</string>
+	<key>DCPinnedKeys</key>
+	<array>
+		<string>$(DC_PIN_ACTIVE)</string>
+		<string>$(DC_PIN_SPARE)</string>
+	</array>
+	<!-- The app reads strings/<lang>.json itself, but iOS only offers a language in Locale.preferredLanguages
+	     when the app says it has it. These four are the files in strings/ (L.languages in Help.swift). -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>es</string>
+		<string>ar</string>
+		<string>bn</string>
+	</array>
+	<!-- The one scheme the app asks iOS about, so a listing can offer "Bus directions in the Transit app" only
+	     when that app is actually installed (Listing.swift, docs/research/2026-09-20/transit-app.md). Asking is a
+	     local question: nothing is sent, and nothing reaches transitapp.com until the person taps. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>transit</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location stays on this phone. It sorts the list by distance and centres the map near you, and is never saved or sent.</string>
+</dict>
+</plist>

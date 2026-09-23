@@ -136,3 +136,17 @@ final class LayerMigrationTests: XCTestCase {
         XCTAssertFalse(next.contains("help:0"), "the oldest is what gives way, not the boundaries")
     }
 }
+
+/// The Areas tab's selection map (docs/MAP-STYLE.md 15.7), the same cases as apps/web/test/boundaries.test.ts.
+final class AreasMapBoundaryStyleTests: XCTestCase {
+    func testSolidAndHeavierThanTheMapTabInEveryBand() {
+        for (mpp, width, cityWidth) in [(60.0, 1.8, 2.6), (20, 2.4, 3.2), (5, 3.0, 3.6)] {
+            let a = areasMapBoundaryStyle(mpp), m = boundaryStyle(mpp)
+            XCTAssertEqual(a.width, width); XCTAssertEqual(a.cityWidth, cityWidth); XCTAssertEqual(a.dash, [])
+            XCTAssertGreaterThan(a.width, m.width)
+            XCTAssertGreaterThan(a.cityWidth, a.width)
+            XCTAssertLessThan(a.cityWidth, boundarySelectedWidth)
+            XCTAssertEqual(a.band, m.band); XCTAssertEqual(a.names, m.names); XCTAssertEqual(a.nameCap, m.nameCap)
+        }
+    }
+}

@@ -75,8 +75,9 @@ export const stripStart = (): StripScroll => ({ state: 'open', y: 0, pivot: 0 })
  * - At the top of the page the strip is always open. Nothing else is honest: a person who has scrolled all the
  *   way back has asked for the map.
  * - Reading DOWN more than `AREAS_TURN_PX` past the last turn shuts it, so the page gets the whole screen.
- * - Scrolling UP more than `AREAS_TURN_PX` past the last turn opens it again — the moment the direction
- *   reverses, not only at the top, which is what every collapsing toolbar does and what Kyle asked for.
+ * - Scrolling back UP does NOT open it: the map returns only at the top of the page (Kyle, 2026-09-23: "when
+ *   the user starts scrolling back up the map should not begin appearing"). A person re-reading a panel keeps
+ *   the whole screen; the bar with Back and the name stays the whole time.
  *
  * Note what this is NOT: a scroll-position animation. `animation-timeline: scroll()` can tie a size to how far
  * down a page is, and that is a genuinely cheap way to shrink a header — but it cannot express "and come back
@@ -92,5 +93,5 @@ export function stripAt(was: StripScroll, y: number): StripScroll {
   const wasDown = was.pivot <= was.y;
   const pivot = down === wasDown ? was.pivot : was.y;      // a turn moves the pivot to where it happened
   if (Math.abs(top - pivot) < AREAS_TURN_PX) return { state: was.state, y: top, pivot };
-  return { state: down ? 'shut' : 'open', y: top, pivot };
+  return { state: down ? 'shut' : was.state, y: top, pivot };
 }

@@ -128,7 +128,7 @@ describe('what the Areas tab lands on', () => {
 // The collapsing strip
 // ---------------------------------------------------------------------------------------------------
 
-describe('the strip collapses as the page is read and comes back the moment it is not', () => {
+describe('the strip collapses as the page is read and comes back only at the top', () => {
   const walk = (ys: number[]) => ys.reduce<StripScroll[]>((acc, y) => [...acc, stripAt(acc[acc.length - 1] ?? stripStart(), y)], []);
 
   it('at the top of the page the map is always whole', () => {
@@ -137,21 +137,22 @@ describe('the strip collapses as the page is read and comes back the moment it i
     expect(stripAt({ state: 'shut', y: 900, pivot: 0 }, -40).state).toBe('open');   // a rubber-banded over-scroll
   });
 
-  it('reading down shuts it, turning round opens it again — not only at the top', () => {
+  it('reading down shuts it, and scrolling back up does not bring the map back until the top (Kyle, 2026-09-23)', () => {
     const down = walk([0, 40, 200, 600]);
     expect(down[down.length - 1]!.state).toBe('shut');
-    // Now up a little, still 500 px down the page: the map comes back.
-    const up = stripAt(stripAt(down[down.length - 1]!, 560), 520);
-    expect(up.state).toBe('open');
-    expect(up.y).toBe(520);
+    // All the way back up the page, a long way past any turn: still shut, right up to the last pixel.
+    let at = down[down.length - 1]!;
+    for (const y of [560, 520, 300, 100, 1]) { at = stripAt(at, y); expect(at.state, `at ${y}`).toBe('shut'); }
+    // The top is what opens it.
+    expect(stripAt(at, 0).state).toBe('open');
+    // And down again after a turn shuts it again.
+    expect(stripAt(stripAt(at, 40), 400).state).toBe('shut');
   });
 
-  it('a wobble at the end of a flick does not flap it: 8 px is the turn', () => {
+  it('a wobble at the start of a read does not shut it: 8 px is the threshold', () => {
     expect(AREAS_TURN_PX).toBe(8);
-    const shut = walk([0, 40, 400])[2]!;
-    expect(shut.state).toBe('shut');
-    expect(stripAt(shut, 396).state).toBe('shut');          // 4 px back is not a turn
-    expect(stripAt(stripAt(shut, 396), 390).state).toBe('open');   // 10 px back is
+    expect(stripAt(stripStart(), 4).state).toBe('open');     // 4 px down is not reading
+    expect(stripAt(stripAt(stripStart(), 4), 10).state).toBe('shut');   // 10 px is
   });
 
   it('it never moves the page: the machine answers with a state, and nothing else', () => {

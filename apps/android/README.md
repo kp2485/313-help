@@ -52,7 +52,8 @@ Three Gradle modules:
 >   lives in a field that dies with the launch and is written nowhere.
 > - **Tapping a polygon opens that area's page IN PLACE**, not as a pushed screen: the map becomes a strip 38 %
 >   of the viewport with Back at its top-start and the name beside it, and the page scrolls under it. Reading
->   down collapses the strip to a 48 dp bar; **turning round brings it back**, mid-page, on an 8 dp threshold
+>   down collapses the strip to a 48 dp bar; **only the top of the page brings it back** (Kyle, 2026-09-23 —
+>   until then turning round mid-page did), on an 8 dp threshold
 >   with a 320 ms settling period. `AreaStripLayout` is a plain `ViewGroup` coordinating an ordinary `ScrollView`
 >   — **no AndroidX CoordinatorLayout**, which this app could not use and which could not express "back the
 >   moment they turn round" anyway, because a scroll-range behaviour has no direction. The collapse is a layout

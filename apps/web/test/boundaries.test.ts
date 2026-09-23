@@ -15,7 +15,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   BOUNDARY_MID_MPP, BOUNDARY_NAME_CAP, BOUNDARY_NAME_MIN_PX, BOUNDARY_NEAR_MPP, BOUNDARY_SELECTED_WIDTH,
-  BOUNDARY_TOKEN, BOUNDARY_WASH_ALPHA, boundaryBand, boundaryStyle,
+  BOUNDARY_TOKEN, BOUNDARY_WASH_ALPHA, areasMapBoundaryStyle, boundaryBand, boundaryStyle,
 } from '../src/bounds.js';
 import { mapListHtml } from '../src/maplist.js';
 import { mapKeyHtml } from '../src/stylepanel.js';
@@ -288,5 +288,18 @@ describe('the boundaries in words', () => {
     }
     // And the only thing the layer store ever holds is the list of layer ids and its version marker.
     expect([...store.keys()].filter((k) => k !== 'layers' && k !== 'layers_v')).toEqual([]);
+  });
+});
+
+describe("the Areas tab's selection map draws the outlines as its subject (docs/MAP-STYLE.md 15.7)", () => {
+  it('is solid and heavier than the Map tab in every band, with the names rule unchanged', () => {
+    for (const [mpp, width, cityWidth] of [[60, 1.8, 2.6], [20, 2.4, 3.2], [5, 3.0, 3.6]] as const) {
+      const a = areasMapBoundaryStyle(mpp), m = boundaryStyle(mpp);
+      expect([a.width, a.cityWidth, a.dash]).toEqual([width, cityWidth, []]);
+      expect(a.width).toBeGreaterThan(m.width);
+      expect(a.cityWidth).toBeGreaterThan(a.width);                     // a city is still the heavier line
+      expect(a.cityWidth).toBeLessThan(BOUNDARY_SELECTED_WIDTH);        // and the tapped one is heavier still
+      expect([a.band, a.names, a.nameCap, a.nameMinPx]).toEqual([m.band, m.names, m.nameCap, m.nameMinPx]);
+    }
   });
 });

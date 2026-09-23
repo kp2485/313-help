@@ -103,8 +103,10 @@ final class AreasHomeParityTests: XCTestCase {
     /// The screen really asks for them. A string nobody reads is a string that quietly rots.
     func testTheAreasScreenAsksForThoseWords() throws {
         let screen = try text("apps/ios/HelpApp/HoodsScreen.swift") + (try text("apps/ios/HelpApp/CityPage.swift"))
+        // Not `hood.back_map`: on iPhone the area page's Back is the system's own (Kyle, 2026-09-23 — the strip's
+        // second Back under it was one too many). The web and Android, which have no system bar, still ask for it.
         for key in ["hood.switch_label", "hood.switch_map", "hood.switch_list", "hood.say_map", "hood.say_list",
-                    "hood.back_map", "hood.here_is", "hood.list_head"] {
+                    "hood.here_is", "hood.list_head"] {
             XCTAssertTrue(screen.contains("\"\(key)\""), "the Areas tab never asks for \(key)")
         }
     }

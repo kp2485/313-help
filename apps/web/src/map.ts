@@ -9,7 +9,7 @@ import type { Segment } from '@313help/query';
 import { fetchVerified, idbGet, idbSet, type BundleIndex } from './data.js';
 import { MAP_GROUPS, mapDrawable } from './needs.js';
 import type { MapStyle } from './layers.js';
-import { BOUNDARY_SELECTED_WIDTH, BOUNDARY_WASH_ALPHA, boundaryStyle } from './bounds.js';
+import { BOUNDARY_SELECTED_WIDTH, BOUNDARY_WASH_ALPHA, areasMapBoundaryStyle, boundaryStyle } from './bounds.js';
 import type { SubwayData, SubwayPainter } from './subway.js';
 
 // ---- world coordinates: flat projection around Detroit; one unit = one degree of latitude ----------------
@@ -1027,7 +1027,12 @@ export class MapView {
     const blocks = sub ? sub.begin({ c, w, h, s: this.s, cx: this.cx, cy: this.cy, overlays: this.spec.overlays ?? [], selection: this.sel, css, avoid: this.avoid,
       contrast: matchMedia('(forced-colors: active)').matches ? 'forced' : this.mqc.matches ? 'more' : 'plain',
       fontScale: Math.max(1, Math.min(1.5, (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16)) }) : [];
-    const quiet = !!sub?.quiet;
+    // The Areas tab's map (the one handed `onArea`) is about the outlines, so its streets are quietened too
+    // (docs/MAP-STYLE.md 15.7) — never under `prefers-contrast: more`, and never under forced colours, where the
+    // Map tab's dashed outline is kept because the dash is the only thing left that says "not a street".
+    const forced = matchMedia('(forced-colors: active)').matches;
+    const areasMap = !!this.spec.onArea && !forced;
+    const quiet = !!sub?.quiet || (areasMap && !this.mqc.matches);
     if (quiet) Object.assign(col, { park: css('--map-park-q'), parkInk: css('--map-park-ink-q'), road: css('--map-road-q'), main: css('--map-main-q'), fwy: css('--map-fwy-q'), ink: css('--map-ink-q') });
     c.lineCap = 'round'; c.lineJoin = 'round'; c.setLineDash([]);
     c.fillStyle = this.map ? col.out : col.land; c.fillRect(0, 0, w, h);
@@ -1098,7 +1103,7 @@ export class MapView {
     // and the greenway all sit above it. `boundaryStyle` (bounds.ts) is the whole table, shared with the ports.
     const areaLabels: { name: string; x: number; y: number; d: number }[] = [];
     if (this.areas.length) {
-      const bs = boundaryStyle(mpp);
+      const bs = areasMap ? areasMapBoundaryStyle(mpp) : boundaryStyle(mpp);
       const trace = (rings: Float32Array[]) => { c.beginPath(); for (const r of rings) { this.trace(r); c.closePath(); } };
       const shown = this.areas.filter((a) => touches(a.box, view));
       for (const a of shown) {

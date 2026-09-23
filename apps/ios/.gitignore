@@ -1,2 +1,5 @@
 .build/
-Xcode/
+# The Xcode project is committed (DECISIONS 2026-09-23); per-person state is not.
+Xcode/**/xcuserdata/
+Xcode/Local.xcconfig
+.DS_Store

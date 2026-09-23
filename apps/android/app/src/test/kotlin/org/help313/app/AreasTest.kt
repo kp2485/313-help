@@ -241,4 +241,19 @@ class AreasTest {
         assertTrue("an area must beat a park", MAP_PICK_ORDER.indexOf("area") < MAP_PICK_ORDER.indexOf("park"))
         assertEquals("the keyboard walks the other way", listOf("segment", "area", "dot"), MAP_WALK_ORDER)
     }
+
+    /** The Areas tab's selection map (docs/MAP-STYLE.md 15.7), the same cases as apps/web/test/boundaries.test.ts. */
+    @Test
+    fun theAreasMapIsSolidAndHeavierThanTheMapTabInEveryBand() {
+        for ((mpp, width, cityWidth) in listOf(Triple(60.0, 1.8, 2.6), Triple(20.0, 2.4, 3.2), Triple(5.0, 3.0, 3.6))) {
+            val a = areasMapBoundaryStyle(mpp)
+            val m = boundaryStyle(mpp)
+            assertEquals(width, a.width, 0.0)
+            assertEquals(cityWidth, a.cityWidth, 0.0)
+            assertTrue(a.dash.isEmpty())
+            assertTrue(a.width > m.width)
+            assertTrue(a.cityWidth > a.width && a.cityWidth < BOUNDARY_SELECTED_WIDTH)
+            assertEquals(m.copy(width = a.width, cityWidth = a.cityWidth, dash = emptyList()), a)
+        }
+    }
 }

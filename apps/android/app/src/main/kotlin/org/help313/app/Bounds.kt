@@ -92,6 +92,22 @@ fun boundaryStyle(metersPerPoint: Double): BoundaryStyle = when (boundaryBand(me
 }
 
 /**
+ * The Areas tab's map, where the outlines ARE the subject (Kyle, 2026-09-23: "the borders on the areas map should
+ * be more prominently visible on the selection map by default"). docs/MAP-STYLE.md 15.7, `areasMapBoundaryStyle`
+ * in apps/web/src/bounds.ts: **solid**, and heavier in every band (city 1.8 / 2.6, mid 2.4 / 3.2, near 3.0 / 3.6
+ * — neighbourhood / city). The tapped outline keeps [BOUNDARY_SELECTED_WIDTH], its colour and its wash.
+ */
+fun areasMapBoundaryStyle(metersPerPoint: Double): BoundaryStyle {
+    val s = boundaryStyle(metersPerPoint)
+    val (width, cityWidth) = when (s.band) {
+        BoundaryBand.CITY -> 1.8 to 2.6
+        BoundaryBand.MID -> 2.4 to 3.2
+        BoundaryBand.NEAR -> 3.0 to 3.6
+    }
+    return s.copy(width = width, cityWidth = cityWidth, dash = emptyList())
+}
+
+/**
  * The boundary colour, as numbers, in the four modes the spec's table names. The app draws with the Android
  * resource `R.color.map_bnd` (light and dark) and `R.color.map_bnd_more`; these are the same values, here, so
  * `:core` can compute the contrast ratios of section 15.2 on a plain JDK and hold them to their floor.

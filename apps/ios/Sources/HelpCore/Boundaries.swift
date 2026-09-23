@@ -81,3 +81,33 @@ public func boundaryStyle(_ metersPerPoint: Double) -> BoundaryStyle {
                              names: true, nameCap: boundaryNameCap, nameMinPoints: boundaryNameMinPoints)
     }
 }
+
+// MARK: - the Areas tab's selection map
+
+/**
+ The Areas tab's map, where the outlines ARE the subject (Kyle, 2026-09-23: *"the borders on the areas map should
+ be more prominently visible on the selection map by default"*). docs/MAP-STYLE.md 15.7.
+
+ On the Map tab a boundary sits under the streets, dashed and thin, because streets and help are what that map is
+ for. On the Areas map a person is choosing an outline, so the outline leads: **solid**, and heavier in every
+ band, while the streets under it are drawn in the quietened basemap (never with Increase Contrast).
+
+ | band | neighbourhood | city |
+ |---|---|---|
+ | `city` | 1.8 | 2.6 |
+ | `mid` | 2.4 | 3.2 |
+ | `near` | 3.0 | 3.6 |
+
+ The tapped outline keeps `boundarySelectedWidth`, its focus colour and its wash: it is still the heaviest thing
+ on the map. Names are the Map tab's rule unchanged. `areasMapBoundaryStyle` in apps/web/src/bounds.ts.
+ */
+public func areasMapBoundaryStyle(_ metersPerPoint: Double) -> BoundaryStyle {
+    var s = boundaryStyle(metersPerPoint)
+    switch s.band {
+    case .city: s.width = 1.8; s.cityWidth = 2.6
+    case .mid: s.width = 2.4; s.cityWidth = 3.2
+    case .near: s.width = 3.0; s.cityWidth = 3.6
+    }
+    s.dash = []
+    return s
+}

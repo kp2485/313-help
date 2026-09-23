@@ -1,0 +1,4 @@
+// Shared settings for the Help313 target. Your own signing team goes in Local.xcconfig next to this file,
+// which git ignores, as one line:  DEVELOPMENT_TEAM = XXXXXXXXXX
+// Without it the app still builds and runs in the Simulator; signing for a device needs it.
+#include? "Local.xcconfig"

@@ -889,3 +889,25 @@ boundaries for ever; adding the layer on every load instead would mean nobody co
   migration marker must be written by **every** write of the layer list, not only by the migration; and the
   numbers in 15.1 are the **third** set — take them from the table, and look at your own screenshots before
   believing any of them.
+
+### 15.7 The Areas tab's selection map
+
+Kyle, 2026-09-23: *"the borders on the areas map should be more prominently visible on the selection map by
+default."* On the Map tab a boundary sits under the streets, because streets and help are what that map is for.
+On the Areas tab's map — the landing and the strip over an area page — a person is **choosing an outline**, so
+the outline leads. `areasMapBoundaryStyle(mpp)` is 15.1 with three changes:
+
+| band | neighbourhood | city | dash |
+|---|---|---|---|
+| `city` | 1.8 | 2.6 | solid |
+| `mid` | 2.4 | 3.2 | solid |
+| `near` | 3.0 | 3.6 | solid |
+
+- **The streets under it are the quietened basemap** of section 4.3, never with Increase Contrast /
+  `prefers-contrast: more`. Quiet streets are what lets a solid outline read as "not a street".
+- **Under forced colours the web keeps 15.1**, dashed: there the dash is the only thing left that says so.
+- Names, the cap, the colour token, the selected stroke (4.0, the focus colour, solid) and its wash are 15.1's,
+  unchanged. The tapped outline is still the heaviest line on the map.
+- Built on all three clients: `bounds.ts` / `map.ts` (a map handed `onArea`), `Boundaries.swift` /
+  `AreasMapView`, and `Bounds.kt` / `AreaOutlineView` (which draws no streets, so only the widths apply). Tests:
+  `apps/web/test/boundaries.test.ts`, `AreasMapBoundaryStyleTests`, `AreasTest`, and the parity readers.
