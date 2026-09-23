@@ -373,6 +373,10 @@ object DirectionsScreen {
                 chosen = -1
                 plans = emptyList()
                 planFor = ""
+                // The old trip's work, if any is still running, is no longer this screen's: its graph is kept, its
+                // plan is not, so it cannot land on "Where are you starting?" a second later.
+                workingFor = ""
+                planning++
                 phase = Phase.NEED_ORIGIN
                 a.render()
             },

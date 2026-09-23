@@ -10,6 +10,8 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class DirectionsTest {
 
@@ -60,6 +62,47 @@ class DirectionsTest {
         var last: Directions.State? = null
         Directions.prepare("broken", { throw IllegalStateException("bad file") }) { last = it }
         assertTrue(last is Directions.State.Unavailable)
+        Directions.reset()
+    }
+
+    /**
+     * The hang found on 2026-09-23: Directions, then back while "Getting the map ready" is up, then Directions to
+     * somewhere else. The second screen asked for the graph while the first build still ran and was answered by
+     * nobody, so it waited for good. Now it is told `Building`, then the same result as the first caller.
+     */
+    @Test
+    fun aSecondAskWhileTheFirstBuildRunsIsAnsweredToo() {
+        Directions.reset()
+        val reading = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        var reads = 0
+        val read: () -> Pair<List<PackedStreets>, List<TransitLayerFiles>>? = {
+            reads++
+            reading.countDown()
+            release.await(10, TimeUnit.SECONDS)
+            null                                           // the answer itself does not matter here, only that it comes
+        }
+        val first = ArrayList<String>()
+        val builder = Thread { Directions.prepare("slow", read) { first.add(it.javaClass.simpleName) } }
+        builder.start()
+        assertTrue("the first build started", reading.await(10, TimeUnit.SECONDS))
+
+        val second = ArrayList<String>()
+        val done = CountDownLatch(1)
+        Directions.prepare("slow", read) { second.add(it.javaClass.simpleName); if (it !is Directions.State.Building) done.countDown() }
+        assertEquals("told at once that the map is being got ready", listOf("Building"), second)
+
+        release.countDown()
+        builder.join(10_000)
+        assertTrue("the second caller hears the result", done.await(10, TimeUnit.SECONDS))
+        assertEquals(listOf("Building", "Unavailable"), first)
+        assertEquals(listOf("Building", "Unavailable"), second)
+        assertEquals("the files were read once, not twice", 1, reads)
+
+        // and nothing is left waiting: the next ask starts from the finished state
+        val third = ArrayList<String>()
+        Directions.prepare("other", { null }) { third.add(it.javaClass.simpleName) }
+        assertEquals(listOf("Building", "Unavailable"), third)
         Directions.reset()
     }
 

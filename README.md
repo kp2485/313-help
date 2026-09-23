@@ -80,7 +80,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
   and trip plans — are written three times against [one spec](schema/query-spec.md) and **203 shared fixture
   cases**; all three pass every case.
-- **Tested and small.** 1,252 tests in `pnpm test`, 364 in `swift test`, 372 in Gradle on a plain JDK. 102 KB of
+- **Tested and small.** 1,263 tests in `pnpm test`, 369 in `swift test`, 375 in Gradle on a plain JDK. 102 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
   (25 KB) loads only if chosen; the bundle is 2.4 MB.
 
@@ -125,7 +125,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,252 tests
+pnpm test                                   # 1,263 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/
