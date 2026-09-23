@@ -1,0 +1,23 @@
+# Seniors, veterans and disability (Kyle, 2026-09-23: one Help tile, "Seniors, veterans, disability", three choices).
+# New top-level slugs `seniors`, `veterans`, `disability`: help BUILT for the group. A place that only welcomes the group
+# keeps its own category and carries the flag. Pages read 2026-09-23 with the pipeline's user agent. No staff names, even
+# where a page shows them (Highland Park's services page names the senior program's staff).
+# Notes for the steward:
+# - Detroit Area Agency on Aging: use detroitseniorsolution.ORG. The .COM (www.detroitseniorsolution.com/about/what-we-do)
+#   now carries spam ("Toxin Rid Review", "Alcoholics Anonymous Meetings in New Jersey"): never link to it.
+# - DAAA funds four Detroit community wellness centers (https://www.detroitseniorsolution.org/health-wellness/community-wellness-centers/).
+#   They need their own pages: St. Patrick Senior Center's site prints no address or phone (already held in to-verify);
+#   lasedinc.com now serves spam in Russian (LaSed held); NSO Northwest Activities Center and the AACA at the Hannan
+#   Center are still to read.
+# - Dearborn Senior Services prints no line of its own; the page's numbers are the city's 311 line (313-943-2150) and
+#   313-943-2009 for the Samaritas food day. Its schedule "mirrors that of the Dearborn Public Schools": closed when
+#   the schools are closed, which the app cannot know, so that goes in the eligibility words.
+# - Wayne County Veterans Services (waynecountymi.gov) did not answer the pipeline: held for a person with a browser.
+#   The VA's Detroit Regional Benefit Office page draws its phone number with a script: held.
+Help for people 60 and older | Detroit Area Agency on Aging | seniors | One call for older adults and caregivers: Meals on Wheels, senior meals, care at home, and support for caregivers. | 1333 Brewery Park Blvd., Ste 200 | Detroit | 48207 | 313-446-4444 | https://www.detroitseniorsolution.org | not stated | Adults 60 and older and their caregivers, in Detroit, Hamtramck and Highland Park. | https://www.detroitseniorsolution.org/contact/ | phone_label=Information and help; flags=seniors
+Hannan Center, senior services and day program | Hannan Center | seniors | Help and classes for people 55 and older, and a day program for older adults living with dementia. | 4750 Woodward Ave | Detroit | 48201 | 313-833-1300 | https://hannan.org | not stated | Adults 55 and older. | https://hannan.org/ | flags=seniors
+Dearborn Senior Services | City of Dearborn | seniors | Classes, fitness, trips, rides and help for adults 50 and older, at the Ford Community and Performing Arts Center. | 15801 Michigan Ave. | Dearborn | 48126 | 313-943-2150 | https://www.dearborn.gov | Monday - Friday 8am-5pm | Adults 50 and older. Closed on days the Dearborn Public Schools are closed. | https://www.dearborn.gov/residents/services-adults-55/senior-center-programs | phone_label=City of Dearborn (311); flags=seniors
+Emergency food day at the Ford Center | Samaritas | food.pantry | Free emergency food once a month. You do not need to sign up first. | 15801 Michigan Ave. | Dearborn | 48126 | 313-943-2009 | https://www.dearborn.gov | 2nd Monday 9am-12pm | Listed with Dearborn Senior Services. Call to ask who can come. | https://www.dearborn.gov/residents/services-adults-55/senior-center-programs | phone_label=Call for help; flags=seniors,no_id_required
+Senior program, City of Highland Park | City of Highland Park | seniors | The city's program for older adults. Call about check-in calls and rides. | 12050 Woodward Avenue | Highland Park | 48203 | 313-252-0050 ext 242 | https://www.highlandparkmi.gov | not stated | Older adults in Highland Park. | https://www.highlandparkmi.gov/services/ | phone_label=Senior program; flags=seniors
+Detroit Vet Center | U.S. Department of Veterans Affairs | veterans | Free, private counseling for veterans, service members and their families. Walk in during office hours. | 11214 East Jefferson Avenue | Detroit | 48214 | 313-822-1141 | https://www.va.gov/detroit-vet-center/ | Mon-Fri 8am-4:30pm | Veterans and service members, including National Guard and Reserves, with any discharge. You do not need VA health care. | https://www.va.gov/detroit-vet-center/ | phone2=877-927-8387; phone2_label=After hours; flags=veterans,walk_in
+Disability Network Wayne County Detroit | Disability Network Wayne County Detroit | disability | Help for people with disabilities to live on their own: life skills, housing, job help, and help at home. | 7800 W. Outer Dr. LL01 | Detroit | 48235 | (313) 923-1655 | https://disabilitynetworkwcd.org | not stated | People with disabilities. | https://disabilitynetworkwcd.org/services/ | flags=disability

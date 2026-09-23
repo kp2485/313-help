@@ -128,9 +128,9 @@ describe('row validation', () => {
     expect(errs({ what: 'Contact Jane Smith for a food box' })).toMatch(/personal contact/);
     expect(errs({ eligibility: 'Email jane@example.org first' })).toMatch(/personal contact/);
   });
-  it('knows 49 categories, each once (docs/03)', () => {
-    expect(KNOWN_CATEGORIES.length).toBe(49);
-    expect(new Set(KNOWN_CATEGORIES).size).toBe(49);
+  it('knows 63 categories, each once (docs/03)', () => {
+    expect(KNOWN_CATEGORIES.length).toBe(63);
+    expect(new Set(KNOWN_CATEGORIES).size).toBe(63);
     // Added 2026-09-22 (Kyle's plan decision 3): somewhere open all night with a phone a person can use.
     for (const c of ['safe.police', 'safe.fire']) expect(KNOWN_CATEGORIES).toContain(c);
     // Added 2026-09-22 (category audit K3): ongoing mental-health support that is not a crisis service. It is a
@@ -138,6 +138,12 @@ describe('row validation', () => {
     expect(KNOWN_CATEGORIES).toContain('health.support');
   });
   it('rejects an unknown category', () => expect(errs({ category: 'food.pantries' })).toMatch(/unknown category/));
+  // Kyle, 2026-09-23: HIV and STI testing and immigration legal help are private kinds. Until the three clients treat
+  // them as private, a published row would be saved, shared and kept in history like any other, so none may publish.
+  it('refuses a published row in a private kind the clients do not treat as private yet', () => {
+    for (const c of ['health.sexual', 'legal.immigration']) expect(errs({ category: c }), c).toMatch(/private/);
+    for (const c of ['health.prenatal', 'kids.prek', 'ids.mail', 'seniors', 'veterans', 'disability']) expect(errs({ category: c }), c).toBe('');
+  });
   // Emergency rooms and urgent care are their own kinds (DECISIONS 2026-09-20): neither says it is free or
   // low-cost, which is what health.clinic means.
   it('takes an emergency room and an urgent care as their own kinds of help', () => {
