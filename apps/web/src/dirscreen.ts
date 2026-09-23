@@ -107,6 +107,17 @@ function post(msg: ToWorker, onReply: (r: FromWorker) => void): void {
  * Firefox 114, and the routing rules are 20 KB gzipped that must not end up in the main script just to keep a
  * same-thread fallback alive. A classic worker is supported by every browser that can run this app at all, and
  * it keeps the whole of the routing out of the first download for everyone who never taps Directions.
+ *
+ * **CSP (checked 2026-09-23): this worker is a same-origin file, and `default-src 'self'` allows it.** `vite build`
+ * emits it as `/assets/dirworker-<hash>.js` and rewrites this line to that path; served with the policy in
+ * public/_headers it loads and plans a trip, with nothing in the console. The console error "Creating a worker
+ * from 'blob:http://localhost:5173/…' violates … default-src 'self'" is **not this worker**: it is Vite's own
+ * dev client, which, when the dev server goes away, pings for its return from a SharedWorker made from a blob
+ * URL, and the `<meta>` policy in index.html blocks it. That client exists only under `vite dev`. The only cost is
+ * that the page does not reload itself when the server comes back. Never add `blob:` (or a `worker-src`) to the
+ * policy to quiet it (CLAUDE.md). Separately, under `vite dev` this classic worker is served as unbundled source
+ * with `import` lines, so it fails to start and Directions stays on "Getting the map ready". Test Directions on
+ * a build (`pnpm --filter @313help/web build`, then serve dist/), not on the dev server.
  */
 function ensureWorker(): void {
   if (worker || noWorker) return;
