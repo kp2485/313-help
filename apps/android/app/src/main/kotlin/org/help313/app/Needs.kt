@@ -124,7 +124,11 @@ val NEEDS: List<Need> = listOf(
         Refine("repair", Query(category = "housing.repair")),
     )),
     Need("utilities", "soon", query = Query(category = "utilities")),
-    Need("day", "soon", query = Query(category = "shelter.day")),
+    // Showers and laundry live here (Kyle, 2026-09-23; audit K5).
+    Need("day", "soon", refine = listOf(
+        Refine("day", Query(category = "shelter.day")),
+        Refine("wash", Query(category = "hygiene")),
+    )),
     Need("things", "soon", refine = listOf(
         Refine("clothes", Query(category = "goods.clothes")),
         Refine("baby", Query(category = "goods.baby")),
@@ -200,7 +204,7 @@ fun isSensitive(category: String): Boolean =
  * immigration legal help: never saved and never in history. Unlike the
  * sensitive listings they keep an address and a distance, because people have to get there.
  */
-private val PRIVATE = listOf("treatment", "assault", "health.sexual", "legal.immigration")
+private val PRIVATE = listOf("treatment", "assault", "health.sexual", "legal.immigration", "youth.advocacy")
 
 fun isPrivate(category: String): Boolean =
     isSensitive(category) || PRIVATE.any { category == it || category.startsWith("$it.") }

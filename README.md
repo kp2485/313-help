@@ -5,7 +5,7 @@
 Free help, transit, parks and neighborhood facts for Detroit, Hamtramck, Highland Park and Dearborn — in an app that
 stores nothing about you, works with no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 618 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 620 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -52,7 +52,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **618 listings** in 53 categories across four cities: 142 food, 91 harm reduction, 80 health (including **9
+- **620 listings** in 54 categories across four cities: 142 food, 91 harm reduction, 80 health (including **9
   emergency rooms and 13 urgent care centers**), 51 places to get somewhere safe now (38 fire stations and 13
   police stations), 37 jobs, 27 treatment, 27 learning, 26 child care and free preschool, and 17 more groups —
   among them help built for seniors, veterans and people with a disability.

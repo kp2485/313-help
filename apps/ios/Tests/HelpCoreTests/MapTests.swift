@@ -335,7 +335,7 @@ final class MapLayerRuleTests: XCTestCase {
         let rows = [Row(category: "health.clinic", lat: 42.3), Row(category: "health.sexual", lat: 42.3),
                     Row(category: "legal", lat: 42.3), Row(category: "legal.immigration", lat: 42.3)]
         XCTAssertEqual(drawable(rows, mapGroups.flatMap(\.tops)), ["health.clinic", "legal"])
-        for c in ["health.sexual", "legal.immigration"] {
+        for c in ["health.sexual", "legal.immigration", "youth.advocacy"] {
             XCTAssertTrue(isPrivate(c), c); XCTAssertFalse(isSensitive(c), c); XCTAssertFalse(canSave(c), c)
         }
         for c in ["health.clinic", "health.prenatal", "legal", "ids.mail", "seniors", "veterans", "disability"] {

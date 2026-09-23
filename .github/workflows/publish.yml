@@ -90,7 +90,9 @@ jobs:
           pnpm --filter @313help/pipeline ingest:greenway
           pnpm --filter @313help/pipeline ingest:city parks
           pnpm --filter @313help/pipeline ingest:city zips
-          if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; fi
+          # Monthly: the street map, the neighborhood outlines and, since 2026-09-23, the transport layers (Kyle). Every
+          # change still arrives as the pull request below; nothing here publishes on its own.
+          if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; pnpm ingest:transit; fi
       - name: Open a pull request if a source changed
         env:
           GH_TOKEN: ${{ github.token }}

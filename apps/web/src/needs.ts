@@ -100,7 +100,11 @@ export const NEEDS: Need[] = [
     { id: 'repair', query: { category: 'housing.repair' }, links: 'owner' },
   ] },
   { id: 'utilities', icon: 'bolt', group: 'soon', query: { category: 'utilities' } },
-  { id: 'day', icon: 'clock', group: 'soon', query: { category: 'shelter.day' } },
+  // Showers and laundry live here (Kyle, 2026-09-23; audit K5): most places with a shower are day centers already.
+  { id: 'day', icon: 'clock', group: 'soon', refine: [
+    { id: 'day', query: { category: 'shelter.day' } },
+    { id: 'wash', query: { category: 'hygiene' } },
+  ] },
   { id: 'things', icon: 'shirt', group: 'soon', refine: [
     { id: 'clothes', query: { category: 'goods.clothes' }, links: 'clothes' },
     { id: 'baby', query: { category: 'goods.baby' }, links: 'baby' },
@@ -210,7 +214,7 @@ export const isSensitive = (category: string) => SENSITIVE.some((c) => category 
  *  immigration legal help (Kyle: "both private"): never saved and never in the browser's history, and
  *  the detail screen has the quick exit. Unlike the sensitive listings they keep an address, a map dot and a distance,
  *  because people have to get there. Every sensitive listing is private too. */
-export const PRIVATE = ['treatment', 'assault', 'health.sexual', 'legal.immigration'];
+export const PRIVATE = ['treatment', 'assault', 'health.sexual', 'legal.immigration', 'youth.advocacy'];
 export const isPrivate = (category: string) => isSensitive(category) || PRIVATE.some((c) => category === c || category.startsWith(c + '.'));
 
 /** The rows a screen that mixes categories draws from (`Need.categories`). A category matches whole or as a
