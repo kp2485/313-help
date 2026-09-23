@@ -69,6 +69,7 @@ let built = false;
 let hasTransit = false;
 let reqId = 0;
 let noWorker = false;                             // this browser refused to start one; the screen says so
+const pending = new Map<number, (r: FromWorker) => void>();   // requests the Worker has not answered yet, by id
 
 /** What the cursor should land on after this redraw, and then nothing. */
 export const takeRefocus = (): string => { const s = refocus; refocus = ''; return s; };
@@ -95,10 +96,8 @@ export function close(): void {
 
 function post(msg: ToWorker, onReply: (r: FromWorker) => void): void {
   if (!worker) { onReply({ type: 'error', id: msg.id, message: 'no worker' }); return; }
-  const w = worker;
-  const listener = (e: MessageEvent<FromWorker>) => { if (e.data.id !== msg.id) return; w.removeEventListener('message', listener); onReply(e.data); };
-  w.addEventListener('message', listener);
-  w.postMessage(msg);
+  pending.set(msg.id, onReply);
+  worker.postMessage(msg);
 }
 
 /**
@@ -117,13 +116,38 @@ function post(msg: ToWorker, onReply: (r: FromWorker) => void): void {
  * URL, and the `<meta>` policy in index.html blocks it. That client exists only under `vite dev`. The only cost is
  * that the page does not reload itself when the server comes back. Never add `blob:` (or a `worker-src`) to the
  * policy to quiet it (CLAUDE.md). Separately, under `vite dev` this classic worker is served as unbundled source
- * with `import` lines, so it fails to start and Directions stays on "Getting the map ready". Test Directions on
- * a build (`pnpm --filter @313help/web build`, then serve dist/), not on the dev server.
+ * with `import` lines, so it fails to start and Directions says "The map could not be read" (the `error` handler
+ * below; DECISIONS 2026-09-23). Test Directions on a build (`pnpm --filter @313help/web build`, then serve
+ * dist/), not on the dev server.
  */
 function ensureWorker(): void {
   if (worker || noWorker) return;
   if (typeof Worker === 'undefined') { noWorker = true; return; }
-  try { worker = new Worker(new URL('./dirworker.ts', import.meta.url)); } catch { noWorker = true; }
+  let w: Worker;
+  try { w = new Worker(new URL('./dirworker.ts', import.meta.url)); } catch { noWorker = true; return; }
+  w.addEventListener('message', (e: MessageEvent<FromWorker>) => {
+    const reply = pending.get(e.data.id);
+    if (!reply) return;
+    pending.delete(e.data.id);
+    reply(e.data);
+  });
+  // A script that cannot be fetched or run does not make the constructor throw: it fires `error` here, later
+  // (always under `vite dev`, which serves a classic worker as a module; in production, an old cached page
+  // asking for a worker file a deploy has since removed). `messageerror` is a reply that could not be read.
+  // Either way every waiting request is answered with an error, so the screen goes to "The map could not be
+  // read" with its Try again, and never waits for ever on "Getting the map ready". The Worker is dropped and
+  // its graph with it; Try again starts a new one.
+  const die = () => {
+    if (worker !== w) return;
+    w.terminate();
+    worker = null; built = false; hasTransit = false;
+    const waiting = [...pending];
+    pending.clear();
+    for (const [id, reply] of waiting) reply({ type: 'error', id, message: 'worker failed' });
+  };
+  w.addEventListener('error', die);
+  w.addEventListener('messageerror', die);
+  worker = w;
 }
 
 /** The map files, then the graph, then the plan. Each step says where it has got to, out loud and on screen. */
@@ -348,6 +372,6 @@ export function onKey(key: string, deps: DirDeps): boolean {
 /** For the tests and for the report: what is on screen, without a DOM. */
 export const state = () => ({ phase, plans: plans.length, chosen, steps: stepList.length, stepAt, offRoute, following, hasTransit, livePos: livePos !== null });
 /** Used by the tests only: forget the graph so a fresh case starts from nothing. */
-export function reset(): void { close(); worker?.terminate(); worker = null; noWorker = false; built = false; hasTransit = false; phase = 'need_origin'; }
+export function reset(): void { close(); worker?.terminate(); worker = null; pending.clear(); noWorker = false; built = false; hasTransit = false; phase = 'need_origin'; }
 
 export { distance, offStreet, summary };
