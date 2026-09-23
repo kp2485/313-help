@@ -28,7 +28,22 @@ export const KNOWN_CATEGORIES = [
   // Somewhere open all night with a phone a person can use (DECISIONS 2026-09-22, Kyle's plan decision 3).
   // A category says what the row offers, not who runs it: both of these offer a door that is never locked.
   'safe.police', 'safe.fire',
+  // Fourteen more kinds of help (Kyle, 2026-09-23; DECISIONS). Listings enter first; each choice reaches the
+  // screens only once it has checked places in it. Two of them are PRIVATE kinds — see PRIVATE_NOT_YET_ON_CLIENTS.
+  'health.prenatal', 'health.sexual', 'housing.repair', 'housing.lead', 'goods.home', 'goods.personal',
+  'hygiene.laundry', 'legal.immigration', 'ids.mail', 'connect.phone', 'kids.prek',
+  // Help built for one group of people: a senior center, a veterans' service office, a center for independent
+  // living. A row that merely welcomes the group keeps its own category and carries the flag instead (docs/03).
+  'seniors', 'veterans', 'disability',
 ] as const;
+/**
+ * Private kinds (no Save, no Share, no history, quick exit: docs/08) that the three clients do not yet treat as
+ * private. A published row in one of these would be saved, shared and remembered like any other, so the build
+ * refuses it. Empty this list in the same change that adds the kinds to `isPrivate` on the web, iPhone and Android.
+ */
+// 2026-09-23: health.sexual and legal.immigration were here until the web, iPhone and Android treated them as private
+// (the same change emptied this list). Keep the list: the next private kind waits here too.
+export const PRIVATE_NOT_YET_ON_CLIENTS: readonly string[] = [];
 const CATEGORY = { test: (c: string) => (KNOWN_CATEGORIES as readonly string[]).includes(c) };
 // Patterns that suggest a person's contact details leaked into public text.
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]+/;
@@ -80,6 +95,7 @@ export function validateRows(rows: BundleRow[], todayStr: string, refusing: Map<
     if (seen.has(r.id)) e('duplicate id');
     seen.add(r.id);
     if (!CATEGORY.test(r.category)) e(`unknown category "${r.category}"`);
+    if ((PRIVATE_NOT_YET_ON_CLIENTS as readonly string[]).includes(r.category)) e(`"${r.category}" is private, and the clients do not treat it as private yet: keep the row proposed (PRIVATE_NOT_YET_ON_CLIENTS)`);
     if (!['active', 'suspended', 'archived'].includes(r.status)) e(`unknown status "${r.status}"`);
     if (!['scheduled', 'always', 'call_first', 'unknown'].includes(r.availability)) e(`unknown availability "${r.availability}"`);
     if (!r.name || !r.what) e('name and what are required');

@@ -115,10 +115,13 @@ val NEEDS: List<Need> = listOf(
         Refine("eyes", Query(category = "health.vision")),
         // Ongoing mental-health support that is not a crisis service: day programmes a person can walk into.
         Refine("support", Query(category = "health.support")),
+        // HIV and STI tests and PrEP: a private kind (Kyle, 2026-09-23).
+        Refine("tests", Query(category = "health.sexual")),
     )),
     Need("home", "soon", refine = listOf(
         Refine("rent", Query(category = "housing.rent")),
         Refine("own", Query(category = "housing.owner")),
+        Refine("repair", Query(category = "housing.repair")),
     )),
     Need("utilities", "soon", query = Query(category = "utilities")),
     Need("day", "soon", query = Query(category = "shelter.day")),
@@ -150,10 +153,17 @@ val NEEDS: List<Need> = listOf(
         Refine("taxes", Query(category = "money.tax")),
         Refine("benefits", Query(category = "money.benefits")),
     )),
-    Need("childcare", "later", query = Query(category = "kids.care")),
+    // All of `kids`: child care and the free Head Start and pre-K programs (`kids.prek`, 2026-09-23).
+    Need("childcare", "later", query = Query(category = "kids")),
     Need("phone", "later", query = Query(category = "connect")),
     Need("rides", "later", query = Query(category = "transport")),
     Need("pets", "later", query = Query(category = "pets")),
+    // Help built for one group of people (Kyle, 2026-09-23): one tile for three groups rather than three tiles.
+    Need("groups", "later", refine = listOf(
+        Refine("seniors", Query(category = "seniors")),
+        Refine("veterans", Query(category = "veterans")),
+        Refine("disability", Query(category = "disability")),
+    )),
 )
 
 /** Browse-by-type chips on the Help screen. */
@@ -186,10 +196,11 @@ fun isSensitive(category: String): Boolean =
     SENSITIVE.any { category == it || category.startsWith("$it.") }
 
 /**
- * Treatment and help after sexual assault (DECISIONS 2026-09-19): never saved and never in history. Unlike the
+ * Treatment and help after sexual assault (DECISIONS 2026-09-19), and since 2026-09-23 HIV and STI tests and
+ * immigration legal help: never saved and never in history. Unlike the
  * sensitive listings they keep an address and a distance, because people have to get there.
  */
-private val PRIVATE = listOf("treatment", "assault")
+private val PRIVATE = listOf("treatment", "assault", "health.sexual", "legal.immigration")
 
 fun isPrivate(category: String): Boolean =
     isSensitive(category) || PRIVATE.any { category == it || category.startsWith("$it.") }

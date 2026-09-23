@@ -491,6 +491,21 @@ class MapLayerRuleTest {
         mapDrawable(rows, tops, { it.category }, { it.lat != null }).map { it.category }
 
     /**
+     * Kyle, 2026-09-23: HIV and STI tests and immigration help are private, and they sit INSIDE groups that are drawn
+     * (health, legal). The rule is asked of the row. The same cases as apps/web/test/behaviour.test.ts.
+     */
+    @Test
+    fun thePrivateKindsInsideADrawnGroupAreNeverADot() {
+        val rows = listOf(Row("health.clinic", 42.3), Row("health.sexual", 42.3), Row("legal", 42.3), Row("legal.immigration", 42.3))
+        assertEquals(listOf("health.clinic", "legal"), drawable(rows, mapGroups.flatMap { it.tops }))
+        for (c in listOf("health.sexual", "legal.immigration")) {
+            assertTrue(c, isPrivate(c))
+            assertFalse(c, isSensitive(c))
+        }
+        for (c in listOf("health.clinic", "health.prenatal", "legal", "ids.mail", "seniors", "veterans", "disability")) assertFalse(c, isPrivate(c))
+    }
+
+    /**
      * The rule the whole tab hangs on. Treatment and help after sexual assault are never drawn, whatever is switched
      * on; a DV shelter and a mental-health crisis line are dropped row by row inside their own group.
      */

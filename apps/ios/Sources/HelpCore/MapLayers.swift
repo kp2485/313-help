@@ -30,7 +30,8 @@ public let mapGroups: [MapGroup] = [
     MapGroup(id: "work", symbol: "briefcase", tops: ["jobs", "learn"]),
     MapGroup(id: "kids", symbol: "figure.2.and.child.holdinghands", tops: ["kids", "youth"]),
     MapGroup(id: "things", symbol: "tshirt", tops: ["goods", "hygiene", "pets"]),
-    MapGroup(id: "paperwork", symbol: "person.text.rectangle", tops: ["housing", "utilities", "money", "legal", "ids", "transport"]),
+    // Seniors, veterans and disability help ride here (2026-09-23), as on the web.
+    MapGroup(id: "paperwork", symbol: "person.text.rectangle", tops: ["housing", "utilities", "money", "legal", "ids", "transport", "seniors", "veterans", "disability"]),
 ]
 
 /// Never a layer, never a dot: help with drugs or alcohol, and help after sexual assault, are dropped as whole
@@ -55,7 +56,9 @@ public func mapDrawable<T>(_ rows: [T], tops: [String],
         guard hasPoint(row) else { return false }
         let c = category(row)
         let top = String(c.split(separator: ".").first ?? "")
-        return !isSensitive(c) && !mapPrivateTops.contains(top) && tops.contains(top)
+        // Asked of the row: a private kind can sit inside a group that is drawn (HIV tests in health, immigration
+        // help in legal; 2026-09-23). isPrivate covers the sensitive kinds and the whole private tops too.
+        return !isPrivate(c) && tops.contains(top)
     }
 }
 

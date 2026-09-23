@@ -329,7 +329,7 @@ final class SavedTests: XCTestCase {
     /// it widened, a clubhouse would lose one.
     func testTheSensitiveSetIsExactlyTheDvAndCrisisPairMatchedWholeOrAsAPrefix() {
         XCTAssertEqual(sensitiveCategories, ["shelter.dv", "health.mental"])
-        XCTAssertEqual(privateCategories, ["treatment", "assault"])
+        XCTAssertEqual(privateCategories, ["treatment", "assault", "health.sexual", "legal.immigration"])   // 2026-09-23
         for category in ["shelter.dv", "shelter.dv.transitional", "health.mental", "health.mental.crisis"] {
             XCTAssertTrue(isSensitive(category), category)
             XCTAssertFalse(canSave(category), category)

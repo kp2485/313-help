@@ -9,6 +9,7 @@
 // `pnpm tasks:sync` to send to the steward queue as a task.
 
 import { today, writeJson } from './util.js';
+import { PRIVATE_NOT_YET_ON_CLIENTS } from './validate.js';
 import { readResources, writeResources } from './seed-io.js';
 import { fetchPage, listingOnPage, phone2OnItsPage, type PageResult } from './page-match.js';
 import { RECHECK, recheckTask, type RecheckTask } from './tasks-sync.js';
@@ -56,7 +57,12 @@ for (const r of rows) {
   }
   task(r, { missing: m.missing });
   if (m.ok) {
-    if (r.status === 'proposed') { r.status = 'active'; r.checked_at_entry = today(); r.entry_method = 'auto_check'; }
+    // A private kind the clients do not treat as private yet (validate.ts) is matched and dated, but stays proposed:
+    // published now, it would be saved, shared and kept in history like any other row.
+    if (r.status === 'proposed' && (PRIVATE_NOT_YET_ON_CLIENTS as readonly string[]).includes(r.category ?? '')) {
+      r.checked_at_entry = today(); r.entry_method = 'auto_check';
+      note(r, `matched its source page; kept proposed until the clients treat ${r.category} as private`);
+    } else if (r.status === 'proposed') { r.status = 'active'; r.checked_at_entry = today(); r.entry_method = 'auto_check'; }
     ok++;
   } else {
     const why = `not found on source page: ${m.missing.join(', ')}`;

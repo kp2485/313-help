@@ -32,7 +32,8 @@ val mapGroups: List<MapGroup> = listOf(
     MapGroup("work", listOf("jobs", "learn")),
     MapGroup("kids", listOf("kids", "youth")),
     MapGroup("things", listOf("goods", "hygiene", "pets")),
-    MapGroup("paperwork", listOf("housing", "utilities", "money", "legal", "ids", "transport")),
+    // Seniors, veterans and disability help ride here (2026-09-23), as on the web.
+    MapGroup("paperwork", listOf("housing", "utilities", "money", "legal", "ids", "transport", "seniors", "veterans", "disability")),
 )
 
 /**
@@ -61,7 +62,8 @@ fun <T> mapDrawable(rows: List<T>, tops: List<String>, category: (T) -> String, 
         if (!hasPoint(row)) return@filter false
         val c = category(row)
         val top = c.substringBefore('.')
-        !isSensitive(c) && !mapPrivateTops.contains(top) && tops.contains(top)
+        // Asked of the row: a private kind can sit inside a group that is drawn (2026-09-23).
+        !isPrivate(c) && tops.contains(top)
     }
 
 fun mapDrawable(rows: List<org.help313.query.BundleRow>, tops: List<String>): List<org.help313.query.BundleRow> =

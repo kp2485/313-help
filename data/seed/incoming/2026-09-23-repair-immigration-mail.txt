@@ -1,0 +1,20 @@
+# Home repair, immigration legal help and a mailing address (Kyle, 2026-09-23). Pages read 2026-09-23 with the pipeline's
+# user agent; every fact is on the owner's page on the line.
+# PRIVATE: legal.immigration is a private kind (Kyle, 2026-09-23). Its rows stay `proposed` until the web, iPhone and
+# Android treat the kind as private; pipeline/src/validate.ts refuses to publish one before then.
+# Notes for the steward:
+# - Habitat Detroit's Critical Home Repair is closed to new applications right now and open only in some neighborhoods
+#   (the page lists Morningside, Boynton & Oakwood Heights, and others marked "Currently Closed"). Listed with a notice.
+# - The City's own repair and lead programs (Critical Home Repair, Detroit LeadSafe Housing, the Health Department's
+#   childhood lead program) live on detroitmi.gov, which refuses the pipeline. They open in application windows, so they
+#   belong in links.ts; the `home_repair` link there expired on 2026-09-22 with the last window. A person should read
+#   them in a browser.
+# - Freedom House Detroit (asylum seekers: shelter and legal help, 313.964.4320) is held for Kyle: it is a shelter for
+#   people fleeing persecution, and whether its address belongs in the app is his call, as it was for DV shelters.
+# - ACCESS immigration services (accesscommunity.org) refuses scripts: held for a browser read.
+# - Mail: NOAH and Pope Francis Center already have rows that mention mail. One row per service (category audit
+#   2026-09-22): the mailing address gets its own ids.mail row at the same door, from the same owner page.
+Critical Home Repair | Habitat for Humanity Detroit | housing.repair | Free repairs for homeowners whose income qualifies: roofs, furnaces, water heaters, windows, doors and ramps. | 14325 Jane Ave | Detroit | 48205 | (313) 521-6691 | https://habitatdetroit.org | not stated | You must own and live in the home, and be current on property taxes or in a payment plan. Income under 80% of the area median. Only some neighborhoods. | https://habitatdetroit.org/critical-home-repair/ | notice=Applications are closed right now. Call to ask when they open.
+Free immigration legal help, Detroit office | Michigan Immigrant Rights Center | legal.immigration | Free legal help with immigration for people who cannot pay a lawyer. Call first; they ask a few questions to see if they can take your case. | 7700 Second Avenue, Suite 603 | Detroit | 48202 | (734) 239-6863 | https://michiganimmigrant.org | Mon-Fri 9:30am-4:30pm | Mostly for households with low income. Help with citizenship and for survivors of domestic violence is open to more people. | https://michiganimmigrant.org/contact-info | phone_label=Intake line (English and Spanish); phone2=1-800-968-4046; phone2_label=Immigrant worker rights; flags=immigrants,spanish
+A mailing address at NOAH | NOAH Project | ids.mail | Use NOAH as your mailing address, so you can get letters about IDs, benefits and jobs. | 23 E Adams Ave | Detroit | 48226 | 313-965-5422 | https://noahatcentral.org | not stated | For people without housing. | https://noahatcentral.org/what-we-do/casework/ | flags=walk_in
+A mailing address at Pope Francis Center | Pope Francis Center | ids.mail | Mail services at the day center, with phone and internet too. Ask at the front desk how to get your mail here. | 438 Saint Antoine St | Detroit | 48226 | 313-964-2823 | https://popefranciscenter.org | not stated | Anyone. No ID, paperwork or screening needed. | https://popefranciscenter.org/our-work/day-center/ | flags=walk_in,no_id_required

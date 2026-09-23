@@ -1,0 +1,15 @@
+# HIV and STI testing, and care in pregnancy (Kyle, 2026-09-23). Pages read 2026-09-23 with the pipeline's user agent.
+# PRIVATE: health.sexual is a private kind (Kyle, 2026-09-23). Its rows stay `proposed` until the web, iPhone and Android
+# treat it as private; pipeline/src/validate.ts refuses to publish one before then.
+# Notes for the steward (held, each needs a person with a browser or a phone call):
+# - Detroit Public Health STD Clinic, 50 E Canfield St Ste 101-S (Wayne Health runs it; (877) 929-6342): Wayne Health's page
+#   gives only the address and scheduling line; the testing, walk-in and PrEP details are on detroitmi.gov, which refuses
+#   the pipeline.
+# - UNIFIED is now part of Vivent Health and has moved from 3968 Mt Elliott (Detroit) to 64 Victor St, Highland Park, as
+#   its own page says. Directories still print the old address.
+# - Prenatal care (health.prenatal): no owner page could be read today. The Luke Clinic (thelukeclinic.org) prints
+#   7354 Whittaker St only as a MAILING address and two phone numbers without saying which is the clinic; the Detroit
+#   Health Department's reproductive and maternal-child pages (detroitmi.gov), Planned Parenthood and CHASS refuse the
+#   pipeline. Until a row is checked, the "Pregnant or new baby" choice can list rows flagged `pregnant` (the Head Start
+#   rows, and the Health Department's WIC offices once flagged).
+Free HIV and STI tests | Vivent Health (UNIFIED) | health.sexual | Free HIV and STI tests and free safe-sex supplies. Help getting PrEP, a daily pill that prevents HIV. | 64 Victor St | Highland Park | 48203 | 313-446-9800 | https://miunified.org | Mon 8:30am-5pm; Tue 1pm-5pm; Wed-Fri 8:30am-5pm | | https://miunified.org/services/ | phone_label=Clinic
