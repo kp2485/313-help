@@ -329,7 +329,7 @@ describe('a private listing is never shared, and no private list is ever drawn o
     for (const c of ['health.sexual', 'legal.immigration']) {
       expect(isPrivate(c), c).toBe(true);
       expect(isSensitive(c), c).toBe(false);            // private, not sensitive: they keep an address, because people go there
-      expect(hashFor({ v: 'list', cat: c } as never), c).toBeNull();
+      expect(hashFor({ v: 'list', cat: c }, () => false), c).toBeNull();
       expect(canSave(c), c).toBe(false);
       expect(canShare(c), c).toBe(false);
     }
