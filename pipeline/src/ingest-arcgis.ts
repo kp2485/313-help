@@ -78,8 +78,11 @@ export function toRows(src: Source, lastEdited: string | null, features: any[], 
     if (typeof lat !== 'number' || !inBbox(lat, lon)) { warnings.push(`${src.id}: "${name}" is outside the service area; skipped`); continue; }
 
     const extra = (src.extra ?? []).map((k) => `${k}=${get(props, k)}`).filter((s) => !s.endsWith('=')).join('; ');
+    // `ref: A+B` joins two fields, for a layer whose rows have no single stable key: the City's food map has no
+    // GlobalID, its OBJECTIDs are renumbered when the layer is overwritten, and two ICNA pantries share a name.
+    const ref = (f.ref ?? '').split('+').map((k) => get(props, k)).filter(Boolean).join('|');
     all.push({
-      sal_id: '', record_ref: get(props, f.ref), name, address_1: address, zip: get(props, f.zip),
+      sal_id: '', record_ref: ref, name, address_1: address, zip: get(props, f.zip),
       lat: lat.toFixed(6), lon: lon.toFixed(6), phone: get(props, f.phone), website: get(props, f.website),
       hours_text: get(props, f.hours), extra, source_id: src.id, source_last_edited: lastEdited ?? '', fetched_at: fetchedAt,
     });
@@ -101,7 +104,9 @@ export function toRows(src: Source, lastEdited: string | null, features: any[], 
 
 async function main() {
   const fetchedAt = today();
-  for (const src of loadSources().filter((s) => s.kind === 'arcgis')) {
+  // `ingest:opendata <id> …` reads only those sources; with no ids, every ArcGIS source (the nightly run).
+  const only = process.argv.slice(2);
+  for (const src of loadSources().filter((s) => s.kind === 'arcgis' && (!only.length || only.includes(s.id)))) {
     const { lastEdited, features } = await fetchLayer(src);
     // What this layer committed last time: every record it has already been given an id for, and every id it
     // has retired. Both decide the ids below, so this read happens before anything is minted.

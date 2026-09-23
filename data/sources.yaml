@@ -100,6 +100,27 @@ sources:
     fields: { name: Site, address: Address, zip: Zip, phone: Phone }   # Contact (staff names) deliberately not mapped
     id_prefix: rec
 
+  # The City's own "Food Pantry Finder" (experience.arcgis.com/experience/67edf7a2d5b14c398b03dacd6d610f97), the
+  # layer behind it (Kyle, 2026-09-23: "deep dive into merging the city's food map"). 97 pantries and hot-meal sites
+  # with name, address, phone, hours in words and a coordinate. Owned by the City's integration account; no licence,
+  # description or maintainer is stated. Last edited 2025-11-21, so it STAGES: every row is a candidate a person
+  # checks (phone call or the host's own page) before it is listed. The facts belong to the hosts, not the City.
+  # Cross-reference and call sheet: docs/research/2026-09-23-city-food-map.md.
+  - id: city_food_map
+    name: City of Detroit Food Pantry Finder layer
+    tier: A
+    kind: arcgis
+    url: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/food_bank_finder_data/FeatureServer/0
+    page: https://experience.arcgis.com/experience/67edf7a2d5b14c398b03dacd6d610f97
+    license: unstated   # the City portal states none (as for the transit layers, DECISIONS 2026-09-20); ask
+    mode: stage         # last edited 2025-11-21, and the facts are the hosts', not the City's
+    max_age_days: 90
+    category: food.pantry   # the layer's Type says "Hot Meal" for some; carried in `extra` for the person entering it
+    org: { id: org_city_of_detroit, name: City of Detroit }
+    fields: { name: Name, address: Address, zip: Zip_Code, phone: Telephone, hours: Hours, ref: Name+Address }
+    extra: [Type, council_district, neighborhood_name]
+    id_prefix: cfm
+
   - id: jlg_route_segments
     name: Joe Louis Greenway Route Segments
     tier: A
