@@ -91,7 +91,7 @@ describe('needs list', () => {
   });
   it('an emergency room and urgent care are their own kinds of help, the emergency room first and led by 911', () => {
     const doctor = NEEDS.find((n) => n.id === 'doctor')!;
-    expect(doctor.refine!.map((r) => r.id)).toEqual(['er', 'urgent', 'doctor', 'dhd', 'dentist', 'eyes', 'support', 'tests']);
+    expect(doctor.refine!.map((r) => r.id)).toEqual(['er', 'urgent', 'doctor', 'dhd', 'dentist', 'eyes', 'support', 'tests', 'pregnant']);
     expect(doctor.refine![0]!.query).toEqual({ category: 'health.er' });
     expect(doctor.refine![1]!.query).toEqual({ category: 'health.urgent' });
     // 911 sits above the emergency-room list, and only there: the plain "a doctor or nurse" screen has no 911 row.
@@ -739,7 +739,7 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     // children's advocacy center is reached from "Browse every kind of help" under Young people, like the rest of it.
     expect(known.filter((c) => !fromNeed(c) && !unreachable.includes(c))).toEqual([
       'youth',
-      'health.prenatal', 'goods.home', 'goods.personal',
+      'goods.home', 'goods.personal',
       'youth.advocacy',
     ]);
     for (const c of known) {

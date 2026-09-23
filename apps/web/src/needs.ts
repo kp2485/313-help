@@ -93,6 +93,8 @@ export const NEEDS: Need[] = [
     { id: 'support', query: { category: 'health.support' } },
     // HIV and STI tests and PrEP: a PRIVATE kind (Kyle, 2026-09-23), so its list and its rows leave no trace.
     { id: 'tests', query: { category: 'health.sexual' } },
+    // Its first checked places arrived on 2026-09-23 (CHASS, Planned Parenthood Detroit), so the choice appears.
+    { id: 'pregnant', query: { category: 'health.prenatal' } },
   ] },
   { id: 'home', icon: 'key', group: 'soon', refine: [
     { id: 'rent', query: { category: 'housing.rent' }, links: 'rent' },

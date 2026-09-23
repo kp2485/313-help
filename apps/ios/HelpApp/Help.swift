@@ -132,7 +132,8 @@ let needs: [Need] = [
         // Ongoing mental-health support that is not a crisis service: day programs a person can walk into.
         .init(id: "support", query: Query(category: "health.support")),
         // HIV and STI tests and PrEP: a private kind (Kyle, 2026-09-23).
-        .init(id: "tests", query: Query(category: "health.sexual"))]),
+        .init(id: "tests", query: Query(category: "health.sexual")),
+        .init(id: "pregnant", query: Query(category: "health.prenatal"))]),
     Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner")), .init(id: "repair", query: Query(category: "housing.repair")), .init(id: "lead", query: Query(category: "housing.lead"))]),
     Need(id: "utilities", symbol: "bolt", now: false, query: Query(category: "utilities")),
     // Showers and laundry live here (Kyle, 2026-09-23; audit K5).
