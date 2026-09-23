@@ -956,7 +956,7 @@ the platform view classes, `java.net.HttpURLConnection` and the Kotlin standard 
 declared library and it is test-only; it never reaches a phone. Everything Gradle actually downloaded on
 2026-09-20 was Apache-2.0 (Gradle 8.11.1, the Kotlin 2.0.21 plugin and standard library, `org.jetbrains:annotations`)
 except two test-only jars: JUnit 4.13.2 under the Eclipse Public Licence 1.0 and its `hamcrest-core` 1.3 under
-BSD-3-Clause. EPL-1.0 is not permissive — flagged for Kyle, and already Open in `docs/DECISIONS.md`. It is not
+BSD-3-Clause. EPL-1.0 is not permissive — Kyle approved it on 2026-09-23 as test-only and never distributed (`docs/DECISIONS.md`). It is not
 distributed, and `./gradlew :query:runFixtures` runs all 203 fixture cases with no test framework on the
 classpath at all (CI runs that too), so dropping JUnit would cost only the `:core` and `:app` unit tests.
 
@@ -1225,8 +1225,8 @@ profile is packaged (`assets/dexopt/baseline.prof` is in the APK), but what *app
 install is `androidx.profileinstaller`, which this app does not have; without it the profile is used when the
 Play Store installs the app, and not by `adb install` or a shared APK. So the second row above is what a Play
 install should resemble and the first is what a sideloaded APK gets — and the first is where reading bytes
-helps most. Adding `profileinstaller` would be this app's first runtime dependency; that is Kyle's call and has
-not been made. `baseline-prof.txt` was updated for the reader's new methods either way.
+helps most. Adding `profileinstaller` would be this app's first runtime dependency; **Kyle decided against it on
+2026-09-23** (DECISIONS): the no-dependency rule stands, and a Play install applies the profile without it. `baseline-prof.txt` was updated for the reader's new methods either way.
 
 **Considered, measured against, and not done.**
 

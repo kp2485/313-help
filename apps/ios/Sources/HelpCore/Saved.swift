@@ -10,7 +10,7 @@ import Foundation
 public let sensitiveCategories = ["shelter.dv", "health.mental"]
 /// Treatment and help after sexual assault (DECISIONS 2026-09-19), and since 2026-09-23 HIV and STI tests and
 /// immigration legal help: never saved either. Every sensitive listing is private too.
-public let privateCategories = ["treatment", "assault", "health.sexual", "legal.immigration"]
+public let privateCategories = ["treatment", "assault", "health.sexual", "legal.immigration", "youth.advocacy"]
 
 private func matches(_ category: String, _ list: [String]) -> Bool {
     list.contains { category == $0 || category.hasPrefix($0 + ".") }

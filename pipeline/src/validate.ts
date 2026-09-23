@@ -35,6 +35,9 @@ export const KNOWN_CATEGORIES = [
   // Help built for one group of people: a senior center, a veterans' service office, a center for independent
   // living. A row that merely welcomes the group keeps its own category and carries the flag instead (docs/03).
   'seniors', 'veterans', 'disability',
+  // A children's advocacy center: where a child is interviewed after abuse (Kids-TALK). PRIVATE on all three clients
+  // (Kyle, 2026-09-23), like help after sexual assault; it keeps its address, because a family has to get there.
+  'youth.advocacy',
 ] as const;
 /**
  * Private kinds (no Save, no Share, no history, quick exit: docs/08) that the three clients do not yet treat as
@@ -101,6 +104,13 @@ export function validateRows(rows: BundleRow[], todayStr: string, refusing: Map<
     if (!r.name || !r.what) e('name and what are required');
     if (/�/.test(JSON.stringify(r))) e('contains a broken character (encoding problem in the source)');
 
+    // A place that chooses not to publish where it is (flag `address_withheld`, DECISIONS 2026-09-23: Freedom House,
+    // a shelter for people seeking asylum). The owner's choice, held by the build: an address or a coordinate added
+    // later from a directory fails here, whatever its category.
+    if (r.flags.includes('address_withheld') && (r.address || r.lat !== undefined || r.lon !== undefined)) {
+      e('this place does not publish its address (flag address_withheld), so it must carry no address and no coordinates');
+    }
+    if (r.flags.includes('address_withheld') && r.phones.length === 0) e('a place that withholds its address publishes on its phone alone, so it must have one');
     // DV rows never carry a place. A schema rule, not an editorial habit (docs/08, audit A8). This holds even
     // when the shelter publishes its own address, which is why it is checked before the "own website" rule below
     // and not as an exception to it (DECISIONS 2026-09-20).

@@ -135,7 +135,8 @@ let needs: [Need] = [
         .init(id: "tests", query: Query(category: "health.sexual"))]),
     Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner")), .init(id: "repair", query: Query(category: "housing.repair"))]),
     Need(id: "utilities", symbol: "bolt", now: false, query: Query(category: "utilities")),
-    Need(id: "day", symbol: "clock", now: false, query: Query(category: "shelter.day")),
+    // Showers and laundry live here (Kyle, 2026-09-23; audit K5).
+    Need(id: "day", symbol: "clock", now: false, refine: [.init(id: "day", query: Query(category: "shelter.day")), .init(id: "wash", query: Query(category: "hygiene"))]),
     Need(id: "things", symbol: "tshirt", now: false, refine: [.init(id: "clothes", query: Query(category: "goods.clothes")), .init(id: "baby", query: Query(category: "goods.baby"))]),
     // Every harm-reduction place that stocks naloxone: the whole `harm` top-level, which is `harm.narcan` plus
     // `harm.supplies` (Wayne County's Well Wayne stations and the Life Points outreach), each of which says it

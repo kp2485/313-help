@@ -84,7 +84,7 @@ Research snapshot as of 2026-09-18. "Verified" means the URL/feed was seen in a 
 
 | Source | Layers | Tier | Licence |
 |---|---|---|---|
-| City of Detroit open data | DDOT Bus Routes, DDOT Bus Stops, QLine Stops, MoGo Stations, Bike Lanes | A | **Unstated** — the portal publishes a disclaimer and no grant. Flagged; ask the City (DECISIONS 2026-09-20) |
+| City of Detroit open data | DDOT Bus Routes, DDOT Bus Stops, QLine Stops, MoGo Stations, Bike Lanes | A | **Unstated** — the portal publishes a disclaimer and no grant. Accepted by Kyle on 2026-09-23 as facts, attributed, until the City answers; ask the City (DECISIONS 2026-09-23) |
 | SMART | routes and stops, from its published GTFS feed | A | **No terms published with the feed.** Flagged |
 | Detroit People Mover | stations, from its published GTFS feed | A | **No terms published with the feed.** Flagged |
 | MDOT | Carpool Lots (park and ride) | A | A disclaimer with no redistribution limit |

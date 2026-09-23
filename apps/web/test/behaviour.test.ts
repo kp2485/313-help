@@ -326,7 +326,7 @@ describe('a private listing is never shared, and no private list is ever drawn o
   // Kyle, 2026-09-23: HIV and STI tests and immigration legal help are private. They sit INSIDE groups that are drawn
   // (health, legal), so the rule has to be asked of the row, not only of its top-level kind.
   it('HIV and STI tests and immigration help are private, kept out of the URL, and never drawn beside their neighbours', () => {
-    for (const c of ['health.sexual', 'legal.immigration']) {
+    for (const c of ['health.sexual', 'legal.immigration', 'youth.advocacy']) {
       expect(isPrivate(c), c).toBe(true);
       expect(isSensitive(c), c).toBe(false);            // private, not sensitive: they keep an address, because people go there
       expect(hashFor({ v: 'list', cat: c }, () => false), c).toBeNull();
@@ -338,8 +338,10 @@ describe('a private listing is never shared, and no private list is ever drawn o
       { id: 'sal_tests', category: 'health.sexual', lat: 42.36 },
       { id: 'sal_legal', category: 'legal', lat: 42.37 },
       { id: 'sal_immigration', category: 'legal.immigration', lat: 42.38 },
+      { id: 'sal_youth', category: 'youth', lat: 42.39 },
+      { id: 'sal_kids_talk', category: 'youth.advocacy', lat: 42.4 },
     ];
-    expect(mapDrawable(rows, MAP_GROUPS.flatMap((g) => g.tops)).map((r) => r.id)).toEqual(['sal_clinic', 'sal_legal']);
+    expect(mapDrawable(rows, MAP_GROUPS.flatMap((g) => g.tops)).map((r) => r.id)).toEqual(['sal_clinic', 'sal_legal', 'sal_youth']);
     // Their neighbours are untouched.
     for (const c of ['health.clinic', 'health.prenatal', 'legal', 'ids.mail', 'seniors', 'veterans', 'disability']) expect(isPrivate(c), c).toBe(false);
   });

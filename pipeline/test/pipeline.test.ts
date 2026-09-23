@@ -128,9 +128,9 @@ describe('row validation', () => {
     expect(errs({ what: 'Contact Jane Smith for a food box' })).toMatch(/personal contact/);
     expect(errs({ eligibility: 'Email jane@example.org first' })).toMatch(/personal contact/);
   });
-  it('knows 63 categories, each once (docs/03)', () => {
-    expect(KNOWN_CATEGORIES.length).toBe(63);
-    expect(new Set(KNOWN_CATEGORIES).size).toBe(63);
+  it('knows 64 categories, each once (docs/03)', () => {
+    expect(KNOWN_CATEGORIES.length).toBe(64);
+    expect(new Set(KNOWN_CATEGORIES).size).toBe(64);
     // Added 2026-09-22 (Kyle's plan decision 3): somewhere open all night with a phone a person can use.
     for (const c of ['safe.police', 'safe.fire']) expect(KNOWN_CATEGORIES).toContain(c);
     // Added 2026-09-22 (category audit K3): ongoing mental-health support that is not a crisis service. It is a
@@ -140,6 +140,13 @@ describe('row validation', () => {
   it('rejects an unknown category', () => expect(errs({ category: 'food.pantries' })).toMatch(/unknown category/));
   // Kyle, 2026-09-23: HIV and STI testing and immigration legal help are private kinds. Until the three clients treat
   // them as private, a published row would be saved, shared and kept in history like any other, so none may publish.
+  // Kyle, 2026-09-23: Freedom House publishes a PO Box and a phone, and no street address, on purpose.
+  it('a place flagged address_withheld can never carry an address or a coordinate, and must have a phone', () => {
+    expect(errs({ flags: ['address_withheld'], address: undefined, lat: undefined, lon: undefined })).toBe('');
+    expect(errs({ flags: ['address_withheld'], address: { address_1: '1 Main St', city: 'Detroit' } as never })).toMatch(/address_withheld/);
+    expect(errs({ flags: ['address_withheld'], address: undefined, lat: 42.33, lon: -83.05 })).toMatch(/address_withheld/);
+    expect(errs({ flags: ['address_withheld'], address: undefined, lat: undefined, lon: undefined, phones: [] })).toMatch(/phone alone/);
+  });
   it('publishes the two private kinds only now that the clients treat them as private', () => {
     // The guard emptied in the same change that added both kinds to isPrivate on all three clients.
     expect(PRIVATE_NOT_YET_ON_CLIENTS).toEqual([]);

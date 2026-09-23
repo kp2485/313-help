@@ -498,7 +498,7 @@ class MapLayerRuleTest {
     fun thePrivateKindsInsideADrawnGroupAreNeverADot() {
         val rows = listOf(Row("health.clinic", 42.3), Row("health.sexual", 42.3), Row("legal", 42.3), Row("legal.immigration", 42.3))
         assertEquals(listOf("health.clinic", "legal"), drawable(rows, mapGroups.flatMap { it.tops }))
-        for (c in listOf("health.sexual", "legal.immigration")) {
+        for (c in listOf("health.sexual", "legal.immigration", "youth.advocacy")) {
             assertTrue(c, isPrivate(c))
             assertFalse(c, isSensitive(c))
         }
