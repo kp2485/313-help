@@ -98,6 +98,8 @@ export const NEEDS: Need[] = [
     { id: 'rent', query: { category: 'housing.rent' }, links: 'rent' },
     { id: 'own', query: { category: 'housing.owner' }, links: 'owner' },
     { id: 'repair', query: { category: 'housing.repair' }, links: 'owner' },
+    // Its first checked place arrived on 2026-09-23 (Detroit LeadSafe Housing), so the choice appears (Kyle's rule).
+    { id: 'lead', query: { category: 'housing.lead' } },
   ] },
   { id: 'utilities', icon: 'bolt', group: 'soon', query: { category: 'utilities' } },
   // Showers and laundry live here (Kyle, 2026-09-23; audit K5): most places with a shower are day centers already.

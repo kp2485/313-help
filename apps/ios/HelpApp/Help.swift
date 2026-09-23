@@ -133,7 +133,7 @@ let needs: [Need] = [
         .init(id: "support", query: Query(category: "health.support")),
         // HIV and STI tests and PrEP: a private kind (Kyle, 2026-09-23).
         .init(id: "tests", query: Query(category: "health.sexual"))]),
-    Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner")), .init(id: "repair", query: Query(category: "housing.repair"))]),
+    Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner")), .init(id: "repair", query: Query(category: "housing.repair")), .init(id: "lead", query: Query(category: "housing.lead"))]),
     Need(id: "utilities", symbol: "bolt", now: false, query: Query(category: "utilities")),
     // Showers and laundry live here (Kyle, 2026-09-23; audit K5).
     Need(id: "day", symbol: "clock", now: false, refine: [.init(id: "day", query: Query(category: "shelter.day")), .init(id: "wash", query: Query(category: "hygiene"))]),

@@ -122,6 +122,7 @@ val NEEDS: List<Need> = listOf(
         Refine("rent", Query(category = "housing.rent")),
         Refine("own", Query(category = "housing.owner")),
         Refine("repair", Query(category = "housing.repair")),
+        Refine("lead", Query(category = "housing.lead")),
     )),
     Need("utilities", "soon", query = Query(category = "utilities")),
     // Showers and laundry live here (Kyle, 2026-09-23; audit K5).

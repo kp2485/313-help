@@ -739,7 +739,7 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     // children's advocacy center is reached from "Browse every kind of help" under Young people, like the rest of it.
     expect(known.filter((c) => !fromNeed(c) && !unreachable.includes(c))).toEqual([
       'youth',
-      'health.prenatal', 'housing.lead', 'goods.home', 'goods.personal',
+      'health.prenatal', 'goods.home', 'goods.personal',
       'youth.advocacy',
     ]);
     for (const c of known) {
