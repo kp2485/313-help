@@ -12,9 +12,10 @@ Four parts:
 Kyle, 2026-09-22: *"The Neighborhood home should be a map view by default showing the full screen map zoomed into the polygon of the neighborhood that the user is in, with a list option up in the top right"*; then *"tapping on a neighborhood full screen should then animate-shrink the map to the top (with a back button top left)"*; then *"I want the map to disappear as the user scrolls down and have it still there when they scroll up."* The iPhone mirrors the web (DECISIONS 2026-09-22; `apps/web/src/areas.ts`, `cameraForArea` in `apps/web/src/map.ts`).
 
 - **The landing** is the map filling the tab under the top bar and above the tab bar — Urgent help, the title and the tabs all stay, and nothing is made inert. Only the outlines are on it: no dot, no listing, no value-carrying fill.
+- **The outlines are this map's subject**, so it draws them solid and heavier than the Map tab does, over the quietened streets (`areasMapBoundaryStyle`, docs/MAP-STYLE.md 15.7; never quietened with Increase Contrast).
 - **Where it opens.** On the polygon the phone has worked out from a position, a typed cross street or the centre of a typed ZIP: `MapCamera.forArea` fits the rings with an **8 %** margin, never closer than **4 m per point** and never wider than the map's own 90 m per point. The area is the Detroit neighborhood that holds the point, else the city that does (`Indicators.area(containing:)`), so Hamtramck, Highland Park and Dearborn residents land on their own outline. It is highlighted and named ("You are in Eastern Market"). Nothing known: the location card over the anchor view, gliding to the polygon when it is answered — arriving without travelling under Reduce Motion. Outside the four cities: the plain "The map stays on the city."
 - **Map | List** is two real buttons in the map's top corner, 44 points tall, each with `.isSelected` and a value a screen reader reads; it mirrors to the leading corner in Arabic, because the controls mirror and the map never does. The choice lives on `HoodsModel`, which is made once and dies with the app: **the map is the default every launch.** The list is the index the tab has always had, opening nearest-first when there is a point to measure from.
-- **Opening an area** keeps the map: `AreaStripScreen` pins it as a strip **38 %** of the screen tall with the outline framed, a Back button ("Back to the map") and the name at its top **leading** corner, and the area's own page scrolling under it. Tapping another outline in the strip swaps the page rather than pushing a second screen. Reading down collapses the strip to a **48-point** bar and turning round brings it back (`stripAt`, an 8-point turn, a 320 ms settling period); the height is the only thing that changes, so the map stays in the view and in the accessibility tree and nothing ever moves the scroll position. Reduce Motion collapses and returns without travelling. The scroll offset comes from `onScrollGeometryChange` on iOS 18 and from a zero-height `GeometryReader` inside the scroll view on iOS 17, which is the deployment target.
+- **Opening an area** keeps the map: `AreaStripScreen` pins it as a strip **38 %** of the screen tall with the outline framed, and the area's own page scrolling under it. Back and the area's name are the **system navigation bar** — one Back, not the strip's own under the system's (Kyle, 2026-09-23). Tapping another outline in the strip swaps the page rather than pushing a second screen. Reading down collapses the strip away entirely, and **only the top of the page brings it back** — scrolling up mid-page does not (`stripAt`, 8 points of reading before it shuts, a 320 ms settling period; Kyle, 2026-09-23). The height is the only thing that changes and nothing ever moves the scroll position; while shut, the map is out of the accessibility tree. Under the strip the page shows an "Open the map" row where a standalone page shows its outline card, because the strip already shows the outline. Reduce Motion collapses and returns without travelling. The scroll offset comes from `onScrollGeometryChange` on iOS 18 and from a zero-height `GeometryReader` inside the scroll view on iOS 17, which is the deployment target.
 - **The rules are in HelpCore** (`Sources/HelpCore/AreasHome.swift`: the landing table, the strip machine, the four numbers, the camera, and which area holds a point) and `Tests/HelpCoreTests/AreasHomeTests.swift` ports `apps/web/test/areas-map.test.ts` case for case. `Tests/AppParityTests/AreasHomeParityTests.swift` holds the numbers and the eight `hood.*` strings to the web's own files.
 - **Fixed on the way (2026-09-22):** `Indicators.init(from:)` is hand-written and never decoded `cities`, `areas`, `area_sources`, `pavement_year` or `permit_years`, so **every city page was silently missing on the phone** however good the bundle was — the city rows in the index, the Dearborn and Hamtramck pages, and the city outlines the Areas map now lands on. The five lines are back and `CityAreasTests`' bundle cases run instead of skipping.
 
@@ -72,7 +73,7 @@ All of `Tests/` runs with `swift test` from `apps/ios`, which is what the `ios-q
 
 ## Building it
 
-The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme `Help313`, product "313 Help", bundle id `org.help313.app`, deployment target iOS 17). That folder is still git-ignored (`apps/ios/.gitignore`), so a fresh clone has to recreate it; the steps under "Making the project again" below say how, and the project file itself is a small hand-written `project.pbxproj` if you would rather copy one. Everything the project *points at* — the Swift files, the asset catalog, the privacy manifest and the scripts — lives outside that folder and is in the repo. There is **one** target, the app: the tests are all in the SwiftPM package.
+The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme `Help313`, product "313 Help", bundle id `org.help313.app`, deployment target iOS 17). It is **in the repo** since 2026-09-23 (DECISIONS): the project file, the shared scheme, both Info.plists and `Project.xcconfig`. Only per-person state is ignored — `xcuserdata/` and `Xcode/Local.xcconfig`, which holds your signing team as one line, `DEVELOPMENT_TEAM = XXXXXXXXXX` (without it the Simulator build still works; a device build needs it). Everything the project *points at* — the Swift files, the asset catalog, the privacy manifest and the scripts — lives outside that folder and is in the repo. There is **one** target, the app: the tests are all in the SwiftPM package.
 
 1. Build the data bundle first, from the repo root: `pnpm build:bundle` (a store build uses `pnpm build:bundle:release`, so the snapshot is signed with the release key). The build phase copies `data/bundle/v1` into the app, **checks its signature against the keys that configuration pins**, and fails a Release build if it does not match. A missing folder fails the build.
 2. Open `apps/ios/Xcode/Help313.xcodeproj` in Xcode, pick an iPhone simulator, and Run. From the command line:
@@ -86,8 +87,7 @@ The Xcode project lives in `apps/ios/Xcode/` (`Help313.xcodeproj`, shared scheme
 
 ### How the project is wired
 
-- The `HelpApp/*.swift` files are referenced in place (`../HelpApp/…`), not copied. Editing them in Xcode edits the files in the repo. Today: `Help.swift`, `Views.swift`, `Screens.swift`, `BundleStore.swift`, `Config.swift`, `Reports.swift`, `Saved.swift`, `Palette.swift`, `HoodsScreen.swift`, `AddPlace.swift`, `Browse.swift`, the navigation work of 2026-09-22's five — `CrossStreet.swift`, `CityPage.swift`, `Directions.swift`, `DirectionsEntry.swift`, `RouteOverlay.swift` — and the Map tab's five: `MapScreen.swift`, `MapModel.swift`, `MapCanvas.swift`, `MapSubway.swift`, `MapPalette.swift`.
-- `HelpApp/Assets.xcassets` (the app icon) and `HelpApp/PrivacyInfo.xcprivacy` are referenced in place too and are copied in by the Resources phase.
+- **`HelpApp/` is a synchronized folder** (Xcode 16+): every file in it is in the app target, with nothing listed by name. A new Swift file is built the moment it is saved there. Until 2026-09-23 the files were listed one by one, and the six added on 2026-09-22 (`Browse`, `CityPage`, `CrossStreet`, `Directions`, `DirectionsEntry`, `RouteOverlay`) never reached the project, so the app stopped compiling (`Cannot find type 'DirDestination' in scope`). The folder is referenced in place (`../HelpApp`), not copied: editing a file in Xcode edits it in the repo. `Assets.xcassets` and `PrivacyInfo.xcprivacy` are in the same folder and are picked up as resources the same way.
 - `DetroitQuery` and `HelpCore` are local Swift package products from `apps/ios` (the `Package.swift` beside this README), linked into the app target.
 - `strings/en.json`, `es.json`, `ar.json` and `bn.json` are referenced in place from the repo root (`../../../strings/…`) and land flat in the app bundle, which is what `L.table(_:)` expects. `Info.plist` lists the same four under `CFBundleLocalizations`, so iOS offers them in `Locale.preferredLanguages`.
 - Build phase "Release preflight" (`Scripts/preflight.sh`, first phase, runs every build): does nothing for Debug; refuses a Release build whose origin or pinned keys are still placeholders, malformed, or a small-order point. See below.
@@ -121,8 +121,10 @@ It refuses: an empty or non-https origin, the placeholder host, fewer than two k
 
 ### Making the project again (or by hand in Xcode)
 
+The project is in the repo now, so this is only for starting over.
+
 1. File → New → Project → iOS App, named "313 Help", interface SwiftUI, language Swift, saved in `apps/ios/Xcode/`.
-2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag in **every** Swift file from `HelpApp/` (twenty-one today: the list under "How the project is wired"), choosing **Create groups** and leaving **Copy items** unticked. Drag in `HelpApp/Assets.xcassets` and `HelpApp/PrivacyInfo.xcprivacy` the same way.
+2. Delete the generated `ContentView.swift` and the `…App.swift` file. Drag the `HelpApp/` **folder** in as a folder (a synchronized group, not a group of files), leaving **Copy items** unticked, so every file in it — the Swift files, `Assets.xcassets` and `PrivacyInfo.xcprivacy` — is in the target without being listed. Add `Project.xcconfig` as the target's base configuration.
 3. File → Add Package Dependencies → Add Local… → select `apps/ios`. Add **both** the `DetroitQuery` and `HelpCore` libraries to the app target.
 4. Drag `strings/en.json`, `es.json`, `ar.json` and `bn.json` in from the repo root, without copying. Add a first Run Script phase containing `"$SRCROOT/../Scripts/preflight.sh"`, and a last Run Script phase "Copy and check bundle snapshot":
    ```sh
@@ -295,8 +297,8 @@ in HelpCore), instantly under Reduce Motion; a fix outside them moves nothing an
 `.isModal` — the map keeps working behind it — and its elements are read first. The decision is
 `firstOpenAction` in `HelpCore/Locate.swift`, shared word for word with the web and Android; the only thing
 stored is a boolean in `LocateFlagStore` (`map-locate.json`, in the excluded-from-backup state directory).
-**The Info.plist purpose string** (`NSLocationWhenInUseUsageDescription`, in the git-ignored `Xcode/` folder)
-should read: *"Your location stays on this phone. It sorts the list by distance and centres the map near you,
+**The Info.plist purpose string** (`NSLocationWhenInUseUsageDescription`, in `Xcode/Info.plist` and `Xcode/Info-Release.plist`)
+reads: *"Your location stays on this phone. It sorts the list by distance and centres the map near you,
 and is never saved or sent."*
 
 **What it draws**, in the web app's order and style (`apps/web/src/map.ts` is the original):
@@ -527,7 +529,6 @@ Not re-checked by hand: the app-switcher snapshot itself (synthetic gestures can
 - Not exercised yet: a real network refresh from a published `DC_BUNDLE_BASE`, the "older bundle refused" path against a live server, calling a number on a real phone, and Spanish (needs a Spanish simulator).
 - Never run on a device and never signed for one; the simulator builds sign with "Sign to Run Locally".
 - No launch-screen artwork beyond `INFOPLIST_KEY_UILaunchScreen_Generation`.
-- `apps/ios/Xcode/` is git-ignored, so the project file and the two Info.plists are not in the repo. Unignore it once it settles, or rebuild it from the steps above.
 - `Scripts/preflight.sh` and `Scripts/verify-snapshot.swift` restate in shell and in a standalone script what `Sources/HelpCore` states in Swift. They must be changed together; `ReleaseRuleTests` reads both files and fails when the key rules drift apart, which catches a missing rule but not a differently-worded one.
 
 ## Release blockers left
@@ -536,7 +537,6 @@ Not re-checked by hand: the app-switcher snapshot itself (synthetic gestures can
 |---|---|---|
 | i20 | The two release public keys (`DC_PIN_ACTIVE`, `DC_PIN_SPARE`) and the real origin. The build now refuses to ship without them, and refuses a snapshot they did not sign. | **Kyle** (generate and hold the keys; register the domain) |
 | i26 | A device build, signing, and an Apple developer account | **Kyle** (account), then work |
-| i27 | `apps/ios/Xcode/` is git-ignored | a decision to unignore it |
 | i28 | `report.failed` and `privacy.reset_failed` in all four string files | the strings owner |
 | — | Store labels and the age rating questionnaire (docs/08). The privacy manifest now declares Other User Content, not linked, not tracking — the nutrition label must match. | **Kyle** |
 | — | The overdose steps still need a review by DHD, MDHHS or counsel before a public release | **Kyle** |

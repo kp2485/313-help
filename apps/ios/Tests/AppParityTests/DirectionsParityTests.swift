@@ -206,6 +206,13 @@ final class DirectionsParityTests: XCTestCase {
             XCTAssertEqual(swiftRow.contains("names: true"), band != "city", "\(band) names, iPhone")
             XCTAssertEqual((webRow ?? "").contains("names: true"), band != "city", "\(band) names, web")
         }
+        // The Areas tab's own weights (docs/MAP-STYLE.md 15.7): solid, and the same three pairs on both clients.
+        for pair in ["1.8, 2.6", "2.4, 3.2", "3.0, 3.6"] {
+            XCTAssertTrue(web.contains("[\(pair)]"), "areasMapBoundaryStyle \(pair), web")
+        }
+        for (w, c) in [("1.8", "2.6"), ("2.4", "3.2"), ("3.0", "3.6")] {
+            XCTAssertTrue(swift.contains("s.width = \(w); s.cityWidth = \(c)"), "areasMapBoundaryStyle \(w)/\(c), iPhone")
+        }
         // The cap, the minimum width a name needs, the selected stroke and the wash.
         for (webName, swiftName, want) in [("BOUNDARY_NAME_CAP", "boundaryNameCap", 12.0),
                                            ("BOUNDARY_NAME_MIN_PX", "boundaryNameMinPoints", 70.0),

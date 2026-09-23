@@ -62,10 +62,12 @@ struct CityPageView: View {
                 .padding(12).frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.warnBg, in: RoundedRectangle(cornerRadius: 12))
                 .fixedSize(horizontal: false, vertical: true)
-            HoodOutlineMap(hood: area.hood, origin: d.origin) {
+            let toMap = {
                 map.show(LatLon(lat: area.hood.center[0], lon: area.hood.center[1]), radiusMeters: 4000)
                 nav.tab = .map
             }
+            // Under the Areas strip the outline is already on screen above the page (HoodPageView says why).
+            if chrome { HoodOutlineMap(hood: area.hood, origin: d.origin, open: toMap) } else { OpenMapRow(open: toMap) }
             if isDetroit {
                 HoodFoot(L.t("city.detroit_children"))
                 NavigationLink(value: HoodRoute.index) {
@@ -401,6 +403,8 @@ struct AreasMapView: View {
 
     @Environment(\.accessibilityReduceTransparency) private var plainBackgrounds
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorScheme) private var scheme
+    @Environment(\.colorSchemeContrast) private var contrast
     @State private var camera = MapCamera(centerX: 0, centerY: 0, scale: MapCamera.minScale, width: 1, height: 1)
     @State private var sized = false
     @State private var lastDrag: CGSize = .zero
@@ -416,8 +420,12 @@ struct AreasMapView: View {
     var body: some View {
         GeometryReader { geo in
             Canvas(opaque: false, rendersAsynchronously: false) { ctx, size in
+                // The outlines are this map's subject (docs/MAP-STYLE.md 15.7): solid and heavier, over quiet
+                // streets — unless Increase Contrast is on, which keeps every street at full strength.
                 MapPainter.draw(MapScene(camera: camera, base: base, drawParks: false, areas: shown,
-                                         areaSelected: selected, plainColors: plainBackgrounds),
+                                         areaSelected: selected, areasMap: true,
+                                         quietFor: contrast == .increased ? nil : (scheme == .dark ? .dark : .light),
+                                         plainColors: plainBackgrounds),
                                 into: ctx, size: size)
             }
             .onAppear { fit(geo.size) }

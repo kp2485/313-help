@@ -1,0 +1,337 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000005 /* en.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* en.json */; };
+		A10000000000000000000006 /* es.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* es.json */; };
+		A10000000000000000000007 /* DetroitQuery in Frameworks */ = {isa = PBXBuildFile; productRef = A90000000000000000000001 /* DetroitQuery */; };
+		A10000000000000000000018 /* HelpCore in Frameworks */ = {isa = PBXBuildFile; productRef = A90000000000000000000003 /* HelpCore */; };
+		A10000000000000000000041 /* ar.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* ar.json */; };
+		A10000000000000000000042 /* bn.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* bn.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A20000000000000000000005 /* en.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = en.json; path = ../../../strings/en.json; sourceTree = SOURCE_ROOT; };
+		A20000000000000000000006 /* es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = es.json; path = ../../../strings/es.json; sourceTree = SOURCE_ROOT; };
+		A20000000000000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A20000000000000000000008 /* 313 Help.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "313 Help.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000011 /* Info-Release.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Release.plist"; sourceTree = "<group>"; };
+		A20000000000000000000041 /* ar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = ar.json; path = ../../../strings/ar.json; sourceTree = SOURCE_ROOT; };
+		A20000000000000000000042 /* bn.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = bn.json; path = ../../../strings/bn.json; sourceTree = SOURCE_ROOT; };
+		AC0000000000000000000002 /* Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		AB0000000000000000000001 /* HelpApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			name = HelpApp;
+			path = ../HelpApp;
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A30000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000007 /* DetroitQuery in Frameworks */,
+				A10000000000000000000018 /* HelpCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A40000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000001 /* HelpApp */,
+				AC0000000000000000000002 /* Project.xcconfig */,
+				A40000000000000000000003 /* Resources */,
+				A20000000000000000000007 /* Info.plist */,
+				A20000000000000000000011 /* Info-Release.plist */,
+				A40000000000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A40000000000000000000003 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000005 /* en.json */,
+				A20000000000000000000006 /* es.json */,
+				A20000000000000000000041 /* ar.json */,
+				A20000000000000000000042 /* bn.json */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000008 /* 313 Help.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A50000000000000000000001 /* Help313 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A80000000000000000000002 /* Build configuration list for PBXNativeTarget "Help313" */;
+			buildPhases = (
+				A60000000000000000000004 /* Release preflight */,
+				A60000000000000000000001 /* Sources */,
+				A30000000000000000000001 /* Frameworks */,
+				A60000000000000000000002 /* Resources */,
+				A60000000000000000000003 /* Copy and check bundle snapshot */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AB0000000000000000000001 /* HelpApp */,
+			);
+			name = Help313;
+			packageProductDependencies = (
+				A90000000000000000000001 /* DetroitQuery */,
+				A90000000000000000000003 /* HelpCore */,
+			);
+			productName = Help313;
+			productReference = A20000000000000000000008 /* 313 Help.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A70000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+			};
+			buildConfigurationList = A80000000000000000000001 /* Build configuration list for PBXProject "Help313" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				es,
+				Base,
+			);
+			mainGroup = A40000000000000000000001;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AA0000000000000000000001 /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A40000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A50000000000000000000001 /* Help313 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A60000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000005 /* en.json in Resources */,
+				A10000000000000000000006 /* es.json in Resources */,
+				A10000000000000000000041 /* ar.json in Resources */,
+				A10000000000000000000042 /* bn.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A60000000000000000000003 /* Copy and check bundle snapshot */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy and check bundle snapshot";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nRES=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nSNAP=\"$RES/bundle-snapshot\"\nFLOOR=\"$RES/bundle-floor.txt\"\nrm -rf \"$SNAP\"\ncp -R \"$SRCROOT/../../../data/bundle/v1\" \"$SNAP\"\n: > \"$FLOOR\"\n# `env -u SDKROOT`: inside a build phase SDKROOT points at the iOS simulator SDK, and this script is a\n# little macOS program (it uses CryptoKit, which a Mac always has).\n# The snapshot is checked against the keys THIS configuration pins, and its date becomes the oldest list the\n# build will accept. A Release build that would ship a snapshot the app itself refuses fails here instead.\nif [ \"${CONFIGURATION:-Debug}\" = \"Release\" ]; then\n\tenv -u SDKROOT -u PLATFORM_NAME -u SUPPORTED_PLATFORMS -u TOOLCHAINS swift \"$SRCROOT/../Scripts/verify-snapshot.swift\" \"$SNAP\" \"$FLOOR\" \"${DC_PIN_ACTIVE:-}\" \"${DC_PIN_SPARE:-}\"\nelse\n\tenv -u SDKROOT -u PLATFORM_NAME -u SUPPORTED_PLATFORMS -u TOOLCHAINS swift \"$SRCROOT/../Scripts/verify-snapshot.swift\" \"$SNAP\" \"$FLOOR\" \"${DC_PIN_ACTIVE:-}\" \"${DC_PIN_SPARE:-}\" || echo \"warning: the bundle snapshot does not verify against this build's pinned keys; a Release build would fail here\"\nfi\n";
+		};
+		A60000000000000000000004 /* Release preflight */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Release preflight";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../Scripts/preflight.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A60000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A80000000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A80000000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A80000000000000000000021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AC0000000000000000000002 /* Project.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DC_API_BASE = "http://localhost:5173/";
+				DC_BUNDLE_BASE = "http://localhost:5173/data/bundle/v1/";
+				DC_PIN_ACTIVE = "MCowBQYDK2VwAyEA8lho2BDn7lpQzqJrs9UHHB/3ScO2T8JUwXpSt/hFdZ8=";
+				DC_PIN_SPARE = "";
+				DC_RELEASE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "313 Help";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.help313.app;
+				PRODUCT_NAME = "313 Help";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A80000000000000000000022 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AC0000000000000000000002 /* Project.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DC_API_BASE = "https://set-this-domain.invalid/";
+				DC_BUNDLE_BASE = "https://set-this-domain.invalid/data/bundle/v1/";
+				DC_PIN_ACTIVE = "SET-RELEASE-KEY-ACTIVE";
+				DC_PIN_SPARE = "SET-RELEASE-KEY-SPARE";
+				DC_RELEASE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Info-Release.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "313 Help";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.help313.app;
+				PRODUCT_NAME = "313 Help";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A80000000000000000000001 /* Build configuration list for PBXProject "Help313" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A80000000000000000000011 /* Debug */,
+				A80000000000000000000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A80000000000000000000002 /* Build configuration list for PBXNativeTarget "Help313" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A80000000000000000000021 /* Debug */,
+				A80000000000000000000022 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		AA0000000000000000000001 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A90000000000000000000001 /* DetroitQuery */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DetroitQuery;
+		};
+		A90000000000000000000003 /* HelpCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HelpCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A70000000000000000000001 /* Project object */;
+}

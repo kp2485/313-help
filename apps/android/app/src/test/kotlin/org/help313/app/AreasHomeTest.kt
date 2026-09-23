@@ -153,23 +153,24 @@ class AreasHomeTest {
         assertEquals(StripState.OPEN, stripAt(StripScroll(StripState.SHUT, 900, 0), -40).state)
     }
 
+    /** Kyle, 2026-09-23: scrolling back up does not bring the map back; only the top of the page does. */
     @Test
-    fun readingDownShutsItAndTurningRoundOpensItAgainNotOnlyAtTheTop() {
-        val down = walk(listOf(0, 40, 200, 600))
-        assertEquals(StripState.SHUT, down.last().state)
-        // Now up a little, still 500 dp down the page: the map comes back.
-        val up = stripAt(stripAt(down.last(), 560), 520)
-        assertEquals(StripState.OPEN, up.state)
-        assertEquals(520, up.y)
+    fun readingDownShutsItAndOnlyTheTopOpensItAgain() {
+        var at = walk(listOf(0, 40, 200, 600)).last()
+        assertEquals(StripState.SHUT, at.state)
+        for (y in listOf(560, 520, 300, 100, 1)) {
+            at = stripAt(at, y)
+            assertEquals("at $y", StripState.SHUT, at.state)
+        }
+        assertEquals(StripState.OPEN, stripAt(at, 0).state)
+        assertEquals(StripState.SHUT, stripAt(stripAt(at, 40), 400).state)
     }
 
     @Test
-    fun aWobbleAtTheEndOfAFlickDoesNotFlapIt() {
+    fun aWobbleAtTheStartOfAReadDoesNotShutIt() {
         assertEquals(8, AREAS_TURN_PX)
-        val shut = walk(listOf(0, 40, 400)).last()
-        assertEquals(StripState.SHUT, shut.state)
-        assertEquals("4 dp back is not a turn", StripState.SHUT, stripAt(shut, 396).state)
-        assertEquals("10 dp back is", StripState.OPEN, stripAt(stripAt(shut, 396), 390).state)
+        assertEquals("4 dp is not reading", StripState.OPEN, stripAt(stripStart(), 4).state)
+        assertEquals("10 dp is", StripState.SHUT, stripAt(stripAt(stripStart(), 4), 10).state)
     }
 
     @Test

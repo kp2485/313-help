@@ -36,6 +36,11 @@ struct MapScene {
     /// The outline a tap chose: a wash of the land colour and a solid line, so the tap can be seen. Never a fill
     /// that carries a value — docs/13's first honesty rule forbids a choropleth.
     var areaSelected = ""
+    /// The Areas tab's map, where the outlines are the subject: `areasMapBoundaryStyle` (docs/MAP-STYLE.md 15.7).
+    var areasMap = false
+    /// On that map, the streets under the outlines in the quietened basemap of this scheme. Nil with Increase
+    /// Contrast, where every street stays at full strength.
+    var quietFor: MapScheme?
     var me: LatLon?
     /// The whole trip a Directions screen is showing: the walking and riding legs, and their markers.
     var route: DrawnRoute?
@@ -63,6 +68,7 @@ enum MapPainter {
         // The quietened basemap: `subway` only, a network layer on, and never with Increase Contrast. Otherwise
         // `quiet` is nil and every colour and width below is exactly what it always was.
         let quiet = s.subway.flatMap { $0.quietBasemap ? QuietBasemap.tokens($0.scheme) : nil }
+            ?? s.quietFor.map { QuietBasemap.tokens($0) }
 
         if let base = s.base {
             var hatch = Path()
@@ -145,7 +151,7 @@ enum MapPainter {
         // city outline is heavier than a neighbourhood's, and that is the only difference between them — never a
         // different colour, and never a fill.
         var areaLabels: [(name: String, x: Double, y: Double, d: Double)] = []
-        let bs = boundaryStyle(mpp)
+        let bs = s.areasMap ? areasMapBoundaryStyle(mpp) : boundaryStyle(mpp)
         for a in s.areas {
             var shape = Path()
             for ring in a.rings { trace(ring, cam: cam, into: &shape, close: true) }

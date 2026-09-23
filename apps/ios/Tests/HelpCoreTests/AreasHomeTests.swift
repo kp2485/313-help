@@ -155,21 +155,22 @@ final class AreasStripTests: XCTestCase {
         XCTAssertEqual(stripAt(StripScroll(state: .shut, y: 900, pivot: 0), y: -40).state, .open)
     }
 
-    func testReadingDownShutsItAndTurningRoundOpensItAgain() {
-        let down = walk([0, 40, 200, 600])
-        XCTAssertEqual(down.last!.state, .shut)
-        // Now up a little, still 520 points down the page: the map comes back.
-        let up = stripAt(stripAt(down.last!, y: 560), y: 520)
-        XCTAssertEqual(up.state, .open)
-        XCTAssertEqual(up.y, 520)
+    /// Kyle, 2026-09-23: scrolling back up does not bring the map back; only the top of the page does.
+    func testReadingDownShutsItAndOnlyTheTopOpensItAgain() {
+        var at = walk([0, 40, 200, 600]).last!
+        XCTAssertEqual(at.state, .shut)
+        for y in [560.0, 520, 300, 100, 1] {
+            at = stripAt(at, y: y)
+            XCTAssertEqual(at.state, .shut, "at \(y)")
+        }
+        XCTAssertEqual(stripAt(at, y: 0).state, .open)
+        XCTAssertEqual(stripAt(stripAt(at, y: 40), y: 400).state, .shut)
     }
 
-    func testAWobbleAtTheEndOfAFlickDoesNotFlapIt() {
+    func testAWobbleAtTheStartOfAReadDoesNotShutIt() {
         XCTAssertEqual(areasTurnPoints, 8)
-        let shut = walk([0, 40, 400])[2]
-        XCTAssertEqual(shut.state, .shut)
-        XCTAssertEqual(stripAt(shut, y: 396).state, .shut)                       // 4 points back is not a turn
-        XCTAssertEqual(stripAt(stripAt(shut, y: 396), y: 390).state, .open)      // 10 points back is
+        XCTAssertEqual(stripAt(stripStart(), y: 4).state, .open)                         // 4 points is not reading
+        XCTAssertEqual(stripAt(stripAt(stripStart(), y: 4), y: 10).state, .shut)         // 10 points is
     }
 
     func testItNeverMovesThePage() {

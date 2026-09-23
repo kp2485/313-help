@@ -456,12 +456,15 @@ struct HoodPageView: View {
                 .padding(12).frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.warnBg, in: RoundedRectangle(cornerRadius: 12))
                 .fixedSize(horizontal: false, vertical: true)
-            HoodOutlineMap(hood: hood, origin: d.origin) {
-                // Cheap, because the Map tab's camera is a handful of numbers: show the middle of this
-                // neighborhood and hand the tab over. Nothing about the person is involved.
+            // Cheap, because the Map tab's camera is a handful of numbers: show the middle of this neighborhood and
+            // hand the tab over. Nothing about the person is involved.
+            let toMap = {
                 map.show(LatLon(lat: hood.center[0], lon: hood.center[1]), radiusMeters: 1600)
                 nav.tab = .map
             }
+            // Under the Areas strip the outline is already on screen, framed, above this page: a second picture of
+            // it is 150 points of repetition, so the page keeps only what the picture did — the way to the Map tab.
+            if chrome { HoodOutlineMap(hood: hood, origin: d.origin, open: toMap) } else { OpenMapRow(open: toMap) }
             HoodHelpPanel(hood: hood, d: d)
             HoodMoneyPanel(hood: hood, d: d, view: yearView)
             HoodConditionsPanel(hood: hood, d: d, view: yearView)
@@ -480,18 +483,18 @@ struct HoodPageView: View {
  up"*).
 
  What it is: the same outlines map the tab lands on, `areasStripFraction` of the screen tall, pinned above the
- area's own page, with the outline the page is about framed and picked out in it. On it, at the top **leading**
- corner — the top-left of an English screen, the top-right of an Arabic one, because the map is the one thing in
- this app that never mirrors and a control bar is not the map — a real Back button that says where it goes, and
- the area's name.
+ area's own page, with the outline the page is about framed and picked out in it. Back and the area's name are
+ the system's own navigation bar (Kyle, 2026-09-23: the strip used to draw a second Back under the system's,
+ which was one Back too many). The web and Android have no system bar, so they keep the strip's own.
 
  Tapping another outline in the strip swaps the page underneath rather than pushing a second copy of this screen:
  one map, one page, whichever outline is under the finger.
 
- **It is a collapsing header.** Reading down shuts it to a `areasBarPoints` bar that keeps Back and the name;
- the moment a person turns round it comes back (`stripAt`, HelpCore — an 8-point turn). The height is the only
- thing that changes: the map stays in the view, stays in the accessibility tree, and the scroll position is never
- touched by us. Under Reduce Motion it still collapses and still returns — it just arrives rather than travels.
+ **It is a collapsing header.** Reading down shuts it away entirely — Back and the name stay in the navigation
+ bar — and only the top of the page brings it back (`stripAt`, HelpCore; Kyle, 2026-09-23). The height is the only
+ thing that changes, and the scroll position is never touched by us. While it is shut the map leaves the
+ accessibility tree, since nothing of it is on screen. Under Reduce Motion it still collapses and still returns —
+ it just arrives rather than travels.
  */
 struct AreaStripScreen: View {
     let model: HoodsModel
@@ -503,7 +506,6 @@ struct AreaStripScreen: View {
     @State private var strip = stripStart()
     /// When the strip last really changed size, in milliseconds. Nothing is stored; it dies with the screen.
     @State private var changedAt = 0.0
-    @AccessibilityFocusState private var focusHeading: Bool
 
     init(id: String, model: HoodsModel) {
         self.model = model
@@ -520,62 +522,30 @@ struct AreaStripScreen: View {
 
     var body: some View {
         GeometryReader { geo in
-            let full = max(areasBarPoints, geo.size.height * areasStripFraction)
+            let full = geo.size.height * areasStripFraction
             VStack(spacing: 0) {
                 stripView(full: full)
                 pageBelow
             }
         }
         .background(Color.appBg.ignoresSafeArea())
-        // No title in the top bar: the strip's own bar names the page 48 points below it, and two identical
-        // headings one under the other is noise on a phone (Kyle, 2026-09-22). The screen is still NAMED for a
-        // screen reader — the container carries the area's name, and the bar's copy of it is the heading
-        // VoiceOver's cursor is moved to when the page opens.
-        .navigationTitle("").navigationBarTitleDisplayMode(.inline)
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(name)
+        // The system bar carries Back and the name: one of each (Kyle, 2026-09-23).
+        .navigationTitle(L.rightToLeft ? ltr(name) : name).navigationBarTitleDisplayMode(.inline)
         .urgentHelp()
-        .onAppear { focusHeading = true }
     }
 
     // MARK: the strip
 
     private func stripView(full: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) {
-            AreasMapView(areas: map.areas, base: map.base, selected: $picked,
-                         open: { swap(to: $0) }, openOn: rings, openId: areaId,
-                         height: full, framed: false)
-            bar
-        }
-        // The collapse is height, and nothing else: the map is still there, merely small.
-        .frame(height: strip.state == .shut ? areasBarPoints : full, alignment: .top)
-        .clipped()
-        .animation(reduceMotion ? nil : .easeOut(duration: areasShrinkMilliseconds / 1000), value: strip.state)
-        .accessibilityElement(children: .contain)
-    }
-
-    /// Back and the name. It is what is left when the strip has collapsed, so it can never be smaller than a
-    /// 44-point target plus its padding — which is what `areasBarPoints` is.
-    private var bar: some View {
-        HStack(spacing: 6) {
-            Button { dismissToMap() } label: {
-                Image(systemName: "chevron.backward")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(Color.brand)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(L.t("hood.back_map"))
-            Text(L.rightToLeft ? ltr(name) : name)
-                .font(.headline).foregroundStyle(Color.ink).lineLimit(1).minimumScaleFactor(0.7)
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityFocused($focusHeading)
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 2)
-        .frame(height: areasBarPoints)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.regularMaterial)
+        AreasMapView(areas: map.areas, base: map.base, selected: $picked,
+                     open: { swap(to: $0) }, openOn: rings, openId: areaId,
+                     height: full, framed: false)
+            // The collapse is height, and nothing else: the map is still there, merely out of sight.
+            .frame(height: strip.state == .shut ? 0 : full, alignment: .top)
+            .clipped()
+            .overlay(alignment: .bottom) { Rectangle().fill(Color.line).frame(height: 1) }
+            .animation(reduceMotion ? nil : .easeOut(duration: areasShrinkMilliseconds / 1000), value: strip.state)
+            .accessibilityHidden(strip.state == .shut)
     }
 
     // MARK: the page under it
@@ -618,12 +588,9 @@ struct AreaStripScreen: View {
         picked = id
         strip = stripStart()
         changedAt = 0
-        focusHeading = true
         UIAccessibility.post(notification: .announcement, argument: map.area(id: id)?.name ?? "")
     }
 
-    @Environment(\.dismiss) private var dismiss
-    private func dismissToMap() { dismiss() }
 }
 
 /// The scroll offset, on both floors the app supports. iOS 18 has a real answer for this; iOS 17 is the
@@ -1561,6 +1528,23 @@ struct HoodYearsTable: View {
 /// the signed bundle with the same Canvas and the same projection as the Map tab. No tile server, nothing fetched,
 /// nothing sent. It is decoration and a shortcut, never the only way to a fact — every number is in the words
 /// below it — so VoiceOver gets one button with one sentence and not a picture to puzzle over.
+/// The way from an area page to the Map tab, where the page already sits under the outline it is about.
+struct OpenMapRow: View {
+    let open: () -> Void
+    var body: some View {
+        Button(action: open) {
+            HStack(spacing: 12) {
+                Image(systemName: "map").foregroundStyle(Color.brand)
+                Text(L.t("hood.mine_map")).font(.body.weight(.semibold)).foregroundStyle(Color.ink)
+                    .fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "chevron.forward").font(.footnote.weight(.semibold)).foregroundStyle(Color.muted)
+            }
+            .card(padding: 14)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct HoodOutlineMap: View {
     let hood: Hood
     let origin: [Double]

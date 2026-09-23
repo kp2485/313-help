@@ -130,7 +130,9 @@ class AreaOutlineView(
         val density = resources.displayMetrics.density
         val cam = camera ?: cameraFor() ?: return
         camera = cam
-        val style = boundaryStyle(cam.metersPerPoint)
+        // The Areas tab's own weights (docs/MAP-STYLE.md 15.7): here the outlines are the subject, so they are
+        // solid and heavier than the Map tab's dashed lattice.
+        val style = areasMapBoundaryStyle(cam.metersPerPoint)
         for (area in areas) {
             val path = Path()
             path.fillType = Path.FillType.EVEN_ODD
@@ -150,14 +152,13 @@ class AreaOutlineView(
                 fill.color = UI.color(context, R.color.brand_soft)
                 canvas.drawPath(path, fill)
             }
-            // **The same table as the Map tab** ([boundaryStyle], docs/MAP-STYLE.md section 15): a boundary is one
-            // thing wherever it is drawn, and the only difference between a city and a neighbourhood is weight.
-            // The dash is absolute in dp, never scaled by the stroke width.
+            // [areasMapBoundaryStyle] (docs/MAP-STYLE.md 15.7): the same colour token as the Map tab, solid, and
+            // the only difference between a city and a neighbourhood is weight.
             stroke.color = if (picked) UI.color(context, R.color.brand) else UI.color(context, R.color.map_bnd)
             stroke.strokeWidth =
                 (if (picked) BOUNDARY_SELECTED_WIDTH else if (area.isCity) style.cityWidth else style.width).toFloat() * density
             stroke.pathEffect =
-                if (picked) null
+                if (picked || style.dash.isEmpty()) null
                 else android.graphics.DashPathEffect(style.dash.map { (it * density).toFloat() }.toFloatArray(), 0f)
             canvas.drawPath(path, stroke)
         }
