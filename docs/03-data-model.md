@@ -167,7 +167,7 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 | `connect` | Free computers, internet and phones | "I need a phone, internet, or a computer" |
 | `pets` | Pet care and food | "Help with my pet" |
 | `safe.police` / `safe.fire` | Police station · Fire station | "Get somewhere safe now" (Right now, and a row at the bottom of the urgent sheet; 911 first on that screen), beside `health.er`. A category says what a row **offers**, not who runs it: what these two offer is a door that is never locked and a phone inside it. Both come from City open data and carry the plain "from the City's list, last updated …" badge — never "checked by a person". A fire station is staffed but the crew goes out, so its row says "Ring the bell. If no one answers, call 911." |
-| `health.prenatal` / `health.sexual` | Care in pregnancy · HIV and STI tests, and PrEP | `health.sexual`: "Doctor, dentist, or eyes" → *HIV and STI tests, and PrEP*. **Private** (Kyle, 2026-09-23): no Save, no Share, no history, quick exit; it keeps its address, and is never a dot on the Map tab. `health.prenatal` has no checked listing yet and no choice |
+| `health.prenatal` / `health.sexual` | Care in pregnancy · HIV and STI tests, and PrEP | `health.sexual`: "Doctor, dentist, or eyes" → *HIV and STI tests, and PrEP*. **Private** (Kyle, 2026-09-23): no Save, no Share, no history, quick exit; it keeps its address, and is never a dot on the Map tab. `health.prenatal`: "Doctor, dentist, or eyes" → *Care while pregnant* since 2026-09-23 (CHASS and Planned Parenthood Detroit, read in Kyle's Chrome) |
 | `housing.repair` / `housing.lead` | Free home repairs · Lead in my home | `housing.repair`: "Rent or keeping my home" → *Fix my home*; `housing.lead` → *Lead in my home* since its first checked place (Detroit LeadSafe Housing, read in Kyle's Chrome on 2026-09-23) |
 | `goods.home` / `goods.personal` / `hygiene.laundry` | Furniture and home things · Pads, tampons and toiletries · Laundry | No checked listing yet and no choice: what exists is mostly referral programs and one-day events. Reached from "Browse every kind of help" until they have places |
 | `legal.immigration` | Immigration legal help | "Free legal help" (the whole `legal` kind). **Private**, as `health.sexual` |
@@ -176,12 +176,12 @@ Keep it small and resident-worded. Map to HSDS taxonomy terms (Open Eligibility 
 | `seniors` · `veterans` · `disability` (as **categories**) | Help built for seniors · for veterans · for people with a disability | "Seniors, veterans, disability", one tile with three choices (Kyle, 2026-09-23). A senior center, a Vet Center, a center for independent living. A place that only *welcomes* the group keeps its own category and carries the flag below. On the Map tab they ride in the "Money, housing, papers, and more help" layer |
 | `seniors` / `veterans` / `lgbtq` / `youth` / `women` / `men` / `reentry` / `disability` / `immigrants` / `pregnant` / `paid_training` / `referral_only` / language (`spanish`, `arabic`, `bengali`) / access (`walk_in`, `appointment_required`, `no_id_required`, `sliding_fee`, `medicaid`) / `address_withheld` | Flags, not categories. `address_withheld` (2026-09-23) marks a place that chooses not to publish where it is (Freedom House): the build refuses an address or coordinate for it and requires a phone. `reentry` = for people with a record or coming home from prison; "I have a record" lists jobs with it first |
 
-**64 slugs in all since 2026-09-23 (15 added that day, `youth.advocacy` among them); 55 of them have a live listing.**
-The nine without one: `shelter.warming` and `shelter.cooling` (alert-driven), `food.benefits` (emptied by the category
-audit), `kids.care` (its one row was Head Start, now `kids.prek`), and five of the new kinds — `health.prenatal`,
+**64 slugs in all since 2026-09-23 (15 added that day, `youth.advocacy` among them); 56 of them have a live listing.**
+The eight without one: `shelter.warming` and `shelter.cooling` (alert-driven), `food.benefits` (emptied by the category
+audit), `kids.care` (its one row was Head Start, now `kids.prek`), and four of the new kinds —
 `goods.home`, `goods.personal`, `hygiene.laundry` and `connect.phone`. The last two already sit under a
 Help screen that lists their whole parent kind (showers and laundry; phones and internet), so a place appears there as
-soon as it is checked. The other three get a choice of their own only once they have checked places; until then they are
+soon as it is checked. The other two get a choice of their own only once they have checked places; until then they are
 reached from "Browse every kind of help", and `apps/web/test/web.test.ts` names each one on purpose.
 *Before 2026-09-23:* **49 slugs in all; 46 of them had a live listing on 2026-09-22.** `shelter.warming` and `shelter.cooling` are
 alert-driven and empty on purpose; `food.benefits` was emptied by the category audit.

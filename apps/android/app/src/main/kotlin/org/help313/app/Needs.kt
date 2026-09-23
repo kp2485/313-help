@@ -117,6 +117,7 @@ val NEEDS: List<Need> = listOf(
         Refine("support", Query(category = "health.support")),
         // HIV and STI tests and PrEP: a private kind (Kyle, 2026-09-23).
         Refine("tests", Query(category = "health.sexual")),
+        Refine("pregnant", Query(category = "health.prenatal")),
     )),
     Need("home", "soon", refine = listOf(
         Refine("rent", Query(category = "housing.rent")),
