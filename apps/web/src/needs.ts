@@ -91,10 +91,13 @@ export const NEEDS: Need[] = [
     // Ongoing mental-health support that is not a crisis service: day programs a person can walk into. Also the
     // second half of "I need to talk to someone", where it sits below 988 and the crisis places (docs/05).
     { id: 'support', query: { category: 'health.support' } },
+    // HIV and STI tests and PrEP: a PRIVATE kind (Kyle, 2026-09-23), so its list and its rows leave no trace.
+    { id: 'tests', query: { category: 'health.sexual' } },
   ] },
   { id: 'home', icon: 'key', group: 'soon', refine: [
     { id: 'rent', query: { category: 'housing.rent' }, links: 'rent' },
     { id: 'own', query: { category: 'housing.owner' }, links: 'owner' },
+    { id: 'repair', query: { category: 'housing.repair' }, links: 'owner' },
   ] },
   { id: 'utilities', icon: 'bolt', group: 'soon', query: { category: 'utilities' } },
   { id: 'day', icon: 'clock', group: 'soon', query: { category: 'shelter.day' } },
@@ -125,10 +128,18 @@ export const NEEDS: Need[] = [
     { id: 'taxes', query: { category: 'money.tax' }, links: 'taxes' },
     { id: 'benefits', query: { category: 'money.benefits' }, links: 'benefits' },
   ] },
-  { id: 'childcare', icon: 'people', group: 'later', query: { category: 'kids.care' }, links: 'childcare' },
+  // All of `kids`: child care itself and the free Head Start and pre-K programs (`kids.prek`, 2026-09-23). The links
+  // below the list are how a family gets help paying, which is the State's program rather than a place.
+  { id: 'childcare', icon: 'people', group: 'later', query: { category: 'kids' }, links: 'childcare' },
   { id: 'phone', icon: 'wifi', group: 'later', query: { category: 'connect' }, links: 'phone' },
   { id: 'rides', icon: 'transit', group: 'later', query: { category: 'transport' }, links: 'rides' },
   { id: 'pets', icon: 'paw', group: 'later', query: { category: 'pets' }, links: 'pets' },
+  // Help BUILT for one group of people (Kyle, 2026-09-23): one tile for three groups rather than three tiles.
+  { id: 'groups', icon: 'people', group: 'later', refine: [
+    { id: 'seniors', query: { category: 'seniors' } },
+    { id: 'veterans', query: { category: 'veterans' } },
+    { id: 'disability', query: { category: 'disability' } },
+  ] },
 ];
 
 /** Browse-by-type chips on the Help tab. The map and events have their own tabs. */
@@ -184,7 +195,9 @@ export const MAP_GROUPS: { id: string; icon: string; tops: string[] }[] = [
   { id: 'kids', icon: 'people', tops: ['kids', 'youth'] },
   // Every label names what is in its layer: this one is clothes and baby things, showers and laundry, and pet help.
   { id: 'things', icon: 'shirt', tops: ['goods', 'hygiene', 'pets'] },
-  { id: 'paperwork', icon: 'card', tops: ['housing', 'utilities', 'money', 'legal', 'ids', 'transport'] },
+  // Seniors, veterans and disability help ride here (2026-09-23): a layer of their own would need a new colour in
+  // three map palettes, and "more help" says so.
+  { id: 'paperwork', icon: 'card', tops: ['housing', 'utilities', 'money', 'legal', 'ids', 'transport', 'seniors', 'veterans', 'disability'] },
 ];
 /** Never a layer, never a dot: treatment and help after sexual assault are private (PRIVATE), and inside the
  *  groups above a single listing is still dropped when it is sensitive (shelter.dv, health.mental). */
@@ -193,10 +206,11 @@ export const PRIVATE_TOPS = ['treatment', 'assault'];
 /** Domestic violence and mental-health crisis listings: no URL, no map dot, no distance, can't be saved (docs/08, 10-A8). */
 export const SENSITIVE = ['shelter.dv', 'health.mental'];
 export const isSensitive = (category: string) => SENSITIVE.some((c) => category === c || category.startsWith(c + '.'));
-/** Treatment and help after sexual assault (DECISIONS 2026-09-19): never saved and never in the browser's history, and
+/** Treatment and help after sexual assault (DECISIONS 2026-09-19), and since 2026-09-23 HIV and STI tests and
+ *  immigration legal help (Kyle: "both private"): never saved and never in the browser's history, and
  *  the detail screen has the quick exit. Unlike the sensitive listings they keep an address, a map dot and a distance,
  *  because people have to get there. Every sensitive listing is private too. */
-export const PRIVATE = ['treatment', 'assault'];
+export const PRIVATE = ['treatment', 'assault', 'health.sexual', 'legal.immigration'];
 export const isPrivate = (category: string) => isSensitive(category) || PRIVATE.some((c) => category === c || category.startsWith(c + '.'));
 
 /** The rows a screen that mixes categories draws from (`Need.categories`). A category matches whole or as a
@@ -217,7 +231,9 @@ export function mapDrawable<T extends { category: string; lat?: number }>(rows: 
   return rows.filter((r) => {
     if (r.lat === undefined) return false;
     const top = r.category.split('.')[0]!;
-    return !isSensitive(r.category) && !PRIVATE_TOPS.includes(top) && tops.includes(top);
+    // A private kind can sit inside a group that is drawn (HIV tests inside health, immigration inside legal), so the
+    // rule asks isPrivate of the row itself, not only whether its whole top-level kind is private.
+    return !isPrivate(r.category) && tops.includes(top);
   });
 }
 

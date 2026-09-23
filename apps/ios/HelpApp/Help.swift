@@ -130,8 +130,10 @@ let needs: [Need] = [
         .init(id: "dentist", query: Query(category: "health.dental")),
         .init(id: "eyes", query: Query(category: "health.vision")),
         // Ongoing mental-health support that is not a crisis service: day programs a person can walk into.
-        .init(id: "support", query: Query(category: "health.support"))]),
-    Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner"))]),
+        .init(id: "support", query: Query(category: "health.support")),
+        // HIV and STI tests and PrEP: a private kind (Kyle, 2026-09-23).
+        .init(id: "tests", query: Query(category: "health.sexual"))]),
+    Need(id: "home", symbol: "key", now: false, refine: [.init(id: "rent", query: Query(category: "housing.rent")), .init(id: "own", query: Query(category: "housing.owner")), .init(id: "repair", query: Query(category: "housing.repair"))]),
     Need(id: "utilities", symbol: "bolt", now: false, query: Query(category: "utilities")),
     Need(id: "day", symbol: "clock", now: false, query: Query(category: "shelter.day")),
     Need(id: "things", symbol: "tshirt", now: false, refine: [.init(id: "clothes", query: Query(category: "goods.clothes")), .init(id: "baby", query: Query(category: "goods.baby"))]),
@@ -147,10 +149,13 @@ let needs: [Need] = [
     Need(id: "legal", symbol: "building.columns", now: false, later: true, query: Query(category: "legal")),
     Need(id: "id", symbol: "person.text.rectangle", now: false, later: true, query: Query(category: "ids")),
     Need(id: "money", symbol: "dollarsign.circle", now: false, later: true, refine: [.init(id: "taxes", query: Query(category: "money.tax")), .init(id: "benefits", query: Query(category: "money.benefits"))]),
-    Need(id: "childcare", symbol: "figure.2.and.child.holdinghands", now: false, later: true, query: Query(category: "kids.care")),
+    // All of `kids`: child care and the free Head Start and pre-K programs (`kids.prek`, 2026-09-23).
+    Need(id: "childcare", symbol: "figure.2.and.child.holdinghands", now: false, later: true, query: Query(category: "kids")),
     Need(id: "phone", symbol: "wifi", now: false, later: true, query: Query(category: "connect")),
     Need(id: "rides", symbol: "bus", now: false, later: true, query: Query(category: "transport")),
     Need(id: "pets", symbol: "pawprint", now: false, later: true, query: Query(category: "pets")),
+    // Help built for one group of people (Kyle, 2026-09-23): one tile for three groups rather than three tiles.
+    Need(id: "groups", symbol: "person.3", now: false, later: true, refine: [.init(id: "seniors", query: Query(category: "seniors")), .init(id: "veterans", query: Query(category: "veterans")), .init(id: "disability", query: Query(category: "disability"))]),
 ]
 
 func telURL(_ number: String) -> URL? { URL(string: telLink(number)) }

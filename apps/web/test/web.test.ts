@@ -91,7 +91,7 @@ describe('needs list', () => {
   });
   it('an emergency room and urgent care are their own kinds of help, the emergency room first and led by 911', () => {
     const doctor = NEEDS.find((n) => n.id === 'doctor')!;
-    expect(doctor.refine!.map((r) => r.id)).toEqual(['er', 'urgent', 'doctor', 'dhd', 'dentist', 'eyes', 'support']);
+    expect(doctor.refine!.map((r) => r.id)).toEqual(['er', 'urgent', 'doctor', 'dhd', 'dentist', 'eyes', 'support', 'tests']);
     expect(doctor.refine![0]!.query).toEqual({ category: 'health.er' });
     expect(doctor.refine![1]!.query).toEqual({ category: 'health.urgent' });
     // 911 sits above the emergency-room list, and only there: the plain "a doctor or nurse" screen has no 911 row.
@@ -721,7 +721,7 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     const src = readFileSync(join(root, 'pipeline/src/validate.ts'), 'utf8');
     const block = src.slice(src.indexOf('export const KNOWN_CATEGORIES = ['), src.indexOf('] as const;'));
     const known = [...block.matchAll(/'([a-z_.]+)'/g)].map((m) => m[1]!);
-    expect(known.length).toBe(49);
+    expect(known.length).toBe(63);
     const hits = (q: string | undefined, c: string) => !!q && (c === q || c.startsWith(q + '.'));
     // A need reaches a category through its own query, a refinement's, a second list's, or — for a screen that
     // mixes kinds, like "Get somewhere safe now" — through `categories`.
@@ -733,7 +733,12 @@ describe('the Map tab (one tab in place of Recreation and Transit, Kyle 2026-09-
     expect(unreachable).toEqual(['shelter.warming', 'shelter.cooling']);
     // Reached from "Browse every kind of help" only, and from no need screen. Listed for Kyle in the audit; a
     // category added later must get a need screen or be added here on purpose.
-    expect(known.filter((c) => !fromNeed(c) && !unreachable.includes(c))).toEqual(['hygiene.shower', 'youth']);
+    // And, on purpose, the kinds added on 2026-09-23 that have no checked listing yet (DECISIONS 2026-09-23: a choice
+    // reaches a Help screen only once it has places in it). Each leaves this list when its choice is added.
+    expect(known.filter((c) => !fromNeed(c) && !unreachable.includes(c))).toEqual([
+      'hygiene.shower', 'youth',
+      'health.prenatal', 'housing.lead', 'goods.home', 'goods.personal', 'hygiene.laundry',
+    ]);
     for (const c of known) {
       const top = c.split('.')[0]!;
       const groups = MAP_GROUPS.filter((g) => g.tops.includes(top)).length;

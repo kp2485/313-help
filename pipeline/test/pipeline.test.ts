@@ -7,7 +7,7 @@ import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
 import { p, parsePhone, sha256, today, uuid5, type CsvRow } from '../src/util.js';
-import { KNOWN_CATEGORIES, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsdsPrivacy, validateRows } from '../src/validate.js';
+import { KNOWN_CATEGORIES, PRIVATE_NOT_YET_ON_CLIENTS, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsdsPrivacy, validateRows } from '../src/validate.js';
 import { readScriptRefusingHosts } from '../src/seed-io.js';
 import { applyAggregates } from '../src/reports-sync.js';
 import { recheckTask, syncTasks } from '../src/tasks-sync.js';
@@ -140,9 +140,13 @@ describe('row validation', () => {
   it('rejects an unknown category', () => expect(errs({ category: 'food.pantries' })).toMatch(/unknown category/));
   // Kyle, 2026-09-23: HIV and STI testing and immigration legal help are private kinds. Until the three clients treat
   // them as private, a published row would be saved, shared and kept in history like any other, so none may publish.
-  it('refuses a published row in a private kind the clients do not treat as private yet', () => {
-    for (const c of ['health.sexual', 'legal.immigration']) expect(errs({ category: c }), c).toMatch(/private/);
-    for (const c of ['health.prenatal', 'kids.prek', 'ids.mail', 'seniors', 'veterans', 'disability']) expect(errs({ category: c }), c).toBe('');
+  it('publishes the two private kinds only now that the clients treat them as private', () => {
+    // The guard emptied in the same change that added both kinds to isPrivate on all three clients.
+    expect(PRIVATE_NOT_YET_ON_CLIENTS).toEqual([]);
+    for (const c of ['health.sexual', 'legal.immigration', 'health.prenatal', 'kids.prek', 'ids.mail', 'seniors', 'veterans', 'disability']) expect(errs({ category: c }), c).toBe('');
+    // And the pipeline and the web agree which kinds are private (the web's list is read as text).
+    const web = readFileSync(p('apps/web/src/needs.ts'), 'utf8');
+    for (const c of ['health.sexual', 'legal.immigration']) expect(web).toMatch(new RegExp(`export const PRIVATE = \\[[^\\]]*'${c.replace('.', '\\.')}'`));
   });
   // Emergency rooms and urgent care are their own kinds (DECISIONS 2026-09-20): neither says it is free or
   // low-cost, which is what health.clinic means.

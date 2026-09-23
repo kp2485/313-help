@@ -41,7 +41,9 @@ export const KNOWN_CATEGORIES = [
  * private. A published row in one of these would be saved, shared and remembered like any other, so the build
  * refuses it. Empty this list in the same change that adds the kinds to `isPrivate` on the web, iPhone and Android.
  */
-export const PRIVATE_NOT_YET_ON_CLIENTS = ['health.sexual', 'legal.immigration'] as const;
+// 2026-09-23: health.sexual and legal.immigration were here until the web, iPhone and Android treated them as private
+// (the same change emptied this list). Keep the list: the next private kind waits here too.
+export const PRIVATE_NOT_YET_ON_CLIENTS: readonly string[] = [];
 const CATEGORY = { test: (c: string) => (KNOWN_CATEGORIES as readonly string[]).includes(c) };
 // Patterns that suggest a person's contact details leaked into public text.
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]+/;

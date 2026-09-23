@@ -328,6 +328,21 @@ final class MapLayerRuleTests: XCTestCase {
         mapDrawable(rows, tops: tops, category: { $0.category }, hasPoint: { $0.lat != nil }).map(\.category)
     }
 
+    /// Kyle, 2026-09-23: HIV and STI tests and immigration help are private, and they sit INSIDE groups that are
+    /// drawn (health, legal). The rule is asked of the row, so they never become a dot beside their neighbours;
+    /// and they cannot be saved. The same cases as apps/web/test/behaviour.test.ts.
+    func testThePrivateKindsInsideADrawnGroupAreNeverADot() {
+        let rows = [Row(category: "health.clinic", lat: 42.3), Row(category: "health.sexual", lat: 42.3),
+                    Row(category: "legal", lat: 42.3), Row(category: "legal.immigration", lat: 42.3)]
+        XCTAssertEqual(drawable(rows, mapGroups.flatMap(\.tops)), ["health.clinic", "legal"])
+        for c in ["health.sexual", "legal.immigration"] {
+            XCTAssertTrue(isPrivate(c), c); XCTAssertFalse(isSensitive(c), c); XCTAssertFalse(canSave(c), c)
+        }
+        for c in ["health.clinic", "health.prenatal", "legal", "ids.mail", "seniors", "veterans", "disability"] {
+            XCTAssertFalse(isPrivate(c), c)
+        }
+    }
+
     /// The rule the whole tab hangs on. Treatment and help after sexual assault are never drawn, whatever is
     /// switched on; a DV shelter and a mental-health crisis line are dropped row by row inside their own group.
     func testTheListingsThatAreNeverADot() {
