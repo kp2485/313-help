@@ -90,6 +90,14 @@ object Directions {
     @Volatile
     private var buildingKey: String? = null
 
+    /**
+     * Everyone who asked for a key while that key was already being built, answered when the build ends. Without
+     * this a second caller was told `Building` by nobody and the result by nobody, and a screen that had moved on
+     * from the first caller's trip (back, then Directions to somewhere else, inside the second the build takes)
+     * sat on "Getting the map ready" for good.
+     */
+    private val waiting = HashMap<String, MutableList<(State) -> Unit>>()
+
     /** How long the last build took, in milliseconds. A number for the timing log, never a screen. */
     @Volatile
     var lastBuildMs: Long = 0
@@ -113,6 +121,10 @@ object Directions {
      * `Building` if any work is needed, and once with the result. `read` is called on the calling thread, so the
      * caller decides whether that is a background one; `MainActivity` runs the whole thing on `Work.io`.
      *
+     * **Every caller gets its result.** A call for a key that is already being built does not build it again: it
+     * is told `Building` at once and then the same result as the call that started the build, on that call's
+     * thread, when the build ends.
+     *
      * `read` returns null when the bundle has no street files at all, which is `Unavailable`, not an error.
      */
     fun prepare(
@@ -120,17 +132,23 @@ object Directions {
         read: () -> Pair<List<PackedStreets>, List<TransitLayerFiles>>?,
         onState: (State) -> Unit,
     ) {
-        synchronized(this) {
+        val joined = synchronized(this) {
             val held = state
             if (held is State.Ready && held.graph.key == "${org.help313.query.STREET_GRAPH_VERSION}:$key") {
                 onState(held)
                 return
             }
-            if (buildingKey == key) return                     // a second tap while the first build runs
-            buildingKey = key
-            state = State.Building
+            if (buildingKey == key) {
+                waiting.getOrPut(key) { ArrayList() }.add(onState)   // a second ask while the first build runs
+                true
+            } else {
+                buildingKey = key
+                state = State.Building
+                false
+            }
         }
         onState(State.Building)
+        if (joined) return
         val next = try {
             val files = read()
             if (files == null || files.first.isEmpty()) {
@@ -146,10 +164,12 @@ object Directions {
         } catch (t: Throwable) {
             State.Unavailable(t.javaClass.simpleName)
         }
-        synchronized(this) {
+        val others = synchronized(this) {
             state = next
-            buildingKey = null
+            if (buildingKey == key) buildingKey = null
+            waiting.remove(key).orEmpty()
         }
         onState(next)
+        for (other in others) other(next)
     }
 }

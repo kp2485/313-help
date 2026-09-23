@@ -58,13 +58,19 @@ final class DirPlanner {
     private(set) var failed = false
     private var graph: StreetGraph?
     private var network: TransitNetwork?
-    private var building = false
+    /// The build in flight. A second screen that asks while it runs waits for it rather than being told "not
+    /// built", and no screen leaving can cancel it (HelpCore/OneRun.swift).
+    private let run = OneRun()
 
-    /// The map files, then the graph. Safe to call as often as a screen likes; it does the work once.
+    /// The map files, then the graph. Safe to call as often as a screen likes; it does the work once, and a call
+    /// made while the work runs returns when it has finished.
     func build(from store: BundleStore) async {
-        guard !built, !building else { return }
-        building = true
-        defer { building = false }
+        guard !built else { return }
+        await run.run { [self] in await load(from: store) }
+    }
+
+    private func load(from store: BundleStore) async {
+        guard !built else { return }
         guard let baseSrc = store.mapSource("map/base.json") else { noFiles = true; return }
         let cellsSrc = store.mapSource("map/streets.json")
         do {
