@@ -116,8 +116,9 @@ function post(msg: ToWorker, onReply: (r: FromWorker) => void): void {
  * URL, and the `<meta>` policy in index.html blocks it. That client exists only under `vite dev`. The only cost is
  * that the page does not reload itself when the server comes back. Never add `blob:` (or a `worker-src`) to the
  * policy to quiet it (CLAUDE.md). Separately, under `vite dev` this classic worker is served as unbundled source
- * with `import` lines, so it fails to start and Directions stays on "Getting the map ready". Test Directions on
- * a build (`pnpm --filter @313help/web build`, then serve dist/), not on the dev server.
+ * with `import` lines, so it fails to start and Directions says "The map could not be read" (the `error` handler
+ * below; DECISIONS 2026-09-23). Test Directions on a build (`pnpm --filter @313help/web build`, then serve
+ * dist/), not on the dev server.
  */
 function ensureWorker(): void {
   if (worker || noWorker) return;
