@@ -96,8 +96,8 @@ public func hasPhone(_ row: BundleRow) -> Bool { row.phones.first != nil }
 /// is: no address, no ZIP, no coordinate, no distance, no map and no directions (docs/08).
 /// A screen puts it into `safe.dv_serves` ("Serves {area}").
 public func serviceAreaStringKey(_ row: BundleRow) -> String? {
-    guard isDvCategory(row.category) else { return nil }
-    return serviceAreaKey(row.serviceArea)
+    // Every DV row, and since 2026-09-24 any row with an area and no coordinate (DetroitQuery `servesAreaKey`).
+    servesAreaKey(row)
 }
 
 /// Every domestic-violence listing carries the one sentence `safe.dv_no_address`: the shelter does not share

@@ -120,8 +120,19 @@ A `shelter.dv` row (and any sub-category of it) carries **no `address`, no `lat`
 | `wayne_county_downriver` | Taylor City Hall, the largest city of the Downriver communities |
 | `oakland_county` | the US Census Bureau's internal point for Oakland County (42.6605, −83.3842; 2026-09-24) |
 | `macomb_county` | the US Census Bureau's internal point for Macomb County (42.6716, −82.9115; 2026-09-24) |
+| every other city and township in the area (71 ids, below) | the US Census Bureau's internal point for that place (`data/ingested/region.json`; 2026-09-24) |
 | `statewide` | none — ranks after every local area |
 | `national` | none — ranks after every local area |
+
+The 71 place ids are the place's own id without `city_`: `allen_park`, `auburn_hills`, `berkley`, `birmingham`, `bloomfield_hills`, `bloomfield_township`, `center_line`, `chesterfield_township`, `clawson`, `clinton_township`, `commerce_township`, `dearborn_heights`, `eastpointe`, `ecorse`, `farmington`, `farmington_hills`, `ferndale`, `fraser`, `garden_city`, `grosse_pointe`, `grosse_pointe_farms`, `grosse_pointe_park`, `grosse_pointe_shores`, `grosse_pointe_woods`, `harper_woods`, `harrison_township`, `hazel_park`, `huntington_woods`, `inkster`, `lathrup_village`, `lincoln_park`, `livonia`, `macomb_township`, `madison_heights`, `melvindale`, `mount_clemens`, `new_baltimore`, `novi`, `oak_park`, `orion_township`, `pleasant_ridge`, `pontiac`, `redford_township`, `river_rouge`, `riverview`, `rochester`, `rochester_hills`, `romulus`, `roseville`, `royal_oak`, `royal_oak_township`, `shelby_township`, `southfield`, `southfield_township`, `southgate`, `st_clair_shores`, `sterling_heights`, `sylvan_lake`, `taylor`, `trenton`, `troy`, `utica`, `walled_lake`, `warren`, `waterford_township`, `wayne`, `west_bloomfield_township`, `westland`, `white_lake_township`, `wixom`, `wyandotte`.
+
+**Not only domestic violence (2026-09-24, Kyle's choice (a)).** `servesByArea(row)` is true for every `shelter.dv` row
+and for **any row that names a `service_area` and has no coordinate** — a phone-only local service (a ride program,
+Meals on Wheels, nurse home visits) or a place the geocoder could not put on the map. Such a row is banded from its
+area's reference point exactly as below, its `miles` is `null`, and a screen says "Serves {area}" (`servesAreaKey`).
+A row with a coordinate ranks by the coordinate and may not name an area as well (the build refuses it; `pnpm geocode`
+drops the area when it places a row). A non-DV row with no coordinate and no area still ranks in band 0, as a
+hotline does. Held by `13-dv-service-area.json`.
 
 The table lives in **code** (`packages/query/src/areas.ts`, mirrored in `Areas.swift` and `Areas.kt`), never in a row. Every shelter serving one area therefore shares one identical point, and that point is a city hall or a county's Census internal point, never a shelter. No ZIP codes and no neighbourhoods: an area must be a whole city or bigger.
 

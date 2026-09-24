@@ -27,6 +27,8 @@ for (const r of rows) {
   if (!hit) { console.warn(`no match: ${r.sal_id} (${r.address_1})`); continue; }
   if (!inBbox(hit.lat, hit.lon)) { console.warn(`outside the service area, ignored: ${r.sal_id}`); continue; }
   r.lat = hit.lat.toFixed(6); r.lon = hit.lon.toFixed(6);
+  // A row that named its area because it had no point ranks by the point now (validate.ts).
+  if (r.service_area) { console.log(`  ${r.sal_id}: placed, so its service_area "${r.service_area}" is dropped`); r.service_area = ''; }
   if (!r.zip && hit.zip) r.zip = hit.zip;
   console.log(`${r.sal_id}: ${r.lat}, ${r.lon}`);
 }

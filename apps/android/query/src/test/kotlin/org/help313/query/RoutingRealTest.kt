@@ -36,7 +36,7 @@ class RoutingRealTest {
         return null
     }
 
-    private class Row(val id: String, val lat: Double, val lon: Double)
+    private class Row(val id: String, val lat: Double, val lon: Double, val city: String)
 
     private fun listings(): List<Row> {
         val dir = File(bundle, "category")
@@ -48,7 +48,7 @@ class RoutingRealTest {
             for (r in rows) {
                 val lat = r["lat"]?.num
                 val lon = r["lon"]?.num
-                if (lat != null && lon != null) out.add(Row(r["id"]?.str ?: "", lat, lon))
+                if (lat != null && lon != null) out.add(Row(r["id"]?.str ?: "", lat, lon, r["address"]?.get("city")?.str ?: ""))
             }
         }
         return out
@@ -226,9 +226,17 @@ class RoutingRealTest {
         if (layers.isEmpty()) return Unit.also { skip("no transit layers") }
         if (rows.size < 40) return Unit.also { skip("no built bundle") }
         val net = buildTransitNetwork(layers)
-        val near = rows.count { stopsNear(net, LatLon(it.lat, it.lon), 400.0).isNotEmpty() }
-        println("transit coverage: $near of ${rows.size} listings have a stop within 400 m (${100 * near / rows.size}%)")
-        assertTrue(near.toDouble() / rows.size > 0.9)                  // the study measured 92%
+        // The study measured 92% in the first four cities; SMART's suburban stops are further apart (2026-09-24), so
+        // the rest of the area is held to a lower, stated floor, as in packages/query/test/routing-real.test.ts.
+        val firstFour = setOf("Detroit", "Hamtramck", "Highland Park", "Dearborn")
+        val (first, rest) = rows.partition { it.city in firstFour }
+        fun covered(list: List<Row>): Double =
+            list.count { stopsNear(net, LatLon(it.lat, it.lon), 400.0).isNotEmpty() }.toDouble() / maxOf(1, list.size)
+        val f = covered(first)
+        val r = covered(rest)
+        println("transit coverage: first four cities ${(100 * f).toInt()}% of ${first.size}; the rest ${(100 * r).toInt()}% of ${rest.size}")
+        assertTrue("first four cities $f", f > 0.9)
+        assertTrue("the rest of the area $r", r > 0.5)
     }
 
     @Test

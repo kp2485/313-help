@@ -35,7 +35,8 @@ final class RoutingRealTests: XCTestCase {
         return []
     }()
 
-    struct Row: Decodable { var id: String; var name: String; var category: String; var lat: Double?; var lon: Double? }
+    struct Address: Decodable { var city: String? }
+    struct Row: Decodable { var id: String; var name: String; var category: String; var lat: Double?; var lon: Double?; var address: Address? }
 
     static let rows: [Row] = {
         let dir = bundle.appendingPathComponent("category")
@@ -204,10 +205,15 @@ final class RoutingRealTests: XCTestCase {
         try skipUnlessRows()
         let net = Self.network!
         let withCoords = Self.rows.filter { $0.lat != nil && $0.lon != nil }
-        let near = withCoords.filter { !stopsNear(net, LatLon(lat: $0.lat!, lon: $0.lon!), metres: 400).isEmpty }.count
-        print("transit coverage: \(near) of \(withCoords.count) listings have a stop within 400 m "
-            + "(\(Int((100 * Double(near) / Double(withCoords.count)).rounded()))%)")
-        XCTAssertGreaterThan(Double(near) / Double(withCoords.count), 0.9)   // the study measured 92%
+        let covered = { (list: [Row]) in Double(list.filter { !stopsNear(net, LatLon(lat: $0.lat!, lon: $0.lon!), metres: 400).isEmpty }.count) / Double(max(1, list.count)) }
+        // The study measured 92% in the first four cities; SMART's suburban stops are further apart (2026-09-24), so
+        // the rest of the area is held to a lower, stated floor, as in packages/query/test/routing-real.test.ts.
+        let first: Set<String> = ["Detroit", "Hamtramck", "Highland Park", "Dearborn"]
+        let inFirst = withCoords.filter { first.contains($0.address?.city ?? "") }, rest = withCoords.filter { !first.contains($0.address?.city ?? "") }
+        let f = covered(inFirst), r = covered(rest)
+        print("transit coverage: first four cities \(Int((100 * f).rounded()))% of \(inFirst.count); the rest \(Int((100 * r).rounded()))% of \(rest.count)")
+        XCTAssertGreaterThan(f, 0.9)
+        XCTAssertGreaterThan(r, 0.5)
     }
 
     func testPlansTheStudysTripWithNoTimeAnywhereInIt() throws {

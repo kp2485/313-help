@@ -1,5 +1,5 @@
 import {
-  badge, bundleAge, effectiveNow, helpAlong, isDvCategory, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens, serviceAreaKey, SERVICE_BBOX,
+  badge, bundleAge, effectiveNow, helpAlong, isDvCategory, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens, serviceAreaKey, servesAreaKey, SERVICE_BBOX,
   type Alert, type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@313help/query';
 import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang } from './i18n.js';
@@ -330,10 +330,11 @@ const searchBtn = () => `<button class="searchbtn" ${go({ v: 'search' })}>${icon
 const rowLink = (view: View, ic: string, title: string, sub = '', own = false, subHtml = '') =>
   `<li><button class="row" ${go(view)}><span class="rowic">${icon(ic)}</span><span class="rowtx"><strong>${own ? owner(title) : esc(title)}</strong>${subHtml || sub ? `<small>${subHtml || esc(sub)}</small>` : ''}</span>${icon('chevron', 'sm turn dim')}</button></li>`;
 
-// A domestic-violence row's only statement about where it is: the coarse area it serves, in words. Never a
-// distance, never a dot, never "near you" — the row carries no place at all (docs/08, schema/query-spec.md).
+// The coarse area a row serves, in words, for a row described by its area (`servesByArea`): every domestic-violence
+// row, whose only statement about where it is this is (docs/08), and a phone-only local service or a row with no map
+// point (2026-09-24). Never a distance, never "near you".
 const areaPill = (row: BundleRow) => {
-  const key = isDvCategory(row.category) ? serviceAreaKey(row.service_area ?? '') : null;
+  const key = servesAreaKey(row);
   return key ? `<span class="pill plain">${T('safe.dv_serves', { area: t(key) })}</span>` : '';
 };
 function card(r: Ranked, showDistance = true): string {

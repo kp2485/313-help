@@ -4,7 +4,7 @@ export { openNow, nextOccurrences, assertScheduleValid } from './schedule.js';
 export { isHoliday, holidayApplies, OPEN_HOLIDAYS_FLAG } from './holidays.js';
 export { badge, bundleAge, detroitDay, type BundleAge } from './freshness.js';
 export { rank, miles, type Query, type Ranked } from './rank.js';
-export { SERVICE_AREAS, SERVICE_AREA_IDS, SERVICE_BBOX, AREA_BAND_MILES, inServiceArea, isServiceArea, serviceAreaKey, isDvCategory, type ServiceArea } from './areas.js';
+export { SERVICE_AREAS, SERVICE_AREA_IDS, SERVICE_BBOX, AREA_BAND_MILES, inServiceArea, isServiceArea, serviceAreaKey, isDvCategory, servesByArea, servesAreaKey, type ServiceArea } from './areas.js';
 export { search, searchTokens, matchTier, normalizeText, type Searchable } from './search.js';
 export { helpAlong, nearestSegment, milesToSegment, milesToLine, WALK_MILES, type Segment, type Phase } from './places.js';
 // Directions, all computed on the device (DECISIONS 2026-09-22). schema/query-spec.md "Streets graph",

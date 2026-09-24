@@ -2,7 +2,7 @@ import type { Alert, Badge, BundleRow, OpenResult } from './types.js';
 import { badge } from './freshness.js';
 import { nextOccurrences, openNow } from './schedule.js';
 import { nowWallMinutes } from './time.js';
-import { AREA_BAND_MILES, SERVICE_AREAS, isDvCategory } from './areas.js';
+import { AREA_BAND_MILES, SERVICE_AREAS, isDvCategory, servesByArea } from './areas.js';
 
 // One ranking rule (DECISIONS 10-B2):
 //   eligibility -> preferred flags (if asked) -> distance band -> wide area -> reported-closed last
@@ -10,7 +10,8 @@ import { AREA_BAND_MILES, SERVICE_AREAS, isDvCategory } from './areas.js';
 // No freshness tier: time passing never reorders a list; only reports do (DECISIONS 2026-09-19).
 // Distance comes before everything except eligibility because many users have no car.
 // A domestic-violence row has no coordinate at all, so it gets its band from its service area's public
-// reference point instead, and never a distance (areas.ts, schema/query-spec.md, DECISIONS 2026-09-20).
+// reference point instead, and never a distance (areas.ts, schema/query-spec.md, DECISIONS 2026-09-20). Since
+// 2026-09-24 so does any row that names a service area and has no coordinate (`servesByArea`).
 
 export interface Query {
   /** Category slug or prefix: "food" matches "food.pantry". */
@@ -48,7 +49,8 @@ function bandOf(mi: number | null): 0 | 1 | 2 {
 }
 
 /**
- * Band and wide-area key for a domestic-violence row. Every input is public and per-area: the person's own
+ * Band and wide-area key for a row ranked by its area (a domestic-violence row, or a row with an area and no
+ * coordinate). Every input is public and per-area: the person's own
  * location (which never leaves the device) and a city hall's coordinate that is identical for every shelter
  * serving that area. The row itself contributes nothing but the name of the area.
  *
@@ -95,10 +97,10 @@ export function rank(rows: BundleRow[], q: Query, now: Date, alerts: Alert[] = [
     .map((row) => {
       // DV rows never carry coordinates and never get a distance (docs/08). Their band comes from the public
       // reference point of the area they serve, so proximity works without any fact that locates a shelter.
-      const dv = isDvCategory(row.category);
-      const mi = !dv && q.near && row.lat !== undefined && row.lon !== undefined
+      const byArea = servesByArea(row);
+      const mi = !isDvCategory(row.category) && q.near && row.lat !== undefined && row.lon !== undefined
         ? miles(q.near, { lat: row.lat, lon: row.lon }) : null;
-      const { band, wide } = dv ? dvBand(row, q.near) : { band: bandOf(mi), wide: 0 as const };
+      const { band, wide } = byArea ? dvBand(row, q.near) : { band: bandOf(mi), wide: 0 as const };
       const open = openNow(row, now, alerts);
       const key = mode === 'week' ? openKeyWeek(row, open, now, alerts) : openKeyNow(open, today);
       return { row, open, badge: badge(row, now), miles: mi, band, key, wide };

@@ -124,7 +124,11 @@ export function validateRows(rows: BundleRow[], todayStr: string, refusing: Map<
       if (r.service_area !== undefined && !isServiceArea(r.service_area)) e(`unknown service_area "${r.service_area}" (one of: ${SERVICE_AREA_IDS.join(', ')})`);
       if (r.phones.length === 0) e('a domestic violence row publishes on its phone alone, so it must have one');
     } else if (r.service_area !== undefined) {
-      e('service_area is for domestic violence rows only; every other row says where it is with an address or a coordinate');
+      // Since 2026-09-24 (Kyle's choice (a)) any row may name the coarse area it serves, but only while it has no
+      // coordinate: a phone-only local service, or an address the geocoder could not place. A row with a point ranks
+      // by the point, so an area beside one would be a second, contradicting answer.
+      if (!isServiceArea(r.service_area)) e(`unknown service_area "${r.service_area}" (one of: ${SERVICE_AREA_IDS.join(', ')})`);
+      if (r.lat !== undefined || r.lon !== undefined) e('service_area is only for a row with no coordinate; this row has one, so it ranks by that');
     }
     // Any other shelter shows an address only if the shelter publishes it on its own site (DECISIONS 2026-09-19).
     // Warming and cooling centers are public buildings the City announces, not shelters people live in.

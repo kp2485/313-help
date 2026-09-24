@@ -9,7 +9,7 @@ package org.help313.app
 
 import org.help313.query.BundleRow
 import org.help313.query.isDvCategory
-import org.help313.query.serviceAreaKey
+import org.help313.query.servesAreaKey
 
 /**
  * What a maps app is asked for: the written address when the place publishes one, otherwise its point.
@@ -75,7 +75,8 @@ fun hasPhone(row: BundleRow): Boolean = row.phones.isNotEmpty()
  * A screen puts it into `safe.dv_serves` ("Serves {area}").
  */
 fun serviceAreaStringKey(row: BundleRow): String? =
-    if (isDvCategory(row.category)) serviceAreaKey(row.serviceArea) else null
+    // Every DV row, and since 2026-09-24 any row with an area and no coordinate (query `servesAreaKey`).
+    servesAreaKey(row)
 
 /**
  * Every domestic-violence listing carries the one sentence `safe.dv_no_address`: the shelter does not share

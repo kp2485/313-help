@@ -54,7 +54,7 @@ describe('the service-area table is the same in all three languages', () => {
       expect(inServiceArea(lat, lon), id).toBe(true);
       // Nowhere near any shelter in the seed: a reference point is a city hall, or for a county the Census
       // Bureau's own published internal point (2026-09-24), never a place we list.
-      expect(SERVICE_AREAS[id]!.reference, id).toMatch(/City Hall|Administrative Center|the US Census Bureau's internal point for \w+ County/);
+      expect(SERVICE_AREAS[id]!.reference, id).toMatch(/City Hall|Administrative Center|the US Census Bureau's internal point for [\w .]+$/);
     }
     // The three counties sit exactly on the Bureau's published points (TIGERweb State_County, INTPTLAT/INTPTLON).
     expect(SERVICE_AREAS.wayne_county!.point).toEqual({ lat: 42.2847, lon: -83.262 });
@@ -99,8 +99,12 @@ describe('row validation', () => {
     });
     it('a row with no phone is refused: a DV row publishes on its phone alone', () =>
       expect(dv({ phones: [] })).toMatch(/publishes on its phone alone/));
-    it('service_area is for DV rows only', () =>
-      expect(errs({ category: 'food.pantry', service_area: 'detroit' })).toMatch(/domestic violence rows only/));
+    it('any row may name its area, but only while it has no coordinate (2026-09-24)', () => {
+      expect(errs({ category: 'transport', service_area: 'royal_oak', lat: undefined, lon: undefined })).toBe('');
+      expect(errs({ category: 'food.meal', service_area: 'macomb_county', lat: undefined, lon: undefined })).toBe('');
+      expect(errs({ category: 'food.pantry', service_area: 'detroit', lat: 42.33, lon: -83.05 })).toMatch(/only for a row with no coordinate/);
+      expect(errs({ category: 'transport', service_area: 'gotham', lat: undefined, lon: undefined })).toMatch(/unknown service_area/);
+    });
   });
   it('the HSDS export is checked on its own terms, not inherited from the rows', () => {
     const virt = { x_detroit: { category: 'shelter.dv' }, service_at_locations: [{ x_detroit: { id: 'sal_dv' }, location: { location_type: 'virtual' } }] };
