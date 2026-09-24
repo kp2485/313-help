@@ -19,22 +19,24 @@ import org.help313.query.LatLon
 import org.help313.query.SERVICE_AREAS
 import java.io.File
 
-// ---- the four cities, as a box ---------------------------------------------------------------------------------
+// ---- the service area, as a box --------------------------------------------------------------------------------
 
 /**
- * CLAUDE.md: "Bbox sanity: lat 42.25–42.46, lon −83.33 to −82.91" (Dearborn reaches west to about −83.32). The
- * same numbers as `SERVICE_BBOX` in packages/query and `ServiceBox` in apps/ios/Sources/HelpCore/Locate.swift.
+ * Every city and township a DDOT or SMART bus stops in (Kyle, 2026-09-24; `pnpm ingest:region` writes the list and
+ * the box round its outlines to data/ingested/region.json). It was four cities until 2026-09-24 (lat 42.25–42.46,
+ * lon −83.33 to −82.91). The same numbers as `SERVICE_BBOX` in packages/query and `serviceBox` in
+ * apps/ios/Sources/HelpCore/Locate.swift.
  */
 object ServiceBox {
-    const val LAT_MIN = 42.25
-    const val LAT_MAX = 42.46
-    const val LON_MIN = -83.33
-    const val LON_MAX = -82.91
+    const val LAT_MIN = 42.11
+    const val LAT_MAX = 42.80
+    const val LON_MIN = -83.57
+    const val LON_MAX = -82.70
 }
 
 /**
- * Whether a point is inside Detroit, Hamtramck, Highland Park or Dearborn. A fix that is not a number is not
- * inside anything: the map is not moved somewhere undefined.
+ * Whether a point is inside the service area's box. A fix that is not a number is not inside anything: the map is
+ * not moved somewhere undefined.
  */
 fun inServiceArea(lat: Double, lon: Double, slack: Double = 0.0): Boolean {
     if (lat.isNaN() || lon.isNaN() || lat.isInfinite() || lon.isInfinite()) return false
@@ -43,6 +45,13 @@ fun inServiceArea(lat: Double, lon: Double, slack: Double = 0.0): Boolean {
 }
 
 fun inServiceArea(p: LatLon, slack: Double = 0.0): Boolean = inServiceArea(p.lat, p.lon, slack)
+
+/**
+ * The whole service area as two corners: what the Map tab's reset button frames, and what an Areas map opens on when
+ * it has no place to open on. The web's `REGION` in apps/web/src/main.ts (the four cities' corners until 2026-09-24).
+ */
+val REGION_CORNERS: List<LatLon> =
+    listOf(LatLon(ServiceBox.LAT_MIN, ServiceBox.LON_MIN), LatLon(ServiceBox.LAT_MAX, ServiceBox.LON_MAX))
 
 /** Two miles, in metres. The shorter side of the map spans twice this: four miles across, the walk-and-bus city. */
 const val LOCATE_RADIUS_METERS = 3218.688
@@ -84,7 +93,7 @@ const val ANCHOR_RADIUS_METERS = LOCATE_RADIUS_METERS
  * The opening view of the Map tab, as a point and a radius — the one decision behind "how far out does the map
  * open?", so the first view and "centre on me" are the same arithmetic ([MapCamera.forRadius]) with a different
  * centre. A location already known — allowed earlier, or the centre of a ZIP a person typed — wins and keeps
- * today's two-mile view; with none, the map opens on the anchor instead of the whole four-city region.
+ * today's two-mile view; with none, the map opens on the anchor instead of the whole service area.
  *
  * Pure, and the same three lines on all three clients (`openingView` in apps/web/src/locate.ts and
  * apps/ios/Sources/HelpCore/Locate.swift). Nothing is stored: it is arithmetic about a view.

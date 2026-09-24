@@ -83,9 +83,10 @@ public func rank(_ rows: [BundleRow], _ q: Query, now: Date, alerts: [Alert] = [
         .map { row in
             // DV rows never carry coordinates and never get a distance (docs/08). Their band comes from the public
             // reference point of the area they serve, so proximity works without any fact that locates a shelter.
+            // Since 2026-09-24 so does any row that names an area and has no coordinate (`servesByArea`).
             let dv = isDvCategory(row.category)
             let mi: Double? = { if !dv, let n = q.near, let lat = row.lat, let lon = row.lon { return miles(n, LatLon(lat: lat, lon: lon)) }; return nil }()
-            let bw = dv ? dvBand(row, near: q.near) : (band: band(mi), wide: 0)
+            let bw = servesByArea(row) ? dvBand(row, near: q.near) : (band: band(mi), wide: 0)
             let open = openNow(row, now: now, alerts: alerts)
             let key = q.mode == "week" ? openKeyWeek(row, open, now: now, alerts: alerts) : openKeyNow(open, today: today)
             return (Ranked(row: row, open: open, badge: badge(row, now: now), miles: mi, band: bw.band), key, bw.wide)

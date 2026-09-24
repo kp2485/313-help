@@ -403,12 +403,12 @@ final class MapModel {
             if let self, self.motionNo == mine { self.motion = nil }
         }
     }
-    /// The whole area, one tap away: the reset button still shows all four cities, whatever the map opened at
+    /// The whole area, one tap away: the reset button still shows the whole service area, whatever the map opened at
     /// (DECISIONS 2026-09-22). It counts as a move now — before, `everMoved = false` meant the next layout refit
     /// the region, which since 2026-09-22 would instead throw the person back to the anchor they just left.
     func reset() {
         everMoved = true
-        camera = MapCamera.fitting(cityCorners, width: camera.width, height: camera.height, cover: true)
+        camera = MapCamera.fitting(serviceRegionCorners, width: camera.width, height: camera.height, cover: true)
         band = zoomBand(metersPerPoint: camera.metersPerPoint, previous: band)
     }
     /// Centre on a point without changing the zoom — "my location", and following a row from the list.
@@ -432,9 +432,6 @@ final class MapModel {
         band = zoomBand(metersPerPoint: camera.metersPerPoint, previous: band)
     }
 
-    /// The four corners of the service area (CLAUDE.md: Detroit, Hamtramck, Highland Park and Dearborn).
-    private let cityCorners = [LatLon(lat: 42.255, lon: -83.29), LatLon(lat: 42.45, lon: -82.91)]
-
     // MARK: loading
     /// The city. Called when the tab first appears and whenever a newer bundle arrives.
     func loadBase(from store: BundleStore) async {
@@ -452,7 +449,7 @@ final class MapModel {
 
     // MARK: the city and neighbourhood outlines (`place:areas`)
     //
-    // Both come from the same file the area pages come from: the four city outlines the pipeline ships
+    // Both come from the same file the area pages come from: the city and township outlines the pipeline ships
     // (`areas[]`, DECISIONS 2026-09-22) and the City's own 205 neighbourhood outlines. **No dot, no listing, no
     // value-carrying fill** — the layer cannot draw a listing because it is never handed one, which is how
     // docs/08's rule about sensitive rows is satisfied here: trivially, by there being nothing to drop.

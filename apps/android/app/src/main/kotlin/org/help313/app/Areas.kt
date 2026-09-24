@@ -1,4 +1,5 @@
-// The four cities and the 205 Detroit neighborhoods as one thing: an **area**, which has a page, an outline, and a
+// Every city and township a bus reaches (four cities until 2026-09-24) and the 205 Detroit neighborhoods as one
+// thing: an **area**, which has a page, an outline, and a
 // place in the map's pick order (audit §3 and §5; DECISIONS 2026-09-22, "The Map tab opens with help on it; the
 // outlines of the four cities and the 205 neighborhoods are a layer" and "Hamtramck, Highland Park, Dearborn and
 // Detroit each have a city page").
@@ -156,6 +157,15 @@ val CITY_PANELS: List<String> = listOf("help", "parks", "crashes", "roads", "vac
  *  dropped here rather than somewhere a screen might forget to check. */
 fun cityPanels(area: Area): List<String> = CITY_PANELS.filter { area.panels.contains(it) }
 
+/**
+ * A place with nothing but the help panel and nothing it says is missing: every city and township a DDOT or SMART bus
+ * stops in beyond the first four (2026-09-24). Its page says just that (`city.outline_only`) instead of the two
+ * sentences about regional numbers, because it has no regional numbers to warn about and nobody has checked what it
+ * publishes, so nothing is claimed. Detroit never is one. The web's `helpOnly` in apps/web/src/hoods.ts `cityPage`.
+ */
+fun isOutlineOnly(d: Indicators, area: Area): Boolean =
+    cityOf(d, area.id)?.hasNeighborhoods != true && area.panels.all { it == "help" } && area.missing.isEmpty()
+
 /** The source line for one panel, or null. Panels never share a source: Detroit's parks come from the City and
  *  Hamtramck's from SEMCOG, and two numbers that share a word must not share a line. */
 fun panelSource(area: Area, d: Indicators, panel: String): AreaSource? {
@@ -173,7 +183,7 @@ fun areaSourcesOf(area: Area, d: Indicators): List<AreaSource> {
 
 // ---- finding an area -------------------------------------------------------------------------------------------------
 
-/** A page an id names: one of Detroit's 205 neighborhoods, or one of the four whole-city areas. */
+/** A page an id names: one of Detroit's 205 neighborhoods, or one of the whole-place areas (a city or township). */
 sealed class AreaPage {
     class OfNeighborhood(val neighborhood: Hood) : AreaPage()
     class OfCity(val area: Area) : AreaPage()
@@ -196,9 +206,10 @@ fun areaById(d: Indicators, id: String): AreaPage? {
 }
 
 /**
- * The area a point falls in: **the four cities first, then the neighborhoods of the city that hit** — which is
- * both cheaper than walking 205 outlines and the reason a Hamtramck resident is no longer told they are not in the
- * app. Null only for a point outside all four cities, which stays a real and honest answer.
+ * The area a point falls in: **the places first (every city and township a bus reaches), then the neighborhoods of
+ * the city that hit** — which is both cheaper than walking 205 outlines and the reason a Hamtramck resident is no
+ * longer told they are not in the app. Null only for a point outside every place, which stays a real and honest
+ * answer.
  *
  * The port of `areaAt` in apps/web/src/hoodfind.ts. Everything here runs on the phone, over outlines in the signed
  * bundle, from a fix that is never written down and never sent (docs/08).
@@ -267,7 +278,7 @@ class DrawnArea(val id: String, val name: String, val isCity: Boolean, val rings
 }
 
 /**
- * The outlines the layer draws: the four cities and all 205 neighborhoods, **at every zoom**.
+ * The outlines the layer draws: every place a bus reaches and all 205 neighborhoods, **at every zoom**.
  *
  * It used to hide the neighborhoods above 14 m per dp, on the reasoning that a name that does not fit should not
  * be promised. The Map tab opens on the whole city, so in practice a person saw four city edges and none of the

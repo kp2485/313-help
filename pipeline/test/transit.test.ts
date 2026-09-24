@@ -11,7 +11,7 @@ import { inBbox, p } from '../src/util.js';
 
 const buf = (s: string) => Buffer.from(s, 'utf8');
 const DOWNTOWN: [number, number] = [-83.045, 42.331];          // Campus Martius
-const PONTIAC: [number, number] = [-83.29, 42.64];             // well outside the service area
+const ANN_ARBOR: [number, number] = [-83.74, 42.28];           // well outside the service area (Pontiac was, until 2026-09-24)
 
 describe('reading a GTFS feed', () => {
   const files = new Map<string, Buffer>([
@@ -21,13 +21,13 @@ describe('reading a GTFS feed', () => {
       's_short,42.331,-83.045,1', 's_short,42.335,-83.045,2',
       's_long,42.331,-83.045,3', 's_long,42.340,-83.045,1', 's_long,42.350,-83.045,2',
       's_back,42.350,-83.045,1', 's_back,42.331,-83.045,2',
-      's_w,42.331,-83.045,1', 's_w,42.640,-83.290,2',
+      's_w,42.331,-83.045,1', 's_w,42.280,-83.740,2',
     ].join('\n') + '\n')],
     ['stops.txt', buf(['stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station',
       'a,Woodward + Warren,42.355,-83.070,0,',
       'b,Times Square Station,42.337,-83.051,1,',
       'c,Times Square platform 1,42.337,-83.051,0,b',      // a platform of b: not a place to wait for
-      'd,Far away,42.640,-83.290,0,',                       // outside the service area
+      'd,Far away,42.280,-83.740,0,',                       // outside the service area
       'e,An entrance,42.337,-83.052,2,',                    // an entrance, not a stop
       'f,Woodward + Warren,42.355,-83.070,0,',              // the same stop twice
     ].join('\n') + '\n')],
@@ -51,7 +51,8 @@ describe('reading a GTFS feed', () => {
   it('a route that leaves the service area keeps only the stretch near home', () => {
     const w = gtfsRoutes(files).filter((l) => l.name === 'Woodward');
     expect(w).toHaveLength(1);
-    expect(w[0]!.line.every(([lon, lat]) => inBbox(lat, lon, SLACK) || lat > 42.4)).toBe(true);
+    // Everything kept is inside, except the one point past the edge that stops the line short of nothing.
+    expect(w[0]!.line.slice(0, -1).every(([lon, lat]) => inBbox(lat, lon, SLACK))).toBe(true);
     expect(w[0]!.line.length).toBeLessThanOrEqual(2);
   });
 
@@ -63,12 +64,12 @@ describe('reading a GTFS feed', () => {
 
 describe('clipping to the service area', () => {
   it('keeps the pieces inside, with one point over the edge so a line does not stop short', () => {
-    const pieces = clipToArea([PONTIAC, DOWNTOWN, [-83.05, 42.34], PONTIAC]);
+    const pieces = clipToArea([ANN_ARBOR, DOWNTOWN, [-83.05, 42.34], ANN_ARBOR]);
     expect(pieces).toHaveLength(1);
-    expect(pieces[0]![0]).toEqual(PONTIAC);                 // the point just before entering
+    expect(pieces[0]![0]).toEqual(ANN_ARBOR);                 // the point just before entering
     expect(pieces[0]!).toContainEqual(DOWNTOWN);
   });
-  it('a line entirely outside gives nothing', () => expect(clipToArea([PONTIAC, [-83.3, 42.7]])).toEqual([]));
+  it('a line entirely outside gives nothing', () => expect(clipToArea([ANN_ARBOR, [-83.75, 42.3]])).toEqual([]));
 });
 
 describe('names and features', () => {
@@ -81,7 +82,7 @@ describe('names and features', () => {
   it('points: only points, only inside the area', () => {
     const pts = featuresToPoints([
       { geometry: { type: 'Point', coordinates: DOWNTOWN }, properties: { name: 'Rosa Parks Transit Center' } },
-      { geometry: { type: 'Point', coordinates: PONTIAC }, properties: { name: 'Far' } },
+      { geometry: { type: 'Point', coordinates: ANN_ARBOR }, properties: { name: 'Far' } },
       { geometry: { type: 'LineString', coordinates: [DOWNTOWN, DOWNTOWN] }, properties: { name: 'A line' } },
       { geometry: null, properties: { name: 'Nothing' } },
     ], ['name']);
@@ -89,7 +90,7 @@ describe('names and features', () => {
   });
   it('lines: both LineString and MultiLineString, clipped', () => {
     const lines = featuresToLines([
-      { geometry: { type: 'MultiLineString', coordinates: [[DOWNTOWN, [-83.05, 42.34]], [PONTIAC, [-83.3, 42.7]]] }, properties: { route_name: 'Conner Creek' } },
+      { geometry: { type: 'MultiLineString', coordinates: [[DOWNTOWN, [-83.05, 42.34]], [ANN_ARBOR, [-83.75, 42.3]]] }, properties: { route_name: 'Conner Creek' } },
     ], ['route_name', 'trail_name']);
     expect(lines).toHaveLength(1);
     expect(lines[0]!.name).toBe('Conner Creek');
@@ -97,7 +98,7 @@ describe('names and features', () => {
   it('GBFS stations come out named and inside the area', () => {
     const got = gbfsStations({ data: { stations: [
       { name: 'Cass & Canfield', lat: DOWNTOWN[1], lon: DOWNTOWN[0] },
-      { name: 'Somewhere else', lat: PONTIAC[1], lon: PONTIAC[0] },
+      { name: 'Somewhere else', lat: ANN_ARBOR[1], lon: ANN_ARBOR[0] },
       { name: 'Broken', lat: 'x', lon: 'y' },
     ] } });
     expect(got.map((s) => s.name)).toEqual(['Cass & Canfield']);

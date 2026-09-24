@@ -164,7 +164,7 @@ describe('asking the browser', () => {
 // Inside the city, and outside it
 // ---------------------------------------------------------------------------------------------------
 
-describe('a fix from outside the four cities moves nothing', () => {
+describe('a fix from outside the service area moves nothing', () => {
   it('knows Detroit, Hamtramck, Highland Park and Dearborn', () => {
     expect(positionOutcome(42.3487, -83.0567)).toBe('inside');    // downtown Detroit
     expect(positionOutcome(42.3934, -83.0497)).toBe('inside');    // Hamtramck City Hall
@@ -177,9 +177,11 @@ describe('a fix from outside the four cities moves nothing', () => {
   });
 
   it('is the same box the pipeline checks every ingested coordinate against', () => {
-    expect(SERVICE_BBOX).toEqual({ latMin: 42.25, latMax: 42.46, lonMin: -83.33, lonMax: -82.91 });
-    for (const [lat, lon] of [[42.25, -83.33], [42.46, -82.91]] as const) expect(inServiceArea(lat, lon)).toBe(true);
-    for (const [lat, lon] of [[42.2499, -83.0], [42.4601, -83.0], [42.35, -83.3301], [42.35, -82.9099]] as const) {
+    // Every city and township a DDOT or SMART bus stops in (2026-09-24); four cities, lat 42.25-42.46 and lon
+    // -83.33 to -82.91, until then.
+    expect(SERVICE_BBOX).toEqual({ latMin: 42.11, latMax: 42.8, lonMin: -83.57, lonMax: -82.7 });
+    for (const [lat, lon] of [[42.11, -83.57], [42.8, -82.7], [42.6389, -83.291]] as const) expect(inServiceArea(lat, lon)).toBe(true);
+    for (const [lat, lon] of [[42.1099, -83.0], [42.8001, -83.0], [42.35, -83.5701], [42.35, -82.6999]] as const) {
       expect(inServiceArea(lat, lon)).toBe(false);
     }
   });
@@ -244,9 +246,9 @@ describe('the two-mile view', () => {
     expect(cam.s).toBeGreaterThanOrEqual(S_MIN);
   });
 
-  it('a point on the edge of the city stays within the map\'s pan limits', () => {
-    const m = { PAN_X: 0.25, PAN_Y: 0.2 };
-    for (const [lat, lon] of [[42.25, -83.33], [42.46, -82.91], [42.25, -82.91], [42.46, -83.33]] as const) {
+  it('a point on the edge of the service area stays within the map\'s pan limits', () => {
+    const m = { PAN_X: 0.4, PAN_Y: 0.5 };
+    for (const [lat, lon] of [[42.11, -83.57], [42.8, -82.7], [42.11, -82.7], [42.8, -83.57]] as const) {
       const cam = cameraForRadius({ lat, lon }, LOCATE_RADIUS_M, 390, 780);
       expect(Math.abs(cam.cx)).toBeLessThanOrEqual(m.PAN_X + 1e-9);
       expect(Math.abs(cam.cy)).toBeLessThanOrEqual(m.PAN_Y + 1e-9);
@@ -429,8 +431,8 @@ describe('the Map tab opens on the anchor, not on the region', () => {
     const { baseSpec, serveBasemap } = await import('./mapfixture.js');
     installPage({ width: W, height: H });
     const key = 'open' + Math.random().toString(36).slice(2);
-    // The Map tab's own spec: the four cities as `fit` (the reset button), the opening view as `open`.
-    const spec = baseSpec(key, [], { cover: true, fit: [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }], ...more });
+    // The Map tab's own spec: the service area as `fit` (the reset button), the opening view as `open`.
+    const spec = baseSpec(key, [], { cover: true, fit: [{ lat: 42.11, lon: -83.57 }, { lat: 42.8, lon: -82.7 }], ...more });
     const view = new MapView(new FakeEl('div') as unknown as HTMLElement, spec, serveBasemap());
     await new Promise((ok) => setTimeout(ok, 25));
     const priv = view as unknown as { cx: number; cy: number; s: number };

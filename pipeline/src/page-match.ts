@@ -72,10 +72,11 @@ export function phonesOn(html: string): Set<string> {
   for (const m of html.matchAll(/href\s*=\s*["']tel:([^"']+)["']/gi)) add(decodeURIComponent(m[1]!).split(/[,;]/)[0]!);
   const text = pageText(html);
   // Area code in parentheses or followed by a separator; then 3 and 4 characters with a separator between. A
-  // separator is a dot or dash with up to two spaces around it, or one or two spaces: "(313)-400-7040",
-  // "(313) 922 - 0033", "313.555.0100", "313 555 0100".
-  const sep = '(?:\\s{0,2}[.-]\\s{0,2}|\\s{1,2})';
-  const written = new RegExp(`(?<![\\w-])(?:\\+?1${sep}?)?(?:\\(\\d{3}\\)(?:\\s{0,2}[.-]?\\s{0,2})|\\d{3}${sep})[0-9A-Z]{3}${sep}[0-9A-Z]{4}(?![\\w-])`, 'g');
+  // separator is a dot, dash or slash with up to two spaces around it, or one or two spaces: "(313)-400-7040",
+  // "(313) 922 - 0033", "313.555.0100", "313 555 0100", "313 / 881-5500" (Grosse Pointe Shores), and a space may
+  // sit inside the parentheses: "( 248)246-3914" (Royal Oak).
+  const sep = '(?:\\s{0,2}[./-]\\s{0,2}|\\s{1,2})';
+  const written = new RegExp(`(?<![\\w-])(?:\\+?1${sep}?)?(?:\\(\\s?\\d{3}\\s?\\)(?:\\s{0,2}[.-]?\\s{0,2})|\\d{3}${sep})[0-9A-Z]{3}${sep}[0-9A-Z]{4}(?![\\w-])`, 'g');
   for (const m of text.matchAll(written)) add(m[0]);
   // Ten digits written with no separators at all.
   for (const m of text.matchAll(/(?<![\w-])(?:1)?\d{10}(?![\w-])/g)) add(m[0]);
@@ -105,13 +106,17 @@ export function streetKey(line1: string): [string, string] | null {
  * The house number, then the street name, with only a direction or a numbered street between them:
  * "2959 Martin Luther King Jr. Blvd", "14 W. 7 Mile Rd". "Suite 2959, on Martin…" does not count.
  */
+/** A French elision in a street name ("L’Anse Creuse", "D'Arcy") is dropped on both sides before matching, so the
+ *  street's own word is the one compared; a curly or a straight apostrophe, either way (Harrison Township, 2026-09-24). */
+const elide = (s: string) => s.replace(/\b([a-z])['’](?=[a-z])/gi, '');
+
 export function addressOnPage(html: string, line1: string): boolean {
-  const key = streetKey(line1);
+  const key = streetKey(elide(line1));
   if (!key) return false;
   const [no, word] = key;
   // Between them only a direction, a numbered street, or a saint ("5900 St. Lawrence", "12 Saint Aubin").
   const between = '(?:[\\s,]+(?:[nsew]|north|south|east|west|st|saint|mt|mount|\\d+(?:st|nd|rd|th)?)\\.?)*';
-  return new RegExp(`(?<![\\w-])${no}${between}[\\s,]+${word}\\b`, 'i').test(pageText(html));
+  return new RegExp(`(?<![\\w-])${no}${between}[\\s,]+${word}\\b`, 'i').test(elide(pageText(html)));
 }
 
 /** `phone2_source_url`: the second number is published on another owner's page (e.g. the food bank's office for a

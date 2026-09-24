@@ -6,7 +6,8 @@
 //           does not want to share a location can type a ZIP and still sort by distance (docs/05).
 // Output is committed under data/ingested/ so builds are reproducible and changes are reviewable.
 
-import { inBbox, p, writeJson, today } from './util.js';
+import { BBOX, inBbox, p, writeJson, today } from './util.js';
+import { inRings, placeAt, regionPlaces } from './region.js';
 
 const UA = { 'user-agent': '313help-pipeline (open-source civic directory; one polite pass per day)' };
 const PARKS = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0';
@@ -37,17 +38,24 @@ export function toZipCenters(features: { attributes: { zipcode?: unknown }; cent
   return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
 }
 
-// Hamtramck, Highland Park and Dearborn are in scope (Kyle, 2026-09-19). The City's layer covers Detroit's ZIPs; the
-// neighbors' ZIPs it lacks come from the Census Bureau's ZIP Code Tabulation Areas (public domain), internal points.
-export const NEIGHBOR_ZIPS = ['48203', '48212', '48120', '48124', '48126', '48128'];
+// Outside Detroit (Hamtramck, Highland Park and Dearborn from 2026-09-19; every city and township a DDOT or SMART bus
+// stops in from 2026-09-24) the City's layer has no ZIPs, so they come from the Census Bureau's ZIP Code Tabulation
+// Areas (public domain). A ZIP is in when the Bureau's internal point for it lies inside a place in the area
+// (data/ingested/region.json), or when its outline holds a place's own centre — Trenton's ZIP has its internal point
+// in Woodhaven, and a person in Trenton still types it. No list of ZIPs is typed by hand.
 const CENSUS_ZCTA = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/PUMA_TAD_TAZ_UGA_ZCTA/MapServer/1';
 
-/** The City's centers, plus Census centers only for wanted ZIPs the City's layer doesn't have. */
-export function addNeighborZips(city: Record<string, [number, number]>, census: { attributes: { ZCTA5?: unknown; INTPTLAT?: unknown; INTPTLON?: unknown } }[], wanted = NEIGHBOR_ZIPS): Record<string, [number, number]> {
+type Zcta = { attributes: { ZCTA5?: unknown; INTPTLAT?: unknown; INTPTLON?: unknown }; geometry?: { rings?: [number, number][][] } };
+/** The default rule: the ZIP's internal point is in a place, or its outline holds a place's centre. */
+export const zipInArea = (f: Zcta, lat: number, lon: number): boolean =>
+  placeAt(lat, lon) !== null || (!!f.geometry?.rings && regionPlaces().some((m) => inRings(m.center, f.geometry!.rings!)));
+
+/** The City's centers, plus a Census center for each ZIP the City's layer lacks and `keep` accepts. */
+export function addNeighborZips(city: Record<string, [number, number]>, census: Zcta[], keep: (f: Zcta, lat: number, lon: number) => boolean = zipInArea): Record<string, [number, number]> {
   const out = { ...city };
   for (const f of census) {
     const zip = String(f.attributes.ZCTA5 ?? ''), lat = Number(f.attributes.INTPTLAT), lon = Number(f.attributes.INTPTLON);
-    if (!wanted.includes(zip) || zip in out || !inBbox(lat, lon, 0.05)) continue;
+    if (!/^\d{5}$/.test(zip) || zip in out || !inBbox(lat, lon, 0.05) || !keep(f, lat, lon)) continue;
     out[zip] = [Number(lat.toFixed(3)), Number(lon.toFixed(3))];
   }
   return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
@@ -59,8 +67,8 @@ async function zips(): Promise<void> {
   const q = `${ZIPS}/query?where=1%3D1&outFields=zipcode&returnGeometry=false&returnCentroid=true&outSR=4326&f=json`;
   const city = toZipCenters(((await (await fetch(q, { headers: UA })).json()) as any).features ?? []);
   if (Object.keys(city).length < 20) throw new Error(`zips: only ${Object.keys(city).length} parsed. Not overwriting the last good file.`);
-  const where = encodeURIComponent(`ZCTA5 IN (${NEIGHBOR_ZIPS.map((z) => `'${z}'`).join(',')})`);
-  const census = (await (await fetch(`${CENSUS_ZCTA}/query?where=${where}&outFields=ZCTA5,INTPTLAT,INTPTLON&returnGeometry=false&f=json`, { headers: UA })).json()) as any;
+  const env = encodeURIComponent(JSON.stringify({ xmin: BBOX.lonMin, ymin: BBOX.latMin, xmax: BBOX.lonMax, ymax: BBOX.latMax, spatialReference: { wkid: 4326 } }));
+  const census = (await (await fetch(`${CENSUS_ZCTA}/query?where=1%3D1&geometry=${env}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=ZCTA5,INTPTLAT,INTPTLON&returnGeometry=true&outSR=4326&maxAllowableOffset=0.0005&f=json`, { headers: UA })).json()) as any;
   if (census.error) throw new Error(`zips: Census layer answered ${census.error.message ?? 'an error'}. Not overwriting the last good file.`);
   const centers = addNeighborZips(city, census.features ?? []);
   const added = Object.keys(centers).filter((z) => !(z in city));

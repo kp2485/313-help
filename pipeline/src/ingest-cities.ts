@@ -45,6 +45,8 @@
 import { p, today, writeJson } from './util.js';
 import { simplify } from './ingest-basemap.js';
 import { LICENSE_PAGE, NOTICE } from './ingest-crashes.js';
+import { regionPlaces } from './region.js';
+import { TIGER_COUSUB } from './ingest-region.js';
 
 type Pt = [number, number];
 
@@ -53,7 +55,6 @@ export const PAVEMENT = `${SEMCOG}/Pavement_Condition_2003_to_2024/FeatureServer
 export const PARKS = `${SEMCOG}/park_poly_2023_view/FeatureServer/0`;
 export const MCD2020 = `${SEMCOG}/mcd_2020/FeatureServer/0`;
 export const PARCELS = 'https://services1.arcgis.com/b6rkZNtCd6Mx2gvB/arcgis/rest/services/Parcels_AssessmentData/FeatureServer/0';
-export const TIGER_PLACES = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/4';
 /** One plain text file per year, per Census region: place totals for new privately-owned housing units authorised. */
 export const BPS_DIR = 'https://www2.census.gov/econ/bps/Place/Midwest%20Region';
 export const BPS_PAGE = 'https://www.census.gov/construction/bps/';
@@ -155,20 +156,18 @@ const pause = () => new Promise((r) => setTimeout(r, 300));
 
 const ringsOf = (g: any): Pt[][] => (!g ? [] : g.type === 'Polygon' ? g.coordinates : g.type === 'MultiPolygon' ? g.coordinates.flat() : []);
 
-async function outlines(): Promise<Record<string, { rings: Pt[][]; center: Pt }>> {
-  const names = CITIES.map((c) => `'${c.tiger}'`).join(',');
-  const fc = await get(`${TIGER_PLACES}/query?where=${encodeURIComponent(`STATE='26' AND BASENAME IN (${names})`)}&outFields=BASENAME,INTPTLAT,INTPTLON&outSR=4326&geometryPrecision=5&returnGeometry=true&f=geojson`);
+/**
+ * Every place's outline and centre, from data/ingested/region.json: the Census Bureau's own county subdivisions and
+ * its published internal point for each, the same outlines the map draws its boundaries from, so a city page and
+ * the map never disagree about where a city ends. We never draw a centre of our own and never call it a city hall.
+ */
+function outlines(): Record<string, { rings: Pt[][]; center: Pt }> {
   const out: Record<string, { rings: Pt[][]; center: Pt }> = {};
-  for (const f of fc.features ?? []) {
-    const city = CITIES.find((c) => c.tiger === String(f.properties?.BASENAME));
-    if (!city) continue;
-    const rings = ringsOf(f.geometry).map((r) => simplify(r, CITY_TOL).map(([x, y]) => [Number(x.toFixed(5)), Number(y.toFixed(5))] as Pt)).filter((r) => r.length >= 8);
-    // The Census Bureau's own published internal point for the place: a point it guarantees is inside the
-    // outline. We never draw a centre of our own and never call it a city hall.
-    const center: Pt = [Number(Number(f.properties?.INTPTLON).toFixed(5)), Number(Number(f.properties?.INTPTLAT).toFixed(5))];
-    if (rings.length && Number.isFinite(center[0]) && Number.isFinite(center[1])) out[city.id] = { rings, center };
+  for (const m of regionPlaces()) {
+    const rings = m.rings.map((r) => simplify(r, CITY_TOL).map(([x, y]) => [Number(x.toFixed(5)), Number(y.toFixed(5))] as Pt)).filter((r) => r.length >= 8);
+    if (rings.length) out[m.id] = { rings, center: m.center };
   }
-  if (Object.keys(out).length !== CITIES.length) throw new Error(`cities: expected ${CITIES.length} TIGER outlines, got ${Object.keys(out).length}. Not overwriting the last good file.`);
+  for (const c of CITIES) if (!out[c.id]) throw new Error(`cities: region.json has no outline for ${c.name}. Not overwriting the last good file.`);
   return out;
 }
 
@@ -232,14 +231,15 @@ async function permits(): Promise<{ by: Record<string, PermitYear[]>; years: num
 }
 
 async function main(): Promise<void> {
-  const [rings, roads, park, vac, parc, perm] = [await outlines(), await pavement(), await parks(), await vacancy(), await parcels(), await permits()];
+  const rings = outlines();
+  const [roads, park, vac, parc, perm] = [await pavement(), await parks(), await vacancy(), await parcels(), await permits()];
   const semcogNotice = NOTICE(new Date().getUTCFullYear());
   const semcog = (name: string, url: string, lastEdited: string, records?: string) => ({
     name, url, page: 'https://maps-semcog.opendata.arcgis.com/', license: 'SEMCOG Copyright License Agreement',
     license_url: LICENSE_PAGE, notice: NOTICE(lastEdited.slice(0, 4)), last_edited: lastEdited, ...(records ? { records_from: records } : {}),
   });
   const sources = {
-    outlines: { name: 'U.S. Census Bureau TIGERweb: city outlines', url: TIGER_PLACES, page: 'https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html', license: 'No licence stated; a work of the United States government (17 U.S.C. §105)', last_edited: today() },
+    outlines: { name: 'U.S. Census Bureau TIGERweb: county subdivisions (cities and townships)', url: TIGER_COUSUB, page: 'https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html', license: 'No licence stated; a work of the United States government (17 U.S.C. §105)', last_edited: today() },
     roads: semcog('SEMCOG — Pavement Condition 2003 to 2024 (PASER)', PAVEMENT, await edited(PAVEMENT), "Michigan's Transportation Asset Management Council"),
     parks: semcog('SEMCOG — Parks and amenities', PARKS, await edited(PARKS)),
     vacancy: semcog('SEMCOG — 2020 Census totals by community', MCD2020, await edited(MCD2020), 'the 2020 U.S. Census'),
@@ -255,6 +255,13 @@ async function main(): Promise<void> {
     ...(parc[c.id] ? { parcels: parc[c.id] } : {}),
     permits: perm.by[c.id] ?? [],
   }));
+  // Every other place in the area (Kyle, 2026-09-24: "an outline and name, with no stats page yet"): its outline,
+  // its centre and the help listed inside it. No panel is fetched for it, so none is drawn; the allow-list in
+  // indicators.ts is what keeps an absent number absent rather than zero.
+  for (const m of regionPlaces()) {
+    if (CITIES.some((c) => c.id === m.id) || !rings[m.id]) continue;
+    cities.push({ id: m.id, name: m.name, semmcd: m.semmcd, fips_place: '', children: 'none' as const, outline_only: true, center: rings[m.id]!.center, rings: rings[m.id]!.rings, permits: [] } as unknown as (typeof cities)[number]);
+  }
   writeJson(p('data/ingested/cities.json'), {
     fetched_at: today(), semcog_notice: semcogNotice, permit_years: perm.years,
     paser: PASER, pavement_year: PAVEMENT_YEAR, detroit_only: DETROIT_ONLY,

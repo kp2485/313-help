@@ -54,24 +54,28 @@ class LocateDecisionTest {
 class ServiceBoxTest {
 
     @Test
-    fun `knows the four cities`() {
+    fun `knows the first four cities and the places a bus reaches beyond them`() {
         assertTrue(inServiceArea(LatLon(42.3487, -83.0567)))   // downtown Detroit
         assertTrue(inServiceArea(LatLon(42.3934, -83.0497)))   // Hamtramck City Hall
         assertTrue(inServiceArea(LatLon(42.4055, -83.0968)))   // Highland Park City Hall
         assertTrue(inServiceArea(LatLon(42.3224, -83.1763)))   // Dearborn
+        assertTrue(inServiceArea(LatLon(42.6389, -83.2910)))   // Pontiac
+        assertTrue(inServiceArea(LatLon(42.4895, -83.0147)))   // Warren
         assertFalse(inServiceArea(LatLon(41.8781, -87.6298)))  // Chicago
     }
 
     @Test
     fun `is the same box the other two clients use`() {
-        assertEquals(42.25, ServiceBox.LAT_MIN, 0.0)
-        assertEquals(42.46, ServiceBox.LAT_MAX, 0.0)
-        assertEquals(-83.33, ServiceBox.LON_MIN, 0.0)
-        assertEquals(-82.91, ServiceBox.LON_MAX, 0.0)
-        assertTrue(inServiceArea(42.25, -83.33))
-        assertTrue(inServiceArea(42.46, -82.91))
-        for (p in listOf(42.2499 to -83.0, 42.4601 to -83.0, 42.35 to -83.3301, 42.35 to -82.9099)) {
-            assertFalse("$p is outside the four cities", inServiceArea(p.first, p.second))
+        // Every city and township a DDOT or SMART bus stops in (2026-09-24); four cities, lat 42.25-42.46 and lon
+        // -83.33 to -82.91, until then.
+        assertEquals(42.11, ServiceBox.LAT_MIN, 0.0)
+        assertEquals(42.80, ServiceBox.LAT_MAX, 0.0)
+        assertEquals(-83.57, ServiceBox.LON_MIN, 0.0)
+        assertEquals(-82.70, ServiceBox.LON_MAX, 0.0)
+        assertTrue(inServiceArea(42.11, -83.57))
+        assertTrue(inServiceArea(42.80, -82.70))
+        for (p in listOf(42.1099 to -83.0, 42.8001 to -83.0, 42.35 to -83.5701, 42.35 to -82.6999)) {
+            assertFalse("$p is outside the service area", inServiceArea(p.first, p.second))
         }
     }
 
@@ -126,11 +130,16 @@ class LocateCameraTest {
     }
 
     @Test
-    fun `a point on the edge of the city stays within the pan limits`() {
-        for (p in listOf(42.25 to -83.33, 42.46 to -82.91, 42.25 to -82.91, 42.46 to -83.33)) {
+    fun `a point on the edge of the service area stays within the pan limits`() {
+        assertEquals(0.4, MapCamera.PAN_LIMIT_X, 0.0)
+        assertEquals(0.5, MapCamera.PAN_LIMIT_Y, 0.0)
+        for (p in listOf(42.11 to -83.57, 42.80 to -82.70, 42.11 to -82.70, 42.80 to -83.57)) {
             val cam = MapCamera.forRadius(LatLon(p.first, p.second), LOCATE_RADIUS_METERS, 390.0, 780.0)
             assertTrue(abs(cam.centerX) <= MapCamera.PAN_LIMIT_X + 1e-9)
             assertTrue(abs(cam.centerY) <= MapCamera.PAN_LIMIT_Y + 1e-9)
+            // and the limits do not pull it back: every corner of the area can be the middle of the map
+            assertEquals("$p", MapProjection.x(p.second), cam.centerX, 1e-9)
+            assertEquals("$p", MapProjection.y(p.first), cam.centerY, 1e-9)
         }
     }
 
@@ -274,14 +283,13 @@ class AnchorViewTest {
         assertEquals(ZoomBand.MID, zoomBand(metresPerDp(onPhone)))
     }
 
-    /** The whole four-city region is still what the reset button shows, and it is much further out than this. */
+    /** The whole service area is what the reset button shows, and it is much further out than this. */
     @Test
     fun `the region fit is still there and is further out`() {
         val (centre, radius) = openingView(null)
         val anchor = MapCamera.forRadius(centre, radius, phoneW, phoneH)
-        val region = MapCamera.fitting(
-            listOf(LatLon(42.255, -83.29), LatLon(42.45, -82.91)), phoneW, phoneH, cover = true,
-        )
+        assertEquals(listOf(LatLon(42.11, -83.57), LatLon(42.80, -82.70)), REGION_CORNERS)
+        val region = MapCamera.fitting(REGION_CORNERS, phoneW, phoneH, cover = true)
         assertTrue(metresPerDp(region) > 2 * metresPerDp(anchor))
     }
 }

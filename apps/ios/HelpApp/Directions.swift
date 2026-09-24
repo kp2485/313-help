@@ -34,15 +34,18 @@ func dirDestination(name: String, lat: Double?, lon: Double?, category: String =
     return DirDestination(lat: lat, lon: lon, name: name)
 }
 
-// MARK: - the graph, built once per bundle, off the main actor
+// MARK: - the street files and the network, held once per bundle; a trip's graph, built per plan
 
 /**
- The street graph and the transit network.
+ The street files and the transit network, and a street graph built for each plan and dropped with it.
 
- Building the graph is one to two seconds on a cheap phone (DECISIONS 2026-09-22), and a phone that has to think
- for a second must not stop answering the person's thumb while it does — so it happens off the main actor, once
- per bundle, and the screen says "Getting the map ready… (about a second)" meanwhile. `StreetGraphCache` keys it
- by the map files' own sha256, which is a fact about a file and never about a person.
+ Since the area widened to every city and township a DDOT or SMART bus stops in (2026-09-24), the whole street map
+ is ~110,000 nodes — a second on a laptop and many on a cheap phone — so no graph of all of it is ever built here.
+ The phone holds the street files once per bundle; each plan builds a graph of only the streets that trip can walk
+ on (`tripWindow`, `windowFiles`; schema/query-spec.md "The trip window"), off the main actor, and drops it with the
+ answer. **A window graph is never cached**: its streets are the streets round two points a person asked about, so
+ a cache of them would be a record of their trips. The transit network is built once and kept: it is the same for
+ everybody. The Swift half of apps/web/src/dirworker.ts.
  */
 @MainActor
 @Observable
@@ -55,13 +58,14 @@ final class DirPlanner {
     private(set) var hasTransit = false
     /// The street files are not on this phone at all. The screen says to open the Map tab once with a signal.
     private(set) var noFiles = false
-    private var graph: StreetGraph?
+    /// `map/base.json` first, then every cell of `map/streets.json` in key order. Files of the bundle, never a trip.
+    private var streets: [PackedStreets]?
     private var network: TransitNetwork?
     /// The build in flight. A second screen that asks while it runs waits for it rather than being told "not
     /// built", and no screen leaving can cancel it (HelpCore/OneRun.swift).
     private let run = OneRun()
 
-    /// The map files, then the graph. Safe to call as often as a screen likes; it does the work once, and a call
+    /// The map files, then the network. Safe to call as often as a screen likes; it does the work once, and a call
     /// made while the work runs returns when it has finished.
     func build(from store: BundleStore) async {
         guard !built else { return }
@@ -74,20 +78,17 @@ final class DirPlanner {
         let cellsSrc = store.mapSource("map/streets.json")
         do {
             // `map/base.json` first, then each cell of `map/streets.json` by its key, sorted. **The order is
-            // part of the contract** — node numbering follows it — so the graph this phone builds is the graph
-            // the fixtures describe (dirfiles.ts, `streetFiles`).
+            // part of the contract** — node numbering follows it — so the graph this phone builds for a trip is
+            // the graph the fixtures describe (dirfiles.ts, `streetFiles`; `windowFiles` keeps the order).
             struct Cells: Decodable, Sendable { var cells: [String: PackedStreets] }
             let base = try await MapLoader.shared.decoded(baseSrc, as: PackedStreets.self)
             var files = [base]
-            var key = baseSrc.sha256
             if let cellsSrc, let cells = try? await MapLoader.shared.decoded(cellsSrc, as: Cells.self) {
                 files += cells.cells.keys.sorted().compactMap { cells.cells[$0] }
-                key += ":" + cellsSrc.sha256
             }
             let layers = await transitLayers(from: store)
-            let g = await StreetGraphCache.shared.graph(key) { buildStreetGraph(files, key: key) }
             let net = await Task.detached(priority: .userInitiated) { buildTransitNetwork(layers) }.value
-            graph = g
+            streets = files
             network = net
             hasTransit = !net.stops.isEmpty
             built = true
@@ -139,16 +140,21 @@ final class DirPlanner {
         return out
     }
 
-    /// Up to three ways to get there, in the planner's own rank order. Off the main actor: an A* across forty
-    /// thousand edges is not work a screen does while a finger is on it.
+    /// Up to three ways to get there, in the planner's own rank order. Off the main actor: building a trip's graph
+    /// and an A* across it is not work a screen does while a finger is on it. The graph is a local of the detached
+    /// task and goes when it returns — it is never stored, here or anywhere.
     func plan(from: LatLon, to: LatLon) async -> [Itinerary] {
-        guard let g = graph, let net = network else { return [] }
-        return await Task.detached(priority: .userInitiated) { DetroitQuery.plan(g, net, from: from, to: to) }.value
+        guard let files = streets, let base = files.first, let net = network else { return [] }
+        return await Task.detached(priority: .userInitiated) {
+            let w = tripWindow(net, from: from, to: to)
+            let g = buildStreetGraph(windowFiles(base, Array(files.dropFirst()), w))
+            return DetroitQuery.plan(g, net, from: from, to: to)
+        }.value
     }
 
-    /// For a new bundle: yesterday's graph says nothing about today's streets.
+    /// For a new bundle: yesterday's streets say nothing about today's.
     func forget() {
-        graph = nil; network = nil; built = false; hasTransit = false; noFiles = false
+        streets = nil; network = nil; built = false; hasTransit = false; noFiles = false
     }
 }
 
@@ -216,8 +222,8 @@ struct DirectionsView: View {
         .urgentHelp()
         .task(id: originKey) { await begin() }
         .onDisappear {
-            // Leaving the screen. The graph stays — it cost a second to build and belongs to the bundle, not to
-            // the trip; the trip does not.
+            // Leaving the screen. The street files and the network stay — they belong to the bundle, not to the
+            // trip; the trip, and the graph that was built for it, do not.
             follower.stop()
             following = false
             plans = []; steps = []; chosen = -1; stepAt = -1; offRoute = false; planFor = ""

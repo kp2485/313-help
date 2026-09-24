@@ -68,7 +68,7 @@ object ZipBox {
      *
      * Two states and no more. With a ZIP in use it says which one and offers to stop using it; without one it is a
      * numeric field and a button. A ZIP that is not five digits, that the bundle does not carry, or whose middle is
-     * outside the four cities all get the same plain sentence beside the field — none of them is a reason to guess
+     * outside the service area all get the same plain sentence beside the field — none of them is a reason to guess
      * at a coordinate.
      */
     fun add(a: MainActivity, col: LinearLayout) {

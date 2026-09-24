@@ -138,6 +138,9 @@ const insideAny = pointInRings;
 export function buildAreas(input: {
   cities: {
     id: string; name: string; children: 'neighborhood' | 'none'; center: Pt; rings: Pt[][];
+    /** A place in the area with an outline and its help only (2026-09-24): nothing about it was researched, so
+     *  nothing is said to be missing — "{city} does not publish" is a claim somebody has to have checked. */
+    outline_only?: boolean;
     parks?: { count: number; acres: number }; roads?: AreaIndicators['roads_bands'];
     vacancy?: { housing_units: number; vacant: number; pct: number; population: number; land_acres: number };
     parcels?: number; permits: NonNullable<AreaIndicators['permits_by_year']>;
@@ -180,7 +183,7 @@ export function buildAreas(input: {
     const anyPermits = c.permits.some((y) => y.units > 0 || y.buildings > 0);
     add('permits', anyPermits, key('src_census_bps', input.sources.permits));
     if (!anyPermits && c.permits.length) missing.push({ panel: 'permits', why: 'none_recorded' });
-    if (!detroit) for (const panel of ['sales', 'blight', 'demolitions', 'issues', 'fires', 'rentals', 'vacant_reg']) missing.push({ panel, why: 'not_published' });
+    if (!detroit && !c.outline_only) for (const panel of ['sales', 'blight', 'demolitions', 'issues', 'fires', 'rentals', 'vacant_reg']) missing.push({ panel, why: 'not_published' });
     return {
       id: c.id, name: c.name, city: c.id, kind: 'city' as const, district: null,
       center: [c.center[1], c.center[0]] as [number, number],

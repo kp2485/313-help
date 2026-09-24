@@ -8,8 +8,8 @@ import { stringify } from 'csv-stringify/sync';
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const p = (...parts: string[]) => join(ROOT, ...parts);
 
-// Detroit bbox sanity (CLAUDE.md).
-// Detroit, Hamtramck, Highland Park and Dearborn (Kyle, 2026-09-19). Dearborn reaches west to about -83.32.
+// Service-area bbox sanity (CLAUDE.md): every city and township a DDOT or SMART bus stops in (Kyle, 2026-09-24;
+// data/ingested/region.json). Four cities until then.
 //
 // The numbers live in packages/query (`SERVICE_BBOX`) since 2026-09-21, because the clients ask the same
 // question of a phone's own location — "is this person in the city at all?" — and two copies of a boundary is

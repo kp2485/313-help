@@ -1,0 +1,250 @@
+# Federal-candidate check, batch "federal-library-clinic", written 2026-09-24: public library buildings (rec.library) and
+# HRSA health-center sites (health.clinic) in the 71 places added on 2026-09-24, starting from the staged leads in
+# data/staging/federal_library.csv (IMLS Public Libraries Survey FY 2024, 73 outlets) and
+# data/staging/federal_clinic.csv (HRSA health-center sites, 37). A federal row is only a lead: no fact below comes from
+# either file. Method: every line was read on the owner's own site (the library's site, or its page on its own city's
+# official site; the health center's own site) on 2026-09-24, one page at a time, with the pipeline's own honest user agent
+# (pipeline/src/page-match.ts fetchPage); each line's phone and street number were then checked on its source_url with the
+# same matcher `pnpm check:sources` uses (listingOnPage). Web search was used only to find sites. Where a site refused
+# scripts, WebFetch was tried; those lines are marked BROWSER.
+#
+# Notes for the steward:
+# - Library `what`: every row says "A public library ... Borrow books with a library card." It says computers, Wi-Fi or
+#   internet only where the library's own site names that service (a menu item such as "Public Computers & WiFi" counts;
+#   "Wireless Printing" alone does not). "Free" appears only where the page says free (Riverview, Hazel Park, Berkley Wi-Fi).
+# - Seasonal hours: where a page gives school-year hours and different summer hours, the schedule is the current
+#   (September) one and a `notice` says which days change in summer, or a comment above the line does.
+# - Several federal phones and addresses are out of date; each line uses what the owner's page prints, and the comment
+#   above it says so (Livonia, Baldwin, Rochester Hills, Clinton-Macomb, Fraser, Commerce ZIP).
+# - health.clinic: 24 of the 37 HRSA sites are already lines in 2026-09-24-health.txt (Honor Community Health, MyCare,
+#   Wellness Plan, Western Wayne, Wayne County Healthy Communities); they are not repeated
+#   here. Only three new lines: Advantage Health's two Warren offices (the org's real site is ahcdetroit.org; its
+#   medical-services page lists both Warren addresses beside the one phone, and is the page the two Detroit Advantage rows
+#   already use) and MyCare's behavioral health office in Center Line.
+# - Advantage Health's page gives one set of hours for the whole organization (Mon, Tue, Thu, Fri 8am-5pm; Wed 10am-7pm)
+#   without tying it to a site; the Detroit rows are call-first, so these two are too.
+#
+# Candidates dropped (not listed), with the reason:
+# - sal_imls_franklin_public_library: Franklin is not one of the 71 places (outside the area).
+# - sal_imls_vest_pocket_library (Livonia): Livonia's page says the Vest Pocket collection "was moved to the Livonia
+#   Senior Wellness Center in November 2025"; it is no longer a library door of its own.
+# - sal_imls_orion_center_branch (1335 Joslyn Rd): Orion's page lists "Orion Center" only as a Little Free Library spot.
+# - Alfred Noble Library, Livonia (not in the federal file): Livonia's pages carry it only as history; closed (2019).
+# - sal_hrsa_anne_mare_ice_pediatric_health_center: Authority Health's page now puts the Anne Mare' Ice Pediatric Health
+#   Center at 12121 Broadstreet Ave, Detroit (outside this batch's area); the Southfield suite is not on its page.
+# - sal_hrsa_greenfield (Health Centers Detroit, 23077 Greenfield Ste 400, Southfield): hcdmg.org says "Temporarily Closed
+#   Due to Fire". Re-check later.
+# - sal_hrsa_chass_westland: chasscenter.org lists only its two Detroit sites.
+# - sal_hrsa_family_medical_center_of_mi_southgate: familymedicalmi.org lists clinics in Monroe and Lenawee counties only;
+#   no Southgate clinic on the owner's site.
+# - Honor Community Health "Empowerment Zones" (sal_hrsa_brewster_elementary_empowerment_zone,
+#   sal_hrsa_ferndale_lower_elementary_empowerment_zone, sal_hrsa_herrington_empowerment_zone,
+#   sal_hrsa_mason_middle_school_empowerment_zone, sal_hrsa_owen_empowerment_zone, sal_hrsa_whitman_empowerment_zone):
+#   Honor's pages describe each as a social and emotional health space inside a school that "supports students"; not a
+#   door open to the public.
+# - Already in 2026-09-24-health.txt (skipped as duplicates): sal_hrsa_avondale_high_school_health_center,
+#   sal_hrsa_baldwin_family_medicine_center, sal_hrsa_family_medicine_center, sal_hrsa_joslyn_smile_center (health.dental),
+#   sal_hrsa_north_oakland_health_center, sal_hrsa_orchard_lake_center, sal_hrsa_plum_hollow_center,
+#   sal_hrsa_pontiac_high_school_health_center, sal_hrsa_pontiac_middle_school_health_center,
+#   sal_hrsa_south_oakland_health_center, sal_hrsa_summit_center, sal_hrsa_the_philip_henry_center (the Oakland 360 Care
+#   Center, health.urgent there), sal_hrsa_waterford_school_health_center, sal_hrsa_center_line, sal_hrsa_groesbeck,
+#   sal_hrsa_mount_clemens, sal_hrsa_the_wellness_plan_medical_center_pontiac,
+#   sal_hrsa_the_wellness_plan_northwest_medical_center, sal_hrsa_wchc_garden_city_health_center,
+#   sal_hrsa_wchc_wayne_health_center, sal_hrsa_western_wayne_family_health_center,
+#   sal_hrsa_western_wayne_family_health_center_26650_eureka_rd_ste_ (the same Taylor building, Suite E),
+#   sal_hrsa_western_wayne_family_health_center_2700_hamlin_blvd, sal_hrsa_western_wayne_southwest_center.
+
+# ================= rec.library =================
+# from sal_imls_allen_park_public_library
+Allen Park Public Library | Allen Park Public Library | rec.library | A public library. Borrow books with a library card. | 8100 Allen Rd | Allen Park | 48101 | 313-381-2425 | https://allenparklibrary.org/ | Mon-Tue 10am-8pm; Wed 10am-5pm; Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://allenparklibrary.org/hours-and-directions/
+# from sal_imls_bacon_memorial_district_library
+Bacon Memorial District Library | Bacon Memorial District Library | rec.library | A public library with public computers. Borrow books with a library card. | 45 Vinewood | Wyandotte | 48192 | 734-246-8357 | https://www.baconlibrary.org/ | Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://www.baconlibrary.org/hours
+# from sal_imls_dearborn_heights_city_libraries
+Caroline Kennedy Library | Dearborn Heights Library | rec.library | A public library. Borrow books with a library card. | 24590 George St | Dearborn Heights | 48127 | 313-791-3800 | https://www.dhlibrary.org/ | Mon-Thu 10am-9pm; Fri-Sat 10am-5pm |  | https://www.dhlibrary.org/
+# from sal_imls_john_f_kennedy_jr_library
+John F. Kennedy, Jr. Library | Dearborn Heights Library | rec.library | A public library. Borrow books with a library card. | 24602 Van Born Rd | Dearborn Heights | 48125 | 313-791-6050 | https://www.dhlibrary.org/ | Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://www.dhlibrary.org/
+# from sal_imls_ecorse_public_library
+Ecorse Public Library | Ecorse Public Library | rec.library | A public library with public computers. Borrow books with a library card. | 4184 W Jefferson Ave | Ecorse | 48229 | 313-389-2030 | https://ecorse.lib.mi.us/ | Tue 10am-6pm; Wed 10am-7pm; Thu 10am-6pm; Fri-Sat 10am-5pm |  | https://ecorse.lib.mi.us/about-2/
+# The library is inside the Maplewood Community Center; the entrance faces Balmoral Street (its page).
+# from sal_imls_garden_city_public_library
+Garden City Public Library | Garden City Public Library | rec.library | A public library with public computers and Wi-Fi. Borrow books with a library card. | 31735 Maplewood St | Garden City | 48135 | 734-793-1830 | https://www.gardencitylib.org/ | Mon-Thu 10am-8pm; Fri-Sat 12pm-5pm |  | https://www.gardencitylib.org/hours-location
+# Grosse Pointe Public Library: each branch page labels these "Winter Hours" (read 2026-09-24). Re-check in late May for summer hours.
+# from sal_imls_grosse_pointe_public_library
+Grosse Pointe Central Library | Grosse Pointe Public Library | rec.library | A public library. Borrow books with a library card. | 10 Kercheval Ave | Grosse Pointe Farms | 48236 | 313-640-4775 | https://grossepointelibrary.org/ | Sun 1pm-5pm; Mon-Thu 9am-9pm; Fri-Sat 9am-5pm |  | https://grossepointelibrary.org/central-library
+# from sal_imls_grosse_pointe_public_library_ewald_branch
+Grosse Pointe Ewald Branch Library | Grosse Pointe Public Library | rec.library | A public library. Borrow books with a library card. | 15175 E Jefferson Ave | Grosse Pointe Park | 48230 | 313-640-4775 | https://grossepointelibrary.org/ | Sun 1pm-5pm; Mon-Thu 9am-9pm; Fri-Sat 9am-5pm |  | https://grossepointelibrary.org/ewald-branch
+# from sal_imls_grosse_pointe_woods_public_library
+Grosse Pointe Woods Branch Library | Grosse Pointe Public Library | rec.library | A public library. Borrow books with a library card. | 20680 Mack Ave | Grosse Pointe Woods | 48236 | 313-640-4775 | https://grossepointelibrary.org/ | Sun 1pm-5pm; Mon-Thu 9am-9pm; Fri-Sat 9am-5pm |  | https://grossepointelibrary.org/woods-branch
+# Harper Woods: these are the "Regular Hours"; the page also lists summer hours (Memorial Day to Labor Day: Mon-Wed 12pm-8pm, Thu-Fri 10am-5pm, Saturday closed).
+# from sal_imls_harper_woods_public_library
+Harper Woods Public Library | Harper Woods Public Library | rec.library | A public library. Borrow books with a library card. | 19601 Harper Ave | Harper Woods | 48225 | 313-343-2575 | https://www.harperwoodslibrary.org/ | Mon-Wed 11am-7pm; Thu-Fri 10am-5pm; Sat 10am-2pm |  | https://www.harperwoodslibrary.org/our-locations-and-hours/harper-woods-public-library
+# from sal_imls_leanna_hicks_public_library_of_inkster
+Leanna Hicks Public Library of Inkster | Leanna Hicks Public Library of Inkster | rec.library | A public library with public computers. Borrow books with a library card. | 2500 Hamlin Dr | Inkster | 48141 | 313-563-2822 | https://inkster.lib.mi.us/ | Mon-Thu 11am-7pm; Sat 11am-5pm |  | https://inkster.lib.mi.us/
+# Lincoln Park: the library's page is on the City of Lincoln Park's site (lincolnparklibrary.org is an unrelated site).
+# from sal_imls_lincoln_park_public_library
+Lincoln Park Public Library | Lincoln Park Public Library | rec.library | A public library. Borrow books with a library card. | 1381 Southfield Rd | Lincoln Park | 48146 | 313-381-0374 | https://www.citylp.com/347/Library | Mon-Thu 10am-8pm; Sat 10am-5pm |  | https://www.citylp.com/347/Library
+# Livonia Civic Center: the page prints (734) 466-2491, not the 466-2451 in the federal file.
+# from sal_imls_livonia_public_library
+Livonia Civic Center Library | Livonia Public Library | rec.library | A public library with public computers and Wi-Fi. Borrow books with a library card. | 32777 Five Mile Rd | Livonia | 48154 | 734-466-2491 | https://livonialibrary.info/ | Sun 1pm-5pm; Mon-Thu 10am-9pm; Fri-Sat 10am-5pm |  | https://livonialibrary.info/hours-locations/ | notice=Closed on Sundays from Memorial Day weekend to Labor Day weekend.
+# from sal_imls_carl_sandburg_branch_library
+Carl Sandburg Library | Livonia Public Library | rec.library | A public library with Wi-Fi. Borrow books with a library card. | 30100 Seven Mile Rd | Livonia | 48152 | 248-893-4010 | https://livonialibrary.info/ | Mon-Tue 12pm-8pm; Wed-Thu 10am-6pm; Fri 10am-5pm |  | https://livonialibrary.info/hours-locations/
+# from sal_imls_melvindale_public_library
+Melvindale Public Library | Melvindale Public Library | rec.library | A public library. Borrow books with a library card. | 18650 Allen Rd | Melvindale | 48122 | 313-429-1090 | https://melvindale.lib.mi.us/ | Mon 10am-6pm; Tue 12pm-8pm; Wed 10am-6pm; Thu 12pm-8pm; Sat 10am-4pm |  | https://melvindale.lib.mi.us/
+# from sal_imls_redford_township_district_library
+Redford Township District Library | Redford Township District Library | rec.library | A public library with public computers and Wi-Fi. Borrow books with a library card. | 25320 W Six Mile Rd | Redford | 48240 | 313-531-5960 | https://www.rtdl.org/ | Sun 12pm-5pm; Mon-Thu 10am-8:30pm; Fri-Sat 10am-5pm |  | https://www.rtdl.org/
+# River Rouge: these are the "Current Hours"; from Memorial Day to Labor Day the page says Friday 11am-3pm and Saturday closed.
+# from sal_imls_river_rouge_public_library
+River Rouge Public Library | River Rouge Public Library | rec.library | A public library. Borrow books with a library card. | 221 Burke St | River Rouge | 48218 | 313-843-2040 | https://www.river-rouge.lib.mi.us/ | Mon-Thu 11am-6pm; Sat 11am-3pm |  | https://river-rouge.lib.mi.us/hours.html
+# from sal_imls_riverview_public_library
+Riverview Veterans Memorial Library | Riverview Veterans Memorial Library | rec.library | A public library with free computers and internet. Borrow books with a library card. | 14300 Sibley Rd | Riverview | 48193 | 734-283-1250 | https://riverviewpubliclibrary.com/ | Mon-Thu 10am-7pm; Sat 10am-3pm |  | https://riverviewpubliclibrary.com/library-hours/
+# from sal_imls_romulus_public_library
+Romulus Public Library | Romulus Public Library | rec.library | A public library. Borrow books with a library card. | 11121 Wayne Rd | Romulus | 48174 | 734-942-7589 | https://www.romuluslibrary.org/ | Mon-Thu 9am-8pm; Fri 9am-6pm; Sat 9:30am-5pm |  | https://www.romuluslibrary.org/
+# from sal_imls_southgate_veterans_memorial_library
+Southgate Veterans Memorial Library | Southgate Veterans Memorial Library | rec.library | A public library. Borrow books with a library card. | 14680 Dix-Toledo Rd | Southgate | 48195 | 734-258-3002 | https://southgate.lib.mi.us/ | Mon-Thu 10am-9pm; Sat 10am-5pm |  | https://southgate.lib.mi.us/contact-us
+# Taylor: the library's own site (taylor.lib.mi.us) answers a script with HTTP 307 from a Sucuri firewall, so the source is its
+# page on the City of Taylor's site, which says "Please see library website for current hours". A person with a browser
+# can add the hours from taylor.lib.mi.us.
+# from sal_imls_taylor_community_library
+Taylor Community Library | Taylor Community Library | rec.library | A public library with public computers and internet. Borrow books with a library card. | 12303 Pardee Rd | Taylor | 48180 | 734-287-4840 | https://taylor.lib.mi.us/ | Call first |  | http://www.cityoftaylor.com/facilities/facility/details/Taylor-Community-Library-47
+# from sal_imls_trenton_veterans_memorial_library
+Trenton Veterans Memorial Library | Trenton Veterans Memorial Library | rec.library | A public library. Borrow books with a library card. | 2790 Westfield Rd | Trenton | 48183 | 734-676-9777 | https://www.trenton.lib.mi.us/ | Mon-Thu 9am-8pm; Fri-Sat 9am-5pm |  | https://www.trenton.lib.mi.us/our-locations-and-hours/your-public-library
+# from sal_imls_wayne_public_library
+Wayne Public Library | Wayne Public Library | rec.library | A public library. Borrow books with a library card. | 3737 S Wayne Rd | Wayne | 48184 | 734-721-7832 | https://www.wayne.lib.mi.us/ | Mon-Thu 10am-8pm; Fri-Sat 12pm-5pm |  | https://www.wayne.lib.mi.us/locationandhours
+# Westland: the federal file names it William P. Faust Public Library of Westland; its own site says Westland Public Library.
+# from sal_imls_william_p_faust_public_library_of_westland
+Westland Public Library | Westland Public Library | rec.library | A public library with public computers and Wi-Fi. Borrow books with a library card. | 6123 Central City Pkwy | Westland | 48185 | 734-326-6123 | https://westlandlibrary.org/ | Mon-Thu 9am-9pm; Fri-Sat 9am-5pm |  | https://westlandlibrary.org/
+# from sal_imls_auburn_hills_public_library
+Auburn Hills Public Library | Auburn Hills Public Library | rec.library | A public library. Borrow books with a library card. | 3400 E Seyburn Dr | Auburn Hills | 48326 | 248-370-9466 | https://ahplibrary.org/ | Sun 1pm-5pm; Mon-Thu 9am-8pm; Fri-Sat 10am-5pm |  | https://ahplibrary.org/branch/auburn-hills-public-library/ | notice=Open Sundays from September to May only.
+# Baldwin: the page prints 248-647-1700, not the 647-7339 in the federal file.
+# from sal_imls_baldwin_public_library
+Baldwin Public Library | Baldwin Public Library | rec.library | A public library with public computers and Wi-Fi. Borrow books with a library card. | 300 W Merrill St | Birmingham | 48009 | 248-647-1700 | https://www.baldwinlib.org/ | Sun 12pm-5pm; Mon-Thu 9:30am-9pm; Fri-Sat 9:30am-5:30pm |  | https://www.baldwinlib.org/
+# Berkley: the page prints "THURS: 10pm - 6pm" (Labor Day to Memorial Day), which cannot be right, so Thursday is left out and
+# the row stays call-first. A person can ask the library and fix it.
+# from sal_imls_berkley_public_library
+Berkley Public Library | Berkley Public Library | rec.library | A public library with public computers and free Wi-Fi. Borrow books with a library card. | 3155 Coolidge Hwy | Berkley | 48072 | 248-658-3440 | https://www.berkleymi.gov/library | Mon-Wed 10am-8pm; Fri 1pm-6pm; Sat 10am-3pm. Call for Thursday hours. |  | https://www.berkleymi.gov/library
+# Clawson: these are the "Regular Hours (Labor Day-Memorial Day)"; in summer it is open Friday 9am-5pm and closed Saturday.
+# from sal_imls_blair_memorial_library
+Blair Memorial Library | Blair Memorial Library | rec.library | A public library with public computers and Wi-Fi. Borrow books with a library card. | 416 N Main St | Clawson | 48017 | 248-588-5500 | https://www.cityofclawson.com/your_government/library/index.php | Mon 12pm-8pm; Tue 10am-6pm; Wed 12pm-8pm; Thu 10am-6pm; Sat 9am-5pm |  | https://www.cityofclawson.com/your_government/library/index.php
+# from sal_imls_bloomfield_township_public_library
+Bloomfield Township Public Library | Bloomfield Township Public Library | rec.library | A public library. Borrow books with a library card. | 1099 Lone Pine Rd | Bloomfield Township | 48302 | 248-642-5800 | https://btpl.org/ | Sun 12pm-5:30pm; Mon-Thu 9:30am-9pm; Fri 9:30am-6:30pm; Sat 9:30am-5:30pm |  | https://btpl.org/contact/
+# Commerce: its "Hours and Location" page shows the address, phone and 2026 closings but no weekly hours in its text, so call first.
+# The page prints ZIP 48382 (the federal file has 48390).
+# from sal_imls_commerce_township_community_library
+Commerce Township Community Library | Commerce Township Community Library | rec.library | A public library. Borrow books with a library card. | 180 E Commerce Rd | Commerce Township | 48382 | 248-669-8108 | https://commercetwp.com/library | Call first |  | https://commercetwp.com/library/about-us/hours-and-location/
+# Farmington Community Library: "Both FCL locations normally have the same hours"; the Farmington Hills building has shorter hours
+# for renovation from September 21 to October 8, 2026 (Sun 1-5pm, Mon-Thu 4-9pm, Fri closed, Sat 10am-6pm). Drop the notice after October 8.
+# from sal_imls_farmington_community_library
+Farmington Community Library, Farmington Hills | Farmington Community Library | rec.library | A public library. Borrow books with a library card. | 32737 W 12 Mile Rd | Farmington Hills | 48334 | 248-553-0300 | https://farmlib.org/ | Sun 1pm-5pm; Mon-Thu 9am-9pm; Fri-Sat 10am-6pm |  | https://farmlib.org/about/locations-hours/ | notice=Until October 8, 2026 this building has shorter hours for repairs: Monday to Thursday 4pm to 9pm, closed Friday.
+# from sal_imls_farmington_branch_library
+Farmington Community Library, Farmington | Farmington Community Library | rec.library | A public library. Borrow books with a library card. | 23500 Liberty St | Farmington | 48335 | 248-553-0321 | https://farmlib.org/ | Sun 1pm-5pm; Mon-Thu 9am-9pm; Fri-Sat 10am-6pm |  | https://farmlib.org/about/locations-hours/
+# from sal_imls_ferndale_public_library
+Ferndale Area District Library | Ferndale Area District Library | rec.library | A public library with public computers and internet. Borrow books with a library card. | 222 E Nine Mile Rd | Ferndale | 48220 | 248-546-2504 | https://www.fadl.org/ | Sun 12pm-5pm; Mon-Thu 10am-8pm; Fri 10am-6pm; Sat 12pm-5pm |  | https://www.fadl.org/
+# Hazel Park: "Free access to internet" and "Wireless Internet access within the library" are on hazel-park.lib.mi.us/about-our-library.
+# from sal_imls_hazel_park_memorial_library
+Hazel Park District Library | Hazel Park District Library | rec.library | A public library with free internet and Wi-Fi. Borrow books with a library card. | 123 E Nine Mile Rd | Hazel Park | 48030 | 248-546-4095 | https://hazel-park.lib.mi.us/ | Mon 10am-6pm; Tue-Thu 12pm-8pm; Fri 10am-6pm; Sat 12pm-4pm |  | https://hazel-park.lib.mi.us/contact-us
+# from sal_imls_huntington_woods_public_library
+Huntington Woods Public Library | Huntington Woods Public Library | rec.library | A public library. Borrow books with a library card. | 26415 Scotia Rd | Huntington Woods | 48070 | 248-543-9720 | https://www.hwmi.org/departments/library/index.php | Sun 1pm-5pm; Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://www.hwmi.org/departments/library/index.php | notice=Closed on Sundays in the summer.
+# from sal_imls_madison_heights_public_library
+Madison Heights Public Library | Madison Heights Public Library | rec.library | A public library. Borrow books with a library card. | 240 W Thirteen Mile Rd | Madison Heights | 48071 | 248-588-7763 | https://www.madisonheightsmi.gov/362/Library | Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://www.madisonheightsmi.gov/362/Library
+# from sal_imls_novi_public_library
+Novi Public Library | Novi Public Library | rec.library | A public library. Borrow books with a library card. | 45255 W Ten Mile Rd | Novi | 48375 | 248-349-0720 | https://novilibrary.org/ | Sun 12pm-6pm; Mon-Thu 10am-9pm; Fri-Sat 10am-6pm |  | https://novilibrary.org/contact
+# BROWSER: Oak Park Public Library - site refuses scripts (oakparkmi.gov answers HTTP 403 to our fetcher and to WebFetch).
+# Phone and address are the federal file's, and the phone is also in the city's own page address (contactus/library_(248)691-7480.php);
+# a person must confirm both on the page and add the hours.
+# from sal_imls_oak_park_public_library
+Oak Park Public Library | Oak Park Public Library | rec.library | A public library. Borrow books with a library card. | 14200 Oak Park Blvd | Oak Park | 48237 | 248-691-7480 | https://www.oakparkmi.gov/departments/library/index.php | Call first |  | https://www.oakparkmi.gov/departments/library/about_the_library.php
+# from sal_imls_orion_township_public_library
+Orion Township Public Library | Orion Township Public Library | rec.library | A public library with public computers. Borrow books with a library card. | 825 Joslyn Rd | Lake Orion | 48362 | 248-693-3000 | https://www.orionlibrary.org/ | Sun 1pm-5pm; Mon-Thu 9:30am-9pm; Fri-Sat 9:30am-5pm |  | https://www.orionlibrary.org/locations | notice=Open Sundays from Labor Day to Memorial Day only.
+# from sal_imls_pontiac_public_library
+Pontiac Public Library | Pontiac Public Library | rec.library | A public library with public computers. Borrow books with a library card. | 60 E Pike St | Pontiac | 48342 | 248-758-3942 | https://pontiaclibrary.org/ | Mon-Thu 10am-8pm; Fri-Sat 10am-5:30pm |  | https://pontiaclibrary.org/
+# Rochester Hills PL: the page prints 248-656-2900, not the 650-7122 in the federal file.
+# from sal_imls_rochester_hills_public_library
+Rochester Hills Public Library | Rochester Hills Public Library | rec.library | A public library. Borrow books with a library card. | 500 Olde Towne Rd | Rochester | 48307 | 248-656-2900 | https://www.rhpl.org/ | Sun 1pm-6pm; Mon-Thu 9am-9pm; Fri-Sat 9am-6pm |  | https://www.rhpl.org/hours
+# from sal_imls_royal_oak_public_library
+Royal Oak Public Library | Royal Oak Public Library | rec.library | A public library with public computers. Borrow books with a library card. | 222 E Eleven Mile Rd | Royal Oak | 48067 | 248-246-3700 | https://ropl.org/ | Sun 1pm-5pm; Mon-Thu 9am-8pm; Fri-Sat 9am-6pm |  | https://www.ropl.org/1064/Hours-and-Location | notice=Closed on Sundays from Memorial Day weekend through Labor Day.
+# Royal Oak Township Library: in Royal Oak Township with a Ferndale mailing address, as its page prints it. The federal file notes the
+# library did not answer the 2024 survey; its own page (read 2026-09-24) still lists this address, phone and Tue-Thu hours.
+# from sal_imls_royal_oak_township_public_library
+Royal Oak Township Library | Royal Oak Township Library | rec.library | A public library. Borrow books with a library card. | 21131 Garden Lane, 2nd Floor | Ferndale | 48220 | 248-542-9205 | https://www.rotownshippl.michlibrary.org/ | Tue-Thu 9am-4pm |  | https://www.rotownshippl.michlibrary.org/locationhours
+# from sal_imls_southfield_public_library
+Southfield Public Library | Southfield Public Library | rec.library | A public library. Borrow books with a library card. | 26300 Evergreen Rd | Southfield | 48076 | 248-796-4200 | https://southfieldlibrary.org/ | Sun 1pm-5pm; Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://southfieldlibrary.org/ | notice=Open Sundays during the school year only.
+# from sal_imls_troy_public_library
+Troy Public Library | Troy Public Library | rec.library | A public library. Borrow books with a library card. | 510 W Big Beaver Rd | Troy | 48084 | 248-524-3538 | https://troypl.org/ | Sun 1pm-5pm; Mon-Thu 9:30am-9pm; Fri-Sat 9:30am-5pm |  | https://troypl.org/information/connect/contact_us.php
+# Walled Lake: walledlakelibrary.org redirects to walledlake.ploud.net, the library's site.
+# from sal_imls_walled_lake_city_library
+Walled Lake City Library | Walled Lake City Library | rec.library | A public library. Borrow books with a library card. | 1499 E West Maple Rd | Walled Lake | 48390 | 248-624-3772 | https://walledlakelibrary.org/ | Mon-Thu 10am-8pm; Fri 10am-6pm; Sat 10am-2pm |  | https://walledlake.ploud.net/
+# from sal_imls_waterford_township_public_library
+Waterford Township Public Library | Waterford Township Public Library | rec.library | A public library. Borrow books with a library card. | 5168 Civic Center Dr | Waterford | 48329 | 248-674-4831 | https://waterfordmi.gov/1328/Library | Sun 1pm-5pm; Mon-Wed 10am-9pm; Thu-Sat 10am-5pm |  | https://waterfordmi.gov/1328/Library | notice=Closed on Sundays from Memorial Day to Labor Day.
+# from sal_imls_west_bloomfield_township_public_library
+West Bloomfield Main Library | West Bloomfield Township Public Library | rec.library | A public library with public computers. Borrow books with a library card. | 4600 Walnut Lake Rd | West Bloomfield Township | 48323 | 248-682-2120 | https://wblib.org/ | Sun 12pm-6pm; Mon-Thu 9am-9pm; Fri-Sat 9am-6pm |  | https://wblib.org/branch/main-library/
+# from sal_imls_westacres_branch_library
+West Bloomfield Westacres Branch Library | West Bloomfield Township Public Library | rec.library | A public library. Borrow books with a library card. | 7321 Commerce Rd | West Bloomfield Township | 48324 | 248-363-4022 | https://wblib.org/ | Sun 12pm-5pm; Mon-Thu 9am-9pm; Fri-Sat 9am-6pm |  | https://wblib.org/branch/westacres-branch/
+# from sal_imls_white_lake_township_library
+White Lake Township Library | White Lake Township Library | rec.library | A public library. Borrow books with a library card. | 11005 Elizabeth Lake Rd | White Lake | 48386 | 248-698-4942 | https://whitelakelibrary.org/ | Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://whitelakelibrary.org/hours-directions/
+# from sal_imls_wixom_public_library
+Wixom Public Library | Wixom Public Library | rec.library | A public library with public computers. Borrow books with a library card. | 49015 Pontiac Trail | Wixom | 48393 | 248-624-2512 | https://www.wixomlibrary.org/ | Mon-Thu 10am-8pm; Fri 10am-6pm; Sat 10am-5pm |  | https://www.wixomlibrary.org/branch/wixom-public-library
+# from sal_imls_center_line_public_library
+Center Line Public Library | Center Line Public Library | rec.library | A public library. Borrow books with a library card. | 7345 Weingartz St | Center Line | 48015 | 586-758-8274 | https://www.centerline.gov/202/Library | Mon 9:30am-7pm; Tue-Fri 9:30am-5pm |  | https://www.centerline.gov/202/Library
+# from sal_imls_chesterfield_township_library
+Chesterfield Township Library | Chesterfield Township Library | rec.library | A public library. Borrow books with a library card. | 50560 Patricia Ave | Chesterfield Township | 48051 | 586-598-4900 | https://www.chelibrary.org/ | Mon-Thu 9:30am-8pm; Fri 9:30am-5pm; Sat 9:30am-4pm |  | https://www.chelibrary.org/about/hours.php
+# Clinton-Macomb Public Library: one "Building Hours" list covers all three; Sunday 12pm-6pm is "Main Library Only".
+# The page prints the Main Library as 586-226-5020 (the federal file has 226-5000).
+# from sal_imls_clinton_macomb_public_library
+Clinton-Macomb Main Library | Clinton-Macomb Public Library | rec.library | A public library. Borrow books with a library card. | 40900 Romeo Plank Rd | Clinton Township | 48038 | 586-226-5020 | https://cmpl.org/ | Sun 12pm-6pm; Mon-Thu 9am-9pm; Fri-Sat 9am-6pm |  | https://cmpl.org/contact_us/index.php
+# from sal_imls_north_branch
+Clinton-Macomb North Branch Library | Clinton-Macomb Public Library | rec.library | A public library. Borrow books with a library card. | 54100 Broughton Rd | Macomb Township | 48042 | 586-226-5082 | https://cmpl.org/ | Mon-Thu 9am-9pm; Fri-Sat 9am-6pm |  | https://cmpl.org/contact_us/index.php
+# from sal_imls_south_branch
+Clinton-Macomb South Branch Library | Clinton-Macomb Public Library | rec.library | A public library. Borrow books with a library card. | 35679 S Gratiot Ave | Clinton Township | 48035 | 586-226-5072 | https://cmpl.org/ | Mon-Thu 9am-9pm; Fri-Sat 9am-6pm |  | https://cmpl.org/contact_us/index.php
+# from sal_imls_eastpointe_memorial_library
+Eastpointe Memorial Library | Eastpointe Memorial Library | rec.library | A public library. Borrow books with a library card. | 15875 Oak Ave | Eastpointe | 48021 | 586-445-5096 | https://www.eastpointemi.gov/departments/eastpointe_memorial_library/eastpointe_library.php | Mon-Thu 10am-6pm; Fri 12pm-5pm; Sat 10am-2pm |  | https://www.eastpointemi.gov/departments/eastpointe_memorial_library/eastpointe_library.php
+# Fraser: the library's page prints 15260 15 Mile Rd; the federal file still has the old 16330 E 14 Mile Rd.
+# from sal_imls_fraser_public_library
+Fraser Public Library | Fraser Public Library | rec.library | A public library. Borrow books with a library card. | 15260 15 Mile Rd | Fraser | 48026 | 586-293-2055 | https://www.fraserpubliclibrary.org/ | Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://www.fraserpubliclibrary.org/get-in-touch
+# Harrison Township: the page shows the phone and "38255 L'Anse Creuse St, Suite A" (curly apostrophe). check:sources' street matcher
+# cannot pass a street whose first word has an apostrophe, so this row will need a person to confirm the address on the page.
+# from sal_imls_harrison_township_public_library
+Harrison Township Public Library | Harrison Township Public Library | rec.library | A public library. Borrow books with a library card. | 38255 L'Anse Creuse St, Suite A | Harrison Township | 48045 | 586-329-1261 | https://www.htlibrary.org/ | Mon-Fri 9am-8pm; Sat 9am-5pm |  | https://www.htlibrary.org/contact-us/
+# from sal_imls_macdonald_public_library
+MacDonald Public Library | MacDonald Public Library | rec.library | A public library. Borrow books with a library card. | 36480 Main St | New Baltimore | 48047 | 586-725-0273 | https://macdonaldlibrary.org/ | Mon-Thu 10am-8pm; Fri-Sat 10am-5pm |  | https://macdonaldlibrary.org/our_library/hours_and_directions.php
+# from sal_imls_mount_clemens_public_library
+Mount Clemens Public Library | Mount Clemens Public Library | rec.library | A public library. Borrow books with a library card. | 150 Cass Ave | Mount Clemens | 48043 | 586-469-6200 | https://www.mtclib.org/ | Mon 10am-8pm; Tue 10am-6pm; Wed 12pm-8pm; Thu 10am-6pm; Fri 10am-5pm; Sat 10am-2pm |  | https://www.mtclib.org/160/Hours-and-Location
+# Roseville: rosevillelibrary.org answers HTTP 403 to a script, so the source is the library's page on the City of Roseville's site.
+# That page gives 29777 Gratiot Avenue as the City Hall address; the library shares it.
+# from sal_imls_roseville_public_library
+Roseville Public Library | Roseville Public Library | rec.library | A public library. Borrow books with a library card. | 29777 Gratiot Ave | Roseville | 48066 | 586-445-5407 | https://rosevillelibrary.org/ | Mon-Thu 9am-8pm; Fri 9am-5pm; Sat 10am-4pm |  | https://www.roseville-mi.gov/198/Library | notice=Open Saturdays from September to May only.
+# St. Clair Shores: closed to walk-in visits for renovation since September 2, 2025, with curbside pickup (scsmi.net/CivicAlerts.aspx?AID=971);
+# a July 28, 2026 update (AID=992) says it is "anticipating reopening this September". The About Us page lists regular hours
+# (Mon-Thu 9am-7pm, Fri 9am-5pm) and curbside hours. Kept call-first; set the schedule once it reopens.
+# from sal_imls_saint_clair_shores_public_library
+St. Clair Shores Public Library | St. Clair Shores Public Library | rec.library | A public library. Borrow books with a library card. | 22500 11 Mile Rd | St. Clair Shores | 48081 | 586-771-9020 | https://www.scsmi.net/1173/Library | Call first |  | https://www.scsmi.net/1171/About-Us | notice=The building has been closed for repairs. Books are picked up at the curb. The city said in July 2026 it hoped to reopen in September.
+# from sal_imls_shelby_township_library
+Shelby Township Library | Shelby Township Library | rec.library | A public library with public computers. Borrow books with a library card. | 52610 Van Dyke Ave | Shelby Township | 48316 | 586-739-7414 | https://www.shelbytwp.org/government/departments/library | Mon-Thu 9am-8pm; Fri-Sat 9am-5pm |  | https://www.shelbytwp.org/government/departments/library
+# Sterling Heights: phone and address from the library's Contact page; the hours are on its Hours & Location page
+# (sterlingheights.gov/1433/Hours-Location), which prints no phone.
+# from sal_imls_sterling_heights_public_library
+Sterling Heights Public Library | Sterling Heights Public Library | rec.library | A public library. Borrow books with a library card. | 40255 Dodge Park Rd | Sterling Heights | 48313 | 586-446-2665 | https://www.sterlingheights.gov/2136/Library | Sun 1pm-5pm; Mon-Thu 8:30am-8pm; Fri 1pm-5pm; Sat 9:30am-5pm |  | https://www.sterlingheights.gov/642/Contact | notice=Open Sundays from Labor Day to Memorial Day only.
+# from sal_imls_utica_public_library
+Utica Public Library | Utica Public Library | rec.library | A public library. Borrow books with a library card. | 7530 Auburn Rd | Utica | 48317 | 586-731-4141 | https://www.uticalibrary.com/ | Mon-Thu 11am-7pm; Fri 11am-4pm; Sat 11am-2:30pm |  | https://www.uticalibrary.com/our-locations-and-hours/utica-public-library
+# BROWSER: Warren Civic Center Library - site refuses scripts (warrenlibrary.net answers HTTP 403). Address, phone and hours were read from
+# https://warrenlibrary.net/library-locations-hours/ through WebFetch on 2026-09-24; a person must confirm all three in a browser.
+# The City of Warren's 311 page still gives an older Burnette address (22005 Van Dyke) and older phones; the library's own page is used.
+# The Civic Center address has no house number ("One City Square"), so check:sources can match only its phone.
+# from sal_imls_civic_center_library
+Warren Civic Center Library | Warren Public Library | rec.library | A public library. Borrow books with a library card. | One City Square, Suite 100 | Warren | 48093 | 586-751-0770 | https://warrenlibrary.net/ | Sun 1pm-5pm; Mon 12pm-8pm; Tue 9am-8pm; Wed 12pm-8pm; Thu 9am-8pm; Fri-Sat 9am-5pm |  | https://warrenlibrary.net/library-locations-hours/ | notice=Open Sundays from Labor Day to Memorial Day only.
+# BROWSER: Warren Arthur J. Miller Branch Library - site refuses scripts (see above).
+# from sal_imls_arthur_j_miller_branch_library
+Warren Arthur J. Miller Branch Library | Warren Public Library | rec.library | A public library. Borrow books with a library card. | 5460 Arden, Suite 303 | Warren | 48092 | 586-751-5377 | https://warrenlibrary.net/ | Mon 9am-5pm; Tue 12pm-8pm; Wed 9am-5pm; Thu 12pm-8pm; Fri-Sat 9am-5pm |  | https://warrenlibrary.net/library-locations-hours/
+# BROWSER: Warren Dorothy M. Busch Branch Library - site refuses scripts (see above).
+# from sal_imls_dorothy_m_busch_branch_library
+Warren Dorothy M. Busch Branch Library | Warren Public Library | rec.library | A public library. Borrow books with a library card. | 23333 Ryan Rd | Warren | 48091 | 586-353-0580 | https://warrenlibrary.net/ | Mon 12pm-8pm; Tue 9am-5pm; Wed 12pm-8pm; Thu 9am-5pm; Fri-Sat 9am-5pm |  | https://warrenlibrary.net/library-locations-hours/
+# BROWSER: Warren Maybelle Burnette Branch Library - site refuses scripts (see above).
+# from sal_imls_maybelle_burnette_branch_library
+Warren Maybelle Burnette Branch Library | Warren Public Library | rec.library | A public library. Borrow books with a library card. | 23345 Van Dyke Ave | Warren | 48089 | 586-353-0579 | https://warrenlibrary.net/ | Mon 9am-5pm; Tue 12pm-8pm; Wed 9am-5pm; Thu 12pm-8pm; Fri-Sat 9am-5pm |  | https://warrenlibrary.net/library-locations-hours/
+
+# ================= health.clinic =================
+# from sal_hrsa_advantage_health
+Advantage Health, Warren (13 Mile Rd) | Advantage Health Centers | health.clinic | See a doctor. Advantage Health also has dentists and counselors, so call to ask what this office offers. They care for people with no insurance and people without a home. | 12200 13 Mile Rd, Suite 200 | Warren | 48093 | 313-416-6262 | https://ahcdetroit.org/ | Call first | | https://ahcdetroit.org/services/medical-services/
+# from sal_hrsa_advantage_health_centers_8_mile
+Advantage Health, Warren (8 Mile Rd) | Advantage Health Centers | health.clinic | See a doctor. Advantage Health also has dentists and counselors, so call to ask what this office offers. They care for people with no insurance and people without a home. | 4669 E 8 Mile Rd | Warren | 48091 | 313-416-6262 | https://ahcdetroit.org/ | Call first | | https://ahcdetroit.org/services/medical-services/
+# from sal_hrsa_center_line_behavioral_health
+MyCare behavioral health, Center Line | MyCare Health Center | health.clinic | Counseling for depression, anxiety, grief and trauma, and care from a psychiatrist (a doctor for mental health). Call to set up a visit. | 6780 E 10 Mile Rd | Center Line | 48015 | 586-834-8060 | https://www.mycarehealthcenter.org/ | Mon 8am-5pm; Tue 8am-7pm; Wed-Thu 8am-5pm; Fri 8am-2pm | | https://www.mycarehealthcenter.org/about-us/locations/

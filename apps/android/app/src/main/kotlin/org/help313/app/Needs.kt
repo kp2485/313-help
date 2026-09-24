@@ -51,11 +51,46 @@ class Need(
     val emptyKey: String? = null,
 )
 
+/**
+ * One row of emergency.json. `area` is a place id (data/ingested/region.json) for a number that belongs to one place
+ * only — a city's own police — shown on that place's page and nowhere else (2026-09-24). Here rather than beside the
+ * loader so `:core` can hold the rules about it.
+ */
+class EmergencyNumber(
+    val id: String,
+    val label: String,
+    val number: String,
+    val sms: String?,
+    val hardcoded: Boolean,
+    val area: String? = null,
+)
+
+/**
+ * The urgent sheet's numbers, in docs/05's order: 911, 988, then the hotlines. Since the area widened (2026-09-24) a
+ * shelter or crisis line comes once per county it serves — Wayne's, then Oakland's, then Macomb's — and each label
+ * names its county, so a person picks their own. A city's own police line is never here: it is on that city's page
+ * ([placeNumbers]). Exactly `URGENT_IDS` in apps/web/src/needs.ts; the sheet shows only these, never every row of
+ * emergency.json, which now carries a police line for every place a bus reaches.
+ */
+val URGENT_IDS: List<String> = listOf(
+    "emg_911", "emg_988",
+    "emg_shelter_helpline", "emg_shelter_outwayne", "emg_housing_oakland", "emg_housing_macomb",
+    "emg_dwihn_crisis", "emg_ochn_crisis", "emg_mccmh_crisis",
+    "emg_ndvh", "emg_avalon", "emg_211",
+)
+
+/**
+ * The numbers that belong to one place only (emergency.json `area`: a city's own police), in the bundle's order, for
+ * that place's page and nowhere else. Never 911 or 988, which belong to everyone.
+ */
+fun placeNumbers(numbers: List<EmergencyNumber>, placeId: String): List<EmergencyNumber> =
+    if (placeId.isEmpty()) emptyList() else numbers.filter { it.area == placeId && !HARDCODED.containsKey(it.id) }
+
 val NEEDS: List<Need> = listOf(
     Need("overdose_now", "now", first = listOf("emg_911"), stepsOnly = true, sensitive = true),
     Need(
         "shelter", "now",
-        first = listOf("emg_shelter_helpline", "emg_shelter_outwayne"),
+        first = listOf("emg_shelter_helpline", "emg_shelter_outwayne", "emg_housing_oakland", "emg_housing_macomb"),
         firstLink = "beds.safebeds" to "https://313safebeds.com/",
         refine = listOf(
             Refine("me", Query(category = "shelter.emergency")),
@@ -67,15 +102,18 @@ val NEEDS: List<Need> = listOf(
     // DV: hotline and 911 before anything else; rows have no address and never show a distance.
     Need("unsafe", "now", first = listOf("emg_ndvh", "emg_911"), query = Query(category = "shelter.dv"),
         sensitive = true, quickExit = true, intro = "safe.dv_intro"),
-    // Crisis first: 988, DWIHN's line, then the crisis places. Under those, the daytime places a person can walk
-    // into (health.support), which are ordinary listings with an address (category audit 2026-09-22, K3).
-    Need("talk", "now", first = listOf("emg_988", "emg_dwihn_crisis"), query = Query(category = "health.mental"),
+    // Crisis first: 988, then each county's own 24-hour line (DWIHN for Wayne, OCHN for Oakland, MCCMH for Macomb;
+    // each label names its county, 2026-09-24), then the crisis places. Under those, the daytime places a person can
+    // walk into (health.support), which are ordinary listings with an address (category audit 2026-09-22, K3).
+    Need("talk", "now", first = listOf("emg_988", "emg_dwihn_crisis", "emg_ochn_crisis", "emg_mccmh_crisis"),
+        query = Query(category = "health.mental"),
         also = Also("support", Query(category = "health.support")),
         sensitive = true, quickExit = true, intro = "talk.intro"),
-    // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door for all four cities, then SAMHSA's.
+    // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door in Wayne County and OCHN's in Oakland
+    // (2026-09-24), then SAMHSA's for anyone.
     Need(
         "drugs", "now",
-        first = listOf("emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"),
+        first = listOf("emg_dwihn_crisis", "emg_ochn_crisis", "emg_dwihn_care_center", "emg_samhsa"),
         quickExit = true,
         intro = "drugs.intro",
         refine = listOf(
@@ -88,7 +126,7 @@ val NEEDS: List<Need> = listOf(
             Refine("supplies", Query(category = "harm.supplies")),
         ),
     ),
-    Need("assault", "now", first = listOf("emg_avalon", "emg_voices4", "emg_911"),
+    Need("assault", "now", first = listOf("emg_avalon", "emg_haven", "emg_turning_point", "emg_voices4", "emg_911"),
         query = Query(category = "assault"), quickExit = true, intro = "assault.intro"),
     // "Get somewhere safe now" (DECISIONS 2026-09-22): a door that is open at 3am with a phone behind it —
     // police stations, fire stations and emergency rooms, in one list ranked by distance. It sits BELOW 911,

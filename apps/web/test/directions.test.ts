@@ -320,6 +320,9 @@ describe('offline: the Worker is handed files, and never goes looking for any', 
       .toEqual({ type: 'error', id: 1, message: 'not built' });
   });
 
+  it('a phone with no street files at all is told so, not handed an empty graph', () =>
+    expect(handle({ type: 'build', id: 9, streets: [], layers: [] })).toMatchObject({ type: 'error', message: 'no streets' }));
+
   it('a phone with the streets and no transit files still gets walking directions', () => {
     // Two short streets that cross, in the bundle's own packed shape, and no transit layer at all.
     const streets = [{
@@ -332,9 +335,9 @@ describe('offline: the Worker is handed files, and never goes looking for any', 
     const ready = handle({ type: 'build', id: 2, streets, layers: [] });
     expect(ready.type).toBe('ready');
     expect(ready).toMatchObject({ transit: false });
-    expect((ready as { nodes: number }).nodes).toBeGreaterThan(0);
     const out = handle({ type: 'plan', id: 3, from: { lat: 42.33, lon: -83.05 }, to: { lat: 42.331, lon: -83.05 } });
     expect(out.type).toBe('plans');
+    expect((out as { plans: Itinerary[] }).plans.length).toBeGreaterThan(0);
     for (const p of (out as { plans: Itinerary[] }).plans) expect(p.legs.every((l) => l.kind === 'walk')).toBe(true);
   });
 

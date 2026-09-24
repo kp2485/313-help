@@ -833,7 +833,7 @@ class MapView(context: Context) : View(context) {
         val mpp = cam.metersPerPoint
         val view = cam.visible
 
-        // The ground. Outside the four cities is a different shade **and** a hatch: two pale fills a step apart
+        // The ground. Outside the service area is a different shade **and** a hatch: two pale fills a step apart
         // (1.20:1) are not a difference anyone can see, and no colour fixes that without making the ground outside
         // darker than the streets inside it. The hatch's own lines clear 3:1 against both fills (DECISIONS
         // 2026-09-20, accessibility audit item 10).
@@ -854,7 +854,7 @@ class MapView(context: Context) : View(context) {
         val base = s.base
         if (base != null) {
             // The hatch is a repeating tile, not two hundred and fifty antialiased diagonals redrawn every frame:
-            // the whole ground outside the four cities is one rectangle filled with a shader. Same picture, and
+            // the whole ground outside the service area is one rectangle filled with a shader. Same picture, and
             // it took the basemap passes from tens of milliseconds to a few on the emulator's software renderer.
             c.drawRect(0f, 0f, w, h, hatchPaint())
 
@@ -938,7 +938,7 @@ class MapView(context: Context) : View(context) {
             }
         }
 
-        // **The outlines of the four cities and the 205 neighborhoods** (`place:areas`), when that layer is on.
+        // **The outlines of every place a bus reaches and the 205 neighborhoods** (`place:areas`), when that layer is on.
         //
         // This closes the gap PR #22 left: the layer, its pick order and its keyboard walk were all written down
         // in Areas.kt and offered in the switcher, and the canvas drew nothing at all — a person could switch
@@ -1090,7 +1090,7 @@ class MapView(context: Context) : View(context) {
     }
 
     /**
-     * One 22 dp tile with two diagonals on it, repeated across the ground outside the four cities. The tile is
+     * One 22 dp tile with two diagonals on it, repeated across the ground outside the service area. The tile is
      * made once and kept: it depends on nothing but the palette, and the palette changes only with the theme,
      * which rebuilds the view.
      */
@@ -1182,7 +1182,7 @@ class MapView(context: Context) : View(context) {
         }
     }
 
-    // ---- the outlines of the four cities and the 205 neighborhoods -----------------------------------------------
+    // ---- the outlines of every place a bus reaches and the 205 neighborhoods -----------------------------------------------
 
     /**
      * The `place:areas` layer, drawn to the band table of docs/MAP-STYLE.md section 15 ([boundaryStyle]). Every

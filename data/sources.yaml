@@ -21,8 +21,9 @@ sources:
     extra: [Distribution_Device_Type, Box_Location, Type_of_Business]
     id_prefix: hr
 
-  # Wayne County's own station map (Kyle, 2026-09-20). 97 stations countywide; the 26 in the service area enter as
-  # listings, facts only and attributed to the County. Read by pipeline/src/ingest-mymap.ts (pnpm ingest:mymap).
+  # Wayne County's own station map (Kyle, 2026-09-20). 97 stations countywide; those inside the service area's
+  # outlines (every city and township a DDOT or SMART bus stops in, 2026-09-24) enter as listings, facts only and
+  # attributed to the County. Read by pipeline/src/ingest-mymap.ts (pnpm ingest:mymap).
   # The map gives a site name, a city, coordinates, the device type, whether it is 24/7 and where the box sits —
   # no street address and no phone, so these rows carry their own city and no address (DECISIONS 2026-09-20).
   - id: wayne_well_wayne_stations
@@ -36,7 +37,6 @@ sources:
     max_age_days: 90    # measured against the map's own "Map updated:" date
     category: harm.supplies
     wording: supplies_station   # naloxone AND fentanyl/xylazine test strips, not Narcan only
-    cities: [Detroit, Dearborn, Hamtramck, Highland Park]   # the service area; Dearborn Heights is not Dearborn
     org: { id: org_wayne_hhvs, name: "Wayne County Department of Health, Human and Veterans Services" }
     id_prefix: wws
 
@@ -158,6 +158,57 @@ sources:
     url: https://dwihn.org/sites/default/files/providers-practitioners/provider-directory.csv
     license: unstated   # public provider directory; used only to match programs and find their own websites
     mode: stage
+
+  # The wider service area (every place a DDOT or SMART bus reaches, 2026-09-24), outside the four covered cities.
+  # Four federal datasets read by pipeline/src/ingest-federal.ts (pnpm ingest:federal, by hand) into
+  # data/staging/federal_<layer>.csv: candidates only, each checked against the place's own page before any import.
+  - id: usgs_structures_fire
+    name: USGS The National Map, National Structures Dataset, Fire Stations/EMS Stations
+    tier: A
+    kind: federal_usgs
+    url: https://carto.nationalmap.gov/arcgis/rest/services/structures/MapServer/16
+    license: public domain   # the service's own description: "public domain structures data"
+    mode: stage
+    category: safe.fire
+
+  - id: usgs_structures_police
+    name: USGS The National Map, National Structures Dataset, Police Stations
+    tier: A
+    kind: federal_usgs
+    url: https://carto.nationalmap.gov/arcgis/rest/services/structures/MapServer/18
+    license: public domain
+    mode: stage
+    category: safe.police
+
+  - id: cms_hospital_general_information
+    name: CMS Hospital General Information (Emergency Services = Yes)
+    tier: A
+    kind: federal_cms
+    url: https://data.cms.gov/provider-data/api/1/metastore/schemas/dataset/items/xubh-q36u
+    page: https://data.cms.gov/provider-data/dataset/xubh-q36u
+    license: public domain (federal government work)   # no coordinate: placed by mailing city, placed_by=city
+    mode: stage
+    category: health.er
+
+  - id: imls_pls_outlets
+    name: IMLS Public Libraries Survey, FY 2024 outlet file
+    tier: A
+    kind: federal_imls
+    url: https://www.imls.gov/sites/default/files/2026-06/pls_fy2024_csv.zip
+    page: https://www.imls.gov/research-evaluation/surveys/public-libraries-survey-pls
+    license: public domain (federal government work)
+    mode: stage
+    category: rec.library
+
+  - id: hrsa_health_center_sites
+    name: HRSA Health Center Service Delivery and Look-Alike Sites
+    tier: A
+    kind: federal_hrsa
+    url: https://data.hrsa.gov/DataDownload/DD_Files/Health_Center_Service_Delivery_and_LookAlike_Sites.csv
+    page: https://data.hrsa.gov/data/download
+    license: public domain (federal government work)   # DV-setting sites are never staged (CLAUDE.md)
+    mode: stage
+    category: health.clinic
 
 # ---------------------------------------------------------------------------------------------------------
 # NOT LISTINGS. The four-city pages (docs/13, "The four cities"; DECISIONS 2026-09-22) are built from regional

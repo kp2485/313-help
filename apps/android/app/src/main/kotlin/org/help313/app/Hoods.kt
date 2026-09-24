@@ -268,7 +268,7 @@ class Indicators(
     val segments: Map<String, List<String>>,
     // ---- added 2026-09-22 with the city pages and the Areas layer (Areas.kt). All of these default to empty, so
     // a bundle built before them decodes exactly as it did and every screen that existed behaves as it did.
-    /** The four cities, in the order the bundle publishes them. */
+    /** Every city and township a bus reaches (the first four first), in the order the bundle publishes them. */
     val cities: List<CityRow> = emptyList(),
     /** One whole-city page each, with its own `panels` allow-list. */
     val areas: List<Area> = emptyList(),

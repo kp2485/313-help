@@ -32,12 +32,12 @@ class ZipTest {
     @Test
     fun theShippedZipFileDecodes() {
         val zips = shipped() ?: return
-        assertTrue("only ${zips.size} ZIPs", zips.size >= 30)
+        // Every ZIP of every city and township a DDOT or SMART bus stops in (2026-09-24; 37 for four cities before).
+        assertTrue("only ${zips.size} ZIPs", zips.size >= 100)
         assertTrue("48226 is downtown Detroit", zips.containsKey("48226"))
         for ((zip, point) in zips) {
             assertEquals("a ZIP that is not five digits: $zip", 5, zip.length)
-            assertTrue("$zip is at ${point.lat}, ${point.lon}", point.lat > 42.0 && point.lat < 42.7)
-            assertTrue("$zip is at ${point.lat}, ${point.lon}", point.lon < -82.5 && point.lon > -83.6)
+            assertTrue("$zip is at ${point.lat}, ${point.lon}", inServiceArea(point))
         }
     }
 
@@ -63,7 +63,7 @@ class ZipTest {
         // ever guessed at. This half needs no bundle and runs everywhere.
         assertTrue(lookupZip(emptyMap(), "48226") is ZipAnswer.Unknown)
         assertTrue("letters are not a ZIP", lookupZip(emptyMap(), "hello") is ZipAnswer.NotAZip)
-        // A ZIP a list carries whose middle is outside the four cities is refused rather than used.
+        // A ZIP a list carries whose middle is outside the service area is refused rather than used.
         assertTrue(lookupZip(mapOf("99999" to LatLon(45.0, -90.0)), "99999") is ZipAnswer.Outside)
 
         val zips = shipped() ?: return

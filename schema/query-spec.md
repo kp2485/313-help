@@ -115,13 +115,26 @@ A `shelter.dv` row (and any sub-category of it) carries **no `address`, no `lat`
 | `dearborn` | Dearborn Administrative Center |
 | `hamtramck` | Hamtramck City Hall |
 | `highland_park` | Highland Park City Hall |
-| `wayne_county` | the geographic centre of Wayne County |
+| `wayne_county` | the US Census Bureau's internal point for Wayne County (42.2847, −83.2620; a hand-picked "geographic centre" until 2026-09-24) |
 | `wayne_county_west` | Westland City Hall, the largest city of western Wayne County |
 | `wayne_county_downriver` | Taylor City Hall, the largest city of the Downriver communities |
+| `oakland_county` | the US Census Bureau's internal point for Oakland County (42.6605, −83.3842; 2026-09-24) |
+| `macomb_county` | the US Census Bureau's internal point for Macomb County (42.6716, −82.9115; 2026-09-24) |
+| every other city and township in the area (71 ids, below) | the US Census Bureau's internal point for that place (`data/ingested/region.json`; 2026-09-24) |
 | `statewide` | none — ranks after every local area |
 | `national` | none — ranks after every local area |
 
-The table lives in **code** (`packages/query/src/areas.ts`, mirrored in `Areas.swift` and `Areas.kt`), never in a row. Every shelter serving one area therefore shares one identical point, and that point is a city hall, not a shelter. No ZIP codes and no neighbourhoods: an area must be a whole city or bigger.
+The 71 place ids are the place's own id without `city_`: `allen_park`, `auburn_hills`, `berkley`, `birmingham`, `bloomfield_hills`, `bloomfield_township`, `center_line`, `chesterfield_township`, `clawson`, `clinton_township`, `commerce_township`, `dearborn_heights`, `eastpointe`, `ecorse`, `farmington`, `farmington_hills`, `ferndale`, `fraser`, `garden_city`, `grosse_pointe`, `grosse_pointe_farms`, `grosse_pointe_park`, `grosse_pointe_shores`, `grosse_pointe_woods`, `harper_woods`, `harrison_township`, `hazel_park`, `huntington_woods`, `inkster`, `lathrup_village`, `lincoln_park`, `livonia`, `macomb_township`, `madison_heights`, `melvindale`, `mount_clemens`, `new_baltimore`, `novi`, `oak_park`, `orion_township`, `pleasant_ridge`, `pontiac`, `redford_township`, `river_rouge`, `riverview`, `rochester`, `rochester_hills`, `romulus`, `roseville`, `royal_oak`, `royal_oak_township`, `shelby_township`, `southfield`, `southfield_township`, `southgate`, `st_clair_shores`, `sterling_heights`, `sylvan_lake`, `taylor`, `trenton`, `troy`, `utica`, `walled_lake`, `warren`, `waterford_township`, `wayne`, `west_bloomfield_township`, `westland`, `white_lake_township`, `wixom`, `wyandotte`.
+
+**Not only domestic violence (2026-09-24, Kyle's choice (a)).** `servesByArea(row)` is true for every `shelter.dv` row
+and for **any row that names a `service_area` and has no coordinate** — a phone-only local service (a ride program,
+Meals on Wheels, nurse home visits) or a place the geocoder could not put on the map. Such a row is banded from its
+area's reference point exactly as below, its `miles` is `null`, and a screen says "Serves {area}" (`servesAreaKey`).
+A row with a coordinate ranks by the coordinate and may not name an area as well (the build refuses it; `pnpm geocode`
+drops the area when it places a row). A non-DV row with no coordinate and no area still ranks in band 0, as a
+hotline does. Held by `13-dv-service-area.json`.
+
+The table lives in **code** (`packages/query/src/areas.ts`, mirrored in `Areas.swift` and `Areas.kt`), never in a row. Every shelter serving one area therefore shares one identical point, and that point is a city hall or a county's Census internal point, never a shelter. No ZIP codes and no neighbourhoods: an area must be a whole city or bigger.
 
 **Banding.** With a location (shared or typed as a ZIP), a `shelter.dv` row with a local `service_area` gets a **coarse** band from the distance between the person and that area's reference point: **0–3 mi → 0, 3–10 mi → 1, over 10 mi → 2**. `statewide` and `national` get band 2 and the wide-area key 1. Without a location, and for a row with no `service_area`, the band is 0 and the wide-area key is 0 — exactly as today.
 
@@ -252,7 +265,13 @@ carried the array, which is what decides between the two penalty tables below.
 
 `cachedStreetGraph(sha256, build)`. The key is `${STREET_GRAPH_VERSION}:${sha256}` where the hash is the map
 file's own SHA-256 — the one already in the signed index. Nothing about a person is in the key. Two graphs are
-kept (`STREET_GRAPH_CACHE_SIZE`); building is ~200 ms on a laptop and 1–2 s on a cheap phone, once per bundle.
+kept (`STREET_GRAPH_CACHE_SIZE`).
+
+**A trip's window is never cached** (2026-09-24). Its streets are the streets round the two points a person asked
+about, so a cache of window graphs would be a record of their last trips, and the directions screen leaves no
+trace. It does not need one: the whole area is 108,820 nodes and ~1 s to build on a laptop (5–10 s on a cheap
+phone), which is why no client builds it for a trip; a trip's window is 2,000–3,500 nodes and 15–50 ms, built for
+the one plan and dropped with it.
 
 ### Signatures
 
@@ -437,9 +456,43 @@ Itinerary = { legs: PlanLeg[], changes, walk_metres, ride_metres, minutes, range
 `plan()` returns `[]` when nothing works — nothing within walking distance, and no route within one change. A
 client says so; it never invents a leg.
 
+## The trip window
+
+`packages/query/src/window.ts`. Mirrored as `Window.swift` and `Window.kt`. Since the service area became every
+city and township a DDOT or SMART bus stops in (2026-09-24), the street map is seven times the size it was. A phone
+still holds the one street file, but it builds a graph only of **where the plan can walk**, and every such place is
+known from the two ends and the bus network before a street is read:
+
+| box | round | padding |
+|---|---|---|
+| the start, and the end | the point | `END_PAD_M` = `ACCESS_M` + 800 = 1,200 m |
+| the walk between them, only when `metresBetween(from, to)` ≤ `MAX_WALK_ONLY_M` | the box of the two points | `WALK_PAD_M` = 800 m |
+| each stop of `transferStops(net, from, to)` | the stop | `TRANSFER_PAD_M` = `TRANSFER_WALK_M` + 800 = 950 m |
+
+Boxes are in degrees: `metres / M_PER_DEG_LAT` north and south, `metres / M_PER_DEG_LON` east and west. They come
+in that order (start, end, the walk if any, then each transfer stop in ascending stop number).
+
+**`transferStops`** runs `plan`'s step 2 without building anything: for each of the `MAX_ACCESS_STOPS` nearest
+stops within `ACCESS_M` of the start, each route and pattern calling there that does **not** also call within
+`ACCESS_M` of the end, and each later stop `x` on that pattern, every stop `y ≠ x` within `TRANSFER_WALK_M` of `x`
+on a different route whose same pattern calls at a stop near the end after `y`. Both `x` and `y` are returned,
+de-duplicated, ascending. There is no cap: it is a superset of every change `plan` can make.
+
+**`windowFiles(base, cells, window)`** keeps every street whose **own** box touches a box of the window: first the
+main-road file (`map/base.json`), then each cell of `map/streets.json` in ascending key order (JavaScript string
+order — `cells` is that list, the one every client already builds from), each cut down to its touching streets in the file's own order (`roadsInBoxes`, which keeps `safety` in
+step). A cell with none is dropped. A street's box is taken over its decoded vertices, inclusive at the edges. A
+street is never chosen by the cell it is filed in: a cell holds a street by its midpoint, and a merged suburban
+street can pass the start with its midpoint two cells away (measured: it moved a Southfield plan's first walk from
+165 m to 367 m before this rule).
+
+**The promise:** a plan on the window is the plan on the whole map, except where the whole map's best walk leaves
+the padding. `16-trip-window.json` holds it on the fixture network; `packages/query/test/routing-real.test.ts`
+holds it on the real area for five named trips and 24 pairs of listings.
+
 ## Fixtures for the directions
 
-`schema/fixtures/14-streets-walk.json` and `15-trip-plans.json`. Two new keys at the top of a fixture file:
+`schema/fixtures/14-streets-walk.json`, `15-trip-plans.json` and `16-trip-window.json`. Two new keys at the top of a fixture file:
 `streets` (an array of `PackedStreets`, exactly the bundle's own shape) and `transit` (an array of
 `TransitLayer`). Three new `fn` kinds, and a case may carry `from` / `to` (`{lat, lon}`) and `no_safety`
 (build the graph as though the files carried no `safety` array — what an older bundle looks like).
@@ -449,6 +502,9 @@ client says so; it never invents a leg.
 | `streetGraph` | `{ nodes, edges, crossings, snapped, components, largest, dead_ends, skipped }`, exactly |
 | `walk` | one string, or `null` when there is no route |
 | `plan` | one string per itinerary, in rank order |
+| `planWindow` | the same strings as `plan`, on the graph of `windowFiles(streets[0], streets[1…], tripWindow(…))` |
+| `transferStops` | the stop numbers, ascending |
+| `windowRoads` | `{ boxes, roads }`: how many boxes, and the name of every kept street in build order |
 
 The strings, which are the contract between the three implementations:
 

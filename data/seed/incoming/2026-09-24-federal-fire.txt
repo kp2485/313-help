@@ -1,0 +1,390 @@
+# Fire stations in the 71 places added on 2026-09-24 (every city and township a DDOT or SMART bus reaches, outside
+# Detroit, Hamtramck, Highland Park and Dearborn). Batch "federal-fire", written 2026-09-24.
+# Candidates: data/staging/federal_fire.csv (157 rows from USGS The National Map, National Structures Dataset, Fire
+# Stations/EMS Stations). A candidate is only a lead: every line below was found on its OWNER's page (the city's or
+# township's fire or public-safety page, or the department's own site) and written from that page alone.
+# Method: read on each department's own site on 2026-09-24, one page at a time, fetched with an honest user agent
+# ("313help-research (open-source civic directory)"). Wixom's and Shelby Township's pages refused that fetcher and were
+# read in a browser; gpwmi.us (Grosse Pointe Woods) closed the connection on it and was read with curl's own default
+# agent. Lines the source check still cannot confirm are marked BROWSER (Grosse Pointe Woods, Shelby Stations 2-5).
+# Web search was used only to find the pages; no fact comes from a search snippet, a directory, a map app or the
+# federal dataset (except a few ZIP codes where the owner's page prints none - noted per line).
+# 139 lines: 135 of the 157 candidates plus 4 stations the dataset missed or had at an old address ("# NEW").
+# Each line's phone and street number were then checked on its source_url with the same matcher `pnpm check:sources`
+# uses (pipeline/src/page-match.ts fetchPage + listingOnPage).
+#
+# Wording (brief addendum):
+# - "Firefighters are there all day and night, but they go out on calls." + "Open 24/7" ONLY where the owner's page
+#   says the stations are staffed around the clock (24 hours / career or full-time staff on every shift). The quote
+#   is in the comment above the line.
+# - Otherwise "It is not always staffed. In an emergency, call 911." + "Call first". For several career departments
+#   (e.g. Dearborn Heights, Redford, Southgate, Inkster) this is only because their page never says it; a steward
+#   who confirms round-the-clock staffing can upgrade those rows.
+# - Public-safety departments (one officer does police and fire) are named "public safety station"; the building
+#   may also appear in the police batch.
+# - A station whose page prints no phone has no phone (the house number is on the page). Where the page prints only
+#   a department-wide number, it is labelled as such ("Fire department main line").
+#
+# NOT listed (reasons in the batch report): River Rouge, Grosse Pointe Farms, Walled Lake, Mount Clemens (no station
+# address tied to the station on any owner page); Commerce Township (owner page names only its headquarters, not
+# its stations); White Lake Township (no station addresses on the owner's pages); Rochester Hills Stations 2-5,
+# Westland Stations 3-5 (no address on an owner page); Roseville headquarters (under renovation per the City);
+# Waterford Station 10 in Pontiac (not on the owner's list: "1 unmanned station ... used by the Pontiac DPW");
+# West Bloomfield Station 9 (Orchard Lake Village, outside the area); outdated dataset addresses replaced by the
+# owner's (Westland Station 2, Shelby Township Station 4, Warren Station 5, Grosse Pointe City).
+# name | org | category | what | address | city | zip | phone | website | schedule | eligibility | source_url | extras
+#
+# ---- Wayne County ----
+# from sal_usfire_allen_park_fire_department
+Allen Park fire station | Allen Park Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 6730 Roosevelt | Allen Park | 48101 | 313-928-0024 | https://cityofallenpark.org/departments/fire_department/index.php | Call first |  | https://cityofallenpark.org/departments/fire_department/index.php | phone_label=Fire department (business line)
+# from sal_usfire_dearborn_heights_fire_station_headquarters
+# The page calls the department's firefighters paramedics and lists 59 personnel, but it does not say the stations are staffed all night, so the plain wording is used. A steward may upgrade both Dearborn Heights rows.
+Dearborn Heights fire station headquarters | Dearborn Heights Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1999 N Beech Daly | Dearborn Heights | 48127 | 313-791-3676 | https://www.dearbornheightsmi.gov/281/Fire-Department | Call first |  | https://www.dearbornheightsmi.gov/281/Fire-Department | phone_label=Fire station
+# from sal_usfire_dearborn_heights_fire_department_station_1
+Dearborn Heights Fire Station 1 | Dearborn Heights Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 4500 S Telegraph | Dearborn Heights | 48125 | 313-791-9880 | https://www.dearbornheightsmi.gov/281/Fire-Department | Call first |  | https://www.dearbornheightsmi.gov/281/Fire-Department | phone_label=Fire station
+# from sal_usfire_ecorse_fire_department
+# The page lists the Fire Chief at 3869 W Jefferson with 313-386-2520 (ext 7034). That is also the City Hall address and main line; the page does not say more about the station. A steward may want to confirm by phone.
+Ecorse fire station | Ecorse Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3869 W Jefferson | Ecorse | 48229 | 313-386-2520 | https://www.ecorsemi.gov/services/fire.php | Call first |  | https://www.ecorsemi.gov/services/fire.php | phone_label=City of Ecorse main line (fire chief is ext. 7034)
+# from sal_usfire_garden_city_fire_department
+# Page: "staffed by 21 career firefighter-paramedics" and "one fire station".
+Garden City fire station | Garden City Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 6000 Middlebelt | Garden City | 48135 | 734-793-1780 | https://www.gardencitymi.org/169/Fire-Department | Open 24/7 |  | https://www.gardencitymi.org/169/Fire-Department | phone_label=Fire department
+# from sal_usfire_grosse_pointe_city_public_safety_department_fire_station
+# from The dataset's address (17145 Maumee Avenue) is out of date: the City's page now puts the Public Safety Department at 17320 Mack Avenue.
+# A public safety department: the same officers answer police and fire calls. This building may also be listed by the police batch.
+Grosse Pointe public safety station | Grosse Pointe Public Safety Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 17320 Mack Avenue | Grosse Pointe | 48230 | 313-886-3200 | https://www.grossepointecity.org/departments/public_safety/ | Call first |  | https://www.grossepointecity.org/departments/public_safety/index.php | phone_label=Public safety department
+# from sal_usfire_grosse_pointe_park_public_safety_department_fire_station
+# Page: "For 24 hour a day non-emergency situations, please call the Dispatch Desk at 313-822-7400." That is the phone, not the lobby, so the plain wording is used.
+Grosse Pointe Park public safety station | Grosse Pointe Park Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 15115 E Jefferson Avenue | Grosse Pointe Park | 48230 | 313-822-7400 | https://www.grossepointepark.org/187/Public-Safety | Call first |  | https://www.grossepointepark.org/187/Public-Safety | phone_label=Dispatch desk (non-emergency, 24 hours)
+# from sal_usfire_grosse_pointe_shores_fire_department
+# The page prints the non-emergency number as "313 / 881-5500" (dispatch "313 / 343-2410"), a form the source check cannot read, so the row carries no phone and is matched on its address. A steward who reads the page may add 313-881-5500 (label Non-emergency) as a person's read.
+# [lead 2026-09-24] phone added: the page prints it "313 / 881-5500", which the page matcher reads since today.
+Grosse Pointe Shores public safety station | Grosse Pointe Shores Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 795 Lake Shore Road | Grosse Pointe Shores | 48236 | 313-881-5500 | https://www.gpshoresmi.gov/departments/public_safety/ | Call first |  | https://www.gpshoresmi.gov/departments/public_safety/police.php
+# from sal_usfire_grosse_pointe_woods_department_of_public_safety_fire_station
+# Page: "One public safety officer is on duty at all times to operate the fire trucks"; address and non-emergency number are in the page's contact block (Robert E. Novitke Municipal Center).
+# BROWSER: Grosse Pointe Woods public safety station - site refuses scripts (gpwmi.us closes the connection for our user agent; it answered curl's default agent on 2026-09-24)
+Grosse Pointe Woods public safety station | Grosse Pointe Woods Department of Public Safety | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 20025 Mack Plaza | Grosse Pointe Woods | 48236 | 313-343-2400 | https://www.gpwmi.us/PublicSafety | Open 24/7 |  | https://www.gpwmi.us/PublicSafety | phone_label=Non-emergency
+# from sal_usfire_harper_woods_fire_department
+Harper Woods fire station | Harper Woods Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 19617 Harper Ave. | Harper Woods | 48225 | 313-343-2550 | https://harperwoodscity.org/fire-department/ | Call first |  | https://harperwoodscity.org/fire-department/ | phone_label=Public safety office
+# from sal_usfire_inkster_fire_department
+# Page: three 7-person units that "work year-round"; it does not say around the clock, so the plain wording is used.
+Inkster fire station | Inkster Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 27717 Michigan Avenue | Inkster | 48141 | 313-563-9874 | https://www.cityofinkstermi.gov/196/Fire-Department | Call first |  | https://www.cityofinkstermi.gov/196/Fire-Department | phone_label=Fire station
+# from sal_usfire_lincoln_park_fire_department
+# Page: "operates 24 hours a day, seven days a week".
+Lincoln Park fire station | Lincoln Park Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 1355 Cleophus Parkway | Lincoln Park | 48146 | 313-381-1975 | https://www.citylp.com/190/Fire-Department | Open 24/7 |  | https://www.citylp.com/190/Fire-Department | phone_label=Non-emergency
+# from sal_usfire_livonia_fire_and_rescue_station_1_headquarters
+# All Livonia rows: "Livonia Firefighters are on duty 24 hours a day, 365 days a year" (https://livonia.gov/368/About-Us). Only Station 1's page prints a phone; the others carry none.
+Livonia Fire Station 1 (headquarters) | Livonia Fire & Rescue | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 14910 Farmington Road | Livonia | 48154 | 734-466-2444 | https://livonia.gov/368/About-Us | Open 24/7 |  | https://livonia.gov/Facilities/Facility/Details/Fire-Station-1-Headquarters-78 | phone_label=Fire department
+# from sal_usfire_livonia_fire_station_3
+Livonia Fire Station 3 | Livonia Fire & Rescue | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 35000 Seven Mile Road | Livonia | 48152 |  | https://livonia.gov/368/About-Us | Open 24/7 |  | https://livonia.gov/Facilities/Facility/Details/Fire-Station-3-79
+# from sal_usfire_livonia_fire_and_rescue_station_4
+Livonia Fire Station 4 | Livonia Fire & Rescue | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 12300 Middlebelt Road | Livonia | 48150 |  | https://livonia.gov/368/About-Us | Open 24/7 |  | https://livonia.gov/Facilities/Facility/Details/Fire-Station-4-80
+# from sal_usfire_livonia_fire_and_rescue_station_5
+Livonia Fire Station 5 | Livonia Fire & Rescue | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 18910 Middlebelt Road | Livonia | 48152 |  | https://livonia.gov/368/About-Us | Open 24/7 |  | https://livonia.gov/Facilities/Facility/Details/Fire-Station-5-81
+# from sal_usfire_livonia_fire_and_rescue_station_6
+Livonia Fire Station 6 | Livonia Fire & Rescue | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 37876 Plymouth Road | Livonia | 48150 |  | https://livonia.gov/368/About-Us | Open 24/7 |  | https://livonia.gov/Facilities/Facility/Details/Fire-Station-6-82
+# from sal_usfire_dearborn_fire_department_melvindale_fire_department_station_
+# Dearborn's fire department serves Melvindale from this station (the two departments merged in 2013). Page: the Emergency Operations Division is "responsible for all emergency responses and 24 hour staff".
+# dearborn.gov answered our fetcher with HTTP 200 on 2026-09-24 (DECISIONS 2026-09-22 recorded a 403). The same page lists Dearborn's own Stations 1-4; they are outside this batch (Dearborn is an original city) and remain the steward task in docs/CHECKS-2026-09-22.md.
+Dearborn Fire Station 5 (Melvindale) | Dearborn Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 3160 Oakwood Blvd. | Melvindale | 48122 | 313-943-2868 | https://dearborn.gov/government/police-fire/fire-services | Open 24/7 |  | https://dearborn.gov/government/police-fire/fire-services/dearborn-fire-department-0 | phone_label=Fire station
+# from sal_usfire_redford_township_fire_department_station_1
+# Redford's page names 45 firefighter/paramedics but does not say the stations are staffed all night, so the plain wording is used. The fire page prints ZIP 48239 for Station 1; the station's own facility page (the source) prints 48240.
+Redford Township Fire Station 1 (headquarters) | Redford Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 18420 Beech Daly | Redford | 48240 | 313-387-2635 | https://www.redfordtwp.gov/184/Fire-Department | Call first |  | https://www.redfordtwp.gov/Facilities/Facility/Details/Station-1-Headquarters-1 | phone_label=Fire department
+# from sal_usfire_redford_township_fire_department_station_2
+Redford Township Fire Station 2 | Redford Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 10101 Beech Daly | Redford | 48239 | 313-387-2635 | https://www.redfordtwp.gov/184/Fire-Department | Call first |  | https://www.redfordtwp.gov/184/Fire-Department | phone_label=Fire department main line
+# from sal_usfire_riverview_fire_department
+# Page: "Staffed 24-hours a day and 365-days a year, by professional Firefighters and Paramedics".
+Riverview fire station | Riverview Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 18500 Civic Park Drive | Riverview | 48193 | 734-281-4264 | https://www.cityofriverview.com/departments/fire_department/index.php | Open 24/7 |  | https://www.cityofriverview.com/departments/fire_department/index.php | phone_label=Fire department
+# from sal_usfire_romulus_fire_department_station_1_headquarters
+# from The dataset calls it Station 1; the City's page calls it Fire Headquarters - Station 4.
+# Page: "27 Career Firefighters" and "two stations".
+Romulus Fire Station 4 (headquarters) | Romulus Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 28777 Eureka Road | Romulus | 48174 | 734-941-8585 | https://www.romulusgov.com/241/Fire | Open 24/7 |  | https://www.romulusgov.com/241/Fire | phone_label=Fire department
+# from sal_usfire_romulus_fire_department_station_2
+Romulus Fire Station 2 | Romulus Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 7221 Middlebelt Rd | Romulus | 48174 | 734-941-8585 | https://www.romulusgov.com/241/Fire | Open 24/7 |  | https://www.romulusgov.com/241/Fire | phone_label=Fire department main line
+# from sal_usfire_southgate_fire_department
+# southgatemi.org redirects to southgatemi.gov. Page: "one fire station, staffed with professional firefighter/paramedics"; it does not say around the clock, so the plain wording is used.
+Southgate fire station | Southgate Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 14730 Reaume Parkway | Southgate | 48195 | 734-258-3080 | https://www.southgatemi.gov/departments/fire/index.php | Call first |  | https://www.southgatemi.gov/departments/fire/index.php | phone_label=Fire department
+# from sal_usfire_taylor_fire_department_station_1
+# Taylor: the page lists all three stations and one number, "734-374-1355 (option 1)".
+Taylor Fire Station 1 | Taylor Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 23345 Goddard Road | Taylor | 48180 | 734-374-1355 | https://www.cityoftaylor.com/210/Fire-Department | Call first |  | https://www.cityoftaylor.com/210/Fire-Department | phone_label=Fire department (press 1)
+# from sal_usfire_taylor_fire_department_station_2
+Taylor Fire Station 2 | Taylor Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 25303 Ecorse Road | Taylor | 48180 | 734-374-1355 | https://www.cityoftaylor.com/210/Fire-Department | Call first |  | https://www.cityoftaylor.com/210/Fire-Department | phone_label=Fire department (press 1)
+# from sal_usfire_taylor_fire_department_station_3
+Taylor Fire Station 3 | Taylor Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 23747 Eureka Road | Taylor | 48180 | 734-374-1355 | https://www.cityoftaylor.com/210/Fire-Department | Call first |  | https://www.cityoftaylor.com/210/Fire-Department | phone_label=Fire department (press 1)
+# from sal_usfire_trenton_fire_department_station_2
+# Page: "29 personnel who cover a continuous 24-hour response". The City names its stations by road, not number; the dataset's numbers are not used. A new headquarters is planned at West Road and Veterans Parkway; it is not open.
+Trenton fire station, King Road | Trenton Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 1989 King Road | Trenton | 48183 | 734-676-1314 | https://www.trentonmi.org/191/Fire-Department | Open 24/7 |  | https://www.trentonmi.org/191/Fire-Department | phone_label=Fire department
+# from sal_usfire_trenton_fire_department_station_1_headquarters
+Trenton fire station, West Jefferson | Trenton Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 2872 W. Jefferson | Trenton | 48183 | 734-676-1314 | https://www.trentonmi.org/191/Fire-Department | Open 24/7 |  | https://www.trentonmi.org/407/Station-Locations-Contacts | phone_label=Fire department
+# from sal_usfire_wayne_fire_department
+Wayne Fire Department station | Wayne Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3300 S Wayne Road | Wayne | 48184 | 734-722-1111 | https://www.cityofwayne.com/158/Fire-Department | Call first |  | https://www.cityofwayne.com/158/Fire-Department | phone_label=Fire department
+# NEW: Westland Fire Station 2 at 7300 N Merriman (the new station that opened in 2025; the dataset's Station 2 at 7825 N Merriman, sal_usfire_westland_fire_department_station_2, is the old one and is not used).
+# Page: "three-shift system to make sure we are fully staffed 24-hours per day. Each shift staffs four strategically placed fire stations". The page prints 7300 N Merriman as the Fire Department's physical address; the City's 2025 bid and press documents call it Fire Station No. 2.
+Westland Fire Station 2 (headquarters) | Westland Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 7300 N Merriman | Westland | 48185 | 734-467-3201 | https://www.cityofwestland.com/171/Fire-Department | Open 24/7 |  | https://www.cityofwestland.com/188/Fire-Rescue-Operations | phone_label=Fire department
+# from sal_usfire_westland_fire_department_station_1
+# The source is the City's cooling-shelter page, which lists "Fire Station #1 - 35701 Central City Parkway - (734) 467-3201" with cooling hours (8am-8pm) that are about the shelter, not the station; those hours are not used.
+Westland Fire Station 1 | Westland Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 35701 Central City Parkway | Westland | 48185 | 734-467-3201 | https://www.cityofwestland.com/171/Fire-Department | Open 24/7 |  | https://www.cityofwestland.com/481/Emergency-Cooling-Shelters-Open | phone_label=Fire department
+# from sal_usfire_wyandotte_fire_department_station_1
+# Wyandotte's page: "fire and emergency services seven days a week, 365 days a year"; it does not say around the clock, so the plain wording is used.
+Wyandotte Fire Department Central Station 1 | Wyandotte Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 266 Maple Street | Wyandotte | 48192 | 734-324-4402 | https://www.wyandottemi.gov/198/Fire-Department | Call first |  | https://www.wyandottemi.gov/Facilities/Facility/Details/Central-Fire-Station-1-1 | phone_label=Fire station
+# from sal_usfire_wyandotte_fire_department_station_2
+Wyandotte Fire Department Station 2 | Wyandotte Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1093 Ford Avenue | Wyandotte | 48192 | 734-324-4403 | https://www.wyandottemi.gov/198/Fire-Department | Call first |  | https://www.wyandottemi.gov/Facilities/Facility/Details/Fire-Station-2-2 | phone_label=Fire station
+#
+# ---- Oakland County ----
+# from sal_usfire_auburn_hills_fire_department_station_1
+# Auburn Hills: "full-time personnel, paid-on-call firefighters, and part-time EMTs/paramedics"; the page does not say around the clock. The phone is the department's office at 3410 E. Seyburn Road; after 5 pm the page sends callers to dispatch.
+Auburn Hills Fire Station 1 | Auburn Hills Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3483 Auburn Rd | Auburn Hills | 48326 | 248-370-9461 | https://www.auburnhills.org/departments/fire/ | Call first |  | https://www.auburnhills.org/departments/fire/about/ | phone_label=Fire department office
+# from sal_usfire_auburn_hills_fire_department_station_2
+Auburn Hills Fire Station 2 | Auburn Hills Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1899 N. Squirrel Rd. | Auburn Hills | 48326 | 248-370-9461 | https://www.auburnhills.org/departments/fire/ | Call first |  | https://www.auburnhills.org/departments/fire/about/ | phone_label=Fire department office
+# from sal_usfire_auburn_hills_fire_department_station_3
+Auburn Hills Fire Station 3 | Auburn Hills Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3253 Joslyn Rd. | Auburn Hills | 48326 | 248-370-9461 | https://www.auburnhills.org/departments/fire/ | Call first |  | https://www.auburnhills.org/departments/fire/about/ | phone_label=Fire department office
+# from sal_usfire_berkley_public_safety_department_fire_station
+# The department's own site. Page: "The Berkley Public Safety lobby is open for reporting 24 hours a day". Public safety officers answer both police and fire calls; this building may also be listed by the police batch.
+Berkley Department of Public Safety station | Berkley Department of Public Safety | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 2395 W. Twelve Mile Rd. | Berkley | 48072 | 248-658-3380 | https://www.berkleypublicsafety.org/ | Open 24/7 |  | https://www.berkleypublicsafety.org/ | phone_label=Police and fire dispatch
+# from sal_usfire_beverly_hills_department_of_public_safety_fire_station
+# from Beverly Hills is a village inside Southfield Township, one of the 71 new places.
+# The department's own site (linked from villagebeverlyhills.com). "Providing service to our community 24 hours a day" is about dispatch, not the lobby, so the plain wording is used.
+Beverly Hills public safety station | Beverly Hills Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 18600 W Thirteen Mile Rd. | Beverly Hills | 48025 | 248-540-3400 | https://www.beverlyhillspolice.com/ | Call first |  | https://www.beverlyhillspolice.com/ | phone_label=Police, fire and EMS (non-emergency)
+# from sal_usfire_birmingham_fire_department_station_no_1
+# Birmingham: "minimum daily 24/7/365 staffing of 10 personnel and our two fire stations".
+Birmingham Fire Station 1 | Birmingham Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 572 S. Adams Rd. | Birmingham | 48009 | 248-530-1870 | https://www.bhamgov.org/about_birmingham/city_departments/fire_department/index.php | Open 24/7 |  | https://www.bhamgov.org/about_birmingham/city_departments/fire_department/index.php | phone_label=Non-emergency
+# from sal_usfire_birmingham_fire_department_station_2
+Birmingham Fire Station 2 | Birmingham Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 1600 West Maple Road | Birmingham | 48009 | 248-530-1870 | https://www.bhamgov.org/about_birmingham/city_departments/fire_department/index.php | Open 24/7 |  | https://www.bhamgov.org/about_birmingham/city_departments/fire_department/index.php | phone_label=Non-emergency
+# from sal_usfire_bloomfield_hills_public_safety_department_fire_station
+# The page invites residents to "stop by" for a station tour and mentions an on-duty watch commander, but does not say the building is open all night, so the plain wording is used.
+Bloomfield Hills public safety station | Bloomfield Hills Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 45 East Long Lake Road | Bloomfield Hills | 48304 | 248-644-4200 | https://www.bloomfieldhills.gov/154/Public-Safety | Call first |  | https://www.bloomfieldhills.gov/154/Public-Safety | phone_label=Public safety
+# from sal_usfire_bloomfield_township_fire_department_station_1
+# Bloomfield Township: "The firefighter/paramedics work 24 hour shifts and are on duty at all stations seven days a week, 365 days a year". The stations have Bloomfield Hills mailing addresses; they are in Bloomfield Township. 248-433-7745 is the fire department's number on the same page.
+Bloomfield Township Fire Station 1 | Bloomfield Township Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 1155 Exeter | Bloomfield Township | 48302 | 248-433-7745 | https://www.bloomfieldtwp.org/fire/ | Open 24/7 |  | https://www.bloomfieldtwp.org/fire/fire-services-and-information/ | phone_label=Fire department office
+# from sal_usfire_bloomfield_township_fire_department_station_2
+Bloomfield Township Fire Station 2 | Bloomfield Township Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 1063 Westview | Bloomfield Township | 48304 | 248-433-7745 | https://www.bloomfieldtwp.org/fire/ | Open 24/7 |  | https://www.bloomfieldtwp.org/fire/fire-services-and-information/ | phone_label=Fire department office
+# from sal_usfire_bloomfield_township_fire_department_station_3
+Bloomfield Township Fire Station 3 | Bloomfield Township Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 4151 W. Maple | Bloomfield Township | 48301 | 248-433-7745 | https://www.bloomfieldtwp.org/fire/ | Open 24/7 |  | https://www.bloomfieldtwp.org/fire/fire-services-and-information/ | phone_label=Fire department office
+# from sal_usfire_bloomfield_township_fire_department_station_4
+Bloomfield Township Fire Station 4 | Bloomfield Township Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 2389 Franklin Road | Bloomfield Township | 48302 | 248-433-7745 | https://www.bloomfieldtwp.org/fire/ | Open 24/7 |  | https://www.bloomfieldtwp.org/fire/fire-services-and-information/ | phone_label=Fire department office
+# from sal_usfire_bloomfield_village_fire_department
+# A volunteer department inside Bloomfield Township (the page's mailing city is Bloomfield Hills). The page says to leave a voice mail and someone will call back.
+Bloomfield Village fire station | Bloomfield Village Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3595 Bradway Blvd | Bloomfield Township | 48301 | 248-645-8285 | https://www.bloomfieldvillage.net/info.php?pnum=38 | Call first |  | https://www.bloomfieldvillage.net/info.php?pnum=38 | phone_label=Fire office (voice mail)
+# from sal_usfire_clawson_fire_department
+# Page: "30 part-paid volunteer firefighters", "on-call 24 hours a day". The page writes Gardner St.; the dataset says Gardner Avenue.
+Clawson fire station | Clawson Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 111 Gardner St. | Clawson | 48017 | 248-524-3477 | https://www.cityofclawson.com/your_government/fire_department/index.php | Call first |  | https://www.cityofclawson.com/your_government/fire_department/index.php | phone_label=Non-emergency
+# from sal_usfire_farmington_fire_department
+# Full-time public safety officers plus reserve firefighters (https://farmgov.com/city-services/public-safety/fire-service/); no around-the-clock statement, so the plain wording is used.
+Farmington Department of Public Safety station | Farmington Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 23600 Liberty Street | Farmington | 48335 | 248-474-4700 | https://farmgov.com/city-services/public-safety/ | Call first |  | https://farmgov.com/city-services/public-safety/contact-us/ | phone_label=Non-emergency
+# from sal_usfire_farmington_hills_fire_department_station_1
+# Farmington Hills: "five fire stations ... all of which are staffed 24 hours a day, seven days a week"; every station is listed with (248) 871-2800. The admin office at 31455 W. 11 Mile Rd. is not a station.
+Farmington Hills Fire Station 1 | Farmington Hills Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 35725 Nine Mile | Farmington Hills | 48334 | 248-871-2800 | https://www.fhgov.com/fire/ | Open 24/7 |  | https://www.fhgov.com/fire/ | phone_label=Fire station
+# from sal_usfire_farmington_hills_fire_department_station_2
+Farmington Hills Fire Station 2 | Farmington Hills Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 28225 Middlebelt | Farmington Hills | 48334 | 248-871-2800 | https://www.fhgov.com/fire/ | Open 24/7 |  | https://www.fhgov.com/fire/ | phone_label=Fire station
+# from sal_usfire_farmington_hills_fire_department_station_3
+Farmington Hills Fire Station 3 | Farmington Hills Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 29260 Grand River | Farmington Hills | 48336 | 248-871-2800 | https://www.fhgov.com/fire/ | Open 24/7 |  | https://www.fhgov.com/fire/ | phone_label=Fire station
+# from sal_usfire_farmington_hills_fire_department_station_4
+Farmington Hills Fire Station 4 | Farmington Hills Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 28711 Drake | Farmington Hills | 48331 | 248-871-2800 | https://www.fhgov.com/fire/ | Open 24/7 |  | https://www.fhgov.com/fire/ | phone_label=Fire station
+# from sal_usfire_farmington_hills_fire_department_station_5_headquarters
+Farmington Hills Fire Station 5 | Farmington Hills Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 29995 W. 12 Mile | Farmington Hills | 48334 | 248-871-2800 | https://www.fhgov.com/fire/ | Open 24/7 |  | https://www.fhgov.com/fire/ | phone_label=Fire station
+# from sal_usfire_ferndale_fire_department_headquarters
+# The dataset flagged this as maybe offices only; the City's page calls it "Fire Station 1 (Headquarters)". Ferndale's department also covers Pleasant Ridge and Royal Oak Township, which have no station of their own.
+Ferndale Fire Station 1 (headquarters) | Ferndale Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1635 Livernois | Ferndale | 48220 | 248-546-2510 | https://ferndalemi.gov/fire | Call first |  | https://ferndalemi.gov/fire | phone_label=Non-emergency
+# from sal_usfire_ferndale_fire_department_station_2
+Ferndale Fire Station 2 | Ferndale Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1070 E. Nine Mile Rd. | Ferndale | 48220 | 248-546-2510 | https://ferndalemi.gov/fire | Call first |  | https://ferndalemi.gov/fire | phone_label=Non-emergency
+# from sal_usfire_franklin_bingham_fire_department
+# Franklin is a village inside Southfield Township (one of the 71 new places); the department serves Franklin, Bingham Farms and Southfield Township. A volunteer department with "station duty". The page labels 32707 Franklin Rd. its "Postal Address"; a steward may want to confirm it is also the station door.
+Franklin-Bingham fire station | Franklin-Bingham Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 32707 Franklin Rd. | Franklin | 48025 | 248-626-9862 | https://www.fbfd.com/ | Call first |  | https://www.fbfd.com/ | phone_label=Fire department
+# from sal_usfire_city_of_hazel_park_fire_station
+# The page also offers free blood-pressure checks "at the fire station on a walk-in basis"; not added as a separate listing.
+Hazel Park fire station | Hazel Park Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 22830 Russell Ave | Hazel Park | 48030 | 248-546-4086 | https://www.hazelpark.org/i_want_to/fire_department3.php | Call first |  | https://www.hazelpark.org/i_want_to/fire_department3.php | phone_label=Non-emergency
+# from sal_usfire_huntington_woods_volunteer_fire_department
+# The page gives office hours of 8:30 AM - 5 PM, Monday through Friday, and says officers provide "24-hour police and fire protection" (a service, not an open lobby), so the plain wording is used.
+Huntington Woods public safety station | Huntington Woods Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 12755 W. 11 Mile Road | Huntington Woods | 48070 | 248-541-1180 | https://www.hwmi.org/departments/public_safety_(police___fire)/index.php | Call first |  | https://www.hwmi.org/departments/public_safety_(police___fire)/index.php | phone_label=Public safety
+# from sal_usfire_madison_heights_fire_department_station_1
+# Madison Heights: "a full-time, paid staff comprised of 31 sworn members operating out of two stations" (https://www.madisonheightsmi.gov/159/About-the-Department).
+Madison Heights Fire Station 1 (headquarters) | Madison Heights Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 31313 Brush Street | Madison Heights | 48071 | 248-588-3605 | https://www.madisonheightsmi.gov/167/Suppression-Division | Open 24/7 |  | https://www.madisonheightsmi.gov/167/Suppression-Division | phone_label=Fire department
+# from sal_usfire_madison_heights_fire_department_station_2
+Madison Heights Fire Station 2 | Madison Heights Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 26339 John R | Madison Heights | 48071 | 248-588-3605 | https://www.madisonheightsmi.gov/167/Suppression-Division | Open 24/7 |  | https://www.madisonheightsmi.gov/167/Suppression-Division | phone_label=Fire department main line
+# from sal_usfire_novi_fire_department_station_1_headquarters
+# Novi: "All four fire stations located throughout the city are staffed seven days a week 24 hours a day" (https://cityofnovi.org/services/public-safety/fire/administration/). The station page prints no station phones.
+Novi Fire Department Station 1 | Novi Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 42975 Grand River Avenue | Novi | 48375 |  | https://cityofnovi.org/services/public-safety/fire/ | Open 24/7 |  | https://cityofnovi.org/services/public-safety/fire/fire-station-locations/
+# from sal_usfire_novi_fire_department_station_2
+Novi Fire Department Station 2 | Novi Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 1919 Paramount | Novi | 48377 |  | https://cityofnovi.org/services/public-safety/fire/ | Open 24/7 |  | https://cityofnovi.org/services/public-safety/fire/fire-station-locations/
+# from sal_usfire_novi_fire_department_station_3
+Novi Fire Department Station 3 | Novi Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 42785 Nine Mile Road | Novi | 48375 |  | https://cityofnovi.org/services/public-safety/fire/ | Open 24/7 |  | https://cityofnovi.org/services/public-safety/fire/fire-station-locations/
+# from sal_usfire_novi_fire_department_station_4
+Novi Fire Department Station 4 | Novi Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 49375 Ten Mile Road | Novi | 48374 |  | https://cityofnovi.org/services/public-safety/fire/ | Open 24/7 |  | https://cityofnovi.org/services/public-safety/fire/fire-station-locations/
+# from sal_usfire_oak_park_department_of_public_safety_fire_station
+# The older URL (/departments/public_safety/index.php) answers HTTP 403; this one answered 200. Offices are open Mondays through Fridays, 8 a.m. to 5 p.m.
+Oak Park Department of Public Safety station | Oak Park Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 13800 Oak Park Blvd | Oak Park | 48237 | 248-691-7520 | https://www.oakparkmi.gov/departments/public-safety | Call first |  | https://www.oakparkmi.gov/departments/public-safety | phone_label=Public safety
+# from sal_usfire_orion_township_fire_department_station_1
+# Orion Township: "a combination of career and paid-on-call firefighters"; full-time battalions work 24-hour shifts but the page does not say each station is staffed, so the plain wording is used. No station phones on the page. Lake Orion is the mailing city; all four are in Orion Township (Station 1 is in the Village of Lake Orion, inside the township).
+Orion Township Fire Station 1 | Orion Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 93 S. Anderson | Lake Orion | 48362 |  | https://www.oriontownship.org/departments/fire_rescue/ | Call first |  | https://www.oriontownship.org/departments/fire_rescue/station_locations___apparatus.php
+# from sal_usfire_orion_township_fire_department_station_2
+Orion Township Fire Station 2 | Orion Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3801 Giddings Rd. | Lake Orion | 48359 |  | https://www.oriontownship.org/departments/fire_rescue/ | Call first |  | https://www.oriontownship.org/departments/fire_rescue/station_locations___apparatus.php
+# from sal_usfire_orion_township_fire_department_station_3
+Orion Township Fire Station 3 | Orion Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3365 Gregory Rd. | Lake Orion | 48359 |  | https://www.oriontownship.org/departments/fire_rescue/ | Call first |  | https://www.oriontownship.org/departments/fire_rescue/station_locations___apparatus.php
+# from sal_usfire_orion_township_fire_department_station_4_headquarters
+Orion Township Fire Station 4 | Orion Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 465 S. Baldwin Rd. | Lake Orion | 48360 |  | https://www.oriontownship.org/departments/fire_rescue/ | Call first |  | https://www.oriontownship.org/departments/fire_rescue/station_locations___apparatus.php
+# from sal_usfire_rochester_fire_department
+# A paid-on-call (volunteer) department.
+Rochester fire station | Rochester Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 277 E. Second St. | Rochester | 48307 | 248-651-4470 | https://www.ci.rochester.mi.us/163/Fire-Department | Call first |  | https://www.ci.rochester.mi.us/163/Fire-Department | phone_label=Fire department
+# from sal_usfire_rochester_hills_fire_department_station_1_headquarters
+# "57 fulltime firefighters ... A minimum of two personnel are available at any time of the day or night and staff one of the five fire stations" and "Station 1 - Headquarters" (https://www.rochesterhills.org/departments/fire/fire.php).
+Rochester Hills Fire Station 1 (headquarters) | Rochester Hills Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 1111 Horizon Court | Rochester Hills | 48309 | 248-656-4720 | https://www.rochesterhills.org/departments/fire/index.php | Open 24/7 |  | https://www.rochesterhills.org/departments/fire/contact_us.php | phone_label=Fire department
+# from sal_usfire_royal_oak_fire_department_station_1
+# Royal Oak: each station has its own page and number. The City prints ZIP 48067 for all three; the dataset has 48073 for Stations 2 and 3. The page's value is kept.
+Royal Oak Fire Station 1 | Royal Oak Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 215 E Sixth Street | Royal Oak | 48067 | 248-246-3800 | https://www.romi.gov/228/Fire | Call first |  | https://www.romi.gov/Facilities/Facility/Details/Fire-Station-No-1-1 | phone_label=Fire station
+# from sal_usfire_royal_oak_fire_department_station_2
+Royal Oak Fire Station 2 | Royal Oak Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 31000 Woodward | Royal Oak | 48067 | 248-246-3820 | https://www.romi.gov/228/Fire | Call first |  | https://www.romi.gov/Facilities/Facility/Details/Fire-Station-No-2-2 | phone_label=Fire station
+# from sal_usfire_royal_oak_fire_department_station_3
+Royal Oak Fire Station 3 | Royal Oak Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 3128 Rochester Road | Royal Oak | 48067 | 248-246-3830 | https://www.romi.gov/228/Fire | Call first |  | https://www.romi.gov/Facilities/Facility/Details/Fire-Station-No-3-3 | phone_label=Fire station
+# from sal_usfire_southfield_fire_department_station_1
+# Southfield: one page lists all five stations with their own numbers. ZIPs are from the dataset; the page prints none.
+Southfield Fire Station 1 | Southfield Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 18400 W 9 Mile | Southfield | 48075 | 248-796-5610 | https://www.cityofsouthfield.com/departments/fire-department | Call first |  | https://www.cityofsouthfield.com/station-locations | phone_label=Fire station
+# from sal_usfire_southfield_fire_department_station_2
+Southfield Fire Station 2 | Southfield Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 25753 W 9 Mile | Southfield | 48033 | 248-796-5620 | https://www.cityofsouthfield.com/departments/fire-department | Call first |  | https://www.cityofsouthfield.com/station-locations | phone_label=Fire station
+# from sal_usfire_southfield_fire_department_station_3
+Southfield Fire Station 3 | Southfield Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 20135 W 12 Mile | Southfield | 48076 | 248-796-5630 | https://www.cityofsouthfield.com/departments/fire-department | Call first |  | https://www.cityofsouthfield.com/station-locations | phone_label=Fire station
+# from sal_usfire_southfield_fire_department_station_4
+Southfield Fire Station 4 | Southfield Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 25120 W 12 Mile | Southfield | 48034 | 248-796-5640 | https://www.cityofsouthfield.com/departments/fire-department | Call first |  | https://www.cityofsouthfield.com/station-locations | phone_label=Fire station
+# from sal_usfire_southfield_fire_department_station_5
+Southfield Fire Station 5 | Southfield Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 24477 Lahser Rd. | Southfield | 48033 | 248-796-5650 | https://www.cityofsouthfield.com/departments/fire-department | Call first |  | https://www.cityofsouthfield.com/station-locations | phone_label=Fire station
+# from sal_usfire_troy_fire_department_station_1
+# Troy: "180 volunteer members and 12 uniformed career staff" (https://troymi.gov/departments/fire_department/about.php). The facilities page prints no station phones. ZIPs are from the dataset.
+Troy Fire Department Station 1 | Troy Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1019 East Big Beaver | Troy | 48083 |  | https://troymi.gov/departments/fire_department/index.php | Call first |  | https://troymi.gov/departments/fire_department/facilities.php
+# from sal_usfire_troy_fire_department_station_2
+Troy Fire Department Station 2 | Troy Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 5600 Livernois | Troy | 48098 |  | https://troymi.gov/departments/fire_department/index.php | Call first |  | https://troymi.gov/departments/fire_department/facilities.php
+# from sal_usfire_troy_fire_department_station_3
+Troy Fire Department Station 3 | Troy Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 2400 West Big Beaver | Troy | 48084 |  | https://troymi.gov/departments/fire_department/index.php | Call first |  | https://troymi.gov/departments/fire_department/facilities.php
+# from sal_usfire_troy_fire_department_station_4
+Troy Fire Department Station 4 | Troy Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 2117 East Maple | Troy | 48083 |  | https://troymi.gov/departments/fire_department/index.php | Call first |  | https://troymi.gov/departments/fire_department/facilities.php
+# from sal_usfire_troy_fire_department_station_5
+Troy Fire Department Station 5 | Troy Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 6399 John R | Troy | 48085 |  | https://troymi.gov/departments/fire_department/index.php | Call first |  | https://troymi.gov/departments/fire_department/facilities.php
+# from sal_usfire_troy_fire_department_station_6
+Troy Fire Department Station 6 | Troy Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 5901 Coolidge | Troy | 48098 |  | https://troymi.gov/departments/fire_department/index.php | Call first |  | https://troymi.gov/departments/fire_department/facilities.php
+# from sal_usfire_waterford_township_fire_department_station_1
+# Waterford Regional Fire Department (Waterford Township and, by contract since 2012, the City of Pontiac): "9 fire stations staffed 24 hours a day" and "107 full-time" firefighters (https://www.waterfordmi.gov/289/Fire). Station pages print no phones; the headquarters row uses the fire page, which prints the department's number.
+Waterford Regional Fire Station 1 (headquarters) | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 2495 Crescent Lake Road | Waterford | 48329 | 248-673-0405 | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/289/Fire | phone_label=Fire department
+# from sal_usfire_waterford_township_fire_department_station_2
+Waterford Regional Fire Station 2 | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 4596 W Walton Boulevard | Waterford | 48329 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-2-27
+# from sal_usfire_waterford_township_fire_department_station_3
+# The dataset has ZIP 48328 for Station 3 and 48329 for Station 4; the City's pages print the reverse. The pages' values are kept.
+Waterford Regional Fire Station 3 | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 3435 Elizabeth Lake Road | Waterford | 48329 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-3-28
+# from sal_usfire_waterford_township_fire_department_station_4
+Waterford Regional Fire Station 4 | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 6615 Williams Lake Road | Waterford | 48328 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-4-29
+# from sal_usfire_waterford_township_fire_department_station_5
+Waterford Regional Fire Station 5 | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 25 N Hospital Road | Waterford | 48327 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-5-30
+# from sal_usfire_waterford_township_fire_department_station_6
+Waterford Regional Fire Station 6 (Pontiac) | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 55 W Walton Boulevard | Pontiac | 48340 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-6-31
+# from sal_usfire_waterford_township_fire_department_station_1_headquarters
+# from The dataset calls 123 E Pike Street Waterford's Station 1 headquarters; the City's page calls it Station 7, the central fire station for Pontiac.
+Waterford Regional Fire Station 7 (Pontiac) | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 123 E Pike Street | Pontiac | 48342 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-7-32
+# from sal_usfire_waterford_township_fire_department_station_8
+# The dataset writes 720 East Madison Avenue; the City's page writes 720 Madison Street.
+Waterford Regional Fire Station 8 (Pontiac) | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 720 Madison Street | Pontiac | 48340 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-8-33
+# from sal_usfire_waterford_township_fire_department_station_9
+Waterford Regional Fire Station 9 (Pontiac) | Waterford Regional Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 787 W Huron Street | Pontiac | 48341 |  | https://www.waterfordmi.gov/289/Fire | Open 24/7 |  | https://www.waterfordmi.gov/Facilities/Facility/Details/Station-9-34
+# from sal_usfire_west_bloomfield_fire_department_station_1
+# West Bloomfield: "staffed with full-time firefighter / paramedics who provide services from 6 fire stations" (fire.php). The stations page prints no phones; Station 5 (the main station) uses fire.php, which prints its address and number. Station 9 (3300 Orchard Lake Road, Orchard Lake Village) is outside the 71 places and is not listed.
+West Bloomfield Fire Station 1 | West Bloomfield Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 4601 Orchard Lake Road | West Bloomfield Township | 48323 |  | https://www.wbtownship.org/government/departments/fire/fire.php | Open 24/7 |  | https://www.wbtownship.org/government/departments/fire/fire_stations1.php
+# from sal_usfire_west_bloomfield_fire_department_station_2
+West Bloomfield Fire Station 2 | West Bloomfield Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 6925 West Maple | West Bloomfield Township | 48322 |  | https://www.wbtownship.org/government/departments/fire/fire.php | Open 24/7 |  | https://www.wbtownship.org/government/departments/fire/fire_stations1.php
+# from sal_usfire_west_bloomfield_township_fire_department_station_3
+West Bloomfield Fire Station 3 | West Bloomfield Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 3340 Green Lake Road | West Bloomfield Township | 48324 |  | https://www.wbtownship.org/government/departments/fire/fire.php | Open 24/7 |  | https://www.wbtownship.org/government/departments/fire/fire_stations1.php
+# from sal_usfire_west_bloomfield_township_fire_department_station_4
+West Bloomfield Fire Station 4 | West Bloomfield Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 5842 Greer Road | West Bloomfield Township | 48324 |  | https://www.wbtownship.org/government/departments/fire/fire.php | Open 24/7 |  | https://www.wbtownship.org/government/departments/fire/fire_stations1.php
+# from sal_usfire_west_bloomfield_fire_department_station_5
+West Bloomfield Fire Station 5 (main station) | West Bloomfield Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 5425 West Maple Road | West Bloomfield Township | 48322 | 248-409-1505 | https://www.wbtownship.org/government/departments/fire/fire.php | Open 24/7 |  | https://www.wbtownship.org/government/departments/fire/fire.php | phone_label=Fire department headquarters
+# from sal_usfire_wixom_fire_department
+# "Fire Department Headquarters is located at 1345 N. Wixom Road"; staff are "six full-time Firefighters and ten part-time Firefighter/EMTs". The only number on the page is a staff member's line, so no phone is given.
+# wixomgov.org answered HTTP 403 to the research fetcher and to WebFetch, so the page was read in a browser; it DID answer the source checker's own user agent (pipeline/src/page-match.ts) and the address matched, so the row is not marked BROWSER.
+Wixom Fire Department station | Wixom Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1345 N. Wixom Road | Wixom | 48393 |  | https://www.wixomgov.org/departments/fire-department | Call first |  | https://www.wixomgov.org/departments/fire-department
+#
+# ---- Macomb County ----
+# from sal_usfire_center_line_department_of_public_safety_fire_station
+# The page's contact block for Public Safety says "Open 24 Hours". This building may also be listed by the police batch.
+Center Line public safety station | Center Line Department of Public Safety | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 7070 E Ten Mile Road | Center Line | 48015 | 586-757-2200 | https://www.centerline.gov/160/Public-Safety | Open 24/7 |  | https://www.centerline.gov/160/Public-Safety | phone_label=Public safety
+# from sal_usfire_chesterfield_township_fire_department_station_1
+# The department's own site lists Stations 1 and 3 with 586.725.2233. It also gives a mailing address, 46525 Continental Dr., without calling it a station, so no row is made for it.
+Chesterfield Fire Station 1 | Chesterfield Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 26001 22 Mile Rd | Chesterfield Township | 48051 | 586-725-2233 | https://www.chesterfieldfire.org/ | Call first |  | https://www.chesterfieldfire.org/ | phone_label=Fire department
+# from sal_usfire_chesterfield_township_fire_department_station_3
+Chesterfield Fire Station 3 | Chesterfield Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 33991 23 Mile Rd | Chesterfield Township | 48047 | 586-725-2233 | https://www.chesterfieldfire.org/ | Call first |  | https://www.chesterfieldfire.org/ | phone_label=Fire department
+# from sal_usfire_clinton_township_fire_department_station_1
+# Clinton Township: each station has a facility page with its address and no phone. The City prints ZIP 48036 for Station 2; the dataset has 48035. The page's value is kept.
+Clinton Township Fire Station 1 | Clinton Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 1129 S Gratiot Avenue | Clinton Township | 48036 |  | https://www.clintontownship.com/208/Fire | Call first |  | https://clintontownship.com/Facilities/Facility/Details/Station-1-1
+# from sal_usfire_clinton_township_fire_department_station_2
+Clinton Township Fire Station 2 | Clinton Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 21250 Fifteen Mile Road | Clinton Township | 48036 |  | https://www.clintontownship.com/208/Fire | Call first |  | https://clintontownship.com/Facilities/Facility/Details/Station-2-2
+# from sal_usfire_clinton_township_fire_department_station_3
+Clinton Township Fire Station 3 | Clinton Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 16720 Clinton River Road | Clinton Township | 48036 |  | https://www.clintontownship.com/208/Fire | Call first |  | https://clintontownship.com/Facilities/Facility/Details/Station-3-3
+# from sal_usfire_clinton_township_fire_department_station_4
+Clinton Township Fire Station 4 (headquarters) | Clinton Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 42601 Romeo Plank Road | Clinton Township | 48038 |  | https://www.clintontownship.com/208/Fire | Call first |  | https://clintontownship.com/Facilities/Facility/Details/Station-4-4
+# from sal_usfire_clinton_township_fire_department_station_5
+Clinton Township Fire Station 5 | Clinton Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 43800 Elizabeth | Clinton Township | 48036 |  | https://www.clintontownship.com/208/Fire | Call first |  | https://clintontownship.com/Facilities/Facility/Details/Station-5-5
+# from sal_usfire_eastpointe_fire_and_rescue
+Eastpointe fire station | Eastpointe Fire & Rescue | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 16370 Nine Mile Road | Eastpointe | 48021 | 586-445-5055 | https://www.eastpointemi.gov/departments/public_safety/eastpointe_fire___rescue/index.php | Call first |  | https://www.eastpointemi.gov/departments/public_safety/eastpointe_fire___rescue/index.php | phone_label=Fire department
+# from sal_usfire_fraser_fire_department
+# The page says the non-emergency number (the regional dispatch center, SERESA) is "Available 24/7"; it says nothing about the building, so the plain wording is used.
+Fraser Department of Public Safety station | Fraser Department of Public Safety | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 33000 Garfield Road | Fraser | 48026 | 586-777-6700 | https://www.frasercitymi.gov/229/Fire | Call first |  | https://www.frasercitymi.gov/229/Fire | phone_label=Non-emergency dispatch (24/7)
+# from sal_usfire_harrison_township_fire_department_station_1
+# Harrison Township: "Harrison Township Fire Fighters staff two fire stations with a minimum of three firefighters at each" (about_us.php). The station pages print no phones.
+Harrison Township Fire Station 1 | Harrison Township Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 27061 Crocker Boulevard | Harrison Township | 48045 |  | https://www.harrisontownshipmi.gov/departments/ht_fire_department/about_us.php | Open 24/7 |  | https://www.harrisontownshipmi.gov/departments/ht_fire_department/station_1.php
+# from sal_usfire_harrison_township_fire_department_station_2
+Harrison Township Fire Station 2 (headquarters) | Harrison Township Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 39460 Jefferson Avenue | Harrison Township | 48045 |  | https://www.harrisontownshipmi.gov/departments/ht_fire_department/about_us.php | Open 24/7 |  | https://www.harrisontownshipmi.gov/departments/ht_fire_department/station_2.php
+# from sal_usfire_macomb_township_fire_department_station_1
+# Macomb Township's page lists Station #1-#4 with addresses, but its open-house notice calls 47711 North Avenue "Fire Station 2" while the list calls it Station #3. Names therefore lead with the road; the numbers are the list's.
+Macomb Township fire station, 23 Mile Road (Station 1) | Macomb Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 19925 23 Mile Road | Macomb Township | 48042 | 586-286-0027 | https://www.macomb-mi.gov/194/Fire-Department | Call first |  | https://www.macomb-mi.gov/194/Fire-Department | phone_label=Fire department
+# from sal_usfire_macomb_township_fire_department_station_2
+Macomb Township fire station, 21 Mile Road (Station 2) | Macomb Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 17800 21 Mile Road | Macomb Township | 48044 | 586-286-0027 | https://www.macomb-mi.gov/194/Fire-Department | Call first |  | https://www.macomb-mi.gov/194/Fire-Department | phone_label=Fire department main line
+# from sal_usfire_macomb_township_fire_and_rescue_station_3
+Macomb Township fire station, North Avenue (Station 3) | Macomb Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 47711 North Ave | Macomb Township | 48042 | 586-286-0027 | https://www.macomb-mi.gov/194/Fire-Department | Call first |  | https://www.macomb-mi.gov/194/Fire-Department | phone_label=Fire department main line
+# from sal_usfire_macomb_township_fire_department_station_4
+Macomb Township fire station, 25 Mile Road (Station 4) | Macomb Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 16820 25 Mile Road | Macomb Township | 48042 | 586-286-0027 | https://www.macomb-mi.gov/194/Fire-Department | Call first |  | https://www.macomb-mi.gov/194/Fire-Department | phone_label=Fire department main line
+# from sal_usfire_new_baltimore_fire_department
+New Baltimore fire station | New Baltimore Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 36535 Green St. | New Baltimore | 48047 | 586-725-0990 | https://www.cityofnewbaltimore.org/378/Fire-Department | Call first |  | https://www.cityofnewbaltimore.org/378/Fire-Department | phone_label=Fire department
+# from sal_usfire_roseville_fire_department_station_2
+Roseville Fire Station 2 | Roseville Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 17644 Frazho Road | Roseville | 48066 | 586-445-5444 | https://www.roseville-mi.gov/192/Fire | Call first |  | https://www.roseville-mi.gov/192/Fire | phone_label=Fire department
+# from sal_usfire_shelby_township_fire_department_station_1_and_headquarters
+# Shelby Township: the fire page lists five stations, each with 586-731-3476. Station 1's address (in the open-house notice) and the number are in the page's own text and pass the source check.
+Shelby Township Fire Station 1 | Shelby Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 6345 23 Mile Rd | Shelby Township | 48316 | 586-731-3476 | https://www.shelbytwp.org/government/departments/fire-department | Call first |  | https://www.shelbytwp.org/government/departments/fire-department | phone_label=Fire department
+# from sal_usfire_shelby_township_fire_department_station_2
+# BROWSER: Shelby Township Fire Station 2 - the Township's station list is drawn by a script (a facility map), so the source check does not see Stations 2-5 in the page it fetches; the list was read in a browser on 2026-09-24 (shelbytwp.org also answers HTTP 403 to the research fetcher)
+Shelby Township Fire Station 2 | Shelby Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 48050 Ryan Rd | Shelby Township | 48317 | 586-731-3476 | https://www.shelbytwp.org/government/departments/fire-department | Call first |  | https://www.shelbytwp.org/government/departments/fire-department | phone_label=Fire department
+# from sal_usfire_shelby_township_fire_department_station_3
+# BROWSER: Shelby Township Fire Station 3 - the Township's station list is drawn by a script (a facility map), so the source check does not see Stations 2-5 in the page it fetches; the list was read in a browser on 2026-09-24 (shelbytwp.org also answers HTTP 403 to the research fetcher)
+Shelby Township Fire Station 3 | Shelby Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 54131 Shelby Rd | Shelby Township | 48316 | 586-731-3476 | https://www.shelbytwp.org/government/departments/fire-department | Call first |  | https://www.shelbytwp.org/government/departments/fire-department | phone_label=Fire department
+# NEW: Shelby Township Fire Station 4 at 13561 25 Mile Rd (the dataset's Station 4 at 51599 Schoenherr Road, sal_usfire_shelby_township_fire_department_station_4, is not on the Township's list and is not used).
+# BROWSER: Shelby Township Fire Station 4 - the Township's station list is drawn by a script (a facility map), so the source check does not see Stations 2-5 in the page it fetches; the list was read in a browser on 2026-09-24 (shelbytwp.org also answers HTTP 403 to the research fetcher)
+Shelby Township Fire Station 4 | Shelby Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 13561 25 Mile Rd | Shelby Township | 48315 | 586-731-3476 | https://www.shelbytwp.org/government/departments/fire-department | Call first |  | https://www.shelbytwp.org/government/departments/fire-department | phone_label=Fire department
+# NEW: Shelby Township Fire Station 5 (not in the federal dataset).
+# BROWSER: Shelby Township Fire Station 5 - the Township's station list is drawn by a script (a facility map), so the source check does not see Stations 2-5 in the page it fetches; the list was read in a browser on 2026-09-24 (shelbytwp.org also answers HTTP 403 to the research fetcher)
+Shelby Township Fire Station 5 | Shelby Township Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 47460 Schoenherr Rd | Shelby Township | 48315 | 586-731-3476 | https://www.shelbytwp.org/government/departments/fire-department | Call first |  | https://www.shelbytwp.org/government/departments/fire-department | phone_label=Fire department
+# from sal_usfire_saint_clair_shores_fire_department_central_station_1
+# The station's page says "Staffed 24 hours a day". The pages for Stations 2 and 3 say nothing about staffing, so they get the plain wording.
+St. Clair Shores Central Fire Station 1 | St. Clair Shores Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 26700 Harper Avenue | St. Clair Shores | 48081 | 586-445-5380 | https://scsmi.net/225/Fire-Department | Open 24/7 |  | https://www.scsmi.net/Facilities/Facility/Details/Central-Fire-Station-One-20 | phone_label=Non-emergency
+# from sal_usfire_saint_clair_shores_fire_department_south_station_2
+St. Clair Shores South Fire Station 2 | St. Clair Shores Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 23815 Greater Mack | St. Clair Shores | 48080 | 586-445-5380 | https://scsmi.net/225/Fire-Department | Call first |  | https://www.scsmi.net/997/Fire-Stations | phone_label=Fire department main line
+# from sal_usfire_saint_clair_shores_fire_department_north_station_3
+St. Clair Shores North Fire Station 3 | St. Clair Shores Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 31201 Greater Mack | St. Clair Shores | 48082 | 586-445-5380 | https://scsmi.net/225/Fire-Department | Call first |  | https://www.scsmi.net/997/Fire-Stations | phone_label=Fire department main line
+# from sal_usfire_sterling_heights_fire_department_station_1
+# Sterling Heights: station pages print addresses only; the headquarters row uses the fire page, which prints its address and the non-emergency business line.
+Sterling Heights Fire Station 1 | Sterling Heights Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 38911 Van Dyke | Sterling Heights | 48313 |  | https://www.sterlingheights.gov/451/Fire-Department | Call first |  | https://www.sterlingheights.gov/facilities/facility/details/Fire-Station-No-1-36
+# from sal_usfire_sterling_heights_fire_department_station_2
+Sterling Heights Fire Station 2 | Sterling Heights Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 12825 19 Mile Road | Sterling Heights | 48313 |  | https://www.sterlingheights.gov/451/Fire-Department | Call first |  | https://www.sterlingheights.gov/facilities/facility/details/Fire-Station-No-2-37
+# from sal_usfire_sterling_heights_fire_department_station_3
+Sterling Heights Fire Station 3 | Sterling Heights Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 5250 15 Mile Road | Sterling Heights | 48310 |  | https://www.sterlingheights.gov/451/Fire-Department | Call first |  | https://www.sterlingheights.gov/facilities/facility/details/Fire-Station-No-3-38
+# from sal_usfire_sterling_heights_fire_department_station_4
+Sterling Heights Fire Station 4 | Sterling Heights Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 12850 15 Mile Road | Sterling Heights | 48312 |  | https://www.sterlingheights.gov/451/Fire-Department | Call first |  | https://www.sterlingheights.gov/facilities/facility/details/Fire-Station-No-4-39
+# from sal_usfire_sterling_heights_fire_department_station_5_headquarters
+Sterling Heights Fire Station 5 (headquarters) | Sterling Heights Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 41625 Ryan Road | Sterling Heights | 48314 | 586-446-2950 | https://www.sterlingheights.gov/451/Fire-Department | Call first |  | https://www.sterlingheights.gov/451/Fire-Department | phone_label=Fire department (non-emergency business line)
+# from sal_usfire_utica_fire_department
+# Page: "Anyone wishing to visit our Fire Station, please call 586-997-0168". Administration is (586) 731-1313.
+Utica Fire Department station | Utica Fire Department | safe.fire | A fire station. It is not always staffed. In an emergency, call 911. | 7609 Auburn Road | Utica | 48317 | 586-997-0168 | https://www.cityofutica.org/departments/utica_fire/index.php | Call first |  | https://www.cityofutica.org/departments/utica_fire/index.php | phone_label=Fire station
+# from sal_usfire_warren_fire_department_station_1
+# Warren: "The City of Warren has six fire stations serving the public 24 hours a day - 365 days a year"; one page lists all six. The phone is the page's "Non-Emergency Dispatch" line. ZIPs are from the dataset except Station 5, which the dataset does not have (see below), so it carries none.
+Warren Fire Station 1 | Warren Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 8321 9 Mile Road | Warren | 48089 | 586-574-9111 | https://www.cityofwarren.org/departments/fire-department/ | Open 24/7 |  | https://www.cityofwarren.org/departments/fire-department/ | phone_label=Non-emergency dispatch
+# from sal_usfire_warren_fire_department_station_2_headquarters
+Warren Fire Station 2 | Warren Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 23293 Schoenherr Road | Warren | 48089 | 586-574-9111 | https://www.cityofwarren.org/departments/fire-department/ | Open 24/7 |  | https://www.cityofwarren.org/departments/fire-department/ | phone_label=Non-emergency dispatch
+# from sal_usfire_warren_fire_department_station_3
+Warren Fire Station 3 | Warren Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 23620 Ryan Road | Warren | 48091 | 586-574-9111 | https://www.cityofwarren.org/departments/fire-department/ | Open 24/7 |  | https://www.cityofwarren.org/departments/fire-department/ | phone_label=Non-emergency dispatch
+# from sal_usfire_warren_fire_department_station_4
+Warren Fire Station 4 | Warren Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 6361 Chicago Road | Warren | 48092 | 586-574-9111 | https://www.cityofwarren.org/departments/fire-department/ | Open 24/7 |  | https://www.cityofwarren.org/departments/fire-department/ | phone_label=Non-emergency dispatch
+# NEW: Warren Fire Station 5 at 30619 Schoenherr (the dataset's Station 5 at 29900 Hoover Road, sal_usfire_warren_fire_department_station_5, is not the City's current address and is not used).
+Warren Fire Station 5 | Warren Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 30619 Schoenherr | Warren |  | 586-574-9111 | https://www.cityofwarren.org/departments/fire-department/ | Open 24/7 |  | https://www.cityofwarren.org/departments/fire-department/ | phone_label=Non-emergency dispatch
+# from sal_usfire_warren_fire_department_station_6
+Warren Fire Station 6 | Warren Fire Department | safe.fire | A fire station. Firefighters are there all day and night, but they go out on calls. | 3090 12 Mile Road | Warren | 48092 | 586-574-9111 | https://www.cityofwarren.org/departments/fire-department/ | Open 24/7 |  | https://www.cityofwarren.org/departments/fire-department/ | phone_label=Non-emergency dispatch

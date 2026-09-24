@@ -124,7 +124,11 @@ export function validateRows(rows: BundleRow[], todayStr: string, refusing: Map<
       if (r.service_area !== undefined && !isServiceArea(r.service_area)) e(`unknown service_area "${r.service_area}" (one of: ${SERVICE_AREA_IDS.join(', ')})`);
       if (r.phones.length === 0) e('a domestic violence row publishes on its phone alone, so it must have one');
     } else if (r.service_area !== undefined) {
-      e('service_area is for domestic violence rows only; every other row says where it is with an address or a coordinate');
+      // Since 2026-09-24 (Kyle's choice (a)) any row may name the coarse area it serves, but only while it has no
+      // coordinate: a phone-only local service, or an address the geocoder could not place. A row with a point ranks
+      // by the point, so an area beside one would be a second, contradicting answer.
+      if (!isServiceArea(r.service_area)) e(`unknown service_area "${r.service_area}" (one of: ${SERVICE_AREA_IDS.join(', ')})`);
+      if (r.lat !== undefined || r.lon !== undefined) e('service_area is only for a row with no coordinate; this row has one, so it ranks by that');
     }
     // Any other shelter shows an address only if the shelter publishes it on its own site (DECISIONS 2026-09-19).
     // Warming and cooling centers are public buildings the City announces, not shelters people live in.
@@ -189,12 +193,19 @@ export function validateHsdsPrivacy(services: unknown[]): Issues {
   return { errors, warnings: [] };
 }
 
-export function validateEmergency(rows: CsvRow[], todayStr: string, release: boolean): Issues & { verified: boolean } {
+/**
+ * `places` is the set of place ids in data/ingested/region.json. A row with an `area` belongs to one place and is
+ * shown only on that place's page (a city's own police, 2026-09-24); it names a place that exists, and 911 and 988
+ * are never scoped to one.
+ */
+export function validateEmergency(rows: CsvRow[], todayStr: string, release: boolean, places?: Set<string>): Issues & { verified: boolean } {
   const errors: string[] = [], warnings: string[] = [];
   const need = new Map([['emg_911', '911'], ['emg_988', '988']]);
   let verified = true;
   for (const r of rows) {
     if (!parsePhone(r.number ?? '')) errors.push(`${r.id}: "${r.number}" is not a valid number`);
+    if (r.area && need.has(r.id!)) errors.push(`${r.id}: 911 and 988 belong to everyone and carry no area`);
+    if (r.area && places && !places.has(r.area)) errors.push(`${r.id}: area "${r.area}" is not a place in data/ingested/region.json`);
     if (need.has(r.id!)) {
       if (r.number !== need.get(r.id!) || r.hardcoded !== 'yes') errors.push(`${r.id}: must be ${need.get(r.id!)} and hardcoded`);
       need.delete(r.id!);

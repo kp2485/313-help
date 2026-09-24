@@ -86,6 +86,18 @@ final class MapFileTests: XCTestCase {
         XCTAssertFalse(m.roads[0].box.isEmpty)
     }
 
+    func testSemcogsNoticeRidesWithTheMapInItsOwnWords() throws {
+        XCTAssertNil(try MapFileDecoder.baseMap(base: Data(baseJSON.utf8), streets: nil).notice,
+                     "an older bundle has no notice, and none is invented")
+        let notice = "Copyright © 2026 SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited."
+        let withNotice = baseJSON.replacingOccurrences(of: #"{"source":{"last_edited":{"roads":"2025-09-30"}}"#,
+                                                       with: #"{"source":{"last_edited":{"roads":"2025-09-30"},"semcog_notice":"\#(notice)"}"#)
+        XCTAssertNotEqual(withNotice, baseJSON)
+        let m = try MapFileDecoder.baseMap(base: Data(withNotice.utf8), streets: nil)
+        XCTAssertEqual(m.notice, notice)
+        XCTAssertEqual(m.edited, "2025-09-30")
+    }
+
     func testTheStreetsFileAddsOneCellPerSquare() throws {
         let streets = """
         {"grid":{},"cells":{"c_0_1":{"origin":[-83.2,42.3],"names":["Elm St"],"roads":[[4,0,[0,0,100,0]]]},
@@ -132,12 +144,16 @@ final class MapFileTests: XCTestCase {
         XCTAssertGreaterThan(m.parks.count, 100)
         XCTAssertFalse(m.boundary.isEmpty)
         XCTAssertEqual(m.edited.count, 10, "the road layer's edit date is a plain YYYY-MM-DD")
-        // Everything is inside the bbox docs/CLAUDE.md gives for the service area, with a little room at the edges.
+        if let notice = m.notice { XCTAssertTrue(notice.contains("SEMCOG"), notice) }
+        // Everything is inside the service area's box (every city and township a DDOT or SMART bus stops in,
+        // 2026-09-24), with a little room at the edges.
         let all = m.roads.reduce(MapBox.empty) { $0.union($1.box) }
-        XCTAssertGreaterThan(MapProjection.lat(y: all.maxY), 42.1)
-        XCTAssertLessThan(MapProjection.lat(y: all.minY), 42.6)
-        XCTAssertGreaterThan(MapProjection.lon(x: all.minX), -83.6)
-        XCTAssertLessThan(MapProjection.lon(x: all.maxX), -82.7)
+        XCTAssertGreaterThan(MapProjection.lat(y: all.maxY), ServiceBox.latMin - 0.05)
+        XCTAssertLessThan(MapProjection.lat(y: all.minY), ServiceBox.latMax + 0.05)
+        XCTAssertGreaterThan(MapProjection.lon(x: all.minX), ServiceBox.lonMin - 0.05)
+        XCTAssertLessThan(MapProjection.lon(x: all.maxX), ServiceBox.lonMax + 0.05)
+        // And it reaches well past the four first cities: Pontiac's streets are on it.
+        XCTAssertGreaterThan(MapProjection.lat(y: all.minY), 42.6)
 
         if let layer = try? Data(contentsOf: dir.appendingPathComponent("transit/qline.json")) {
             let l = try MapFileDecoder.layer(layer)
@@ -192,7 +208,8 @@ final class MapCameraTests: XCTestCase {
         XCTAssertEqual(c.metersPerPoint, 0.6, accuracy: 1e-6)
         for _ in 0..<80 { c = c.zoomed(by: 0.5) }
         XCTAssertEqual(c.scale, MapCamera.minScale, accuracy: 1e-6)
-        XCTAssertEqual(c.metersPerPoint, 90, accuracy: 1e-6)
+        // 180 m per point since the area became every city and township a bus stops in (90 until 2026-09-24).
+        XCTAssertEqual(c.metersPerPoint, 180, accuracy: 1e-6)
     }
 
     func testPanningFollowsTheFingerAndCannotLoseTheCity() {

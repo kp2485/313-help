@@ -50,7 +50,9 @@ pnpm test                # query fixture cases + pipeline, API and web tests
 pnpm build:bundle        # data/seed + data/ingested -> data/hsds + data/bundle/v1 (signed, dev key)
 pnpm ingest:opendata     # City open-data layers into data/ingested and data/staging, plus the greenway
                          # segments, the police and fire stations, and the City's parks and ZIP areas
-pnpm ingest:cities       # the four-city page numbers (SEMCOG, Census, TIGER, Wayne County) -> data/ingested/cities.json
+pnpm ingest:region       # the service area from the SMART and DDOT feeds and TIGER outlines -> data/ingested/region.json
+                         # (run first: the basemap, ZIPs, city pages and station layers all read it)
+pnpm ingest:cities       # the city pages (SEMCOG, Census, TIGER, Wayne County numbers for the first four) -> data/ingested/cities.json
 pnpm ingest:transit      # the 11 transport layers for the Map tab. By hand, about monthly — on purpose
                          # it is NOT in the nightly publish (DECISIONS 2026-09-20)
 pnpm ingest:mymap        # Wayne County's Well Wayne Stations map (Google My Maps KML) -> data/ingested/
@@ -69,6 +71,16 @@ Other scripts, explained in [OPERATIONS.md](OPERATIONS.md): `pnpm ingest:basemap
 
 One or two lines per date; the reasoning behind each change is in [DECISIONS.md](DECISIONS.md) under the same date.
 
+- **2026-09-24 — Wherever the buses go.** The service area is every city and township a DDOT or SMART bus stops in
+  or runs through: 75 places in Wayne, Oakland and Macomb counties, worked out from the feeds by `pnpm
+  ingest:region` (DECISIONS 2026-09-24). TIGER streets and SEMCOG parks outside Detroit; every DDOT and SMART route
+  whole and tested to lie inside the outlines; directions build only the trip's window ([query-spec, "The trip
+  window"](../schema/query-spec.md)); each place's own police line on its page; Oakland's and Macomb's shelter,
+  crisis and sexual-assault lines beside Wayne's; 139 ZIPs; 77 Well Wayne stations. The 71 new places have an
+  outline and their help, not yet statistics. Then the first pass of listings there: 1,075 published (723 → 1,798),
+  each matched on its owner's page, 95 of them phone-only or unplaceable and ranked by a coarse area as DV rows are;
+  federal fire, police, hospital, library and health-center records staged as candidates (`pnpm ingest:federal`);
+  52 more waiting for a person with a browser (DECISIONS 2026-09-24).
 - **2026-09-22 — Directions, one tab set, and the Areas map.** Offline walking and bus directions on all three
   clients, from the street graph and transit files already in the bundle: A* with the City's own safety fields as
   the penalty, published headways only, ranges never times, at most one change, traceless

@@ -19,8 +19,9 @@ import kotlin.math.abs
 
 class AreasHomeTest {
 
-    /** One unit of the world is one degree of latitude; MIN_SCALE is 90 m per dp, which is what pins it. */
-    private val metresPerUnit = MapCamera.MIN_SCALE * 90
+    /** One unit of the world is one degree of latitude; MIN_SCALE is 180 m per dp (90 until 2026-09-24), which is
+     *  what pins it. */
+    private val metresPerUnit = MapCamera.MIN_SCALE * 180
     private fun mpp(scale: Double) = metresPerUnit / scale
 
     /** A rectangle of `w` by `h` degrees with its south-west corner at (lat, lon), as one ring. */
@@ -88,15 +89,18 @@ class AreasHomeTest {
     }
 
     @Test
-    fun aWholeCityIsNotOpenedWiderThanTheCameraHasEverAllowed() {
-        // Detroit is about 0.2° tall and 0.4° wide; on a phone that is well past the map's own far limit.
-        val cam = MapCamera.forArea(box(42.255, -83.288, 0.195, 0.377), phoneW, phoneH)!!
-        assertEquals(90.0, mpp(cam.scale), 1e-6)
+    fun theWholeServiceAreaIsNotOpenedWiderThanTheCameraAllows() {
+        // Every city and township a DDOT or SMART bus stops in is about 0.62° tall and 0.87° wide; on a phone that
+        // is past the map's own far limit.
+        val cam = MapCamera.forArea(box(42.11, -83.57, 0.62, 0.87), phoneW, phoneH)!!
+        assertEquals(180.0, mpp(cam.scale), 1e-6)
         assertEquals(MapCamera.MIN_SCALE, cam.scale, 1e-9)
         // A laptop's wider box gets closer, and is still inside the limits.
-        val big = MapCamera.forArea(box(42.255, -83.288, 0.195, 0.377), laptopW, laptopH)!!
-        assertTrue(mpp(big.scale) < 90.0)
+        val big = MapCamera.forArea(box(42.11, -83.57, 0.62, 0.87), laptopW, laptopH)!!
+        assertTrue(mpp(big.scale) < 180.0)
         assertTrue(big.scale >= MapCamera.MIN_SCALE)
+        // Detroit alone now opens inside the limit on a phone.
+        assertTrue(mpp(MapCamera.forArea(box(42.255, -83.288, 0.195, 0.377), phoneW, phoneH)!!.scale) < 180.0)
     }
 
     @Test
@@ -122,7 +126,7 @@ class AreasHomeTest {
             Triple(false, false, false) to AreasLanding.ASK,      // nobody has said where they are
             Triple(true, true, false) to AreasLanding.AREA,       // a position allowed this session, in a neighbourhood
             Triple(true, true, false) to AreasLanding.AREA,       // a typed cross street or ZIP, the same answer
-            Triple(false, false, true) to AreasLanding.OUTSIDE,   // a fix from beyond the four cities
+            Triple(false, false, true) to AreasLanding.OUTSIDE,   // a fix from beyond the service area
             Triple(true, false, false) to AreasLanding.OUTSIDE,   // inside the box, but no outline holds it
             Triple(true, true, true) to AreasLanding.OUTSIDE,     // outside wins even over a remembered area
         )

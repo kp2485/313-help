@@ -122,7 +122,7 @@ or `hubs`, and draws the same whether or not they exist. Those layer files are b
   values are in `apps/web/src/style.css` and are copied, not re-invented.
 - **The basemap under it** (both styles; `draw()` in `map.ts`, `MapPainter.draw` on iPhone):
   - *Ground:* fill `--map-out`; over it a **hatch** — diagonal lines at 45° (down to the right), **11 u** apart,
-    **1 u** wide, `--map-out-ink` — then the four cities filled `--map-land` (even-odd) and their edge stroked
+    **1 u** wide, `--map-out-ink` — then the service area's places filled `--map-land` (even-odd) and their edge stroked
     `--map-main` **1.5 u**. The hatch is what says "not our area": two pale fills were 1.20:1.
   - *Parks:* `--map-park`; a park narrower than 7 u gets a dot r 2 in `--map-park-ink` at 75 % (not in a small
     `quiet` map). Park names from `mpp < 7`, italic 600 12, only when the park is ≥ 46 u wide.
@@ -573,7 +573,7 @@ QLINE: the City publishes stops, no track, so the line runs through the middle o
 pair, south to north, `derived: true`. People Mover: the operator's `shapes.txt`, closed, in travel order,
 `loop: true`.
 
-**Sizes** (bytes; gzip −9; 2026-09-21). Budget held: **every file ≤ 64 KB gzipped** (a test fails the build of
+**Sizes** (bytes; gzip −9; 2026-09-21; the budget was raised to **256 KB** on 2026-09-24, when the area became every city and township a DDOT or SMART bus reaches and SMART's network came in whole: `smart_routes.net.json` is 71 KB, `smart_stops.json` 65 KB — DECISIONS 2026-09-24). Budget at the time: **every file ≤ 64 KB gzipped** (a test fails the build of
 the data otherwise), lazy per layer, and **`standard` pays nothing**.
 
 | file | raw | gz | note |
@@ -814,7 +814,7 @@ Contrast, computed from the tokens in `apps/web/src/style.css` (floor 3.00; the 
 |---|---|---|---|---|
 | boundary / `--map-land` | 5.70 | 5.77 | 9.32 | 9.84 |
 | boundary / `--map-park` | 4.36 | 4.20 | 7.68 | 7.58 |
-| boundary / `--map-out` (the hatched ground outside the four cities, which a city outline runs along) | 4.88 | 6.75 | 7.92 | 11.14 |
+| boundary / `--map-out` (the hatched ground outside the service area, which a place's outline runs along) | 4.88 | 6.75 | 7.92 | 11.14 |
 
 For scale: a main road is 4.91 against the land in the light theme and a side street 4.01. The boundary now sits
 just above the main road — which is the point. The first values (`#8d6a9a` / `#9f83b1`, land 4.26 / 5.13) cleared

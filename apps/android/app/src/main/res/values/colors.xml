@@ -31,7 +31,7 @@
     <!-- A neighbourhood or city boundary (docs/MAP-STYLE.md section 15.2). Deliberately NOT a street colour:
          map_road, map_main and map_fwy are all within a step of each other in grey-green, and an administrative
          edge that wears one of them is not a boundary, it is a road. The plum clears 3:1 against the land, a park
-         and the ground outside the four cities in both themes. The `_more` value is for a phone asking for more
+         and the ground outside the service area in both themes. The `_more` value is for a phone asking for more
          contrast (MapPalette.highContrast). -->
     <color name="map_bnd">#7A5588</color>
     <color name="map_bnd_more">#5A3A6B</color>

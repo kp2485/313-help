@@ -59,7 +59,7 @@ enum MapPainter {
         let mpp = cam.metersPerPoint
         let view = cam.visible
 
-        // The ground. Outside the four cities is a TEXTURE, not a shade: two pale fills a step apart (1.20:1) were
+        // The ground. Outside the service area is a TEXTURE, not a shade: two pale fills a step apart (1.20:1) were
         // not a difference anyone could see, so the area is sparse diagonal hatching whose own lines clear 3:1
         // against both fills (as the web; DECISIONS 2026-09-20). The city edge is a drawn line as well.
         ctx.fill(Path(CGRect(origin: .zero, size: size)), with: .color(s.base == nil ? MapColor.land : MapColor.outside))

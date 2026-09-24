@@ -64,7 +64,9 @@ export async function build(opts: BuildOptions = {}) {
 
   // 2. Validate
   const issues = [...idIssues, validateRows(rows, todayStr, scriptRefusingHosts(readScriptRefusingHosts())), validateAlerts(alerts, new Set(rows.map((r) => r.id)))];
-  const emg = validateEmergency(emergency, todayStr, !!opts.release);
+  const regionFile = p('data/ingested/region.json');
+  const placeIds = existsSync(regionFile) ? new Set((JSON.parse(readFileSync(regionFile, 'utf8')).municipalities as { id: string }[]).map((m) => m.id)) : undefined;
+  const emg = validateEmergency(emergency, todayStr, !!opts.release, placeIds);
   issues.push(emg);
   const services = toHsds(parts);
   // The published HSDS copy gets the domestic-violence rule checked on its own terms, not inherited from the rows.
@@ -187,7 +189,7 @@ export async function build(opts: BuildOptions = {}) {
   if (existsSync(zipsFile)) put('places/zips.json', JSON.parse(readFileSync(zipsFile, 'utf8')));
   put('alerts.json', alerts.filter((a) => a.status === 'published' && Date.parse(a.ends_at) > now.getTime()));
   put('emergency.json', emergency.sort((a, b) => Number(a.sort) - Number(b.sort))
-    .map((r) => ({ id: r.id, label: r.label, number: r.number, ...(r.sms ? { sms: r.sms } : {}), hardcoded: r.hardcoded === 'yes' })));
+    .map((r) => ({ id: r.id, label: r.label, number: r.number, ...(r.sms ? { sms: r.sms } : {}), hardcoded: r.hardcoded === 'yes', ...(r.area ? { area: r.area } : {}) })));
 
   // Retiring the directory is a person's decision, committed to git (docs/OPERATIONS "How to retire the directory").
   const directoryFile = p('data/seed/directory.json');

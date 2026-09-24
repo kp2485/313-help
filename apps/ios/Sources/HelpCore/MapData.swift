@@ -116,11 +116,15 @@ public struct BaseMap: Equatable, Sendable {
     public var roads: [MapLine]          // the big roads, at every zoom
     public var cells: [MapCell]          // the small streets, by square
     public var parks: [MapArea]
-    public var boundary: [[Double]]      // the four cities' outlines, one flat x, y run per ring
+    public var boundary: [[Double]]      // the service area's outline, one flat x, y run per ring
     /// The day the City last edited the road layer. Shown under the map; never frozen at build time.
     public var edited: String
-    public init(roads: [MapLine], cells: [MapCell], parks: [MapArea], boundary: [[Double]], edited: String) {
+    /// SEMCOG's required notice (`source.semcog_notice`), when the map draws SEMCOG's park outlines: shown under the
+    /// map beside the source line, in English and in SEMCOG's own words, never translated. Nil in an older bundle.
+    public var notice: String?
+    public init(roads: [MapLine], cells: [MapCell], parks: [MapArea], boundary: [[Double]], edited: String, notice: String? = nil) {
         self.roads = roads; self.cells = cells; self.parks = parks; self.boundary = boundary; self.edited = edited
+        self.notice = notice
     }
 }
 
@@ -183,7 +187,8 @@ public enum MapFileDecoder {
         struct Source: Decodable {
             struct Edited: Decodable { var roads: String }
             var lastEdited: Edited
-            enum CodingKeys: String, CodingKey { case lastEdited = "last_edited" }
+            var semcogNotice: String?
+            enum CodingKeys: String, CodingKey { case lastEdited = "last_edited", semcogNotice = "semcog_notice" }
         }
         var source: Source
         var origin: [Double]
@@ -231,7 +236,8 @@ public enum MapFileDecoder {
             cells: cells,
             parks: b.parks.map { MapArea(name: name($0.name, b.parkNames), points: polyline($0.enc, origin: b.origin)) },
             boundary: b.boundary.map { polyline($0, origin: b.origin) },
-            edited: b.source.lastEdited.roads)
+            edited: b.source.lastEdited.roads,
+            notice: b.source.semcogNotice.flatMap { $0.isEmpty ? nil : $0 })
     }
 
     /// One transport layer (`map/transit/ddot_routes.json` and the rest).
@@ -274,13 +280,17 @@ public struct MapCamera: Equatable, Sendable {
         self.centerX = centerX; self.centerY = centerY; self.scale = scale; self.width = width; self.height = height
     }
 
-    /// 90 m per point zoomed out (the whole city on a phone), 0.6 m per point zoomed in (one doorway). The same
-    /// two limits the web map uses, so neither app can be zoomed somewhere the other cannot follow.
-    public static let minScale = MapProjection.metersPerUnit / 90
+    /// 180 m per point zoomed out, 0.6 m per point zoomed in (one doorway). The same two limits the web map uses
+    /// (`S_MIN`, `S_MAX` in apps/web/src/map.ts), so neither app can be zoomed somewhere the other cannot follow.
+    /// It was 90 until 2026-09-24, when the area became every city and township a DDOT or SMART bus stops in: 72 by
+    /// 69 km, which a phone held upright shows whole only at about 180 m per point.
+    public static let minScale = MapProjection.metersPerUnit / 180
     public static let maxScale = MapProjection.metersPerUnit / 0.6
-    /// Detroit and its neighbours sit well inside this; it stops a flung finger from losing the city entirely.
-    public static let panLimitX = 0.25
-    public static let panLimitY = 0.2
+    /// How far the middle may go, in map units round the projection's origin: the service area's box (lon
+    /// -83.57..-82.70 is x -0.35..0.30; lat 42.11..42.80 is y -0.45..0.24), and a little over. It stops a flung
+    /// finger from losing the area entirely. 0.25 / 0.2 while the area was four cities (`PAN_X`, `PAN_Y` on the web).
+    public static let panLimitX = 0.4
+    public static let panLimitY = 0.5
 
     public var metersPerPoint: Double { MapProjection.metersPerUnit / scale }
     public func screenX(_ x: Double) -> Double { (x - centerX) * scale + width / 2 }

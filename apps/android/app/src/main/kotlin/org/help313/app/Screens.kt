@@ -636,8 +636,10 @@ object Screens {
     // ---- Urgent help ---------------------------------------------------------------------------------------
 
     /**
-     * Reachable from every screen. 911 and 988 are hardcoded and are always first; everything below them comes
-     * from the signed bundle's emergency.json, in the order a steward published (docs/05).
+     * Reachable from every screen. 911 and 988 are hardcoded and are always first; the hotlines below them are the
+     * fixed list [URGENT_IDS] (the web's own), each read from the signed bundle's emergency.json (docs/05). Never
+     * every row of that file: since 2026-09-24 it carries a police line for every place a bus reaches, and those
+     * belong on that place's page ([placeNumbers]), not here.
      */
     fun urgent(a: MainActivity): View {
         val col = UI.column(a, 16)
@@ -652,9 +654,10 @@ object Screens {
         card.addView(UI.text(a, L.t("urgent.od_sub"), 16f, R.color.muted, topDp = 2))
         col.addView(card)
 
-        for (e in a.store.bundle?.emergency.orEmpty()) {
-            if (e.id == "emg_911" || e.id == "emg_988") continue
-            col.addView(UI.callButton(a, e.label, e.number) { a.dial(e.number) })
+        for (id in URGENT_IDS) {
+            if (HARDCODED.containsKey(id)) continue                  // 911 and 988, already at the top
+            val e = a.emergency(id) ?: continue                       // a number this bundle does not carry
+            col.addView(UI.callButton(a, e.first, e.second) { a.dial(e.second) })
         }
 
         // The last row on the sheet, under every number: docs/05's ordering does not move (DECISIONS 2026-09-22).

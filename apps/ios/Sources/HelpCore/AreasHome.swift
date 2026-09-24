@@ -14,7 +14,7 @@ import Foundation
 // MARK: - what the tab lands on
 
 /// What the Areas tab lands on. Three cases and no fourth — and `outside` covers both ways a person can be
-/// outside: a fix that came back beyond the four cities, and a fix inside the bounding box that no outline
+/// outside: a fix that came back beyond the service area, and a fix inside the bounding box that no outline
 /// holds. Both get the same plain sentence, because both are the same fact: we have nothing to say about that
 /// spot. Nothing is ever given to the nearest outline instead.
 public enum AreasLanding: String, Equatable, Sendable {
@@ -22,7 +22,7 @@ public enum AreasLanding: String, Equatable, Sendable {
     case area
     /// Nobody has said where they are: the location card (location → cross street → ZIP).
     case ask
-    /// A fix came back from outside the four cities, or from a spot no outline holds: the plain message.
+    /// A fix came back from outside the service area, or from a spot no outline holds: the plain message.
     case outside
 }
 

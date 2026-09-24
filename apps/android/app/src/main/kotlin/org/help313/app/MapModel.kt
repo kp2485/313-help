@@ -144,9 +144,6 @@ object MapModel {
         private set
     private var everMoved = false
 
-    /** The four corners of the service area (CLAUDE.md: Detroit, Hamtramck, Highland Park and Dearborn). */
-    private val cityCorners = listOf(LatLon(42.255, -83.29), LatLon(42.45, -82.91))
-
     // -- what has arrived
     @Volatile var base: BaseMap? = null; private set
     @Volatile var baseFailed = false; private set
@@ -281,13 +278,14 @@ object MapModel {
     }
 
     /**
-     * The whole area, one tap away: the reset button still shows all four cities, whatever the map opened at
+     * The whole area, one tap away: the reset button shows the whole service area ([REGION_CORNERS]: every city
+     * and township a DDOT or SMART bus stops in, since 2026-09-24), whatever the map opened at
      * (DECISIONS 2026-09-22). It counts as a move now — before, `everMoved = false` meant the next layout refit
      * the region, which since 2026-09-22 would instead throw the person back to the anchor they just left.
      */
     fun reset() {
         everMoved = true
-        camera = MapCamera.fitting(cityCorners, camera.width, camera.height, cover = true)
+        camera = MapCamera.fitting(REGION_CORNERS, camera.width, camera.height, cover = true)
     }
 
     /**

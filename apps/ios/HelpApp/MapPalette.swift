@@ -2,7 +2,7 @@
 // (apps/web/src/style.css `--map-*`, `--gw-*`, `--lyr-*`) in all four of their values — light, dark, and each
 // with Increase Contrast, the web's `prefers-contrast: more` — and the numbers live in HelpCore
 // (`StandardPalette`), where `swift test` holds them to the web's file token for token and to 3:1 for every pair
-// a frame puts side by side: every street against the land AND a park, the hatch outside the four cities against
+// a frame puts side by side: every street against the land AND a park, the hatch outside the service area against
 // both grounds, every line against its casing (docs/ACCESSIBILITY-AUDIT-2026-09-20, WCAG 1.4.11).
 //
 // Colour never carries a meaning on its own anywhere on this map: a greenway phase also has its own dash pattern
@@ -38,7 +38,7 @@ private func mapToken(_ t: MapToken) -> Color {
 
 enum MapColor {
     // The ground
-    static let outside = mapToken(.out)                     // beyond the four cities, under the hatch
+    static let outside = mapToken(.out)                     // beyond the service area, under the hatch
     static let outsideInk = mapToken(.outInk)               // the hatch itself: 3:1 against both grounds
     static let land = mapToken(.land)
     static let park = mapToken(.park)

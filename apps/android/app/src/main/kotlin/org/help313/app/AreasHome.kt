@@ -25,13 +25,13 @@ enum class AreasLanding {
     /** Nobody has said where they are: the location card, over the anchor view. */
     ASK,
 
-    /** A fix came back from outside the four cities, or from a spot no outline holds: the plain message. */
+    /** A fix came back from outside the service area, or from a spot no outline holds: the plain message. */
     OUTSIDE,
 }
 
 /**
  * The landing, from what the device already knows. Three cases and no fourth — and "outside" covers both ways a
- * person can be outside: a fix that came back beyond the four cities, and a fix inside the bounding box that no
+ * person can be outside: a fix that came back beyond the service area, and a fix inside the bounding box that no
  * outline holds. Both get the same plain sentence, because both are the same fact: we have nothing to say about
  * that spot. Nothing is ever given to the nearest outline instead ([areaAt] says the same, at the point).
  */

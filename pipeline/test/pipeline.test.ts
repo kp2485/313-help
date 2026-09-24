@@ -2,11 +2,11 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { badge, miles as milesBetween, openNow, rank, SERVICE_AREAS, SERVICE_AREA_IDS, type BundleRow } from '@313help/query';
+import { badge, inServiceArea, miles as milesBetween, openNow, rank, SERVICE_AREAS, SERVICE_AREA_IDS, type BundleRow } from '@313help/query';
 import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
-import { p, parsePhone, sha256, today, uuid5, type CsvRow } from '../src/util.js';
+import { p, parsePhone, readCsv, sha256, today, uuid5, type CsvRow } from '../src/util.js';
 import { KNOWN_CATEGORIES, PRIVATE_NOT_YET_ON_CLIENTS, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsdsPrivacy, validateRows } from '../src/validate.js';
 import { readScriptRefusingHosts } from '../src/seed-io.js';
 import { applyAggregates } from '../src/reports-sync.js';
@@ -47,15 +47,19 @@ describe('the service-area table is the same in all three languages', () => {
     expect(areasOf('apps/ios/Sources/DetroitQuery/Areas.swift', /^ {4}"(\w+)": ServiceArea\(point: (?:LatLon\(lat: (-?[\d.]+), lon: (-?[\d.]+)\)|nil)/gm)).toEqual(ts);
     expect(areasOf('apps/android/query/src/main/kotlin/org/help313/query/Areas.kt', /^ {4}"(\w+)" to ServiceArea\((?:LatLon\((-?[\d.]+), (-?[\d.]+)\)|null)/gm)).toEqual(ts);
   });
-  it('every reference point is a public place in or around Wayne County, never a shelter', () => {
+  it('every reference point is a public place inside the service area, never a shelter', () => {
     for (const [id, pt] of Object.entries(ts)) {
       if (pt === 'none') { expect(SERVICE_AREAS[id]!.wide, id).toBe(true); continue; }
       const [lat, lon] = pt.split(',').map(Number) as [number, number];
-      expect(lat, id).toBeGreaterThan(42.0); expect(lat, id).toBeLessThan(42.5);
-      expect(lon, id).toBeLessThan(-82.8); expect(lon, id).toBeGreaterThan(-83.6);
-      // Nowhere near any shelter in the seed: a reference point is a city hall, not a place we list.
-      expect(SERVICE_AREAS[id]!.reference, id).toMatch(/City Hall|Administrative Center|geographic centre/);
+      expect(inServiceArea(lat, lon), id).toBe(true);
+      // Nowhere near any shelter in the seed: a reference point is a city hall, or for a county the Census
+      // Bureau's own published internal point (2026-09-24), never a place we list.
+      expect(SERVICE_AREAS[id]!.reference, id).toMatch(/City Hall|Administrative Center|the US Census Bureau's internal point for [\w .]+$/);
     }
+    // The three counties sit exactly on the Bureau's published points (TIGERweb State_County, INTPTLAT/INTPTLON).
+    expect(SERVICE_AREAS.wayne_county!.point).toEqual({ lat: 42.2847, lon: -83.262 });
+    expect(SERVICE_AREAS.oakland_county!.point).toEqual({ lat: 42.6605, lon: -83.3842 });
+    expect(SERVICE_AREAS.macomb_county!.point).toEqual({ lat: 42.6716, lon: -82.9115 });
   });
 });
 
@@ -95,8 +99,12 @@ describe('row validation', () => {
     });
     it('a row with no phone is refused: a DV row publishes on its phone alone', () =>
       expect(dv({ phones: [] })).toMatch(/publishes on its phone alone/));
-    it('service_area is for DV rows only', () =>
-      expect(errs({ category: 'food.pantry', service_area: 'detroit' })).toMatch(/domestic violence rows only/));
+    it('any row may name its area, but only while it has no coordinate (2026-09-24)', () => {
+      expect(errs({ category: 'transport', service_area: 'royal_oak', lat: undefined, lon: undefined })).toBe('');
+      expect(errs({ category: 'food.meal', service_area: 'macomb_county', lat: undefined, lon: undefined })).toBe('');
+      expect(errs({ category: 'food.pantry', service_area: 'detroit', lat: 42.33, lon: -83.05 })).toMatch(/only for a row with no coordinate/);
+      expect(errs({ category: 'transport', service_area: 'gotham', lat: undefined, lon: undefined })).toMatch(/unknown service_area/);
+    });
   });
   it('the HSDS export is checked on its own terms, not inherited from the rows', () => {
     const virt = { x_detroit: { category: 'shelter.dv' }, service_at_locations: [{ x_detroit: { id: 'sal_dv' }, location: { location_type: 'virtual' } }] };
@@ -115,7 +123,13 @@ describe('row validation', () => {
     expect(errs({ category: 'shelter.emergency', website: 'https://shelter.org', facts: src('https://example.org/') })).toBe('');   // intake phone only
     expect(errs({ category: 'shelter.cooling', address: addr })).toBe('');   // a public building, not a shelter
   });
-  it('rejects coordinates outside the service area', () => expect(errs({ lat: 42.6, lon: -83.05 })).toMatch(/outside the service area/));
+  it('rejects coordinates outside the service area', () => {
+    expect(errs({ lat: 42.28, lon: -83.74 })).toMatch(/outside the service area/);      // Ann Arbor
+    expect(errs({ lat: 42.98, lon: -83.05 })).toMatch(/outside the service area/);      // north of Chesterfield
+  });
+  it('accepts places anywhere a DDOT or SMART bus stops (Kyle, 2026-09-24)', () => {
+    for (const [lat, lon] of [[42.6389, -83.2910], [42.4895, -83.0147], [42.1398, -83.1785], [42.5286, -83.4851]]) expect(errs({ lat, lon }), `${lat},${lon}`).toBe('');   // Pontiac, Warren, Trenton, Walled Lake
+  });
   it('accepts places in Dearborn, Hamtramck and Highland Park (Kyle, 2026-09-19)', () => {
     for (const [lat, lon] of [[42.322, -83.176], [42.33, -83.312], [42.395, -83.049], [42.405, -83.097]]) expect(errs({ lat, lon }), `${lat},${lon}`).toBe('');
   });
@@ -237,6 +251,20 @@ describe('emergency numbers', () => {
   it('911 and 988 must be present, exact, and hardcoded', () => {
     expect(validateEmergency([base[0]!], '2026-09-18', false).errors.join()).toMatch(/emg_988 is missing/);
     expect(validateEmergency([{ ...base[0]!, number: '313-555-0100' }, base[1]!], '2026-09-18', false).errors.join()).toMatch(/must be 911/);
+  });
+  it('a row scoped to one place names a place in the area, and 911 and 988 are never scoped', () => {
+    const places = new Set(['city_warren']);
+    const police = { id: 'emg_police_warren', number: '586-574-4700', hardcoded: 'no', verified_published_on: '2026-09-15', area: 'city_warren' };
+    expect(validateEmergency([...base, police], '2026-09-18', true, places).errors).toEqual([]);
+    expect(validateEmergency([...base, { ...police, area: 'city_nowhere' }], '2026-09-18', true, places).errors.join()).toMatch(/not a place/);
+    expect(validateEmergency([{ ...base[0]!, area: 'city_warren' }, base[1]!], '2026-09-18', true, places).errors.join()).toMatch(/carry no area/);
+  });
+  it('the committed emergency file: every scoped row names a place, and every place row is a police line', () => {
+    const region = JSON.parse(readFileSync(p('data/ingested/region.json'), 'utf8')) as { municipalities: { id: string }[] };
+    const rows = readCsv(p('data/seed/emergency.csv'));
+    const ids = new Set(region.municipalities.map((m) => m.id));
+    expect(validateEmergency(rows, '2026-09-24', false, ids).errors).toEqual([]);
+    for (const r of rows.filter((x) => x.area)) expect(r.id).toBe(`emg_police_${r.area!.slice('city_'.length)}`);
   });
 });
 
@@ -390,6 +418,14 @@ describe('does the page still show this listing (one strict matcher)', () => {
   it('a street named for a saint counts: "5900 St. Lawrence"', () => {
     expect(addressOnPage('<p>5900 St. Lawrence, Detroit</p>', '5900 St. Lawrence St')).toBe(true);
     expect(addressOnPage('<p>12 Saint Aubin</p>', '12 St Aubin St')).toBe(true);
+    // (phones, not addresses; kept beside the address cases because the same pages taught both)
+    expect(phoneOnPage('<p>Public Safety 313 / 881-5500</p>', '313-881-5500')).toBe(true);
+    expect(phoneOnPage('<p>Book a ride: ( 248)246-3914</p>', '248-246-3914')).toBe(true);
+    expect(phoneOnPage('<p>Due 10/12/2024 at 3:00</p>', '101-220-2430')).toBe(false);
+    // A French elision in the street name, curly or straight, on either side (Harrison Township's library).
+    expect(addressOnPage('<p>38255 L’Anse Creuse St, Harrison Township</p>', "38255 L'Anse Creuse St")).toBe(true);
+    expect(addressOnPage("<p>38255 L'Anse Creuse</p>", '38255 L’Anse Creuse St')).toBe(true);
+    expect(addressOnPage('<p>38255 Jefferson Ave</p>', '38255 L’Anse Creuse St')).toBe(false);
   });
   const page = `<html><head><script>var tracking = "3135550100";</script><style>.x{}</style></head><body>
     <h1>St. Moses Pantry</h1><p>Call (313) 555-0100 or 313.555.0199. Toll free 1-800-866-THAW.</p>
@@ -661,18 +697,20 @@ describe('ZIP center points', () => {
       { attributes: { zipcode: '48202' } },
     ])).toEqual({ '48201': [42.347, -83.06], '48236': [42.425, -82.9] });
   });
-  it('Hamtramck, Highland Park and Dearborn ZIPs come from the Census layer only when the City\'s layer lacks them', () => {
+  it('ZIPs outside Detroit come from the Census layer, by where the Bureau puts each one, only when the City\'s layer lacks them', () => {
     const census = [
       { attributes: { ZCTA5: '48124', INTPTLAT: '+42.2980362', INTPTLON: '-083.2476095' } },
       { attributes: { ZCTA5: '48126', INTPTLAT: '+42.3303262', INTPTLON: '-083.1871333' } },   // the City has it: City wins
-      { attributes: { ZCTA5: '48301', INTPTLAT: '+42.54', INTPTLON: '-083.28' } },             // Bloomfield Hills: not wanted
+      { attributes: { ZCTA5: '48301', INTPTLAT: '+42.54', INTPTLON: '-083.28' } },             // Bloomfield Hills: in the area since 2026-09-24
+      { attributes: { ZCTA5: '48187', INTPTLAT: '+42.3309', INTPTLON: '-083.4938' } },         // Canton: in the box, SMART does not serve it
     ];
-    expect(addNeighborZips({ '48126': [42.33, -83.18] }, census)).toEqual({ '48124': [42.298, -83.248], '48126': [42.33, -83.18] });
+    expect(addNeighborZips({ '48126': [42.33, -83.18] }, census)).toEqual({ '48124': [42.298, -83.248], '48126': [42.33, -83.18], '48301': [42.54, -83.28] });
   });
   it('the committed file covers the city, corner to corner', () => {
     const { zips } = JSON.parse(readFileSync(p('data/ingested/city_zips.json'), 'utf8')) as { zips: Record<string, [number, number]> };
-    expect(Object.keys(zips).length).toBeGreaterThanOrEqual(25);
+    expect(Object.keys(zips).length).toBeGreaterThanOrEqual(120);
     for (const z of ['48201', '48209', '48219', '48224', '48238']) expect(zips[z], z).toBeDefined();
+    for (const z of ['48341', '48091', '48183', '48084']) expect(zips[z], `${z} (Pontiac, Warren, Trenton, Troy)`).toBeDefined();
     for (const z of ['48203', '48212', '48120', '48124', '48126', '48128']) expect(zips[z], `${z} (Highland Park, Hamtramck, Dearborn)`).toBeDefined();
   });
 });

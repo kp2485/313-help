@@ -16,6 +16,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { dirname } from 'node:path';
 import { safetyByte, type Segment } from '@313help/query';
 import { p, today } from './util.js';
+import { regionPlaces, type Place } from './region.js';
 
 const ORG = 'https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services';
 const ROADS = `${ORG}/City_of_Detroit_Roads/FeatureServer/0`;
@@ -258,15 +259,21 @@ const linesOf = (g: any): Pt[][] => (!g ? [] : g.type === 'LineString' ? [g.coor
 const ringsOf = (g: any): Pt[][] => (!g ? [] : g.type === 'Polygon' ? g.coordinates : g.type === 'MultiPolygon' ? g.coordinates.flat() : []);
 const compact = (path: string, data: unknown) => { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, JSON.stringify(data) + '\n'); };
 
-// ---- the neighbor cities (Kyle, 2026-09-19) -------------------------------------
-// Hamtramck, Highland Park and Dearborn are in the service area, and the City's layers stop at Detroit. Their streets
-// and all four city outlines come from the Census Bureau's TIGER data (public domain). The four outlines come from
-// one source so their shared borders line up exactly: no seams, and Hamtramck and Highland Park fill the hole in
-// Detroit's outline instead of reading as water.
+// ---- the rest of the service area (Kyle, 2026-09-19; widened 2026-09-24) -----------------------------------
+// The City's layers stop at Detroit. Every other city and township in the area (data/ingested/region.json,
+// `pnpm ingest:region`: wherever a DDOT or SMART bus stops) gets its streets from the Census Bureau's TIGER data
+// (public domain) and its park outlines from SEMCOG. All the outlines come from ONE source — the TIGER county
+// subdivisions region.json carries — so shared borders line up exactly: no seams, and Hamtramck and Highland
+// Park fill the hole in Detroit's outline instead of reading as water.
 const TIGER = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb';
-const TIGER_PLACES = `${TIGER}/Places_CouSub_ConCity_SubMCD/MapServer/4`;
 const TIGER_ROADS = [`${TIGER}/Transportation/MapServer/2`, `${TIGER}/Transportation/MapServer/6`, `${TIGER}/Transportation/MapServer/8`];
-export const NEIGHBOR_CITIES = ['Hamtramck', 'Highland Park', 'Dearborn'];
+export const SEMCOG_PARKS = 'https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/park_poly_2023_view/FeatureServer/0';
+/** TIGER roads are asked for one tile at a time, so no single answer is huge; a line in two tiles comes back twice
+ *  and `pickNames` keeps one, because it groups by geometry. */
+export const TIGER_TILE_DEG = 0.1;
+/** SEMCOG's own required notice (its Copyright License Agreement; ingest-crashes.ts and the city pages use this same
+ *  definition), shown in English beside the map's source line, since SEMCOG's park outlines are drawn there. */
+export const SEMCOG_NOTICE = (year: string) => `Copyright © ${year} SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.`;
 
 /** TIGER's road codes to ours: limited-access 0, other main roads 1, local streets 4. Ramps, alleys, paths: none. */
 export function tigerClass(mtfcc: unknown): number | null {
@@ -297,12 +304,21 @@ export function insideRings(pt: Pt, rings: Pt[][]): boolean {
  * stops dead at the city line (0 Woodward vertices inside Highland Park) and TIGER's piece was being dropped.
  * Clipping instead of dropping gives one authority on each side of the line and no gap between them.
  */
+const boxOf = (pts: Pt[]): readonly [number, number, number, number] => {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [x, y] of pts) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  return [x0, y0, x1, y1];
+};
+/** A ring's box, worked out once: with 73 places' rings and a quarter of a million streets, recomputing it for
+ *  every line is billions of comparisons. */
+const ringBoxes = new WeakMap<Pt[], readonly [number, number, number, number]>();
+const ringBox = (r: Pt[]) => ringBoxes.get(r) ?? (ringBoxes.set(r, boxOf(r)), ringBoxes.get(r)!);
+
 export function clipToRings(line: Pt[], rings: Pt[][], keepInside: boolean): Pt[][] {
   // Most of Detroit is nowhere near these three outlines, so a line whose box misses every ring's box needs no
   // work at all: it is wholly outside, and that answer is exact.
-  const box = (pts: Pt[]) => [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))] as const;
-  const lb = box(line);
-  const near = rings.filter((r) => { const rb = box(r); return rb[0] <= lb[2] && rb[2] >= lb[0] && rb[1] <= lb[3] && rb[3] >= lb[1]; });
+  const lb = boxOf(line);
+  const near = rings.filter((r) => { const rb = ringBox(r); return rb[0] <= lb[2] && rb[2] >= lb[0] && rb[1] <= lb[3] && rb[3] >= lb[1]; });
   if (!near.length) return keepInside ? [] : [line];
   const out: Pt[][] = [];
   let run: Pt[] = [];
@@ -368,31 +384,61 @@ async function tigerQuery(layer: string, where: string, extra = ''): Promise<any
   }
 }
 
-/** The four city outlines, and every named street with any part in Hamtramck, Highland Park or Dearborn. */
-async function neighbors(cityNames: Set<string>): Promise<{ outlines: Pt[][]; rings: Pt[][]; roads: Road[] }> {
-  const names = ['Detroit', ...NEIGHBOR_CITIES].map((n) => `'${n}'`).join(',');
-  const places = await tigerQuery(TIGER_PLACES, `STATE='26' AND BASENAME IN (${names})`);
-  if (places.length !== 4) throw new Error(`basemap: expected 4 city outlines from TIGER, got ${places.length}. Not overwriting the last good files.`);
-  const outlines = places.flatMap((f) => ringsOf(f.geometry));
-  const near = places.filter((f) => NEIGHBOR_CITIES.includes(String(f.properties?.BASENAME)));
-  const nearRings = near.flatMap((f) => ringsOf(f.geometry));
-  const all = nearRings.flat(), env = { xmin: Math.min(...all.map((q) => q[0])), ymin: Math.min(...all.map((q) => q[1])), xmax: Math.max(...all.map((q) => q[0])), ymax: Math.max(...all.map((q) => q[1])), spatialReference: { wkid: 4326 } };
-  const box = `&geometry=${encodeURIComponent(JSON.stringify(env))}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects`;
+/** The tiles of TIGER_TILE_DEG that a set of rings' boxes touch, as ArcGIS envelopes, in a fixed order. */
+export function tilesFor(rings: Pt[][], deg = TIGER_TILE_DEG): { xmin: number; ymin: number; xmax: number; ymax: number }[] {
+  const keys = new Set<string>();
+  for (const r of rings) {
+    const xs = r.map((q) => q[0]), ys = r.map((q) => q[1]);
+    for (let i = Math.floor(Math.min(...xs) / deg); i <= Math.floor(Math.max(...xs) / deg); i++)
+      for (let j = Math.floor(Math.min(...ys) / deg); j <= Math.floor(Math.max(...ys) / deg); j++) keys.add(`${i},${j}`);
+  }
+  return [...keys].sort().map((k) => { const [i, j] = k.split(',').map(Number) as [number, number]; return { xmin: Number((i * deg).toFixed(6)), ymin: Number((j * deg).toFixed(6)), xmax: Number(((i + 1) * deg).toFixed(6)), ymax: Number(((j + 1) * deg).toFixed(6)) }; });
+}
+
+/** Every outline in the area, and every named street with any part in a place that is not Detroit. */
+async function neighbors(cityNames: Set<string>): Promise<{ outlines: Pt[][]; rings: Pt[][]; roads: Road[]; places: Place[] }> {
+  const places = regionPlaces();
+  if (!places.some((m) => m.id === 'city_detroit')) throw new Error('basemap: region.json has no Detroit. Not overwriting the last good files.');
+  const outlines = places.flatMap((m) => m.rings);
+  const nearRings = places.filter((m) => m.id !== 'city_detroit').flatMap((m) => m.rings);
   const raw: { line: Pt[]; name: string; cls: number }[] = [];
+  const tiles = tilesFor(nearRings);
   for (const layer of TIGER_ROADS) {
-    for (const f of await tigerQuery(layer, '1=1', box)) {
-      const cls = tigerClass(f.properties?.MTFCC), name = tigerName(f.properties?.NAME);
-      if (cls === null || (!name && cls !== 0)) continue;
-      for (const line of linesOf(f.geometry)) if (line.length > 1) raw.push({ cls, name, line });
+    for (const env of tiles) {
+      const box = `&geometry=${encodeURIComponent(JSON.stringify({ ...env, spatialReference: { wkid: 4326 } }))}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects`;
+      for (const f of await tigerQuery(layer, '1=1', box)) {
+        const cls = tigerClass(f.properties?.MTFCC), name = tigerName(f.properties?.NAME);
+        if (cls === null || (!name && cls !== 0)) continue;
+        for (const line of linesOf(f.geometry)) if (line.length > 1) raw.push({ cls, name, line });
+      }
+      await new Promise((r) => setTimeout(r, 300));
     }
   }
-  // One name per geometry first (TIGER sends each edge once per name), then cut each line at the city line and
-  // keep the part inside. A street that runs on into Detroit keeps the blocks that are in the neighbour city
-  // instead of being thrown away whole.
+  // One name per geometry first (TIGER sends each edge once per name, and a line in two tiles twice), then cut
+  // each line at the area's edge and keep the part inside. A street that runs on into Detroit keeps the blocks
+  // that are outside Detroit instead of being thrown away whole.
   const roads: Road[] = [];
   for (const r of pickNames(raw, cityNames)) for (const line of clipToRings(r.line, nearRings, true)) roads.push({ cls: r.cls, name: r.name, line });
-  if (roads.length < 1000) throw new Error(`basemap: only ${roads.length} neighbor-city streets parsed. Not overwriting the last good files.`);
-  return { outlines, rings: nearRings, roads };
+  if (roads.length < 1000 * places.length / 4) throw new Error(`basemap: only ${roads.length} streets parsed outside Detroit. Not overwriting the last good files.`);
+  return { outlines, rings: nearRings, roads, places };
+}
+
+/** SEMCOG's park outlines for every place in the area but Detroit (Detroit's own come from the City). */
+async function semcogParks(places: Place[]): Promise<{ name: string; ring: Pt[] }[]> {
+  const codes = places.filter((m) => m.id !== 'city_detroit').map((m) => m.semmcd);
+  const out: { name: string; ring: Pt[] }[] = [];
+  for (let i = 0; i < codes.length; i += 40) {
+    const where = `semmcd IN (${codes.slice(i, i + 40).join(',')})`;
+    for (let offset = 0; ; offset += 1000) {
+      const q = `${SEMCOG_PARKS}/query?where=${encodeURIComponent(where)}&outFields=OBJECTID,park_name&outSR=4326&geometryPrecision=6&resultOffset=${offset}&resultRecordCount=1000&orderByFields=OBJECTID&f=geojson`;
+      const fc = (await (await fetch(q, { headers: UA })).json()) as any;
+      if (fc.error) throw new Error(`${SEMCOG_PARKS}: ${JSON.stringify(fc.error)}`);
+      for (const f of fc.features ?? []) for (const ring of ringsOf(f.geometry).slice(0, 1)) out.push({ name: String(f.properties?.park_name ?? '').trim(), ring });
+      if ((fc.features ?? []).length < 1000) break;
+      await new Promise((r) => setTimeout(r, 300));
+    }
+  }
+  return out;
 }
 
 /**
@@ -423,8 +469,8 @@ async function main() {
   }
   if (city.length < 20000) throw new Error(`basemap: only ${city.length} roads parsed. Not overwriting the last good files.`);
   const near = await neighbors(new Set(city.map((r) => r.name).filter(Boolean)));
-  // One authority on each side of the city line: TIGER inside the three neighbour cities, the City of Detroit's
-  // own layer outside. The City's layer reaches about 0.95 km into Highland Park and a few metres into
+  // One authority on each side of the city line: TIGER in every other place in the area, the City of Detroit's
+  // own layer in Detroit. The City's layer reaches about 0.95 km into Highland Park and a few metres into
   // Hamtramck; clipping that away is what stops the same block being drawn, and labelled, twice.
   const roads: Road[] = [];
   for (const r of city) for (const line of clipToRings(r.line, near.rings, false)) roads.push({ ...r, line });
@@ -438,12 +484,19 @@ async function main() {
     const n = String(f.properties?.park_name ?? '').trim();
     return ringsOf(f.geometry).slice(0, 1).map((ring) => [n ? parkNames.push(n) - 1 : -1, encodeLine(simplify(ring, 3), origin)] as [number, number[]]);
   }).filter((x) => x[1].length >= 8);
+  // Park outlines outside Detroit are SEMCOG's (the SEMCOG Copyright License Agreement Kyle accepted on
+  // 2026-09-22; its notice is on the map's source line). Detroit keeps the City's own.
+  const outside = await semcogParks(near.places);
+  for (const pk of outside) {
+    const ring = encodeLine(simplify(pk.ring, 3), origin);
+    if (ring.length >= 8) parks.push([pk.name ? parkNames.push(pk.name) - 1 : -1, ring]);
+  }
   const big = packRoads(roads.filter((r) => r.cls <= 2), origin, 4);
-  // All four outlines from TIGER, simplified alike, so shared borders stay shared. (The City's boundary layer is
+  // Every outline from TIGER, simplified alike, so shared borders stay shared. (The City's boundary layer is
   // still read, to date it in source.json, but the drawn outline is TIGER's.)
   void cityFeats;
   const boundary = near.outlines.map((ring) => encodeLine(simplify(ring, 15), origin)).filter((r) => r.length >= 8);
-  const sources = { roads: await lastEdited(ROADS), parks: await lastEdited(PARKS), boundary: await lastEdited(BOUNDARY), neighbors: today() };
+  const sources = { roads: await lastEdited(ROADS), parks: await lastEdited(PARKS), boundary: await lastEdited(BOUNDARY), neighbors: today(), semcog_parks: await lastEdited(SEMCOG_PARKS) };
   compact(`${dir}/base.json`, { origin, names: big.names, roads: big.roads, ...(big.safety ? { safety: big.safety } : {}), park_names: parkNames, parks, boundary });
 
   const byCell = new Map<string, Road[]>();
@@ -464,9 +517,10 @@ async function main() {
   // `safety_fields` says which fields of the City's Roads layer the one byte per polyline was packed from, so a
   // reader of the file never has to guess. TIGER publishes none of them, so the three neighbour cities' streets
   // carry a byte of 0 — "this file told us nothing" — and the graph falls back to street class there.
-  compact(`${dir}/source.json`, { name: 'City of Detroit open data (Detroit roads and parks); US Census Bureau TIGER (city outlines; Hamtramck, Highland Park and Dearborn streets)', urls: { roads: ROADS, parks: PARKS, boundary: BOUNDARY, tiger_places: TIGER_PLACES, tiger_roads: TIGER_ROADS }, last_edited: sources, grid: GRID, scale: SCALE, safety_fields: [...SAFETY_FIELDS] });
+  // Every place outside Detroit is in the same position.
+  compact(`${dir}/source.json`, { name: 'City of Detroit open data (Detroit roads and parks); US Census Bureau TIGER (outlines; streets outside Detroit); SEMCOG (parks outside Detroit)', urls: { roads: ROADS, parks: PARKS, boundary: BOUNDARY, tiger_outlines: 'data/ingested/region.json', tiger_roads: TIGER_ROADS, semcog_parks: SEMCOG_PARKS }, last_edited: sources, grid: GRID, scale: SCALE, safety_fields: [...SAFETY_FIELDS], semcog_notice: SEMCOG_NOTICE(sources.semcog_parks.slice(0, 4)) });
   const withSafety = roads.filter((r) => (r.safety ?? 0) > 0).length;
-  console.log(`basemap: ${roads.length} road pieces -> ${big.roads.length} main-road lines in base.json, ${byCell.size} cells; ${parks.length} parks; crossings for ${Object.keys(cross).length} greenway segments; ${withSafety} pieces carry the City's safety fields; ${near.roads.length} pieces from TIGER inside the three neighbour cities, ${clipped >= 0 ? clipped : 0} City pieces net change from clipping at the city line`);
+  console.log(`basemap: ${roads.length} road pieces -> ${big.roads.length} main-road lines in base.json, ${byCell.size} cells; ${parks.length} parks; crossings for ${Object.keys(cross).length} greenway segments; ${withSafety} pieces carry the City's safety fields; ${near.roads.length} pieces from TIGER outside Detroit (${near.places.length - 1} places), ${outside.length} SEMCOG parks, ${clipped >= 0 ? clipped : 0} City pieces net change from clipping at the city line`);
 }
 
 if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/ingest-basemap.ts')) {

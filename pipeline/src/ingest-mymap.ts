@@ -20,6 +20,7 @@ import { existsSync } from 'node:fs';
 import { INGESTED_COLUMNS, loadSources, sharpDrop, type Source } from './ingest-arcgis.js';
 import { assertNoMovedIds, assignIds, NO_PRIOR, oneRowPerRecord, readPrior, recordKey, RETIRED_COLUMNS, retiredPath, retiredRows, type IdRequest, type PriorIds, type Retired } from './ingest-ids.js';
 import { p, readCsv, writeCsv, slug, inBbox, today, type CsvRow } from './util.js';
+import { placeAt } from './region.js';
 
 /** Same columns as an ArcGIS layer, plus the city this layer publishes for itself. */
 export const MYMAP_COLUMNS = [...INGESTED_COLUMNS.slice(0, 4), 'city', ...INGESTED_COLUMNS.slice(4)];
@@ -125,16 +126,18 @@ export function hoursText(access: string[]): string {
   return '';
 }
 
-export function toRows(src: Source, lastEdited: string | null, placemarks: Placemark[], fetchedAt: string, prior: PriorIds = NO_PRIOR): { rows: CsvRow[]; warnings: string[]; retired: Retired[] } {
+export function toRows(src: Source, lastEdited: string | null, placemarks: Placemark[], fetchedAt: string, prior: PriorIds = NO_PRIOR, inArea: (lat: number, lon: number) => boolean = (lat, lon) => placeAt(lat, lon) !== null): { rows: CsvRow[]; warnings: string[]; retired: Retired[] } {
   const warnings: string[] = [];
   const cities = new Set((src.cities ?? []).map((c) => c.toLowerCase()));
   const all: CsvRow[] = [];
   for (const pm of [...placemarks].sort((a, b) => `${a.city}|${a.name}`.localeCompare(`${b.city}|${b.name}`))) {
-    // The map covers the whole county. The service area is Detroit, Hamtramck, Highland Park and Dearborn, and the
-    // map states each station's city itself, so the city decides (Dearborn Heights is not Dearborn). The bbox is a
-    // second, independent sanity check on the coordinate the County publishes.
+    // The map covers the whole county. The service area is every city and township a DDOT or SMART bus stops in
+    // (2026-09-24), so the station's own coordinate decides, against the area's outlines: a station in Canton,
+    // which SMART does not serve, stays out. A source may still name `cities` to narrow that further. The bbox is
+    // a second, independent sanity check on the coordinate the County publishes.
     if (cities.size && !cities.has(pm.city.toLowerCase())) continue;
     if (!inBbox(pm.lat, pm.lon)) { warnings.push(`${src.id}: "${pm.name}" (${pm.city}) is at ${pm.lat},${pm.lon}, outside the service area; skipped`); continue; }
+    if (!inArea(pm.lat, pm.lon)) continue;
 
     const d = parseDetails(pm.description);
     // `extra` is a "; "-separated list of key=value, so a value's own semicolons become commas. Nothing else changes.

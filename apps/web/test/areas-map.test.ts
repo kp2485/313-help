@@ -17,8 +17,8 @@ const src = (name: string) => readFileSync(join(__dirname, '../src/' + name), 'u
 const main = src('main.ts');
 const css = src('style.css');
 const strings = JSON.parse(readFileSync(join(root, 'strings/en.json'), 'utf8')) as Record<string, string>;
-/** One unit of the world is one degree of latitude; `S_MIN` is 90 m per pixel, which is what pins it. */
-const M_PER_UNIT = S_MIN * 90;
+/** One unit of the world is one degree of latitude; `S_MIN` is 180 m per pixel (90 until 2026-09-24), which is what pins it. */
+const M_PER_UNIT = S_MIN * 180;
 const mpp = (s: number) => M_PER_UNIT / s;
 
 /** A rectangle of `w` by `h` degrees with its south-west corner at (lat, lon), as one ring. */
@@ -77,15 +77,18 @@ describe('the camera that frames one area (cameraForArea)', () => {
     expect(cam.s).toBeLessThanOrEqual(S_MAX);
   });
 
-  it('a whole city is not opened wider than the camera has ever allowed: 90 metres per pixel', () => {
-    // Detroit is about 0.2° tall and 0.4° wide; on a phone that is well past the map's own far limit.
-    const cam = cameraForArea(box(42.255, -83.288, 0.195, 0.377), phone)!;
-    expect(mpp(cam.s)).toBeCloseTo(90, 6);
+  it('the whole service area is not opened wider than the camera allows: 180 metres per pixel', () => {
+    // Every city and township a DDOT or SMART bus stops in or runs through is about 0.69° tall and 0.87° wide; on a phone that is
+    // past the map's own far limit.
+    const cam = cameraForArea(box(42.11, -83.57, 0.69, 0.87), phone)!;
+    expect(mpp(cam.s)).toBeCloseTo(180, 6);
     expect(cam.s).toBeCloseTo(S_MIN, 9);
     // A laptop's wider box gets closer, and is still inside the limits.
-    const big = cameraForArea(box(42.255, -83.288, 0.195, 0.377), laptop)!;
-    expect(mpp(big.s)).toBeLessThan(90);
+    const big = cameraForArea(box(42.11, -83.57, 0.69, 0.87), laptop)!;
+    expect(mpp(big.s)).toBeLessThan(180);
     expect(big.s).toBeGreaterThanOrEqual(S_MIN);
+    // Detroit alone now opens inside the limit on a phone.
+    expect(mpp(cameraForArea(box(42.255, -83.288, 0.195, 0.377), phone)!.s)).toBeLessThan(180);
   });
 
   it('an area the bundle carries no outline for moves nothing at all', () => {
@@ -118,9 +121,9 @@ describe('what the Areas tab lands on', () => {
   it('the map is never taken away: every case is still a map with something said over it', () => {
     // There is no fourth answer, and none of the three is "show a list instead".
     expect(new Set(CASES.map((c) => areasLanding(c.o)))).toEqual(new Set(['ask', 'area', 'outside']));
-    // Outside the four cities the map stays, and the ways in under it carry the sentence the app already uses.
+    // Outside the service area the map stays, and the ways in under it carry the sentence the app already uses.
     expect(main).toContain("${here ? '' : `<div class=\"areasask\">${locChip()}</div>`}");
-    expect(strings['map.locate_outside']).toContain('The map stays on the city.');
+    expect(strings['map.locate_outside']).toContain('The map stays where it is.');
   });
 });
 

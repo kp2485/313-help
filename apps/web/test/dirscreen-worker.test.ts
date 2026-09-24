@@ -33,7 +33,7 @@ const deps = () => ({
 const PLACE = { lat: 42.377, lon: -83.135, name: 'X' };
 
 const healthy = (m: ToWorker): FromWorker =>
-  m.type === 'build' ? { type: 'ready', id: m.id, nodes: 1, edges: 0, buildMs: 1, transit: false } : { type: 'plans', id: m.id, plans: [] };
+  m.type === 'build' ? { type: 'ready', id: m.id, transit: false } : { type: 'plans', id: m.id, plans: [] };
 
 describe('a Worker that fails is a failed screen with Try again, never a screen that waits for ever', () => {
   let m: typeof import('../src/dirscreen.js');

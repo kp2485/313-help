@@ -291,8 +291,8 @@ describe('what "your neighborhood" leaves behind: nothing', () => {
     const html = hoodIndex(indicators([hood('West Square', 1, [square(42.3, -83.12)])]), ui, { ...INDEX_OPTS, located: true, mine: null });
     expect(html).toContain(strings['hood.mine_outside']);
     expect(html).toContain(`data-go='{"v":"tab","tab":"map"}'`);
-    expect(strings['hood.only_detroit']).toMatch(/Hamtramck/);
-    expect(strings['hood.only_detroit']).toMatch(/Dearborn/);
+    expect(strings['hood.only_detroit']).toMatch(/205 neighborhoods/);
+    expect(strings['hood.only_detroit']).toMatch(/Every other city and town/);
   });
   it('a found neighborhood is one row to its own page, with the line that says where it came from', () => {
     const mine = hood('West Square', 1, [square(42.3, -83.12)]);

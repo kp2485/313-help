@@ -108,7 +108,8 @@ fun rank(rows: List<BundleRow>, q: Query, nowMillis: Long, alerts: List<Alert> =
             val dv = isDvCategory(row.category)
             val mi = if (!dv && near != null && row.lat != null && row.lon != null)
                 miles(near, LatLon(row.lat, row.lon)) else null
-            val bw = if (dv) dvBand(row, near) else bandOf(mi) to 0
+            // Since 2026-09-24 so does any row that names an area and has no coordinate (`servesByArea`).
+            val bw = if (servesByArea(row)) dvBand(row, near) else bandOf(mi) to 0
             val open = openNow(row, nowMillis, alerts)
             val key = if (q.mode == "week") openKeyWeek(row, open, nowMillis, alerts) else openKeyNow(open, today)
             Triple(Ranked(row, open, badge(row, nowMillis), mi, bw.first), key, bw.second)

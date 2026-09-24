@@ -2,7 +2,7 @@
 // navigation audit C1 and §3). The Swift half of `cityPage` and of the map half of `hoodIndex` in
 // apps/web/src/hoods.ts.
 //
-// Hamtramck, Highland Park and Dearborn publish nothing per neighborhood, so their page is the whole city. The
+// No city but Detroit publishes anything per neighborhood, so every other page is the whole city or township. The
 // rules the page keeps live in HelpCore/CityAreas.swift, where `swift test` runs them: a panel is drawn only
 // when this area's own allow-list names it, every panel prints its own source and its owner's own notice, and
 // `missing` is one plain sentence rather than a zero or an empty chart. No number from another city appears
@@ -77,9 +77,22 @@ struct CityPageView: View {
                         Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.muted)
                     }.card(padding: 14)
                 }.buttonStyle(.plain)
+            } else if cityIsOutlineOnly(area, isDetroit: isDetroit) {
+                // A place with nothing but the help panel (every city and township a bus reaches, 2026-09-24) says
+                // just that: it has no regional numbers to warn about, and nobody has checked what it publishes.
+                HoodFoot(L.t("city.outline_only", ["city": area.name]))
             } else {
                 HoodFoot(L.t("city.no_neighborhoods", ["city": area.name]))
                 HoodFoot(L.t("city.regional", ["city": area.name]))
+            }
+            // A city's own police line (emergency.json `area`, 2026-09-24): on this page and nowhere else, and only
+            // when the bundle has one for this place. Never 911 or 988, which belong to everyone.
+            let police = numbersForPlace(store.bundle?.emergency ?? [], placeId: area.id, area: \.area)
+            if !police.isEmpty {
+                HoodHead(L.t("city.police_head"))
+                Text(L.t("city.police_lede", ["city": area.name]))
+                    .font(.body).foregroundStyle(Color.ink).fixedSize(horizontal: false, vertical: true)
+                ForEach(police) { e in CallRow(label: e.label, number: e.number) }
             }
             // The allow-list, in its fixed order, and nothing else. A panel with no number is a bug the tests
             // catch, never a blank box on a person's screen.
@@ -370,7 +383,7 @@ struct PanelSource: View {
 /**
  The Areas tab's map (Kyle, 2026-09-22; DECISIONS 2026-09-22).
 
- It is the landing, and it fills the tab: the four city outlines and the 205 neighbourhood outlines, nothing else
+ It is the landing, and it fills the tab: the city and township outlines and Detroit's 205 neighbourhood outlines, nothing else
  on it — no dot, no listing, no number, and never a fill that carries a value. It opens ZOOMED TO the outline the
  phone has worked out a person is standing in (`MapCamera.forArea`, HelpCore), highlighted; an answer that lands
  after it has opened GLIDES to that outline, and simply arrives under Reduce Motion.
@@ -388,7 +401,7 @@ struct AreasMapView: View {
     /// A tap on an outline. On the landing it opens that area's page; in a strip it swaps the page underneath.
     let open: (String) -> Void
     /// The outline this map opens on, already decoded. Empty — an area the bundle carries no outline for, or
-    /// nobody has said where they are — and it opens on the four cities instead, which is where it always did.
+    /// nobody has said where they are — and it opens on the whole service area instead (`REGION` on the web).
     var openOn: [[LatLon]] = []
     /// The id of that outline. It is what tells this view an ANSWER has arrived: when it changes, the camera
     /// travels to the new outline rather than being rebuilt around it.
@@ -409,9 +422,6 @@ struct AreasMapView: View {
     @State private var sized = false
     @State private var lastDrag: CGSize = .zero
     @State private var lastPinch: CGFloat = 1
-
-    /// The four corners of the service area, as the Map tab uses them.
-    private let corners = [LatLon(lat: 42.255, lon: -83.29), LatLon(lat: 42.45, lon: -82.91)]
 
     private var shown: [AreaOutline] {
         areasDrawn(areas, view: camera.visible)
@@ -481,7 +491,7 @@ struct AreasMapView: View {
         if sized { camera = camera.resized(width: size.width, height: size.height).clamped(); return }
         sized = true
         camera = MapCamera.forArea(openOn, width: size.width, height: size.height)
-            ?? MapCamera.fitting(corners, width: size.width, height: size.height, cover: true)
+            ?? MapCamera.fitting(serviceRegionCorners, width: size.width, height: size.height, cover: true)
     }
 
     /// The camera travels to the outline an answer named. Nothing is stored and nothing is sent: a fix becomes a

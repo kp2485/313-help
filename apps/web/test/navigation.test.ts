@@ -198,8 +198,9 @@ describe.skipIf(!haveBundle)('the real streets of Detroit', () => {
     const out = resolveCrossing(map, 'Woodward Ave')!;
     expect(out.kind).toBe('street');
     if (out.kind !== 'street') return;
+    // Woodward runs from the river to Pontiac, so its middle is north of 8 Mile since the area widened (2026-09-24).
     expect(out.point.lat).toBeGreaterThan(42.3);
-    expect(out.point.lat).toBeLessThan(42.46);
+    expect(out.point.lat).toBeLessThan(42.8);
   });
 
   it('a street nobody has is said to be unknown, by name — never guessed at', () => {

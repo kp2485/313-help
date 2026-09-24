@@ -1,5 +1,5 @@
 import {
-  badge, bundleAge, effectiveNow, helpAlong, isDvCategory, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens, serviceAreaKey,
+  badge, bundleAge, effectiveNow, helpAlong, isDvCategory, matchTier, miles as milesBetween, nearestSegment, nextOccurrences, openNow, rank, search, searchTokens, serviceAreaKey, servesAreaKey, SERVICE_BBOX,
   type Alert, type BundleRow, type OpenResult, type Query, type Ranked, type Schedule, type Segment,
 } from '@313help/query';
 import { LANGS, currentLang, initLang, langPicker, locale, setLang, t, type Lang } from './i18n.js';
@@ -12,7 +12,7 @@ import { icon } from './icons.js';
 import { MapView, focusArea, focusRadius, loadLayer, loadMap, loadNet, loadedBase, type LayerData, type MapArea, type MapDot, type MapRoute, type MapSpec, type Overlay } from './map.js';
 import { LOCATE_RADIUS_M, firstOpenAction, locateAnswered, locateCardClick, locateCardHtml, locatePermission, openingView, positionOutcome, rememberLocateAnswered, requestPosition, type LocateAsk } from './locate.js';
 import { forgetCrossings, resolveCrossing, type CrossOutcome } from './intersections.js';
-import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, inCategories, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
+import { CATEGORIES, HARDCODED, MAP_GROUPS, NEEDS, TABS, URGENT_IDS, inCategories, isPrivate, isSensitive, mapDrawable, type Need, type TabId } from './needs.js';
 import { loadLayers, loadStyle, mapStyle, saveStyle, toggleLayer, type MapStyle } from './layers.js';
 import { LAYER_STYLE } from './layerstyle.js';
 import { mapKeyHtml, styleSwitchHtml } from './stylepanel.js';
@@ -330,10 +330,11 @@ const searchBtn = () => `<button class="searchbtn" ${go({ v: 'search' })}>${icon
 const rowLink = (view: View, ic: string, title: string, sub = '', own = false, subHtml = '') =>
   `<li><button class="row" ${go(view)}><span class="rowic">${icon(ic)}</span><span class="rowtx"><strong>${own ? owner(title) : esc(title)}</strong>${subHtml || sub ? `<small>${subHtml || esc(sub)}</small>` : ''}</span>${icon('chevron', 'sm turn dim')}</button></li>`;
 
-// A domestic-violence row's only statement about where it is: the coarse area it serves, in words. Never a
-// distance, never a dot, never "near you" — the row carries no place at all (docs/08, schema/query-spec.md).
+// The coarse area a row serves, in words, for a row described by its area (`servesByArea`): every domestic-violence
+// row, whose only statement about where it is this is (docs/08), and a phone-only local service or a row with no map
+// point (2026-09-24). Never a distance, never "near you".
 const areaPill = (row: BundleRow) => {
-  const key = isDvCategory(row.category) ? serviceAreaKey(row.service_area ?? '') : null;
+  const key = servesAreaKey(row);
   return key ? `<span class="pill plain">${T('safe.dv_serves', { area: t(key) })}</span>` : '';
 };
 function card(r: Ranked, showDistance = true): string {
@@ -668,7 +669,7 @@ function mapTab(): string {
   // On a phone this is one column, exactly as before (.maptop and .mapside are display:contents). On a laptop
   // the map sits beside the switcher and the list, and stays put while the list scrolls.
   return `<main class="wide"><h1 class="page" tabindex="-1">${T('tab.map')}</h1><p class="lede">${T('map.lede')}</p>
-    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), areas: layerOn('place:areas') ? mapAreas() : undefined, fit: CITY, cover: true, open: openingView(here) })}
+    <div class="maptop">${mapBox({ key: 'maptab', label: t('map.label_tab'), quiet: true, dots, overlays: over, style: styleOn(), subway: subwaySpec(), segments: layerOn('place:greenway'), parks: layerOn('place:parks'), areas: layerOn('place:areas') ? mapAreas() : undefined, fit: REGION, cover: true, open: openingView(here) })}
     <div class="mapside">${mapKey()}${locChip()}${layerSwitcher()}${layerList(rows, over)}</div></div>
     ${sources.length ? `<p class="foot">${T('map.sources')} ${sources.map(layerSource).join(' · ')}<br>${T('map.layer_filtered')}</p>` : ''}
     ${parks.length ? `<h2>${T('rec.title')}</h2>${nearParks.length ? `<ul class="rows">${nearParks.map(({ p, mi }) => parkRow(p, mi)).join('')}</ul>` : ''}
@@ -780,7 +781,7 @@ function eventsTab(): string {
 // below them. "Get somewhere safe now" (DECISIONS 2026-09-22) is a new row under all of it, never above any
 // number. Like the rest of this sheet it writes nothing to the URL, so it leaves no trace in history.
 function urgent(): string {
-  return `<main><p class="lede">${T('urgent.lede')}</p><div class="stackbtns">${['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_avalon', 'emg_211'].map(callButton).join('')}</div>
+  return `<main><p class="lede">${T('urgent.lede')}</p><div class="stackbtns">${URGENT_IDS.map(callButton).join('')}</div>
     <ul class="rows">${rowLink({ v: 'need', id: 'overdose_now' }, 'pulse', t('need.overdose_now'), t('urgent.od_sub'))}${rowLink({ v: 'need', id: 'safe_now' }, 'shield', t('need.safe_now'), t('urgent.safe_sub'))}</ul></main>`;
 }
 function need(view: Extract<View, { v: 'need' }>): string {
@@ -907,7 +908,11 @@ const directionsScreen = (): string =>
 // Maps (map.ts): streets, parks and the greenway, drawn on the phone from the signed bundle. No third party.
 // A screen asks for a map here; the views are attached after the screen is drawn.
 let mapSpecs: MapSpec[] = [], mapViews: MapView[] = [];
-const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];   // the whole city, for maps that are about parks
+// The whole service area (every city and township a DDOT or SMART bus stops in, 2026-09-24): what the Map and Areas
+// tabs frame when there is no place to open on. The parks map keeps Detroit and its three neighbours, because the
+// parks it lists are the City of Detroit's own.
+const REGION = [{ lat: SERVICE_BBOX.latMin, lon: SERVICE_BBOX.lonMin }, { lat: SERVICE_BBOX.latMax, lon: SERVICE_BBOX.lonMax }];
+const CITY = [{ lat: 42.256, lon: -83.287 }, { lat: 42.45, lon: -82.911 }];
 const segPoints = (segs: Segment[]) => segs.flatMap((x) => x.lines.flat().map(([lon, lat]) => ({ lat, lon })));
 function mapBox(o: { key: string; label: string; style?: MapStyle; subway?: MapSpec['subway']; focus?: string; dots?: MapDot[]; route?: MapRoute; me?: boolean; fit?: { lat: number; lon: number }[]; open?: MapSpec['open']; minMeters?: number; small?: boolean; cover?: boolean; quiet?: boolean; outline?: { lat: number; lon: number }[][]; areas?: MapArea[]; selected?: string; overlays?: Overlay[]; segments?: boolean; parks?: boolean; openArea?: MapSpec['openArea']; onArea?: MapSpec['onArea']; lead?: string }): string {
   // The greenway is drawn when a map is ASKED to draw it, and not otherwise (Kyle, 2026-09-22; audit §6).
@@ -1174,6 +1179,8 @@ const hoodUi = (d: Indicators): Ui => ({
   // are two files under one signature, so an id from the older of the two may name a row that has since been
   // archived: the row then says the distance and nothing more, rather than offering a page that is not there.
   listing: (id: string) => bundle?.rows.find((r) => r.id === id) ?? null,
+  // A city's own police line (emergency.csv `area`, 2026-09-24): on that city's page and nowhere else.
+  placeCalls: (placeId: string) => (bundle?.emergency ?? []).filter((e) => e.area === placeId).map((e) => callButton(e.id)).join(''),
 });
 /** The numbers, or a screen that says why there are none yet. */
 function hoodsReady(): Indicators | null {
@@ -1234,7 +1241,7 @@ function areasMap(d: Indicators, mine: Hood | null, lead: string): string {
   const on = (areaPick ? areaById(d, areaPick) : null) ?? mine;
   const rings = on ? outline(on, d.origin) : undefined;
   return mapBox({
-    key: AREAS_MAP_KEY, label: t('map.label_areas'), areas, selected: on?.id ?? '', fit: CITY, cover: true,
+    key: AREAS_MAP_KEY, label: t('map.label_areas'), areas, selected: on?.id ?? '', fit: REGION, cover: true,
     open: openingView(here),
     // `areasGlide` is the one moment the camera is NOT handed the outline: an answer has just arrived, the map
     // is being built again from scratch, and the polygon is somewhere to travel to rather than to open on.
@@ -1318,7 +1325,7 @@ function areaStrip(h: Hood, d: Indicators): string {
   const rings = outline(h, d.origin), areas = mapAreas();
   const map = areas.length
     ? mapBox({ key: 'hood:' + h.id, label: t('map.label_hood', { name: h.name }), areas, selected: h.id,
-        fit: rings.flat().length ? rings.flat() : CITY, openArea: rings, minMeters: 900,
+        fit: rings.flat().length ? rings.flat() : REGION, openArea: rings, minMeters: 900,
         onArea: (id) => { if (id !== h.id) { areaPick = id; navigate({ v: 'hood', id }); } } })
     : '';
   return `<div class="areastrip">${map}<div class="areabar"><button class="iconbtn" data-back aria-label="${T('hood.back_map')}">${icon('back', 'turn')}</button><strong class="areabarname">${owner(h.name)}</strong></div></div>`;
@@ -1377,7 +1384,7 @@ const contactLine = () => `<p class="foot">${T('about.contact')} <a href="mailto
 function credits(): string {
   const groups = new Set((bundle?.rows ?? []).map((r) => r.facts.source?.name).filter(Boolean)).size;
   return `<h2>${T('about.credits_h')}</h2><ul class="plain">${groups ? `<li>${T('about.credits_orgs', { count: groups })}</li>` : ''}
-    ${['about.credits_foodbanks', 'about.credits_city', 'about.credits_census'].map((k) => `<li>${T(k)}</li>`).join('')}</ul><p>${T('about.credits_thanks')}</p><p class="foot">${T('about.maker')}</p>${contactLine()}`;
+    ${['about.credits_foodbanks', 'about.credits_city', 'about.credits_census', 'about.credits_semcog'].map((k) => `<li>${T(k)}</li>`).join('')}</ul><p>${T('about.credits_thanks')}</p><p class="foot">${T('about.maker')}</p>${contactLine()}`;
 }
 
 /** What the browser is told a traceless screen is FOR. Every one of these is true of anybody: a person looking

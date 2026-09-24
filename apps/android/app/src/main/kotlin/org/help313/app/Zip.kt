@@ -21,7 +21,8 @@ import org.help313.query.LatLon
 const val ZIP_FILE = "places/zips.json"
 
 /**
- * `{ "zips": { "48226": [lat, lon], … } }` — 37 of them, the four cities and what touches them.
+ * `{ "zips": { "48226": [lat, lon], … } }` — every ZIP of every city and township a DDOT or SMART bus stops in
+ * (37 while the area was four cities, until 2026-09-24).
  *
  * Throws on anything that is not that, and the caller treats a throw as "the ZIP list could not be read", never as
  * "there are no ZIPs".
@@ -71,8 +72,8 @@ sealed class ZipAnswer {
     object Unknown : ZipAnswer()
 
     /**
-     * A ZIP the bundle carries whose centre is outside Detroit, Hamtramck, Highland Park and Dearborn. The list is
-     * for those four cities, so sorting it by distance from somewhere else is a worse answer than not sorting it.
+     * A ZIP the bundle carries whose centre is outside the service area's box. The list is for that area, so
+     * sorting it by distance from somewhere else is a worse answer than not sorting it.
      */
     object Outside : ZipAnswer()
 

@@ -303,7 +303,7 @@ object HoodScreens {
      *
      * The same flow, and the same refusals, as every other screen that offers it (Screens.listBody): the button is
      * never pressed for anybody, a refusal is never nagged at, and once Android has stopped putting its dialog up
-     * the words say where the switch is instead of asking again. A fix from outside the four cities says so; a fix
+     * the words say where the switch is instead of asking again. A fix from outside the service area says so; a fix
      * inside them but outside Detroit says that only Detroit has neighborhood pages.
      */
     private fun yourNeighborhood(a: MainActivity, col: LinearLayout, d: Indicators) {
@@ -328,7 +328,7 @@ object HoodScreens {
         }
         val mine = hoodAt(d, here)
         if (mine == null) {
-            // Inside the four cities (MainActivity only keeps a fix that is) but outside every Detroit outline:
+            // Inside the service area (MainActivity only keeps a fix that is) but outside every Detroit outline:
             // Hamtramck, Highland Park, Dearborn, or the river.
             col.addView(UI.text(a, L.t("hood.mine_outside"), 16f, R.color.ink, topDp = 6))
             col.addView(

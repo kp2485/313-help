@@ -15,7 +15,7 @@ import { LINKS } from '../src/links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
 import { canSave } from '../src/saved.js';
 import { telHref } from '../src/phone.js';
-import { rank, SERVICE_AREA_IDS } from '@313help/query';
+import { rank, servesAreaKey, SERVICE_AREAS, SERVICE_AREA_IDS } from '@313help/query';
 import { releaseKeyProblems } from '../src/keys.js';
 import { LANGS, dirFor, pickLang } from '../src/i18n.js';
 import { hoodList, hoodPage, rate, type Hood, type Indicators } from '../src/hoods.js';
@@ -69,7 +69,7 @@ describe('needs list', () => {
     const shelter = NEEDS.find((n) => n.id === 'shelter')!;
     expect(shelter.firstLinks).toBe('beds');
     expect(LINKS.beds!.items.map((i) => i.url)).toEqual(['https://313safebeds.com/']);
-    expect(shelter.first).toEqual(['emg_shelter_helpline', 'emg_shelter_outwayne']);
+    expect(shelter.first).toEqual(['emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_housing_oakland', 'emg_housing_macomb']);   // one per county since 2026-09-24
     // The link panel is drawn above the call buttons on the screen itself.
     expect(main).toContain('${topLinks}${first ? `<div class="stackbtns">${first}</div>` : \'\'}');
     expect(strings['link.beds.safebeds.body']).toMatch(/their site, not ours/);
@@ -85,10 +85,10 @@ describe('needs list', () => {
     expect(NEEDS.find((n) => n.id === 'talk')!.first![0]).toBe('emg_988');
   });
   it('treatment: DWIHN\'s 24-hour line first, then SAMHSA; sexual assault: hotlines and 911 first; both have a quick exit', () => {
-    expect(NEEDS.find((n) => n.id === 'drugs')).toMatchObject({ first: ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true });
-    expect(NEEDS.find((n) => n.id === 'assault')).toMatchObject({ first: ['emg_avalon', 'emg_voices4', 'emg_911'], quickExit: true, query: { category: 'assault' } });
+    expect(NEEDS.find((n) => n.id === 'drugs')).toMatchObject({ first: ['emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true });
+    expect(NEEDS.find((n) => n.id === 'assault')).toMatchObject({ first: ['emg_avalon', 'emg_haven', 'emg_turning_point', 'emg_voices4', 'emg_911'], quickExit: true, query: { category: 'assault' } });
     const emg = readFileSync(join(root, 'data/seed/emergency.csv'), 'utf8');
-    for (const id of ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa', 'emg_avalon', 'emg_voices4']) expect(emg, id).toMatch(new RegExp(`^${id},`, 'm'));
+    for (const id of ['emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_dwihn_care_center', 'emg_samhsa', 'emg_avalon', 'emg_haven', 'emg_turning_point', 'emg_voices4']) expect(emg, id).toMatch(new RegExp(`^${id},`, 'm'));
     for (const wrong of ['800-421-4949', '800-231-1127', '800-841-4949']) expect(emg.split('\n').filter((l) => l.startsWith('emg_')).map((l) => l.split(',').slice(0, 4).join(',')).join('\n')).not.toContain(wrong);
   });
   it('an emergency room and urgent care are their own kinds of help, the emergency room first and led by 911', () => {
@@ -383,7 +383,10 @@ describe('the other languages', () => {
     'hood.chart_bar',
     // The four cities' own names. A city keeps its name in Spanish; the Arabic and Bengali tables transliterate
     // them, which this loop only ever checks against the English.
-    'area.detroit', 'area.dearborn', 'area.hamtramck', 'area.highland_park']);
+    'area.detroit', 'area.dearborn', 'area.hamtramck', 'area.highland_park',
+    // The other 71 cities and townships (2026-09-24) keep their written names in every language: a place's name is
+    // what is on its signs, and a transliteration nobody has read is worse than the name. A speaker may add one.
+    ...Object.entries(SERVICE_AREAS).filter(([, a]) => /internal point for (?!.* County$)/.test(a.reference)).map(([id]) => `area.${id}`)]);
 
   for (const l of OTHER) {
     const w = table(l);
@@ -555,7 +558,12 @@ describe('map', () => {
     // The mileage pill is still gated by the screen AND by miles being null.
     expect(main).toContain("showDistance && r.miles !== null ? `<span class=\"pill plain\">${T('miles'");
     // The area pill, and the one sentence, come from strings; neither names a place.
-    expect(main).toContain("isDvCategory(row.category) ? serviceAreaKey(row.service_area ?? '') : null");
+    // Which rows say "Serves {area}": every DV row, and since 2026-09-24 any row with an area and no coordinate.
+    const base = { category: 'transport', service_area: 'royal_oak' };
+    expect(servesAreaKey({ category: 'shelter.dv', service_area: 'detroit' })).toBe('area.detroit');
+    expect(servesAreaKey(base)).toBe('area.royal_oak');
+    expect(servesAreaKey({ ...base, lat: 42.49, lon: -83.14 })).toBeNull();          // a placed row speaks by its place
+    expect(servesAreaKey({ category: 'transport' })).toBeNull();
     expect(main).toContain("T('safe.dv_serves', { area: t(key) })");
     expect(main).toContain("isDvCategory(r.category) ? `<p class=\"foot\">${T('safe.dv_no_address')}</p>` : ''");
     for (const k of ['safe.dv_serves', 'safe.dv_no_address', ...SERVICE_AREA_IDS.map((a) => `area.${a}`)]) {

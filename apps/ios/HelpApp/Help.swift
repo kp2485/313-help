@@ -54,6 +54,17 @@ enum L {
     static func pending(_ key: String, english: String) -> String { tables[current]?[key] ?? en[key] ?? english }
 }
 
+/// The urgent sheet's numbers, in docs/05's order: 911, 988, then the hotlines. Since the area widened (2026-09-24)
+/// a shelter or crisis line comes once per county it serves — Wayne's, then Oakland's, then Macomb's — and each
+/// label names its county, so a person picks their own. A city's own police line is never here: it is on that
+/// city's page (emergency.json `area`). Exactly `URGENT_IDS` in apps/web/src/needs.ts.
+let urgentIds = [
+    "emg_911", "emg_988",
+    "emg_shelter_helpline", "emg_shelter_outwayne", "emg_housing_oakland", "emg_housing_macomb",
+    "emg_dwihn_crisis", "emg_ochn_crisis", "emg_mccmh_crisis",
+    "emg_ndvh", "emg_avalon", "emg_211",
+]
+
 /// 911 and 988 are hardcoded. No bundle, feed, or server can change them (audit A5).
 let hardcoded = ["emg_911": "911", "emg_988": "988"]
 
@@ -96,22 +107,24 @@ struct Need: Identifiable {
 
 let needs: [Need] = [
     Need(id: "overdose_now", symbol: "waveform.path.ecg", now: true, first: ["emg_911"], stepsOnly: true, sensitive: true),
-    Need(id: "shelter", symbol: "bed.double", now: true, first: ["emg_shelter_helpline", "emg_shelter_outwayne"],
+    Need(id: "shelter", symbol: "bed.double", now: true, first: ["emg_shelter_helpline", "emg_shelter_outwayne", "emg_housing_oakland", "emg_housing_macomb"],
          firstLink: ("beds.safebeds", "https://313safebeds.com/"), refine: [
         .init(id: "me", query: Query(category: "shelter.emergency")), .init(id: "kids", query: Query(category: "shelter.emergency")), .init(id: "young", query: Query(category: "shelter.emergency", prefer: ["youth"]))]),   // youth shelters first
     Need(id: "unsafe", symbol: "shield", now: true, first: ["emg_ndvh", "emg_911"], intro: "safe.dv_intro", query: Query(category: "shelter.dv"), sensitive: true, quickExit: true),
-    // Crisis first: 988, DWIHN's line, then the crisis places. Under those, the daytime places a person can walk
-    // into (health.support), which are ordinary listings with an address (category audit 2026-09-22, K3).
-    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis"], intro: "talk.intro", query: Query(category: "health.mental"), also: .init(id: "support", query: Query(category: "health.support")), sensitive: true, quickExit: true),
-    // Treatment and sexual assault (DECISIONS 2026-09-19): numbers first. The iPhone app saves nothing and keeps no
-    // history, so "private" needs no extra rule here; addresses and distance stay.
-    Need(id: "drugs", symbol: "leaf", now: true, first: ["emg_dwihn_crisis", "emg_dwihn_care_center", "emg_samhsa"],
+    // Crisis first: 988, then each county's own 24-hour line (DWIHN for Wayne, OCHN for Oakland, MCCMH for Macomb;
+    // each label names its county, 2026-09-24), then the crisis places. Under those, the daytime places a person
+    // can walk into (health.support), which are ordinary listings with an address (category audit 2026-09-22, K3).
+    Need(id: "talk", symbol: "bubble.left", now: true, first: ["emg_988", "emg_dwihn_crisis", "emg_ochn_crisis", "emg_mccmh_crisis"], intro: "talk.intro", query: Query(category: "health.mental"), also: .init(id: "support", query: Query(category: "health.support")), sensitive: true, quickExit: true),
+    // Treatment and sexual assault (DECISIONS 2026-09-19): numbers first. DWIHN's 24-hour line is the front door in
+    // Wayne County and OCHN's in Oakland (2026-09-24), then SAMHSA's for anyone. The iPhone app saves nothing and
+    // keeps no history, so "private" needs no extra rule here; addresses and distance stay.
+    Need(id: "drugs", symbol: "leaf", now: true, first: ["emg_dwihn_crisis", "emg_ochn_crisis", "emg_dwihn_care_center", "emg_samhsa"],
          intro: "drugs.intro", quickExit: true, refine: [
         .init(id: "today", query: Query(category: "treatment", prefer: ["walk_in"])), .init(id: "detox", query: Query(category: "treatment.detox")),
         .init(id: "meds", query: Query(category: "treatment.meds")), .init(id: "stay", query: Query(category: "treatment.residential")),
         .init(id: "home", query: Query(category: "treatment.outpatient")), .init(id: "recovery", query: Query(category: "treatment.recovery")),
         .init(id: "supplies", query: Query(category: "harm.supplies"))]),
-    Need(id: "assault", symbol: "shield", now: true, first: ["emg_avalon", "emg_voices4", "emg_911"], intro: "assault.intro", query: Query(category: "assault"), quickExit: true),
+    Need(id: "assault", symbol: "shield", now: true, first: ["emg_avalon", "emg_haven", "emg_turning_point", "emg_voices4", "emg_911"], intro: "assault.intro", query: Query(category: "assault"), quickExit: true),
     // "Get somewhere safe now" (DECISIONS 2026-09-22): a door that is open at 3am with a phone behind it —
     // police stations, fire stations and emergency rooms, in one list ranked by distance. It sits BELOW 911,
     // 988 and the hotlines on the urgent sheet and here: docs/05's ordering is untouched, this is a row under
@@ -162,8 +175,10 @@ let needs: [Need] = [
 
 func telURL(_ number: String) -> URL? { URL(string: telLink(number)) }
 
+/// One of everybody's numbers, by id. A row that belongs to one place only (a city's own police, emergency.json
+/// `area`) is never answered here: it is on that city's page and nowhere else (CityPage.swift, 2026-09-24).
 func emergencyNumber(_ id: String, in b: LoadedBundle?) -> (label: String, number: String)? {
-    let fromBundle = b?.emergency.first { $0.id == id }
+    let fromBundle = numbersForEveryone(b?.emergency ?? [], area: \.area).first { $0.id == id }
     guard let number = hardcoded[id] ?? fromBundle?.number else { return nil }   // hardcoded always wins
     return (fromBundle?.label ?? (id == "emg_911" ? "Emergency" : "Suicide and crisis lifeline"), number)
 }

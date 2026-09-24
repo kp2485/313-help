@@ -166,7 +166,7 @@ struct MapSurface: View {
     @State private var askedForLocation = false
     /// Our own card, over the map, the first time this tab is opened on this phone (DECISIONS 2026-09-21).
     @State private var locateCard = false
-    /// A fix that arrived from somewhere that is not one of the four cities. The map does not move, and says so.
+    /// A fix that arrived from somewhere that is not in the service area. The map does not move, and says so.
     @State private var locateOutside = false
     /// The decision has already been made this launch, so coming back to the tab does not re-open anything.
     @State private var locateChecked = false
@@ -262,7 +262,7 @@ struct MapSurface: View {
         }
     }
 
-    /// A fix has arrived. Inside the four cities the map moves to a two-mile view around it and says so; outside
+    /// A fix has arrived. Inside the service area the map moves to a two-mile view around it and says so; outside
     /// them nothing moves, and the words say why rather than leaving a person staring at an unchanged map.
     private func locationArrived(_ p: LatLon) {
         locateCard = false
@@ -530,8 +530,15 @@ struct MapSurface: View {
                 if let edited = model.base?.edited, !edited.isEmpty {
                     // Who the streets and parks come from, over the map itself. The whole sentence — with what a
                     // drag and a pinch do — is in "See this map as a list", where there is room for it.
-                    Text(L.t("map.source", ["date": prettyDate(edited)]))
-                        .font(.caption2).foregroundStyle(Color.muted).lineLimit(2)
+                    // SEMCOG's notice rides under it whenever the map draws SEMCOG's parks: in English, its own words.
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L.t("map.source", ["date": prettyDate(edited)]))
+                            .font(.caption2).foregroundStyle(Color.muted).lineLimit(2)
+                        if let notice = model.base?.notice {
+                            Text(notice).font(.caption2).foregroundStyle(Color.muted).lineLimit(2)
+                                .environment(\.locale, Locale(identifier: "en"))
+                        }
+                    }
                         .padding(8)
                         .background(plainBackgrounds ? AnyShapeStyle(Color.surface) : AnyShapeStyle(.thinMaterial),
                                     in: RoundedRectangle(cornerRadius: 10))
@@ -1184,6 +1191,12 @@ struct MapListSheet: View {
                     if let edited = model.base?.edited, !edited.isEmpty {
                         Text(L.t("map.source", ["date": prettyDate(edited)]))
                             .font(.footnote).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                        // SEMCOG's required notice, in English and in its own words (never translated).
+                        if let notice = model.base?.notice {
+                            Text(notice).font(.footnote).foregroundStyle(Color.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .environment(\.locale, Locale(identifier: "en"))
+                        }
                     }
                 }.padding(16)
             }

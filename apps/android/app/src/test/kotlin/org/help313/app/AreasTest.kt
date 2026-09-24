@@ -1,4 +1,4 @@
-// The four cities and the 205 outlines, on a plain JDK: the decode of the file the app actually ships, the
+// Every city and township a bus reaches and the 205 outlines, on a plain JDK: the decode of the file the app actually ships, the
 // allow-list a city page draws from, where a point falls, and what a tap on the outline layer finds.
 //
 // Two of these are the reason the file exists. **The allow-list** is what keeps "Dearborn does not publish blight
@@ -33,16 +33,27 @@ class AreasTest {
 
     // ---- the file the app ships ----------------------------------------------------------------------------------
 
+    /** The places region.json names: every city and township a DDOT or SMART bus stops in. Null with no file. */
+    private fun regionIds(): Set<String>? {
+        val f = File(root, "data/ingested/region.json")
+        if (!f.isFile) return null
+        return (org.help313.query.Json.parse(f.readBytes())["municipalities"]?.arr ?: emptyList())
+            .mapNotNull { it["id"]?.str }.toSet()
+    }
+
     @Test
-    fun theShippedFileCarriesFourCitiesAndFourCityPages() {
+    fun theShippedFileCarriesEveryPlaceABusReachesAndOnePageEach() {
         val d = real() ?: return
-        assertEquals("four cities", 4, d.cities.size)
+        // Every city and township a DDOT or SMART bus stops in (2026-09-24; four cities until then).
+        assertEquals("every place a bus reaches", 75, d.cities.size)
         assertEquals(
-            "the four cities, in the bundle's own order",
+            "the four first cities lead, in the bundle's own order",
             listOf("city_detroit", "city_hamtramck", "city_highland_park", "city_dearborn"),
-            d.cities.map { it.id },
+            d.cities.take(4).map { it.id },
         )
-        assertEquals("one page each", 4, d.areas.size)
+        regionIds()?.let { assertEquals("the same places region.json names", it, d.cities.map { c -> c.id }.toSet()) }
+        assertEquals("one page each", d.cities.size, d.areas.size)
+        assertEquals("pages in the same order as the places", d.cities.map { it.id }, d.areas.map { it.id })
         assertTrue("Detroit is the only city with neighborhoods under it", d.cities.count { it.hasNeighborhoods } == 1)
         assertTrue("Detroit has them", cityOf(d, "city_detroit")!!.hasNeighborhoods)
         assertTrue("Hamtramck does not", !cityOf(d, "city_hamtramck")!!.hasNeighborhoods)
@@ -52,6 +63,9 @@ class AreasTest {
             assertTrue("${a.id} has no name", a.name.isNotEmpty())
             assertTrue("${a.id} draws no panel at all", cityPanels(a).isNotEmpty())
         }
+        // Beyond the first four, a place has its outline and its help and nothing else yet, and misses nothing.
+        val helpOnly = d.areas.drop(4).filter { it.panels == listOf("help") && it.missing.isEmpty() }
+        assertEquals("every place past the first four is an outline and its help", d.areas.size - 4, helpOnly.size)
     }
 
     /**
@@ -71,6 +85,30 @@ class AreasTest {
                 assertNotNull("${a.id} draws $p with no source line", panelSource(a, d, p))
             }
         }
+    }
+
+    /**
+     * A place a bus reaches that has nothing but its help (2026-09-24) says just that, and claims nothing about what
+     * it publishes; the first four keep their researched sentences. The web's `helpOnly` in apps/web/src/hoods.ts.
+     */
+    @Test
+    fun aPlaceWithOnlyItsHelpIsAnOutlineOnlyPage() {
+        val d = real() ?: return
+        val warren = d.areas.first { it.id == "city_warren" }
+        assertTrue("Warren is an outline and its help", isOutlineOnly(d, warren))
+        assertEquals(listOf("help"), cityPanels(warren))
+        for (id in listOf("city_detroit", "city_hamtramck", "city_highland_park", "city_dearborn")) {
+            assertTrue("$id keeps its full page", !isOutlineOnly(d, d.areas.first { it.id == id }))
+        }
+        // A page with only its help but something it says is missing is not one: the reason is still said.
+        val hamtramck = d.areas.first { it.id == "city_hamtramck" }
+        val helpButMissing = Area(
+            hamtramck.hood, hamtramck.city, hamtramck.kind, panels = listOf("help"),
+            sources = hamtramck.sources, missing = hamtramck.missing, parkAcres = null,
+            roadsBands = null, vacancy = null, permitsByYear = emptyList(),
+        )
+        assertTrue(hamtramck.missing.isNotEmpty())
+        assertTrue(!isOutlineOnly(d, helpButMissing))
     }
 
     /** A panel that is not one of the six can never be drawn, however the data asks. */
@@ -131,6 +169,9 @@ class AreasTest {
             Triple(42.3928, -83.0496, "city_hamtramck"),
             Triple(42.4055, -83.0968, "city_highland_park"),
             Triple(42.3223, -83.1763, "city_dearborn"),
+            // and the places a bus reaches beyond them (2026-09-24)
+            Triple(42.4895, -83.0147, "city_warren"),
+            Triple(42.6389, -83.2910, "city_pontiac"),
         )
         for ((lat, lon, id) in cases) {
             val at = areaAt(d, lat, lon)
@@ -153,9 +194,9 @@ class AreasTest {
         )
     }
 
-    /** A point outside all four is still a real answer, and still null: nothing is guessed. */
+    /** A point outside every place is still a real answer, and still null: nothing is guessed. */
     @Test
-    fun aPointOutsideAllFourCitiesIsNull() {
+    fun aPointOutsideEveryPlaceIsNull() {
         val d = real() ?: return
         assertNull("a point in Lake St Clair", areaAt(d, 42.46, -82.80))
         assertNull("a point in Ohio", areaAt(d, 41.50, -83.60))
@@ -182,9 +223,11 @@ class AreasTest {
         // Every outline, at every zoom (docs/MAP-STYLE.md section 15): what keeps 205 of them from being a mesh
         // is weight, not hiding. It is the NAMES the zoom still governs, in boundaryStyle.
         val all = drawnAreas(d)
-        assertEquals("the four cities and all 205", 4 + 205, all.size)
-        assertEquals("the four cities come first", 4, all.take(4).count { it.isCity })
-        assertEquals("and nothing else is a city", 4, all.count { it.isCity })
+        val places = d.areas.count { it.isCity && it.hood.rings.isNotEmpty() }
+        assertEquals("every place a bus reaches has an outline", d.cities.size, places)
+        assertEquals("every place and all 205", places + 205, all.size)
+        assertEquals("the places come first", places, all.take(places).count { it.isCity })
+        assertEquals("and nothing else is a city", places, all.count { it.isCity })
     }
 
     /**

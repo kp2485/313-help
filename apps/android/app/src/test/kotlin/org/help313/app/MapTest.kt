@@ -175,13 +175,19 @@ class MapFileTest {
         assertTrue(m.parks.size > 100)
         assertTrue(m.boundary.isNotEmpty())
         assertEquals("the road layer's edit date is a plain YYYY-MM-DD", 10, m.edited.length)
-        // Everything is inside the bbox CLAUDE.md gives for the service area, with a little room at the edges.
+        // Everything is inside the service area's box (every city and township a DDOT or SMART bus stops in, since
+        // 2026-09-24), with a little room at the edges.
         var all = MapBox.EMPTY
         for (r in m.roads) all = all.union(r.box)
-        assertTrue(MapProjection.lat(all.maxY) > 42.1)
-        assertTrue(MapProjection.lat(all.minY) < 42.6)
-        assertTrue(MapProjection.lon(all.minX) > -83.6)
-        assertTrue(MapProjection.lon(all.maxX) < -82.7)
+        for (lat in listOf(MapProjection.lat(all.minY), MapProjection.lat(all.maxY))) {
+            for (lon in listOf(MapProjection.lon(all.minX), MapProjection.lon(all.maxX))) {
+                assertTrue("a road reaches $lat, $lon", inServiceArea(lat, lon, slack = 0.02))
+            }
+        }
+        // and it is the whole area now, not Detroit and its three neighbours: Pontiac's roads are on it
+        assertTrue("the roads stop at ${MapProjection.lat(all.minY)}", MapProjection.lat(all.minY) > 42.6)
+        // SEMCOG's own notice rides with the map when it carries SEMCOG's parks, in their words
+        m.notice?.let { assertTrue(it, it.contains("SEMCOG")) }
         // The small streets are what makes the file big; a cell with nothing in it would be a decoding bug.
         assertTrue(m.cells.size > 10)
         assertTrue(m.cells.all { it.roads.isNotEmpty() })
@@ -272,7 +278,8 @@ class MapCameraTest {
         assertEquals(0.6, c.metersPerPoint, 1e-6)
         repeat(80) { c = c.zoomed(0.5) }
         assertEquals(MapCamera.MIN_SCALE, c.scale, 1e-6)
-        assertEquals(90.0, c.metersPerPoint, 1e-6)
+        // 180 m per dp since the area became every city and township a bus reaches (2026-09-24); 90 before.
+        assertEquals(180.0, c.metersPerPoint, 1e-6)
     }
 
     @Test

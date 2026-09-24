@@ -127,7 +127,7 @@ A city is **a signed bundle plus a service-area config, not a fork.**
 1. **Multi-region bundles.** Gather today's Detroit values — now a handful of constants and seed files — into one
    region config; publish `data/bundle/v1/<region>/` with one signed index each; add a region picker, or
    auto-select from a typed ZIP — on the device, as today.
-2. **A second Michigan city as the proof.** Flint, Grand Rapids, or Wayne County beyond the four cities: new seed
+2. **A second Michigan city as the proof.** Flint or Grand Rapids (the SMART and DDOT area of Wayne, Oakland and Macomb came first, on 2026-09-24): new seed
    CSVs, a new config, local stewards, no fork.
 3. **A Michigan base layer.** Statewide programs and hotlines from state open data and Michigan 211, under every
    Michigan region, so a small town starts with something true.

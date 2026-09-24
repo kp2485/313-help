@@ -1,0 +1,302 @@
+# Police stations (safe.police) and hospital emergency rooms (health.er) in the 71 places of the widened area
+# (every city and township a DDOT or SMART bus reaches, 2026-09-24).
+# Leads: data/staging/federal_police.csv (USGS National Structures Dataset, 75 candidates) and
+# data/staging/federal_er.csv (CMS Hospital General Information, 19 hospitals with an emergency department, placed by
+# mailing city only). A candidate is only a lead: every line below was read on its OWNER's own page (the city's or
+# township's police page, the sheriff's own substation page, the hospital's own emergency-room page), with WebFetch or
+# a plain request that says who we are, on 2026-09-24. Web search was used only to find pages. No fact comes from a
+# search snippet, a directory, Yelp, Waze, Apple Maps or the federal files themselves, except where a line carries a
+# browser flag and says so. Each line's candidate is in the `# from` comment above it ("# from none" = the owner page lists
+# it and the federal file does not).
+#
+# Wording (brief addendum, 2026-09-24):
+# - A police line says "Someone is there all day and night, and there is a phone you can use." ONLY where the
+#   department's own page says the lobby, the station or the department is open 24 hours (Berkley, Garden City,
+#   Madison Heights, Sylvan Lake, Wixom, the Sheriff's Pontiac substation, Oakland University). Those carry
+#   `Open 24/7` and flags=walk_in. Everywhere else the line says "A police station." and gives the lobby or station
+#   hours the page states, or `Call first`. Office hours for administration, records or city hall are NOT used as a
+#   station's hours; those lines are `Call first`.
+# - An emergency room says "open all day and night" only where the hospital's own page says 24 hours / 24/7.
+#   All 23 ER lines read on their pages do; the Huron Valley-Sinai line (BROWSER, unread) does not say it. No ER
+#   line says free.
+# - Phones are the ones the page prints for that station, labelled as the page labels them. The non-emergency numbers
+#   already in data/seed/emergency.csv were reused only where the station's own page (the source_url) prints them.
+#
+# Notes for the steward:
+# - Grosse Pointe (City): the Public Safety Department's own page gives 17320 Mack Avenue. The federal file (2020) has
+#   17145 Maumee Avenue; the page does not mention Maumee. The line uses the page.
+# - Oakland University Police: its own page gives the Police and Support Services Building, 201 Meadow Brook Road,
+#   Rochester, MI 48309. The federal file had 2200 N. Squirrel Road (the university's main address). The line uses
+#   the page. "Rochester" is the mailing city the page prints; the federal point placed it in Auburn Hills.
+# - Allen Park, Grosse Pointe Farms and Sylvan Lake: the street address on the source page is the city's own address
+#   in the page's header or footer (the police page does not repeat it beside the police phone). The federal file puts
+#   the police station at the same address. Worth one look by a person.
+# - Grosse Pointe Shores: the page prints the police numbers as "313 / 881-5500", which the page checker cannot read
+#   as a phone number, so the line carries NO phone and publishes on its house number. A steward may add
+#   313-881-5500 (label "Non-emergency") after reading the page.
+# - Bloomfield Township: the page prints "4200 Telegraph Road P.O. Box 489 Bloomfield Township, MI 48303-0489"; that
+#   ZIP belongs to the P.O. box, so the ZIP field is left empty rather than guessed.
+# - Commerce Township, Orion Township and Rochester Hills (Oakland County Sheriff's substations) and the Michigan
+#   State Police Metro North Post: the page gives lobby hours without days ("Lobby Hours 8am to 4pm"). They are kept
+#   as written, so each line arrives call-first. Orion's page prints "Lake Orion, Michigan 48360" (mailing city).
+# - Metro North Post (Oak Park) serves Royal Oak Township by contract. michigan.gov refuses scripts (403), so the
+#   source is Royal Oak Township's own police page, which prints the post's address, non-emergency number and lobby
+#   hours.
+# - Beverly Hills and Franklin are villages inside Southfield Township; Wolverine Lake is a village inside Commerce
+#   Township; Lake Orion is a village inside Orion Township. The city field is the village the page prints.
+# - Chesterfield Township: the page's heading is "Records Department Open Lobby Hours"; those are the only lobby hours
+#   it gives, so they are the line's schedule.
+# - Henry Ford Health bought the Ascension Providence hospitals and Ascension Macomb-Oakland: the CMS names
+#   ("Ascension Providence Hospital, Southfield and Novi", "Ascension Providence Rochester") are now Henry Ford
+#   Providence Southfield, Henry Ford Providence Novi and Henry Ford Rochester on henryford.com. The CMS record for
+#   Southfield and Novi is two emergency rooms, so it is two lines.
+# - Corewell Health Trenton: the hospital's page gives 5400 Fort St.; CMS has 5450. The line uses the page.
+# - McLaren Oakland's emergency page contains a hidden "Temporarily Closed" template (its closed flag is 0); the hours
+#   block reads 12:00 AM - 12:00 AM every day and the text says "around-the-clock coverage". McLaren Macomb's
+#   emergency page prints no phone, so its line uses the hospital's own home page (mclaren.org/macomb), which prints
+#   the address, the main number and "24/7 expert care" for emergencies.
+# - Garden City Hospital's emergency page lists two emergency rooms, both "Open 24 hours a day, 7 days a week, 365
+#   days a year": Garden City and the new free-standing one at the Westland Community Health Center.
+#
+# Held out (candidate, reason):
+# - sal_uspolice_river_rouge_police_department: River Rouge's own police and contact pages (cityofriverrouge.net)
+#   print phones but no street address anywhere; cityofriverrouge.com did not answer. No line until a page shows it.
+# - sal_uspolice_macomb_county_sheriff_s_office (43565 Elizabeth Rd) and the Sheriff's Harrison Township, Macomb
+#   Township and Mt. Clemens substations: macombgov.org prints each address and phone but says nothing about a public
+#   lobby, and the sheriff's own records page (sheriff.macombgov.org) has an expired certificate. By the brief a
+#   sheriff substation counts only when its page shows a public lobby. A person should read them: Harrison Township,
+#   Macomb Township and Mount Clemens have no police line in this batch.
+# - sal_uspolice_oakland_county_sheriff_s_office (1200 N. Telegraph, Bldg 38E): headquarters; no lobby stated on the
+#   pages read. Pontiac is covered by the Sheriff's 24/7 Pontiac substation below.
+# - sal_uspolice_michigan_state_police_district_2_headquarters (Taylor): a district headquarters; michigan.gov refuses
+#   scripts and no other owner page names it.
+# - sal_uspolice_wayne_county_sheriff_s_office (3100 S. Henry Ruff, Westland): no page on waynecountymi.gov that was
+#   read prints this address; only directories do.
+# - Hospitals: none held. Every CMS candidate is inside the 71 places.
+#
+# name | org | category | what | address | city | zip | phone | website | schedule | eligibility | source_url | extras
+
+# ---------- Police: Wayne County ----------
+# from sal_uspolice_allen_park_police_department
+Allen Park police station | Allen Park Police Department | safe.police | A police station. | 15915 Southfield Rd | Allen Park | 48101 | 313-386-7800 | https://cityofallenpark.org/departments/police/index.php | Call first | | https://cityofallenpark.org/departments/police/other_resources/police_reports.php | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_dearborn_heights_police_department
+Dearborn Heights police station | Dearborn Heights Police Department | safe.police | A police station. | 25637 Michigan Avenue | Dearborn Heights | 48125 | 313-277-6770 | https://www.dearbornheightsmi.gov/315/Police-Department | Call first | | https://www.dearbornheightsmi.gov/315/Police-Department | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_ecorse_police_department
+Ecorse police station | Ecorse Police Department | safe.police | A police station. | 3869 W Jefferson Ave | Ecorse | 48229 | 313-381-0900 | https://www.ecorsemi.gov/services/police/index.php | Call first | | https://www.ecorsemi.gov/services/police/index.php | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_garden_city_police_department
+Garden City police station | Garden City Police Department | safe.police | A police station. Someone is there all day and night, and there is a phone you can use. | 6000 Middlebelt Road | Garden City | 48135 | 734-793-1700 | https://www.gardencitymi.org/206/Police-Department | Open 24/7 | | https://www.gardencitymi.org/206/Police-Department | flags=walk_in; phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_grosse_pointe_public_safety_department_police_station (federal address 17145 Maumee is not on the page)
+Grosse Pointe police station | Grosse Pointe Public Safety Department | safe.police | A police station. The department does police and fire work. | 17320 Mack Avenue | Grosse Pointe | 48230 | 313-886-3200 | https://www.grossepointecity.org/departments/public_safety/index.php | Call first | | https://www.grossepointecity.org/departments/public_safety/index.php | phone_label=Public safety department; notice=If you are in danger, call 911.
+# from sal_uspolice_grosse_pointe_farms_department_of_public_safety_police_stati
+Grosse Pointe Farms police station | Grosse Pointe Farms Department of Public Safety | safe.police | A police station. The department does police and fire work. | 90 Kerby Road | Grosse Pointe Farms | 48236 | 313-885-2100 | https://www.grossepointefarms.org/departments/public_safety_(police_fire)/index.php | Call first | | https://www.grossepointefarms.org/departments/public_safety_(police_fire)/index.php | phone_label=Public safety department; notice=If you are in danger, call 911.
+# from sal_uspolice_grosse_pointe_park_public_safety_department_police_station
+Grosse Pointe Park police station | Grosse Pointe Park Department of Public Safety | safe.police | A police station. The department does police and fire work. The dispatch desk answers its non-emergency number 24 hours a day. | 15115 E Jefferson Avenue | Grosse Pointe Park | 48230 | 313-822-7400 | https://www.grossepointepark.org/187/Public-Safety | Call first | | https://www.grossepointepark.org/187/Public-Safety | phone_label=Dispatch desk, non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_grosse_pointe_shores_police_station (no phone: the page prints "313 / 881-5500", see notes)
+# [lead 2026-09-24] phone added: the page prints it "313 / 881-5500", which the page matcher reads since today.
+Grosse Pointe Shores police station | Grosse Pointe Shores Department of Public Safety | safe.police | A police station. The department does police and fire work. | 795 Lake Shore Road | Grosse Pointe Shores | 48236 | 313-881-5500 | https://www.gpshoresmi.gov/departments/public_safety/police.php | Call first |  | https://www.gpshoresmi.gov/departments/public_safety/police.php | notice=If you are in danger, call 911.
+# BROWSER: Grosse Pointe Woods police station — gpwmi.us closes the connection on our checker's request (node fetch:
+#   socket closed, three tries). Read on 2026-09-24 with a plain curl request: "Robert E. Novitke Municipal Center
+#   20025 Mack Plaza Grosse Pointe Woods, MI 48236 ... Non-Emergency Ph: (313) 343-2400", office hours 8:30-5 Mon-Fri.
+# from sal_uspolice_grosse_pointe_woods_police_department
+Grosse Pointe Woods police station | Grosse Pointe Woods Department of Public Safety | safe.police | A police station. The department does police and fire work. | 20025 Mack Plaza | Grosse Pointe Woods | 48236 | 313-343-2400 | https://www.gpwmi.us/PublicSafety | Call first | | https://www.gpwmi.us/PublicSafety | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_harper_woods_police_department
+Harper Woods police station | Harper Woods Department of Public Safety | safe.police | A police station. | 19617 Harper Ave | Harper Woods | 48225 | 313-343-2500 | https://harperwoodscity.org/police-department/ | Call first | | https://harperwoodscity.org/police-department/ | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_inkster_police_department
+Inkster police station | Inkster Police Department | safe.police | A police station. | 26279 Michigan Avenue | Inkster | 48141 | 313-563-9850 | https://www.cityofinkstermi.gov/214/Police-Department | Call first | | https://www.cityofinkstermi.gov/214/Police-Department | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_lincoln_park_police_department (the page prints "1427 Cleophus", no street type)
+Lincoln Park police station | Lincoln Park Police Department | safe.police | A police station. | 1427 Cleophus | Lincoln Park | 48146 | 313-381-1800 | https://www.citylp.com/187/Police-Department | Call first | | https://www.citylp.com/187/Police-Department | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_livonia_police_department
+Livonia police station | Livonia Police Department | safe.police | A police station. | 15050 Farmington Rd | Livonia | 48154 | 734-466-2470 | https://www.livoniapd.com/ | Call first | | https://www.livoniapd.com/contact/ | phone_label=Police department main phone; notice=If you are in danger, call 911.
+# BROWSER: Melvindale police station — site refuses scripts (403 to our fetcher). Read with WebFetch on 2026-09-24:
+#   "3100 Oakwood Blvd. Melvindale, MI 48122", non-emergency 313-429-1070, "open to the public M-F from 8:30 AM to
+#   4:30 PM (closed from 12:00 PM to 1:00 PM)", and a call box outside the front entrance reaches dispatch after hours.
+# from sal_uspolice_melvindale_police_department
+Melvindale police station | Melvindale Police Department | safe.police | A police station. After hours, a call box outside the front door reaches dispatch. | 3100 Oakwood Blvd | Melvindale | 48122 | 313-429-1070 | https://melvindale.org/city-services/police-department/ | Mon-Fri 8:30am-noon & 1pm-4:30pm | | https://melvindale.org/city-services/police-department/ | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_redford_township_police_department
+Redford Township police station | Redford Township Police Department | safe.police | A police station. Officers take complaints and crash reports 24 hours a day, 7 days a week. | 25833 Elsinore | Redford | 48239 | 313-387-2500 | https://www.redfordtwp.gov/195/Police-Department | Call first | | https://www.redfordtwp.gov/195/Police-Department | phone_label=Police department; phone2=313-387-2551; phone2_label=After hours; notice=If you are in danger, call 911.
+# from sal_uspolice_riverview_police_department
+Riverview police station | Riverview Police Department | safe.police | A police station. | 14100 Civic Park Drive | Riverview | 48193 | 734-281-4222 | https://www.cityofriverview.com/departments/police_department/index.php | Call first | | https://www.cityofriverview.com/departments/police_department/index.php | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_romulus_police_department
+Romulus police station | Romulus Police Department | safe.police | A police station. | 11165 Olive Street | Romulus | 48174 | 734-941-8400 | https://www.romulusgov.com/168/Police | Call first | | https://www.romulusgov.com/168/Police | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_southgate_police_department
+Southgate police station | Southgate Police Department | safe.police | A police station. | 14710 Reaume Parkway | Southgate | 48195 | 734-258-3060 | https://www.southgatemi.gov/departments/police/index.php | Call first | | https://www.southgatemi.gov/departments/police/index.php | phone_label=Police department; phone2=734-258-3045; phone2_label=Command officer on duty; notice=If you are in danger, call 911.
+# from sal_uspolice_taylor_police_department
+Taylor police station | Taylor Police Department | safe.police | A police station. | 23515 Goddard Rd | Taylor | 48180 | 734-287-6611 | https://www.cityoftaylor.com/347/Police | Call first | | https://www.cityoftaylor.com/347/Police | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_trenton_police_department
+Trenton police station | Trenton Police Department | safe.police | A police station. | 2872 West Jefferson | Trenton | 48183 | 734-676-3737 | https://www.trentonmi.org/537/Police-Department | Call first | | https://www.trentonmi.org/537/Police-Department | phone_label=Police station; notice=If you are in danger, call 911.
+# from sal_uspolice_wayne_police_department
+Wayne police station | Wayne Police Department | safe.police | A police station. | 33701 E Michigan Avenue | Wayne | 48184 | 734-721-1414 | https://www.cityofwayne.com/159/Police | Call first | | https://www.cityofwayne.com/159/Police | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_westland_police_department
+Westland police station | Westland Police Department | safe.police | A police station. | 36701 Ford Road | Westland | 48185 | 734-722-9600 | https://www.cityofwestland.com/258/Police-Department | Call first | | https://www.cityofwestland.com/258/Police-Department | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_wyandotte_police_department
+Wyandotte police station | Wyandotte Police Department | safe.police | A police station. | 2015 Biddle Avenue | Wyandotte | 48192 | 734-324-4405 | https://www.wyandottemi.gov/195/Police-Department | Call first | | https://www.wyandottemi.gov/195/Police-Department | phone_label=Police department; notice=If you are in danger, call 911.
+
+# ---------- Police: Oakland County ----------
+# from sal_uspolice_auburn_hills_police_department
+Auburn Hills police station | Auburn Hills Police Department | safe.police | A police station. | 1899 N. Squirrel Rd | Auburn Hills | 48326 | 248-370-9444 | https://www.auburnhills.org/departments/police/ | Call first | | https://www.auburnhills.org/departments/police/ | phone_label=Non-emergency police and fire dispatch; notice=If you are in danger, call 911.
+# from sal_uspolice_berkley_police_department
+Berkley police station | Berkley Public Safety Department | safe.police | A police station. Someone is there all day and night, and there is a phone you can use. | 2395 W. Twelve Mile Rd | Berkley | 48072 | 248-658-3380 | https://www.berkleypublicsafety.org/ | Open 24/7 | | https://www.berkleypublicsafety.org/ | flags=walk_in; phone_label=Police and fire dispatch; notice=If you are in danger, call 911.
+# from sal_uspolice_beverly_hills_department_of_public_safety_police_station (village of Beverly Hills, Southfield Township)
+Beverly Hills police station | Beverly Hills Department of Public Safety | safe.police | A police station. The department does police, fire and ambulance work. | 18600 W Thirteen Mile Rd | Beverly Hills | 48025 | 248-540-3400 | https://www.beverlyhillspolice.com/ | Call first | | https://www.beverlyhillspolice.com/ | phone_label=Police, fire and EMS; notice=If you are in danger, call 911.
+# from sal_uspolice_birmingham_police_department
+Birmingham police station | Birmingham Police Department | safe.police | A police station, on the first floor of City Hall. Use the Pierce Street entrance. | 151 Martin Street | Birmingham | 48009 | 248-530-1870 | https://www.bhamgov.org/about_birmingham/city_departments/police_department/index.php | Mon-Fri 8am-4pm | | https://www.bhamgov.org/about_birmingham/city_departments/police_department/index.php | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_bloomfield_hills_public_safety_department_police_station
+Bloomfield Hills police station | Bloomfield Hills Public Safety Department | safe.police | A police station. | 45 East Long Lake Road | Bloomfield Hills | 48304 | 248-644-4200 | https://www.bloomfieldhills.gov/154/Public-Safety | Call first | | https://www.bloomfieldhills.gov/154/Public-Safety | phone_label=Public safety; notice=If you are in danger, call 911.
+# from sal_uspolice_bloomfield_township_police_department (ZIP left empty: the page's 48303-0489 is the P.O. box's)
+Bloomfield Township police station | Bloomfield Township Police Department | safe.police | A police station. | 4200 Telegraph Road | Bloomfield Township | | 248-433-7755 | https://www.bloomfieldtwp.org/police | Call first | | https://www.bloomfieldtwp.org/police | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_clawson_police_department
+Clawson police station | Clawson Police Department | safe.police | A police station. | 425 N. Main St | Clawson | 48017 | 248-435-5000 | https://www.cityofclawson.com/your_government/police_department/index.php | Call first | | https://www.cityofclawson.com/your_government/police_department/index.php | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_oakland_county_sheriff_s_office_commerce_township_substation
+Sheriff's substation, Commerce Township | Oakland County Sheriff's Office | safe.police | A sheriff's office substation. It is the police for Commerce Township. | 2019 Township Drive, Suite 664 | Commerce Township | 48390 | 248-624-0715 | https://www.oaklandcountymi.gov/government/sheriff | Lobby 8am-4pm; the page does not say which days | | https://www.oaklandcountymi.gov/government/sheriff/ocso-organization/law-enforcement/substations/commerce-township | phone_label=Substation non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_farmington_police_department
+Farmington police station | Farmington Public Safety Department | safe.police | A police station. | 23600 Liberty Street | Farmington | 48335 | 248-474-4700 | https://farmgov.com/city-services/public-safety/contact-us/ | Call first | | https://farmgov.com/city-services/public-safety/contact-us/ | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_farmington_hills_police_department
+Farmington Hills police station | Farmington Hills Police Department | safe.police | A police station. | 31655 W. Eleven Mile Road | Farmington Hills | 48336 | 248-871-2600 | https://www.fhgov.com/department-and-services/police/ | Call first | | https://www.fhgov.com/department-and-services/police/ | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_ferndale_police_department
+Ferndale police station | Ferndale Police Department | safe.police | A police station, at Ferndale City Hall. | 310 E. Nine Mile Rd | Ferndale | 48220 | 248-541-3650 | https://ferndalemi.gov/government/police | Call first | | https://ferndalemi.gov/government/police | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_franklin_police_department (village of Franklin, Southfield Township; also serves Bingham Farms)
+Franklin police station | Franklin-Bingham Farms Police Department | safe.police | A police station for Franklin and Bingham Farms. After hours and on weekends, call the non-emergency number to reach an officer. | 32311 Franklin Road | Franklin | 48025 | 248-626-9672 | https://www.franklin.mi.us/departments/police_department/index.php | Mon-Fri 9am-5pm | | https://www.franklin.mi.us/departments/police_department/index.php | phone_label=Police station; phone2=248-626-5444; phone2_label=Non-emergency, after hours; notice=If you are in danger, call 911.
+# from sal_uspolice_hazel_park_police_department
+Hazel Park police station | Hazel Park Police Department | safe.police | A police station. | 111 E. Nine Mile Road | Hazel Park | 48030 | 248-542-6161 | https://www.hazelpark.org/i_want_to/police_department3/contact/index.php | Call first | | https://www.hazelpark.org/i_want_to/police_department3/contact/index.php | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_huntington_woods_police_department
+Huntington Woods police station | Huntington Woods Public Safety Department | safe.police | A police station. The department does police and fire work. | 12755 W. 11 Mile Road | Huntington Woods | 48070 | 248-541-1180 | https://www.hwmi.org/departments/public_safety_(police___fire)/index.php | Mon-Fri 8:30am-5pm | | https://www.hwmi.org/departments/public_safety_(police___fire)/index.php | phone_label=Public safety; notice=If you are in danger, call 911.
+# BROWSER: Lake Orion police station — site refuses scripts (lakeorion.org answers our fetcher and WebFetch with a
+#   challenge / 403). NOTHING on this line was read on the owner's page: the name and address are the federal lead's
+#   (USGS, 2020). A person must read https://www.lakeorion.org/police-department, confirm the address, and add the
+#   station's phone and hours, or drop the line.
+# from sal_uspolice_lake_orion_police_department (village of Lake Orion, Orion Township)
+Lake Orion police station | Lake Orion Police Department | safe.police | A police station. | 21 East Church Street | Lake Orion | 48362 | | https://www.lakeorion.org/police-department | Call first | | https://www.lakeorion.org/police-department | notice=If you are in danger, call 911.
+# BROWSER: Lathrup Village police station — the page is an empty shell to scripts (226 characters; the text is drawn
+#   by JavaScript, and WebFetch got nothing usable; check:sources will report it as a miss, which holds it the same
+#   way). NOTHING on this line was read on the owner's page: the address is
+#   the federal lead's (USGS, 2020, which gives the mailing city Southfield). A person must read the page, confirm the
+#   address and add the station's phone, or drop the line.
+# from sal_uspolice_lathrup_village_police_department
+Lathrup Village police station | Lathrup Village Police Department | safe.police | A police station. | 27400 Southfield Road | Lathrup Village | 48076 | | https://www.lathrupvillage.org/page/public-safety | Call first | | https://www.lathrupvillage.org/page/public-safety | notice=If you are in danger, call 911.
+# from sal_uspolice_madison_heights_police_department
+Madison Heights police station | Madison Heights Police Department | safe.police | A police station. Someone is there all day and night, and there is a phone you can use. | 280 West Thirteen Mile Road | Madison Heights | 48071 | 248-585-2100 | https://www.madisonheightsmi.gov/230/Police | Open 24/7 | | https://www.madisonheightsmi.gov/230/Police | flags=walk_in; phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_novi_police_department
+Novi police station | Novi Police Department | safe.police | A police station. The non-emergency number is answered at any time. | 45125 Ten Mile Road | Novi | 48375 | 248-348-7100 | https://cityofnovi.org/services/public-safety/police/ | Call first | | https://cityofnovi.org/services/public-safety/police/ | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_oak_park_department_of_public_safety_police_department
+Oak Park police station | Oak Park Department of Public Safety | safe.police | A police station, next to City Hall. The department does police, fire and ambulance work. | 13800 Oak Park Blvd | Oak Park | 48237 | 248-691-7520 | https://www.oakparkmi.gov/departments/public-safety | Call first | | https://www.oakparkmi.gov/departments/public-safety | phone_label=Public safety; notice=If you are in danger, call 911.
+# from sal_uspolice_michigan_state_police_district_2_metro_post_21 (source: Royal Oak Township's own police page; see notes)
+State Police Metro North Post | Michigan State Police | safe.police | A Michigan State Police post. It is the police for Royal Oak Township. | 14350 West 10 Mile Rd | Oak Park | 48237 | 248-584-5740 | https://www.royaloaktwp.com/index.php/services/police | Lobby 8am-4pm; the page does not say which days | | https://www.royaloaktwp.com/index.php/services/police | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_oakland_university_police_department (address from the owner page, not the lead's 2200 N. Squirrel)
+Oakland University police station | Oakland University Police Department | safe.police | A police station on the Oakland University campus, in the Police and Support Services Building. Someone is there all day and night, and there is a phone you can use. | 201 Meadow Brook Road | Rochester | 48309 | 248-370-3331 | https://www.oakland.edu/police/ | Open 24/7 | | https://www.oakland.edu/police/ | flags=walk_in; phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_pleasant_ridge_police_department
+Pleasant Ridge police station | Pleasant Ridge Police Department | safe.police | A police station. Officers are on duty 24 hours a day, and the phone is answered 24 hours a day. | 23925 Woodward Avenue | Pleasant Ridge | 48069 | 248-541-2900 | https://cityofpleasantridge.org/pleasant-ridge-police/ | Call first | | https://cityofpleasantridge.org/pleasant-ridge-police/ | phone_label=Non-emergency, press 1 for dispatch; notice=If you are in danger, call 911.
+# from sal_uspolice_oakland_county_sheriff_s_office_pontiac_patrol_services
+Sheriff's substation, Pontiac | Oakland County Sheriff's Office | safe.police | A sheriff's office substation. It is the police for Pontiac. Someone is there all day and night, and there is a phone you can use. | 110 East Pike Street | Pontiac | 48342 | 248-409-7100 | https://www.oaklandcountymi.gov/government/sheriff | Open 24/7 | | https://www.oaklandcountymi.gov/government/sheriff/ocso-organization/law-enforcement/city-of-pontiac | flags=walk_in; phone_label=Substation non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_rochester_police_department
+Rochester police station | Rochester Police Department | safe.police | A police station. | 400 Sixth St | Rochester | 48307 | 248-651-9621 | https://www.ci.rochester.mi.us/176/Police-Department | Call first | | https://www.ci.rochester.mi.us/176/Police-Department | phone_label=Police department; notice=If you are in danger, call 911.
+# from none (Oakland County Sheriff's Rochester Hills substation; the city has no police department of its own)
+Sheriff's substation, Rochester Hills | Oakland County Sheriff's Office | safe.police | A sheriff's office substation. It is the police for Rochester Hills. | 750 Barclay Circle | Rochester Hills | 48307 | 248-537-3530 | https://www.oaklandcountymi.gov/government/sheriff | Lobby 7am-11pm; the page does not say which days | | https://www.oaklandcountymi.gov/government/sheriff/ocso-organization/law-enforcement/city-of-rochester-hills | phone_label=Substation non-emergency; notice=If you are in danger, call 911.
+# from none (Oakland County Sheriff's Orion Township substation; the township has no police department of its own)
+Sheriff's substation, Orion Township | Oakland County Sheriff's Office | safe.police | A sheriff's office substation. It is the police for Orion Township. | 2323 Joslyn Road | Lake Orion | 48360 | 248-393-0090 | https://www.oaklandcountymi.gov/government/sheriff | Lobby 8:30am-4:30pm; the page does not say which days | | https://www.oaklandcountymi.gov/government/sheriff/ocso-organization/law-enforcement/substations/orion-township | phone_label=Substation non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_royal_oak_police_department
+Royal Oak police station | Royal Oak Police Department | safe.police | A police station. | 450 E. 11 Mile | Royal Oak | 48067 | 248-246-3500 | https://www.romi.gov/304/Police | Call first | | https://www.romi.gov/304/Police | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_southfield_police_department
+Southfield police station | Southfield Police Department | safe.police | A police station. | 26000 Evergreen Road | Southfield | 48076 | 248-796-5500 | https://www.cityofsouthfield.com/departments/police-department/contact-us | Call first | | https://www.cityofsouthfield.com/departments/police-department/contact-us | phone_label=Patrol front desk; notice=If you are in danger, call 911.
+# from sal_uspolice_sylvan_lake_police_department
+Sylvan Lake police station | Sylvan Lake Police Department | safe.police | A police station. Someone is there all day and night, and there is a phone you can use. | 1820 Inverness | Sylvan Lake | 48320 | 248-682-2104 | https://www.sylvanlake.org/residents/police_department/index.php | Open 24/7 | | https://www.sylvanlake.org/residents/police_department/index.php | flags=walk_in; phone_label=Non-emergency, 24 hours; notice=If you are in danger, call 911.
+# from sal_uspolice_troy_police_department
+Troy police station | Troy Police Department | safe.police | A police station. | 500 West Big Beaver Road | Troy | 48084 | 248-524-3477 | https://troymi.gov/departments/police/index.php | Call first | | https://troymi.gov/departments/police/index.php | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_walled_lake_police_department
+Walled Lake police station | Walled Lake Police Department | safe.police | A police station. | 1499 E. West Maple Road | Walled Lake | 48390 | 248-624-3111 | https://walledlake.us/index.php/contact-the-police-department | Call first | | https://walledlake.us/index.php/contact-the-police-department | phone_label=Dispatch; notice=If you are in danger, call 911.
+# from sal_uspolice_waterford_township_police_department
+Waterford Township police station | Waterford Township Police Department | safe.police | A police station. The front desk is open every day from 7 a.m. to 7 p.m. After 7 p.m., use the blue call box in the lobby and dispatch will send an officer. | 5150 Civic Center Drive | Waterford | 48329 | 248-674-0351 | https://www.waterfordmi.gov/162/Police | Daily 7am-7pm | | https://www.waterfordmi.gov/1112/Contact | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_west_bloomfield_police_department
+West Bloomfield police station | West Bloomfield Township Police Department | safe.police | A police station. | 4530 Walnut Lake Road | West Bloomfield | 48323 | 248-975-9200 | https://www.wbtownship.org/government/departments/police/police.php | Call first | | https://www.wbtownship.org/government/departments/police/police.php | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# BROWSER: White Lake Township police station — our fetcher's request to whitelaketwp.com fails (no answer). Read
+#   with WebFetch on 2026-09-24: "7525 Highland Road, White Lake, MI 48383", Non-Emergency "(248) 698-4400". The page
+#   also prints "M-T 7:30am-5:30pm", which could not be told apart from the township office's hours, so not used.
+# from sal_uspolice_white_lake_township_police
+White Lake Township police station | White Lake Township Police Department | safe.police | A police station. | 7525 Highland Road | White Lake | 48383 | 248-698-4400 | https://www.whitelaketwp.com/police | Call first | | https://www.whitelaketwp.com/police | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_wixom_police_department
+Wixom police station | Wixom Police Department | safe.police | A police station. Someone is there all day and night, and there is a phone you can use. | 49045 Pontiac Trail | Wixom | 48393 | 248-624-6114 | https://www.wixomgov.org/departments/police-department | Open 24/7 | | https://www.wixomgov.org/departments/police-department | flags=walk_in; phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_wolverine_lake_police_department (village of Wolverine Lake, Commerce Township)
+Wolverine Lake police station | Wolverine Lake Police Department | safe.police | A police station. | 425 Glengary Road | Wolverine Lake | 48390 | 248-624-1710 | https://www.wolverinelake.com/government/departments/police_department/index.php | Call first | | https://www.wolverinelake.com/government/departments/police_department/index.php | phone_label=Police department; notice=If you are in danger, call 911.
+
+# ---------- Police: Macomb County ----------
+# from sal_uspolice_center_line_department_of_public_safety_police_department
+Center Line police station | Center Line Department of Public Safety | safe.police | A police station. The department does police and fire work. | 7070 E Ten Mile Road | Center Line | 48015 | 586-757-2200 | https://www.centerline.gov/167/About-Public-Safety | Call first | | https://www.centerline.gov/167/About-Public-Safety | phone_label=Public safety; notice=If you are in danger, call 911.
+# from sal_uspolice_chesterfield_township_police_department
+Chesterfield Township police station | Chesterfield Township Police Department | safe.police | A police station. | 46525 Continental Drive | Chesterfield Township | 48047 | 586-949-2322 | https://chesterfieldpolice.org/ | Mon-Tue 9am-4pm; Wed 9am-5pm; Thu-Fri 9am-4pm | | https://chesterfieldpolice.org/contact-info/ | phone_label=Police department dispatch; notice=If you are in danger, call 911.
+# from sal_uspolice_clinton_township_police_department_headquarters (the page gives a station front desk here)
+Clinton Township police station | Clinton Township Police Department | safe.police | A police station. | 37985 Groesbeck Highway | Clinton Township | 48036 | 586-493-7802 | https://clintontownship.com/281/Police | Call first | | https://clintontownship.com/281/Police | phone_label=Station front desk; phone2=586-469-5502; phone2_label=Police dispatch, non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_eastpointe_police_department
+Eastpointe police station | Eastpointe Police Department | safe.police | A police station. | 16083 E. 9 Mile Road | Eastpointe | 48021 | 586-445-5100 | https://www.eastpointemi.gov/departments/public_safety/eastpointe_police_department/index.php | Call first | | https://www.eastpointemi.gov/departments/public_safety/eastpointe_police_department/index.php | phone_label=Front desk; phone2=586-777-6700; phone2_label=Dispatch, non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_fraser_police_department
+Fraser police station | Fraser Department of Public Safety | safe.police | A police station. The department does police and fire work. The non-emergency number is answered 24 hours a day. | 33000 Garfield Road | Fraser | 48026 | 586-777-6700 | https://www.frasercitymi.gov/Directory/Home/DepartmentListing?DID=12 | Call first | | https://www.frasercitymi.gov/Directory/Home/DepartmentListing?DID=12 | phone_label=Dispatch, non-emergency; phone2=586-293-2000; phone2_label=Administration office; notice=If you are in danger, call 911.
+# from sal_uspolice_macomb_community_college_police_department_south_campus
+Macomb Community College police, South Campus | Macomb Community College Police Department | safe.police | The college police office on Macomb Community College's South Campus, in K Building, Room 340. | 14500 E. 12 Mile Rd | Warren | 48088 | 586-445-7135 | https://www.macomb.edu/about-macomb/college-police/index.html | Call first | | https://www.macomb.edu/about-macomb/college-police/index.html | phone_label=College police; notice=If you are in danger, call 911.
+# from none (the same page lists the college police office on Center Campus)
+Macomb Community College police, Center Campus | Macomb Community College Police Department | safe.police | The college police office on Macomb Community College's Center Campus, in I Building, Room 103. | 44575 Garfield Rd | Clinton Township | 48038 | 586-445-7135 | https://www.macomb.edu/about-macomb/college-police/index.html | Call first | | https://www.macomb.edu/about-macomb/college-police/index.html | phone_label=College police; notice=If you are in danger, call 911.
+# from sal_uspolice_new_baltimore_police_department
+New Baltimore police station | New Baltimore Police Department | safe.police | A police station. | 37885 Green Street | New Baltimore | 48047 | 586-725-2181 | https://www.cityofnewbaltimore.org/Directory.aspx?did=13 | Call first | | https://www.cityofnewbaltimore.org/Directory.aspx?did=13 | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_roseville_police_department
+Roseville police station | Roseville Police Department | safe.police | A police station. | 29753 Gratiot Avenue | Roseville | 48066 | 586-447-4483 | https://www.roseville-mi.gov/200/Police | Call first | | https://www.roseville-mi.gov/240/Department-Administration | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_saint_clair_shores_police_department
+St. Clair Shores police station | St. Clair Shores Police Department | safe.police | A police station. | 27665 Jefferson Ave | St. Clair Shores | 48081 | 586-445-5300 | https://www.scsmi.net/240/Police | Call first | | https://www.scsmi.net/240/Police | phone_label=Main phone, press 1 for the front desk; phone2=586-777-6700; phone2_label=Dispatch, non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_shelby_township_police_department
+Shelby Township police station | Shelby Township Police Department | safe.police | A police station, on the township's municipal campus next to the 41A District Court. | 52530 Van Dyke Ave | Shelby Township | 48316 | 586-731-2121 | https://www.shelbytwp.org/government/departments/police-department | Call first | | https://www.shelbytwp.org/Home/Components/FacilityDirectory/FacilityDirectory/36/32 | phone_label=Police department; notice=If you are in danger, call 911.
+# from sal_uspolice_sterling_heights_police_department
+Sterling Heights police station | Sterling Heights Police Department | safe.police | A police station. | 40333 Dodge Park Road | Sterling Heights | 48313 | 586-446-2801 | https://www.sterlingheights.gov/466/Police-Department | Call first | | https://www.sterlingheights.gov/466/Police-Department | phone_label=Front desk; phone2=586-446-2800; phone2_label=Dispatch, non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_utica_police_department
+Utica police station | Utica Police Department | safe.police | A police station. | 7550 Auburn Road | Utica | 48317 | 586-731-2345 | https://www.cityofutica.org/departments/utica_police/index.php | Call first | | https://www.cityofutica.org/departments/utica_police/index.php | phone_label=Non-emergency; notice=If you are in danger, call 911.
+# from sal_uspolice_warren_police_department
+Warren police station | Warren Police Department | safe.police | A police station. | 29900 S. Civic Center Blvd | Warren | 48093 | 586-574-4700 | https://www.cityofwarren.org/departments/police-department/ | Call first | | https://www.cityofwarren.org/departments/police-department/ | phone_label=Police department; notice=If you are in danger, call 911.
+
+# ---------- Emergency rooms ----------
+# from sal_cmser_ascension_providence_hospital_southfield_and_novi (Southfield campus)
+Emergency room at Providence Southfield Hospital | Henry Ford Health | health.er | An emergency room, open all day and night. | 16001 W 9 Mile Rd | Southfield | 48075 | 248-849-3000 | https://www.henryford.com/ | Open 24 hours, 7 days a week | | https://www.henryford.com/locations/providence-southfield-hospital | phone_label=Hospital main line; notice=If someone could die, call 911 first.
+# from sal_cmser_ascension_providence_hospital_southfield_and_novi (Novi campus)
+Emergency room at Providence Novi Hospital | Henry Ford Health | health.er | An emergency room, open all day and night. A Level II adult trauma center. | 47601 Grand River Ave | Novi | 48374 | 248-465-4100 | https://www.henryford.com/ | Open 24 hours, 7 days a week | | https://www.henryford.com/locations/providence-novi-hospital | phone_label=Hospital main line; notice=If someone could die, call 911 first.
+# from sal_cmser_ascension_providence_rochester_hospital (now Henry Ford Rochester Hospital)
+Emergency room at Rochester Hospital | Henry Ford Health | health.er | An emergency room, open all day and night. A Level III adult trauma center. | 1101 W University Dr | Rochester | 48307 | 248-652-5000 | https://www.henryford.com/ | Open 24 hours, 7 days a week | | https://www.henryford.com/locations/rochester-hospital | phone_label=Hospital main line; notice=If someone could die, call 911 first.
+# from sal_cmser_henry_ford_health_warren_hospital
+Emergency room at Warren Hospital | Henry Ford Health | health.er | An emergency room, open all day and night. A Level III adult trauma center. | 11800 12 Mile Rd | Warren | 48093 | 586-573-5000 | https://www.henryford.com/ | Open 24/7 | | https://www.henryford.com/locations/warren-hospital | phone_label=Hospital main line; notice=If someone could die, call 911 first.
+# from sal_cmser_henry_ford_macomb_hospital
+Emergency room at Macomb Hospital | Henry Ford Health | health.er | An emergency room, open all day and night. | 15855 19 Mile Rd | Clinton Township | 48038 | 586-263-2601 | https://www.henryford.com/ | Open 24 hours, 7 days a week | | https://www.henryford.com/locations/macomb | phone_label=Emergency; phone2=586-263-2300; phone2_label=Hospital main line; notice=If someone could die, call 911 first.
+# from sal_cmser_henry_ford_health_west_bloomfield_hospital
+Emergency room at West Bloomfield Hospital | Henry Ford Health | health.er | An emergency room, open all day and night. | 6777 W Maple Rd | West Bloomfield | 48322 | 248-325-0300 | https://www.henryford.com/ | Open 24 hours, 7 days a week | | https://www.henryford.com/locations/west-bloomfield | phone_label=Emergency; phone2=248-325-1000; phone2_label=Hospital main line; notice=If someone could die, call 911 first.
+# from sal_cmser_wyandotte_hospital_and_medical_center
+Emergency room at Wyandotte Hospital | Henry Ford Health | health.er | An emergency room, open all day and night. | 2333 Biddle Ave | Wyandotte | 48192 | 734-246-7095 | https://www.henryford.com/ | Open 24 hours, 7 days a week | | https://www.henryford.com/locations/wyandotte | phone_label=Emergency; phone2=734-246-6000; phone2_label=Hospital main line; notice=If someone could die, call 911 first.
+# from none (Henry Ford Medical Center - Madison Heights: "provides 24/7 emergency care for patients of all ages")
+Emergency room at Medical Center - Madison Heights | Henry Ford Health | health.er | An emergency room for all ages, open all day and night. | 27351 Dequindre Rd | Madison Heights | 48071 | 248-967-7000 | https://www.henryford.com/ | Open 24 hours, 7 days a week | | https://www.henryford.com/locations/madison-heights-hospital | phone_label=Main line; notice=If someone could die, call 911 first.
+# from none (Henry Ford Medical Center - Sterling Heights: "a 24/7 emergency department")
+Emergency room at Medical Center - Sterling Heights | Henry Ford Health | health.er | An emergency room, open all day and night, inside a Henry Ford medical center. | 3500 15 Mile Rd | Sterling Heights | 48310 | 586-977-9300 | https://www.henryford.com/ | Open 24/7 | | https://www.henryford.com/locations/sterling-heights | phone_label=Main line; notice=If someone could die, call 911 first.
+# from sal_cmser_beaumont_hospital_farmington_hills
+Emergency room at Farmington Hills Hospital | Corewell Health | health.er | An emergency room, open all day and night. | 28050 Grand River Ave. | Farmington Hills | 48336 | 947-521-8566 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000193631/corewell-health-farmington-hills-hospital-emergency | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from none (Corewell Health Emergency - Livonia/Northville, a department of Farmington Hills Hospital)
+Emergency room, Livonia/Northville | Corewell Health | health.er | An emergency room, open all day and night. | 39000 7 Mile Road | Livonia | 48152 | 947-523-4316 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000193647/corewell-health-emergency-livonia-northville | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from sal_cmser_beaumont_hospital_grosse_pointe
+Emergency room at Beaumont Grosse Pointe Hospital | Corewell Health | health.er | An emergency room, open all day and night. | 468 Cadieux Road | Grosse Pointe | 48230 | 313-473-1605 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000194548/corewell-health-beaumont-grosse-pointe-hospital-emergency | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from sal_cmser_beaumont_hospital_royal_oak (Stuart H. Blanck Emergency, William Beaumont University Hospital)
+Emergency room at William Beaumont University Hospital | Corewell Health | health.er | An emergency room, open all day and night. | 3601 W. 13 Mile Road | Royal Oak | 48073 | 248-898-7000 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000193216/corewell-health-stuart-h-blanck-emergency-william-beaumont-university-hospital | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from sal_cmser_beaumont_hospital_taylor
+Emergency room at Taylor Hospital | Corewell Health | health.er | An emergency room, open all day and night. | 10000 Telegraph Road | Taylor | 48180 | 313-295-5001 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000194550/corewell-health-taylor-hospital-emergency | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from sal_cmser_beaumont_hospital_troy
+Emergency room at Beaumont Troy Hospital | Corewell Health | health.er | An emergency room, open all day and night. | 44201 Dequindre Road | Troy | 48085 | 248-964-8787 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000194552/corewell-health-beaumont-troy-hospital-emergency | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from sal_cmser_corewell_health_trenton_hospital (the page gives 5400 Fort St.; CMS has 5450)
+Emergency room at Trenton Hospital | Corewell Health | health.er | An emergency room, open all day and night. | 5400 Fort St. | Trenton | 48183 | 734-671-3883 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000194551/corewell-health-trenton-hospital-emergency | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from sal_cmser_corewell_health_wayne_hospital
+Emergency room at Wayne Hospital | Corewell Health | health.er | An emergency room, open all day and night. | 33155 Annapolis St. | Wayne | 48184 | 734-467-4042 | https://corewellhealth.org/ | Open 24 hours, 7 days a week | | https://corewellhealth.org/locations/LOC0000193636/corewell-health-wayne-hospital-emergency | phone_label=Emergency department main line; notice=If someone could die, call 911 first.
+# from sal_cmser_garden_city_hospital
+Emergency room at Garden City Hospital | Garden City Hospital | health.er | An emergency room, open all day and night, every day of the year. | 6245 Inkster Road | Garden City | 48135 | 734-458-3300 | https://gch.org/ | Open 24 hours, 7 days a week | | https://gch.org/services/emergency-services/ | phone_label=Emergency department; notice=If someone could die, call 911 first.
+# from none (Garden City Hospital's free-standing emergency room at the Westland Community Health Center)
+Emergency room at Westland Community Health Center | Garden City Hospital | health.er | A free-standing emergency room run by Garden City Hospital, open all day and night, every day of the year. | 35700 Warren Road | Westland | 48185 | 313-828-5000 | https://gch.org/ | Open 24 hours, 7 days a week | | https://gch.org/services/emergency-services/ | phone_label=Emergency department; notice=If someone could die, call 911 first.
+# from sal_cmser_mclaren_macomb (source: the hospital's home page; its emergency page prints no phone)
+Emergency room at McLaren Macomb | McLaren Health Care | health.er | An emergency room, open all day and night. | 1000 Harrington Blvd. | Mount Clemens | 48043 | 586-493-8000 | https://www.mclaren.org/macomb | Open 24/7 | | https://www.mclaren.org/macomb | phone_label=Hospital main line; notice=If someone could die, call 911 first.
+# from sal_cmser_mclaren_oakland
+Emergency room at McLaren Oakland | McLaren Health Care | health.er | An emergency room, open all day and night. A verified trauma center. | 50 N Perry St | Pontiac | 48342 | 248-338-5332 | https://www.mclaren.org/ | Open 24/7 | | https://www.mclaren.org/main/locations/emergency-department-at-mclaren-oakland-670 | phone_label=Emergency department; notice=If someone could die, call 911 first.
+# from sal_cmser_st_joe_mercy_hospital_system_livonia (now Trinity Health Livonia Hospital)
+Emergency room at Livonia Hospital | Trinity Health Michigan | health.er | An emergency room, open all day and night, every day of the year. | 36475 Five Mile Rd | Livonia | 48154 | 734-655-4800 | https://www.trinityhealthmichigan.org/ | Open 24 hours, 7 days a week | | https://www.trinityhealthmichigan.org/location/trinity-health-emergency-livonia-hospital | phone_label=Emergency department; notice=If someone could die, call 911 first.
+# from sal_cmser_trinity_health_oakland_hospital
+Emergency room at Oakland Hospital | Trinity Health Michigan | health.er | An emergency room and Level II trauma center, open all day and night, for adults and children. | 44405 Woodward Ave | Pontiac | 48341 | 248-758-7000 | https://www.trinityhealthmichigan.org/ | Open 24 hours, 7 days a week | | https://www.trinityhealthmichigan.org/location/trinity-health-emergency-oakland-hospital | phone_label=Emergency department; notice=If someone could die, call 911 first.
+# BROWSER: Huron Valley-Sinai emergency room — site refuses scripts (dmc.org answers our fetcher with bot protection
+#   and WebFetch with 403, as it has since 2026-09-20). NOTHING on this line was read on the owner's page: the name,
+#   address and phone are the CMS lead's (Hospital General Information, 2026-07-22). A person must read the page,
+#   confirm each field and that it says 24 hours, or drop the line. `what` says only "An emergency room." until then.
+# from sal_cmser_huron_valley_sinai_hospital
+Emergency room at Huron Valley-Sinai Hospital | Detroit Medical Center | health.er | An emergency room. | One William Carls Drive | Commerce Township | 48382 | 248-937-3370 | https://www.dmc.org | Call first | | https://www.dmc.org/locations/detail/dmc-huron-valley-sinai-hospital---emergency | phone_label=Hospital main line; notice=If someone could die, call 911 first.

@@ -115,7 +115,7 @@ class MainActivity : Activity() {
 
     /**
      * The Map tab's first open (docs/05, DECISIONS 2026-09-21). All three are in memory: our own card waiting to
-     * be answered, a fix that came from outside the four cities, and "the decision has already been made this
+     * be answered, a fix that came from outside the service area, and "the decision has already been made this
      * launch". The one thing that outlives the launch is the answered flag, in [locateFlags] — a boolean, and
      * nothing else. The position itself is [near] and is never written down.
      */
