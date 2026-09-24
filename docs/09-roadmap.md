@@ -33,7 +33,9 @@ exact numbers on every neighborhood page; police and fire stations under "Get so
 
 ### 1. Provider-verified listings — the biggest freshness lever
 
-The design, with the seven decisions it waits on, is [14-provider-verified-listings.md](14-provider-verified-listings.md).
+**Built 2026-09-24** ([14-provider-verified-listings.md](14-provider-verified-listings.md), with Kyle's seven
+decisions and what was built). What is left is people's work: the project mailbox, and the first round of emails
+to the 213 organizations whose listings cite their own website. The plan as first written follows.
 
 Everything we do today notices a problem *after* it exists: a page stopped matching, a visitor found a locked
 door. The only party who knows *before* is the organization itself. A script can notice that a page changed; only

@@ -78,9 +78,9 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   [test script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
 - **Three clients, one spec.** A web PWA (vanilla TypeScript), an iPhone app (SwiftUI) and an Android app (Kotlin,
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
-  and trip plans — are written three times against [one spec](schema/query-spec.md) and **203 shared fixture
+  and trip plans — are written three times against [one spec](schema/query-spec.md) and **205 shared fixture
   cases**; all three pass every case.
-- **Tested and small.** 1,280 tests in `pnpm test`, 369 in `swift test`, 375 in Gradle on a plain JDK. 102 KB of
+- **Tested and small.** 1,318 tests in `pnpm test`, 369 in `swift test`, 375 in Gradle on a plain JDK. 102 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
   (25 KB) loads only if chosen; the bundle is 2.4 MB.
 
@@ -105,7 +105,9 @@ A directory is only as good as its worst listing. Full detail: [docs/04](docs/04
 10. **It never rots silently.** A copy older than 72 hours says so, older than 30 days says "call first," and a
     documented sunset switch points every phone at 211 ([docs/12](docs/12-gift-and-handoff.md)).
 
-The best next improvement is **provider-verified listings** — see the [roadmap](#roadmap).
+11. **The people who run a place can say "still right" or fix it.** A steward emails a one-use link to the address
+    on the organization's own page; the answer is dated ("The people who run it checked this 3 days ago"), and any
+    change waits for a steward. No account, and the organization's address is never stored ([docs/14](docs/14-provider-verified-listings.md)).
 
 ## Privacy
 
@@ -125,7 +127,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,280 tests
+pnpm test                                   # 1,318 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/
@@ -146,9 +148,8 @@ More: [iPhone](apps/ios/README.md) · [Android](apps/android/README.md) · [desi
 ## Roadmap
 
 **Now** (the fuller version is [docs/09](docs/09-roadmap.md))
-- **Provider-verified listings** — the biggest freshness lever. The owner knows first when hours change; a script
-  can only notice that a page changed. A no-account "confirm or fix your listing" flow: a signed link sent to the
-  address on the organization's own page, one tap to confirm, and any change held for a steward.
+- **Every organization asked in turn** — the first round of "Is this listing right?" emails to the 213 organizations
+  whose listings cite their own website, then every three months.
 - Native-speaker review of Spanish, Arabic and Bengali, crisis screens first; testing with people who use screen
   readers, switches and large text ([script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
 - App Store and Google Play releases.

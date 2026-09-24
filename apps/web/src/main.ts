@@ -26,6 +26,7 @@ import { canSave, canShare, clearSaved, loadSaved, toggleSaved } from './saved.j
 import { safeUrl } from './url.js';
 import { focusSelector, type FocusEl } from './focus.js';
 import { directionsHref, dirPayload, transitAppHref, transitHref } from './directions.js';
+import { clock, clockHtml, hoursLine, prettyDate } from './hours.js';
 import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
@@ -156,24 +157,13 @@ function announce(message: string): void {
   setTimeout(() => { if (sayEl) sayEl.textContent = message; }, 60);
 }
 
-/** A clock time. The digits stay Western in every language (DECISIONS 2026-09-20), but "am" and "pm" are our own
- *  two words and are translated like any other: Arabic writes ص and م, and `Intl` already says so in the alert
- *  lines, so leaving English here made one screen say both. */
-function clock(hhmm: string): string {
-  const [h, m] = hhmm.split(':').map(Number) as [number, number];
-  return `${((h + 11) % 12) + 1}${m ? ':' + String(m).padStart(2, '0') : ''} ${t(h < 12 || h === 24 ? 'clock.am' : 'clock.pm')}`;
-}
-/** A clock time (or a range of them) ready to sit inside a right-to-left sentence as one left-to-right run. */
-const clockHtml = (...parts: string[]) => `<bdi>${parts.map(esc).join(' – ')}</bdi>`;
+// clock, clockHtml, prettyDate and hoursLine are in hours.ts, shared with the owner page (owner.ts).
 const detroitDay = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Detroit' }).format(d);
 function dayName(date: string): string {
   const diff = Math.round((Date.parse(date) - Date.parse(detroitDay(now()))) / 86400000);
   if (diff === 0) return t('day.today');
   if (diff === 1) return t('day.tomorrow');
   return new Intl.DateTimeFormat(locale(), { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(date));
-}
-function prettyDate(d: string): string {
-  return d ? new Intl.DateTimeFormat(locale(), { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(d.slice(0, 10))) : '';
 }
 function openText(o: OpenResult): string {
   switch (o.state) {
@@ -826,15 +816,6 @@ function linkPanels(set: string, top = false): string {
   const l = LINKS[set]!, today = detroitDay(now());
   return `${l.items.filter((b) => !b.until || b.until >= today).map((b) => `<h2>${T(`link.${set}.${b.id}.title`)}</h2><div class="panel"><p>${T(`link.${set}.${b.id}.body`)}</p><div class="stackbtns">${ext(b.url, t(`link.${set}.${b.id}.label`))}</div></div>`).join('')}
     ${top ? '' : `<p class="foot">${T('benefits.note')} <a href="tel:211">211</a></p>`}<p class="foot">${T(top ? 'links.checked' : 'transit.checked', { date: prettyDate(l.checked) })}</p>`;
-}
-const DAY_ORDER = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
-function hoursLine(s: Schedule): string {
-  const codes = (s.byday ?? '').split(',').filter(Boolean);
-  const days = codes.map((d) => { const m = /^([+-]?\d+)?(\w\w)$/.exec(d)!; return (m[1] ? `#${m[1]} ` : '') + t('day.' + m[2]); });
-  const run = days.length > 2 && codes.every((d, i) => i === 0 || DAY_ORDER.indexOf(d) === DAY_ORDER.indexOf(codes[i - 1]!) + 1);
-  // "Mon, Wed, Fri": the comma is the list separator of the language reading it, not always a Latin one.
-  const label = !s.freq ? prettyDate(s.dtstart) : run ? `${days[0]} – ${days[days.length - 1]}` : days.join(t('list.sep'));
-  return `<li><span>${esc(label)}</span><span>${clockHtml(clock(s.opens_at), clock(s.closes_at))}${s.description ? ` · ${owner(s.description)}` : ''}</span></li>`;
 }
 // Directions live in directions.ts, so a row with coordinates but no street address (the naloxone and
 // test-strip spots) still gets them. A coordinate is never printed as an address.

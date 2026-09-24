@@ -23,8 +23,9 @@ This is the part D Compassion — and most resource directories — never solved
 | 12 | **Signed bundles.** Ed25519; clients pin two keys and keep the copy they had if a new one fails. | `pipeline/src/sign.ts`; each client's verify step |
 | 13 | **Old copies say so; retirement is deliberate.** Over 72 hours: "Call before you go." Over 30 days: "Call first, or call 211." `retired: true` points every phone at 211. | docs/12; fixtures `08-bundle-age` |
 
-**The best next improvement is provider-verified listings** (docs/09): everything above notices a problem after
-it exists; only the owner knows before. `owner_attest` is already a method in the schema and the badge rules.
+**Provider-verified listings** (docs/14, built 2026-09-24): everything above notices a problem after it exists;
+only the owner knows before. A steward emails the people who run a listing a one-use link; "still right" becomes a
+dated `owner_attest`, and "something changed" waits for a steward like any other change.
 
 ## Principles
 
@@ -156,7 +157,7 @@ Two entry points:
 
 **Resident/helper: "Add a place that helps"** (in app, on the Help tab under More). One screen. Fields: name of the place, what kind of help it is (one choice), what people get there, address (typed), days and times in your own words, the place's phone (optional), anything else, and "How do you know about it?" (I run it / I volunteer there / I went there / I heard about it). There is no choice for a domestic-violence shelter, and the API drops the address if one is sent anyway. It goes to the steward queue as a proposal. Confirmation: "Thanks. A person will check this place before it shows up. That can take a few days." *Note the honest promise: we say what actually happens.* Offline, it waits on the phone and sends when the phone is back online.
 
-**Provider: "Confirm or fix your listing"** (roadmap, docs/09 — the biggest freshness lever). A signed, expiring link sent to the contact address on the organization's own page; *Still right* records an `owner_attest` confirmation, and any change is held for a steward. That address is the one contact the project would hold — a provider's, never a resident's — see 08.
+**Provider: "Is this listing right?"** (docs/14, built 2026-09-24 — the biggest freshness lever). A steward makes a one-use link that works for 30 days on the steward page and emails it, by hand, to the contact address on the organization's own page. The page it opens shows the listing as residents see it: *Yes, it is still right* records a dated `owner_attest` ("The people who run it checked this {days} days ago"), which does not clear a report that the place closed (a steward calls); *Something changed* is a proposal about that listing, held for a steward. The organization's address is never stored — see 08. Who is asked: listings whose source is a page on their own website, every three months, monthly for mobile pantries.
 
 Church food banks: a church that posts its own food-bank distribution on its own site may be listed from that page. We never copy Forgotten Harvest or Gleaners partner lists.
 

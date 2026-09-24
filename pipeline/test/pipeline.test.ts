@@ -315,6 +315,21 @@ describe('report facts from the write API', () => {
     expect(badge(r, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
     expect(r.facts.last_confirm_method).toBe('community_confirm');
   });
+  it('an owner\'s "still right" is the newest confirmation: the badge says the people who run it checked', () => {
+    const r = row({ facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' }, checked_at_entry: '2026-09-01', entry_method: 'web' } });
+    applyAggregates([r], { circuit_breaker: false, targets: [{ target_id: 'sal_test', closed_open: 0, closed_last_at: null, wrong_open: 0, last_confirmed_at: '2026-09-16T09:00Z' }], attests: [{ target_id: 'sal_test', at: '2026-09-17T11:30Z' }] });
+    expect(r.facts).toMatchObject({ last_confirmed_at: '2026-09-17T11:30Z', last_confirm_method: 'owner_attest' });
+    expect(badge(r, new Date('2026-09-18T17:45:00Z'))).toMatchObject({ level: 'confirmed', key: 'badge.confirmed.owner_attest' });
+  });
+  it('an older owner confirmation never replaces a newer visitor\'s, and never clears a closed report (D4)', () => {
+    const newer = row({});
+    applyAggregates([newer], agg({ attests: [{ target_id: 'sal_test', at: '2026-09-15T08:00Z' }] }));
+    expect(newer.facts.last_confirm_method).toBe('community_confirm');
+    const closed = row({});
+    applyAggregates([closed], agg({ attests: [{ target_id: 'sal_test', at: '2026-09-18T08:00Z' }] }));   // after the closed report
+    expect(closed.facts.last_confirm_method).toBe('owner_attest');
+    expect(badge(closed, new Date('2026-09-18T17:45:00Z')).level).toBe('reported_closed');
+  });
   it('a steward restore puts the listing back but never claims anyone phoned (review 10b)', () => {
     for (const reason_code of ['restored', 'confirmed_by_phone']) {   // older overrides said confirmed_by_phone by default
       const r = row({ facts: { reports: { closed_open: 0, wrong_open: 0 }, source: { type: 'seed_list', name: 'test' }, checked_at_entry: '2026-09-01', entry_method: 'web' } });

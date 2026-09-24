@@ -39,6 +39,7 @@ In production the pipeline syncs every id at each publish.
 | When | What | How long |
 |---|---|---|
 | About weekly | Work the exceptions queue at `/admin/`: listings 2+ phones reported closed (highlighted), other corrections, new proposals (one entry check each), and **Pages that changed**: listings whose own web page, read again each night, no longer shows the phone number or street address we list, or could not be read. Open the page (`source_url` in `data/seed/resources.csv`). If the place changed, fix its row and press *I'll fix it*; if the page just moved things around, press *Checked: it's fine*. Either way the task stays closed until the check says something different. A task closes itself when the page matches again. The app never changes because of one | under an hour |
+| About weekly | `/admin/` → **Ask the people who run it**: make a link for a few of the listings due, and email each one from the project mailbox to the address on the organization's own page ("How to ask the people who run a listing" below). About three a working day keeps every listing on its three-month turn | 15 minutes |
 | Every month | `pnpm ingest:neighborhoods` and `pnpm ingest:basemap` refresh the neighborhood numbers and the street map from City open data (the nightly job does this on the 1st and opens a pull request). Read the diff, merge it | 5 minutes |
 | Every month, **by hand** | `pnpm ingest:transit` — the 11 transport layers on the Map tab. It is **deliberately not in `publish.yml`** (DECISIONS 2026-09-20): monthly by hand is the decision, because these layers change slowly and unevenly (bike lanes were edited 2026-09-19, the City's DDOT layers 2026-02-09, SMART's feed 2026-08-26) and each one's licence is still an open question. Read the diff of `data/ingested/transit/` and merge it; `source.json` records each owner and its licence text | 5 minutes |
 | Every year, **by hand**, when SEMCOG publishes a new crash year (it normally republishes each autumn) | `pnpm ingest:crashes` — the "Safe streets" numbers on neighborhood pages. It is **deliberately not in `publish.yml`** (DECISIONS 2026-09-20): the layer gains one year at a time, so a nightly run would only re-read the same years, and the licence is unsettled — SEMCOG **does** publish terms, a portal-wide [Copyright License Agreement](https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement) whose **one-way indemnification clause** Kyle has not knowingly accepted, and the records underneath are the Michigan State Police's. The agreement's **required** copyright notice is carried in NOTICE and is now printed on the Safe streets panel itself — but as a constant in `apps/web/src/hoods.ts` (`SEMCOG_NOTICE`) with the year written into it, while the bundle carries the same sentence with the year taken from the layer's own last-edited date. **When you refresh the layer, check that constant against `data/ingested/crashes.json`'s `license_notice`.** The script picks the five most recent complete years by itself, so nothing needs editing; read the diff of `data/ingested/crashes.json` and merge it, then `pnpm build:bundle`. What the file holds is **the five-year window only** — no per-year cells, because 18 suppressed "fewer than 5" counts could be worked out by subtracting the published years from a total (DECISIONS 2026-09-20). If you ever add a year breakdown back, run the test that proves a hidden cell still has more than one possible value. **If SEMCOG or MSP objects, delete `data/ingested/crashes.json` and rebuild: the panel disappears on its own.** | 5 minutes |
@@ -90,6 +91,35 @@ A steward is anyone who can open `/admin/`. There is no steward account in our c
 Their email is recorded next to each decision they make (`steward_actions`) and is never published.
 
 **Restoring a listing** someone archived by mistake: `/admin/` → **Archived by a steward** → *It's open again: restore it*. It comes back at the next build. Nothing was deleted.
+
+## How to ask the people who run a listing (docs/14)
+
+`/admin/` → **Ask the people who run it** lists who is due. It includes listings whose source is a page on their
+own website. Never-asked listings come first, then each one every three months, monthly for mobile pantries. A
+listing whose last link is still waiting for an answer is left out.
+
+1. **Make a link and an email.** The link works once, for 30 days. The page shows it once and only then, so copy
+   the email before you reload.
+2. **Open their page** (the link beside the name), and find the contact email it shows. Use only that address,
+   never one someone gave you another way. We never store it.
+3. **Send the email from the project mailbox**, as it is.
+4. **What comes back:**
+   - *Still right* updates the badge at the next build: "The people who run it checked this 0 days ago".
+   - *Something changed* appears under **Proposed new places** as "A change from the people who run it", beside
+     what the app says now. Call the number on their own page, or read the page, then fix the row in
+     `data/seed/resources.csv`. A new phone, address or place on the map is always your check first.
+   - If they said *still right* after a visitor reported the place closed, the listing goes to the top of
+     **Reported listings** with a note. Call before you clear or archive anything: their word alone does not clear
+     the report.
+
+**What our emails never contain, so a fake one is easy to tell:** anything but one link to `313help.com`, a request
+for a password, a payment or anything about the person, or an attachment. If an organization asks whether an email
+was really from us, it is if a steward made that link on `/admin/` that day.
+
+**Deploying this part:** the D1 migration `0005_owner.sql` must be applied before the code that uses it is merged,
+because `main` redeploys the Worker and the nightly build reads the aggregates:
+`pnpm --filter @313help/api exec wrangler d1 migrations apply 313-help --remote`. It only adds tables and one
+column, so the Worker already running is unaffected.
 
 ## How to retire the directory on purpose
 
@@ -170,9 +200,11 @@ Repository **variables** (not secret): `PUBLISH_ENABLED` (`true` turns the night
 `reports`: listing or place id, kind, optional note (phone numbers and emails masked before storage), optional suggested correction (hours and address masked the same way; a suggested phone is kept), observed and submitted time (to the minute; to the hour for places), a per-target daily hash, steward outcome, and `photo_key` when a photo came with a place report. After 180 days a report becomes a monthly count and the row is removed, together with its photo.
 `report_counts`: what is left of old reports: id, kind, month, count.
 `photos`: a random key, the upload hour, and which report it belongs to. The picture itself is in a private R2 bucket and is deleted 30 days after its report closes (one day if no report claimed it), or when its report becomes a monthly count, whichever comes first.
-`proposals`: the place's name, category, what it offers and schedule text (both masked like a note), address (never for DV), public phone, how the submitter knows, masked note. Removed 180 days after a steward settles it; an open proposal waits for a steward.
+`proposals`: for a change from the people who run a listing (docs/14), the listing id it is about; then the place's name, category, what it offers and schedule text (both masked like a note), address (never for DV), public phone, how the submitter knows, masked note. Removed 180 days after a steward settles it; an open proposal waits for a steward.
 `listing_overrides`: a steward's decision about a listing (archived, paused, or active again), the reason (`restored` for active again: a restore is never recorded as a phone check), a replacement id if there is one, and the minute. The pipeline applies these at build time.
 `steward_tasks`: tasks the machine raised for a steward. Today only the nightly re-check: a listing id, `missing` or `unreadable`, the page matcher's own words (which of the listing's published phone numbers or street address it could not find, or why the page could not be read), the day, and whether it is open, dismissed by a steward (`checked_fine` or `will_fix`), or closed because the page matched again.
+`owner_links`: one per "Is this listing right?" link (docs/14): the SHA-256 of its key (never the key), the listing id, its category when the link was made, the organization's page the steward took the address from, when it was made, expires and was used, and the answer (`still_right` or `changed`). **Never the organization's email address.** Removed 180 days after the link expired.
+`owner_attests`: a listing id and the minute its owner said "still right". Kept, like `report_counts`.
 `steward_actions`: steward email, action, reason code, optional note. Never published.
 There is no table of residents, and no column anywhere for an IP address, device, user agent, or location.
 

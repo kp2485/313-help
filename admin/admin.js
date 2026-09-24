@@ -5,7 +5,7 @@
 //   1. listings that visitors reported closed or moved   2. other corrections   3. proposed new places
 //   4. listings whose own web page changed (the nightly re-check).
 
-import { CLOSED, esc, groupReports, settleBody, taskItem } from './queue.js';
+import { CLOSED, esc, groupReports, ownerDue, ownerEmail, settleBody, taskItem } from './queue.js';
 
 const app = document.getElementById('app');
 const say = (text) => { const el = document.getElementById('say'); if (el) { el.textContent = ''; setTimeout(() => (el.textContent = text), 60); } };
@@ -16,6 +16,10 @@ const SCRIPT = 'Phone script: “Are you still running this? What days and times
 // `shown` is what the page last showed, by listing: a button settles those reports and no others (a report that
 // came in since stays open for the next look).
 let names = new Map(), shown = new Map(), message = '';
+// Listings that can be asked (docs/14), and the emails made on this page since it loaded. A link's key is answered
+// once by the Worker and lives only here, in memory, until the steward has copied it into their email.
+let askRows = [];
+const made = new Map();
 
 // Every write is JSON (an empty object when there is nothing to say): the API refuses any other steward write,
 // which is what stops another site from posting a form here with the steward's login (and the browser adds Origin).
@@ -35,12 +39,18 @@ async function loadNames() {
     const files = Object.keys(index.files).filter((f) => f.startsWith('category/') || f === 'archived.json' || f === 'places/greenway.json');
     for (const f of files) {
       const data = await (await fetch(`/data/bundle/v1/${f}`, { cache: 'no-store' })).json();
-      for (const row of Array.isArray(data) ? data : data.segments ?? []) names.set(row.id, { name: row.name, phone: row.phones?.[0]?.number, category: row.category ?? 'greenway' });
+      for (const row of Array.isArray(data) ? data : data.segments ?? []) {
+        names.set(row.id, { name: row.name, phone: row.phones?.[0]?.number, category: row.category ?? 'greenway', what: row.what,
+          // Written exactly as the owner page fills its form (apps/web/src/owner.ts), so an address nobody touched
+          // never shows as changed.
+          address: row.address ? `${row.address.line1}, ${row.address.city}${row.address.zip ? ` ${row.address.zip}` : ''}` : null, hours: row.hours_text ?? null });
+        if (f.startsWith('category/') && row.status === 'active') askRows.push({ id: row.id, name: row.name, category: row.category, source_url: row.facts?.source?.url, website: row.website, scheduled: (row.schedules ?? []).length > 0 });
+      }
     }
   } catch { /* the queue still works with ids only */ }
 }
 
-function reportGroup({ target_id: targetId, reports, hot, phones }) {
+function reportGroup({ target_id: targetId, reports, hot, phones, owner_at: ownerAt }) {
   const meta = names.get(targetId) ?? { name: targetId };
   const counts = {};
   for (const r of reports) counts[r.kind] = (counts[r.kind] ?? 0) + 1;
@@ -48,7 +58,7 @@ function reportGroup({ target_id: targetId, reports, hot, phones }) {
   return `<article class="item ${hot ? 'hot' : ''}" data-target="${esc(targetId)}">
     <h3>${esc(meta.name)}</h3>
     <p class="sub">${esc(targetId)}${meta.phone ? ` · <a href="tel:${esc(meta.phone)}">${esc(meta.phone)}</a>` : ''}</p>
-    <p class="tags">${hot ? `<span class="tag warn">Look at this one first: ${esc(String(phones ?? 2))} different phones said it closed or moved</span> ` : ''}${Object.entries(counts).map(([k, n]) => `<span class="tag ${CLOSED.includes(k) ? 'warn' : ''}">${esc(KIND[k] ?? k)} × ${n}</span>`).join(' ')}</p>
+    <p class="tags">${ownerAt ? `<span class="tag warn">Look at this one first: the people who run it said it is still right on ${esc(ownerAt.slice(0, 10))}, after it was reported closed. Call to check before you clear or archive anything.</span> ` : ''}${hot ? `<span class="tag warn">Look at this one first: ${esc(String(phones ?? 2))} different phones said it closed or moved</span> ` : ''}${Object.entries(counts).map(([k, n]) => `<span class="tag ${CLOSED.includes(k) ? 'warn' : ''}">${esc(KIND[k] ?? k)} × ${n}</span>`).join(' ')}</p>
     <ul class="notes">${reports.filter((r) => r.detail || r.suggested || r.photo_key).map((r) => `<li><strong>${esc(KIND[r.kind] ?? r.kind)}</strong> · ${esc(r.submitted_at.slice(0, 10))}${r.detail ? ` · “${esc(r.detail)}”` : ''}${r.suggested ? ` · suggested: ${esc(r.suggested)}` : ''}${r.photo_key ? `<div class="photo"><img src="/v1/steward/photos/${esc(r.photo_key)}" alt="Photo sent with this report" loading="lazy"><button data-act="discard-photo" data-photo="${esc(r.photo_key)}">Delete this photo now</button><small>Never share or post a photo. If it shows a person, a face, a license plate or a house number, delete it. It deletes itself 30 days after the report is closed.</small></div>` : ''}</li>`).join('')}</ul>
     ${isListing ? `<p class="script">${esc(SCRIPT)}</p>
     <div class="actions">
@@ -65,7 +75,35 @@ function reportGroup({ target_id: targetId, reports, hot, phones }) {
     </div></article>`;
 }
 
+/** "Something changed", from the people who run a listing (docs/14): what the app says now, beside what they sent. */
+function ownerChange(p) {
+  const now = names.get(p.target_id) ?? {};
+  const line = (label, was, is) => `<tr><th scope="row">${label}</th><td>${esc(was ?? '')}</td><td${(was ?? '') !== (is ?? '') ? ' class="changed"' : ''}>${esc(is ?? '')}</td></tr>`;
+  return `<article class="item hot" data-proposal="${esc(p.id)}">
+    <h3>A change from the people who run it: ${esc(now.name ?? p.target_id)}</h3>
+    <p class="sub">${esc(p.target_id)} · ref ${esc(p.ref)} · ${esc(p.submitted_at.slice(0, 10))}. They answered the link a steward sent to the address on their own page.</p>
+    <table class="compare"><thead><tr><th></th><th scope="col">The app says now</th><th scope="col">They say</th></tr></thead><tbody>
+      ${line('Name', now.name, p.name)}${line('What', now.what, p.what)}${p.category === 'shelter.dv' ? '' : line('Address', now.address, p.address)}${line('Phone', now.phone, p.phone)}${line('Hours', now.hours, p.schedule_text)}
+    </tbody></table>${p.notes ? `<p class="sub">“${esc(p.notes)}”</p>` : ''}
+    <p class="script">Check it: call the number on their own page, or read the page. Then fix the row in data/seed/resources.csv. A new phone, address or place on the map needs your check first (docs/10 A5).</p>
+    <div class="actions"><button data-act="proposal" data-status="accepted" data-reason="listed" class="good">Checked and fixed the row</button>
+      <button data-act="proposal" data-status="rejected" data-reason="could_not_confirm">Couldn't confirm</button>
+      <button data-act="proposal" data-status="rejected" data-reason="spam">Spam</button></div></article>`;
+}
+
+/** A listing that is due to be asked, and the one button that makes its link. */
+function askItem({ row, last }) {
+  const email = made.get(row.id);
+  const before = last ? `Last asked ${esc(last.made_at.slice(0, 10))}: ${esc(last.answer === 'still_right' ? 'they said still right' : last.answer === 'changed' ? 'they sent a change' : 'no answer')}` : 'Never asked';
+  return `<article class="item" data-target="${esc(row.id)}"><h3>${esc(row.name)}</h3>
+    <p class="sub">${esc(row.id)} · ${esc(row.category)} · ${before} · <a href="${esc(row.source_url)}" target="_blank" rel="noopener noreferrer">their page</a></p>
+    ${email ? `<p>Open their page, find the contact email it shows, and send this from the project mailbox. The link is shown only here, only now.</p>
+      <textarea class="email" rows="16" readonly aria-label="The email to send to ${esc(row.name)}">${esc(email)}</textarea>`
+      : `<div class="actions"><button data-act="owner-link" class="good">Make a link and an email</button></div>`}</article>`;
+}
+
 function proposal(p) {
+  if (p.target_id) return ownerChange(p);
   return `<article class="item" data-proposal="${esc(p.id)}">
     <h3>${esc(p.name)} <span class="tag">${esc(p.category)}</span></h3>
     <p class="sub">Ref ${esc(p.ref)} · ${esc(p.submitted_at.slice(0, 10))} · submitter says: ${esc({ run_it: 'I run it', volunteer: 'I volunteer there', went_there: 'I went there', heard: 'I heard about it' }[p.how_known] ?? p.how_known)}</p>
@@ -80,8 +118,11 @@ function proposal(p) {
 
 async function render() {
   try {
-    const [queue, agg, tasks] = await Promise.all([api('/v1/steward/queue'), api('/v1/steward/aggregates'), api('/v1/steward/tasks')]);
-    const groups = groupReports(queue.reports, queue.closed_phones);
+    const [queue, agg, tasks, owner] = await Promise.all([api('/v1/steward/queue'), api('/v1/steward/aggregates'), api('/v1/steward/tasks'), api('/v1/steward/owner-links')]);
+    const groups = groupReports(queue.reports, queue.closed_phones, queue.owner_said_open ?? {});
+    // The ones just made stay on the page, with their email, until it is reloaded.
+    const due = ownerDue(askRows, owner.links, new Date());
+    const asking = [...askRows.filter((r) => made.has(r.id)).map((row) => ({ row, last: null })), ...due.filter((d) => !made.has(d.row.id)).slice(0, 20)];
     shown = new Map(groups.map((g) => [g.target_id, g]));
     const archived = (agg.overrides ?? []).filter((o) => o.status === 'archived');
     if (message) say(message);
@@ -91,6 +132,8 @@ async function render() {
       <section><h2>Proposed new places <span class="count">${queue.proposals.length}</span></h2>${queue.proposals.map(proposal).join('') || '<p class="empty">No proposals waiting.</p>'}</section>
       <section><h2>Pages that changed <span class="count">${tasks.tasks.length}</span></h2><p class="sub">Each night the listing's own web page is read again. These no longer show the phone number or street address we list, or could not be read. Nothing in the app has changed. Open the page (its link is <code>source_url</code> in data/seed/resources.csv); if the place changed, fix the row there.</p>
         ${tasks.tasks.map((t) => taskItem(t, names)).join('') || '<p class="empty">Every page still matches.</p>'}</section>
+      <section><h2>Ask the people who run it <span class="count">${due.length}</span></h2><p class="sub">Listings whose source is a page on their own website, due to be asked (docs/14): never asked first, then every three months, monthly for mobile pantries. Make a link, then email it yourself, from the project mailbox, to the address their own page shows. We never store that address. The link works once, for 30 days. What they say comes back here: "still right" updates the badge at the next build, and a change waits for you above.</p>
+        ${asking.map(askItem).join('') || '<p class="empty">Nobody is due.</p>'}${due.length > 20 ? `<p class="sub">And ${due.length - 20} more after these.</p>` : ''}</section>
       <section><h2>Publish</h2><p>Archiving and clearing take effect at the next bundle build. The nightly job does this; to do it now:</p><pre>pnpm build:bundle</pre>
       </section>
       <section><h2>Archived by a steward <span class="count">${archived.length}</span></h2><p class="sub">Nothing here was deleted. If a place turns out to be open, restore it; it comes back at the next build.</p>
@@ -106,7 +149,13 @@ app.addEventListener('click', async (ev) => {
   const group = shown.get(item.dataset.target) ?? { target_id: item.dataset.target, reports: [] };
   btn.disabled = true;
   try {
-    if (act === 'discard-photo') {
+    if (act === 'owner-link') {
+      const row = askRows.find((r) => r.id === item.dataset.target);
+      if (!row) throw new Error('That listing is not in the bundle this page loaded. Reload the page.');
+      const link = await api('/v1/steward/owner-links', { method: 'POST', body: JSON.stringify({ target_id: row.id, category: row.category, source_url: row.source_url }) });
+      made.set(row.id, ownerEmail(row.name, `${location.origin}/owner.html#${link.key}`, link.expires_at, row.source_url));
+      message = `Link made for ${row.name}. Copy the email below; the link is not shown again.`;
+    } else if (act === 'discard-photo') {
       await api(`/v1/steward/photos/${btn.dataset.photo}/discard`, { method: 'POST' });
       message = 'Photo deleted. The report is still here.';
     } else if (act === 'archive' || act === 'active') {

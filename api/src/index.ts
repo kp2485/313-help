@@ -5,10 +5,10 @@
 //   - times are coarsened before storage; free text is masked before storage
 
 import { Hono, type Context } from 'hono';
-import { keyring, verifyAccess, type JwksFetcher } from './access.js';
+import { DEV_STEWARD_VALUE, keyring, verifyAccess, type JwksFetcher } from './access.js';
 import { logFixed } from './log.js';
 import { MAX_PHOTO_BYTES, PHOTO_KEY, checkJpeg, type PhotoStore } from './photo.js';
-import { CLOSED_KINDS, CONFIRM_KINDS, WRONG_KINDS, isListingId, parseDismiss, parseListingStatus, parseProposal, parseReport, parseResolve, parseSettle, parseTargets, parseTasks } from './validate.js';
+import { CLOSED_KINDS, CONFIRM_KINDS, OWNER_LINK_DAYS, WRONG_KINDS, isListingId, parseDismiss, parseListingStatus, parseOwnerChange, parseOwnerKey, parseOwnerLink, parseProposal, parseReport, parseResolve, parseSettle, parseTargets, parseTasks } from './validate.js';
 
 export interface Stmt { bind(...args: unknown[]): Stmt; run(): Promise<{ meta: { changes: number } }>; all<T = Record<string, unknown>>(): Promise<{ results: T[] }>; first<T = Record<string, unknown>>(): Promise<T | null> }
 /** A batch is one transaction (D1), answering one result per statement. */
@@ -23,9 +23,6 @@ const randomId = (prefix: string, bytes = 8) => prefix + [...crypto.getRandomVal
 // `restored` says a steward put a listing back, and nothing more: it is never a phone check (review 10b).
 const REASONS = ['confirmed_by_phone', 'confirmed_in_person', 'confirmed_on_web', 'could_not_confirm', 'not_true', 'duplicate', 'spam', 'about_a_person', 'listed', 'not_a_fit', 'restored'];
 const inList = (kinds: string[]) => kinds.map((k) => `'${k}'`).join(',');
-
-/** The one value `DEV_STEWARD` may hold, and only with no Cloudflare Access settings present (api/.dev.vars). */
-export const DEV_STEWARD_VALUE = 'local';
 
 export function createApp(deps: Deps = { now: () => new Date() }) {
   const app = new Hono<{ Bindings: Env; Variables: { who: string } }>();
@@ -103,6 +100,47 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     return c.json({ accepted: true, ref }, 202);
   });
 
+  // ---- the people who run a listing (docs/14) ----------------------------------------------
+  // A steward sends a link, by hand, to the address on the organization's own page. The link's key is 32 random bytes;
+  // only its SHA-256 is stored. It works for one listing, once, for 30 days. Every way it can fail — unknown, used,
+  // expired — answers the same fixed words and records nothing, so a guess learns nothing (D3).
+  const OWNER_GONE = 'this link has expired or was already used';
+  const keyHash = async (key: string) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  const LIVE_LINK = "key_hash = ? AND used_at IS NULL AND expires_at > ?";
+
+  app.post('/v1/owner/look', async (c) => {
+    const parsed = parseOwnerKey(await body(c, 512));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const link = await c.env.DB.prepare(`SELECT target_id, category, expires_at FROM owner_links WHERE ${LIVE_LINK}`).bind(await keyHash(parsed.value.key), minute(deps.now())).first();
+    return link ? c.json(link) : c.json({ error: OWNER_GONE }, 404);
+  });
+
+  // "Still right": a dated owner_attest for the badge. It does not clear a report that the place closed; it puts the
+  // listing at the top of the steward queue, and a steward calls (D4).
+  app.post('/v1/owner/confirm', async (c) => {
+    const parsed = parseOwnerKey(await body(c, 512));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const at = minute(deps.now()), answer = randomId('att_');
+    const [used] = await c.env.DB.batch([
+      c.env.DB.prepare(`UPDATE owner_links SET used_at = ?, answer = 'still_right', answer_id = ? WHERE ${LIVE_LINK}`).bind(at, answer, await keyHash(parsed.value.key), at),
+      c.env.DB.prepare('INSERT OR IGNORE INTO owner_attests (target_id, at) SELECT target_id, ? FROM owner_links WHERE answer_id = ?').bind(at, answer)]);
+    return used?.meta.changes ? c.json({ accepted: true }, 202) : c.json({ error: OWNER_GONE }, 404);
+  });
+
+  // "Something changed": a proposal about this listing (D5), held for a steward like every other change. The category
+  // is the one the link was made for, so a domestic-violence listing's answer never keeps an address (docs/08).
+  app.post('/v1/owner/propose', async (c) => {
+    const parsed = parseOwnerChange(await body(c));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const p = parsed.value, at = minute(deps.now()), id = randomId('prop_'), ref = randomId('', 3).toUpperCase();
+    const [used] = await c.env.DB.batch([
+      c.env.DB.prepare(`UPDATE owner_links SET used_at = ?, answer = 'changed', answer_id = ? WHERE ${LIVE_LINK}`).bind(at, id, await keyHash(p.key), at),
+      c.env.DB.prepare(`INSERT INTO proposals (id, ref, name, category, what, address, phone, schedule_text, how_known, notes, submitted_at, target_id)
+        SELECT ?, ?, ?, category, ?, CASE WHEN category = 'shelter.dv' THEN NULL ELSE ? END, ?, ?, 'run_it', ?, ?, target_id FROM owner_links WHERE answer_id = ?`)
+        .bind(id, ref, p.name, p.what, p.address, p.phone, p.schedule_text, p.notes, at, id)]);
+    return used?.meta.changes ? c.json({ accepted: true, ref }, 202) : c.json({ error: OWNER_GONE }, 404);
+  });
+
   // ---- stewards and the pipeline, behind Cloudflare Access --------------------------------
   app.use('/v1/steward/*', async (c, next) => {
     // Local development only: `DEV_STEWARD=local` in api/.dev.vars stands in for Cloudflare Access. Three locks, none
@@ -138,8 +176,14 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
   app.get('/v1/steward/queue', async (c) => {
     const reports = await c.env.DB.prepare(`SELECT id, target_id, kind, detail, suggested, observed_at, submitted_at, photo_key FROM reports WHERE status = 'open' AND kind NOT IN (${inList(CONFIRM_KINDS)}) ORDER BY submitted_at DESC LIMIT 500`).all();
     const closedPhones = await c.env.DB.prepare(`SELECT target_id, COUNT(DISTINCT client_nonce) AS n FROM reports WHERE status = 'open' AND kind IN (${inList(CLOSED_KINDS)}) GROUP BY target_id`).all<{ target_id: string; n: number }>();
-    const proposals = await c.env.DB.prepare("SELECT id, ref, name, category, what, address, phone, schedule_text, how_known, notes, submitted_at FROM proposals WHERE status = 'open' ORDER BY (how_known = 'heard'), submitted_at DESC LIMIT 200").all();
-    return c.json({ reports: reports.results, closed_phones: Object.fromEntries(closedPhones.results.map((r) => [r.target_id, r.n])), proposals: proposals.results });
+    const proposals = await c.env.DB.prepare("SELECT id, ref, name, category, what, address, phone, schedule_text, how_known, notes, submitted_at, target_id FROM proposals WHERE status = 'open' ORDER BY (how_known = 'heard'), submitted_at DESC LIMIT 200").all();
+    // The people who run a listing said "still right" after a visitor said it closed: that listing goes to the top,
+    // and a steward calls. The owner's word alone does not clear the report (D4).
+    const attested = await c.env.DB.prepare(`SELECT a.target_id, MAX(a.at) AS at FROM owner_attests a
+      JOIN (SELECT target_id, MAX(submitted_at) AS closed_at FROM reports WHERE status = 'open' AND kind IN (${inList(CLOSED_KINDS)}) GROUP BY target_id) r
+        ON r.target_id = a.target_id AND a.at > r.closed_at GROUP BY a.target_id`).all<{ target_id: string; at: string }>();
+    return c.json({ reports: reports.results, closed_phones: Object.fromEntries(closedPhones.results.map((r) => [r.target_id, r.n])), proposals: proposals.results,
+      owner_said_open: Object.fromEntries(attested.results.map((r) => [r.target_id, r.at])) });
   });
 
   // Photos are for stewards' eyes only, and a steward can throw one away at once (a face, a house number, abuse).
@@ -238,7 +282,9 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
         COUNT(DISTINCT CASE WHEN kind IN (${inList(CONFIRM_KINDS)}) AND c.last_closed IS NOT NULL AND r.submitted_at > c.last_closed THEN client_nonce END) AS open_after_closed
       FROM r LEFT JOIN c ON c.target_id = r.target_id GROUP BY r.target_id`).bind(...(tripped ? [since] : [])).all<{ target_id: string; closed_open: number }>();
     const overrides = await c.env.DB.prepare('SELECT target_id, status, reason_code, replacement_id, at FROM listing_overrides').all();
-    return c.json({ circuit_breaker: tripped, targets: open.results, overrides: overrides.results });
+    // The latest "still right" from the people who run each listing: a date, for `owner_attest` (docs/14).
+    const attests = await c.env.DB.prepare('SELECT target_id, MAX(at) AS at FROM owner_attests GROUP BY target_id').all();
+    return c.json({ circuit_breaker: tripped, targets: open.results, overrides: overrides.results, attests: attests.results });
   });
 
   // ---- tasks the machine raises for a steward (DECISIONS 2026-09-19) ------------------------------
@@ -288,6 +334,29 @@ export function createApp(deps: Deps = { now: () => new Date() }) {
     return c.json({ ok: true });
   });
 
+  // ---- asking the people who run a listing (docs/14) -----------------------------------------
+  // The key is answered once, here, and never again: the steward pastes the link into an email they send themselves,
+  // to the address on the organization's own page. Nothing about that address is stored (D2).
+  app.post('/v1/steward/owner-links', async (c) => {
+    const parsed = parseOwnerLink(await body(c));
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
+    const { target_id, category, source_url } = parsed.value;
+    if (!(await c.env.DB.prepare("SELECT 1 AS ok FROM targets WHERE id = ? AND kind = 'listing'").bind(target_id).first())) return c.json({ error: 'unknown listing' }, 404);
+    const bytes = crypto.getRandomValues(new Uint8Array(32));
+    const key = btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const now = deps.now(), made = minute(now), expires = minute(new Date(now.getTime() + OWNER_LINK_DAYS * 86400000));
+    await c.env.DB.batch([
+      c.env.DB.prepare('INSERT INTO owner_links (key_hash, target_id, category, source_url, made_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)').bind(await keyHash(key), target_id, category, source_url, made, expires),
+      c.env.DB.prepare('INSERT INTO steward_actions (at, steward, action, subject_id, reason_code, note) VALUES (?, ?, ?, ?, ?, ?)').bind(made, c.get('who'), 'owner_link.made', target_id, null, null)]);
+    return c.json({ key, expires_at: expires }, 201);
+  });
+
+  // Who has been asked, and what they said: for the steward page's "who is due" list (D7). Never a key or its hash.
+  app.get('/v1/steward/owner-links', async (c) => {
+    const links = await c.env.DB.prepare('SELECT target_id, made_at, expires_at, used_at, answer FROM owner_links ORDER BY made_at DESC LIMIT 5000').all();
+    return c.json({ links: links.results });
+  });
+
   return app;
 }
 
@@ -322,7 +391,9 @@ export async function retention(db: Db, now: Date, photos?: PhotoStore): Promise
       ON CONFLICT (target_id, kind, month) DO UPDATE SET n = n + excluded.n`).bind(cutoff),
     db.prepare(`DELETE FROM photos WHERE report_id IN (SELECT id ${due})`).bind(cutoff),
     db.prepare("DELETE FROM proposals WHERE status != 'open' AND resolved_at < ?").bind(cutoff),
-    db.prepare(`DELETE ${due}`).bind(cutoff)]);
+    db.prepare(`DELETE ${due}`).bind(cutoff),
+    // A link is kept 180 days past its expiry, for the "who was asked" list, and then goes. The dated answers stay.
+    db.prepare('DELETE FROM owner_links WHERE expires_at < ?').bind(cutoff)]);
   return removed?.meta.changes ?? 0;
 }
 
