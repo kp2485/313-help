@@ -216,6 +216,18 @@ describe('emergency numbers', () => {
     expect(checkEmergencyRow(c, { ok: false, why: 'bot protection' }, '2026-09-18')).toBe('unreadable');
     expect(c).toEqual(row());
   });
+  it('check:emergency: a number on a host in script-refusing-hosts.csv is unread for a person, never a mismatch, from that day on', () => {
+    const refusing = new Map([['lathrupvillage.org', { host: 'lathrupvillage.org', refusing_since: '2026-09-24', refusal: 'a shell drawn by a script' }]]);
+    const row = () => ({ id: 'emg_police_lathrup_village', number: '248-354-1010', source_url: 'https://www.lathrupvillage.org/page/public-safety', mismatch_on: '', verified_published_on: '2026-09-24' });
+    const shell = { ok: true as const, html: '<footer>City Hall 248-557-2600</footer><script>"248-354-1010"</script>' };
+    const a = row();
+    expect(checkEmergencyRow(a, shell, '2026-09-25', refusing)).toBe('unreadable');
+    expect(a).toEqual(row());
+    // Before the day it was listed, the page is still read and judged.
+    expect(checkEmergencyRow(row(), shell, '2026-09-23', refusing)).toBe('mismatch');
+    // Another host is not excused by the list.
+    expect(checkEmergencyRow({ ...row(), source_url: 'https://www.cityofsouthfield.com/x' }, shell, '2026-09-25', refusing)).toBe('mismatch');
+  });
   it('211 is checked against its own page ("211" or "2-1-1"); 911 and 988 never are (REVIEW 30a)', () => {
     const row = (over = {}) => ({ id: 'emg_211', number: '211', source_url: 'https://mi211.org/', hardcoded: '', mismatch_on: '', verified_published_on: '', ...over });
     const a = row();
