@@ -55,7 +55,6 @@ final class DirPlanner {
     private(set) var hasTransit = false
     /// The street files are not on this phone at all. The screen says to open the Map tab once with a signal.
     private(set) var noFiles = false
-    private(set) var failed = false
     private var graph: StreetGraph?
     private var network: TransitNetwork?
     /// The build in flight. A second screen that asks while it runs waits for it rather than being told "not
@@ -93,7 +92,6 @@ final class DirPlanner {
             hasTransit = !net.stops.isEmpty
             built = true
             noFiles = false
-            failed = false
         } catch {
             // A bundle that has never been held is the one case the screen cannot route around.
             noFiles = true
@@ -150,7 +148,7 @@ final class DirPlanner {
 
     /// For a new bundle: yesterday's graph says nothing about today's streets.
     func forget() {
-        graph = nil; network = nil; built = false; hasTransit = false; noFiles = false; failed = false
+        graph = nil; network = nil; built = false; hasTransit = false; noFiles = false
     }
 }
 
