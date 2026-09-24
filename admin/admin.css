@@ -18,6 +18,12 @@ pre { padding:.7rem 1rem; border-radius:.6rem; background:var(--surface); border
 
 .photo { display: grid; gap: .375rem; margin-top: .5rem; max-width: 24rem; } .photo img { max-width: 100%; border-radius: .5rem; border: 1px solid var(--line); } .photo small { color: var(--muted); }
 
+/* A change from the people who run a listing (docs/14): what the app says now beside what they sent. A changed cell
+   says so in words as well as colour (1.4.1): it is bold, and the column heads say which side is which. */
+.compare { width:100%; border-collapse:collapse; margin:.5rem 0; font-size:.95rem; } .compare th, .compare td { text-align:start; vertical-align:top; padding:.35rem .5rem; border-bottom:1px solid var(--line); }
+.compare td.changed { background:var(--warn-bg); color:var(--warn); font-weight:700; }
+textarea.email { width:100%; font:.95rem/1.45 ui-monospace,Menlo,Consolas,monospace; padding:.6rem .75rem; border-radius:.6rem; border:1.5px solid var(--edge); background:var(--surface); color:var(--ink); }
+
 /* The queue is one long page of boxes and the only thing that separates them is a border, so a forced-colours
    mode has to be told which borders matter. Nothing here is decoration: an outline IS the control (1.4.11). */
 @media (forced-colors: active) {

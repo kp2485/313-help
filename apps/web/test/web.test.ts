@@ -8,6 +8,8 @@ import { sha256Hex, signatureOk } from '../src/verify.js';
 import { TRANSIT } from '../src/transit.js';
 import { clip, decodeLine, inside, wx, wy } from '../src/map.js';
 import { boundaryStyle } from '../src/bounds.js';
+import { clock, clockHtml, hoursLine } from '../src/hours.js';
+import { setLang } from '../src/i18n.js';
 import { directionsHref, placeQuery, transitAppHref, transitAppQuery, transitHref } from '../src/directions.js';
 import { LINKS } from '../src/links.js';
 import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal } from '../src/propose.js';
@@ -456,18 +458,24 @@ describe('the other languages', () => {
     // and nothing Bengali-only touches the phone layout English and Spanish already have
     for (const r of RULES) if (/:lang\(bn\)/.test(r.sel)) expect(r.body).toMatch(/^[^:]*line-height|font-family/);
   });
-  it('"am" and "pm" are words we translate, not letters left in English', () => {
-    expect(main).toContain("${t(h < 12 || h === 24 ? 'clock.am' : 'clock.pm')}");
-    expect(main).not.toMatch(/'am' : 'pm'/);
+  // hours.ts, driven (these two used to quote its lines while they lived in main.ts).
+  const WEEKLY = { freq: 'WEEKLY' as const, byday: 'MO,WE', dtstart: '2026-09-01', opens_at: '09:00', closes_at: '13:30' };
+  it('"am" and "pm" are words we translate, not letters left in English', async () => {
     for (const l of ['en', 'es', 'ar', 'bn']) for (const k of ['clock.am', 'clock.pm', 'list.sep']) expect(table(l)[k], `${l} ${k}`).toBeTruthy();
     expect(table('ar')['clock.am']).toBe('ص');
     // and the day of the week comes from the same files, never from the browser's idea of a weekday
     for (const l of ['en', 'es', 'ar', 'bn']) for (const d of ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']) expect(table(l)['day.' + d], `${l} ${d}`).toBeTruthy();
-    expect(main).toContain("t('day.' + m[2])");
-    expect(main).toContain("days.join(t('list.sep'))");
+    for (const l of ['en', 'es', 'ar', 'bn'] as const) {
+      expect(await setLang(l), l).toBe(true);
+      expect(clock('09:00'), l).toBe(`9 ${table(l)['clock.am']}`);
+      expect(clock('13:30'), l).toBe(`1:30 ${table(l)['clock.pm']}`);
+      expect(hoursLine(WEEKLY), l).toContain(`${table(l)['day.MO']}${table(l)['list.sep']}${table(l)['day.WE']}`);
+    }
+    await setLang('en');
   });
   it('a clock time reads left to right wherever it is printed, not only in the hours table', () => {
-    expect(main).toContain("const clockHtml = (...parts: string[]) => `<bdi>${parts.map(esc).join(' – ')}</bdi>`;");
+    expect(clockHtml('9 am', '1 pm')).toBe('<bdi>9 am – 1 pm</bdi>');
+    expect(hoursLine(WEEKLY)).toContain('<bdi>9 am – 1:30 pm</bdi>');
     // no bare "9 am – 1 pm" left anywhere: every pair of clock times goes through clockHtml
     expect(main).not.toMatch(/\$\{esc\(clock\([^)]*\)\)\} – /);
   });

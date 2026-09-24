@@ -88,7 +88,7 @@ describe('the first time the pipeline talks to a fresh Worker', () => {
   it('answers the aggregates the build asks for, on an empty database, in the shape it expects', async () => {
     const res = await steward('/v1/steward/aggregates');
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ circuit_breaker: false, targets: [], overrides: [] });
+    expect(await res.json()).toEqual({ circuit_breaker: false, targets: [], overrides: [], attests: [] });
   });
 
   it('takes the first sync of ids into an empty targets table, in batches, and a second sync changes nothing', async () => {
@@ -108,7 +108,7 @@ describe('the first time the pipeline talks to a fresh Worker', () => {
   });
 
   it('shows an empty queue rather than an error before anyone has reported anything', async () => {
-    expect(await (await steward('/v1/steward/queue')).json()).toEqual({ reports: [], closed_phones: {}, proposals: [] });
+    expect(await (await steward('/v1/steward/queue')).json()).toEqual({ reports: [], closed_phones: {}, proposals: [], owner_said_open: {} });
   });
 });
 

@@ -1,8 +1,9 @@
 # 14 — Provider-verified listings (design note)
 
-**Status: proposed, 2026-09-24. Nothing here is built.** This turns the roadmap's first item
-([09](09-roadmap.md), "Now → 1") into a design. **Seven decisions are Kyle's**, and they are gathered in one place
-(§4), each with the options and a recommendation. Nothing gets built until they are answered. What happens after that is in §6.
+**Status: accepted and built, 2026-09-24.** This turns the roadmap's first item ([09](09-roadmap.md), "Now → 1")
+into a design. **Kyle accepted all seven recommendations in §4** ("go with your recommendations for the seven
+decisions"), and §7 says what was built and where. It goes live when the D1 migration is applied and a project
+mailbox exists (§7).
 
 ## 1. What it is for
 
@@ -180,7 +181,47 @@ its `website` host.)
    docs/OPERATIONS.md.
 
 **What needs Kyle before it goes live (CLAUDE.md):**
-- **A `--remote` D1 migration.**
-- **A WAF rate rule** for the two new public routes.
-- **A project mailbox** if D1 is (a).
-- **No new dependency.** No new Worker secret either, if D3 goes as recommended.
+- **A `--remote` D1 migration** (`0005_owner.sql`), applied **before** the code is merged (§7).
+- **A project mailbox** to send the links from (D1 (a)).
+- ~~A WAF rate rule for the new public routes~~ — not needed: the existing rule covers every `POST /v1/*`
+  (`api/edge-protections.md`), and the routes are `POST /v1/owner/*`.
+- **No new dependency, and no new Worker secret** (D3).
+
+## 7. What was built (2026-09-24)
+
+- **Database** (`api/migrations/0005_owner.sql`, additive only):
+  - `owner_links`: the SHA-256 of each key, the listing, its category when the link was made, the source page,
+    when it was made, expires and was used, and the answer.
+  - `owner_attests`: listing and minute.
+  - `proposals.target_id`.
+  - An expired link row goes 180 days after it expired. The dated answers stay.
+- **Worker** (`api/src/index.ts`, `api/src/validate.ts`; tests in `api/test/owner.test.ts`):
+  - Public, closed schemas with size caps:
+    - `POST /v1/owner/look` names the link's listing and changes nothing.
+    - `POST /v1/owner/confirm` records "still right".
+    - `POST /v1/owner/propose` records "something changed" as a proposal with `target_id`. The address is
+      dropped for `shelter.dv`, by the category stored with the link, never by the body.
+  - An unknown, used or expired key always answers the same fixed words and records nothing.
+  - Using a link and recording its answer happen in one transaction, tied by an answer id, so two taps can
+    never make two answers.
+  - Steward: `POST /v1/steward/owner-links` answers the key once. `GET /v1/steward/owner-links` lists who was
+    asked, never a key or its hash.
+  - The queue returns `owner_said_open` (D4), and the aggregates return `attests`.
+- **Pipeline** (`pipeline/src/reports-sync.ts`): the newest dated confirmation wins. An owner's becomes
+  `last_confirm_method: owner_attest`; a closed report still outweighs it (D4).
+- **The rules:** two new badge fixtures in `schema/fixtures/06-badge.json`, passing on the web, iPhone and
+  Android. No rule changed.
+- **The page organizations open** (`apps/web/owner.html`, `apps/web/src/owner.ts`; tests in
+  `apps/web/test/owner.test.ts`):
+  - A separate small entry that loads none of the app.
+  - It takes the key out of the address bar before anything else, and reads the listing from the same signed
+    bundle as the app.
+  - It shows the listing, including its hours through the app's own `hours.ts`, with the two answers and the
+    form, in all four languages.
+  - Its body is checked against the Worker's own validator in the test.
+- **Steward page** (`admin/`; rules in `admin/queue.js`, tested in `api/test/admin.test.ts`):
+  - **"Ask the people who run it"** lists who is due (D6, D7) and makes a link and the email text.
+  - An owner's change is shown beside what the app says now.
+  - A listing its owner called still right after a closed report goes to the top (D4).
+- **Cadence as built:** every 90 days, 30 for `food.mobile`. A listing whose link is still waiting is not asked
+  again.

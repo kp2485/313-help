@@ -190,6 +190,55 @@ export function parseTargets(body: unknown): Result<{ listings: string[]; places
   return { ok: true, value: { listings: listings as string[], places: places as string[] } };
 }
 
+// ---- the people who run a listing (docs/14) ------------------------------------------------------
+// A steward makes a link for one listing; the organization answers "still right" or "something changed" with it.
+// No account, no password, and no address of theirs is ever stored (D2).
+
+/** 32 random bytes, base64url without padding. */
+export const OWNER_KEY = /^[A-Za-z0-9_-]{43}$/;
+export const OWNER_LINK_DAYS = 30;
+
+export interface OwnerLinkInput { target_id: string; category: string; source_url: string }
+
+/** A steward asks for a link. `source_url` is the organization's own page the steward will take the address from. */
+export function parseOwnerLink(body: unknown): Result<OwnerLinkInput> {
+  const b = closed(body, ['target_id', 'category', 'source_url']);
+  if (!b.ok) return b;
+  const { target_id, category, source_url } = b.value;
+  if (!isListingId(target_id)) return fail('bad target_id');
+  if (typeof category !== 'string' || !CATEGORY.test(category) || category.length > 40) return fail('bad category');
+  if (typeof source_url !== 'string' || source_url.length > 300) return fail('source_url must be the organization\'s own https page');
+  let url: URL;
+  try { url = new URL(source_url); } catch { return fail('source_url must be the organization\'s own https page'); }
+  if (url.protocol !== 'https:') return fail('source_url must be the organization\'s own https page');
+  return { ok: true, value: { target_id, category, source_url: url.toString() } };
+}
+
+/** Just the key: looking a link up, or answering "still right". */
+export function parseOwnerKey(body: unknown): Result<{ key: string }> {
+  const b = closed(body, ['key']);
+  if (!b.ok) return b;
+  return typeof b.value.key === 'string' && OWNER_KEY.test(b.value.key) ? { ok: true, value: { key: b.value.key } } : fail('bad key');
+}
+
+export interface OwnerChangeInput { key: string; name: string; what: string; address: string | null; phone: string | null; schedule_text: string | null; notes: string | null }
+
+/** "Something changed": the listing as its owner says it is now. The same fields and the same masking as a proposed
+ *  new place; the category comes from the link, never from this body. */
+export function parseOwnerChange(body: unknown): Result<OwnerChangeInput> {
+  const b = closed(body, ['key', 'name', 'what', 'address', 'phone', 'schedule_text', 'notes']);
+  if (!b.ok) return b;
+  if (typeof b.value.key !== 'string' || !OWNER_KEY.test(b.value.key)) return fail('bad key');
+  const name = text(b.value.name, 120), what = text(b.value.what, 280);
+  if (!name || !what) return fail('name and what are required');
+  // The hours come prefilled with every line of the listing's schedule, so they get more room than a new place's.
+  const notes = text(b.value.notes, 280), schedule = text(b.value.schedule_text, 600);
+  return { ok: true, value: {
+    key: b.value.key, name, what: mask(what), address: text(b.value.address, 200), phone: text(b.value.phone, 40),
+    schedule_text: schedule ? mask(schedule) : null, notes: notes ? mask(notes) : null,
+  } };
+}
+
 export function parseDismiss(body: unknown): Result<{ reason: string }> {
   const b = closed(body, ['reason']);
   if (!b.ok) return b;

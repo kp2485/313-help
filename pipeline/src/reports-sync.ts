@@ -9,6 +9,8 @@ export interface Aggregates {
   targets: { target_id: string; closed_open: number; closed_last_at: string | null; wrong_open: number; last_confirmed_at: string | null; open_after_closed?: number }[];
   /** Steward decisions (admin tool). The seed files are never edited; these are applied at build time. */
   overrides?: { target_id: string; status: 'archived' | 'suspended' | 'active'; reason_code: string; replacement_id: string | null; at: string }[];
+  /** The latest "still right" from the people who run each listing (docs/14): the date of an `owner_attest`. */
+  attests?: { target_id: string; at: string }[];
 }
 
 export function applyAggregates(rows: BundleRow[], agg: Aggregates): { applied: number; frozen: boolean } {
@@ -27,8 +29,17 @@ export function applyAggregates(rows: BundleRow[], agg: Aggregates): { applied: 
       r.facts.last_confirm_method = 'community_confirm';
     }
   }
-  // A steward's decision is not subject to the circuit breaker: a person already looked.
   const rowsById = new Map(rows.map((r) => [r.id, r]));
+  // The people who run it said "still right" (docs/14). Like a visitor's confirm it counts only when it is the newest
+  // dated confirmation, and like one it does not outweigh a report that the place closed: freshness.ts lets only a
+  // steward's phone check do that (D4). The badge says whose word it is: "The people who run it checked this".
+  for (const a of agg.attests ?? []) {
+    const r = rowsById.get(a.target_id);
+    if (!r || (r.facts.last_confirmed_at && a.at <= r.facts.last_confirmed_at)) continue;
+    r.facts.last_confirmed_at = a.at;
+    r.facts.last_confirm_method = 'owner_attest';
+  }
+  // A steward's decision is not subject to the circuit breaker: a person already looked.
   for (const o of agg.overrides ?? []) {
     const r = rowsById.get(o.target_id);
     if (!r) continue;

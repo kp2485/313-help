@@ -3,8 +3,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEV_STEWARD_VALUE, createApp, retention, type Db, type Env, type Stmt } from '../src/index.js';
-import { keyring, verifyAccess } from '../src/access.js';
+import { createApp, retention, type Db, type Env, type Stmt } from '../src/index.js';
+import { DEV_STEWARD_VALUE, keyring, verifyAccess } from '../src/access.js';
 import { mask } from '../src/validate.js';
 
 // A D1-shaped wrapper over Node's built-in SQLite, so tests run the real migration and real SQL.

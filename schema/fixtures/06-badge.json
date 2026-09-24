@@ -285,6 +285,41 @@
         "checked_at_entry": "2026-09-01",
         "entry_method": "web"
       }
+    },
+    {
+      "id": "sal_owner_attest",
+      "facts": {
+        "reports": {
+          "closed_open": 0,
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-01",
+        "entry_method": "web",
+        "last_confirmed_at": "2026-10-10T15:07Z",
+        "last_confirm_method": "owner_attest"
+      }
+    },
+    {
+      "id": "sal_owner_after_closed",
+      "facts": {
+        "reports": {
+          "closed_open": 1,
+          "closed_last_at": "2026-10-10",
+          "wrong_open": 0
+        },
+        "source": {
+          "type": "seed_list",
+          "name": "test"
+        },
+        "checked_at_entry": "2026-09-01",
+        "entry_method": "web",
+        "last_confirmed_at": "2026-10-15T09:00Z",
+        "last_confirm_method": "owner_attest"
+      }
     }
   ],
   "cases": [
@@ -510,6 +545,29 @@
       "name": "a phone check the same day as the report does not outweigh it",
       "fn": "badge",
       "row": "sal_phone_check_same_day",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "reported_once"
+      }
+    },
+    {
+      "name": "the people who run it said \"still right\" 10 days ago: the badge says it was them (docs/14)",
+      "fn": "badge",
+      "row": "sal_owner_attest",
+      "now": "2026-10-20T16:00:00Z",
+      "expect": {
+        "level": "confirmed",
+        "key": "badge.confirmed.owner_attest",
+        "params": {
+          "days": 10
+        },
+        "tier": 0
+      }
+    },
+    {
+      "name": "an owner's \"still right\" after a closed report does not clear it: a steward calls (docs/14 D4)",
+      "fn": "badge",
+      "row": "sal_owner_after_closed",
       "now": "2026-10-20T16:00:00Z",
       "expect": {
         "level": "reported_once"

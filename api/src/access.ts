@@ -9,6 +9,11 @@ export type JwksFetcher = (teamDomain: string) => Promise<Jwk[]>;
 export type Keyring = (teamDomain: string, kid: string | undefined, now: Date) => Promise<Jwk | undefined>;
 export interface AccessEnv { ACCESS_TEAM_DOMAIN?: string; ACCESS_AUD?: string }
 
+/** The one value `DEV_STEWARD` may hold, and only with no Cloudflare Access settings present (api/.dev.vars).
+ *  It lives here, not in index.ts: the Workers runtime reads every named export of the main module as an entry
+ *  point, and `wrangler dev` refuses to start with a string among them. */
+export const DEV_STEWARD_VALUE = 'local';
+
 const b64url = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '=')), (c) => c.charCodeAt(0));
 
 export const fetchJwks: JwksFetcher = async (domain) => {
