@@ -3133,7 +3133,7 @@
     -83.07578
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 3,
      "health": 0,
@@ -3151,7 +3151,7 @@
      "ids": 1,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -5806,13 +5806,13 @@
      "food": 0.7,
      "clinic": 0.5,
      "narcan": 0.8,
-     "indoors": 2.3
+     "indoors": 1.9
     },
     "nearest_id": {
      "food": "sal_the_open_food_pantry",
      "clinic": "sal_the_wellness_east_medical_center",
      "narcan": "sal_hr_20216_van_dyke_ave",
-     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+     "indoors": "sal_warren_public_warren_maybelle_burnette_branch_library"
     },
     "none_listed_yet": [],
     "coverage_checked": false
@@ -10662,7 +10662,7 @@
     -83.05826
    ],
    "help": {
-    "total": 10,
+    "total": 11,
     "by": {
      "food": 7,
      "health": 1,
@@ -10680,7 +10680,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -19911,13 +19911,13 @@
     -82.96388
    ],
    "help": {
-    "total": 14,
+    "total": 16,
     "by": {
      "food": 4,
      "health": 0,
      "harm": 2,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 2,
      "rec": 1,
@@ -19929,7 +19929,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -23144,13 +23144,13 @@
     -82.94105
    ],
    "help": {
-    "total": 16,
+    "total": 18,
     "by": {
      "food": 3,
      "health": 2,
      "harm": 3,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 1,
      "rec": 1,
@@ -23162,7 +23162,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 2,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -30014,13 +30014,13 @@
     -82.95465
    ],
    "help": {
-    "total": 11,
+    "total": 13,
     "by": {
      "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 1,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 2,
      "rec": 1,
@@ -30032,7 +30032,7 @@
      "ids": 0,
      "money": 1,
      "goods": 1,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -32932,13 +32932,13 @@
     -83.28288
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
      "harm": 0,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 1,
@@ -33815,13 +33815,13 @@
     -83.28134
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 1,
      "health": 0,
      "harm": 0,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 1,
@@ -39148,13 +39148,13 @@
     -83.28883
    ],
    "help": {
-    "total": 19,
+    "total": 22,
     "by": {
      "food": 3,
      "health": 1,
      "harm": 2,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 4,
@@ -39166,7 +39166,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 2,
+     "kids": 4,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -39272,7 +39272,7 @@
     -83.34119
    ],
    "help": {
-    "total": 12,
+    "total": 13,
     "by": {
      "food": 3,
      "health": 1,
@@ -39290,7 +39290,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 1,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -39590,7 +39590,7 @@
     -82.89896
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
      "food": 0,
      "health": 0,
@@ -39655,13 +39655,13 @@
     -82.92925
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
      "food": 0,
      "health": 0,
      "harm": 1,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 2,
@@ -39673,7 +39673,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 1,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -39719,13 +39719,13 @@
     -83.3203
    ],
    "help": {
-    "total": 23,
+    "total": 24,
     "by": {
      "food": 5,
      "health": 2,
      "harm": 4,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 2,
@@ -39843,13 +39843,13 @@
     -83.37232
    ],
    "help": {
-    "total": 33,
+    "total": 34,
     "by": {
      "food": 3,
      "health": 5,
      "harm": 3,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 3,
@@ -39904,7 +39904,7 @@
     -83.18216
    ],
    "help": {
-    "total": 9,
+    "total": 11,
     "by": {
      "food": 2,
      "health": 0,
@@ -39967,13 +39967,13 @@
     -83.29402
    ],
    "help": {
-    "total": 19,
+    "total": 20,
     "by": {
      "food": 2,
      "health": 0,
      "harm": 3,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 3,
@@ -40030,12 +40030,12 @@
     -83.12416
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 1,
      "health": 0,
      "harm": 4,
-     "shelter": 0,
+     "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
      "youth": 0,
@@ -40156,13 +40156,13 @@
     -83.36744
    ],
    "help": {
-    "total": 12,
+    "total": 14,
     "by": {
      "food": 1,
      "health": 0,
      "harm": 3,
-     "shelter": 0,
-     "utilities": 0,
+     "shelter": 1,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 2,
@@ -40280,13 +40280,13 @@
     -83.26769
    ],
    "help": {
-    "total": 24,
+    "total": 25,
     "by": {
      "food": 2,
      "health": 6,
      "harm": 3,
      "shelter": 0,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 2,
@@ -40465,13 +40465,13 @@
     -83.38078
    ],
    "help": {
-    "total": 30,
+    "total": 32,
     "by": {
      "food": 4,
      "health": 1,
      "harm": 2,
      "shelter": 5,
-     "utilities": 0,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 1,
      "rec": 1,
@@ -40483,7 +40483,7 @@
      "ids": 1,
      "money": 0,
      "goods": 0,
-     "kids": 1,
+     "kids": 2,
      "connect": 1,
      "transport": 1,
      "pets": 0
@@ -40526,13 +40526,13 @@
     -83.1573
    ],
    "help": {
-    "total": 14,
+    "total": 17,
     "by": {
      "food": 2,
      "health": 2,
      "harm": 2,
-     "shelter": 0,
-     "utilities": 0,
+     "shelter": 1,
+     "utilities": 1,
      "hygiene": 0,
      "youth": 0,
      "rec": 1,
@@ -40971,10 +40971,10 @@
     -83.49569
    ],
    "help": {
-    "total": 9,
+    "total": 11,
     "by": {
      "food": 1,
-     "health": 1,
+     "health": 2,
      "harm": 0,
      "shelter": 0,
      "utilities": 0,
@@ -40982,7 +40982,7 @@
      "youth": 0,
      "rec": 1,
      "jobs": 0,
-     "learn": 3,
+     "learn": 4,
      "treatment": 0,
      "housing": 0,
      "legal": 0,
@@ -41099,7 +41099,7 @@
     -83.37596
    ],
    "help": {
-    "total": 17,
+    "total": 18,
     "by": {
      "food": 2,
      "health": 4,
@@ -41110,7 +41110,7 @@
      "youth": 0,
      "rec": 3,
      "jobs": 0,
-     "learn": 0,
+     "learn": 1,
      "treatment": 0,
      "housing": 1,
      "legal": 0,
@@ -41162,7 +41162,7 @@
     -83.13137
    ],
    "help": {
-    "total": 14,
+    "total": 15,
     "by": {
      "food": 3,
      "health": 4,
@@ -41180,7 +41180,7 @@
      "ids": 0,
      "money": 2,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -41351,7 +41351,7 @@
     -83.22728
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 2,
@@ -41415,7 +41415,7 @@
     -83.10335
    ],
    "help": {
-    "total": 15,
+    "total": 16,
     "by": {
      "food": 3,
      "health": 1,
@@ -41427,7 +41427,7 @@
      "rec": 1,
      "jobs": 0,
      "learn": 0,
-     "treatment": 1,
+     "treatment": 2,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -41604,7 +41604,7 @@
     -83.26194
    ],
    "help": {
-    "total": 12,
+    "total": 13,
     "by": {
      "food": 2,
      "health": 1,
@@ -42489,7 +42489,7 @@
     -83.50081
    ],
    "help": {
-    "total": 2,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -43253,7 +43253,7 @@
     -83.03656
    ],
    "help": {
-    "total": 12,
+    "total": 16,
     "by": {
      "food": 2,
      "health": 1,
@@ -43316,7 +43316,7 @@
     -82.8909
    ],
    "help": {
-    "total": 21,
+    "total": 22,
     "by": {
      "food": 3,
      "health": 6,
@@ -43328,7 +43328,7 @@
      "rec": 1,
      "jobs": 0,
      "learn": 2,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 1,
      "legal": 0,
      "ids": 0,
@@ -43506,7 +43506,7 @@
     -83.025
    ],
    "help": {
-    "total": 46,
+    "total": 51,
     "by": {
      "food": 12,
      "health": 10,
@@ -43515,7 +43515,7 @@
      "utilities": 1,
      "hygiene": 0,
      "youth": 0,
-     "rec": 0,
+     "rec": 3,
      "jobs": 2,
      "learn": 2,
      "treatment": 1,
@@ -43524,7 +43524,7 @@
      "ids": 1,
      "money": 2,
      "goods": 0,
-     "kids": 2,
+     "kids": 4,
      "connect": 0,
      "transport": 0,
      "pets": 2

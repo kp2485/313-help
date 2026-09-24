@@ -284,8 +284,13 @@ describe('the trip window (schema/query-spec.md "The trip window")', () => {
     let seed = 11;
     const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
     let compared = 0;
-    for (let i = 0; i < 24; i++) {
+    // Pairs really a few miles apart (1-6): since the area widened, two random listings are usually two counties
+    // apart with no one-change bus route, and a pair with no plan compares nothing.
+    for (let i = 0, tries = 0; i < 24 && tries < 5000; tries++) {
       const a = withCoords[Math.floor(rnd() * withCoords.length)]!, b = withCoords[Math.floor(rnd() * withCoords.length)]!;
+      const d = metresBetween({ lat: a.lat!, lon: a.lon! }, { lat: b.lat!, lon: b.lon! });
+      if (d < 1600 || d > 9700) continue;
+      i++;
       const from = { lat: a.lat!, lon: a.lon! }, to = { lat: b.lat!, lon: b.lon! };
       const full = plan(whole!, net!, from, to);
       const part = plan(windowed(from, to).g, net!, from, to);

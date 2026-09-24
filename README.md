@@ -6,7 +6,7 @@ Free help, transit, parks and neighborhood facts for Detroit and every city and 
 where a DDOT or SMART bus stops or runs, across Wayne, Oakland and Macomb counties — in an app that
 stores nothing about you, works with no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 1,798 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 1,841 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -53,10 +53,10 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **1,798 listings** in 62 categories, 1,078 of them outside the first four cities: 324 food, 226 health (including
-  **32 emergency rooms and 52 urgent care centers**), 154 harm reduction, 253 places to get somewhere safe now (172
-  fire stations and 81 police stations), 118 recreation centers and libraries, 93 child care and free preschool,
-  78 housing, 71 learning, 66 treatment, 61 jobs, and 15 more groups — among them help built for seniors, veterans
+- **1,841 listings** in 62 categories, 1,121 of them outside the first four cities: 324 food, 227 health (including
+  **33 emergency rooms and 52 urgent care centers**), 154 harm reduction, 263 places to get somewhere safe now (177
+  fire stations and 86 police stations), 122 recreation centers and libraries, 102 child care and free preschool,
+  78 housing, 73 learning, 68 treatment, 61 jobs, and 15 more groups — among them help built for seniors, veterans
   and people with a disability.
 - **A Map tab drawn on the phone** from City open data, Census TIGER files and SEMCOG's parks inside the signed
   bundle, covering the whole area — every DDOT and SMART route drawn whole and tested to lie inside it — no tile
@@ -86,7 +86,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   cases**; the web and iPhone pass every case, and Android's are run by CI.
 - **Tested and small.** 1,380 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
-  (26 KB) loads only if chosen; the bundle is 6.6 MB for the whole three-county area.
+  (26 KB) loads only if chosen; the bundle is 6.7 MB for the whole three-county area.
 
 ## How listings stay fresh
 
