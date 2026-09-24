@@ -25,7 +25,7 @@ import { HOW_KNOWN, PROPOSE_CATEGORIES, buildProposal, flushProposals, submitPro
 import { canSave, canShare, clearSaved, loadSaved, toggleSaved } from './saved.js';
 import { safeUrl } from './url.js';
 import { focusSelector, type FocusEl } from './focus.js';
-import { directionsHref, transitAppHref, transitHref } from './directions.js';
+import { directionsHref, dirPayload, transitAppHref, transitHref } from './directions.js';
 import './style.css';
 
 // ---- state: memory only. Nothing about what a person taps is ever written or sent. ----------
@@ -371,7 +371,7 @@ function results(query: Query, opts: { limit?: number; seeAll?: View; emptyKey?:
   // screen, and never a dot for a sensitive listing (those carry no coordinates in the first place).
   const pins = opts.noDistance ? [] : ranked.filter((r) => r.row.lat !== undefined && !isSensitive(r.row.category));
   const map = !pins.length ? '' : listMap
-    ? `${mapBox({ key: 'list:' + JSON.stringify([query, opts.only ?? null]), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: openText(r.open), category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id }), dir: dirValue(r.row.name, r.row.lat, r.row.lon, r.row.category) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
+    ? `${mapBox({ key: 'list:' + JSON.stringify([query, opts.only ?? null]), label: t('map.label_list'), quiet: true, fit: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon! })), minMeters: 1500, dots: pins.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: openText(r.open), category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id }), dir: dirPayload(r.row.name, r.row.lat, r.row.lon, r.row.category) })) })}<button class="chip" data-listmap>${T('map.hide')}</button>`
     : `<button class="chip" data-listmap>${icon('pin', 'sm')}${T('map.show', { count: pins.length })}</button>`;
   return `${opts.noDistance ? '' : locChip()}${map}<h2 class="vh">${T('results.head')}</h2><ul class="cards">${shown.map((r) => card(r, !opts.noDistance)).join('')}</ul>
     ${opts.seeAll && ranked.length > shown.length ? `<button class="btn ghost" ${go(opts.seeAll)}>${T('results.see_all', { count: ranked.length })}</button>` : ''}`;
@@ -671,7 +671,7 @@ function mapTab(): string {
   // `sub` is what a tap card says under the name, and what the keyboard's ring reads out: the kind of help, and
   // whether it is open now. `category` is what lets map.ts run every dot through `mapDrawable` again before the
   // keyboard is allowed to land on it.
-  const dots: MapDot[] = rows.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: `${layerName('help:' + groupOf(r.row.category))} · ${openText(r.open)}`, category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id } satisfies View), dir: dirValue(r.row.name, r.row.lat, r.row.lon, r.row.category), css: '--grp-' + groupOf(r.row.category) }));
+  const dots: MapDot[] = rows.map((r) => ({ lat: r.row.lat!, lon: r.row.lon!, label: r.row.name, sub: `${layerName('help:' + groupOf(r.row.category))} · ${openText(r.open)}`, category: r.row.category, go: JSON.stringify({ v: 'detail', id: r.row.id } satisfies View), dir: dirPayload(r.row.name, r.row.lat, r.row.lon, r.row.category), css: '--grp-' + groupOf(r.row.category) }));
   const nearParks = here ? [...parks].map((p) => ({ p, mi: milesBetween(here!, p) })).sort((a, b) => a.mi - b.mi).slice(0, 5) : [];
   const centers = rank(bundle?.rows ?? [], { category: 'rec', ...(here ? { near: here } : {}) }, now(), bundle?.alerts ?? []);
   const sources = (bundle?.transit?.layers ?? []).filter((l) => layerOn('go:' + l.id));
@@ -884,13 +884,10 @@ function detail(id: string): { title: string; html: string; exit: boolean; ownTi
 // the first time somebody taps Directions and is a chunk of its own; `packages/query` does the routing and is
 // not forked here. What main.ts owns is the one thing it must: `here`, the origin, which is a variable that
 // dies with the page and is handed to the planner and to nothing else.
-/** The `data-dir` payload: a destination, and never anything about the person. Null where a row must not be
- *  routed to at all — a DV or crisis listing carries no coordinate in the first place. */
-const dirValue = (name: string, lat?: number, lon?: number, category = ''): string | undefined =>
-  (lat === undefined || lon === undefined || isSensitive(category) ? undefined : JSON.stringify({ lat, lon, name }));
+// The `data-dir` payload is `dirPayload` (directions.ts): a destination, and never anything about the person.
 /** The button, wherever a row or a card offers one. `primary` is the big green one on a listing's own screen. */
 function dirButton(name: string, lat?: number, lon?: number, category = '', primary = false): string {
-  const p = dirValue(name, lat, lon, category);
+  const p = dirPayload(name, lat, lon, category);
   if (!p) return '';
   return `<button class="btn${primary ? '' : ' ghost'}" data-dir="${esc(p)}" aria-label="${T('dir.open_label', { name })}">${icon('pin', 'sm')}${T('dir.open')}</button>`;
 }
@@ -1132,7 +1129,7 @@ function segment(s: Segment): string {
   const near = helpAlong(bundle!.rows.filter((r) => !isSensitive(r.category)), s);
   const ranked = rank(near.map((n) => n.row), {}, now(), bundle!.alerts);
   return `<main><p class="meta"><span class="pill ${s.phase === 'open' ? 'open' : 'closed'}">${T('gw.' + s.phase)}</span></p>${s.phase === 'open' ? '' : `<p class="lede">${T('gw.not_open')}</p>`}
-    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), segments: true, focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, category: n.row.category, go: JSON.stringify({ v: 'detail', id: n.row.id }), dir: dirValue(n.row.name, n.row.lat, n.row.lon, n.row.category) })) })}
+    ${mapBox({ key: 'seg:' + s.id, label: t('map.label_segment', { name: s.name }), segments: true, focus: s.id, fit: segPoints([s]), minMeters: 700, dots: near.map((n) => ({ lat: n.row.lat!, lon: n.row.lon!, label: n.row.name, category: n.row.category, go: JSON.stringify({ v: 'detail', id: n.row.id }), dir: dirPayload(n.row.name, n.row.lat, n.row.lon, n.row.category) })) })}
     ${s.cross_streets?.length ? `<h2>${T('gw.crosses')}</h2><p>${owner(s.cross_streets.join(' · '))}</p>` : ''}
     <h2>${T('gw.help_along')}</h2>${ranked.length ? `<ul class="cards">${ranked.map((r) => card({ ...r, miles: near.find((n) => n.row.id === r.row.id)!.miles })).join('')}</ul>` : `<p class="empty">${T('gw.help_none')}</p>`}
     ${s.phase === 'open' ? reportBox(s.id, true) : ''}

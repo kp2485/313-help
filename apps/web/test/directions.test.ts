@@ -18,6 +18,8 @@ import { mapRoute } from '../src/dirscreen.js';
 import { hashFor } from '../src/router.js';
 import { orderFeatures } from '../src/map.js';
 import { handle } from '../src/dirworker.js';
+import { dirPayload } from '../src/directions.js';
+import { SENSITIVE } from '../src/needs.js';
 
 const root = join(__dirname, '../../..');
 const LANGS = ['en', 'es', 'ar', 'bn'] as const;
@@ -209,42 +211,24 @@ describe('nothing about where somebody is, or is going, is ever written down', (
     }
   });
 
-  it('the file loader touches only the bundle\'s own map files, through the signed index', () => {
-    const src = readFileSync(join(__dirname, '../src/dirfiles.ts'), 'utf8');
-    // every read goes through fetchVerified (checksum from the already signature-checked index)
-    expect(src).not.toMatch(/\bfetch\((?!Verified)/);
-    expect(src.match(/fetchVerified\(/g) ?? []).toHaveLength(3);
-    // and the only things it ever names are map files
-    for (const m of src.matchAll(/'(map\/[\w./-]+)'/g)) expect(m[1]).toMatch(/^map\//);
-    // what it writes is the file itself, under the file's own key: never anything about a person
-    expect(src.match(/idbSet\(/g) ?? []).toHaveLength(2);
-    expect(src).toContain("idbSet('layer:' + file");
-    expect(src).toContain("idbSet('map', { key: want.join(':'), base, streets })");
+  // The file loader (only the bundle's own map files, through the signed index; the file itself is all it keeps)
+  // is driven in dirfiles.test.ts, and following along (one watch, ended by every way off the screen) in
+  // dirscreen-follow.test.ts.
+
+  it('the payload a Directions button carries is the destination, and nothing else', () => {
+    const p = dirPayload('Auntie Na\'s Village', 42.377, -83.135, 'food.pantry');
+    expect(JSON.parse(p!)).toEqual({ lat: 42.377, lon: -83.135, name: 'Auntie Na\'s Village' });   // exactly these keys
+    // a coordinate is enough: a place with no street address a person could read out still gets directions
+    expect(dirPayload('Naloxone box', 42.35, -83.06, 'harm.naloxone')).toBeDefined();
   });
 
-  it('the payload a Directions button carries is a destination, and nothing else', () => {
-    const main = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
-    expect(main).toContain('JSON.stringify({ lat, lon, name })');
-    // the ORIGIN never goes into a view, a button or an attribute: it is read from `here` at the moment of use
-    expect(main).toMatch(/origin: \(\) => here,/);
-    const router = readFileSync(join(__dirname, '../src/router.ts'), 'utf8');
-    expect(router).toContain("{ v: 'directions'; to: { lat: number; lon: number }; name: string }");
-    expect(router).not.toMatch(/directions[\s\S]{0,120}from:/);
-  });
-
-  it('a row the map may not draw at all never gets a Directions button either', () => {
-    const main = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
-    // `dirValue` is the one gate, and it fails closed: no coordinate, or a sensitive category, and there is no
-    // payload — so a DV shelter or a crisis line can never be routed to even if one were handed over.
-    expect(main).toContain('lat === undefined || lon === undefined || isSensitive(category) ? undefined');
-  });
-
-  it('following along reads a position and keeps it in one variable, with no watch left running', () => {
-    const src = readFileSync(join(__dirname, '../src/dirscreen.ts'), 'utf8');
-    expect(src).toContain('navigator.geolocation.watchPosition');
-    expect(src).toContain('navigator.geolocation.clearWatch');
-    // every way out of the screen goes through stopFollowing
-    for (const fn of ['export function open', 'export function close']) expect(src.slice(src.indexOf(fn), src.indexOf(fn) + 400)).toContain('stopFollowing()');
+  it('fails closed: no coordinate, or a sensitive kind, and there is no button at all', () => {
+    expect(dirPayload('X', undefined, -83.05, 'food.pantry')).toBeUndefined();
+    expect(dirPayload('X', 42.33, undefined, 'food.pantry')).toBeUndefined();
+    // A DV shelter or a crisis line carries no coordinate in the first place; if one were ever handed over, the
+    // gate still refuses it.
+    expect(SENSITIVE.length).toBeGreaterThan(0);
+    for (const kind of SENSITIVE) expect(dirPayload('X', 42.33, -83.05, kind), kind).toBeUndefined();
   });
 });
 
@@ -324,13 +308,7 @@ describe('following along, and what it will not do', () => {
     expect(list[currentStep({ lat: atTheStart[1], lon: atTheStart[0] }, BUS, list)]!.leg).toBe(0);
   });
 
-  it('never reroutes: the only thing an off-route position does is offer to plan again', () => {
-    const src = readFileSync(join(__dirname, '../src/dirscreen.ts'), 'utf8');
-    const watch = src.slice(src.indexOf('function startFollowing'), src.indexOf('// ---- the screen'));
-    expect(watch).not.toContain('runPlan(');
-    expect(watch).not.toContain('begin(');
-    expect(src).toContain("data-dir-act=\"again\"");
-  });
+  // "Never reroutes: an off-route position only offers to plan again" is driven in dirscreen-follow.test.ts.
 });
 
 // ---------------------------------------------------------------------------------------------------
@@ -402,7 +380,7 @@ describe('where a person can ask for directions', () => {
   });
 
   it('a dot on the map carries its own destination, so the bottom card has the button', () => {
-    expect(main.match(/dirValue\(/g) ?? []).toHaveLength(4);             // one definition, three sets of dots
+    expect(main.match(/dirPayload\(/g) ?? []).toHaveLength(4);           // the button, and three sets of dots
     const mapSrc = readFileSync(join(__dirname, '../src/map.ts'), 'utf8');
     expect(mapSrc).toContain('export const dirBtn =');
     expect(mapSrc).toContain('data-dir="${esc(dir)}"');

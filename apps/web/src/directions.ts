@@ -5,6 +5,8 @@
 // printed as if it were an address: it only ever goes to the maps app the person chose to open.
 // Nothing here touches the network or the phone; the screen says plainly that a maps app will see the place.
 
+import { isSensitive } from './needs.js';
+
 export interface Place {
   address?: { line1: string; city: string; zip?: string };
   lat?: number;
@@ -67,3 +69,14 @@ export function transitAppHref(r: Place, ua: string): string | null {
   const q = transitAppQuery(r);
   return q ? `transit://directions?to=${q}` : null;
 }
+
+// ---- our own directions ------------------------------------------------------
+// The one gate for the in-app Directions screen (DECISIONS 2026-09-22), shared by every button that opens it.
+
+/**
+ * What a Directions button carries: the destination, and never anything about the person. Undefined where a row
+ * must not be routed to at all: no coordinate, or a sensitive kind (a domestic-violence shelter, a mental-health
+ * crisis line), which fails closed even if a coordinate were ever handed over.
+ */
+export const dirPayload = (name: string, lat?: number, lon?: number, category = ''): string | undefined =>
+  (lat === undefined || lon === undefined || isSensitive(category) ? undefined : JSON.stringify({ lat, lon, name }));
