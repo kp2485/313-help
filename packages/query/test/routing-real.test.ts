@@ -45,7 +45,7 @@ function streetFiles(): PackedStreets[] {
   return [];
 }
 
-interface Row { id: string; name: string; category: string; lat?: number; lon?: number }
+interface Row { id: string; name: string; category: string; lat?: number; lon?: number; address?: { city?: string } }
 function listings(): Row[] {
   const dir = join(bundle, 'category');
   if (!existsSync(dir)) return [];
@@ -193,11 +193,17 @@ describe('trip plans, on the committed transit layers', () => {
     console.log(`transit: ${net!.stops.length} stops, ${net!.routes.length} routes, ${withHeadway.length} with a published headway`);
   });
 
-  it.skipIf(!ok || !hasRows)('puts a stop within 400 m of at least 90% of our listings', () => {
+  it.skipIf(!ok || !hasRows)('puts a stop within 400 m of 90% of the first four cities\' listings, and says what the suburbs get', () => {
     const withCoords = rows.filter((r) => typeof r.lat === 'number' && typeof r.lon === 'number');
-    const near = withCoords.filter((r) => stopsNear(net!, { lat: r.lat!, lon: r.lon! }, 400).length > 0).length;
-    console.log(`transit coverage: ${near} of ${withCoords.length} listings have a stop within 400 m (${(100 * near / withCoords.length).toFixed(0)}%)`);
-    expect(near / withCoords.length).toBeGreaterThan(0.9);        // the study measured 92%
+    const near = (list: Row[]) => list.filter((r) => stopsNear(net!, { lat: r.lat!, lon: r.lon! }, 400).length > 0).length;
+    const FIRST = new Set(['Detroit', 'Hamtramck', 'Highland Park', 'Dearborn']);
+    const first = withCoords.filter((r) => FIRST.has(r.address?.city ?? '')), rest = withCoords.filter((r) => !FIRST.has(r.address?.city ?? ''));
+    const f = near(first) / first.length, s = near(rest) / rest.length;
+    console.log(`transit coverage: first four cities ${(100 * f).toFixed(0)}% of ${first.length}; the rest of the area ${(100 * s).toFixed(0)}% of ${rest.length}`);
+    expect(f).toBeGreaterThan(0.9);                               // the study measured 92%
+    // SMART's stops are further apart than DDOT's, and suburban help is spread thinner (2026-09-24): the point of
+    // this line is that the number is known and can only fall by a decision, not that it is high.
+    expect(s).toBeGreaterThan(0.5);
   });
 
   it.skipIf(!ok)('plans the study\'s trip as walking legs and rides, with no time anywhere in it', () => {

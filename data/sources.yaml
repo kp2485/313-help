@@ -159,6 +159,57 @@ sources:
     license: unstated   # public provider directory; used only to match programs and find their own websites
     mode: stage
 
+  # The wider service area (every place a DDOT or SMART bus reaches, 2026-09-24), outside the four covered cities.
+  # Four federal datasets read by pipeline/src/ingest-federal.ts (pnpm ingest:federal, by hand) into
+  # data/staging/federal_<layer>.csv: candidates only, each checked against the place's own page before any import.
+  - id: usgs_structures_fire
+    name: USGS The National Map, National Structures Dataset, Fire Stations/EMS Stations
+    tier: A
+    kind: federal_usgs
+    url: https://carto.nationalmap.gov/arcgis/rest/services/structures/MapServer/16
+    license: public domain   # the service's own description: "public domain structures data"
+    mode: stage
+    category: safe.fire
+
+  - id: usgs_structures_police
+    name: USGS The National Map, National Structures Dataset, Police Stations
+    tier: A
+    kind: federal_usgs
+    url: https://carto.nationalmap.gov/arcgis/rest/services/structures/MapServer/18
+    license: public domain
+    mode: stage
+    category: safe.police
+
+  - id: cms_hospital_general_information
+    name: CMS Hospital General Information (Emergency Services = Yes)
+    tier: A
+    kind: federal_cms
+    url: https://data.cms.gov/provider-data/api/1/metastore/schemas/dataset/items/xubh-q36u
+    page: https://data.cms.gov/provider-data/dataset/xubh-q36u
+    license: public domain (federal government work)   # no coordinate: placed by mailing city, placed_by=city
+    mode: stage
+    category: health.er
+
+  - id: imls_pls_outlets
+    name: IMLS Public Libraries Survey, FY 2024 outlet file
+    tier: A
+    kind: federal_imls
+    url: https://www.imls.gov/sites/default/files/2026-06/pls_fy2024_csv.zip
+    page: https://www.imls.gov/research-evaluation/surveys/public-libraries-survey-pls
+    license: public domain (federal government work)
+    mode: stage
+    category: rec.library
+
+  - id: hrsa_health_center_sites
+    name: HRSA Health Center Service Delivery and Look-Alike Sites
+    tier: A
+    kind: federal_hrsa
+    url: https://data.hrsa.gov/DataDownload/DD_Files/Health_Center_Service_Delivery_and_LookAlike_Sites.csv
+    page: https://data.hrsa.gov/data/download
+    license: public domain (federal government work)   # DV-setting sites are never staged (CLAUDE.md)
+    mode: stage
+    category: health.clinic
+
 # ---------------------------------------------------------------------------------------------------------
 # NOT LISTINGS. The four-city pages (docs/13, "The four cities"; DECISIONS 2026-09-22) are built from regional
 # and federal layers that become NUMBERS, never rows in the directory, so they have no entry above: like the

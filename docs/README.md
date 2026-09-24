@@ -77,7 +77,9 @@ One or two lines per date; the reasoning behind each change is in [DECISIONS.md]
   whole and tested to lie inside the outlines; directions build only the trip's window ([query-spec, "The trip
   window"](../schema/query-spec.md)); each place's own police line on its page; Oakland's and Macomb's shelter,
   crisis and sexual-assault lines beside Wayne's; 139 ZIPs; 77 Well Wayne stations. The 71 new places have an
-  outline and their help, not yet statistics.
+  outline and their help, not yet statistics. Then the first pass of listings there: 980 published (723 → 1,703),
+  each matched on its owner's page; federal fire, police, hospital, library and health-center records staged as
+  candidates (`pnpm ingest:federal`); 147 more waiting for a person or a ranking decision (DECISIONS 2026-09-24).
 - **2026-09-22 — Directions, one tab set, and the Areas map.** Offline walking and bus directions on all three
   clients, from the street graph and transit files already in the bundle: A* with the City's own safety fields as
   the penalty, published headways only, ranges never times, at most one change, traceless

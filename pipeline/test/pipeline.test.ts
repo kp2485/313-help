@@ -414,6 +414,14 @@ describe('does the page still show this listing (one strict matcher)', () => {
   it('a street named for a saint counts: "5900 St. Lawrence"', () => {
     expect(addressOnPage('<p>5900 St. Lawrence, Detroit</p>', '5900 St. Lawrence St')).toBe(true);
     expect(addressOnPage('<p>12 Saint Aubin</p>', '12 St Aubin St')).toBe(true);
+    // (phones, not addresses; kept beside the address cases because the same pages taught both)
+    expect(phoneOnPage('<p>Public Safety 313 / 881-5500</p>', '313-881-5500')).toBe(true);
+    expect(phoneOnPage('<p>Book a ride: ( 248)246-3914</p>', '248-246-3914')).toBe(true);
+    expect(phoneOnPage('<p>Due 10/12/2024 at 3:00</p>', '101-220-2430')).toBe(false);
+    // A French elision in the street name, curly or straight, on either side (Harrison Township's library).
+    expect(addressOnPage('<p>38255 L’Anse Creuse St, Harrison Township</p>', "38255 L'Anse Creuse St")).toBe(true);
+    expect(addressOnPage("<p>38255 L'Anse Creuse</p>", '38255 L’Anse Creuse St')).toBe(true);
+    expect(addressOnPage('<p>38255 Jefferson Ave</p>', '38255 L’Anse Creuse St')).toBe(false);
   });
   const page = `<html><head><script>var tracking = "3135550100";</script><style>.x{}</style></head><body>
     <h1>St. Moses Pantry</h1><p>Call (313) 555-0100 or 313.555.0199. Toll free 1-800-866-THAW.</p>

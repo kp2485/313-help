@@ -21,7 +21,9 @@ for (const r of rows) {
   if (!r.address_1 || (r.lat && r.lon) || isDvCategory(r.category ?? '')) continue;
   // "Suite 100", "Ste. 4-450", "Suite G 7", "#2": the Census geocoder matches the building, not the unit.
   const street = r.address_1.replace(/,?\s*(suite|ste\.?|unit|#)\s*[\w-]+(\s+\w{1,3})?$/i, '');
-  const hit = await geocode(`${street}, ${r.city || 'Detroit'}, MI ${r.zip ?? ''}`);
+  // A township's name is often not the mailing city the Census geocoder knows ("Clinton Township" mail says Mount
+  // Clemens or Clinton Twp), so a miss on street + city is tried once more on street + ZIP alone (2026-09-24).
+  const hit = await geocode(`${street}, ${r.city || 'Detroit'}, MI ${r.zip ?? ''}`) ?? (r.zip ? await geocode(`${street}, MI ${r.zip}`) : null);
   if (!hit) { console.warn(`no match: ${r.sal_id} (${r.address_1})`); continue; }
   if (!inBbox(hit.lat, hit.lon)) { console.warn(`outside the service area, ignored: ${r.sal_id}`); continue; }
   r.lat = hit.lat.toFixed(6); r.lon = hit.lon.toFixed(6);

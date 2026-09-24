@@ -6,7 +6,7 @@ Free help, transit, parks and neighborhood facts for Detroit and every city and 
 where a DDOT or SMART bus stops or runs, across Wayne, Oakland and Macomb counties — in an app that
 stores nothing about you, works with no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 723 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 1,703 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -53,10 +53,11 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **723 listings** in 56 categories: 154 food, 142 harm reduction, 83 health (including **9
-  emergency rooms and 13 urgent care centers**), 51 places to get somewhere safe now (38 fire stations and 13
-  police stations), 44 jobs, 43 child care and free preschool, 31 learning, 28 treatment, and 17 more groups —
-  among them help built for seniors, veterans and people with a disability.
+- **1,703 listings** in 62 categories, 981 of them outside the first four cities: 311 food, 212 health (including
+  **29 emergency rooms and 48 urgent care centers**), 151 harm reduction, 245 places to get somewhere safe now (168
+  fire stations and 77 police stations), 114 recreation centers and libraries, 91 child care and free preschool,
+  68 housing, 65 learning, 63 treatment, 61 jobs, and 15 more groups — among them help built for seniors, veterans
+  and people with a disability.
 - **A Map tab drawn on the phone** from City open data, Census TIGER files and SEMCOG's parks inside the signed
   bundle, covering the whole area — every DDOT and SMART route drawn whole and tested to lie inside it — no tile
   server, no map company, works offline — on web, iPhone and Android. It opens two miles around you if you allow
@@ -81,11 +82,11 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   [test script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
 - **Three clients, one spec.** A web PWA (vanilla TypeScript), an iPhone app (SwiftUI) and an Android app (Kotlin,
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
-  and trip plans — are written three times against [one spec](schema/query-spec.md) and **217 shared fixture
+  and trip plans — are written three times against [one spec](schema/query-spec.md) and **220 shared fixture
   cases**; the web and iPhone pass every case, and Android's are run by CI.
-- **Tested and small.** 1,353 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
+- **Tested and small.** 1,377 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
-  (26 KB) loads only if chosen; the bundle is 5.3 MB for the whole three-county area.
+  (26 KB) loads only if chosen; the bundle is 6.5 MB for the whole three-county area.
 
 ## How listings stay fresh
 
@@ -130,7 +131,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,353 tests
+pnpm test                                   # 1,377 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/

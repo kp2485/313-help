@@ -28,7 +28,8 @@
     "ingest:safe": "tsx src/ingest-safe.ts",
     "alert:new": "tsx src/alert-new.ts",
     "import:lines": "tsx src/import-lines.ts",
-    "ingest:treatment": "tsx src/ingest-treatment.ts"
+    "ingest:treatment": "tsx src/ingest-treatment.ts",
+    "ingest:federal": "tsx src/ingest-federal.ts"
   },
   "dependencies": {
     "@313help/query": "workspace:*",
