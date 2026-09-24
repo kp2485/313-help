@@ -2,7 +2,7 @@
  "source": {
   "name": "City of Detroit parks layer",
   "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0",
-  "last_edited": "2026-09-14"
+  "last_edited": "2026-09-21"
  },
  "parks": [
   {
