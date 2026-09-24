@@ -49,7 +49,7 @@ The four tabs are **Home · Help · Map · Areas** on every client (2026-09-22; 
 
 ## Data sources
 
-Registry in `data/sources.yaml` for the layers that become listings (see docs/02 for tiers); the City layers behind the map, parks, ZIPs, events and neighborhood numbers are named at the top of their ingest scripts (`pipeline/src/ingest-*.ts`). Do not scrape any Tier C/D source. No institution maintains a feed for us (DHD included): stewards maintain `data/seed/`; a change in an open-data source arrives as a pull request and is published only when a steward merges it. Page watchers are planned, not built, and would only open steward tasks. All sources are read-only; never write back. Identify our requests honestly; if a site blocks them, check by hand rather than disguising the request.
+Registry in `data/sources.yaml` for the layers that become listings (see docs/02 for tiers); the City layers behind the map, parks, ZIPs, events and neighborhood numbers are named at the top of their ingest scripts (`pipeline/src/ingest-*.ts`). Do not scrape any Tier C/D source. No institution maintains a feed for us (DHD included): stewards maintain `data/seed/`; a change in an open-data source arrives as a pull request and is published only when a steward merges it (a re-read in which only the fetch dates moved is committed without one: `pipeline/src/ingest-changes.ts`, DECISIONS 2026-09-24). Page watchers are planned, not built, and would only open steward tasks. All sources are read-only; never write back. Identify our requests honestly; if a site blocks them, check by hand rather than disguising the request.
 
 ## Places and condition reports (docs/11, approved)
 
