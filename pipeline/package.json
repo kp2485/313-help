@@ -8,6 +8,7 @@
     "typecheck": "tsc -p .",
     "build:bundle": "tsx src/build.ts",
     "ingest:opendata": "tsx src/ingest-arcgis.ts",
+    "ingest:refresh-only": "tsx src/ingest-changes.ts",
     "geocode": "tsx src/geocode.ts",
     "check:sources": "tsx src/check-sources.ts",
     "tasks:sync": "tsx src/tasks-sync.ts",
