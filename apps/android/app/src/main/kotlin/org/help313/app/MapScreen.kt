@@ -805,6 +805,14 @@ object MapScreen {
         MapModel.base?.edited?.takeIf { it.isNotEmpty() }?.let {
             col.addView(UI.text(a, L.t("map.source", "date" to dateText(it)), 14f, R.color.muted, topDp = 12))
         }
+        // SEMCOG asks for this sentence wherever their park outlines are reproduced. It is theirs, so it stays in
+        // their words — the same English on every screen — and it is marked English so a screen reader says it in an
+        // English voice. Never machine translated (CLAUDE.md).
+        MapModel.base?.notice?.let {
+            val notice = UI.text(a, it, 13f, R.color.muted, topDp = 4)
+            notice.textLocale = java.util.Locale.US
+            col.addView(notice)
+        }
         return UI.scroller(a, col)
     }
 

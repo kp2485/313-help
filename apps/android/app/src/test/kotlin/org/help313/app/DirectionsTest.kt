@@ -1,10 +1,13 @@
-// What the app does with the street graph, on a plain JVM: the cache key, the decode, and the three states.
-// The rules themselves are `:query`'s and are checked by schema/fixtures; this is the holding.
+// What the app does with the street files, on a plain JVM: the key, the decode, the three states, and the one
+// call that plans a trip on its own window graph. The rules themselves are `:query`'s and are checked by
+// schema/fixtures; this is the holding.
 package org.help313.app
 
+import org.help313.query.LatLon
 import org.help313.query.PackedStreets
 import org.help313.query.StreetGraphCache
 import org.help313.query.TransitLayerFiles
+import org.help313.query.WalkLeg
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -106,8 +109,53 @@ class DirectionsTest {
         Directions.reset()
     }
 
+    /** Two short streets that cross, in the bundle's own packed shape (the web's dirworker test uses the same). */
+    private val crossing = PackedStreets(
+        origin = doubleArrayOf(-83.05, 42.33),
+        names = listOf("Woodward Ave", "Warren Ave"),
+        roads = listOf(
+            PackedStreets.Road(3, 0, intArrayOf(0, 0, 0, 200)),
+            PackedStreets.Road(3, 1, intArrayOf(0, 100, 200, 0)),
+        ),
+    )
+
     @Test
-    fun theGraphIsBuiltOnceAndThenComesFromTheCache() {
+    fun aPhoneWithStreetsAndNoTransitFilesStillGetsWalkingDirections() {
+        Directions.reset()
+        var ready: Directions.State.Ready? = null
+        Directions.prepare("walk-only", { Pair(listOf(crossing), emptyList()) }) { if (it is Directions.State.Ready) ready = it }
+        assertTrue("ready", ready != null)
+        assertTrue("no transit files is no network, not a failure", ready!!.network == null)
+        val plans = Directions.planTrip(ready!!, LatLon(42.33, -83.05), LatLon(42.331, -83.05))
+        assertTrue("a walk", plans.isNotEmpty())
+        for (p in plans) assertTrue(p.legs.all { it is WalkLeg })
+        Directions.reset()
+    }
+
+    /**
+     * A window graph is the streets round two points a person asked about, so it is never kept (schema/query-spec.md
+     * "The trip window"): every plan builds its own, and nothing is left in the street-graph cache afterwards.
+     */
+    @Test
+    fun aTripsWindowGraphIsBuiltForThePlanAndNeverKept() {
+        Directions.reset()
+        StreetGraphCache.clear()
+        var ready: Directions.State.Ready? = null
+        Directions.prepare("window", { Pair(listOf(crossing), emptyList()) }) { if (it is Directions.State.Ready) ready = it }
+        val from = LatLon(42.33, -83.05)
+        val to = LatLon(42.331, -83.05)
+        val one = Directions.windowGraph(ready!!, from, to)
+        val two = Directions.windowGraph(ready!!, from, to)
+        assertTrue("a new graph for every plan", one !== two)
+        assertEquals("no key: a window graph is never filed under anything", "", one.key)
+        assertEquals(one.nodeCount, two.nodeCount)
+        Directions.planTrip(ready!!, from, to)
+        assertTrue("nothing reached the cache", !StreetGraphCache.holds("window"))
+        Directions.reset()
+    }
+
+    @Test
+    fun theFilesAreReadOnceAndATripBuildsOnlyItsWindow() {
         val base = File(repo(), "data/bundle/v1/map/base.json")
         val streets = File(repo(), "data/bundle/v1/map/streets.json")
         if (!base.isFile) {
@@ -122,19 +170,23 @@ class DirectionsTest {
 
         var ready: Directions.State.Ready? = null
         Directions.prepare("key-one", read) { if (it is Directions.State.Ready) ready = it }
-        assertTrue("built", ready != null)
-        val g = ready!!.graph
-        assertTrue("${g.nodeCount} nodes", g.nodeCount > 20_000)
-        assertTrue("built in ${Directions.lastBuildMs} ms", Directions.lastBuildMs < 10_000)
-        println("street graph: ${g.nodeCount} nodes, ${g.edgeCount} edges, built in ${Directions.lastBuildMs} ms on this JVM")
+        assertTrue("read", ready != null)
+        assertTrue(Directions.isReady("key-one"))
 
-        // the same key again is the held state: no second read of the files, no second build
+        // the same key again is the held state: no second read of the files
         var again: Directions.State.Ready? = null
         Directions.prepare("key-one", read) { if (it is Directions.State.Ready) again = it }
         assertEquals("the files were read once", 1, reads)
-        assertTrue("the same graph object", again!!.graph === g)
-        assertTrue(StreetGraphCache.holds("key-one"))
-        assertTrue(Directions.isReady("key-one"))
+        assertTrue("the same held files", again === ready)
+
+        // The study's trip (Woodward at W Grand Blvd to 12028 Yellowstone): a walk-only window over the whole area is
+        // still a small part of it, and it is built in well under the time the whole area takes.
+        val t = System.currentTimeMillis()
+        val g = Directions.windowGraph(ready!!, LatLon(42.3697, -83.0742), LatLon(42.377459, -83.135296))
+        val ms = System.currentTimeMillis() - t
+        println("window graph: ${g.nodeCount} nodes, ${g.edgeCount} edges, built in $ms ms on this JVM")
+        assertTrue("${g.nodeCount} nodes", g.nodeCount in 1..60_000)
+        assertTrue("built in $ms ms", ms < 10_000)
         Directions.reset()
     }
 }

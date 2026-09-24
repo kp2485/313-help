@@ -47,14 +47,17 @@ final class ServiceBoxTests: XCTestCase {
     }
 
     func testIsTheSameBoxTheOtherTwoClientsUse() {
-        XCTAssertEqual(ServiceBox.latMin, 42.25)
-        XCTAssertEqual(ServiceBox.latMax, 42.46)
-        XCTAssertEqual(ServiceBox.lonMin, -83.33)
-        XCTAssertEqual(ServiceBox.lonMax, -82.91)
-        XCTAssertTrue(inServiceArea(lat: 42.25, lon: -83.33))
-        XCTAssertTrue(inServiceArea(lat: 42.46, lon: -82.91))
-        for p in [(42.2499, -83.0), (42.4601, -83.0), (42.35, -83.3301), (42.35, -82.9099)] {
-            XCTAssertFalse(inServiceArea(lat: p.0, lon: p.1), "\(p) is outside the four cities")
+        // Every city and township a DDOT or SMART bus stops in (2026-09-24); four cities, lat 42.25-42.46 and lon
+        // -83.33 to -82.91, until then.
+        XCTAssertEqual(ServiceBox.latMin, 42.11)
+        XCTAssertEqual(ServiceBox.latMax, 42.80)
+        XCTAssertEqual(ServiceBox.lonMin, -83.57)
+        XCTAssertEqual(ServiceBox.lonMax, -82.70)
+        for p in [(42.11, -83.57), (42.80, -82.70), (42.6389, -83.291)] {      // the corners, and Pontiac
+            XCTAssertTrue(inServiceArea(lat: p.0, lon: p.1), "\(p) is inside the service area")
+        }
+        for p in [(42.1099, -83.0), (42.8001, -83.0), (42.35, -83.5701), (42.35, -82.6999)] {
+            XCTAssertFalse(inServiceArea(lat: p.0, lon: p.1), "\(p) is outside the service area")
         }
     }
 
@@ -107,8 +110,10 @@ final class LocateCameraTests: XCTestCase {
         XCTAssertGreaterThan(cam.width, 0)
     }
 
-    func testAPointOnTheEdgeOfTheCityStaysWithinThePanLimits() {
-        for p in [(42.25, -83.33), (42.46, -82.91), (42.25, -82.91), (42.46, -83.33)] {
+    func testAPointOnTheEdgeOfTheServiceAreaStaysWithinThePanLimits() {
+        XCTAssertEqual(MapCamera.panLimitX, 0.4)            // PAN_X, PAN_Y in apps/web/src/map.ts
+        XCTAssertEqual(MapCamera.panLimitY, 0.5)
+        for p in [(42.11, -83.57), (42.80, -82.70), (42.11, -82.70), (42.80, -83.57)] {
             let cam = MapCamera.forRadius(LatLon(lat: p.0, lon: p.1), radiusMeters: locateRadiusMeters,
                                           width: 390, height: 780)
             XCTAssertLessThanOrEqual(abs(cam.centerX), MapCamera.panLimitX + 1e-9)
@@ -198,13 +203,16 @@ final class AnchorViewTests: XCTestCase {
         XCTAssertEqual(zoomBand(metersPerPoint: metresPerPoint(onPhone)), .mid)
     }
 
-    /// The whole four-city region is still what the reset button shows, and it is much further out than this.
+    /// The whole service area is still what the reset button shows, and it is much further out than this.
     func testTheRegionFitIsStillThereAndIsFurtherOut() {
         let v = openingView(nil)
         let anchor = MapCamera.forRadius(v.center, radiusMeters: v.radiusMeters, width: phone.w, height: phone.h)
-        let region = MapCamera.fitting([LatLon(lat: 42.255, lon: -83.29), LatLon(lat: 42.45, lon: -82.91)],
-                                       width: phone.w, height: phone.h, cover: true)
+        XCTAssertEqual(serviceRegionCorners, [LatLon(lat: 42.11, lon: -83.57), LatLon(lat: 42.80, lon: -82.70)])
+        let region = MapCamera.fitting(serviceRegionCorners, width: phone.w, height: phone.h, cover: true)
         XCTAssertGreaterThan(metresPerPoint(region), 2 * metresPerPoint(anchor))
+        // It frames the middle of the whole area, not of Detroit, and stays inside the camera's own limits.
+        XCTAssertEqual(MapProjection.lat(y: region.centerY), (42.11 + 42.80) / 2, accuracy: 1e-9)
+        XCTAssertGreaterThanOrEqual(region.scale, MapCamera.minScale)
     }
 }
 

@@ -74,8 +74,11 @@ type Pt = [number, number];                                   // [lon, lat]
 const DIR = 'data/ingested/transit';
 const ORIGIN: Pt = [GRID.lon0, GRID.lat0];                    // the same origin as the street map, so cells line up
 
-/** How far outside the service-area bbox a route or stop may still be kept, in degrees (about 7 miles). */
-export const SLACK = 0.1;
+/** How far outside the service-area bbox a route or stop may still be kept, in degrees (about 1.4 miles). It was
+ *  0.1 (about 7 miles) while the area was four cities, to keep the suburban ends of routes; since 2026-09-24 the
+ *  area is every city and township SMART or DDOT stops in, so the whole network is inside and a small margin
+ *  only keeps a line from stopping short of the edge. */
+export const SLACK = 0.02;
 
 export interface LayerSource { name: string; url: string; page: string; license: string }
 export interface PackedLayer {
@@ -90,8 +93,8 @@ export type NetFile = Record<string, unknown> & { id: string; v: number; routes?
 export const gtfsRows = (buf: Buffer | undefined): Record<string, string>[] =>
   !buf ? [] : (parse(buf.toString('utf8'), { columns: (h: string[]) => h.map((x) => x.replace(/^\uFEFF/, '').trim()), skip_empty_lines: true, trim: true, relax_column_count: true }) as Record<string, string>[]);
 
-/** The pieces of a line that lie inside the service area (plus SLACK). A route to the suburbs keeps only its
- *  Detroit-area stretches, so one regional feed does not put the whole three-county network in the bundle. */
+/** The pieces of a line that lie inside the service area (plus SLACK). Statewide layers (Amtrak, the coach atlas,
+ *  MDOT's lots) keep only what is near the area. */
 export function clipToArea(line: Pt[], slack = SLACK): Pt[][] {
   const out: Pt[][] = [];
   let run: Pt[] = [];

@@ -263,7 +263,7 @@
     -83.02288
    ],
    "help": {
-    "total": 27,
+    "total": 30,
     "by": {
      "food": 7,
      "health": 3,
@@ -281,7 +281,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 1,
+     "kids": 4,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -455,7 +455,7 @@
     -83.08138
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 2,
      "health": 1,
@@ -619,7 +619,7 @@
     -83.16515
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 2,
@@ -637,7 +637,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -804,9 +804,9 @@
     -83.15373
    ],
    "help": {
-    "total": 14,
+    "total": 18,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 0,
      "harm": 3,
      "shelter": 0,
@@ -822,7 +822,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 1,
      "transport": 0,
      "pets": 0
@@ -834,7 +834,7 @@
      "indoors": 0.8
     },
     "nearest_id": {
-     "food": "sal_neighborhood_service_nso_northwest_wellness_center_senio",
+     "food": "sal_detroit_parks_gleaners_groceries_at_the_northwest_activi",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
      "narcan": "sal_hr_8031_w_mcnichols",
      "indoors": "sal_detroit_parks_northwest_activities_center"
@@ -994,7 +994,7 @@
     -83.15691
    ],
    "help": {
-    "total": 11,
+    "total": 13,
     "by": {
      "food": 4,
      "health": 1,
@@ -1012,7 +1012,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -1507,7 +1507,7 @@
     -83.26934
    ],
    "help": {
-    "total": 3,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 0,
@@ -1525,7 +1525,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -1696,9 +1696,9 @@
     -83.16983
    ],
    "help": {
-    "total": 9,
+    "total": 12,
     "by": {
-     "food": 3,
+     "food": 5,
      "health": 0,
      "harm": 3,
      "shelter": 0,
@@ -1714,19 +1714,19 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.8,
+     "food": 0.7,
      "clinic": 1.7,
      "narcan": 1,
      "indoors": 0.7
     },
     "nearest_id": {
-     "food": "sal_new_liberty_food_pantry",
+     "food": "sal_detroit_area_frozen_meals_for_seniors_at_adams_butzel_re",
      "clinic": "sal_advantage_health_west_mcnichols",
      "narcan": "sal_hr_13601_w_mcnichols",
      "indoors": "sal_detroit_parks_adams_butzel_complex"
@@ -2075,7 +2075,7 @@
     -83.09284
    ],
    "help": {
-    "total": 11,
+    "total": 12,
     "by": {
      "food": 4,
      "health": 1,
@@ -2259,11 +2259,11 @@
     -83.15632
    ],
    "help": {
-    "total": 5,
+    "total": 10,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 1,
-     "harm": 1,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -2283,13 +2283,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.3,
+     "food": 0.1,
      "clinic": 3.5,
      "narcan": 0.4,
      "indoors": 0.1
     },
     "nearest_id": {
-     "food": "sal_perry_outreach_food_boxes",
+     "food": "sal_detroit_parks_free_supper_for_kids_at_kemeny_recreation_",
      "clinic": "sal_western_wayne_dearborn_health_center",
      "narcan": "sal_hr_2795_s_fort_st",
      "indoors": "sal_detroit_parks_kemeny_recreation_center"
@@ -2451,7 +2451,7 @@
     -83.04895
    ],
    "help": {
-    "total": 22,
+    "total": 23,
     "by": {
      "food": 2,
      "health": 11,
@@ -2579,7 +2579,7 @@
     -83.26215
    ],
    "help": {
-    "total": 22,
+    "total": 23,
     "by": {
      "food": 11,
      "health": 1,
@@ -2597,7 +2597,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -2771,10 +2771,10 @@
     -83.05184
    ],
    "help": {
-    "total": 34,
+    "total": 38,
     "by": {
      "food": 3,
-     "health": 11,
+     "health": 13,
      "harm": 5,
      "shelter": 2,
      "utilities": 0,
@@ -2786,7 +2786,7 @@
      "treatment": 3,
      "housing": 0,
      "legal": 2,
-     "ids": 1,
+     "ids": 2,
      "money": 1,
      "goods": 0,
      "kids": 0,
@@ -2943,7 +2943,7 @@
     -83.04764
    ],
    "help": {
-    "total": 16,
+    "total": 17,
     "by": {
      "food": 3,
      "health": 2,
@@ -2961,7 +2961,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 1
@@ -3322,9 +3322,9 @@
     -83.19513
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -3697,7 +3697,7 @@
     -83.07147
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 2,
      "health": 0,
@@ -3715,7 +3715,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 1
@@ -3890,11 +3890,11 @@
     -83.12895
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -3908,7 +3908,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -3916,18 +3916,17 @@
     "nearest_miles": {
      "food": 1.1,
      "clinic": 2.2,
-     "narcan": 1.1,
+     "narcan": 0.8,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_gleaners_community_gleaners_drive_up_food_at_urban_neigh",
      "clinic": "sal_chass_southwest",
-     "narcan": "sal_hr_1725_lawndale",
+     "narcan": "sal_wws_river_rouge_the_flower_bowl",
      "indoors": "sal_detroit_parks_patton_community_center"
     },
     "none_listed_yet": [
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -4259,10 +4258,10 @@
     -83.09804
    ],
    "help": {
-    "total": 47,
+    "total": 52,
     "by": {
      "food": 11,
-     "health": 7,
+     "health": 8,
      "harm": 6,
      "shelter": 2,
      "utilities": 1,
@@ -4277,8 +4276,8 @@
      "ids": 0,
      "money": 2,
      "goods": 0,
-     "kids": 0,
-     "connect": 0,
+     "kids": 3,
+     "connect": 1,
      "transport": 0,
      "pets": 1
     },
@@ -4452,7 +4451,7 @@
     -83.10325
    ],
    "help": {
-    "total": 34,
+    "total": 37,
     "by": {
      "food": 9,
      "health": 8,
@@ -4470,7 +4469,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 0,
      "transport": 1,
      "pets": 0
@@ -4643,9 +4642,9 @@
     -83.15171
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
-     "food": 1,
+     "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -4835,7 +4834,7 @@
     -82.97745
    ],
    "help": {
-    "total": 28,
+    "total": 32,
     "by": {
      "food": 4,
      "health": 8,
@@ -4845,15 +4844,15 @@
      "hygiene": 1,
      "youth": 0,
      "rec": 1,
-     "jobs": 1,
-     "learn": 3,
+     "jobs": 2,
+     "learn": 4,
      "treatment": 0,
      "housing": 0,
      "legal": 0,
      "ids": 0,
      "money": 2,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -5211,7 +5210,7 @@
     -83.13992
    ],
    "help": {
-    "total": 24,
+    "total": 31,
     "by": {
      "food": 8,
      "health": 7,
@@ -5221,15 +5220,15 @@
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 1,
-     "learn": 1,
+     "jobs": 4,
+     "learn": 2,
      "treatment": 0,
      "housing": 0,
      "legal": 1,
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 0,
      "transport": 1,
      "pets": 0
@@ -5403,9 +5402,9 @@
     -83.21232
    ],
    "help": {
-    "total": 12,
+    "total": 14,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 3,
      "harm": 2,
      "shelter": 0,
@@ -5972,7 +5971,7 @@
     -82.96555
    ],
    "help": {
-    "total": 29,
+    "total": 36,
     "by": {
      "food": 3,
      "health": 8,
@@ -5982,15 +5981,15 @@
      "hygiene": 1,
      "youth": 0,
      "rec": 1,
-     "jobs": 1,
-     "learn": 3,
+     "jobs": 2,
+     "learn": 4,
      "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
      "money": 2,
      "goods": 0,
-     "kids": 0,
+     "kids": 4,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -6129,7 +6128,7 @@
     -83.09121
    ],
    "help": {
-    "total": 15,
+    "total": 16,
     "by": {
      "food": 1,
      "health": 4,
@@ -6147,7 +6146,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -6311,7 +6310,7 @@
     -83.07415
    ],
    "help": {
-    "total": 31,
+    "total": 33,
     "by": {
      "food": 4,
      "health": 5,
@@ -6329,8 +6328,8 @@
      "ids": 0,
      "money": 0,
      "goods": 1,
-     "kids": 0,
-     "connect": 0,
+     "kids": 1,
+     "connect": 1,
      "transport": 1,
      "pets": 0
     },
@@ -6488,11 +6487,11 @@
     -82.92028
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
      "food": 1,
      "health": 4,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -6506,7 +6505,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -6680,7 +6679,7 @@
     -83.21277
    ],
    "help": {
-    "total": 11,
+    "total": 12,
     "by": {
      "food": 0,
      "health": 3,
@@ -6871,10 +6870,10 @@
     -83.06197
    ],
    "help": {
-    "total": 22,
+    "total": 26,
     "by": {
      "food": 3,
-     "health": 2,
+     "health": 4,
      "harm": 4,
      "shelter": 0,
      "utilities": 0,
@@ -6890,9 +6889,9 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 0,
+     "connect": 1,
      "transport": 0,
-     "pets": 0
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.7,
@@ -7237,9 +7236,9 @@
     -83.14843
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
-     "food": 1,
+     "food": 3,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -7267,7 +7266,7 @@
      "indoors": 0.9
     },
     "nearest_id": {
-     "food": "sal_new_liberty_food_pantry",
+     "food": "sal_detroit_area_frozen_meals_for_seniors_at_adams_butzel_re",
      "clinic": "sal_advantage_health_oakman",
      "narcan": "sal_hr_8105_fenkell_ave",
      "indoors": "sal_detroit_parks_adams_butzel_complex"
@@ -7432,10 +7431,10 @@
     -83.11023
    ],
    "help": {
-    "total": 13,
+    "total": 15,
     "by": {
      "food": 5,
-     "health": 1,
+     "health": 2,
      "harm": 3,
      "shelter": 0,
      "utilities": 0,
@@ -7450,7 +7449,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -7807,7 +7806,7 @@
     -83.12632
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 1,
      "health": 0,
@@ -7825,7 +7824,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -8347,7 +8346,7 @@
     -83.04737
    ],
    "help": {
-    "total": 27,
+    "total": 29,
     "by": {
      "food": 2,
      "health": 10,
@@ -8362,7 +8361,7 @@
      "treatment": 2,
      "housing": 1,
      "legal": 1,
-     "ids": 1,
+     "ids": 2,
      "money": 1,
      "goods": 0,
      "kids": 0,
@@ -8476,7 +8475,7 @@
     -83.04659
    ],
    "help": {
-    "total": 49,
+    "total": 52,
     "by": {
      "food": 6,
      "health": 3,
@@ -8491,8 +8490,8 @@
      "treatment": 3,
      "housing": 4,
      "legal": 2,
-     "ids": 1,
-     "money": 2,
+     "ids": 3,
+     "money": 1,
      "goods": 1,
      "kids": 0,
      "connect": 0,
@@ -8826,11 +8825,11 @@
     -82.93322
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -8852,13 +8851,13 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 1.6,
-     "narcan": 1.1,
+     "narcan": 0.8,
      "indoors": 2.3
     },
     "nearest_id": {
      "food": "sal_peace_lutheran_food_pantry",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_hr_17111_harper_ave",
+     "narcan": "sal_wws_grosse_pointe_grosse_pointe_public_safety_department",
      "indoors": "sal_detroit_parks_chandler_park_fieldhouse"
     },
     "none_listed_yet": [
@@ -9012,7 +9011,7 @@
     -82.98566
    ],
    "help": {
-    "total": 8,
+    "total": 11,
     "by": {
      "food": 2,
      "health": 2,
@@ -9024,13 +9023,13 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 1,
+     "treatment": 2,
      "housing": 0,
      "legal": 0,
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -9205,7 +9204,7 @@
     -83.04137
    ],
    "help": {
-    "total": 22,
+    "total": 24,
     "by": {
      "food": 5,
      "health": 3,
@@ -9220,8 +9219,8 @@
      "treatment": 1,
      "housing": 1,
      "legal": 1,
-     "ids": 1,
-     "money": 2,
+     "ids": 2,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -9363,7 +9362,7 @@
     -82.98695
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 2,
      "health": 0,
@@ -9376,7 +9375,7 @@
      "jobs": 1,
      "learn": 0,
      "treatment": 0,
-     "housing": 0,
+     "housing": 1,
      "legal": 0,
      "ids": 0,
      "money": 0,
@@ -9557,7 +9556,7 @@
     -83.08471
    ],
    "help": {
-    "total": 19,
+    "total": 20,
     "by": {
      "food": 2,
      "health": 3,
@@ -9571,7 +9570,7 @@
      "learn": 1,
      "treatment": 0,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 2,
@@ -9921,7 +9920,7 @@
     -83.02726
    ],
    "help": {
-    "total": 25,
+    "total": 27,
     "by": {
      "food": 6,
      "health": 1,
@@ -9939,7 +9938,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 1,
      "pets": 0
@@ -10094,7 +10093,7 @@
     -83.25192
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 1,
@@ -10112,7 +10111,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -10285,7 +10284,7 @@
     -83.227
    ],
    "help": {
-    "total": 11,
+    "total": 12,
     "by": {
      "food": 4,
      "health": 2,
@@ -10663,9 +10662,9 @@
     -83.05826
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
-     "food": 3,
+     "food": 5,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -10687,13 +10686,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.9,
+     "food": 0.1,
      "clinic": 2.1,
      "narcan": 1.2,
      "indoors": 0.1
     },
     "nearest_id": {
-     "food": "sal_king_david_food_pantry",
+     "food": "sal_detroit_area_hot_lunch_for_seniors_at_farwell_recreation",
      "clinic": "sal_the_wellness_east_medical_center",
      "narcan": "sal_hr_17601_mound_rd",
      "indoors": "sal_detroit_parks_farwell_recreation_center"
@@ -11046,9 +11045,9 @@
     -83.15704
    ],
    "help": {
-    "total": 16,
+    "total": 20,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 0,
      "harm": 6,
      "shelter": 0,
@@ -11064,7 +11063,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -11240,7 +11239,7 @@
     -83.28007
    ],
    "help": {
-    "total": 0,
+    "total": 1,
     "by": {
      "food": 0,
      "health": 0,
@@ -11258,7 +11257,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -11266,13 +11265,13 @@
     "nearest_miles": {
      "food": 1,
      "clinic": 2.1,
-     "narcan": 1.6,
+     "narcan": 1.1,
      "indoors": 2
     },
     "nearest_id": {
      "food": "sal_first_baptist_food_pantry",
      "clinic": "sal_health_center_at_henry_ford_high_school",
-     "narcan": "sal_wws_detroit_the_people_s_action",
+     "narcan": "sal_wws_redford_redford_interfaith_relief",
      "indoors": "sal_detroit_parks_crowell_recreation_center"
     },
     "none_listed_yet": [
@@ -11433,7 +11432,7 @@
     -83.04712
    ],
    "help": {
-    "total": 14,
+    "total": 15,
     "by": {
      "food": 2,
      "health": 3,
@@ -11454,7 +11453,7 @@
      "kids": 0,
      "connect": 0,
      "transport": 0,
-     "pets": 0
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.1,
@@ -11597,7 +11596,7 @@
     -82.96086
    ],
    "help": {
-    "total": 24,
+    "total": 27,
     "by": {
      "food": 4,
      "health": 8,
@@ -11607,15 +11606,15 @@
      "hygiene": 1,
      "youth": 0,
      "rec": 1,
-     "jobs": 0,
-     "learn": 2,
+     "jobs": 1,
+     "learn": 3,
      "treatment": 0,
      "housing": 0,
      "legal": 0,
      "ids": 0,
      "money": 2,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -11977,7 +11976,7 @@
     -83.23889
    ],
    "help": {
-    "total": 11,
+    "total": 15,
     "by": {
      "food": 5,
      "health": 2,
@@ -11995,7 +11994,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 4,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -12511,7 +12510,7 @@
     -83.09077
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 1,
@@ -12529,7 +12528,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -12705,7 +12704,7 @@
     -82.98943
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
@@ -12717,7 +12716,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -12866,9 +12865,9 @@
     -83.17258
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 0,
      "harm": 1,
      "shelter": 0,
@@ -12884,7 +12883,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -13251,7 +13250,7 @@
     -83.21552
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
      "health": 0,
@@ -13269,7 +13268,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -13440,7 +13439,7 @@
     -83.22473
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
@@ -13458,7 +13457,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -14009,7 +14008,7 @@
     -83.00956
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 2,
      "health": 1,
@@ -14027,7 +14026,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -14202,7 +14201,7 @@
     -83.02417
    ],
    "help": {
-    "total": 10,
+    "total": 12,
     "by": {
      "food": 2,
      "health": 1,
@@ -14220,7 +14219,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 1,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -14389,7 +14388,7 @@
     -83.00117
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 1,
      "health": 1,
@@ -14407,7 +14406,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 1,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -14581,7 +14580,7 @@
     -83.04073
    ],
    "help": {
-    "total": 27,
+    "total": 30,
     "by": {
      "food": 4,
      "health": 0,
@@ -14596,8 +14595,8 @@
      "treatment": 0,
      "housing": 3,
      "legal": 2,
-     "ids": 1,
-     "money": 2,
+     "ids": 3,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -15112,7 +15111,7 @@
     -83.20466
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 0,
      "health": 0,
@@ -15130,7 +15129,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -15485,7 +15484,7 @@
     -83.17473
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 3,
      "health": 1,
@@ -15503,7 +15502,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -15861,9 +15860,9 @@
     -83.17482
    ],
    "help": {
-    "total": 4,
+    "total": 7,
     "by": {
-     "food": 2,
+     "food": 5,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -15885,13 +15884,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.5,
+     "food": 0.4,
      "clinic": 2.1,
      "narcan": 1.1,
      "indoors": 0.6
     },
     "nearest_id": {
-     "food": "sal_gospel_tabernacle_drive_up_food_pantry",
+     "food": "sal_wayne_metro_senior_food_boxes_stansbury_pick_up",
      "clinic": "sal_advantage_health_west_mcnichols",
      "narcan": "sal_hr_14040_greenfield",
      "indoors": "sal_detroit_parks_adams_butzel_complex"
@@ -16044,9 +16043,9 @@
     -83.1736
    ],
    "help": {
-    "total": 13,
+    "total": 16,
     "by": {
-     "food": 3,
+     "food": 5,
      "health": 1,
      "harm": 2,
      "shelter": 0,
@@ -16062,7 +16061,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -16074,7 +16073,7 @@
      "indoors": 0.7
     },
     "nearest_id": {
-     "food": "sal_neighborhood_service_nso_northwest_wellness_center_senio",
+     "food": "sal_detroit_parks_gleaners_groceries_at_the_northwest_activi",
      "clinic": "sal_advantage_health_west_mcnichols",
      "narcan": "sal_hr_13601_w_mcnichols",
      "indoors": "sal_detroit_parks_northwest_activities_center"
@@ -16425,9 +16424,9 @@
     -83.0972
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 1,
      "harm": 0,
      "shelter": 0,
@@ -16449,13 +16448,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.7,
+     "food": 0.5,
      "clinic": 1.4,
      "narcan": 0.8,
      "indoors": 0.5
     },
     "nearest_id": {
-     "food": "sal_cass_community_free_meals_and_food_pantry",
+     "food": "sal_detroit_area_frozen_meals_for_seniors_at_joseph_walker_w",
      "clinic": "sal_huda_clinic",
      "narcan": "sal_hr_8801_woodward",
      "indoors": "sal_detroit_parks_joseph_walker_williams_center"
@@ -16601,7 +16600,7 @@
     -83.24891
    ],
    "help": {
-    "total": 12,
+    "total": 14,
     "by": {
      "food": 2,
      "health": 0,
@@ -16619,7 +16618,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -16795,10 +16794,10 @@
     -83.08922
    ],
    "help": {
-    "total": 19,
+    "total": 23,
     "by": {
      "food": 4,
-     "health": 1,
+     "health": 2,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -16813,8 +16812,8 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
-     "connect": 0,
+     "kids": 2,
+     "connect": 1,
      "transport": 0,
      "pets": 0
     },
@@ -16970,7 +16969,7 @@
     -83.07385
    ],
    "help": {
-    "total": 16,
+    "total": 18,
     "by": {
      "food": 4,
      "health": 1,
@@ -16988,8 +16987,8 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
-     "connect": 0,
+     "kids": 1,
+     "connect": 1,
      "transport": 0,
      "pets": 0
     },
@@ -17143,9 +17142,9 @@
     -83.18956
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -17337,9 +17336,9 @@
     -83.19064
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 2,
      "harm": 3,
      "shelter": 0,
@@ -17527,9 +17526,9 @@
     -82.99524
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 2,
      "harm": 1,
      "shelter": 0,
@@ -17539,7 +17538,7 @@
      "rec": 1,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -17704,9 +17703,9 @@
     -83.00244
    ],
    "help": {
-    "total": 15,
+    "total": 17,
     "by": {
-     "food": 5,
+     "food": 6,
      "health": 2,
      "harm": 2,
      "shelter": 0,
@@ -17716,7 +17715,7 @@
      "rec": 1,
      "jobs": 0,
      "learn": 0,
-     "treatment": 2,
+     "treatment": 3,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -17728,13 +17727,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.6,
+     "food": 0.2,
      "clinic": 0.3,
      "narcan": 0.6,
      "indoors": 0.2
     },
     "nearest_id": {
-     "food": "sal_csk_meldrum_meals",
+     "food": "sal_detroit_area_frozen_meals_for_seniors_at_butzel_family_c",
      "clinic": "sal_detroit_community_dr_sophie_womack_health_center",
      "narcan": "sal_hr_1264_meldrum_st",
      "indoors": "sal_detroit_parks_butzel_family_center"
@@ -18088,7 +18087,7 @@
     -82.94657
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 1,
      "health": 1,
@@ -18106,7 +18105,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -18281,10 +18280,10 @@
     -83.07276
    ],
    "help": {
-    "total": 8,
+    "total": 10,
     "by": {
      "food": 0,
-     "health": 1,
+     "health": 3,
      "harm": 2,
      "shelter": 1,
      "utilities": 0,
@@ -18438,7 +18437,7 @@
     -82.98369
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
@@ -18450,7 +18449,7 @@
      "rec": 0,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -18599,7 +18598,7 @@
     -83.20375
    ],
    "help": {
-    "total": 10,
+    "total": 12,
     "by": {
      "food": 5,
      "health": 3,
@@ -18617,7 +18616,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -19175,7 +19174,7 @@
     -83.03515
    ],
    "help": {
-    "total": 20,
+    "total": 22,
     "by": {
      "food": 3,
      "health": 1,
@@ -19190,8 +19189,8 @@
      "treatment": 1,
      "housing": 1,
      "legal": 1,
-     "ids": 1,
-     "money": 2,
+     "ids": 2,
+     "money": 1,
      "goods": 0,
      "kids": 0,
      "connect": 0,
@@ -19537,9 +19536,9 @@
     -83.09537
    ],
    "help": {
-    "total": 12,
+    "total": 13,
     "by": {
-     "food": 3,
+     "food": 4,
      "health": 2,
      "harm": 1,
      "shelter": 0,
@@ -19916,7 +19915,7 @@
     -82.96388
    ],
    "help": {
-    "total": 12,
+    "total": 14,
     "by": {
      "food": 4,
      "health": 0,
@@ -19926,10 +19925,10 @@
      "hygiene": 0,
      "youth": 2,
      "rec": 1,
-     "jobs": 1,
+     "jobs": 2,
      "learn": 0,
      "treatment": 0,
-     "housing": 0,
+     "housing": 1,
      "legal": 0,
      "ids": 0,
      "money": 1,
@@ -20110,7 +20109,7 @@
     -82.9702
    ],
    "help": {
-    "total": 2,
+    "total": 5,
     "by": {
      "food": 0,
      "health": 0,
@@ -20128,7 +20127,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -20275,7 +20274,7 @@
     -83.13324
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 3,
      "health": 0,
@@ -20293,7 +20292,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -20468,7 +20467,7 @@
     -83.02998
    ],
    "help": {
-    "total": 16,
+    "total": 17,
     "by": {
      "food": 4,
      "health": 0,
@@ -20489,7 +20488,7 @@
      "kids": 0,
      "connect": 0,
      "transport": 0,
-     "pets": 0
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.1,
@@ -21024,7 +21023,7 @@
     -83.06466
    ],
    "help": {
-    "total": 21,
+    "total": 23,
     "by": {
      "food": 1,
      "health": 1,
@@ -21043,9 +21042,9 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 0,
+     "connect": 1,
      "transport": 0,
-     "pets": 0
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.6,
@@ -21185,10 +21184,10 @@
     -83.05548
    ],
    "help": {
-    "total": 33,
+    "total": 37,
     "by": {
      "food": 3,
-     "health": 11,
+     "health": 13,
      "harm": 5,
      "shelter": 0,
      "utilities": 0,
@@ -21204,9 +21203,9 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 0,
+     "connect": 1,
      "transport": 0,
-     "pets": 0
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.3,
@@ -21346,7 +21345,7 @@
     -83.26368
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
      "food": 0,
      "health": 0,
@@ -21364,7 +21363,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -21513,7 +21512,7 @@
     -83.08474
    ],
    "help": {
-    "total": 16,
+    "total": 19,
     "by": {
      "food": 4,
      "health": 0,
@@ -21531,8 +21530,8 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
-     "connect": 0,
+     "kids": 2,
+     "connect": 1,
      "transport": 0,
      "pets": 0
     },
@@ -21861,10 +21860,10 @@
     -83.06043
    ],
    "help": {
-    "total": 51,
+    "total": 55,
     "by": {
      "food": 5,
-     "health": 13,
+     "health": 15,
      "harm": 8,
      "shelter": 2,
      "utilities": 0,
@@ -21876,11 +21875,11 @@
      "treatment": 2,
      "housing": 0,
      "legal": 3,
-     "ids": 1,
+     "ids": 2,
      "money": 1,
      "goods": 1,
      "kids": 0,
-     "connect": 0,
+     "connect": 1,
      "transport": 1,
      "pets": 0
     },
@@ -22041,7 +22040,7 @@
     -83.1262
    ],
    "help": {
-    "total": 25,
+    "total": 30,
     "by": {
      "food": 10,
      "health": 3,
@@ -22059,7 +22058,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 5,
      "connect": 0,
      "transport": 1,
      "pets": 0
@@ -22418,7 +22417,7 @@
     -83.05688
    ],
    "help": {
-    "total": 20,
+    "total": 22,
     "by": {
      "food": 3,
      "health": 1,
@@ -22432,14 +22431,14 @@
      "learn": 1,
      "treatment": 1,
      "housing": 0,
-     "legal": 4,
+     "legal": 5,
      "ids": 0,
      "money": 0,
      "goods": 0,
      "kids": 0,
      "connect": 0,
      "transport": 0,
-     "pets": 0
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.3,
@@ -22583,7 +22582,7 @@
     -83.23433
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 3,
      "health": 1,
@@ -22601,7 +22600,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -23149,7 +23148,7 @@
     -82.94105
    ],
    "help": {
-    "total": 10,
+    "total": 12,
     "by": {
      "food": 3,
      "health": 2,
@@ -23159,7 +23158,7 @@
      "hygiene": 0,
      "youth": 1,
      "rec": 0,
-     "jobs": 0,
+     "jobs": 1,
      "learn": 0,
      "treatment": 0,
      "housing": 0,
@@ -23167,7 +23166,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -23727,7 +23726,7 @@
     -83.07818
    ],
    "help": {
-    "total": 13,
+    "total": 14,
     "by": {
      "food": 1,
      "health": 2,
@@ -23741,7 +23740,7 @@
      "learn": 0,
      "treatment": 1,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -23885,7 +23884,7 @@
     -83.08069
    ],
    "help": {
-    "total": 15,
+    "total": 16,
     "by": {
      "food": 2,
      "health": 2,
@@ -23899,7 +23898,7 @@
      "learn": 0,
      "treatment": 1,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -24437,7 +24436,7 @@
     -83.08025
    ],
    "help": {
-    "total": 25,
+    "total": 26,
     "by": {
      "food": 3,
      "health": 5,
@@ -24455,7 +24454,7 @@
      "ids": 0,
      "money": 0,
      "goods": 1,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -24619,7 +24618,7 @@
     -83.07155
    ],
    "help": {
-    "total": 24,
+    "total": 25,
     "by": {
      "food": 5,
      "health": 2,
@@ -24633,7 +24632,7 @@
      "learn": 1,
      "treatment": 1,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -24811,7 +24810,7 @@
     -83.2255
    ],
    "help": {
-    "total": 11,
+    "total": 12,
     "by": {
      "food": 2,
      "health": 3,
@@ -25193,9 +25192,9 @@
     -83.16299
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
-     "food": 1,
+     "food": 3,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -25217,13 +25216,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.6,
+     "food": 0.4,
      "clinic": 2.2,
      "narcan": 1.1,
      "indoors": 0.4
     },
     "nearest_id": {
-     "food": "sal_gospel_tabernacle_drive_up_food_pantry",
+     "food": "sal_detroit_area_frozen_meals_for_seniors_at_adams_butzel_re",
      "clinic": "sal_advantage_health_oakman",
      "narcan": "sal_hr_10000_plymouth_rd",
      "indoors": "sal_detroit_parks_adams_butzel_complex"
@@ -25576,7 +25575,7 @@
     -83.10077
    ],
    "help": {
-    "total": 13,
+    "total": 14,
     "by": {
      "food": 2,
      "health": 1,
@@ -25594,7 +25593,7 @@
      "ids": 0,
      "money": 0,
      "goods": 2,
-     "kids": 0,
+     "kids": 1,
      "connect": 1,
      "transport": 0,
      "pets": 0
@@ -25759,7 +25758,7 @@
     -83.23033
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
      "food": 3,
      "health": 1,
@@ -25777,7 +25776,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -25951,7 +25950,7 @@
     -83.26411
    ],
    "help": {
-    "total": 10,
+    "total": 11,
     "by": {
      "food": 1,
      "health": 0,
@@ -25969,7 +25968,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -26505,11 +26504,11 @@
     -83.15402
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
-     "food": 1,
+     "food": 2,
      "health": 0,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -26529,13 +26528,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 1.3,
+     "food": 1.1,
      "clinic": 2.5,
      "narcan": 0.6,
      "indoors": 1.1
     },
     "nearest_id": {
-     "food": "sal_perry_outreach_food_boxes",
+     "food": "sal_detroit_parks_free_supper_for_kids_at_kemeny_recreation_",
      "clinic": "sal_western_wayne_dearborn_health_center",
      "narcan": "sal_hr_377_schaefer_st",
      "indoors": "sal_detroit_parks_kemeny_recreation_center"
@@ -26664,7 +26663,7 @@
     -83.26131
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 0,
      "health": 0,
@@ -26682,7 +26681,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -26841,7 +26840,7 @@
     -82.96213
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 4,
      "health": 0,
@@ -26854,7 +26853,7 @@
      "jobs": 0,
      "learn": 0,
      "treatment": 0,
-     "housing": 0,
+     "housing": 1,
      "legal": 0,
      "ids": 0,
      "money": 0,
@@ -27385,9 +27384,9 @@
     -83.18166
    ],
    "help": {
-    "total": 3,
+    "total": 5,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -27403,7 +27402,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -27933,9 +27932,9 @@
     -83.07051
    ],
    "help": {
-    "total": 6,
+    "total": 8,
     "by": {
-     "food": 3,
+     "food": 5,
      "health": 0,
      "harm": 0,
      "shelter": 0,
@@ -28125,7 +28124,7 @@
     -83.11696
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 3,
      "health": 0,
@@ -28143,7 +28142,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -28318,7 +28317,7 @@
     -83.08522
    ],
    "help": {
-    "total": 14,
+    "total": 15,
     "by": {
      "food": 3,
      "health": 2,
@@ -28332,7 +28331,7 @@
      "learn": 0,
      "treatment": 0,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -28501,7 +28500,7 @@
     -83.12024
    ],
    "help": {
-    "total": 17,
+    "total": 18,
     "by": {
      "food": 6,
      "health": 2,
@@ -28519,7 +28518,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -28693,7 +28692,7 @@
     -83.00622
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 1,
      "health": 1,
@@ -28711,7 +28710,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -28884,9 +28883,9 @@
     -83.18534
    ],
    "help": {
-    "total": 11,
+    "total": 14,
     "by": {
-     "food": 8,
+     "food": 9,
      "health": 0,
      "harm": 1,
      "shelter": 1,
@@ -28902,7 +28901,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -29078,7 +29077,7 @@
     -83.20317
    ],
    "help": {
-    "total": 5,
+    "total": 7,
     "by": {
      "food": 5,
      "health": 0,
@@ -29096,7 +29095,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -29272,7 +29271,7 @@
     -83.04603
    ],
    "help": {
-    "total": 13,
+    "total": 14,
     "by": {
      "food": 3,
      "health": 1,
@@ -29293,7 +29292,7 @@
      "kids": 0,
      "connect": 0,
      "transport": 0,
-     "pets": 0
+     "pets": 1
     },
     "nearest_miles": {
      "food": 0.7,
@@ -29457,9 +29456,9 @@
     -83.17296
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 0,
      "harm": 2,
      "shelter": 1,
@@ -29475,7 +29474,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -29837,7 +29836,7 @@
     -82.98469
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 1,
      "health": 0,
@@ -29855,7 +29854,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -30019,7 +30018,7 @@
     -82.95465
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 3,
      "health": 0,
@@ -30029,7 +30028,7 @@
      "hygiene": 0,
      "youth": 2,
      "rec": 1,
-     "jobs": 0,
+     "jobs": 1,
      "learn": 0,
      "treatment": 0,
      "housing": 0,
@@ -30213,7 +30212,7 @@
     -82.9498
    ],
    "help": {
-    "total": 11,
+    "total": 13,
     "by": {
      "food": 3,
      "health": 1,
@@ -30231,7 +30230,7 @@
      "ids": 0,
      "money": 2,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -30599,7 +30598,7 @@
     -83.01792
    ],
    "help": {
-    "total": 16,
+    "total": 18,
     "by": {
      "food": 4,
      "health": 1,
@@ -30614,10 +30613,10 @@
      "treatment": 0,
      "housing": 4,
      "legal": 0,
-     "ids": 1,
-     "money": 1,
+     "ids": 2,
+     "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -30766,7 +30765,7 @@
     -83.23026
    ],
    "help": {
-    "total": 9,
+    "total": 11,
     "by": {
      "food": 4,
      "health": 1,
@@ -30784,7 +30783,7 @@
      "ids": 0,
      "money": 1,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -31639,7 +31638,7 @@
     -83.18815
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 3,
      "health": 2,
@@ -31657,7 +31656,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -31825,9 +31824,9 @@
     -83.2082
    ],
    "help": {
-    "total": 10,
+    "total": 14,
     "by": {
-     "food": 5,
+     "food": 6,
      "health": 0,
      "harm": 2,
      "shelter": 0,
@@ -31843,7 +31842,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -32019,9 +32018,9 @@
     -83.17015
    ],
    "help": {
-    "total": 17,
+    "total": 21,
     "by": {
-     "food": 5,
+     "food": 6,
      "health": 2,
      "harm": 3,
      "shelter": 0,
@@ -32037,7 +32036,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 3,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -32049,7 +32048,7 @@
      "indoors": 0.3
     },
     "nearest_id": {
-     "food": "sal_neighborhood_service_nso_northwest_wellness_center_senio",
+     "food": "sal_detroit_parks_gleaners_groceries_at_the_northwest_activi",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
      "narcan": "sal_hr_13635_w_7_mile_rd",
      "indoors": "sal_detroit_parks_northwest_activities_center"
@@ -32206,7 +32205,7 @@
     -83.19366
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 3,
      "health": 2,
@@ -32224,7 +32223,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -32377,7 +32376,7 @@
     -83.27367
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
      "food": 1,
      "health": 0,
@@ -32395,7 +32394,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -32965,13 +32964,13 @@
     "nearest_miles": {
      "food": 1.2,
      "clinic": 2.9,
-     "narcan": 1.2,
+     "narcan": 1,
      "indoors": 1.3
     },
     "nearest_id": {
      "food": "sal_brightmoor_artisans_b_moor_nourished_free_pantry",
      "clinic": "sal_health_center_at_henry_ford_high_school",
-     "narcan": "sal_hr_16651_lasher",
+     "narcan": "sal_wws_redford_lighthouse_community_church",
      "indoors": "sal_detroit_parks_crowell_recreation_center"
     },
     "none_listed_yet": [
@@ -33131,7 +33130,7 @@
     -83.22364
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
      "food": 1,
      "health": 0,
@@ -33149,7 +33148,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -33319,9 +33318,9 @@
     -83.13552
    ],
    "help": {
-    "total": 20,
+    "total": 27,
     "by": {
-     "food": 4,
+     "food": 6,
      "health": 0,
      "harm": 3,
      "shelter": 0,
@@ -33337,19 +33336,19 @@
      "ids": 1,
      "money": 2,
      "goods": 0,
-     "kids": 0,
+     "kids": 5,
      "connect": 0,
      "transport": 0,
      "pets": 1
     },
     "nearest_miles": {
-     "food": 0.5,
+     "food": 0.2,
      "clinic": 1.6,
      "narcan": 0.3,
      "indoors": 0.2
     },
     "nearest_id": {
-     "food": "sal_gleaners_community_gleaners_drive_up_food_at_urban_neigh",
+     "food": "sal_detroit_area_frozen_meals_for_seniors_at_patton_recreati",
      "clinic": "sal_american_indian_medical_clinic",
      "narcan": "sal_hr_1725_lawndale",
      "indoors": "sal_detroit_parks_patton_community_center"
@@ -33667,7 +33666,7 @@
     -83.07512
    ],
    "help": {
-    "total": 21,
+    "total": 23,
     "by": {
      "food": 1,
      "health": 2,
@@ -33681,12 +33680,12 @@
      "learn": 1,
      "treatment": 1,
      "housing": 0,
-     "legal": 4,
+     "legal": 5,
      "ids": 0,
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 0,
+     "connect": 1,
      "transport": 0,
      "pets": 0
     },
@@ -33822,7 +33821,7 @@
     -83.28134
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
      "health": 0,
@@ -33840,7 +33839,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -33848,13 +33847,13 @@
     "nearest_miles": {
      "food": 1.5,
      "clinic": 2.5,
-     "narcan": 1.3,
+     "narcan": 0.9,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_brightmoor_artisans_b_moor_nourished_free_pantry",
      "clinic": "sal_health_center_at_henry_ford_high_school",
-     "narcan": "sal_hr_16651_lasher",
+     "narcan": "sal_wws_redford_redford_interfaith_relief",
      "indoors": "sal_detroit_parks_crowell_recreation_center"
     },
     "none_listed_yet": [
@@ -34012,7 +34011,7 @@
     -83.18162
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 2,
@@ -34030,7 +34029,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -34174,7 +34173,7 @@
     -83.1339
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 1,
      "health": 0,
@@ -34192,7 +34191,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 1,
      "transport": 0,
      "pets": 0
@@ -34360,7 +34359,7 @@
     -83.08272
    ],
    "help": {
-    "total": 14,
+    "total": 15,
     "by": {
      "food": 2,
      "health": 2,
@@ -34374,7 +34373,7 @@
      "learn": 0,
      "treatment": 1,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 0,
@@ -34513,9 +34512,9 @@
     -83.09267
    ],
    "help": {
-    "total": 24,
+    "total": 26,
     "by": {
-     "food": 5,
+     "food": 6,
      "health": 4,
      "harm": 1,
      "shelter": 0,
@@ -34527,7 +34526,7 @@
      "learn": 0,
      "treatment": 0,
      "housing": 0,
-     "legal": 3,
+     "legal": 4,
      "ids": 0,
      "money": 0,
      "goods": 2,
@@ -34537,13 +34536,13 @@
      "pets": 0
     },
     "nearest_miles": {
-     "food": 0.6,
+     "food": 0.2,
      "clinic": 2,
      "narcan": 0.9,
      "indoors": 0.2
     },
     "nearest_id": {
-     "food": "sal_crossroads_sunday_meal",
+     "food": "sal_detroit_area_frozen_meals_for_seniors_at_joseph_walker_w",
      "clinic": "sal_huda_clinic",
      "narcan": "sal_hr_8801_woodward",
      "indoors": "sal_detroit_parks_joseph_walker_williams_center"
@@ -34897,7 +34896,7 @@
     -82.98685
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 2,
      "health": 0,
@@ -34915,7 +34914,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -35286,7 +35285,7 @@
     -83.23183
    ],
    "help": {
-    "total": 14,
+    "total": 16,
     "by": {
      "food": 3,
      "health": 3,
@@ -35304,7 +35303,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 2,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -35478,7 +35477,7 @@
     -82.97911
    ],
    "help": {
-    "total": 2,
+    "total": 4,
     "by": {
      "food": 0,
      "health": 0,
@@ -35496,7 +35495,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -35607,10 +35606,10 @@
     -83.07338
    ],
    "help": {
-    "total": 17,
+    "total": 20,
     "by": {
      "food": 1,
-     "health": 1,
+     "health": 3,
      "harm": 2,
      "shelter": 0,
      "utilities": 0,
@@ -35626,7 +35625,7 @@
      "money": 1,
      "goods": 0,
      "kids": 0,
-     "connect": 0,
+     "connect": 1,
      "transport": 0,
      "pets": 0
     },
@@ -35949,7 +35948,7 @@
     -83.23488
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 4,
      "health": 0,
@@ -35967,7 +35966,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -36141,7 +36140,7 @@
     -82.99356
    ],
    "help": {
-    "total": 21,
+    "total": 27,
     "by": {
      "food": 1,
      "health": 9,
@@ -36151,15 +36150,15 @@
      "hygiene": 0,
      "youth": 0,
      "rec": 0,
-     "jobs": 1,
-     "learn": 3,
+     "jobs": 2,
+     "learn": 4,
      "treatment": 0,
      "housing": 0,
      "legal": 0,
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 1,
+     "kids": 5,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -36520,10 +36519,10 @@
     -83.07609
    ],
    "help": {
-    "total": 38,
+    "total": 41,
     "by": {
      "food": 7,
-     "health": 2,
+     "health": 3,
      "harm": 8,
      "shelter": 0,
      "utilities": 0,
@@ -36538,8 +36537,8 @@
      "ids": 0,
      "money": 0,
      "goods": 1,
-     "kids": 0,
-     "connect": 0,
+     "kids": 1,
+     "connect": 1,
      "transport": 1,
      "pets": 0
     },
@@ -36689,9 +36688,9 @@
     -82.99777
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
-     "food": 2,
+     "food": 3,
      "health": 2,
      "harm": 1,
      "shelter": 0,
@@ -36701,7 +36700,7 @@
      "rec": 1,
      "jobs": 0,
      "learn": 0,
-     "treatment": 0,
+     "treatment": 1,
      "housing": 0,
      "legal": 0,
      "ids": 0,
@@ -36866,7 +36865,7 @@
     -83.23423
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 4,
      "health": 0,
@@ -36884,7 +36883,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -37053,7 +37052,7 @@
     -83.10633
    ],
    "help": {
-    "total": 13,
+    "total": 14,
     "by": {
      "food": 3,
      "health": 1,
@@ -37071,7 +37070,7 @@
      "ids": 0,
      "money": 0,
      "goods": 2,
-     "kids": 0,
+     "kids": 1,
      "connect": 1,
      "transport": 0,
      "pets": 0
@@ -37244,9 +37243,9 @@
     -83.19156
    ],
    "help": {
-    "total": 17,
+    "total": 20,
     "by": {
-     "food": 4,
+     "food": 6,
      "health": 4,
      "harm": 4,
      "shelter": 0,
@@ -37262,7 +37261,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -37274,7 +37273,7 @@
      "indoors": 1.1
     },
     "nearest_id": {
-     "food": "sal_westminster_church_respond_free_lunch",
+     "food": "sal_detroit_parks_free_supper_for_kids_at_racquet_up",
      "clinic": "sal_advantage_health_west_mcnichols",
      "narcan": "sal_hr_13601_w_mcnichols",
      "indoors": "sal_detroit_parks_northwest_activities_center"
@@ -37612,7 +37611,7 @@
     -82.94313
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 1,
      "health": 2,
@@ -37630,7 +37629,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -37994,6 +37993,432 @@
    "name": "Dearborn",
    "kind": "city",
    "children": "none"
+  },
+  {
+   "id": "city_allen_park",
+   "name": "Allen Park",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_dearborn_heights",
+   "name": "Dearborn Heights",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_ecorse",
+   "name": "Ecorse",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_garden_city",
+   "name": "Garden City",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_grosse_pointe",
+   "name": "Grosse Pointe",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_grosse_pointe_farms",
+   "name": "Grosse Pointe Farms",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_grosse_pointe_park",
+   "name": "Grosse Pointe Park",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_grosse_pointe_shores",
+   "name": "Grosse Pointe Shores",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_grosse_pointe_woods",
+   "name": "Grosse Pointe Woods",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_harper_woods",
+   "name": "Harper Woods",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_inkster",
+   "name": "Inkster",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_lincoln_park",
+   "name": "Lincoln Park",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_livonia",
+   "name": "Livonia",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_melvindale",
+   "name": "Melvindale",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_redford_township",
+   "name": "Redford Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_river_rouge",
+   "name": "River Rouge",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_riverview",
+   "name": "Riverview",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_romulus",
+   "name": "Romulus",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_southgate",
+   "name": "Southgate",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_taylor",
+   "name": "Taylor",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_trenton",
+   "name": "Trenton",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_wayne",
+   "name": "Wayne",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_westland",
+   "name": "Westland",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_wyandotte",
+   "name": "Wyandotte",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_auburn_hills",
+   "name": "Auburn Hills",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_berkley",
+   "name": "Berkley",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_birmingham",
+   "name": "Birmingham",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_bloomfield_hills",
+   "name": "Bloomfield Hills",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_bloomfield_township",
+   "name": "Bloomfield Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_clawson",
+   "name": "Clawson",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_commerce_township",
+   "name": "Commerce Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_farmington",
+   "name": "Farmington",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_farmington_hills",
+   "name": "Farmington Hills",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_ferndale",
+   "name": "Ferndale",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_hazel_park",
+   "name": "Hazel Park",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_huntington_woods",
+   "name": "Huntington Woods",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_lathrup_village",
+   "name": "Lathrup Village",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_madison_heights",
+   "name": "Madison Heights",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_novi",
+   "name": "Novi",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_oak_park",
+   "name": "Oak Park",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_orion_township",
+   "name": "Orion Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_pleasant_ridge",
+   "name": "Pleasant Ridge",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_pontiac",
+   "name": "Pontiac",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_rochester",
+   "name": "Rochester",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_rochester_hills",
+   "name": "Rochester Hills",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_royal_oak",
+   "name": "Royal Oak",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_royal_oak_township",
+   "name": "Royal Oak Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_southfield",
+   "name": "Southfield",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_southfield_township",
+   "name": "Southfield Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_sylvan_lake",
+   "name": "Sylvan Lake",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_troy",
+   "name": "Troy",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_walled_lake",
+   "name": "Walled Lake",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_waterford_township",
+   "name": "Waterford Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_west_bloomfield_township",
+   "name": "West Bloomfield Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_white_lake_township",
+   "name": "White Lake Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_wixom",
+   "name": "Wixom",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_center_line",
+   "name": "Center Line",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_chesterfield_township",
+   "name": "Chesterfield Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_clinton_township",
+   "name": "Clinton Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_eastpointe",
+   "name": "Eastpointe",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_fraser",
+   "name": "Fraser",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_harrison_township",
+   "name": "Harrison Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_macomb_township",
+   "name": "Macomb Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_mount_clemens",
+   "name": "Mount Clemens",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_new_baltimore",
+   "name": "New Baltimore",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_roseville",
+   "name": "Roseville",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_shelby_township",
+   "name": "Shelby Township",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_st_clair_shores",
+   "name": "St. Clair Shores",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_sterling_heights",
+   "name": "Sterling Heights",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_utica",
+   "name": "Utica",
+   "kind": "city",
+   "children": "none"
+  },
+  {
+   "id": "city_warren",
+   "name": "Warren",
+   "kind": "city",
+   "children": "none"
   }
  ],
  "areas": [
@@ -38008,28 +38433,28 @@
     -83.10224
    ],
    "help": {
-    "total": 472,
+    "total": 540,
     "by": {
-     "food": 130,
-     "health": 61,
+     "food": 142,
+     "health": 64,
      "harm": 73,
      "shelter": 7,
      "utilities": 4,
      "hygiene": 4,
      "youth": 17,
      "rec": 18,
-     "jobs": 28,
-     "learn": 17,
-     "treatment": 22,
-     "housing": 8,
-     "legal": 8,
-     "ids": 3,
-     "money": 11,
+     "jobs": 33,
+     "learn": 19,
+     "treatment": 23,
+     "housing": 9,
+     "legal": 9,
+     "ids": 5,
+     "money": 10,
      "goods": 3,
-     "kids": 1,
-     "connect": 2,
+     "kids": 36,
+     "connect": 4,
      "transport": 3,
-     "pets": 2
+     "pets": 3
     },
     "nearest_miles": {
      "food": 0.3,
@@ -38159,7 +38584,7 @@
     -83.05594
    ],
    "help": {
-    "total": 21,
+    "total": 22,
     "by": {
      "food": 2,
      "health": 3,
@@ -38177,7 +38602,7 @@
      "ids": 0,
      "money": 2,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -38339,15 +38764,15 @@
     -83.09765
    ],
    "help": {
-    "total": 15,
+    "total": 18,
     "by": {
      "food": 1,
-     "health": 1,
+     "health": 2,
      "harm": 3,
-     "shelter": 1,
+     "shelter": 2,
      "utilities": 0,
      "hygiene": 1,
-     "youth": 1,
+     "youth": 0,
      "rec": 0,
      "jobs": 2,
      "learn": 0,
@@ -38357,7 +38782,7 @@
      "ids": 0,
      "money": 0,
      "goods": 0,
-     "kids": 0,
+     "kids": 1,
      "connect": 0,
      "transport": 0,
      "pets": 0
@@ -38489,9 +38914,9 @@
     -83.21149
    ],
    "help": {
-    "total": 53,
+    "total": 61,
     "by": {
-     "food": 7,
+     "food": 8,
      "health": 13,
      "harm": 9,
      "shelter": 0,
@@ -38499,15 +38924,15 @@
      "hygiene": 0,
      "youth": 0,
      "rec": 1,
-     "jobs": 5,
+     "jobs": 6,
      "learn": 10,
      "treatment": 0,
      "housing": 3,
-     "legal": 0,
+     "legal": 1,
      "ids": 0,
      "money": 3,
      "goods": 0,
-     "kids": 0,
+     "kids": 4,
      "connect": 0,
      "transport": 1,
      "pets": 1
@@ -38657,13 +39082,4608 @@
      "why": "not_published"
     }
    ]
+  },
+  {
+   "id": "city_allen_park",
+   "name": "Allen Park",
+   "city": "city_allen_park",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.25947,
+    -83.21039
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2.8,
+     "clinic": 4.7,
+     "narcan": 0.1,
+     "indoors": 2.8
+    },
+    "nearest_id": {
+     "food": "sal_detroit_parks_free_supper_for_kids_at_kemeny_recreation_",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_allen_park_big_ben_s_comix_oasis",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_dearborn_heights",
+   "name": "Dearborn Heights",
+   "city": "city_dearborn_heights",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.33567,
+    -83.28883
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.8,
+     "clinic": 4.1,
+     "narcan": 0.6,
+     "indoors": 4.6
+    },
+    "nearest_id": {
+     "food": "sal_cherry_hill_helping_hand_food_pantry",
+     "clinic": "sal_covenant_care_joy_rd",
+     "narcan": "sal_wws_dearborn_heights_caroline_kennedy_library",
+     "indoors": "sal_dearborn_public_henry_ford_centennial_library"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_ecorse",
+   "name": "Ecorse",
+   "city": "city_ecorse",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.24959,
+    -83.14044
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.6,
+     "clinic": 4.7,
+     "narcan": 0.1,
+     "indoors": 1.9
+    },
+    "nearest_id": {
+     "food": "sal_perry_outreach_food_boxes",
+     "clinic": "sal_chass_southwest",
+     "narcan": "sal_wws_ecorse_ecorse_public_library",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_garden_city",
+   "name": "Garden City",
+   "city": "city_garden_city",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.32438,
+    -83.34119
+   ],
+   "help": {
+    "total": 1,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 1,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 3.6,
+     "clinic": 6.8,
+     "narcan": 0.8,
+     "indoors": 7
+    },
+    "nearest_id": {
+     "food": "sal_cherry_hill_helping_hand_food_pantry",
+     "clinic": "sal_covenant_care_joy_rd",
+     "narcan": "sal_wws_garden_city_garden_city_public_library",
+     "indoors": "sal_dearborn_public_henry_ford_centennial_library"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_grosse_pointe",
+   "name": "Grosse Pointe",
+   "city": "city_grosse_pointe",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.38393,
+    -82.90387
+   ],
+   "help": {
+    "total": 1,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 1,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2.3,
+     "clinic": 2.4,
+     "narcan": 1.2,
+     "indoors": 2.7
+    },
+    "nearest_id": {
+     "food": "sal_st_john_food_pantry",
+     "clinic": "sal_detroit_community_east_riverside_health_center",
+     "narcan": "sal_wws_grosse_pointe_grosse_pointe_public_safety_department",
+     "indoors": "sal_detroit_parks_community_center_at_ab_ford"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_grosse_pointe_farms",
+   "name": "Grosse Pointe Farms",
+   "city": "city_grosse_pointe_farms",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.39754,
+    -82.88918
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2.6,
+     "clinic": 2.7,
+     "narcan": 1.6,
+     "indoors": 3.9
+    },
+    "nearest_id": {
+     "food": "sal_my_father_s_food_pantry",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_grosse_pointe_grosse_pointe_public_safety_department",
+     "indoors": "sal_detroit_parks_community_center_at_ab_ford"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_grosse_pointe_park",
+   "name": "Grosse Pointe Park",
+   "city": "city_grosse_pointe_park",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.37395,
+    -82.92344
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.3,
+     "clinic": 1.3,
+     "narcan": 1.6,
+     "indoors": 1.5
+    },
+    "nearest_id": {
+     "food": "sal_st_john_food_pantry",
+     "clinic": "sal_detroit_community_east_riverside_health_center",
+     "narcan": "sal_wws_grosse_pointe_grosse_pointe_public_safety_department",
+     "indoors": "sal_detroit_parks_community_center_at_ab_ford"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_grosse_pointe_shores",
+   "name": "Grosse Pointe Shores",
+   "city": "city_grosse_pointe_shores",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.4444,
+    -82.87366
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 3.1,
+     "clinic": 3.1,
+     "narcan": 2.9,
+     "indoors": 4.6
+    },
+    "nearest_id": {
+     "food": "sal_my_father_s_food_pantry",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_grosse_pointe_woods",
+   "name": "Grosse Pointe Woods",
+   "city": "city_grosse_pointe_woods",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.43926,
+    -82.89896
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.8,
+     "clinic": 1.8,
+     "narcan": 1.8,
+     "indoors": 3.3
+    },
+    "nearest_id": {
+     "food": "sal_my_father_s_food_pantry",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_harper_woods",
+   "name": "Harper Woods",
+   "city": "city_harper_woods",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.43901,
+    -82.92925
+   ],
+   "help": {
+    "total": 1,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 1,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.1,
+     "clinic": 1,
+     "narcan": 0.8,
+     "indoors": 1.7
+    },
+    "nearest_id": {
+     "food": "sal_my_father_s_food_pantry",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_inkster",
+   "name": "Inkster",
+   "city": "city_inkster",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.29394,
+    -83.3203
+   ],
+   "help": {
+    "total": 4,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 4,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2.7,
+     "clinic": 7,
+     "narcan": 0.3,
+     "indoors": 6.1
+    },
+    "nearest_id": {
+     "food": "sal_cherry_hill_helping_hand_food_pantry",
+     "clinic": "sal_covenant_care_joy_rd",
+     "narcan": "sal_wws_inkster_the_flower_bowl",
+     "indoors": "sal_dearborn_public_henry_ford_centennial_library"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_lincoln_park",
+   "name": "Lincoln Park",
+   "city": "city_lincoln_park",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.24329,
+    -83.18126
+   ],
+   "help": {
+    "total": 4,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 4,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2.4,
+     "clinic": 5.4,
+     "narcan": 0.5,
+     "indoors": 2.4
+    },
+    "nearest_id": {
+     "food": "sal_detroit_parks_free_supper_for_kids_at_kemeny_recreation_",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_lincoln_park_lincoln_park_smokers",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_livonia",
+   "name": "Livonia",
+   "city": "city_livonia",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.39718,
+    -83.37232
+   ],
+   "help": {
+    "total": 3,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 3,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5.4,
+     "clinic": 7.4,
+     "narcan": 0.2,
+     "indoors": 5.9
+    },
+    "nearest_id": {
+     "food": "sal_brightmoor_artisans_b_moor_nourished_free_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_robert_and_janet_bennett_civic_center_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_melvindale",
+   "name": "Melvindale",
+   "city": "city_melvindale",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.27869,
+    -83.18216
+   ],
+   "help": {
+    "total": 4,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 4,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.3,
+     "clinic": 3,
+     "narcan": 0,
+     "indoors": 1.3
+    },
+    "nearest_id": {
+     "food": "sal_detroit_parks_free_supper_for_kids_at_kemeny_recreation_",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_melvindale_melvindale_housing_commission",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_redford_township",
+   "name": "Redford Township",
+   "city": "city_redford_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.39479,
+    -83.29402
+   ],
+   "help": {
+    "total": 3,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 3,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.5,
+     "clinic": 4.1,
+     "narcan": 1.4,
+     "indoors": 2.2
+    },
+    "nearest_id": {
+     "food": "sal_brightmoor_artisans_b_moor_nourished_free_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_redford_lighthouse_community_church",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_river_rouge",
+   "name": "River Rouge",
+   "city": "city_river_rouge",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.27435,
+    -83.12416
+   ],
+   "help": {
+    "total": 4,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 4,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.4,
+     "clinic": 2.8,
+     "narcan": 0.5,
+     "indoors": 1.7
+    },
+    "nearest_id": {
+     "food": "sal_perry_outreach_food_boxes",
+     "clinic": "sal_chass_southwest",
+     "narcan": "sal_wws_river_rouge_the_flower_bowl",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_riverview",
+   "name": "Riverview",
+   "city": "city_riverview",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.17346,
+    -83.19838
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 7.2,
+     "clinic": 10.3,
+     "narcan": 0.8,
+     "indoors": 7.2
+    },
+    "nearest_id": {
+     "food": "sal_detroit_parks_free_supper_for_kids_at_kemeny_recreation_",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_riverview_community_of_christ",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_romulus",
+   "name": "Romulus",
+   "city": "city_romulus",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.22126,
+    -83.36744
+   ],
+   "help": {
+    "total": 3,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 3,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 7.9,
+     "clinic": 12,
+     "narcan": 1.6,
+     "indoors": 10.5
+    },
+    "nearest_id": {
+     "food": "sal_cherry_hill_helping_hand_food_pantry",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_romulus_spartan_6_security_inc",
+     "indoors": "sal_dearborn_public_henry_ford_centennial_library"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_southgate",
+   "name": "Southgate",
+   "city": "city_southgate",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.20471,
+    -83.20569
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5.3,
+     "clinic": 8.2,
+     "narcan": 0.1,
+     "indoors": 5.3
+    },
+    "nearest_id": {
+     "food": "sal_detroit_parks_free_supper_for_kids_at_kemeny_recreation_",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_southgate_southgate_veterans_memorial_library",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_taylor",
+   "name": "Taylor",
+   "city": "city_taylor",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.22528,
+    -83.26769
+   ],
+   "help": {
+    "total": 3,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 3,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5.3,
+     "clinic": 8.2,
+     "narcan": 1.5,
+     "indoors": 6.5
+    },
+    "nearest_id": {
+     "food": "sal_dearborn_first_dearborn_community_food_pantry",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_taylor_wayne_county_community_college_district_downriver",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_trenton",
+   "name": "Trenton",
+   "city": "city_trenton",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.14025,
+    -83.19236
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 9.3,
+     "clinic": 12.6,
+     "narcan": 0.6,
+     "indoors": 9.4
+    },
+    "nearest_id": {
+     "food": "sal_perry_outreach_food_boxes",
+     "clinic": "sal_western_wayne_dearborn_health_center",
+     "narcan": "sal_wws_trenton_on_your_side_family_services",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_wayne",
+   "name": "Wayne",
+   "city": "city_wayne",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.27691,
+    -83.38815
+   ],
+   "help": {
+    "total": 4,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 4,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 6.4,
+     "clinic": 10.5,
+     "narcan": 0.4,
+     "indoors": 9.7
+    },
+    "nearest_id": {
+     "food": "sal_cherry_hill_helping_hand_food_pantry",
+     "clinic": "sal_covenant_care_joy_rd",
+     "narcan": "sal_wws_wayne_recovery_action_network_of_michigan",
+     "indoors": "sal_dearborn_public_henry_ford_centennial_library"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_westland",
+   "name": "Westland",
+   "city": "city_westland",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.31917,
+    -83.38078
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5.5,
+     "clinic": 8.9,
+     "narcan": 0.9,
+     "indoors": 8.9
+    },
+    "nearest_id": {
+     "food": "sal_cherry_hill_helping_hand_food_pantry",
+     "clinic": "sal_covenant_care_joy_rd",
+     "narcan": "sal_wws_westland_faith_primary_care",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_wyandotte",
+   "name": "Wyandotte",
+   "city": "city_wyandotte",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.21073,
+    -83.1573
+   ],
+   "help": {
+    "total": 2,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 2,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 4.2,
+     "clinic": 7.5,
+     "narcan": 0.8,
+     "indoors": 4.3
+    },
+    "nearest_id": {
+     "food": "sal_perry_outreach_food_boxes",
+     "clinic": "sal_chass_southwest",
+     "narcan": "sal_wws_wyandotte_salvation_arny_downriver_corps_community_cente",
+     "indoors": "sal_detroit_parks_kemeny_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_auburn_hills",
+   "name": "Auburn Hills",
+   "city": "city_auburn_hills",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.67472,
+    -83.24361
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 16.1,
+     "clinic": 16.3,
+     "narcan": 17,
+     "indoors": 17.3
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_berkley",
+   "name": "Berkley",
+   "city": "city_berkley",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.4986,
+    -83.18534
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 4,
+     "clinic": 4.3,
+     "narcan": 4.7,
+     "indoors": 4.8
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_jalen_rose_leade",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_birmingham",
+   "name": "Birmingham",
+   "city": "city_birmingham",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.5448,
+    -83.21658
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 7.2,
+     "clinic": 7.4,
+     "narcan": 8.1,
+     "indoors": 8.3
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_jalen_rose_leade",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_bloomfield_hills",
+   "name": "Bloomfield Hills",
+   "city": "city_bloomfield_hills",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.58136,
+    -83.24642
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 9.6,
+     "clinic": 9.9,
+     "narcan": 10.5,
+     "indoors": 11.2
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_bloomfield_township",
+   "name": "Bloomfield Township",
+   "city": "city_bloomfield_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.57789,
+    -83.27447
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 9.3,
+     "clinic": 9.8,
+     "narcan": 10.4,
+     "indoors": 11.6
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_clawson",
+   "name": "Clawson",
+   "city": "city_clawson",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.53667,
+    -83.15041
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 6.8,
+     "clinic": 7.2,
+     "narcan": 6.6,
+     "indoors": 7.3
+    },
+    "nearest_id": {
+     "food": "sal_new_prospect_grocery_give_away",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_commerce_township",
+   "name": "Commerce Township",
+   "city": "city_commerce_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.57387,
+    -83.49569
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 14.8,
+     "clinic": 16.1,
+     "narcan": 12.8,
+     "indoors": 16.6
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_farmington",
+   "name": "Farmington",
+   "city": "city_farmington",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.46138,
+    -83.37838
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5.9,
+     "clinic": 7.3,
+     "narcan": 3,
+     "indoors": 7.1
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_farmington_hills",
+   "name": "Farmington Hills",
+   "city": "city_farmington_hills",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.48565,
+    -83.37596
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 6.3,
+     "clinic": 7.7,
+     "narcan": 4.4,
+     "indoors": 8
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_ferndale",
+   "name": "Ferndale",
+   "city": "city_ferndale",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.45921,
+    -83.13137
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.5,
+     "clinic": 2.3,
+     "narcan": 1.3,
+     "indoors": 2.5
+    },
+    "nearest_id": {
+     "food": "sal_new_prospect_grocery_give_away",
+     "clinic": "sal_detroit_community_nolan_family_medical_center",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_hazel_park",
+   "name": "Hazel Park",
+   "city": "city_hazel_park",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.46193,
+    -83.09769
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2,
+     "clinic": 2.1,
+     "narcan": 1.6,
+     "indoors": 2.5
+    },
+    "nearest_id": {
+     "food": "sal_puritan_street_food_pantry",
+     "clinic": "sal_detroit_community_nolan_family_medical_center",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_huntington_woods",
+   "name": "Huntington Woods",
+   "city": "city_huntington_woods",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.4819,
+    -83.16809
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 3.1,
+     "clinic": 3.3,
+     "narcan": 3.6,
+     "indoors": 3.5
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_jalen_rose_leade",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_lathrup_village",
+   "name": "Lathrup Village",
+   "city": "city_lathrup_village",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.49208,
+    -83.22728
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 3.8,
+     "clinic": 3.8,
+     "narcan": 4.5,
+     "indoors": 5.3
+    },
+    "nearest_id": {
+     "food": "sal_corpus_christi_emergency_food",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_madison_heights",
+   "name": "Madison Heights",
+   "city": "city_madison_heights",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.50726,
+    -83.10335
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5,
+     "clinic": 5.2,
+     "narcan": 4.4,
+     "indoors": 5.1
+    },
+    "nearest_id": {
+     "food": "sal_puritan_street_food_pantry",
+     "clinic": "sal_detroit_community_nolan_family_medical_center",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_novi",
+   "name": "Novi",
+   "city": "city_novi",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.47849,
+    -83.48682
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 11.5,
+     "clinic": 12.9,
+     "narcan": 8.1,
+     "indoors": 12.6
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_oak_park",
+   "name": "Oak Park",
+   "city": "city_oak_park",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.46494,
+    -83.18241
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.7,
+     "clinic": 2,
+     "narcan": 2.4,
+     "indoors": 2.5
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_jalen_rose_leade",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_orion_township",
+   "name": "Orion Township",
+   "city": "city_orion_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.75687,
+    -83.26194
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 21.7,
+     "clinic": 22,
+     "narcan": 22.7,
+     "indoors": 23
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_pleasant_ridge",
+   "name": "Pleasant Ridge",
+   "city": "city_pleasant_ridge",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.47152,
+    -83.1445
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2.3,
+     "clinic": 3.4,
+     "narcan": 2.4,
+     "indoors": 2.9
+    },
+    "nearest_id": {
+     "food": "sal_new_prospect_grocery_give_away",
+     "clinic": "sal_detroit_community_nolan_family_medical_center",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_pontiac",
+   "name": "Pontiac",
+   "city": "city_pontiac",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.64923,
+    -83.28736
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 14.3,
+     "clinic": 14.8,
+     "narcan": 15.3,
+     "indoors": 16.3
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_rochester",
+   "name": "Rochester",
+   "city": "city_rochester",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.68664,
+    -83.11972
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 17.2,
+     "clinic": 17.6,
+     "narcan": 16.8,
+     "indoors": 17.3
+    },
+    "nearest_id": {
+     "food": "sal_new_prospect_grocery_give_away",
+     "clinic": "sal_detroit_community_nolan_family_medical_center",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_rochester_hills",
+   "name": "Rochester Hills",
+   "city": "city_rochester_hills",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.66348,
+    -83.1592
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 15.4,
+     "clinic": 15.7,
+     "narcan": 15.3,
+     "indoors": 16
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_jalen_rose_leade",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_royal_oak",
+   "name": "Royal Oak",
+   "city": "city_royal_oak",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.50782,
+    -83.15389
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 4.8,
+     "clinic": 5.3,
+     "narcan": 4.8,
+     "indoors": 5.3
+    },
+    "nearest_id": {
+     "food": "sal_new_prospect_grocery_give_away",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_royal_oak_township",
+   "name": "Royal Oak Township",
+   "city": "city_royal_oak_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.44981,
+    -83.1624
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1,
+     "clinic": 1.8,
+     "narcan": 1.6,
+     "indoors": 1.3
+    },
+    "nearest_id": {
+     "food": "sal_word_in_food_pantry",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_southfield",
+   "name": "Southfield",
+   "city": "city_southfield",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.47464,
+    -83.25951
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 2.2,
+     "clinic": 2.7,
+     "narcan": 3.2,
+     "indoors": 4.4
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_southfield_township",
+   "name": "Southfield Township",
+   "city": "city_southfield_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.52036,
+    -83.26482
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5.3,
+     "clinic": 5.8,
+     "narcan": 6.4,
+     "indoors": 7.6
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_detroit_the_people_s_action",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_sylvan_lake",
+   "name": "Sylvan Lake",
+   "city": "city_sylvan_lake",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.61676,
+    -83.33346
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 12.5,
+     "clinic": 13.2,
+     "narcan": 13.1,
+     "indoors": 14.7
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_troy",
+   "name": "Troy",
+   "city": "city_troy",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.58388,
+    -83.14553
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 10,
+     "clinic": 10.4,
+     "narcan": 9.8,
+     "indoors": 10.6
+    },
+    "nearest_id": {
+     "food": "sal_new_prospect_grocery_give_away",
+     "clinic": "sal_institute_for_iph_health_center_james_couzens",
+     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "indoors": "sal_healthy_kidz_tindal_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_walled_lake",
+   "name": "Walled Lake",
+   "city": "city_walled_lake",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.5372,
+    -83.47371
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 12.4,
+     "clinic": 13.8,
+     "narcan": 10.1,
+     "indoors": 14.1
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_waterford_township",
+   "name": "Waterford Township",
+   "city": "city_waterford_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.66198,
+    -83.38792
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 16.4,
+     "clinic": 17.2,
+     "narcan": 16.4,
+     "indoors": 18.6
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_west_bloomfield_township",
+   "name": "West Bloomfield Township",
+   "city": "city_west_bloomfield_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.5667,
+    -83.38709
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 10.5,
+     "clinic": 11.6,
+     "narcan": 9.9,
+     "indoors": 12.6
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_white_lake_township",
+   "name": "White Lake Township",
+   "city": "city_white_lake_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.65496,
+    -83.50081
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 18.9,
+     "clinic": 20,
+     "narcan": 17.7,
+     "indoors": 20.9
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_wixom",
+   "name": "Wixom",
+   "city": "city_wixom",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.52278,
+    -83.53019
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 14.6,
+     "clinic": 15.9,
+     "narcan": 11.6,
+     "indoors": 15.9
+    },
+    "nearest_id": {
+     "food": "sal_first_baptist_food_pantry",
+     "clinic": "sal_health_center_at_henry_ford_high_school",
+     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "indoors": "sal_detroit_parks_crowell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_center_line",
+   "name": "Center Line",
+   "city": "city_center_line",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.48056,
+    -83.02742
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 3.1,
+     "clinic": 2.8,
+     "narcan": 2.4,
+     "indoors": 3.2
+    },
+    "nearest_id": {
+     "food": "sal_st_raymond_our_parish_food_pantry",
+     "clinic": "sal_the_wellness_east_medical_center",
+     "narcan": "sal_hr_20216_van_dyke_ave",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_chesterfield_township",
+   "name": "Chesterfield Township",
+   "city": "city_chesterfield_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.67947,
+    -82.80632
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 18.1,
+     "clinic": 18.7,
+     "narcan": 17,
+     "indoors": 18.4
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_clinton_township",
+   "name": "Clinton Township",
+   "city": "city_clinton_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.59034,
+    -82.91695
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 10.2,
+     "clinic": 11.5,
+     "narcan": 9.7,
+     "indoors": 10.6
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_eastpointe",
+   "name": "Eastpointe",
+   "city": "city_eastpointe",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.46608,
+    -82.94634
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 1.8,
+     "clinic": 3,
+     "narcan": 1.4,
+     "indoors": 2
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_fraser",
+   "name": "Fraser",
+   "city": "city_fraser",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.5377,
+    -82.94667
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 6.4,
+     "clinic": 7.6,
+     "narcan": 6.1,
+     "indoors": 6.8
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_the_wellness_east_medical_center",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_harrison_township",
+   "name": "Harrison Township",
+   "city": "city_harrison_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.58757,
+    -82.81746
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 12.4,
+     "clinic": 12.6,
+     "narcan": 11.1,
+     "indoors": 12.6
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_macomb_township",
+   "name": "Macomb Township",
+   "city": "city_macomb_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.67486,
+    -82.91817
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 15.9,
+     "clinic": 16.9,
+     "narcan": 15.5,
+     "indoors": 16.4
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_the_wellness_east_medical_center",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_mount_clemens",
+   "name": "Mount Clemens",
+   "city": "city_mount_clemens",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.59806,
+    -82.88151
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 11.3,
+     "clinic": 12.2,
+     "narcan": 10.5,
+     "indoors": 11.7
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_new_baltimore",
+   "name": "New Baltimore",
+   "city": "city_new_baltimore",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.68531,
+    -82.73765
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 20.2,
+     "clinic": 20.5,
+     "narcan": 19,
+     "indoors": 20.5
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_roseville",
+   "name": "Roseville",
+   "city": "city_roseville",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.50759,
+    -82.93658
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 4.5,
+     "clinic": 5.8,
+     "narcan": 4,
+     "indoors": 4.9
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_shelby_township",
+   "name": "Shelby Township",
+   "city": "city_shelby_township",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.67311,
+    -83.03656
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 15.9,
+     "clinic": 16.1,
+     "narcan": 15.7,
+     "indoors": 16.1
+    },
+    "nearest_id": {
+     "food": "sal_st_raymond_our_parish_food_pantry",
+     "clinic": "sal_the_wellness_east_medical_center",
+     "narcan": "sal_hr_20216_van_dyke_ave",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_st_clair_shores",
+   "name": "St. Clair Shores",
+   "city": "city_st_clair_shores",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.49304,
+    -82.8909
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 5.1,
+     "clinic": 5.1,
+     "narcan": 3.6,
+     "indoors": 5.2
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_covenant_community_care_moross",
+     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "indoors": "sal_detroit_parks_heilmann_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_sterling_heights",
+   "name": "Sterling Heights",
+   "city": "city_sterling_heights",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.58121,
+    -83.03032
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 9.6,
+     "clinic": 9.7,
+     "narcan": 9.4,
+     "indoors": 9.8
+    },
+    "nearest_id": {
+     "food": "sal_st_raymond_our_parish_food_pantry",
+     "clinic": "sal_the_wellness_east_medical_center",
+     "narcan": "sal_hr_20216_van_dyke_ave",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_utica",
+   "name": "Utica",
+   "city": "city_utica",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.62874,
+    -83.02333
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 12.8,
+     "clinic": 13,
+     "narcan": 12.7,
+     "indoors": 13.1
+    },
+    "nearest_id": {
+     "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
+     "clinic": "sal_the_wellness_east_medical_center",
+     "narcan": "sal_hr_20216_van_dyke_ave",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
+  },
+  {
+   "id": "city_warren",
+   "name": "Warren",
+   "city": "city_warren",
+   "kind": "city",
+   "district": null,
+   "center": [
+    42.4929,
+    -83.025
+   ],
+   "help": {
+    "total": 0,
+    "by": {
+     "food": 0,
+     "health": 0,
+     "harm": 0,
+     "shelter": 0,
+     "utilities": 0,
+     "hygiene": 0,
+     "youth": 0,
+     "rec": 0,
+     "jobs": 0,
+     "learn": 0,
+     "treatment": 0,
+     "housing": 0,
+     "legal": 0,
+     "ids": 0,
+     "money": 0,
+     "goods": 0,
+     "kids": 0,
+     "connect": 0,
+     "transport": 0,
+     "pets": 0
+    },
+    "nearest_miles": {
+     "food": 3.8,
+     "clinic": 3.6,
+     "narcan": 3.3,
+     "indoors": 4
+    },
+    "nearest_id": {
+     "food": "sal_st_raymond_our_parish_food_pantry",
+     "clinic": "sal_the_wellness_east_medical_center",
+     "narcan": "sal_hr_20216_van_dyke_ave",
+     "indoors": "sal_detroit_parks_farwell_recreation_center"
+    },
+    "none_listed_yet": [
+     "food",
+     "health",
+     "harm"
+    ],
+    "coverage_checked": false
+   },
+   "places": {
+    "parks": 0,
+    "rec_centers": 0,
+    "greenway_open": 0
+   },
+   "years": {},
+   "panels": [
+    "help"
+   ],
+   "sources": {},
+   "missing": []
   }
  ],
  "area_sources": {
   "src_detroit_parks": {
    "name": "City of Detroit parks layer",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0",
-   "last_edited": "2026-09-14",
+   "last_edited": "2026-09-21",
    "license": "Unstated (the City portal publishes a disclaimer only)"
   },
   "src_semcog_crashes": {
@@ -38700,7 +43720,7 @@
    "url": "https://www2.census.gov/econ/bps/Place/Midwest%20Region/",
    "page": "https://www.census.gov/construction/bps/",
    "license": "No licence stated; a work of the United States government (17 U.S.C. §105)",
-   "last_edited": "2026-09-22",
+   "last_edited": "2026-09-24",
    "records_from": "the permit-issuing place"
   },
   "src_semcog_parks": {

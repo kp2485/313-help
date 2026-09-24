@@ -62,7 +62,7 @@ public enum ZipLookup: Equatable, Sendable {
     case notAZip
 }
 
-/// The middle of a typed ZIP, or why there isn't one. A ZIP outside the four cities is simply one the bundle does
+/// The middle of a typed ZIP, or why there isn't one. A ZIP outside the service area is simply one the bundle does
 /// not carry, and gets the same honest answer as a made-up one — this file ships Detroit, Hamtramck, Highland
 /// Park and Dearborn, and nothing else.
 public func lookUpZip(_ typed: String, in zips: ZipCenters) -> ZipLookup {

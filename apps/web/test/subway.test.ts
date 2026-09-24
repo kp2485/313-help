@@ -172,8 +172,8 @@ describe('subway: what decides the drawing is plain functions (docs/MAP-STYLE.md
       expect(S.basemapTokens(style, on, contrast)).toEqual({ quiet: false, road: '--map-road', main: '--map-main', fwy: '--map-fwy', park: '--map-park', parkInk: '--map-park-ink', ink: '--map-ink' });
   });
   it('reads the four real network files, and refuses anything that is not format 2 by answering "draw standard"', () => {
-    expect(NETS.ddot_routes).toMatchObject({ system: 'ddot', agency: 'DDOT', stopsLayer: 'ddot_stops' }); expect(NETS.ddot_routes!.routes.length).toBe(37); expect(NETS.smart_routes!.routes.length).toBe(42);
-    expect(NETS.ddot_routes!.trunks.length).toBe(5); expect(NETS.smart_routes!.trunks.length).toBe(10); expect(Math.max(...NETS.ddot_routes!.trunks.map((k) => k.routes.length))).toBe(17);
+    expect(NETS.ddot_routes).toMatchObject({ system: 'ddot', agency: 'DDOT', stopsLayer: 'ddot_stops' }); expect(NETS.ddot_routes!.routes.length).toBe(37); expect(NETS.smart_routes!.routes.length).toBe(45);   // 42 while the network was clipped to four cities
+    expect(NETS.ddot_routes!.trunks.length).toBe(5); expect(NETS.smart_routes!.trunks.length).toBe(11); expect(Math.max(...NETS.ddot_routes!.trunks.map((k) => k.routes.length))).toBe(17);
     expect(NETS.people_mover!.routes[0]).toMatchObject({ loop: true, short: 'DPM', ends: [] }); expect(NETS.qline!.routes[0]!.ends.map((e) => e.name)).toEqual(['Congress Station', 'Grand Blvd Station']);
     for (const net of Object.values(NETS)) for (const l of net!.lines) { expect(l.runs[0]!.from).toBe(0); expect(l.runs[l.runs.length - 1]!.to).toBe(l.pts.length / 2 - 1); for (const r of l.runs) expect(r.to).toBeGreaterThan(r.from); }
     expect(S.decodeServes(file('ddot_stops.net.json'))!.length).toBe(decodeLayer(file('ddot_stops.json')).points.length);

@@ -8,7 +8,9 @@ import Foundation
 import HelpCore
 
 // BundleIndex, BundleError and the checks themselves live in HelpCore/Verify.swift, where `swift test` reaches them.
-struct EmergencyNumber: Codable, Identifiable { var id: String; var label: String; var number: String; var hardcoded: Bool }
+/// One row of emergency.json. `area` is a place id (data/ingested/region.json) for a number that belongs to one place
+/// only — a city's own police — shown on that place's page (CityPage.swift) and nowhere else (2026-09-24).
+struct EmergencyNumber: Codable, Identifiable { var id: String; var label: String; var number: String; var hardcoded: Bool; var area: String? = nil }
 struct CityEvent: Codable, Identifiable { var id: String; var title: String; var startsAt: String; var endsAt: String?; var location: String?; var url: String }
 struct ArchivedRow: Codable, Identifiable { var id: String; var name: String; var category: String; var archived: BundleRow.Archived }
 /// A City park (`places/parks.json`): a name, where it is, and how big. Drawn on the Map tab and listed under it.

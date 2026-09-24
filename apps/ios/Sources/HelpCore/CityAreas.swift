@@ -131,6 +131,30 @@ public let cityPanels = ["help", "parks", "crashes", "roads", "vacancy", "permit
 /// The panels this area draws, in the fixed order, and nothing else.
 public func cityPanelsShown(_ a: Area) -> [String] { cityPanels.filter(a.shows) }
 
+/// A city or township with nothing but the help panel and nothing missing — every place a DDOT or SMART bus stops
+/// in that was added on 2026-09-24. Its page says just that (`city.outline_only`) instead of the regional warning
+/// (`city.no_neighborhoods` + `city.regional`): it has no regional numbers to warn about, and nobody has checked
+/// what it publishes, so nothing is claimed. Never Detroit. `helpOnly` in `cityPage`, apps/web/src/hoods.ts.
+public func cityIsOutlineOnly(_ a: Area, isDetroit: Bool) -> Bool {
+    !isDetroit && a.panels.allSatisfy { $0 == "help" } && a.missing.isEmpty
+}
+
+/// The numbers that belong to ONE place only (emergency.json `area`: a city's own police line), for that place's
+/// page and nowhere else, in the file's own order. A row with no `area` — 911, 988, a county's crisis line — is
+/// everybody's and is never returned here; a row with an `area` is never shown anywhere but here (`placeCalls`
+/// in apps/web/src/main.ts). Generic so the app's own row type can be handed straight in.
+public func numbersForPlace<Row>(_ rows: [Row], placeId: String, area: (Row) -> String?) -> [Row] {
+    guard !placeId.isEmpty else { return [] }
+    return rows.filter { area($0) == placeId }
+}
+
+/// The rows a list of everybody's numbers may draw from: every row that belongs to no one place. The urgent sheet
+/// and the need screens name their ids, and none of them is a city's police line; this is the guard that keeps a
+/// place's own number off them even if an id were ever mistyped into a list.
+public func numbersForEveryone<Row>(_ rows: [Row], area: (Row) -> String?) -> [Row] {
+    rows.filter { (area($0) ?? "").isEmpty }
+}
+
 /// Which page an id names. `nil` for an id this bundle does not carry.
 public enum AreaPage: Equatable, Sendable {
     case neighborhood(Hood)
@@ -225,7 +249,7 @@ public func shoelace(_ pts: [Double]) -> Double {
     return a / 2
 }
 
-/// The outlines, ready to draw: the four city outlines first, then Detroit's 205 neighbourhoods. The cities come
+/// The outlines, ready to draw: the city and township outlines first, then Detroit's 205 neighbourhoods. The cities come
 /// first so that a tap landing in two outlines at once can prefer the smaller one and a Detroit neighbourhood
 /// wins over the Detroit outline it sits inside (`areaAt`). `sub` is handed in already worded, because the words
 /// belong to the screen and the arithmetic belongs here.

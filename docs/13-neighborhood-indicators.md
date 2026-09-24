@@ -165,6 +165,11 @@ it always had; a bundle built before the years existed draws the totals and no c
 
 ## The four cities (2026-09-22)
 
+**Since 2026-09-24 the area has 75 places** (every city and township a DDOT or SMART bus reaches). The 71 beyond
+the four below have a city page with their outline, the help inside them and their own police line, and no
+statistics: `outline_only` in `cities.json`, an allow-list of `help` alone and an empty `missing` list, because
+nobody has checked what they publish (DECISIONS 2026-09-24). Everything below is about the first four.
+
 **Detroit, Hamtramck, Highland Park and Dearborn each have a city page.** Kyle, 2026-09-22 (DECISIONS): build
 and ship them now. The research behind this is `docs/research/2026-09-22-neighborhoods-three-cities.md`, read in
 full before anything here was written.

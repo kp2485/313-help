@@ -105,7 +105,7 @@ public enum MapToken: String, Sendable, CaseIterable {
     /// A neighbourhood or city boundary (docs/MAP-STYLE.md 15.2). Deliberately not a street colour: `road`,
     /// `main` and `freeway` are all within a step of each other in grey-green, and an administrative edge
     /// wearing one of them is not a boundary, it is a road. A muted plum reads as "administrative" beside them
-    /// and clears 3:1 against the land, a park and the hatched ground outside the four cities, in all four modes.
+    /// and clears 3:1 against the land, a park and the hatched ground outside the service area, in all four modes.
     case boundary = "--map-bnd"
     case gwOpen = "--gw-open", gwBuild = "--gw-build", gwFund = "--gw-fund", gwPlan = "--gw-plan", gwCase = "--gw-case"
     case bus = "--lyr-bus", smart = "--lyr-smart", rail = "--lyr-rail", bike = "--lyr-bike"
@@ -134,7 +134,7 @@ public enum StandardPalette {
 }
 
 // The `standard` basemap's furniture, as the web draws it (apps/web/src/map.ts `draw()`), in points.
-/// The ground outside the four cities is a TEXTURE, not a shade: diagonal lines this far apart, this wide, in
+/// The ground outside the service area is a TEXTURE, not a shade: diagonal lines this far apart, this wide, in
 /// `--map-out-ink`, which clears 3:1 against both fills. Two pale fills a step apart were 1.20:1.
 public let mapHatchSpacing = 11.0, mapHatchWidth = 1.0
 /// The city edge is a drawn line too, in `--map-main`.

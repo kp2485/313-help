@@ -11,7 +11,7 @@
 import { p, parsePhone, readCsv, today, writeCsv, type CsvRow } from './util.js';
 import { fetchPage, phoneOnPage, shortCodeOnPage, type PageResult } from './page-match.js';
 
-export const EMERGENCY_COLUMNS = ['id', 'label', 'number', 'sms', 'hardcoded', 'sort', 'verified_by_call_on', 'verified_published_on', 'mismatch_on', 'source_url', 'internal_note'];
+export const EMERGENCY_COLUMNS = ['id', 'label', 'number', 'sms', 'hardcoded', 'sort', 'area', 'verified_by_call_on', 'verified_published_on', 'mismatch_on', 'source_url', 'internal_note'];
 
 export type EmergencyCheck = 'match' | 'mismatch' | 'unreadable' | 'skipped';
 

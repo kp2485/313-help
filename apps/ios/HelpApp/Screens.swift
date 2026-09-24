@@ -179,6 +179,7 @@ struct AboutView: View {
                 Bullet(L.t("about.credits_foodbanks"))
                 Bullet(L.t("about.credits_city"))
                 Bullet(L.t("about.credits_census"))
+                Bullet(L.t("about.credits_semcog"))
             }.card()
             Text(L.t("about.credits_thanks")).font(.subheadline).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
             Text(L.t("about.maker")).font(.footnote).foregroundStyle(Color.muted)

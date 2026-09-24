@@ -36,9 +36,22 @@ export interface Need {
   emptyKey?: string;
 }
 
+/**
+ * The urgent sheet's numbers, in docs/05's order: 911, 988, then the hotlines. Since the area widened (2026-09-24)
+ * a shelter or crisis line comes once per county it serves — Wayne's, then Oakland's, then Macomb's — and each
+ * label names its county, so a person picks their own. A city's own police line is never here: it is on that
+ * city's page (emergency.csv `area`).
+ */
+export const URGENT_IDS = [
+  'emg_911', 'emg_988',
+  'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_housing_oakland', 'emg_housing_macomb',
+  'emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_mccmh_crisis',
+  'emg_ndvh', 'emg_avalon', 'emg_211',
+];
+
 export const NEEDS: Need[] = [
   { id: 'overdose_now', icon: 'pulse', group: 'now', first: ['emg_911'], stepsOnly: true, sensitive: true },
-  { id: 'shelter', icon: 'bed', group: 'now', firstLinks: 'beds', first: ['emg_shelter_helpline', 'emg_shelter_outwayne'], refine: [
+  { id: 'shelter', icon: 'bed', group: 'now', firstLinks: 'beds', first: ['emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_housing_oakland', 'emg_housing_macomb'], refine: [
     { id: 'me', query: { category: 'shelter.emergency' } },
     { id: 'kids', query: { category: 'shelter.emergency' } },
     // Every emergency shelter, with the ones for young people first (DECISIONS 2026-09-19). Not after-school programs.
@@ -46,13 +59,15 @@ export const NEEDS: Need[] = [
   ] },
   // DV: hotline and 911 before anything else; rows have no address and never show a distance.
   { id: 'unsafe', icon: 'shield', group: 'now', first: ['emg_ndvh', 'emg_911'], query: { category: 'shelter.dv' }, sensitive: true, quickExit: true, intro: 'safe.dv_intro' },
-  // Crisis first: 988, DWIHN's line, then the crisis places (health.mental, sensitive). Under those, and only
+  // Crisis first: 988, then each county's own 24-hour line (DWIHN for Wayne, OCHN for Oakland, MCCMH for Macomb; each
+  // label names its county, 2026-09-24), then the crisis places (health.mental, sensitive). Under those, and only
   // under those, the daytime places a person can walk into (health.support) — ordinary listings with an address
   // (category audit 2026-09-22, K3). The screen itself stays traceless and keeps its quick exit.
-  { id: 'talk', icon: 'chat', group: 'now', first: ['emg_988', 'emg_dwihn_crisis'], query: { category: 'health.mental' }, also: { id: 'support', query: { category: 'health.support' } }, sensitive: true, quickExit: true, intro: 'talk.intro' },
-  // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door for all four cities, then SAMHSA's.
+  { id: 'talk', icon: 'chat', group: 'now', first: ['emg_988', 'emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_mccmh_crisis'], query: { category: 'health.mental' }, also: { id: 'support', query: { category: 'health.support' } }, sensitive: true, quickExit: true, intro: 'talk.intro' },
+  // Treatment (DECISIONS 2026-09-19): DWIHN's 24-hour line is the front door in Wayne County and OCHN's in Oakland
+  // (2026-09-24), then SAMHSA's for anyone.
   // Listings are private (not saved, not in history) but keep their address and distance: people have to get there.
-  { id: 'drugs', icon: 'sprout', group: 'now', first: ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true, intro: 'drugs.intro', refine: [
+  { id: 'drugs', icon: 'sprout', group: 'now', first: ['emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true, intro: 'drugs.intro', refine: [
     { id: 'today', query: { category: 'treatment', prefer: ['walk_in'] } },
     { id: 'detox', query: { category: 'treatment.detox' }, links: 'treatment' },
     { id: 'meds', query: { category: 'treatment.meds' }, links: 'treatment' },
@@ -62,7 +77,7 @@ export const NEEDS: Need[] = [
     { id: 'supplies', query: { category: 'harm.supplies' }, links: 'supplies' },
   ] },
   // Like the DV screen: hotlines first, quick exit. Places keep an address only if they publish one.
-  { id: 'assault', icon: 'shield', group: 'now', first: ['emg_avalon', 'emg_voices4', 'emg_911'], query: { category: 'assault' }, links: 'assault', quickExit: true, intro: 'assault.intro' },
+  { id: 'assault', icon: 'shield', group: 'now', first: ['emg_avalon', 'emg_haven', 'emg_turning_point', 'emg_voices4', 'emg_911'], query: { category: 'assault' }, links: 'assault', quickExit: true, intro: 'assault.intro' },
   // "Get somewhere safe now" (DECISIONS 2026-09-22): a door that is open at 3am with a phone behind it —
   // police stations, fire stations and emergency rooms, in one list ranked by distance. It sits BELOW 911,
   // 988 and the hotlines on the urgent sheet and here: docs/05's ordering is untouched, this is a row under it.

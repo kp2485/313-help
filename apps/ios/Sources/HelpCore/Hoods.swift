@@ -258,7 +258,7 @@ public struct Indicators: Decodable, Equatable, Sendable {
         city = try c.decode([String: HoodYear].self, forKey: .city)
         neighborhoods = try c.decode([Hood].self, forKey: .neighborhoods)
         segments = try c.decode([String: [String]].self, forKey: .segments)
-        // The four cities (DECISIONS 2026-09-22). This hand-written initialiser left all five of these keys out,
+        // The city pages (DECISIONS 2026-09-22; every city and township a bus reaches since 2026-09-24). This hand-written initialiser left all five of these keys out,
         // so every one of them was silently nil on the phone however good the bundle was: no city rows in the
         // index, no city page reachable, and — the reason it was found — nothing for a Hamtramck, Highland Park
         // or Dearborn fix to land on when the Areas tab became a map (2026-09-22). They are optional because a
@@ -280,7 +280,7 @@ public struct Indicators: Decodable, Equatable, Sendable {
     public var neighborhoods: [Hood]
     /// Greenway stretch id → the neighborhoods it runs through.
     public var segments: [String: [String]]
-    /// The four cities (DECISIONS 2026-09-22), all optional: a bundle built before the city pages carries none
+    /// The city pages (DECISIONS 2026-09-22; 75 places since 2026-09-24), all optional: a bundle built before the city pages carries none
     /// of them and every screen that existed before behaves exactly as it did.
     public var cities: [CityRow]?
     public var areas: [Area]?
@@ -346,7 +346,7 @@ public func hoodOutline(_ h: Hood, origin: [Double]) -> [[LatLon]] {
 
  This is the whole of "Use my location" on the Neighborhoods tab. It runs HERE, on the phone, against outlines
  that arrived in the signed bundle — the position is never sent anywhere to be looked up, and it is never
- written down (docs/08). A fix that is not a number, or that is outside the four cities, is inside nothing.
+ written down (docs/08). A fix that is not a number, or that is outside the service area, is inside nothing.
  */
 public func hoodContains(_ h: Hood, _ p: LatLon, origin: [Double]) -> Bool {
     guard p.lat.isFinite, p.lon.isFinite else { return false }

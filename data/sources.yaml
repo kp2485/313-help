@@ -21,8 +21,9 @@ sources:
     extra: [Distribution_Device_Type, Box_Location, Type_of_Business]
     id_prefix: hr
 
-  # Wayne County's own station map (Kyle, 2026-09-20). 97 stations countywide; the 26 in the service area enter as
-  # listings, facts only and attributed to the County. Read by pipeline/src/ingest-mymap.ts (pnpm ingest:mymap).
+  # Wayne County's own station map (Kyle, 2026-09-20). 97 stations countywide; those inside the service area's
+  # outlines (every city and township a DDOT or SMART bus stops in, 2026-09-24) enter as listings, facts only and
+  # attributed to the County. Read by pipeline/src/ingest-mymap.ts (pnpm ingest:mymap).
   # The map gives a site name, a city, coordinates, the device type, whether it is 24/7 and where the box sits —
   # no street address and no phone, so these rows carry their own city and no address (DECISIONS 2026-09-20).
   - id: wayne_well_wayne_stations
@@ -36,7 +37,6 @@ sources:
     max_age_days: 90    # measured against the map's own "Map updated:" date
     category: harm.supplies
     wording: supplies_station   # naloxone AND fentanyl/xylazine test strips, not Narcan only
-    cities: [Detroit, Dearborn, Hamtramck, Highland Park]   # the service area; Dearborn Heights is not Dearborn
     org: { id: org_wayne_hhvs, name: "Wayne County Department of Health, Human and Veterans Services" }
     id_prefix: wws
 

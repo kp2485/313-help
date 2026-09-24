@@ -69,7 +69,7 @@ describe('needs list', () => {
     const shelter = NEEDS.find((n) => n.id === 'shelter')!;
     expect(shelter.firstLinks).toBe('beds');
     expect(LINKS.beds!.items.map((i) => i.url)).toEqual(['https://313safebeds.com/']);
-    expect(shelter.first).toEqual(['emg_shelter_helpline', 'emg_shelter_outwayne']);
+    expect(shelter.first).toEqual(['emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_housing_oakland', 'emg_housing_macomb']);   // one per county since 2026-09-24
     // The link panel is drawn above the call buttons on the screen itself.
     expect(main).toContain('${topLinks}${first ? `<div class="stackbtns">${first}</div>` : \'\'}');
     expect(strings['link.beds.safebeds.body']).toMatch(/their site, not ours/);
@@ -85,10 +85,10 @@ describe('needs list', () => {
     expect(NEEDS.find((n) => n.id === 'talk')!.first![0]).toBe('emg_988');
   });
   it('treatment: DWIHN\'s 24-hour line first, then SAMHSA; sexual assault: hotlines and 911 first; both have a quick exit', () => {
-    expect(NEEDS.find((n) => n.id === 'drugs')).toMatchObject({ first: ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true });
-    expect(NEEDS.find((n) => n.id === 'assault')).toMatchObject({ first: ['emg_avalon', 'emg_voices4', 'emg_911'], quickExit: true, query: { category: 'assault' } });
+    expect(NEEDS.find((n) => n.id === 'drugs')).toMatchObject({ first: ['emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_dwihn_care_center', 'emg_samhsa'], quickExit: true });
+    expect(NEEDS.find((n) => n.id === 'assault')).toMatchObject({ first: ['emg_avalon', 'emg_haven', 'emg_turning_point', 'emg_voices4', 'emg_911'], quickExit: true, query: { category: 'assault' } });
     const emg = readFileSync(join(root, 'data/seed/emergency.csv'), 'utf8');
-    for (const id of ['emg_dwihn_crisis', 'emg_dwihn_care_center', 'emg_samhsa', 'emg_avalon', 'emg_voices4']) expect(emg, id).toMatch(new RegExp(`^${id},`, 'm'));
+    for (const id of ['emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_dwihn_care_center', 'emg_samhsa', 'emg_avalon', 'emg_haven', 'emg_turning_point', 'emg_voices4']) expect(emg, id).toMatch(new RegExp(`^${id},`, 'm'));
     for (const wrong of ['800-421-4949', '800-231-1127', '800-841-4949']) expect(emg.split('\n').filter((l) => l.startsWith('emg_')).map((l) => l.split(',').slice(0, 4).join(',')).join('\n')).not.toContain(wrong);
   });
   it('an emergency room and urgent care are their own kinds of help, the emergency room first and led by 911', () => {

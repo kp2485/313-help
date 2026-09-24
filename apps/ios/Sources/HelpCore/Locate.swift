@@ -15,16 +15,17 @@
 import DetroitQuery
 import Foundation
 
-// MARK: - the four cities, as a box
+// MARK: - the service area, as a box
 
-/// CLAUDE.md: "Bbox sanity: lat 42.25–42.46, lon −83.33 to −82.91" (Dearborn reaches west to about −83.32).
-/// The same numbers as `SERVICE_BBOX` in packages/query and `ServiceBox` on Android.
+/// Every city and township a DDOT or SMART bus stops in (Kyle, 2026-09-24; data/ingested/region.json holds the
+/// list and the box round its outlines). It was four cities until 2026-09-24 (lat 42.25–42.46, lon −83.33 to
+/// −82.91). The same numbers as `SERVICE_BBOX` in packages/query/src/areas.ts and `ServiceBox` on Android.
 public enum ServiceBox {
-    public static let latMin = 42.25, latMax = 42.46, lonMin = -83.33, lonMax = -82.91
+    public static let latMin = 42.11, latMax = 42.80, lonMin = -83.57, lonMax = -82.70
 }
 
-/// Whether a point is inside Detroit, Hamtramck, Highland Park or Dearborn. A fix that is not a number is not
-/// inside anything: the map is not moved somewhere undefined.
+/// Whether a point is inside the service area's box. A fix that is not a number is not inside anything: the map
+/// is not moved somewhere undefined.
 public func inServiceArea(lat: Double, lon: Double, slack: Double = 0) -> Bool {
     guard lat.isFinite, lon.isFinite else { return false }
     return lat >= ServiceBox.latMin - slack && lat <= ServiceBox.latMax + slack
@@ -32,6 +33,11 @@ public func inServiceArea(lat: Double, lon: Double, slack: Double = 0) -> Bool {
 }
 
 public func inServiceArea(_ p: LatLon, slack: Double = 0) -> Bool { inServiceArea(lat: p.lat, lon: p.lon, slack: slack) }
+
+/// Two opposite corners of the service area's box: what the Map tab's reset and the Areas map frame when there is
+/// no place to open on (`REGION` in apps/web/src/main.ts, 2026-09-24). It was the four cities' corners before.
+public let serviceRegionCorners = [LatLon(lat: ServiceBox.latMin, lon: ServiceBox.lonMin),
+                                   LatLon(lat: ServiceBox.latMax, lon: ServiceBox.lonMax)]
 
 /// Two miles, in metres. The shorter side of the map spans twice this: four miles across, the walk-and-bus city.
 public let locateRadiusMeters = 3218.688

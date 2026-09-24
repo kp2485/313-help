@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   badge, bundleAge, buildStreetGraph, buildTransitNetwork, effectiveNow, helpAlong, milesToSegment, nearestSegment,
-  nextOccurrences, openNow, plan, rank, search, walkRoute,
+  nextOccurrences, openNow, plan, rank, search, walkRoute, tripWindow, windowFiles, transferStops,
 } from '../src/index.js';
 import type { Alert, BundleRow, PackedStreets, Segment, TransitLayer, WalkRoute } from '../src/index.js';
 
@@ -13,7 +13,7 @@ const dir = join(__dirname, '../../../schema/fixtures');
 interface Case {
   name: string;
   fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'rankDetail' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment' | 'search'
-  | 'streetGraph' | 'walk' | 'plan';
+  | 'streetGraph' | 'walk' | 'plan' | 'planWindow' | 'transferStops' | 'windowRoads';
   segment?: string; openOnly?: boolean; maxMiles?: number; tolerance?: number;
   now: string;
   text?: string;
@@ -117,6 +117,23 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
               ? `walk ${r10(l.metres)}m`
               : `ride ${l.route_id} ${l.stops}st ${l.headway_minutes === null ? 'no-headway' : `every ${l.headway_minutes}`}`).join(' > ')} [${p.range[0]}-${p.range[1]}]`);
             expect(got).toEqual(c.expect); break;
+          }
+          // The trip window (16-trip-window.json): the first street file is the main roads, any others are cells in key order.
+          case 'planWindow': {
+            const files = c.no_safety ? bare : streets;
+            const w = tripWindow(network, c.from!, c.to!);
+            const g = buildStreetGraph(windowFiles(files[0]!, files.slice(1), w), `${file}:window`);
+            const got = plan(g, network!, c.from!, c.to!).map((p) => `${p.legs.map((l) => l.kind === 'walk'
+              ? `walk ${r10(l.metres)}m`
+              : `ride ${l.route_id} ${l.stops}st ${l.headway_minutes === null ? 'no-headway' : `every ${l.headway_minutes}`}`).join(' > ')} [${p.range[0]}-${p.range[1]}]`);
+            expect(got).toEqual(c.expect); break;
+          }
+          case 'transferStops':
+            expect(transferStops(network!, c.from!, c.to!)).toEqual(c.expect); break;
+          case 'windowRoads': {
+            const w = tripWindow(network, c.from!, c.to!);
+            const kept = windowFiles(streets[0]!, streets.slice(1), w);
+            expect({ boxes: w.boxes.length, roads: kept.flatMap((f) => f.roads.map((r) => f.names[r[1]]!)) }).toEqual(c.expect); break;
           }
         }
       });

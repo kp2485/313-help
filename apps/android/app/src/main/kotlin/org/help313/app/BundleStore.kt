@@ -29,8 +29,6 @@ import org.help313.query.Segment
 import java.io.File
 import java.util.concurrent.Executors
 
-class EmergencyNumber(val id: String, val label: String, val number: String, val sms: String?, val hardcoded: Boolean)
-
 class CityEvent(val id: String, val title: String, val startsAt: String, val endsAt: String?, val location: String?, val url: String)
 
 class ArchivedRow(val id: String, val name: String, val category: String, val at: String, val reason: String)
@@ -329,6 +327,8 @@ class BundleStore private constructor(context: Context) {
                     EmergencyNumber(
                         it["id"]?.str ?: "", it["label"]?.str ?: "", it["number"]?.str ?: "",
                         it["sms"]?.str, it["hardcoded"]?.bool ?: false,
+                        // A place id for a number that belongs to one place only (a city's own police), or null.
+                        area = it["area"]?.str?.takeIf { a -> a.isNotEmpty() },
                     )
                 }
                 name == "archived.json" -> archived = j.arr.map {

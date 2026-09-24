@@ -252,7 +252,13 @@ carried the array, which is what decides between the two penalty tables below.
 
 `cachedStreetGraph(sha256, build)`. The key is `${STREET_GRAPH_VERSION}:${sha256}` where the hash is the map
 file's own SHA-256 — the one already in the signed index. Nothing about a person is in the key. Two graphs are
-kept (`STREET_GRAPH_CACHE_SIZE`); building is ~200 ms on a laptop and 1–2 s on a cheap phone, once per bundle.
+kept (`STREET_GRAPH_CACHE_SIZE`).
+
+**A trip's window is never cached** (2026-09-24). Its streets are the streets round the two points a person asked
+about, so a cache of window graphs would be a record of their last trips, and the directions screen leaves no
+trace. It does not need one: the whole area is 108,820 nodes and ~1 s to build on a laptop (5–10 s on a cheap
+phone), which is why no client builds it for a trip; a trip's window is 2,000–3,500 nodes and 15–50 ms, built for
+the one plan and dropped with it.
 
 ### Signatures
 
@@ -437,9 +443,43 @@ Itinerary = { legs: PlanLeg[], changes, walk_metres, ride_metres, minutes, range
 `plan()` returns `[]` when nothing works — nothing within walking distance, and no route within one change. A
 client says so; it never invents a leg.
 
+## The trip window
+
+`packages/query/src/window.ts`. Mirrored as `Window.swift` and `Window.kt`. Since the service area became every
+city and township a DDOT or SMART bus stops in (2026-09-24), the street map is seven times the size it was. A phone
+still holds the one street file, but it builds a graph only of **where the plan can walk**, and every such place is
+known from the two ends and the bus network before a street is read:
+
+| box | round | padding |
+|---|---|---|
+| the start, and the end | the point | `END_PAD_M` = `ACCESS_M` + 800 = 1,200 m |
+| the walk between them, only when `metresBetween(from, to)` ≤ `MAX_WALK_ONLY_M` | the box of the two points | `WALK_PAD_M` = 800 m |
+| each stop of `transferStops(net, from, to)` | the stop | `TRANSFER_PAD_M` = `TRANSFER_WALK_M` + 800 = 950 m |
+
+Boxes are in degrees: `metres / M_PER_DEG_LAT` north and south, `metres / M_PER_DEG_LON` east and west. They come
+in that order (start, end, the walk if any, then each transfer stop in ascending stop number).
+
+**`transferStops`** runs `plan`'s step 2 without building anything: for each of the `MAX_ACCESS_STOPS` nearest
+stops within `ACCESS_M` of the start, each route and pattern calling there that does **not** also call within
+`ACCESS_M` of the end, and each later stop `x` on that pattern, every stop `y ≠ x` within `TRANSFER_WALK_M` of `x`
+on a different route whose same pattern calls at a stop near the end after `y`. Both `x` and `y` are returned,
+de-duplicated, ascending. There is no cap: it is a superset of every change `plan` can make.
+
+**`windowFiles(base, cells, window)`** keeps every street whose **own** box touches a box of the window: first the
+main-road file (`map/base.json`), then each cell of `map/streets.json` in ascending key order (JavaScript string
+order — `cells` is that list, the one every client already builds from), each cut down to its touching streets in the file's own order (`roadsInBoxes`, which keeps `safety` in
+step). A cell with none is dropped. A street's box is taken over its decoded vertices, inclusive at the edges. A
+street is never chosen by the cell it is filed in: a cell holds a street by its midpoint, and a merged suburban
+street can pass the start with its midpoint two cells away (measured: it moved a Southfield plan's first walk from
+165 m to 367 m before this rule).
+
+**The promise:** a plan on the window is the plan on the whole map, except where the whole map's best walk leaves
+the padding. `16-trip-window.json` holds it on the fixture network; `packages/query/test/routing-real.test.ts`
+holds it on the real area for five named trips and 24 pairs of listings.
+
 ## Fixtures for the directions
 
-`schema/fixtures/14-streets-walk.json` and `15-trip-plans.json`. Two new keys at the top of a fixture file:
+`schema/fixtures/14-streets-walk.json`, `15-trip-plans.json` and `16-trip-window.json`. Two new keys at the top of a fixture file:
 `streets` (an array of `PackedStreets`, exactly the bundle's own shape) and `transit` (an array of
 `TransitLayer`). Three new `fn` kinds, and a case may carry `from` / `to` (`{lat, lon}`) and `no_safety`
 (build the graph as though the files carried no `safety` array — what an older bundle looks like).
@@ -449,6 +489,9 @@ client says so; it never invents a leg.
 | `streetGraph` | `{ nodes, edges, crossings, snapped, components, largest, dead_ends, skipped }`, exactly |
 | `walk` | one string, or `null` when there is no route |
 | `plan` | one string per itinerary, in rank order |
+| `planWindow` | the same strings as `plan`, on the graph of `windowFiles(streets[0], streets[1…], tripWindow(…))` |
+| `transferStops` | the stop numbers, ascending |
+| `windowRoads` | `{ boxes, roads }`: how many boxes, and the name of every kept street in build order |
 
 The strings, which are the contract between the three implementations:
 

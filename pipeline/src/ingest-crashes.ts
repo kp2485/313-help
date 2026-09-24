@@ -39,6 +39,7 @@
 import { readFileSync } from 'node:fs';
 import { inBbox, p, today, writeJson } from './util.js';
 import { pointInRing, type Neighborhood } from './ingest-neighborhoods.js';
+import { SEMCOG_NOTICE } from './ingest-basemap.js';
 
 export const LAYER = 'https://services1.arcgis.com/xUx8EjNc6egUPYWh/arcgis/rest/services/crash2024_10year/FeatureServer/0';
 export const PAGE = 'https://maps-semcog.opendata.arcgis.com/datasets/SEMCOG::crash-locations-2015-2024';
@@ -58,7 +59,8 @@ export const FIELDS = ['YEAR', 'PEDESTRIAN', 'BICYCLE', 'KCOUNT', 'ACOUNT'];
  * inserted". The appropriate year is the layer's own, so it comes from the layer's last-edited date and does not
  * drift with the calendar. The notice travels in the bundle (build.ts) so no app has to hard-code it.
  */
-export const NOTICE = (year: number | string) => `Copyright © ${year} SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited.`;
+/** SEMCOG's required notice; one definition, in ingest-basemap.ts, which also puts it beside the map's parks. */
+export const NOTICE = (year: number | string) => SEMCOG_NOTICE(String(year));
 export const LICENSE_PAGE = 'https://maps-semcog.opendata.arcgis.com/pages/copyright-license-agreement';
 const UA = { 'user-agent': '313help-pipeline (open-source civic directory for Detroit; one polite pass)' };
 

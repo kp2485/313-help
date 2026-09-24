@@ -35,18 +35,20 @@ export const SERVICE_AREAS: Record<string, ServiceArea> = {
 };
 
 /**
- * The four cities, as one box (CLAUDE.md: "Bbox sanity: lat 42.25–42.46, lon −83.33 to −82.91"; Dearborn reaches
- * west to about −83.32). It was already the pipeline's sanity check on every coordinate it ingests
- * (`BBOX` in pipeline/src/util.ts, which now re-exports this one); the clients need the same box to answer one
- * question the pipeline never asks: is the phone in the city at all? A location outside it is not moved to
- * (docs/05, "Map tab"), because a map of Detroit centred on Chicago is not a map of anything.
+ * The service area, as one box: every city and township a DDOT or SMART bus stops in or runs through (Kyle, 2026-09-24;
+ * `pnpm ingest:region` writes the list and the box round its outlines to data/ingested/region.json, and a test
+ * holds this box to contain that one). It was four cities until 2026-09-24 (lat 42.25–42.46, lon −83.33 to
+ * −82.91). It is the pipeline's sanity check on every coordinate it ingests (`BBOX` in pipeline/src/util.ts,
+ * which re-exports this one); the clients need the same box to answer one question the pipeline never asks:
+ * is the phone in the area at all? A location outside it is not moved to (docs/05, "Map tab"), because a map of
+ * Detroit centred on Chicago is not a map of anything.
  *
  * Mirrored by `serviceBox` in apps/ios/Sources/HelpCore/Locate.swift and by `ServiceBox` in
  * apps/android/app/src/main/kotlin/org/help313/app/Locate.kt.
  */
-export const SERVICE_BBOX = { latMin: 42.25, latMax: 42.46, lonMin: -83.33, lonMax: -82.91 };
+export const SERVICE_BBOX = { latMin: 42.11, latMax: 42.80, lonMin: -83.57, lonMax: -82.70 };
 
-/** Whether a point is inside the four cities. `slack` is in degrees, for a caller that wants the edge forgiven. */
+/** Whether a point is inside the service area's box. `slack` is in degrees, for a caller that wants the edge forgiven. */
 export const inServiceArea = (lat: number, lon: number, slack = 0): boolean =>
   Number.isFinite(lat) && Number.isFinite(lon) &&
   lat >= SERVICE_BBOX.latMin - slack && lat <= SERVICE_BBOX.latMax + slack &&

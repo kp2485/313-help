@@ -88,18 +88,21 @@ final class RoutingRealTests: XCTestCase {
 
     // ---- the street graph ----------------------------------------------------------------------
 
-    func testGraphIsTheSizeAndShapeTheStudyMeasured() throws {
+    func testGraphIsTheSizeAndShapeTheWholeAreaMeasured() throws {
         try skipUnlessData()
         let g = Self.graph!, s = g.stats
-        // The study: 23,863 nodes, 40,342 edges, 45 components, largest 99.5%.
-        XCTAssertGreaterThan(g.nodeCount, 20_000)
-        XCTAssertLessThan(g.nodeCount, 28_000)
-        XCTAssertGreaterThan(g.edgeCount, 34_000)
-        XCTAssertLessThan(g.edgeCount, 46_000)
-        XCTAssertGreaterThan(Double(s.largestComponent) / Double(g.nodeCount), 0.99)
-        XCTAssertLessThan(Double(s.deadEnds) / Double(g.nodeCount), 0.15)
-        XCTAssertGreaterThan(s.crossings, 15_000)
-        XCTAssertGreaterThan(s.snapped, 5_000)
+        // The study (Detroit and three cities, before the 2026-09-22 basemap fix): 23,863 nodes, 40,342 edges.
+        // The whole area (every city and township a DDOT or SMART bus stops in, 2026-09-24): 108,820 nodes,
+        // 163,723 edges, 375 components, largest 98.9%, 15.4% dead ends (TIGER's suburban courts and cul-de-sacs).
+        // That size is why a phone builds a trip's window, not this graph (see "the trip window" below).
+        XCTAssertGreaterThan(g.nodeCount, 95_000)
+        XCTAssertLessThan(g.nodeCount, 125_000)
+        XCTAssertGreaterThan(g.edgeCount, 140_000)
+        XCTAssertLessThan(g.edgeCount, 190_000)
+        XCTAssertGreaterThan(Double(s.largestComponent) / Double(g.nodeCount), 0.98)
+        XCTAssertLessThan(Double(s.deadEnds) / Double(g.nodeCount), 0.17)
+        XCTAssertGreaterThan(s.crossings, 60_000)
+        XCTAssertGreaterThan(s.snapped, 40_000)
         print("streets graph: \(g.nodeCount) nodes, \(g.edgeCount) edges, \(s.components) components, "
             + "largest \(String(format: "%.1f", 100 * Double(s.largestComponent) / Double(g.nodeCount)))%, "
             + "dead ends \(String(format: "%.1f", 100 * Double(s.deadEnds) / Double(g.nodeCount)))%, "
@@ -115,12 +118,12 @@ final class RoutingRealTests: XCTestCase {
         print("safety bytes: \(onHin) of \(g.waySafety.count) ways are on the City's High Injury Network")
     }
 
-    func testBuildsFastEnoughToDoItOncePerBundle() throws {
+    func testBuildsWithoutAnAccidentalQuadratic() throws {
         try skipUnlessData()
-        // 183 ms on the study's Mac. This is a debug build of Swift with bounds checking on every array read,
-        // and CI is slower again, so the bound is generous on purpose: what it catches is an accidental
-        // quadratic, not a slow laptop.
-        XCTAssertLessThan(Self.graph!.stats.buildMs, 30_000)
+        // 984 ms for the whole area in TypeScript on a Mac. This is a debug build of Swift with bounds checking on
+        // every array read, and CI is slower again, so the bound is generous on purpose: what it catches is an
+        // accidental quadratic, not a slow laptop. No phone builds this graph: it builds a trip's window (below).
+        XCTAssertLessThan(Self.graph!.stats.buildMs, 120_000)
     }
 
     func testAnswersAWalkingRouteForTwentyListingPairsQuickly() throws {
@@ -244,5 +247,70 @@ final class RoutingRealTests: XCTestCase {
         let plans = plan(Self.graph!, Self.network!, from: LatLon(lat: 42.3314, lon: -83.0458), to: LatLon(lat: 42.3353, lon: -83.0495))
         XCTAssertGreaterThan(plans.count, 0)
         XCTAssertTrue(plans[0].legs.allSatisfy { !$0.isRide })
+    }
+
+    // ---- the trip window (schema/query-spec.md "The trip window") ---------------------------------
+
+    /// What a person reads of a plan: its legs, their routes and stops, and each distance to the metre.
+    func shape(_ ps: [Itinerary]) -> [String] {
+        ps.map { p in p.legs.map { l -> String in
+            switch l {
+            case .walk(let w): return "walk \(Int(w.metres.rounded()))"
+            case .ride(let r): return "\(r.routeId) \(r.fromStop.index)-\(r.toStop.index)"
+            }
+        }.joined(separator: " > ") }
+    }
+
+    /// A trip's own graph, built the way the phone builds it: from the main roads and the cells in key order.
+    func windowed(_ from: LatLon, _ to: LatLon) -> (w: TripWindow, g: StreetGraph, ms: Double) {
+        let w = tripWindow(Self.network, from: from, to: to)
+        let t = Date()
+        let g = buildStreetGraph(windowFiles(Self.streetFiles[0], Array(Self.streetFiles.dropFirst()), w), key: "window")
+        return (w, g, Date().timeIntervalSince(t) * 1000)
+    }
+
+    func testATripAcrossDetroitBuildsASmallPartOfTheArea() throws {
+        try skipUnlessTransit()
+        let (w, g, ms) = windowed(LatLon(lat: 42.3697, lon: -83.0742), LatLon(lat: 42.377459, lon: -83.135296))
+        print("window: \(w.boxes.count) boxes, \(g.nodeCount) of \(Self.graph!.nodeCount) nodes, built in \(Int(ms.rounded())) ms")
+        XCTAssertLessThan(g.nodeCount, Self.graph!.nodeCount / 4)
+    }
+
+    func testTheWindowGivesTheSamePlansAsTheWholeGraphForNamedTrips() throws {
+        try skipUnlessTransit()
+        let trips: [(String, LatLon, LatLon)] = [
+            ("the study's trip", LatLon(lat: 42.3697, lon: -83.0742), LatLon(lat: 42.377459, lon: -83.135296)),
+            ("four blocks downtown", LatLon(lat: 42.3314, lon: -83.0458), LatLon(lat: 42.3353, lon: -83.0495)),
+            ("Detroit to Pontiac", LatLon(lat: 42.3314, lon: -83.0458), LatLon(lat: 42.6389, lon: -83.2910)),
+            ("Dearborn to Warren", LatLon(lat: 42.3224, lon: -83.1763), LatLon(lat: 42.4895, lon: -83.0147)),
+            ("Southfield to Royal Oak", LatLon(lat: 42.4734, lon: -83.2219), LatLon(lat: 42.4895, lon: -83.1446)),
+        ]
+        var compared = 0
+        for (name, from, to) in trips {
+            let full = plan(Self.graph!, Self.network!, from: from, to: to)
+            let part = plan(windowed(from, to).g, Self.network!, from: from, to: to)
+            XCTAssertEqual(shape(part), shape(full), name)
+            if !full.isEmpty { compared += 1 }
+            print("\(name): \(shape(full).first ?? "(no plan)")")
+        }
+        XCTAssertGreaterThanOrEqual(compared, 4)
+    }
+
+    func testTheWindowGivesTheSamePlansAsTheWholeGraphForListingPairs() throws {
+        try skipUnlessTransit()
+        try skipUnlessRows()
+        let withCoords = Self.rows.filter { $0.lat != nil && $0.lon != nil }
+        var seed = 11
+        func rnd() -> Double { seed = (seed &* 1103515245 &+ 12345) & 0x7fffffff; return Double(seed) / Double(0x7fffffff) }
+        var compared = 0
+        for _ in 0..<24 {
+            let a = withCoords[Int(rnd() * Double(withCoords.count))], b = withCoords[Int(rnd() * Double(withCoords.count))]
+            let from = LatLon(lat: a.lat!, lon: a.lon!), to = LatLon(lat: b.lat!, lon: b.lon!)
+            let full = plan(Self.graph!, Self.network!, from: from, to: to)
+            let part = plan(windowed(from, to).g, Self.network!, from: from, to: to)
+            XCTAssertEqual(shape(part), shape(full), "\(a.id) -> \(b.id)")
+            if !full.isEmpty { compared += 1 }
+        }
+        XCTAssertGreaterThanOrEqual(compared, 6)
     }
 }

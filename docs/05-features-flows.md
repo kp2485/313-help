@@ -34,7 +34,7 @@ Map          one map with a layer switcher (free help by kind · parks · Joe Lo
 Parks and paths (2026-09-22)  →  every City park (each with its own page), the recreation centers, and the
              Joe Louis Greenway as ONE row  →  the greenway screen  →  its 52 stretches (condition reports
              unchanged)  →  Neighborhoods
-Areas        a FULL-SCREEN map of the four cities and Detroit's 205 neighborhoods, outlines only, opened on
+Areas        a FULL-SCREEN map of the area's 75 cities and townships and Detroit's 205 neighborhoods, outlines only, opened on
              the polygon you are standing in; "Map | List" at the top right switches to the list (Nearest
              first when a location is known, else A–Z or by council district); at ≥ 64 rem both at once, map
              left and list right  →  one neighborhood or one city (docs/13), which opens UNDER the map: the
@@ -173,7 +173,7 @@ Only **Use my location** asks the platform, and only ever **coarse** location: `
 never requested). When a fix arrives **inside** the service area the map animates — instantly under Reduce
 Motion — to a **two-mile radius** around the person: the shorter side of the screen spans four miles, clamped to
 the map's existing zoom and pan limits, with the "you are here" dot and "Map centred near you" through the live
-region. **Outside** Detroit, Hamtramck, Highland Park and Dearborn nothing moves and the screen says so, with
+region. **Outside** the service area (every city and township a DDOT or SMART bus reaches) nothing moves and the screen says so, with
 the ZIP entry beside it. A refusal, an error or a timeout dismisses the card, leaves the map where it was, and
 shows the refused message; nothing ever asks again on its own — the "Use my location" button is the way to try,
 and once the platform has stopped offering its prompt the words say where the switch is in Settings.

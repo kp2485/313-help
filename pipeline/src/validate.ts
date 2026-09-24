@@ -189,12 +189,19 @@ export function validateHsdsPrivacy(services: unknown[]): Issues {
   return { errors, warnings: [] };
 }
 
-export function validateEmergency(rows: CsvRow[], todayStr: string, release: boolean): Issues & { verified: boolean } {
+/**
+ * `places` is the set of place ids in data/ingested/region.json. A row with an `area` belongs to one place and is
+ * shown only on that place's page (a city's own police, 2026-09-24); it names a place that exists, and 911 and 988
+ * are never scoped to one.
+ */
+export function validateEmergency(rows: CsvRow[], todayStr: string, release: boolean, places?: Set<string>): Issues & { verified: boolean } {
   const errors: string[] = [], warnings: string[] = [];
   const need = new Map([['emg_911', '911'], ['emg_988', '988']]);
   let verified = true;
   for (const r of rows) {
     if (!parsePhone(r.number ?? '')) errors.push(`${r.id}: "${r.number}" is not a valid number`);
+    if (r.area && need.has(r.id!)) errors.push(`${r.id}: 911 and 988 belong to everyone and carry no area`);
+    if (r.area && places && !places.has(r.area)) errors.push(`${r.id}: area "${r.area}" is not a place in data/ingested/region.json`);
     if (need.has(r.id!)) {
       if (r.number !== need.get(r.id!) || r.hardcoded !== 'yes') errors.push(`${r.id}: must be ${need.get(r.id!)} and hardcoded`);
       need.delete(r.id!);

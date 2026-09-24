@@ -35,7 +35,7 @@ public struct BoundaryStyle: Equatable, Sendable {
     public var band: BoundaryBand
     /// Stroke width in points for a neighbourhood outline.
     public var width: Double
-    /// Stroke width for one of the four city outlines: a city is a bigger fact than a neighbourhood, and the
+    /// Stroke width for one of the city and township outlines: a city is a bigger fact than a neighbourhood, and the
     /// only thing that says so is weight — never colour, and never a fill.
     public var cityWidth: Double
     /// Dash in points, **absolute** — not multiplied by the line width the way a transit dash is. A hairline

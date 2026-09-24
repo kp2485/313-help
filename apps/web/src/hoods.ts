@@ -111,6 +111,9 @@ export interface Ui {
   /** A listing from the bundle this page is drawn beside, or null when the bundle has not loaded or no longer
    *  carries that id. Only the "nearest" rows use it, to name and open the place the distance belongs to. */
   listing?: (id: string) => { id: string; name: string; category: string } | null;
+  /** Call buttons for the numbers that belong to one place only (emergency.csv `area`: a city's own police), or ''
+   *  when the bundle has none for it. Never 911 or 988, which belong to everyone. */
+  placeCalls?: (placeId: string) => string;
 }
 /** Per 1,000 parcels. No rate without a count we can show and a base we can defend (honesty rules 2 and 3). */
 /**
@@ -607,6 +610,8 @@ export function cityPage(h: Area, d: Indicators, ui: Ui, view: HoodView = 'table
   const notPublished = h.missing.filter((m) => m.why === 'not_published').map((m) => ui.t('city.missing.' + m.panel));
   const noneRecorded = h.missing.filter((m) => m.why === 'none_recorded');
   const years = d.permit_years ?? [];
+  const helpOnly = !detroit && h.panels.every((p) => p === 'help') && !h.missing.length;
+  const police = ui.placeCalls?.(h.id) ?? '';
 
   const help = `<h2>${T('hood.help_head')}</h2>
     <p>${T(h.help.total === 1 ? 'city.help_count_one' : h.help.total === 0 ? 'city.help_none' : 'city.help_count', { count: h.help.total, city: h.name })}</p>
@@ -638,7 +643,11 @@ export function cityPage(h: Area, d: Indicators, ui: Ui, view: HoodView = 'table
   return `<main><p class="org">${T('city.kind')}</p>
     <p class="banner plain">${T('hood.describe')}</p>${ui.map(h)}
     ${detroit ? `<p class="foot">${T('city.detroit_children')}</p><ul class="rows"><li><button class="row" ${ui.go({ v: 'tab', tab: 'hoods' })}><span class="rowtx"><strong>${T('city.see_neighborhoods')}</strong></span></button></li></ul>`
+      // A place with nothing but the help panel (every city and township a bus reaches, 2026-09-24) says just that:
+      // it has no regional numbers to warn about, and nobody has checked what it publishes, so nothing is claimed.
+      : helpOnly ? `<p class="foot">${T('city.outline_only', { city: h.name })}</p>`
       : `<p class="foot">${T('city.no_neighborhoods', { city: h.name })}</p><p class="foot">${T('city.regional', { city: h.name })}</p>`}
+    ${police ? `<h2>${T('city.police_head')}</h2><p>${T('city.police_lede', { city: h.name })}</p><div class="stackbtns">${police}</div>` : ''}
     ${CITY_PANELS.filter(on).map((k) => drawn[k] ?? '').join('')}
     ${noneRecorded.map((m) => `<p class="foot">${T('city.' + m.panel + '_none', { city: h.name, from: years[0] ?? '', to: years[years.length - 1] ?? '' })}</p>`).join('')}
     ${notPublished.length ? `<p class="foot">${slot(ui, 'city.missing', 'list', notPublished.join(', '), { city: h.name })}</p>` : ''}

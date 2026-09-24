@@ -2,10 +2,11 @@
 
 [![ci](https://github.com/kp2485/313-help/actions/workflows/ci.yml/badge.svg)](https://github.com/kp2485/313-help/actions/workflows/ci.yml)
 
-Free help, transit, parks and neighborhood facts for Detroit, Hamtramck, Highland Park and Dearborn — in an app that
+Free help, transit, parks and neighborhood facts for Detroit and every city and township its buses reach — 75 places
+where a DDOT or SMART bus stops or runs, across Wayne, Oakland and Macomb counties — in an app that
 stores nothing about you, works with no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 670 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 721 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -16,7 +17,7 @@ stores nothing about you, works with no signal, and never sends you to a pantry 
 | **Bus and rail riders** | DDOT, SMART, QLINE, People Mover, Amtrak, intercity buses and park-and-ride on one offline map; reduced-fare ID help; one-tap hand-off to a trip planner or the Transit app |
 | **Cyclists and MoGo users** | MoGo stations, bike lanes and the Joe Louis Greenway, segment by segment |
 | **Families and older adults** | 302 parks, recreation centers, libraries, youth programs, senior meals and rides |
-| **Neighbors and block clubs** | A page for each of 205 neighborhoods and for Hamtramck, Highland Park and Dearborn: help nearby, home sales beside permits, blight, Safe streets — exact numbers, never a ranking |
+| **Neighbors and block clubs** | A page for each of Detroit's 205 neighborhoods and for each of the 75 cities and townships: help nearby, the place's own police line, and for Detroit, Hamtramck, Highland Park and Dearborn home sales beside permits, blight, Safe streets — exact numbers, never a ranking |
 | **Helpers** | Community health workers, librarians, 211 operators, churches and outreach teams who look things up for someone else — and tell us when a listing is wrong |
 | **Spanish, Arabic and Bengali speakers** | The whole interface in four languages; Arabic runs right to left |
 | **People using a screen reader, keyboard, switch or large text** | Audited against WCAG 2.2 AA; every map is also a text list |
@@ -52,11 +53,12 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **670 listings** in 56 categories across four cities: 154 food, 91 harm reduction, 83 health (including **9
+- **721 listings** in 56 categories: 154 food, 142 harm reduction, 83 health (including **9
   emergency rooms and 13 urgent care centers**), 51 places to get somewhere safe now (38 fire stations and 13
   police stations), 44 jobs, 43 child care and free preschool, 31 learning, 28 treatment, and 17 more groups —
   among them help built for seniors, veterans and people with a disability.
-- **A Map tab drawn on the phone** from City open data and Census TIGER files inside the signed bundle — no tile
+- **A Map tab drawn on the phone** from City open data, Census TIGER files and SEMCOG's parks inside the signed
+  bundle, covering the whole area — every DDOT and SMART route drawn whole and tested to lie inside it — no tile
   server, no map company, works offline — on web, iPhone and Android. It opens two miles around you if you allow
   it, else around a cross street you type (resolved on the device), else around City Hall. Layers: help by
   category, neighborhood and city boundaries (on by default, drawn at every zoom), 52 greenway segments, 302
@@ -66,8 +68,9 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   graph and transit files: A* over the streets, steered off the City's own High Injury Network; published
   headways only (never real-time, never a timetable); every estimate a range; at most one bus change; the route
   drawn on our own map. Nothing leaves the device and the screen leaves no URL or history entry
-  ([study](docs/research/2026-09-22-offline-directions.md)). On web, iPhone and Android.
-- **205 neighborhood pages and a page for each city** from public datasets: exact numbers, no rankings, no
+  ([study](docs/research/2026-09-22-offline-directions.md)). A phone builds only the streets the trip can walk
+  on — 2,000 to 3,500 nodes, not the area's 108,820 — so it stays quick on an old phone. On web, iPhone and Android.
+- **205 neighborhood pages and a page for each of the 75 cities and townships** from public datasets: exact numbers, no rankings, no
   per-neighborhood crime ([docs/13](docs/13-neighborhood-indicators.md)). The Areas tab is a map that opens on
   the outline you are standing in (found on the device), with boundaries drawn and the A–Z or by-district list one
   control away; opening an area shrinks the map to a strip the page scrolls under. By-year numbers read as a table
@@ -78,11 +81,11 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   [test script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
 - **Three clients, one spec.** A web PWA (vanilla TypeScript), an iPhone app (SwiftUI) and an Android app (Kotlin,
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
-  and trip plans — are written three times against [one spec](schema/query-spec.md) and **205 shared fixture
-  cases**; all three pass every case.
-- **Tested and small.** 1,318 tests in `pnpm test`, 369 in `swift test`, 375 in Gradle on a plain JDK. 102 KB of
+  and trip plans — are written three times against [one spec](schema/query-spec.md) and **217 shared fixture
+  cases**; the web and iPhone pass every case, and Android's are run by CI.
+- **Tested and small.** 1,353 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
-  (25 KB) loads only if chosen; the bundle is 2.4 MB.
+  (26 KB) loads only if chosen; the bundle is 5.3 MB for the whole three-county area.
 
 ## How listings stay fresh
 
@@ -127,7 +130,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,318 tests
+pnpm test                                   # 1,353 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/
@@ -175,7 +178,7 @@ directories. National sources are already wired — SAMHSA, US DOT NTAD, Census 
 per-state privacy re-engineering, the four-language framework takes more, and each region gets the same steward queue.
 
 1. One region config file and multi-region bundles, with the region picked by ZIP on the device.
-2. A second Michigan city as the proof — Flint, Grand Rapids, or Wayne County beyond the four cities.
+2. A second Michigan city as the proof — Flint or Grand Rapids.
 3. A Michigan-wide base layer from state open data and Michigan 211.
 4. A hosted "region in a box" for cities and nonprofits, alongside the open-source gift.
 5. A national directory of regional bundles sharing the national hotlines.

@@ -62,15 +62,18 @@ final class AreasCameraTests: XCTestCase {
         XCTAssertLessThanOrEqual(cam.scale, MapCamera.maxScale)
     }
 
-    func testAWholeCityIsNotOpenedWiderThanTheCameraHasEverAllowed() {
-        // Detroit is about 0.2° tall and 0.4° wide; on a phone that is well past the map's own far limit.
-        let cam = MapCamera.forArea(box(42.255, -83.288, 0.195, 0.377), width: phone.w, height: phone.h)!
-        XCTAssertEqual(mpp(cam), 90, accuracy: 1e-6)
+    func testTheWholeServiceAreaIsNotOpenedWiderThanTheCameraAllows() {
+        // Every city and township a DDOT or SMART bus stops in is about 0.69° tall and 0.87° wide; on a phone that
+        // is past the map's own far limit, 180 m per point (90 until 2026-09-24).
+        let cam = MapCamera.forArea(box(42.11, -83.57, 0.69, 0.87), width: phone.w, height: phone.h)!
+        XCTAssertEqual(mpp(cam), 180, accuracy: 1e-6)
         XCTAssertEqual(cam.scale, MapCamera.minScale, accuracy: 1e-9)
         // A laptop's wider box gets closer, and is still inside the limits.
-        let big = MapCamera.forArea(box(42.255, -83.288, 0.195, 0.377), width: laptop.w, height: laptop.h)!
-        XCTAssertLessThan(mpp(big), 90)
+        let big = MapCamera.forArea(box(42.11, -83.57, 0.69, 0.87), width: laptop.w, height: laptop.h)!
+        XCTAssertLessThan(mpp(big), 180)
         XCTAssertGreaterThanOrEqual(big.scale, MapCamera.minScale)
+        // Detroit alone now opens inside the limit on a phone.
+        XCTAssertLessThan(mpp(MapCamera.forArea(box(42.255, -83.288, 0.195, 0.377), width: phone.w, height: phone.h)!), 180)
     }
 
     func testAnAreaTheBundleCarriesNoOutlineForMovesNothingAtAll() {
@@ -90,7 +93,7 @@ final class AreasLandingTests: XCTestCase {
         ("nobody has said where they are: the location card, over the anchor view", false, false, false, .ask),
         ("a position allowed this session, inside a neighbourhood: that polygon", true, true, false, .area),
         ("a typed cross street or ZIP is the same answer by another road", true, true, false, .area),
-        ("a fix from beyond the four cities: the plain message, and the map stays", false, false, true, .outside),
+        ("a fix from beyond the service area: the plain message, and the map stays", false, false, true, .outside),
         ("a point inside the box that no outline holds is the same plain message", true, false, false, .outside),
         ("outside wins even if an older area is still remembered", true, true, true, .outside),
     ]

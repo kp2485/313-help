@@ -50,7 +50,7 @@ final class HoodsModel {
 }
 
 /// Where a tap on the map, on the index, or on "Your neighborhood" goes next. `hood` is any area id — a Detroit
-/// neighborhood or one of the four cities — because both are the same page drawn from the same components.
+/// neighborhood or one of the cities and townships — because both are the same page drawn from the same components.
 enum HoodRoute: Hashable { case hood(String), index }
 
 /// A to Z, grouped by council district, or nearest first. **None of the three is a ranking**: the City numbers
@@ -122,7 +122,7 @@ struct HoodsIndexView: View {
     /// The outline a tap chose, this screen only.
     @State private var picked = ""
     @State private var navigate: String?
-    /// A fix that came back from outside the four cities. The map does not move and the words say why — the
+    /// A fix that came back from outside the service area. The map does not move and the words say why — the
     /// point is not kept either, exactly as on the Map tab and on the web.
     @State private var outside = false
     /// Where VoiceOver's cursor is among the outlines, so coming Back from an area page puts it on the polygon
@@ -162,7 +162,7 @@ struct HoodsIndexView: View {
 
     /// The landing (Kyle, 2026-09-22): a map filling the tab under the top bar and above the tab bar — Urgent
     /// help and the tabs all stay, and nothing is made inert, so it is deliberately not the full-screen map
-    /// dialog. On it: the four city outlines and the 205 neighbourhood outlines and **nothing else**.
+    /// dialog. On it: the city and township outlines and the 205 neighbourhood outlines and **nothing else**.
     @ViewBuilder private func mapFace(_ d: Indicators) -> some View {
         let mine = here.point.flatMap { d.area(containing: $0) }
         let land = areasLanding(located: here.point != nil, area: mine != nil, outside: outside)
@@ -183,7 +183,7 @@ struct HoodsIndexView: View {
     }
 
     /// What is said over the map. The area a person is in, named; or — with nothing known, and for a spot
-    /// outside the four cities — the three ways in, over the view the map already had.
+    /// outside the service area — the three ways in, over the view the map already had.
     @ViewBuilder private func said(_ land: AreasLanding, _ mine: AreaPage?) -> some View {
         switch land {
         case .area:
@@ -226,7 +226,7 @@ struct HoodsIndexView: View {
         announce(L.t(v == .map ? "hood.say_map" : "hood.say_list"))
     }
 
-    /// A fix, a typed junction or the middle of a typed ZIP. Inside the four cities the map glides to the
+    /// A fix, a typed junction or the middle of a typed ZIP. Inside the service area the map glides to the
     /// outline that holds it; outside them nothing moves, the point is dropped, and the words say why.
     private func arrived(_ p: LatLon?) {
         guard let p else { return }
@@ -1556,7 +1556,9 @@ struct HoodOutlineMap: View {
         Button(action: open) {
             GeometryReader { geo in
                 Canvas { ctx, size in
-                    let cam = MapCamera.fitting(rings.flatMap { $0 }, width: size.width, height: size.height, minMeters: 900)
+                    // An area with no outline in this bundle frames the whole service area (`REGION` on the web).
+                    let pts = rings.flatMap { $0 }
+                    let cam = MapCamera.fitting(pts.isEmpty ? serviceRegionCorners : pts, width: size.width, height: size.height, minMeters: 900)
                     var shape = Path()
                     for ring in rings {
                         var flat: [Double] = []

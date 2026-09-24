@@ -230,6 +230,31 @@ fun runFixtures(dir: File = fixturesDir()): FixtureResult {
                     val got = plan(g, network!!, latLon(c["from"]!!), latLon(c["to"]!!)).map { planSummary(it) }
                     if (!matches(got, expect)) fail(got)
                 }
+                // The trip window (16-trip-window.json): the first street file is the main roads, any others are
+                // cells in key order. A window graph is built for the one case and dropped, as a client does.
+                "planWindow" -> {
+                    val noSafety = c["no_safety"]?.bool ?: false
+                    val files = if (noSafety) streets.map { it.withoutSafety() } else streets
+                    val from = latLon(c["from"]!!)
+                    val to = latLon(c["to"]!!)
+                    val w = tripWindow(network, from, to)
+                    val g = buildStreetGraph(windowFiles(files.first(), files.drop(1), w), "${file.name}:window")
+                    val got = plan(g, network!!, from, to).map { planSummary(it) }
+                    if (!matches(got, expect)) fail(got)
+                }
+                "transferStops" -> {
+                    val got = transferStops(network!!, latLon(c["from"]!!), latLon(c["to"]!!))
+                    if (!matches(got, expect)) fail(got)
+                }
+                "windowRoads" -> {
+                    val w = tripWindow(network, latLon(c["from"]!!), latLon(c["to"]!!))
+                    val kept = windowFiles(streets.first(), streets.drop(1), w)
+                    val got = mapOf(
+                        "boxes" to w.boxes.size,
+                        "roads" to kept.flatMap { f -> f.roads.map { r -> f.names.getOrNull(r.nameIndex) ?: "" } },
+                    )
+                    if (!matches(got, expect)) fail(got)
+                }
                 // A case whose `fn` this port does not implement yet. Counted and printed, never silently
                 // passed, so the number falling through is visible in CI.
                 else -> { skipped++; ran-- }

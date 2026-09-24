@@ -470,14 +470,17 @@ final class NetFileTests: XCTestCase {
         let extras = MapFileDecoder.transitExtras(try Data(contentsOf: url))
         XCTAssertEqual(Set(extras.netFiles.keys), ["ddot_routes", "ddot_stops", "smart_routes", "smart_stops", "qline", "people_mover"])
         XCTAssertEqual(extras.netFiles["qline"], "map/transit/qline.net.json")
-        XCTAssertEqual(extras.hubs.count, 4)
+        // Four hubs in Detroit and Dearborn, and Pontiac's since the area widened to every place a bus stops in
+        // (2026-09-24).
+        XCTAssertEqual(extras.hubs.count, 5)
+        XCTAssertTrue(extras.hubs.contains { $0.name.hasPrefix("Pontiac") })
         let gcp = try XCTUnwrap(extras.hubs.first { $0.name == "Grand Circus Park" })
         XCTAssertEqual(gcp.layers, ["people_mover", "qline"])
         XCTAssertEqual(MapProjection.lat(y: gcp.y), 42.3364, accuracy: 0.002)
         XCTAssertEqual(MapProjection.lon(x: gcp.x), -83.0507, accuracy: 0.002)
         let raw = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any]
         let origins = ((raw?["hubs"] as? [[String: Any]]) ?? []).map { $0["origin"] as? [Double] }
-        XCTAssertEqual(origins.count, 4); XCTAssertTrue(origins.allSatisfy { $0?.count == 2 }, "every hub says what its numbers count from")
+        XCTAssertEqual(origins.count, 5); XCTAssertTrue(origins.allSatisfy { $0?.count == 2 }, "every hub says what its numbers count from")
         XCTAssertFalse(gcp.shows(layersOn: ["go:qline"]), "a hub is drawn when two or more of its layers are on")
         XCTAssertTrue(gcp.shows(layersOn: ["go:qline", "go:people_mover"]))
     }

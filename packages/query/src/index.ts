@@ -30,3 +30,10 @@ export {
   type TransitNetwork, type TransitLayer, type TransitRoute, type TransitStop,
   type PackedPoints, type PackedRoutes, type PackedServes,
 } from './transit-plan.js';
+// Which streets a trip's walking graph is built from, since the area widened (2026-09-24). schema/query-spec.md
+// "The trip window".
+export {
+  tripWindow, windowFiles, transferStops, roadsInBoxes, boxAround,
+  END_PAD_M, TRANSFER_PAD_M, WALK_PAD_M,
+  type GeoBox, type TripWindow,
+} from './window.js';

@@ -50,13 +50,13 @@ class AreaOutlineView(
     /**
      * Where this map OPENS: the rings of one outline, framed with [MapCamera.AREA_FIT_MARGIN] of room and never
      * closer than [MapCamera.AREA_MIN_MPP] ([MapCamera.forArea] — the same camera as the web's `cameraForArea`).
-     * Null opens on all the outlines it was handed, which is the whole city.
+     * Null opens on all the outlines it was handed, which is the whole service area.
      */
     private val openRings: List<List<LatLon>>? = null,
     /**
      * Where this map opens when there is no outline to frame: a point and a radius in metres — the app's one
      * opening view ([openingView], Locate.kt), which is a location already known or the civic anchor. Without it
-     * the map opens on everything it was handed, which is the four cities at arm's length.
+     * the map opens on everything it was handed, which is the whole service area at arm's length.
      */
     private val openAt: Pair<LatLon, Double>? = null,
     /** True for the tab's own landing and for the strip: fill the box given rather than take a fixed shape. */
@@ -542,7 +542,7 @@ object AreaScreens {
      * **The landing.** A full-screen map of the outlines and nothing else, opened zoomed to the person's own
      * polygon when their area is known — the Detroit neighborhood that holds the point, else the city that does
      * ([areaAt]) — highlighted and named. Unknown: the location card over the anchor view, which moves to the
-     * polygon the moment it is answered. Outside the four cities: the plain message, and the map stays.
+     * polygon the moment it is answered. Outside the service area: the plain message, and the map stays.
      */
     private fun mapFace(a: MainActivity, d: Indicators): View {
         val here = a.near
@@ -714,8 +714,9 @@ object AreaScreens {
     // ---- one city page ---------------------------------------------------------------------------------------------
 
     /**
-     * A whole-city page: Detroit, Hamtramck, Highland Park and Dearborn. The same pieces as a neighborhood page,
-     * and **only the panels this area's own allow-list names**, in the fixed order of [CITY_PANELS].
+     * A whole-place page: Detroit, Hamtramck, Highland Park and Dearborn, and since 2026-09-24 every other city and
+     * township a DDOT or SMART bus stops in. The same pieces as a neighborhood page, and **only the panels this
+     * area's own allow-list names**, in the fixed order of [CITY_PANELS].
      *
      * Every panel prints its own source, with its own date and its own required notice. Nothing inherits, and no
      * number from another city appears anywhere: there is no cross-city comparison on this page at all.
@@ -746,11 +747,24 @@ object AreaScreens {
                     a.go(Route.Hoods())
                 },
             )
+        } else if (isOutlineOnly(d, area)) {
+            // A place with nothing but the help panel (every city and township a bus reaches, 2026-09-24) says just
+            // that: it has no regional numbers to warn about, and nobody has checked what it publishes.
+            col.addView(UI.text(a, L.t("city.outline_only", "city" to area.name), 15f, R.color.muted, topDp = 10))
         } else {
             col.addView(UI.text(a, L.t("city.no_neighborhoods", "city" to area.name), 15f, R.color.muted, topDp = 10))
             // The sentence the research doc requires on every non-Detroit page: these are not the same
             // measurements as Detroit's, so the two pages should not be read side by side.
             col.addView(UI.text(a, L.t("city.regional", "city" to area.name), 15f, R.color.muted, topDp = 6))
+        }
+
+        // The place's own police line (emergency.json `area`, 2026-09-24), under the words that say 911 comes first:
+        // on this page and nowhere else. Nothing is drawn when the bundle has none for this place.
+        val police = placeNumbers(a.store.bundle?.emergency.orEmpty(), area.id)
+        if (police.isNotEmpty()) {
+            col.addView(UI.sectionHead(a, L.t("city.police_head")))
+            col.addView(UI.text(a, L.t("city.police_lede", "city" to area.name), 15f, R.color.ink, topDp = 4))
+            for (e in police) col.addView(UI.callButton(a, e.label, e.number) { a.dial(e.number) })
         }
 
         // **The allow-list.** A panel is drawn because this area lists it, never because a number is present.

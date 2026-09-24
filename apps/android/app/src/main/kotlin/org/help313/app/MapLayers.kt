@@ -142,7 +142,7 @@ fun mapLayerStyle(id: String, @Suppress("UNUSED_PARAMETER") style: MapStyle = Ma
     mapLayerStyles[id] ?: MapLayerStyle("bus")
 
 /**
- * The outlines of the four cities and the 205 Detroit neighborhoods, as a layer (audit §3; DECISIONS 2026-09-22).
+ * The outlines of every place a bus reaches and the 205 Detroit neighborhoods, as a layer (audit §3; DECISIONS 2026-09-22).
  *
  * Thin dashed lines with names, the neighborhoods only from the zoom at which a name fits; **no choropleth, ever**
  * (docs/13, rule 1) — the only fill is a wash on the one outline that was tapped, which carries no number. The

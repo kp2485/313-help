@@ -127,10 +127,15 @@ class BaseMap(
     /** The small streets, by square. */
     val cells: List<MapCell>,
     val parks: List<MapArea>,
-    /** The four cities' outlines, one flat x, y run per ring. */
+    /** The service area's outline, one flat x, y run per ring. */
     val boundary: List<DoubleArray>,
     /** The day the City last edited the road layer. Shown under the map; never frozen at build time. */
     val edited: String,
+    /**
+     * SEMCOG's required notice (`source.semcog_notice`), when the map draws SEMCOG's park outlines, or null. Shown
+     * beside the source line in English, in their own words, never translated (the web's `notice` in map.ts).
+     */
+    val notice: String? = null,
 )
 
 /** One switched-on transport layer's shapes (`map/transit/…`). */
@@ -225,6 +230,7 @@ object MapFileDecoder {
             },
             boundary = (b["boundary"]?.arr ?: emptyList()).map { polyline(ints(it), o) },
             edited = b["source"]?.get("last_edited")?.get("roads")?.str ?: "",
+            notice = b["source"]?.get("semcog_notice")?.str?.takeIf { it.isNotBlank() },
         )
     }
 
@@ -336,16 +342,21 @@ data class MapCamera(
 
     companion object {
         /**
-         * 90 m per dp zoomed out (the whole city on a phone), 0.6 m per dp zoomed in (one doorway). The same two
-         * limits the web map and the iPhone app use, so no two of the three can be zoomed somewhere the others
-         * cannot follow.
+         * 180 m per dp zoomed out, 0.6 m per dp zoomed in (one doorway). The same two limits the web map and the
+         * iPhone app use, so no two of the three can be zoomed somewhere the others cannot follow. It was 90 until
+         * 2026-09-24, when the area became every city and township a DDOT or SMART bus stops in: 72 by 69 km, which
+         * a phone held upright shows whole only at about 180 m per dp.
          */
-        val MIN_SCALE = MapProjection.METERS_PER_UNIT / 90
+        val MIN_SCALE = MapProjection.METERS_PER_UNIT / 180
         val MAX_SCALE = MapProjection.METERS_PER_UNIT / 0.6
 
-        /** Detroit and its neighbours sit well inside this; it stops a flung finger from losing the city entirely. */
-        const val PAN_LIMIT_X = 0.25
-        const val PAN_LIMIT_Y = 0.2
+        /**
+         * How far the middle may go, in world units round the projection's origin: the service area's box (lon
+         * -83.57..-82.70 is x -0.35..0.30; lat 42.11..42.80 is y -0.45..0.24), and a little over. It stops a flung
+         * finger from losing the area entirely. 0.25 / 0.2 while the area was four cities.
+         */
+        const val PAN_LIMIT_X = 0.4
+        const val PAN_LIMIT_Y = 0.5
 
         /**
          * The opening view: at least these points on the screen, never closer than [minMeters] across. [cover] fills
@@ -405,8 +416,8 @@ data class MapCamera(
          *   picture of six houses with no streets a person could recognise. The map's own limit is 0.6 m/dp
          *   ([MAX_SCALE]) and a person can still zoom all the way in by hand — this is only where it OPENS.
          *
-         * A whole city is handled by the other end of the same clamp: [MIN_SCALE] is 90 m per dp, so Detroit
-         * cannot open wider than the camera has ever allowed.
+         * A whole city is handled by the other end of the same clamp: [MIN_SCALE] is 180 m per dp, so no place
+         * can open wider than the camera allows.
          */
         const val AREA_FIT_MARGIN = 0.08
         const val AREA_MIN_MPP = 4.0

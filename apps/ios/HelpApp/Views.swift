@@ -363,7 +363,7 @@ struct UrgentView: View {
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 10) {
             Text(L.t("urgent.lede")).font(.body).foregroundStyle(Color.muted).padding(.bottom, 4)
-            EmergencyRows(ids: ["emg_911", "emg_988", "emg_shelter_helpline", "emg_shelter_outwayne", "emg_dwihn_crisis", "emg_ndvh", "emg_avalon", "emg_211"])
+            EmergencyRows(ids: urgentIds)
             NavRow(title: L.t("need.overdose_now"), symbol: "waveform.path.ecg") { OverdoseView() }.padding(.top, 6)
             // The last row on the sheet, under every number: docs/05's ordering does not move (DECISIONS 2026-09-22).
             if let safe = needs.first(where: { $0.id == "safe_now" }) {

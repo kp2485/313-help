@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CATEGORIES, MAP_GROUPS, NEEDS, PRIVATE_TOPS, SENSITIVE, TABS, inCategories, isPrivate, isSensitive, mapDrawable } from '../src/needs.js';
+import { CATEGORIES, MAP_GROUPS, NEEDS, PRIVATE_TOPS, SENSITIVE, TABS, URGENT_IDS, inCategories, isPrivate, isSensitive, mapDrawable } from '../src/needs.js';
 import { hashFor, isPrivateCat } from '../src/router.js';
 import { rank, type BundleRow } from '@313help/query';
 import { LINKS } from '../src/links.js';
@@ -617,7 +617,7 @@ describe('what the app does when something cannot be fetched', () => {
 
 describe('a map layer says who it came from and what we did to it', () => {
   const main = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
-  it('a licence we know the address of is a link, and the cut to our four cities is stated', () => {
+  it('a licence we know the address of is a link, and the cut to our service area is stated', () => {
     expect(main).toContain("'CC BY-NC 4.0': 'https://creativecommons.org/licenses/by-nc/4.0/',");
     expect(main).toContain('const url = LICENSE_URL[l.source.license];');
     expect(main).toContain("${sources.map(layerSource).join(' · ')}<br>${T('map.layer_filtered')}");
@@ -625,8 +625,8 @@ describe('a map layer says who it came from and what we did to it', () => {
       expect(table(l)['map.layer_license'], l).toContain('{name}');
       expect(table(l)['map.layer_filtered'], l).toBeTypeOf('string');
     }
-    // English names the four cities the service area covers (CLAUDE.md).
-    for (const city of ['Detroit', 'Hamtramck', 'Highland Park', 'Dearborn']) expect(table('en')['map.layer_filtered']).toContain(city);
+    // English says what the service area is: wherever the buses in this app stop (CLAUDE.md, 2026-09-24).
+    for (const word of ['DDOT', 'SMART']) expect(table('en')['map.layer_filtered']).toContain(word);
   });
   it('a licence with no address we know is still printed, never guessed at', () => {
     expect(main).toContain("url ? ext(url, t('map.layer_license', { name: l.source.license }), 'link') : esc(t('map.layer_license', { name: l.source.license }))");
@@ -785,7 +785,7 @@ describe('a daytime clubhouse is not a crisis line: `health.support` (audit K3)'
     const talk = NEEDS.find((n) => n.id === 'talk')!;
     // The crisis screen is unchanged where it matters: 988 first, its own list is still the crisis one, it is
     // still sensitive and still has the quick exit.
-    expect(talk.first).toEqual(['emg_988', 'emg_dwihn_crisis']);
+    expect(talk.first).toEqual(['emg_988', 'emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_mccmh_crisis']);   // one line per county
     expect(talk.query).toEqual({ category: 'health.mental' });
     expect(talk).toMatchObject({ sensitive: true, quickExit: true });
     // And the daytime places come after that list, under their own heading, never mixed into it.
@@ -854,9 +854,11 @@ describe('"Get somewhere safe now": one list of the doors that are open at 3am',
   it('leads with 911 and sits below the hotlines, never above one', () => {
     expect(safe.first).toEqual(['emg_911']);
     expect(safe.group).toBe('now');
-    // On the urgent sheet the call buttons are unchanged and the new row is the last thing on the screen.
+    // The urgent sheet keeps docs/05's order: 911, then 988, then the hotlines — one shelter line and one crisis
+    // line per county since 2026-09-24 — and the new row is the last thing on the screen.
+    expect(URGENT_IDS.slice(0, 2)).toEqual(['emg_911', 'emg_988']);
+    expect(URGENT_IDS).toEqual(['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_housing_oakland', 'emg_housing_macomb', 'emg_dwihn_crisis', 'emg_ochn_crisis', 'emg_mccmh_crisis', 'emg_ndvh', 'emg_avalon', 'emg_211']);
     const sheet = main.slice(main.indexOf('function urgent()'), main.indexOf('function need('));
-    expect(sheet).toContain("['emg_911', 'emg_988', 'emg_shelter_helpline', 'emg_shelter_outwayne', 'emg_dwihn_crisis', 'emg_ndvh', 'emg_avalon', 'emg_211'].map(callButton)");
     expect(sheet.indexOf("id: 'safe_now'")).toBeGreaterThan(sheet.indexOf("id: 'overdose_now'"));
     expect(sheet.indexOf("id: 'safe_now'")).toBeGreaterThan(sheet.indexOf('.map(callButton)'));
   });

@@ -246,6 +246,56 @@ final class CityAreasTests: XCTestCase {
         XCTAssertTrue(semcogNotice.hasSuffix(" SEMCOG. All Rights Reserved. Reproduction or Use Without Permission is Prohibited."))
     }
 
+    // MARK: every other city and township a bus reaches (2026-09-24)
+
+    private func decodeArea(id: String, panels: [String], missing: String = "[]") throws -> Area {
+        let list = panels.map { "\"\($0)\"" }.joined(separator: ",")
+        return try JSONDecoder().decode(Area.self, from: Data("""
+        {"id":"\(id)","name":"\(id)","district":null,"center":[42.49,-83.01],
+         "help":{"total":3,"by":{},"nearest_miles":{},"none_listed_yet":[],"coverage_checked":true},
+         "places":{"parks":0,"rec_centers":0,"greenway_open":0},"years":{},
+         "city":"\(id)","kind":"city","panels":[\(list)],"sources":{},"missing":\(missing)}
+        """.utf8))
+    }
+
+    func testAPlaceWithOnlyItsHelpSaysSoInsteadOfTheRegionalWarning() throws {
+        // Warren: an outline, its help, nothing else — `city.outline_only`, never `city.regional`.
+        XCTAssertTrue(cityIsOutlineOnly(try decodeArea(id: "city_warren", panels: ["help"]), isDetroit: false))
+        XCTAssertTrue(cityIsOutlineOnly(try decodeArea(id: "city_warren", panels: []), isDetroit: false))
+        // The four first cities keep their full pages and their researched sentence.
+        XCTAssertFalse(cityIsOutlineOnly(try decodeArea(id: "city_hamtramck", panels: ["help", "parks", "crashes"]), isDetroit: false))
+        let saysMissing = try decodeArea(id: "city_highland_park", panels: ["help"],
+                                         missing: #"[{"panel":"permits","why":"none_recorded"}]"#)
+        XCTAssertFalse(cityIsOutlineOnly(saysMissing, isDetroit: false), "a page that says what is missing is not outline-only")
+        // Detroit never is, whatever its panels.
+        XCTAssertFalse(cityIsOutlineOnly(try decodeArea(id: "city_detroit", panels: ["help"]), isDetroit: true))
+    }
+
+    func testTheShippedBundleHasAPageForEveryPlaceABusReaches() throws {
+        let d = try builtIndicators()
+        let cities = (d.areas ?? []).filter { $0.kind == "city" }
+        let isDetroit = { (a: Area) in d.cityRows.first { $0.id == a.id }?.hasNeighborhoods == true }
+        let outlineOnly = cities.filter { cityIsOutlineOnly($0, isDetroit: isDetroit($0)) }
+        // Detroit and its three first neighbours keep their full pages; every other place is an outline and its help.
+        XCTAssertGreaterThanOrEqual(cities.count, 70, "every city and township a DDOT or SMART bus stops in has a page")
+        XCTAssertEqual(outlineOnly.count, cities.count - 4)
+        for id in ["city_hamtramck", "city_highland_park", "city_dearborn"] where cities.contains(where: { $0.id == id }) {
+            XCTAssertFalse(outlineOnly.contains { $0.id == id }, "\(id) lost its full page")
+        }
+    }
+
+    /// A city's own police line is on that city's page and nowhere else (emergency.json `area`).
+    func testAPlacesOwnNumberIsOnlyEverOnThatPlacesPage() {
+        struct Row: Equatable { var id: String; var area: String? }
+        let rows = [Row(id: "emg_911", area: nil), Row(id: "emg_police_warren", area: "city_warren"),
+                    Row(id: "emg_ochn_crisis", area: nil), Row(id: "emg_police_royal_oak", area: "city_royal_oak"),
+                    Row(id: "emg_odd", area: "")]
+        XCTAssertEqual(numbersForPlace(rows, placeId: "city_warren", area: \.area).map(\.id), ["emg_police_warren"])
+        XCTAssertEqual(numbersForPlace(rows, placeId: "city_hamtramck", area: \.area), [], "Hamtramck is not given Warren's number")
+        XCTAssertEqual(numbersForPlace(rows, placeId: "", area: \.area), [], "no place, no numbers — not the unscoped ones")
+        XCTAssertEqual(numbersForEveryone(rows, area: \.area).map(\.id), ["emg_911", "emg_ochn_crisis", "emg_odd"])
+    }
+
     private func decodeHood(id: String, lat: Double, lon: Double) throws -> Hood {
         try JSONDecoder().decode(Hood.self, from: Data("""
         {"id":"\(id)","name":"\(id)","district":null,"center":[\(lat),\(lon)],

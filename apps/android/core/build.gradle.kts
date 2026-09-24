@@ -47,13 +47,13 @@ kotlin.sourceSets["main"].kotlin.include(
     "org/help313/app/MapStyle.kt",       // the subway style: bands, palette as numbers, network files, geometry, badges
     "org/help313/app/MapList.kt",        // "See this map as a list": never told the style, so identical in both
     "org/help313/app/DayWords.kt",       // "Today" / "Tomorrow" / "Friday, Sep 25"
-    "org/help313/app/Locate.kt",         // the four cities as a box, the first-open decision, the answered flag
+    "org/help313/app/Locate.kt",         // the service area as a box, the first-open decision, the answered flag
     "org/help313/app/Hoods.kt",          // the neighborhood numbers: the decode, where a point falls, the index order
     "org/help313/app/Zip.kt",            // a typed ZIP: what counts as one, and the point at the middle of it
     "org/help313/app/Propose.kt",        // what a proposal is, its closed body, and the queue's rules
-    "org/help313/app/Directions.kt",     // which files the street graph is built from, its one key, its states
+    "org/help313/app/Directions.kt",     // the street files, their one key, their states, the trip-window plan
     "org/help313/app/Intersections.kt",  // "Woodward and Warren": the parser, the crossings, the 120 m merge
-    "org/help313/app/Areas.kt",          // the four cities and the 205 outlines: the pages, the layer, the pick
+    "org/help313/app/Areas.kt",          // every place a bus reaches and the 205 outlines: the pages, the layer, the pick
     "org/help313/app/AreasHome.kt",      // the Areas tab: what it lands on, and the strip that collapses as you read
     "org/help313/app/Bounds.kt",         // how a boundary is drawn at every zoom: the band table and its one colour
     "org/help313/app/Parks.kt",          // the 302 parks: what one is, and the only two orders a list may have

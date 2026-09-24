@@ -24,7 +24,8 @@ type Box = [number, number, number, number];                           // minX, 
 interface Line { cls: number; name: string; pts: Float32Array; box: Box }
 interface Area { name: string; pts: Float32Array; box: Box }
 interface Cell { box: Box; roads: Line[] }
-export interface BaseMap { roads: Line[]; cells: Cell[]; parks: Area[]; boundary: Float32Array[]; edited: string }
+/** `notice` is SEMCOG's required notice, when the map draws SEMCOG's park outlines; shown in English, its own words. */
+export interface BaseMap { roads: Line[]; cells: Cell[]; parks: Area[]; boundary: Float32Array[]; edited: string; notice?: string }
 
 /** [x0, y0, dx1, dy1, ...] in 1e-5 degrees from `origin` -> world x,y pairs. */
 export function decodeLine(enc: number[], origin: [number, number]): Float32Array {
@@ -41,7 +42,7 @@ const merge = (boxes: Box[]): Box => boxes.reduce((m, x) => [Math.min(m[0], x[0]
 const touches = (a: Box, b: Box) => a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
 
 interface RoadFile { origin: [number, number]; names: string[]; roads: [number, number, number[]][] }
-interface BaseFile extends RoadFile { source: { last_edited: { roads: string } }; park_names: string[]; parks: [number, number[]][]; boundary: number[][] }
+interface BaseFile extends RoadFile { source: { last_edited: { roads: string }; semcog_notice?: string }; park_names: string[]; parks: [number, number[]][]; boundary: number[][] }
 const roadsOf = (f: RoadFile): Line[] => f.roads.map(([cls, n, enc]) => { const pts = decodeLine(enc, f.origin); return { cls, name: n < 0 ? '' : f.names[n]!, pts, box: boxOf(pts) }; });
 
 export function decodeMap(base: BaseFile, streets: { cells: Record<string, RoadFile> }): BaseMap {
@@ -51,6 +52,7 @@ export function decodeMap(base: BaseFile, streets: { cells: Record<string, RoadF
     parks: base.parks.map(([n, enc]) => { const pts = decodeLine(enc, base.origin); return { name: n < 0 ? '' : base.park_names[n]!, pts, box: boxOf(pts) }; }),
     boundary: base.boundary.map((enc) => decodeLine(enc, base.origin)),
     edited: base.source.last_edited.roads,
+    ...(base.source.semcog_notice ? { notice: base.source.semcog_notice } : {}),
   };
 }
 
@@ -339,8 +341,12 @@ export const dirBtn = (dir: string | undefined, S: { directions?: string }): str
 // flung map carries, what counts as a tap. All of it lives here, out of the event handlers, so it can be held to
 // a test instead of to a thumb.
 export interface Cam { cx: number; cy: number; s: number }
-export const S_MIN = M_PER_UNIT / 90, S_MAX = M_PER_UNIT / 0.6;        // 90 m per pixel out, 0.6 m per pixel in
-export const PAN_X = 0.25, PAN_Y = 0.2;                                // how far the middle may leave the city
+// 180 m per pixel out, 0.6 m per pixel in. It was 90 until 2026-09-24, when the area became every city and township a
+// DDOT or SMART bus stops in or runs through: 72 by 77 km, which a phone held upright shows whole only at about 180 m per pixel.
+export const S_MIN = M_PER_UNIT / 180, S_MAX = M_PER_UNIT / 0.6;
+// How far the middle may go, in world units round (LON0, LAT0): the service area's box (lon -83.57..-82.70 is
+// x -0.35..0.30; lat 42.11..42.80 is y -0.45..0.24), and a little over. 0.25 / 0.2 while the area was four cities.
+export const PAN_X = 0.4, PAN_Y = 0.5;
 /** Zoom about a point on the screen: the map point under `px,py` before is under `px,py` after. */
 export function zoomAbout(cam: Cam, f: number, px: number, py: number, w: number, h: number): Cam {
   const s = Math.max(S_MIN, Math.min(S_MAX, cam.s * f));
@@ -376,7 +382,7 @@ export function cameraForRadius(center: { lat: number; lon: number }, radiusMete
  *   six houses with no streets a person could recognise. The map's own limit is 0.6 m/px (`S_MAX`) and a person
  *   can still zoom all the way in by hand — this is only where it OPENS.
  *
- * A whole city is handled by the other end of the same clamp: `S_MIN` is 90 m per pixel, so Detroit cannot open
+ * A whole city is handled by the other end of the same clamp: `S_MIN` is 180 m per pixel, so no place can open
  * wider than the camera has ever allowed.
  */
 export const AREA_FIT_MARGIN = 0.08, AREA_MIN_MPP = 4;
@@ -408,7 +414,7 @@ export function cameraForArea(rings: readonly { lat: number; lon: number }[][], 
   return { cx: Math.max(-PAN_X, Math.min(PAN_X, (minX + maxX) / 2)), cy: Math.max(-PAN_Y, Math.min(PAN_Y, (minY + maxY) / 2)), s };
 }
 
-/** Drag: the map follows the finger, and the middle never leaves the four cities by more than a screen or two. */
+/** Drag: the map follows the finger, and the middle never leaves the service area by more than a screen or two. */
 export function panCam(cam: Cam, dx: number, dy: number): Cam {
   return { cx: Math.max(-PAN_X, Math.min(PAN_X, cam.cx - dx / cam.s)), cy: Math.max(-PAN_Y, Math.min(PAN_Y, cam.cy - dy / cam.s)), s: cam.s };
 }
@@ -542,7 +548,7 @@ export class MapView {
     this.listen();
     live.set(spec.key, this);
     this.resize(true);
-    void loadMap(index).then((m) => { this.map = m; if (!m) this.say(`<p class="foot">${esc(S.noStreets)}</p>`); else if (!this.note.innerHTML) this.say(`<p class="foot">${esc(S.source(m.edited))}</p>`); this.redraw(); });
+    void loadMap(index).then((m) => { this.map = m; if (!m) this.say(`<p class="foot">${esc(S.noStreets)}</p>`); else if (!this.note.innerHTML) this.say(`<p class="foot">${esc(S.source(m.edited))}</p>${m.notice ? `<p class="foot" lang="en">${esc(m.notice)}</p>` : ''}`); this.redraw(); });
   }
   moveTo(cam: { cx: number; cy: number; s: number }): void { Object.assign(this, cam); this.touched = true; this.redraw(); }
   /**

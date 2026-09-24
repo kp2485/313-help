@@ -23,7 +23,6 @@ import org.help313.query.Itinerary
 import org.help313.query.LatLon
 import org.help313.query.PackedStreets
 import org.help313.query.TransitLayerFiles
-import org.help313.query.plan as planTrip
 
 object DirectionsScreen {
 
@@ -74,8 +73,9 @@ object DirectionsScreen {
     }
 
     /**
-     * Leaving the screen. The graph stays — it cost a second to build and it belongs to the bundle, not to the
-     * trip — and the trip does not. Called by MainActivity whenever the screen on top stops being a Directions one.
+     * Leaving the screen. The decoded street and transit files stay — they belong to the bundle, not to the trip —
+     * and the trip does not, nor does any street graph: each plan's window graph was dropped with its answer.
+     * Called by MainActivity whenever the screen on top stops being a Directions one.
      */
     fun close(a: MainActivity) {
         stopFollowing(a)
@@ -92,7 +92,7 @@ object DirectionsScreen {
         phase = Phase.NEED_ORIGIN
     }
 
-    /** For the tests and for a new bundle: forget the trip and the graph both. */
+    /** For the tests and for a new bundle: forget the trip. */
     fun reset() {
         dest = null
         destName = ""
@@ -118,12 +118,12 @@ object DirectionsScreen {
     // ---- the work ----------------------------------------------------------------------------------------------
 
     /**
-     * The map files, then the graph, then the plan. Each step says where it has got to, out loud and on screen.
+     * The map files, then the plan. Each step says where it has got to, out loud and on screen.
      *
-     * All of it on `Work.io`: building the street graph is one to two seconds on a cheap phone (DECISIONS
-     * 2026-09-22) and a phone that has to think for a second must not stop answering the person's thumb while it
-     * does. `Directions.prepare` is what holds the graph, keyed by the signed index's own hashes, so a second trip
-     * in the same session costs nothing.
+     * All of it on `Work.io`: reading the files and building a trip's graph must not stop the phone answering the
+     * person's thumb. `Directions.prepare` holds the decoded files, keyed by the signed index's own hashes, so a
+     * second trip in the same session reads nothing again. The street graph itself is never held: each plan builds
+     * the graph of its own trip window and drops it (schema/query-spec.md "The trip window").
      */
     private fun ensureWork(a: MainActivity) {
         val to = dest ?: return
@@ -140,14 +140,15 @@ object DirectionsScreen {
             a.render()
             return
         }
+        val graphKey = Directions.graphKey(index)
         val held = Directions.current()
-        if (held is Directions.State.Ready) {
+        // The files already read for THIS bundle: a newer bundle's streets are read again, never planned on stale ones.
+        if (held is Directions.State.Ready && held.key == graphKey) {
             runPlan(a, from, to, key, held)
             return
         }
         phase = Phase.BUILDING
         a.render()
-        val graphKey = Directions.graphKey(index)
         val store = a.store
         Work.io {
             Directions.prepare(graphKey, { readFiles(store) }) { st ->
@@ -233,10 +234,10 @@ object DirectionsScreen {
         // A phone with no transit files still gets a plan: an empty network is a real answer and the planner goes
         // on ranking the walk, which is the leg that matters most to the two people this was built for. Treating
         // "no buses" as "no way to get there" is what this used to do (found on the emulator, 2026-09-22).
-        val net = ready.network ?: org.help313.query.buildTransitNetwork(emptyList())
         val buses = ready.network != null && ready.network.stops.isNotEmpty()
         Work.io {
-            val found = runCatching { planTrip(ready.graph, net, from, to).take(3) }.getOrElse { emptyList() }
+            // The trip's own window graph is built inside this call and dropped when it returns: never cached.
+            val found = runCatching { Directions.planTrip(ready, from, to, limit = 3) }.getOrElse { emptyList() }
             a.runOnUiThread {
                 if (id != planning || a.current() !is Route.Directions) return@runOnUiThread
                 plans = found
@@ -373,7 +374,7 @@ object DirectionsScreen {
                 chosen = -1
                 plans = emptyList()
                 planFor = ""
-                // The old trip's work, if any is still running, is no longer this screen's: its graph is kept, its
+                // The old trip's work, if any is still running, is no longer this screen's: the files are kept, its
                 // plan is not, so it cannot land on "Where are you starting?" a second later.
                 workingFor = ""
                 planning++

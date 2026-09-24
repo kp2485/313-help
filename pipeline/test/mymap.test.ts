@@ -8,6 +8,7 @@ import { hoursText, mapUpdated, MYMAP_COLUMNS, NOT_24H, parseDetails, parseKml, 
 import { fromIngested, toHsds } from '../src/normalize.js';
 import { validateRows } from '../src/validate.js';
 import { formatPhone, inBbox, p, parsePhone, readCsv, type CsvRow } from '../src/util.js';
+import { placeAt } from '../src/region.js';
 
 const src = (id: string): Source => loadSources().find((s) => s.id === id)!;
 const WWS = 'wayne_well_wayne_stations';
@@ -69,13 +70,15 @@ describe('reading a Google My Map (pipeline/src/ingest-mymap.ts)', () => {
     expect(hoursText([])).toBe('');
   });
 
-  it('keeps the service area by the city the map states, not by the bounding box alone', () => {
-    const { rows, warnings } = toRows(src(WWS), lastEdited, placemarks, '2026-09-20');
-    // Allen Park sits inside the bbox and is still not in the service area; Dearborn Heights is not Dearborn.
-    expect(inBbox(42.2574226, -83.2101111)).toBe(true);
-    expect(rows.map((r) => r.sal_id)).toEqual(['sal_wws_detroit_wayne_county_criminal_justice_complex', 'sal_wws_hamtramck_hamtramck_city_hall']);
+  it('keeps the service area by the station\'s own coordinate against the area\'s outlines, not by the box alone', () => {
+    // Canton sits inside the box and SMART does not serve it, so a station there stays out whatever it is called.
+    const canton = { city: 'Canton', name: 'Canton Library', description: '', lat: 42.3087, lon: -83.4822 };
+    expect(inBbox(canton.lat, canton.lon)).toBe(true);
+    const { rows, warnings } = toRows(src(WWS), lastEdited, [...placemarks, canton], '2026-09-20');
+    // Allen Park and Dearborn Heights have been in the area since 2026-09-24 (every city a DDOT or SMART bus stops in).
+    expect(rows.map((r) => r.sal_id)).toEqual(['sal_wws_allen_park_big_ben_s_comix_oasis', 'sal_wws_dearborn_heights_somewhere_else', 'sal_wws_detroit_wayne_county_criminal_justice_complex', 'sal_wws_hamtramck_hamtramck_city_hall']);
     expect(warnings).toEqual([]);
-    const cjc = rows[0]!;
+    const cjc = rows[2]!;
     expect(cjc.address_1).toBe('');
     expect(cjc.city).toBe('Detroit');
     expect(cjc.hours_text).toBe('');                       // mixed access says nothing
@@ -140,11 +143,13 @@ describe('the Wayne County stations as listings', () => {
   const csv = readCsv(p('data/ingested/wayne_well_wayne_stations.csv'));
   const { rows, orgs, svcOf } = fromIngested(wws, csv);
 
-  it('is the 26 stations in the service area, in four cities, with no street address', () => {
-    expect(rows).toHaveLength(26);
+  it('is every station inside the service area\'s outlines, with no street address', () => {
+    expect(rows).toHaveLength(csv.length);
+    expect(rows.length).toBeGreaterThanOrEqual(70);                 // 77 of the County's 97 on 2026-09-24
+    for (const r of csv) expect(placeAt(Number(r.lat), Number(r.lon)), r.name).not.toBeNull();
     const byCity: Record<string, number> = {};
     for (const r of csv) byCity[r.city!] = (byCity[r.city!] ?? 0) + 1;
-    expect(byCity).toEqual({ Detroit: 13, Dearborn: 6, Hamtramck: 5, 'Highland Park': 2 });
+    expect(byCity).toMatchObject({ Detroit: 13, Dearborn: 6, Hamtramck: 5, 'Highland Park': 2 });
     for (const r of rows) {
       expect(r.address).toBeUndefined();          // the County publishes none, and we never make one up
       expect(inBbox(r.lat!, r.lon!)).toBe(true);
@@ -197,7 +202,7 @@ describe('the Wayne County stations as listings', () => {
       if (r.availability === 'always') expect(r.hours_text).toBeUndefined();
       else { expect(r.availability).toBe('unknown'); expect(openNow(r, new Date()).state).toBe('unknown'); }
     }
-    expect(rows.filter((r) => r.availability === 'always')).toHaveLength(14);   // the map's red pins
+    expect(rows.filter((r) => r.availability === 'always')).toHaveLength(csv.filter((r) => r.hours_text === '24 hrs').length);   // the map's red pins
     expect(rows.find((r) => r.id === 'sal_wws_detroit_wayne_county_criminal_justice_complex')!.hours_text).toBeUndefined();
   });
 

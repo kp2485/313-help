@@ -71,18 +71,20 @@ describe('SAMHSA treatment programs (DECISIONS 2026-09-19)', () => {
     expect(samePlace({ phone: '313-555-0100', street: '3737 Lawton Street', city: 'Detroit' }, { phones: ['313-555-9999'], street: '3737 Lawton St', city: 'Detroit' })).toBe(true);
     expect(samePlace({ phone: '313-555-0100', street: '3737 Lawton Street', city: 'Detroit' }, { phones: ['313-555-9999'], street: '3737 Lawton St', city: 'Dearborn' })).toBe(false);
   });
-  it('reads the three files: directory rows in the four cities, OTP rows, and DWIHN\'s dated provider list', () => {
+  it('reads the three files: directory rows in the service area, OTP rows, and DWIHN\'s dated provider list', () => {
     const rows = [['name1', 'name2', 'street1', 'street2', 'city', 'state', 'zip', 'phone', 'intake1', 'service_code_info'],
       ['Hope', 'Main', '1 Oak Street', '', 'Highland Park', 'MI', '48203-1234', '313-555-0100', '313-555-0101', 'SA * OP * MD'],
-      ['Elsewhere', '', '2 Elm', '', 'Southfield', 'MI', '48075', '248-555-0100', '', 'SA OP MD'],
+      ['Elsewhere', '', '2 Elm', '', 'Ann Arbor', 'MI', '48104', '734-555-0100', '', 'SA OP MD'],
+      ['Clinton', '', '4 Elm', '', 'Clinton Twp', 'MI', '48036', '586-555-0100', '', 'SA OP MD'],   // mail's "Twp" form
       ['Ohio Detroit', '', '3 Elm', '', 'Detroit', 'OH', '43000', '419-555-0100', '', 'SA OP MD']];
     const dir = directoryPrograms(rows);
-    expect(dir).toHaveLength(1);
+    expect(dir).toHaveLength(2);
     expect(dir[0]).toMatchObject({ name: 'Hope', site: 'Main', city: 'Highland Park', zip: '48203', intake: '313-555-0101' });
+    expect(dir[1]).toMatchObject({ name: 'Clinton', city: 'Clinton Township' });
     expect([...dir[0]!.codes]).toEqual(['SA', 'OP', 'MD']);
     const otp = otpPrograms('"Program Name",Street,City,State,"Zip Code",Phone,Certification\n"Hope",1 Oak Street,Highland Park,MI,48203,(313) 555-0100,Certified\n"Far",9 Pine,Lansing,MI,48900,(517) 555-0100,Certified\n');
     expect(otp).toHaveLength(1);
-    const merged = mergePrograms(dir, otp);
+    const merged = mergePrograms(dir.slice(0, 1), otp);
     expect(merged).toHaveLength(1);
     expect(merged[0]).toMatchObject({ from: ['directory', 'otp'], otp: 'Certified' });
     const dw = dwihnProviders('"Last Updated",04/06/2026\nPIHP,"Organization Name",Address,City,Phone,Website\nDWIHN,Hope,1 Oak St,Highland Park,(313) 555-0100,https://hope.example.org\n');

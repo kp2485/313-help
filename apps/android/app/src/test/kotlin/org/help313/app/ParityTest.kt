@@ -429,7 +429,8 @@ class ParityTest {
         assertTrue("the Narcan need must ask for the whole harm kind: ${narcan.line}", narcan.line.contains("cat=harm "))
         val talk = needs.first { it.id == "talk" }
         assertTrue(talk.line.contains("cat=health.mental"))
-        assertTrue("988 still comes first", talk.line.contains("first=emg_988|emg_dwihn_crisis"))
+        // 988 first, then one crisis line per county since 2026-09-24 (Wayne, Oakland, Macomb).
+        assertTrue("988 still comes first", talk.line.contains("first=emg_988|emg_dwihn_crisis|emg_ochn_crisis|emg_mccmh_crisis "))
         assertTrue(talk.line.contains("sensitive=true exit=true"))
         assertEquals("support", alsoId(talk.line))
         assertTrue(talk.line, talk.line.contains("also=support:cat=health.support"))
@@ -461,6 +462,73 @@ class ParityTest {
         assertTrue(screens.contains("""col.addView(UI.sectionHead(a, L.t("also.${'$'}{need.id}.${'$'}{al.id}")))"""))
         assertTrue("the need's own list comes before its second one",
             screens.indexOf("listBody(a, col, q,") < screens.indexOf("listBody(a, col, al.query,"))
+    }
+
+    // ---- the numbers that belong to one place (2026-09-24) -------------------------------------------------------
+
+    /** One CSV line into its fields, honouring quotes (the labels carry commas). */
+    private fun csvFields(line: String): List<String> {
+        val out = ArrayList<String>()
+        val cur = StringBuilder()
+        var q = false
+        var i = 0
+        while (i < line.length) {
+            val ch = line[i]
+            when {
+                q && ch == '"' && i + 1 < line.length && line[i + 1] == '"' -> { cur.append('"'); i++ }
+                q && ch == '"' -> q = false
+                q -> cur.append(ch)
+                ch == '"' -> q = true
+                ch == ',' -> { out += cur.toString(); cur.setLength(0) }
+                else -> cur.append(ch)
+            }
+            i++
+        }
+        out += cur.toString()
+        return out
+    }
+
+    /**
+     * **The urgent sheet is the web's fixed list**, not every row of emergency.json: since the area widened that
+     * file carries a police line for every place a bus reaches, and a sheet of seventy police stations is not an
+     * urgent sheet. 911 and 988 lead, then one shelter line and one crisis line per county.
+     */
+    @Test
+    fun theUrgentSheetIsTheWebsFixedList() {
+        val web = text("apps/web/src/needs.ts")
+        val block = web.substringAfter("export const URGENT_IDS = [", "").substringBefore("];")
+        assertTrue("could not read URGENT_IDS from apps/web/src/needs.ts", block.isNotEmpty())
+        assertEquals("the urgent sheets differ", quoted(block), URGENT_IDS)
+        assertEquals(listOf("emg_911", "emg_988"), URGENT_IDS.take(2))
+        assertEquals("hardcoded numbers lead the sheet", HARDCODED.keys.toList(), URGENT_IDS.filter { HARDCODED.containsKey(it) })
+    }
+
+    /** A number scoped to one place (emergency.csv `area`) is never on the urgent sheet or before a need's list. */
+    @Test
+    fun aNumberThatBelongsToOnePlaceNeverReachesAGeneralList() {
+        val lines = text("data/seed/emergency.csv").trim().split("\n").map { csvFields(it.trimEnd('\r')) }
+        val at = lines[0].indexOf("area")
+        assertTrue("emergency.csv has no area column", at >= 0)
+        val scoped = lines.drop(1).filter { it.getOrElse(at) { "" }.isNotEmpty() }.map { it[0] }.toSet()
+        assertTrue("only ${scoped.size} police lines scoped to a place", scoped.size >= 60)
+        for (id in URGENT_IDS) assertFalse(id, scoped.contains(id))
+        for (n in NEEDS) for (id in n.first + n.refine.flatMap { it.first }) assertFalse("${n.id}: $id", scoped.contains(id))
+    }
+
+    /** A place's page gets its own line and no other place's; 911 and 988 never ride along as a place's. */
+    @Test
+    fun aPlacesOwnNumbersAreOnlyItsOwn() {
+        val numbers = listOf(
+            EmergencyNumber("emg_911", "Emergency", "911", null, true),
+            EmergencyNumber("emg_police_warren", "Warren Police Department", "586-574-4700", null, false, area = "city_warren"),
+            EmergencyNumber("emg_police_pontiac", "Pontiac police", "248-000-0000", null, false, area = "city_pontiac"),
+            EmergencyNumber("emg_988", "Crisis", "988", null, true, area = "city_warren"),
+            EmergencyNumber("emg_211", "211", "211", null, false),
+        )
+        assertEquals(listOf("emg_police_warren"), placeNumbers(numbers, "city_warren").map { it.id })
+        assertEquals(listOf("emg_police_pontiac"), placeNumbers(numbers, "city_pontiac").map { it.id })
+        assertEquals("a place with none has none", emptyList<String>(), placeNumbers(numbers, "city_hamtramck").map { it.id })
+        assertEquals("no place, no numbers", emptyList<String>(), placeNumbers(numbers, "").map { it.id })
     }
 
     // ---- the navigation rebuild of 2026-09-22 (docs/NAVIGATION-AUDIT-2026-09-22.md) ------------------------------

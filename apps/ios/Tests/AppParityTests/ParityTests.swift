@@ -40,6 +40,47 @@ final class ParityTests: XCTestCase {
         }
     }
 
+    /// The urgent sheet's numbers, in docs/05's order: `urgentIds` in Help.swift is exactly `URGENT_IDS` in
+    /// apps/web/src/needs.ts (2026-09-24: one shelter and one crisis line per county).
+    func testTheUrgentSheetMatchesTheWebApp() throws {
+        let web = quoted(bracketed(try text("apps/web/src/needs.ts"), after: "export const URGENT_IDS = "))
+        let ios = quoted(bracketed(try text("apps/ios/HelpApp/Help.swift"), after: "let urgentIds = "))
+        XCTAssertFalse(web.isEmpty, "could not read URGENT_IDS in apps/web/src/needs.ts")
+        XCTAssertEqual(Array(web.prefix(2)), ["emg_911", "emg_988"], "911 and 988 come first (docs/05)")
+        XCTAssertEqual(ios, web, "the iPhone's urgent sheet differs from apps/web/src/needs.ts")
+    }
+
+    /// A number that belongs to one place (emergency.csv `area`: a city's own police) is on that city's page and
+    /// never on the urgent sheet or any need screen. Every `emg_` id Help.swift names is checked against the file.
+    func testAPlacesOwnNumberIsNeverInAGeneralList() throws {
+        let rows = try text("data/seed/emergency.csv").split(separator: "\n").map { csvFields(String($0)) }
+        let head = try XCTUnwrap(rows.first)
+        let at = try XCTUnwrap(head.firstIndex(of: "area"), "emergency.csv has no area column")
+        let scoped = Set(rows.dropFirst().filter { $0.count > at && !$0[at].isEmpty }.map { $0[0] })
+        XCTAssertGreaterThanOrEqual(scoped.count, 60, "the committed file carries the cities' own police lines")
+        let help = try text("apps/ios/HelpApp/Help.swift")
+        let named = quoted(help).filter { $0.hasPrefix("emg_") }
+        XCTAssertFalse(named.isEmpty)
+        for id in named { XCTAssertFalse(scoped.contains(id), "\(id) belongs to one place and is in a general list") }
+    }
+
+    /// One CSV line into its fields, honouring quotes (the labels carry commas).
+    private func csvFields(_ line: String) -> [String] {
+        var out: [String] = [], cur = "", inQuotes = false
+        let chars = Array(line.trimmingCharacters(in: .newlines))
+        var i = 0
+        while i < chars.count {
+            let ch = chars[i]
+            if inQuotes {
+                if ch == "\"" && i + 1 < chars.count && chars[i + 1] == "\"" { cur.append("\""); i += 1 }
+                else if ch == "\"" { inQuotes = false } else { cur.append(ch) }
+            } else if ch == "\"" { inQuotes = true } else if ch == "," { out.append(cur); cur = "" } else { cur.append(ch) }
+            i += 1
+        }
+        out.append(cur)
+        return out
+    }
+
     /// The languages the app registers (L.languages in Help.swift). English is the fallback.
     private static let languages = ["en", "es", "ar", "bn"]
 

@@ -177,6 +177,27 @@ final class FixtureTests: XCTestCase {
                     let got = plan(g, network!, from: latLon(c["from"])!, to: latLon(c["to"])!).map(planSummary)
                     ok = got == expect as? [String]
                     if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
+                // The trip window (16-trip-window.json): the first street file is the main roads, any others are
+                // cells in key order. A window graph is built for the one case and dropped, as on the phone.
+                case "planWindow":
+                    let files = (c["no_safety"] as? Bool ?? false) ? streets.map(\.withoutSafety) : streets
+                    let from = latLon(c["from"])!, to = latLon(c["to"])!
+                    let w = tripWindow(network, from: from, to: to)
+                    let g = buildStreetGraph(windowFiles(files[0], Array(files.dropFirst()), w), key: "\(file):window")
+                    let got = plan(g, network!, from: from, to: to).map(planSummary)
+                    ok = got == expect as? [String]
+                    if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
+                case "transferStops":
+                    let got = transferStops(network!, from: latLon(c["from"])!, to: latLon(c["to"])!)
+                    ok = got == (expect as? [NSNumber])?.map(\.intValue)
+                    if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
+                case "windowRoads":
+                    let w = tripWindow(network, from: latLon(c["from"])!, to: latLon(c["to"])!)
+                    let kept = windowFiles(streets[0], Array(streets.dropFirst()), w)
+                    let roads = kept.flatMap { f in f.roads.map { f.names.indices.contains($0.nameIdx) ? f.names[$0.nameIdx] : "" } }
+                    let want = expect as! [String: Any]
+                    ok = w.boxes.count == (want["boxes"] as! NSNumber).intValue && roads == want["roads"] as? [String]
+                    if !ok { failures.append("\(name): got \(w.boxes.count) boxes, \(roads)"); ran += 1; continue }
                 // A case whose `fn` this port does not implement yet — the directions rules land in TypeScript
                 // first (schema/query-spec.md "Directions") and are ported afterwards. Counted and printed,
                 // never silently passed, so the number falling through is visible in CI.

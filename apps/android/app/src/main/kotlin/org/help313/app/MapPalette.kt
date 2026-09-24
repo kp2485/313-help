@@ -1,7 +1,7 @@
 // The map's colours, light and dark, exactly the tokens the web map draws with (apps/web/src/style.css as of
 // 2026-09-21), including the contrast fixes of docs/ACCESSIBILITY-AUDIT-2026-09-20: every street now clears 3:1
 // against the land and against a park, the city edge is a stroked line rather than a 1.20:1 change of shade, and
-// the ground outside the four cities is a hatch whose own lines clear 3:1 rather than a second pale fill.
+// the ground outside the service area is a hatch whose own lines clear 3:1 rather than a second pale fill.
 //
 // The values themselves are in res/values/colors.xml and res/values-night/colors.xml, so Android switches theme on
 // its own and nothing here reads a preference. **MapView.kt never names a colour value**: the layer rules in

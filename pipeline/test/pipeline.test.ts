@@ -6,7 +6,7 @@ import { badge, miles as milesBetween, openNow, rank, SERVICE_AREAS, SERVICE_ARE
 import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
-import { p, parsePhone, sha256, today, uuid5, type CsvRow } from '../src/util.js';
+import { p, parsePhone, readCsv, sha256, today, uuid5, type CsvRow } from '../src/util.js';
 import { KNOWN_CATEGORIES, PRIVATE_NOT_YET_ON_CLIENTS, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsdsPrivacy, validateRows } from '../src/validate.js';
 import { readScriptRefusingHosts } from '../src/seed-io.js';
 import { applyAggregates } from '../src/reports-sync.js';
@@ -115,7 +115,13 @@ describe('row validation', () => {
     expect(errs({ category: 'shelter.emergency', website: 'https://shelter.org', facts: src('https://example.org/') })).toBe('');   // intake phone only
     expect(errs({ category: 'shelter.cooling', address: addr })).toBe('');   // a public building, not a shelter
   });
-  it('rejects coordinates outside the service area', () => expect(errs({ lat: 42.6, lon: -83.05 })).toMatch(/outside the service area/));
+  it('rejects coordinates outside the service area', () => {
+    expect(errs({ lat: 42.28, lon: -83.74 })).toMatch(/outside the service area/);      // Ann Arbor
+    expect(errs({ lat: 42.98, lon: -83.05 })).toMatch(/outside the service area/);      // north of Chesterfield
+  });
+  it('accepts places anywhere a DDOT or SMART bus stops (Kyle, 2026-09-24)', () => {
+    for (const [lat, lon] of [[42.6389, -83.2910], [42.4895, -83.0147], [42.1398, -83.1785], [42.5286, -83.4851]]) expect(errs({ lat, lon }), `${lat},${lon}`).toBe('');   // Pontiac, Warren, Trenton, Walled Lake
+  });
   it('accepts places in Dearborn, Hamtramck and Highland Park (Kyle, 2026-09-19)', () => {
     for (const [lat, lon] of [[42.322, -83.176], [42.33, -83.312], [42.395, -83.049], [42.405, -83.097]]) expect(errs({ lat, lon }), `${lat},${lon}`).toBe('');
   });
@@ -237,6 +243,20 @@ describe('emergency numbers', () => {
   it('911 and 988 must be present, exact, and hardcoded', () => {
     expect(validateEmergency([base[0]!], '2026-09-18', false).errors.join()).toMatch(/emg_988 is missing/);
     expect(validateEmergency([{ ...base[0]!, number: '313-555-0100' }, base[1]!], '2026-09-18', false).errors.join()).toMatch(/must be 911/);
+  });
+  it('a row scoped to one place names a place in the area, and 911 and 988 are never scoped', () => {
+    const places = new Set(['city_warren']);
+    const police = { id: 'emg_police_warren', number: '586-574-4700', hardcoded: 'no', verified_published_on: '2026-09-15', area: 'city_warren' };
+    expect(validateEmergency([...base, police], '2026-09-18', true, places).errors).toEqual([]);
+    expect(validateEmergency([...base, { ...police, area: 'city_nowhere' }], '2026-09-18', true, places).errors.join()).toMatch(/not a place/);
+    expect(validateEmergency([{ ...base[0]!, area: 'city_warren' }, base[1]!], '2026-09-18', true, places).errors.join()).toMatch(/carry no area/);
+  });
+  it('the committed emergency file: every scoped row names a place, and every place row is a police line', () => {
+    const region = JSON.parse(readFileSync(p('data/ingested/region.json'), 'utf8')) as { municipalities: { id: string }[] };
+    const rows = readCsv(p('data/seed/emergency.csv'));
+    const ids = new Set(region.municipalities.map((m) => m.id));
+    expect(validateEmergency(rows, '2026-09-24', false, ids).errors).toEqual([]);
+    for (const r of rows.filter((x) => x.area)) expect(r.id).toBe(`emg_police_${r.area!.slice('city_'.length)}`);
   });
 });
 
@@ -661,18 +681,20 @@ describe('ZIP center points', () => {
       { attributes: { zipcode: '48202' } },
     ])).toEqual({ '48201': [42.347, -83.06], '48236': [42.425, -82.9] });
   });
-  it('Hamtramck, Highland Park and Dearborn ZIPs come from the Census layer only when the City\'s layer lacks them', () => {
+  it('ZIPs outside Detroit come from the Census layer, by where the Bureau puts each one, only when the City\'s layer lacks them', () => {
     const census = [
       { attributes: { ZCTA5: '48124', INTPTLAT: '+42.2980362', INTPTLON: '-083.2476095' } },
       { attributes: { ZCTA5: '48126', INTPTLAT: '+42.3303262', INTPTLON: '-083.1871333' } },   // the City has it: City wins
-      { attributes: { ZCTA5: '48301', INTPTLAT: '+42.54', INTPTLON: '-083.28' } },             // Bloomfield Hills: not wanted
+      { attributes: { ZCTA5: '48301', INTPTLAT: '+42.54', INTPTLON: '-083.28' } },             // Bloomfield Hills: in the area since 2026-09-24
+      { attributes: { ZCTA5: '48187', INTPTLAT: '+42.3309', INTPTLON: '-083.4938' } },         // Canton: in the box, SMART does not serve it
     ];
-    expect(addNeighborZips({ '48126': [42.33, -83.18] }, census)).toEqual({ '48124': [42.298, -83.248], '48126': [42.33, -83.18] });
+    expect(addNeighborZips({ '48126': [42.33, -83.18] }, census)).toEqual({ '48124': [42.298, -83.248], '48126': [42.33, -83.18], '48301': [42.54, -83.28] });
   });
   it('the committed file covers the city, corner to corner', () => {
     const { zips } = JSON.parse(readFileSync(p('data/ingested/city_zips.json'), 'utf8')) as { zips: Record<string, [number, number]> };
-    expect(Object.keys(zips).length).toBeGreaterThanOrEqual(25);
+    expect(Object.keys(zips).length).toBeGreaterThanOrEqual(120);
     for (const z of ['48201', '48209', '48219', '48224', '48238']) expect(zips[z], z).toBeDefined();
+    for (const z of ['48341', '48091', '48183', '48084']) expect(zips[z], `${z} (Pontiac, Warren, Trenton, Troy)`).toBeDefined();
     for (const z of ['48203', '48212', '48120', '48124', '48126', '48128']) expect(zips[z], `${z} (Highland Park, Hamtramck, Dearborn)`).toBeDefined();
   });
 });

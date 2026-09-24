@@ -9,7 +9,9 @@ export interface BundleIndex {
   version: string; generated_at: string; retired?: boolean; photos?: boolean; emergency_verified: boolean; signing: 'release' | 'dev';
   counts: Record<string, number>; files: Record<string, { sha256: string; bytes: number }>;
 }
-export interface EmergencyNumber { id: string; label: string; number: string; sms?: string; hardcoded: boolean }
+/** One row of emergency.json. `area` is a place id (region.json) for a number that belongs to one place only — a
+ *  city's own police — shown on that place's page and nowhere else (2026-09-24). */
+export interface EmergencyNumber { id: string; label: string; number: string; sms?: string; hardcoded: boolean; area?: string }
 export interface Bundle {
   index: BundleIndex;
   rows: BundleRow[];

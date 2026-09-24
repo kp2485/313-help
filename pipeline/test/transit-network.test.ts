@@ -198,7 +198,7 @@ describe('a packed network (format 2)', () => {
     expect(ends.sort()).toEqual(['Woodward & North', 'Woodward & South']);
   });
   it('an end outside the area is where we clipped, not a terminal', () => {
-    const far: Network = { ...net, routes: [net.routes[0]!], stops: [], lines: [{ route: 0, line: [[-83.05, 42.33], [-83.05, 42.70]] }] };
+    const far: Network = { ...net, routes: [net.routes[0]!], stops: [], lines: [{ route: 0, line: [[-83.05, 42.33], [-83.05, 42.95]] }] };
     expect(packNetwork(far, { routes: 'a', stops: 'b' }, ORIGIN, 2, realEnd).routesLayer.routes[0]!.ends).toHaveLength(1);
   });
   it('an interchange is where stops of two routes meet', () => {
@@ -246,8 +246,8 @@ describe('reading the owners', () => {
     ['agency.txt', buf('agency_id,agency_name,agency_url\n1,SMART,https://smartbus.org\n')],
     ['routes.txt', buf('route_id,route_short_name,route_long_name,route_color,route_text_color\n461,461,FAST Woodward,ce2a2a,ffffff\n450,450,Woodward Local,,\n999,999,Nowhere near,00ff00,000000\n')],
     ['trips.txt', buf('route_id,trip_id,shape_id,direction_id\n461,t1,s1,0\n461,t2,s1,0\n450,t3,s2,0\n999,t4,s3,0\n')],
-    ['shapes.txt', buf(['shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence', 's1,42.33,-83.05,1', 's1,42.35,-83.05,2', 's2,42.33,-83.05,1', 's2,42.34,-83.05,2', 's3,42.70,-83.30,1', 's3,42.71,-83.30,2'].join('\n') + '\n')],
-    ['stops.txt', buf(['stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station', 'a,Woodward + Warren,42.335,-83.05,0,', 'st,Times Square,42.345,-83.05,1,', 'pl,Times Square platform,42.345,-83.05,0,st', 'far,Far,42.70,-83.30,0,'].join('\n') + '\n')],
+    ['shapes.txt', buf(['shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence', 's1,42.33,-83.05,1', 's1,42.35,-83.05,2', 's2,42.33,-83.05,1', 's2,42.34,-83.05,2', 's3,42.28,-83.74,1', 's3,42.29,-83.74,2'].join('\n') + '\n')],
+    ['stops.txt', buf(['stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station', 'a,Woodward + Warren,42.335,-83.05,0,', 'st,Times Square,42.345,-83.05,1,', 'pl,Times Square platform,42.345,-83.05,0,st', 'far,Far,42.28,-83.74,0,'].join('\n') + '\n')],
     ['stop_times.txt', buf('trip_id,arrival_time,departure_time,stop_id,stop_sequence\nt1,8:00,8:00,a,1\nt2,8:00,8:00,pl,2\nt2,7:50,7:50,a,1\nt3,9:00,9:00,a,1\nt4,9:00,9:00,far,1\n')],
   ]);
   it('a GTFS feed: names, colours and order are the owner\'s; FAST is the owner\'s word for frequent', () => {
@@ -286,8 +286,10 @@ describe('reading the owners', () => {
 describe('the committed files', () => {
   const dir = p('data/ingested/transit'), has = existsSync(`${dir}/source.json`);
   const read = (id: string) => JSON.parse(readFileSync(`${dir}/${id}.json`, 'utf8'));
-  /** The most any one layer may weigh, gzipped: a layer is one lazy download on a phone. */
-  const BUDGET_GZ = 64 * 1024;
+  /** The most any one layer may weigh, gzipped: a layer is one lazy download on a phone. 64 KB until 2026-09-24;
+   *  raised when the area became every city and township SMART or DDOT stops in (Kyle: "the map file is still
+   *  pretty small in today's world"). */
+  const BUDGET_GZ = 256 * 1024;
 
   const net = (id: string) => JSON.parse(readFileSync(`${dir}/${id}.net.json`, 'utf8'));
 

@@ -4,7 +4,7 @@
 //     to the yearly N-SUMHSS survey): what care each program gives, how it's paid for, who it serves.
 //   - SAMHSA's Opioid Treatment Program Directory (live CSV): the federally certified methadone clinics.
 //   - DWIHN's provider directory (the programs Wayne County's public system pays for): its website, when it has one.
-// Output: data/staging/samhsa_treatment.csv (every program in the four cities, with a decision and a reason) and
+// Output: data/staging/samhsa_treatment.csv (every program in the service area, with a decision and a reason) and
 // data/seed/incoming/samhsa-treatment.txt: import lines for programs we don't list yet, only when DWIHN names the
 // program's own website. `pnpm import:lines` + `pnpm check:sources` then publish a row only if that website shows
 // its phone and street number, like every other listing. Nothing here publishes anything by itself.
@@ -17,12 +17,29 @@ import { readResources } from './seed-io.js';
 import { streetKey } from './page-match.js';
 import { p, parsePhone, slug, today, writeCsv, type CsvRow } from './util.js';
 import { readSheet } from './xlsx.js';
+import { regionPlaces } from './region.js';
 
 const UA = { 'user-agent': '313help-pipeline (open-source civic directory; one polite pass)' };
 export const SAMHSA_DIRECTORY = 'https://www.samhsa.gov/data/sites/default/files/reports/rpt57009/2025_SU_Facilities_for_All_City_All.xlsx';
 export const SAMHSA_OTP = 'https://www.samhsa.gov/find-help/locators/opioid-treatment-program-directory/export?page&_format=csv';
 export const DWIHN_PROVIDERS = 'https://dwihn.org/sites/default/files/providers-practitioners/provider-directory.csv';
-const CITIES = new Map(['detroit', 'dearborn', 'hamtramck', 'highland park'].map((c) => [c, c.replace(/\b\w/g, (x) => x.toUpperCase())]));
+/**
+ * The postal city a program writes, lower-cased, to the place it is in. SAMHSA's rows carry a mailing city, not a
+ * coordinate, so the list is every place in the service area (data/ingested/region.json) by its own name, and a
+ * township also by the "Twp" and bare forms mail uses ("Clinton Twp", "Shelby"). A mailing city that spans two
+ * places (Bloomfield Hills mail reaches Bloomfield Township) is caught later, when the address is geocoded and the
+ * build checks the point.
+ */
+export function cityNames(places: { name: string }[]): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const { name } of places) {
+    out.set(name.toLowerCase(), name);
+    const twp = /^(.*) Township$/.exec(name);
+    if (twp) { out.set(`${twp[1]!.toLowerCase()} twp`, name); if (!out.has(twp[1]!.toLowerCase())) out.set(twp[1]!.toLowerCase(), name); }
+  }
+  return out;
+}
+const CITIES = cityNames(regionPlaces());
 
 export interface Program {
   name: string; site: string; street: string; city: string; zip: string; phone: string; intake: string;
@@ -68,7 +85,7 @@ export function mapProgram(pr: Program): Mapped {
   return { category, flags, what, eligibility };
 }
 
-/** SAMHSA directory rows (sheet 1, with a header row) in the four cities. */
+/** SAMHSA directory rows (sheet 1, with a header row) in the service area. */
 export function directoryPrograms(rows: string[][]): Program[] {
   const [head, ...body] = rows;
   const col = (name: string) => head!.indexOf(name);
@@ -80,7 +97,7 @@ export function directoryPrograms(rows: string[][]): Program[] {
   }));
 }
 
-/** OTP directory rows in the four cities. */
+/** OTP directory rows in the service area. */
 export function otpPrograms(csv: string): Program[] {
   const rows = parse(csv, { columns: true, skip_empty_lines: true, bom: true }) as CsvRow[];
   return rows.filter((r) => r.State === 'MI' && CITIES.has((r.City ?? '').trim().toLowerCase())).map((r) => ({
@@ -179,7 +196,7 @@ if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/ingest-treatmen
     ...lines, '',
   ].join('\n'));
   const count = (d: string) => staged.filter((s) => s.decision === d).length;
-  console.log(`${programs.length} programs in the four cities: ${count('listed')} already listed, ${count('import')} to import, ${count('staged')} staged for a person, ${count('skip')} left out.`);
+  console.log(`${programs.length} programs in the service area: ${count('listed')} already listed, ${count('import')} to import, ${count('staged')} staged for a person, ${count('skip')} left out.`);
   for (const s of staged.filter((x) => x.decision === 'skip')) console.log(`  left out: ${s.name} (${s.reason})`);
   // A treatment listing that is on none of the three lists may have closed or moved: a person should look.
   const everything = [...programs.map((pr) => ({ phones: [pr.phone, pr.intake], street: pr.street, city: pr.city })), ...provider.rows.map((d) => ({ phones: [d.Phone ?? ''], street: d.Address ?? '', city: d.City ?? '' }))];

@@ -335,3 +335,61 @@ describe('Detroit’s own city page is the one city page with children', () => {
     expect(html).not.toContain(T('city.detroit_children'));
   });
 });
+
+describe('every other city and township a bus reaches (2026-09-24): an outline, its help, and its own police line', () => {
+  const warren = area({
+    id: 'city_warren', name: 'Warren', city: 'city_warren',
+    panels: ['help'], sources: {}, missing: [],
+    crashes: undefined, crashes_by_year: undefined, roads_bands: undefined, vacancy: undefined, permits_by_year: undefined, park_acres: undefined, parcels: undefined,
+  });
+  const policeUi: Ui = { ...ui, placeCalls: (id) => (id === 'city_warren' ? '<a class="callrow" href="tel:+15865744700">Warren Police Department</a>' : '') };
+
+  it('says why the place is here and that it has no other numbers yet — and claims nothing about what it publishes', () => {
+    const html = cityPage(warren, d(), ui);
+    expect(html).toContain(T('city.outline_only', { city: 'Warren' }));
+    expect(html).not.toContain(T('city.regional', { city: 'Warren' }));
+    expect(html).not.toContain(T('city.no_neighborhoods', { city: 'Warren' }));
+    expect(html).not.toContain('does not publish');
+    for (const k of ['city.parks_head', 'hood.crash_head', 'city.roads_head', 'city.vacancy_head', 'city.permits_head']) expect(html, k).not.toContain(T(k));
+    expect(html).toContain(T('hood.help_head'));
+  });
+
+  it('shows the place\'s own police line under 911, and nothing when the bundle has none for it', () => {
+    const html = cityPage(warren, d(), policeUi);
+    expect(html).toContain(T('city.police_head'));
+    expect(html).toContain(T('city.police_lede', { city: 'Warren' }));
+    expect(html).toContain('Warren Police Department');
+    expect(html.indexOf('911')).toBeLessThan(html.indexOf('Warren Police Department'));
+    // Hamtramck's page is not given Warren's number.
+    expect(cityPage(area(), d(), policeUi)).not.toContain(T('city.police_head'));
+  });
+
+  it('the four first cities keep their full pages and their researched sentence', () => {
+    const html = cityPage(area(), d(), ui);
+    expect(html).toContain(T('city.regional', { city: 'Hamtramck' }));
+    expect(html).not.toContain(T('city.outline_only', { city: 'Hamtramck' }));
+  });
+});
+
+describe('a number that belongs to one place never reaches a general list', () => {
+  /** One CSV line into its fields, honouring quotes (the labels carry commas). */
+  const fields = (line: string): string[] => {
+    const out: string[] = []; let cur = '', q = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i]!;
+      if (q) { if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; } else if (ch === '"') q = false; else cur += ch; }
+      else if (ch === '"') q = true; else if (ch === ',') { out.push(cur); cur = ''; } else cur += ch;
+    }
+    return [...out, cur];
+  };
+  const csv = readFileSync(join(root, 'data/seed/emergency.csv'), 'utf8').trim().split('\n').map(fields);
+  const at = csv[0]!.indexOf('area');
+  const scoped = new Set(csv.slice(1).filter((c) => c[at]).map((c) => c[0]!));
+
+  it('the committed file has police lines scoped to a place, and none of them is on the urgent sheet or a need', async () => {
+    const { URGENT_IDS, NEEDS } = await import('../src/needs.js');
+    expect(scoped.size).toBeGreaterThanOrEqual(60);
+    for (const id of URGENT_IDS) expect(scoped.has(id), id).toBe(false);
+    for (const n of NEEDS) for (const id of [...(n.first ?? []), ...(n.refine ?? []).flatMap((r) => r.first ?? [])]) expect(scoped.has(id), `${n.id}: ${id}`).toBe(false);
+  });
+});

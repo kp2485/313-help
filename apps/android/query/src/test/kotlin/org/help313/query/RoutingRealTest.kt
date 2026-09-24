@@ -20,19 +20,20 @@ class RoutingRealTest {
 
     private fun read(f: File): Json = Json.parse(f.readBytes())
 
-    private fun streetFiles(): List<PackedStreets> {
+    /** The main-road file and every cell by key, as a client holds them; null when neither is in the checkout. */
+    private fun streetParts(): Pair<PackedStreets, List<PackedStreets>>? {
         if (File(bundle, "map/base.json").isFile) {
             val base = PackedStreets.fromJson(read(File(bundle, "map/base.json")))
             val cells = read(File(bundle, "map/streets.json"))["cells"]?.obj ?: emptyMap()
-            return listOf(base) + cells.keys.sorted().map { PackedStreets.fromJson(cells.getValue(it)) }
+            return base to cells.keys.sorted().map { PackedStreets.fromJson(cells.getValue(it)) }
         }
         if (File(ingested, "base.json").isFile) {
             val base = PackedStreets.fromJson(read(File(ingested, "base.json")))
             val cells = (File(ingested, "cells").listFiles() ?: emptyArray()).sortedBy { it.name }
                 .map { PackedStreets.fromJson(read(it)) }
-            return listOf(base) + cells
+            return base to cells
         }
-        return emptyList()
+        return null
     }
 
     private class Row(val id: String, val lat: Double, val lon: Double)
@@ -78,7 +79,8 @@ class RoutingRealTest {
         return out
     }
 
-    private val files by lazy { streetFiles() }
+    private val parts by lazy { streetParts() }
+    private val files by lazy { parts?.let { listOf(it.first) + it.second } ?: emptyList() }
     private val rows by lazy { listings() }
     private val layers by lazy { transitLayers() }
     private val graph by lazy { if (files.isEmpty()) null else buildStreetGraph(files, "real") }
@@ -89,16 +91,19 @@ class RoutingRealTest {
     }
 
     @Test
-    fun theGraphIsTheSizeAndShapeTheStudyMeasured() {
+    fun theGraphIsTheSizeAndShapeTheWholeAreaMeasured() {
         val g = graph ?: return Unit.also { skip("no street files") }
         val s = g.stats
-        // The study: 23,863 nodes, 40,342 edges, 45 components, largest 99.5%, built in 183 ms.
-        assertTrue("nodes ${g.nodeCount}", g.nodeCount in 20_001..27_999)
-        assertTrue("edges ${g.edgeCount}", g.edgeCount in 34_001..45_999)
-        assertTrue(s.largestComponent.toDouble() / g.nodeCount > 0.99)
-        assertTrue(s.deadEnds.toDouble() / g.nodeCount < 0.15)
-        assertTrue("crossings ${s.crossings}", s.crossings > 15_000)
-        assertTrue("snapped ${s.snapped}", s.snapped > 5_000)
+        // The study (Detroit and three cities, before the 2026-09-22 basemap fix): 23,863 nodes, 40,342 edges, 45
+        // components, largest 99.5%, built in 183 ms. The whole area (every city and township a DDOT or SMART bus
+        // stops in, 2026-09-24): 108,820 nodes, 163,723 edges, 375 components, largest 98.9%, 15.4% dead ends
+        // (TIGER's suburban courts and cul-de-sacs). That size is why a phone builds a trip's window, not this graph.
+        assertTrue("nodes ${g.nodeCount}", g.nodeCount in 95_001..124_999)
+        assertTrue("edges ${g.edgeCount}", g.edgeCount in 140_001..189_999)
+        assertTrue(s.largestComponent.toDouble() / g.nodeCount > 0.98)
+        assertTrue(s.deadEnds.toDouble() / g.nodeCount < 0.17)
+        assertTrue("crossings ${s.crossings}", s.crossings > 60_000)
+        assertTrue("snapped ${s.snapped}", s.snapped > 40_000)
         println(
             "streets graph: ${g.nodeCount} nodes, ${g.edgeCount} edges, ${s.components} components, " +
                 "largest ${"%.1f".format(100.0 * s.largestComponent / g.nodeCount)}%, " +
@@ -118,11 +123,11 @@ class RoutingRealTest {
     }
 
     @Test
-    fun itBuildsFastEnoughToDoItOnceWhenABundleChanges() {
+    fun itBuildsWithoutAnAccidentalQuadratic() {
         val g = graph ?: return Unit.also { skip("no street files") }
-        // 183 ms on the study's Mac; a cheap phone is 5-10x slower. A CI runner is slower than both, so the
-        // bound is generous on purpose: what it catches is an accidental quadratic, not a slow laptop.
-        assertTrue("built in ${g.stats.buildMs} ms", g.stats.buildMs < 6_000)
+        // 984 ms for the whole area on a Mac in TypeScript; a CI runner is slower. What this catches is an
+        // accidental quadratic, not a slow laptop. No phone builds this graph: it builds a trip's window (below).
+        assertTrue("built in ${g.stats.buildMs} ms", g.stats.buildMs < 16_000)
     }
 
     @Test
@@ -268,5 +273,79 @@ class RoutingRealTest {
         val plans = plan(g, net, LatLon(42.3314, -83.0458), LatLon(42.3353, -83.0495))
         assertTrue(plans.isNotEmpty())
         assertTrue(plans[0].legs.all { it is WalkLeg })
+    }
+
+    // ---- the trip window (schema/query-spec.md "The trip window") ----------------------------------------------
+
+    /** What a person reads of a plan: its legs, their routes and stops, and each distance to the metre. */
+    private fun shape(ps: List<Itinerary>): List<String> = ps.map { p ->
+        p.legs.joinToString(" > ") { l ->
+            when (l) {
+                is WalkLeg -> "walk ${Math.round(l.metres)}"
+                is RideLeg -> "${l.routeId} ${l.fromStop.index}-${l.toStop.index}"
+            }
+        }
+    }
+
+    /** The graph a phone builds for one trip: only the streets its window touches. Never cached. */
+    private fun windowGraph(net: TransitNetwork, from: LatLon, to: LatLon): Pair<TripWindow, StreetGraph> {
+        val (base, cells) = parts!!
+        val w = tripWindow(net, from, to)
+        return w to buildStreetGraph(windowFiles(base, cells, w), "window")
+    }
+
+    @Test
+    fun aTripAcrossDetroitBuildsASmallPartOfTheArea() {
+        val whole = graph ?: return Unit.also { skip("no street files") }
+        if (layers.isEmpty()) return Unit.also { skip("no transit layers") }
+        val net = buildTransitNetwork(layers)
+        val (w, g) = windowGraph(net, LatLon(42.3697, -83.0742), LatLon(42.377459, -83.135296))
+        println("window: ${w.boxes.size} boxes, ${g.nodeCount} of ${whole.nodeCount} nodes, built in ${g.stats.buildMs} ms")
+        assertTrue("${g.nodeCount} of ${whole.nodeCount}", g.nodeCount < whole.nodeCount / 4)
+    }
+
+    @Test
+    fun theWindowGivesTheSamePlansAsTheWholeGraphForNamedTrips() {
+        val whole = graph ?: return Unit.also { skip("no street files") }
+        if (layers.isEmpty()) return Unit.also { skip("no transit layers") }
+        val net = buildTransitNetwork(layers)
+        val trips = listOf(
+            Triple("the study's trip", LatLon(42.3697, -83.0742), LatLon(42.377459, -83.135296)),
+            Triple("four blocks downtown", LatLon(42.3314, -83.0458), LatLon(42.3353, -83.0495)),
+            Triple("Detroit to Pontiac", LatLon(42.3314, -83.0458), LatLon(42.6389, -83.2910)),
+            Triple("Dearborn to Warren", LatLon(42.3224, -83.1763), LatLon(42.4895, -83.0147)),
+            Triple("Southfield to Royal Oak", LatLon(42.4734, -83.2219), LatLon(42.4895, -83.1446)),
+        )
+        var compared = 0
+        for ((name, from, to) in trips) {
+            val full = plan(whole, net, from, to)
+            val part = plan(windowGraph(net, from, to).second, net, from, to)
+            assertEquals(name, shape(full), shape(part))
+            if (full.isNotEmpty()) compared++
+            println("$name: ${shape(full).firstOrNull() ?: "(no plan)"}")
+        }
+        assertTrue("$compared compared", compared >= 4)
+    }
+
+    @Test
+    fun theWindowGivesTheSamePlansAsTheWholeGraphForListingPairs() {
+        val whole = graph ?: return Unit.also { skip("no street files") }
+        if (layers.isEmpty()) return Unit.also { skip("no transit layers") }
+        if (rows.size < 40) return Unit.also { skip("no built bundle") }
+        val net = buildTransitNetwork(layers)
+        var seed = 11L
+        fun rnd(): Double { seed = (seed * 1103515245 + 12345) and 0x7fffffff; return seed.toDouble() / 0x7fffffff }
+        var compared = 0
+        for (i in 0 until 24) {
+            val a = rows[(rnd() * rows.size).toInt().coerceAtMost(rows.size - 1)]
+            val b = rows[(rnd() * rows.size).toInt().coerceAtMost(rows.size - 1)]
+            val from = LatLon(a.lat, a.lon)
+            val to = LatLon(b.lat, b.lon)
+            val full = plan(whole, net, from, to)
+            val part = plan(windowGraph(net, from, to).second, net, from, to)
+            assertEquals("${a.id} -> ${b.id}", shape(full), shape(part))
+            if (full.isNotEmpty()) compared++
+        }
+        assertTrue("$compared compared", compared >= 6)
     }
 }
