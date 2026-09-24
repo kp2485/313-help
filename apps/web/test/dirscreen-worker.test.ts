@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FromWorker, ToWorker } from '../src/dirworker.js';
+import { FakeWorker } from './fakes.js';
 
 // The map files: one street file, no transit. `release` lets a test hold them back until the Worker has failed.
 let filesReady: Promise<void> = Promise.resolve();
@@ -22,23 +23,6 @@ vi.mock('../src/dirfiles.js', () => ({
 
 const en = JSON.parse(readFileSync(join(__dirname, '../../../strings/en.json'), 'utf8')) as Record<string, string>;
 const t = (key: string, p: Record<string, string | number> = {}) => (en[key] ?? key).replace(/\{(\w+)\}/g, (_: string, k: string) => String(p[k] ?? ''));
-
-/** A Worker with nothing behind it. `answer` decides what it says back, if anything; `fail` is the browser
- *  reporting that the script could not be loaded or run. */
-class FakeWorker extends EventTarget {
-  static made: FakeWorker[] = [];
-  static answer: ((m: ToWorker) => FromWorker | null) = () => null;
-  sent: ToWorker[] = [];
-  terminated = false;
-  constructor(public readonly url: URL | string) { super(); FakeWorker.made.push(this); }
-  postMessage(m: ToWorker): void {
-    this.sent.push(m);
-    const reply = FakeWorker.answer(m);
-    if (reply) queueMicrotask(() => { if (!this.terminated) this.dispatchEvent(new MessageEvent('message', { data: reply })); });
-  }
-  terminate(): void { this.terminated = true; }
-  fail(kind: 'error' | 'messageerror' = 'error'): void { this.dispatchEvent(new Event(kind)); }
-}
 
 const deps = () => ({
   t, esc: (s: unknown) => String(s ?? ''), icon: () => '', mapBox: () => '<div class="mapbox"></div>',

@@ -2,9 +2,12 @@
 // environment is Node with no DOM, so `installPage()` puts the handful of globals MapView touches in place, and
 // every canvas it makes hands out a context that writes down each call and each property it is given — the
 // drawing, as a list of lines, which is what a test can hold still.
+//
+// Also `FakeWorker`, the directions Worker with nothing behind it, for driving dirscreen.ts.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { FromWorker, ToWorker } from '../src/dirworker.js';
 
 export type Call = string;
 const fmt = (v: unknown): string => (typeof v === 'number' ? (Math.round(v * 100) / 100).toString() : Array.isArray(v) ? `[${v.map(fmt).join(',')}]` : String(v));
@@ -68,4 +71,22 @@ export function installPage(size = { width: 390, height: 384 }, tokens = themeTo
   g.requestAnimationFrame = (f: () => void) => { page.frames++; f(); return 0; };
   g.cancelAnimationFrame = () => {};
   return page;
+}
+
+/** The directions Worker with nothing behind it. Install it with `vi.stubGlobal('Worker', FakeWorker)`.
+ *  `answer` decides what it says back, if anything (it may call dirworker.ts's own `handle`); `fail` is the
+ *  browser reporting that the script could not be loaded or run. */
+export class FakeWorker extends EventTarget {
+  static made: FakeWorker[] = [];
+  static answer: ((m: ToWorker) => FromWorker | null) = () => null;
+  sent: ToWorker[] = [];
+  terminated = false;
+  constructor(public readonly url: URL | string) { super(); FakeWorker.made.push(this); }
+  postMessage(m: ToWorker): void {
+    this.sent.push(m);
+    const reply = FakeWorker.answer(m);
+    if (reply) queueMicrotask(() => { if (!this.terminated) this.dispatchEvent(new MessageEvent('message', { data: reply })); });
+  }
+  terminate(): void { this.terminated = true; }
+  fail(kind: 'error' | 'messageerror' = 'error'): void { this.dispatchEvent(new Event(kind)); }
 }
