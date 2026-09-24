@@ -53,7 +53,7 @@ const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]+/;
 // Case-sensitive on purpose: the name part must be Capitalized Words, or "ask for help today" would match.
 const CONTACT_NAME = /\b(?:[Cc]ontact|[Aa]sk for)\s+(?:(?:Mr|Ms|Mrs|Dr|Sister|Pastor|Rev)\.?\s+)?[A-Z][a-z]+\s+[A-Z][a-z]+\b/;
 
-const host = (u?: string) => { try { return u ? new URL(u).hostname.replace(/^www\./, '') : null; } catch { return null; } };
+export const host = (u?: string) => { try { return u ? new URL(u).hostname.replace(/^www\./, '') : null; } catch { return null; } };
 const sameSite = (a?: string, b?: string) => { const x = host(a), y = host(b); return !!x && x === y; };
 
 // ---- domestic violence: a row that names no place at all --------------------------------------------------

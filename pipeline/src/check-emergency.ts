@@ -4,21 +4,33 @@
 //   - the page was read and the number is NOT on it: stamp mismatch_on. A release build then fails until a person
 //     reads the page and fixes emergency.csv (DECISIONS 2026-09-19: a release fails only on a mismatch);
 //   - the page couldn't be read (an error, or bot protection): logged for a person to check in a browser. Not a
-//     failure, and nothing is stamped.
+//     failure, and nothing is stamped. A host in data/seed/script-refusing-hosts.csv (from its refusing_since day)
+//     is not fetched at all and is logged the same way: lathrupvillage.org answers with a shell whose only visible
+//     numbers are City Hall's, and the police line is drawn by a script (DECISIONS 2026-09-24).
 // 911 and 988 are hardcoded and never checked. Another three-digit code (211) is checked against its owner's page
 // the same way, allowing for "2-1-1". Nothing here ever rewrites a number.
 
 import { p, parsePhone, readCsv, today, writeCsv, type CsvRow } from './util.js';
 import { fetchPage, phoneOnPage, shortCodeOnPage, type PageResult } from './page-match.js';
+import { readScriptRefusingHosts } from './seed-io.js';
+import { host, scriptRefusingHosts, type RefusingHost } from './validate.js';
 
 export const EMERGENCY_COLUMNS = ['id', 'label', 'number', 'sms', 'hardcoded', 'sort', 'area', 'verified_by_call_on', 'verified_published_on', 'mismatch_on', 'source_url', 'internal_note'];
 
 export type EmergencyCheck = 'match' | 'mismatch' | 'unreadable' | 'skipped';
 
+/** The listed host a row's page is on, if that host refused scripts on or before `day`. */
+export function refusedHost(url: string | undefined, refusing: Map<string, RefusingHost>, day: string): RefusingHost | undefined {
+  const ref = refusing.get(host(url) ?? '');
+  return ref && ref.refusing_since <= day ? ref : undefined;
+}
+
 /** One row against its page. Updates the row's dates; returns what happened. */
-export function checkEmergencyRow(r: CsvRow, page: PageResult | null, day: string): EmergencyCheck {
+export function checkEmergencyRow(r: CsvRow, page: PageResult | null, day: string, refusing: Map<string, RefusingHost> = new Map()): EmergencyCheck {
   const ph = parsePhone(r.number ?? '');
-  if (!ph || r.hardcoded === 'yes' || !r.source_url || !page) return 'skipped';
+  if (!ph || r.hardcoded === 'yes' || !r.source_url) return 'skipped';
+  if (refusedHost(r.source_url, refusing, day)) return 'unreadable';
+  if (!page) return 'skipped';
   if (!page.ok) return 'unreadable';
   const onPage = ph.number.length === 3 ? shortCodeOnPage(page.html, ph.number) : phoneOnPage(page.html, r.number!);
   if (onPage) { r.verified_published_on = day; r.mismatch_on = ''; return 'match'; }
@@ -29,11 +41,14 @@ export function checkEmergencyRow(r: CsvRow, page: PageResult | null, day: strin
 if ((process.argv[1] ?? '').split('\\').join('/').endsWith('/src/check-emergency.ts')) {
   const path = p('data/seed/emergency.csv');
   const rows = readCsv(path);
+  const refusing = scriptRefusingHosts(readScriptRefusingHosts());
   let mismatches = 0;
   for (const r of rows) {
     const ph = parsePhone(r.number ?? '');
-    const page = ph && r.hardcoded !== 'yes' && r.source_url ? await fetchPage(r.source_url) : null;
-    const result = checkEmergencyRow(r, page, today());
+    const ref = refusedHost(r.source_url, refusing, today());
+    const page = ref ? { ok: false as const, why: `${ref.host} is in script-refusing-hosts.csv: ${ref.refusal}` }
+      : ph && r.hardcoded !== 'yes' && r.source_url ? await fetchPage(r.source_url) : null;
+    const result = checkEmergencyRow(r, page, today(), refusing);
     if (result === 'match') console.log(`ok        ${r.id} ${r.number} is on ${r.source_url}`);
     else if (result === 'mismatch') { mismatches++; console.warn(`MISMATCH  ${r.id} ${r.number} is not on ${r.source_url}. Has the published number changed? Read the page and fix emergency.csv by hand.`); }
     else if (result === 'unreadable') console.warn(`unread    ${r.id}: ${r.source_url} (${page && !page.ok ? page.why : ''}). Check it in a browser and record the date in verified_by_call_on or verified_published_on.`);
