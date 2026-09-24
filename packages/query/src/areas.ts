@@ -4,10 +4,11 @@
 // in it is published. A steward may instead record `service_area`, one value from the closed list below — a whole
 // city or bigger, never a ZIP and never a neighbourhood.
 //
-// Each area maps HERE, in code, to one fixed public reference point: a city hall. The point is about the area,
+// Each area maps HERE, in code, to one fixed public reference point: a city hall, or for a county the Census
+// Bureau's published internal point. The point is about the area,
 // never about a shelter, and every shelter serving one area shares the same point. That is the whole safety
 // argument: the only things that go into the ordering are the person's own location (which never leaves the
-// device) and a city hall's published coordinate, so the order can say which area a row serves — which the
+// device) and a city hall's or the Census Bureau's published coordinate, so the order can say which area a row serves — which the
 // screen says in words anyway — and nothing finer.
 //
 // Mirrored by apps/ios/Sources/DetroitQuery/Areas.swift and
@@ -27,9 +28,14 @@ export const SERVICE_AREAS: Record<string, ServiceArea> = {
   dearborn: { point: { lat: 42.3224, lon: -83.1763 }, reference: 'Dearborn Administrative Center', wide: false },
   hamtramck: { point: { lat: 42.3934, lon: -83.0497 }, reference: 'Hamtramck City Hall', wide: false },
   highland_park: { point: { lat: 42.4055, lon: -83.0968 }, reference: 'Highland Park City Hall', wide: false },
-  wayne_county: { point: { lat: 42.2410, lon: -83.1770 }, reference: 'the geographic centre of Wayne County', wide: false },
+  // The three counties use the Census Bureau's own published internal point (TIGERweb State_County, INTPTLAT and
+  // INTPTLON), so anyone can check the number. Wayne's was a hand-picked "geographic centre" at 42.2410, -83.1770,
+  // about 8 km from the Bureau's point, until 2026-09-24.
+  wayne_county: { point: { lat: 42.2847, lon: -83.2620 }, reference: "the US Census Bureau's internal point for Wayne County", wide: false },
   wayne_county_west: { point: { lat: 42.3247, lon: -83.4001 }, reference: 'Westland City Hall, the largest city of western Wayne County', wide: false },
   wayne_county_downriver: { point: { lat: 42.2256, lon: -83.2696 }, reference: 'Taylor City Hall, the largest city of the Downriver communities', wide: false },
+  oakland_county: { point: { lat: 42.6605, lon: -83.3842 }, reference: "the US Census Bureau's internal point for Oakland County", wide: false },
+  macomb_county: { point: { lat: 42.6716, lon: -82.9115 }, reference: "the US Census Bureau's internal point for Macomb County", wide: false },
   statewide: { point: null, reference: 'no local centre: Michigan as a whole', wide: true },
   national: { point: null, reference: 'no local centre: the United States', wide: true },
 };

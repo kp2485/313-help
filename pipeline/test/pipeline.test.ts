@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { badge, miles as milesBetween, openNow, rank, SERVICE_AREAS, SERVICE_AREA_IDS, type BundleRow } from '@313help/query';
+import { badge, inServiceArea, miles as milesBetween, openNow, rank, SERVICE_AREAS, SERVICE_AREA_IDS, type BundleRow } from '@313help/query';
 import { build } from '../src/build.js';
 import { fetchLayer, sharpDrop, toRows, type Source } from '../src/ingest-arcgis.js';
 import { verifyBytes } from '../src/sign.js';
@@ -47,15 +47,19 @@ describe('the service-area table is the same in all three languages', () => {
     expect(areasOf('apps/ios/Sources/DetroitQuery/Areas.swift', /^ {4}"(\w+)": ServiceArea\(point: (?:LatLon\(lat: (-?[\d.]+), lon: (-?[\d.]+)\)|nil)/gm)).toEqual(ts);
     expect(areasOf('apps/android/query/src/main/kotlin/org/help313/query/Areas.kt', /^ {4}"(\w+)" to ServiceArea\((?:LatLon\((-?[\d.]+), (-?[\d.]+)\)|null)/gm)).toEqual(ts);
   });
-  it('every reference point is a public place in or around Wayne County, never a shelter', () => {
+  it('every reference point is a public place inside the service area, never a shelter', () => {
     for (const [id, pt] of Object.entries(ts)) {
       if (pt === 'none') { expect(SERVICE_AREAS[id]!.wide, id).toBe(true); continue; }
       const [lat, lon] = pt.split(',').map(Number) as [number, number];
-      expect(lat, id).toBeGreaterThan(42.0); expect(lat, id).toBeLessThan(42.5);
-      expect(lon, id).toBeLessThan(-82.8); expect(lon, id).toBeGreaterThan(-83.6);
-      // Nowhere near any shelter in the seed: a reference point is a city hall, not a place we list.
-      expect(SERVICE_AREAS[id]!.reference, id).toMatch(/City Hall|Administrative Center|geographic centre/);
+      expect(inServiceArea(lat, lon), id).toBe(true);
+      // Nowhere near any shelter in the seed: a reference point is a city hall, or for a county the Census
+      // Bureau's own published internal point (2026-09-24), never a place we list.
+      expect(SERVICE_AREAS[id]!.reference, id).toMatch(/City Hall|Administrative Center|the US Census Bureau's internal point for \w+ County/);
     }
+    // The three counties sit exactly on the Bureau's published points (TIGERweb State_County, INTPTLAT/INTPTLON).
+    expect(SERVICE_AREAS.wayne_county!.point).toEqual({ lat: 42.2847, lon: -83.262 });
+    expect(SERVICE_AREAS.oakland_county!.point).toEqual({ lat: 42.6605, lon: -83.3842 });
+    expect(SERVICE_AREAS.macomb_county!.point).toEqual({ lat: 42.6716, lon: -82.9115 });
   });
 });
 

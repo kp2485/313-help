@@ -21,9 +21,11 @@ public let serviceAreas: [String: ServiceArea] = [
     "dearborn": ServiceArea(point: LatLon(lat: 42.3224, lon: -83.1763), reference: "Dearborn Administrative Center", wide: false),
     "hamtramck": ServiceArea(point: LatLon(lat: 42.3934, lon: -83.0497), reference: "Hamtramck City Hall", wide: false),
     "highland_park": ServiceArea(point: LatLon(lat: 42.4055, lon: -83.0968), reference: "Highland Park City Hall", wide: false),
-    "wayne_county": ServiceArea(point: LatLon(lat: 42.2410, lon: -83.1770), reference: "the geographic centre of Wayne County", wide: false),
+    "wayne_county": ServiceArea(point: LatLon(lat: 42.2847, lon: -83.2620), reference: "the US Census Bureau's internal point for Wayne County", wide: false),
     "wayne_county_west": ServiceArea(point: LatLon(lat: 42.3247, lon: -83.4001), reference: "Westland City Hall, the largest city of western Wayne County", wide: false),
     "wayne_county_downriver": ServiceArea(point: LatLon(lat: 42.2256, lon: -83.2696), reference: "Taylor City Hall, the largest city of the Downriver communities", wide: false),
+    "oakland_county": ServiceArea(point: LatLon(lat: 42.6605, lon: -83.3842), reference: "the US Census Bureau's internal point for Oakland County", wide: false),
+    "macomb_county": ServiceArea(point: LatLon(lat: 42.6716, lon: -82.9115), reference: "the US Census Bureau's internal point for Macomb County", wide: false),
     "statewide": ServiceArea(point: nil, reference: "no local centre: Michigan as a whole", wide: true),
     "national": ServiceArea(point: nil, reference: "no local centre: the United States", wide: true),
 ]

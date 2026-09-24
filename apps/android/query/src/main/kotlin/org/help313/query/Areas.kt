@@ -22,9 +22,11 @@ val SERVICE_AREAS: Map<String, ServiceArea> = linkedMapOf(
     "dearborn" to ServiceArea(LatLon(42.3224, -83.1763), "Dearborn Administrative Center", false),
     "hamtramck" to ServiceArea(LatLon(42.3934, -83.0497), "Hamtramck City Hall", false),
     "highland_park" to ServiceArea(LatLon(42.4055, -83.0968), "Highland Park City Hall", false),
-    "wayne_county" to ServiceArea(LatLon(42.2410, -83.1770), "the geographic centre of Wayne County", false),
+    "wayne_county" to ServiceArea(LatLon(42.2847, -83.2620), "the US Census Bureau's internal point for Wayne County", false),
     "wayne_county_west" to ServiceArea(LatLon(42.3247, -83.4001), "Westland City Hall, the largest city of western Wayne County", false),
     "wayne_county_downriver" to ServiceArea(LatLon(42.2256, -83.2696), "Taylor City Hall, the largest city of the Downriver communities", false),
+    "oakland_county" to ServiceArea(LatLon(42.6605, -83.3842), "the US Census Bureau's internal point for Oakland County", false),
+    "macomb_county" to ServiceArea(LatLon(42.6716, -82.9115), "the US Census Bureau's internal point for Macomb County", false),
     "statewide" to ServiceArea(null, "no local centre: Michigan as a whole", true),
     "national" to ServiceArea(null, "no local centre: the United States", true),
 )

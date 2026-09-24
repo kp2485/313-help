@@ -115,13 +115,15 @@ A `shelter.dv` row (and any sub-category of it) carries **no `address`, no `lat`
 | `dearborn` | Dearborn Administrative Center |
 | `hamtramck` | Hamtramck City Hall |
 | `highland_park` | Highland Park City Hall |
-| `wayne_county` | the geographic centre of Wayne County |
+| `wayne_county` | the US Census Bureau's internal point for Wayne County (42.2847, −83.2620; a hand-picked "geographic centre" until 2026-09-24) |
 | `wayne_county_west` | Westland City Hall, the largest city of western Wayne County |
 | `wayne_county_downriver` | Taylor City Hall, the largest city of the Downriver communities |
+| `oakland_county` | the US Census Bureau's internal point for Oakland County (42.6605, −83.3842; 2026-09-24) |
+| `macomb_county` | the US Census Bureau's internal point for Macomb County (42.6716, −82.9115; 2026-09-24) |
 | `statewide` | none — ranks after every local area |
 | `national` | none — ranks after every local area |
 
-The table lives in **code** (`packages/query/src/areas.ts`, mirrored in `Areas.swift` and `Areas.kt`), never in a row. Every shelter serving one area therefore shares one identical point, and that point is a city hall, not a shelter. No ZIP codes and no neighbourhoods: an area must be a whole city or bigger.
+The table lives in **code** (`packages/query/src/areas.ts`, mirrored in `Areas.swift` and `Areas.kt`), never in a row. Every shelter serving one area therefore shares one identical point, and that point is a city hall or a county's Census internal point, never a shelter. No ZIP codes and no neighbourhoods: an area must be a whole city or bigger.
 
 **Banding.** With a location (shared or typed as a ZIP), a `shelter.dv` row with a local `service_area` gets a **coarse** band from the distance between the person and that area's reference point: **0–3 mi → 0, 3–10 mi → 1, over 10 mi → 2**. `statewide` and `national` get band 2 and the wide-area key 1. Without a location, and for a row with no `service_area`, the band is 0 and the wide-area key is 0 — exactly as today.
 

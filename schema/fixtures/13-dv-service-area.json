@@ -1,5 +1,5 @@
 {
-  "description": "Friday 2026-09-18 1:45pm. Domestic-violence rows sort by proximity WITHOUT any fact that locates a shelter (schema/query-spec.md, docs/08, DECISIONS 2026-09-20). A shelter.dv row carries no address, no ZIP and no coordinate; it may carry a coarse `service_area`, and each area maps IN CODE to one public reference point (a city hall). The band comes from the person to that point; `miles` on the result is always null, so no client can show a distance. statewide and national rank after every local area. Rows with no service_area rank exactly as a coordinate-less row ranks today. Near points: downtown Detroit 42.3500,-83.0600; Dearborn 42.3100,-83.1900; Downriver 42.2100,-83.2300.",
+  "description": "Friday 2026-09-18 1:45pm. Domestic-violence rows sort by proximity WITHOUT any fact that locates a shelter (schema/query-spec.md, docs/08, DECISIONS 2026-09-20). A shelter.dv row carries no address, no ZIP and no coordinate; it may carry a coarse `service_area`, and each area maps IN CODE to one public reference point (a city hall, or a county's Census Bureau internal point). The band comes from the person to that point; `miles` on the result is always null, so no client can show a distance. statewide and national rank after every local area. Rows with no service_area rank exactly as a coordinate-less row ranks today. Near points: downtown Detroit 42.3500,-83.0600; Dearborn 42.3100,-83.1900; Downriver 42.2100,-83.2300; Pontiac 42.6389,-83.2910; Sterling Heights 42.5803,-83.0302; Taylor 42.2409,-83.2697.",
   "rows": [
     {
       "id": "dv_detroit_a",
@@ -40,6 +40,30 @@
       "availability": "always",
       "service_area": "wayne_county_downriver",
       "phones": [{ "number": "(313) 555-0105" }]
+    },
+    {
+      "id": "dv_wayne",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "wayne_county",
+      "phones": [{ "number": "(313) 555-0105" }]
+    },
+    {
+      "id": "dv_oakland",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "oakland_county",
+      "phones": [{ "number": "(313) 555-0106" }]
+    },
+    {
+      "id": "dv_macomb",
+      "category": "shelter.dv",
+      "what": "Call any time.",
+      "availability": "always",
+      "service_area": "macomb_county",
+      "phones": [{ "number": "(313) 555-0107" }]
     },
     {
       "id": "dv_statewide",
@@ -89,132 +113,56 @@
       "fn": "rank",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter.dv" },
-      "expect": [
-        "dv_dearborn",
-        "dv_detroit_b",
-        "dv_downriver",
-        "dv_hp",
-        "dv_national",
-        "dv_no_area",
-        "dv_statewide",
-        "dv_detroit_a"
-      ]
+      "expect": ["dv_dearborn", "dv_detroit_b", "dv_downriver", "dv_hp", "dv_macomb", "dv_national", "dv_no_area", "dv_oakland", "dv_statewide", "dv_wayne", "dv_detroit_a"]
     },
     {
       "name": "downtown Detroit: Detroit's area is band 0, Dearborn and Highland Park band 1, Downriver band 2; statewide and national last",
       "fn": "rank",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter.dv", "near": { "lat": 42.35, "lon": -83.06 } },
-      "expect": [
-        "dv_detroit_b",
-        "dv_no_area",
-        "dv_detroit_a",
-        "dv_dearborn",
-        "dv_hp",
-        "dv_downriver",
-        "dv_national",
-        "dv_statewide"
-      ]
+      "expect": ["dv_detroit_b", "dv_no_area", "dv_detroit_a", "dv_dearborn", "dv_hp", "dv_downriver", "dv_macomb", "dv_oakland", "dv_wayne", "dv_national", "dv_statewide"]
     },
     {
       "name": "the same list from Dearborn: Dearborn's area comes first now — the order follows the AREA, never the shelter",
       "fn": "rank",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter.dv", "near": { "lat": 42.31, "lon": -83.19 } },
-      "expect": [
-        "dv_dearborn",
-        "dv_no_area",
-        "dv_detroit_b",
-        "dv_downriver",
-        "dv_hp",
-        "dv_detroit_a",
-        "dv_national",
-        "dv_statewide"
-      ]
+      "expect": ["dv_dearborn", "dv_no_area", "dv_detroit_b", "dv_downriver", "dv_hp", "dv_wayne", "dv_detroit_a", "dv_macomb", "dv_oakland", "dv_national", "dv_statewide"]
     },
     {
       "name": "from Downriver: Downriver band 0, Dearborn band 1, Detroit and Highland Park band 2 — and still ahead of statewide and national",
       "fn": "rank",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter.dv", "near": { "lat": 42.21, "lon": -83.23 } },
-      "expect": [
-        "dv_downriver",
-        "dv_no_area",
-        "dv_dearborn",
-        "dv_detroit_b",
-        "dv_hp",
-        "dv_detroit_a",
-        "dv_national",
-        "dv_statewide"
-      ]
+      "expect": ["dv_downriver", "dv_no_area", "dv_dearborn", "dv_wayne", "dv_detroit_b", "dv_hp", "dv_macomb", "dv_oakland", "dv_detroit_a", "dv_national", "dv_statewide"]
     },
     {
       "name": "two shelters in one area tie on the band: only the open key and the id separate them, never anything location-derived",
       "fn": "rankDetail",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter.dv", "near": { "lat": 42.35, "lon": -83.06 } },
-      "expect": [
-        "dv_detroit_b band0 no-distance",
-        "dv_no_area band0 no-distance",
-        "dv_detroit_a band0 no-distance",
-        "dv_dearborn band1 no-distance",
-        "dv_hp band1 no-distance",
-        "dv_downriver band2 no-distance",
-        "dv_national band2 no-distance",
-        "dv_statewide band2 no-distance"
-      ]
+      "expect": ["dv_detroit_b band0 no-distance", "dv_no_area band0 no-distance", "dv_detroit_a band0 no-distance", "dv_dearborn band1 no-distance", "dv_hp band1 no-distance", "dv_downriver band2 no-distance", "dv_macomb band2 no-distance", "dv_oakland band2 no-distance", "dv_wayne band2 no-distance", "dv_national band2 no-distance", "dv_statewide band2 no-distance"]
     },
     {
       "name": "no location: every DV row is band 0 and still carries no distance",
       "fn": "rankDetail",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter.dv" },
-      "expect": [
-        "dv_dearborn band0 no-distance",
-        "dv_detroit_b band0 no-distance",
-        "dv_downriver band0 no-distance",
-        "dv_hp band0 no-distance",
-        "dv_national band0 no-distance",
-        "dv_no_area band0 no-distance",
-        "dv_statewide band0 no-distance",
-        "dv_detroit_a band0 no-distance"
-      ]
+      "expect": ["dv_dearborn band0 no-distance", "dv_detroit_b band0 no-distance", "dv_downriver band0 no-distance", "dv_hp band0 no-distance", "dv_macomb band0 no-distance", "dv_national band0 no-distance", "dv_no_area band0 no-distance", "dv_oakland band0 no-distance", "dv_statewide band0 no-distance", "dv_wayne band0 no-distance", "dv_detroit_a band0 no-distance"]
     },
     {
       "name": "mixed list: ordinary shelters sort by their true distance, DV rows by their area, and no DV row carries a distance",
       "fn": "rankDetail",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter", "near": { "lat": 42.35, "lon": -83.06 } },
-      "expect": [
-        "dv_detroit_b band0 no-distance",
-        "dv_no_area band0 no-distance",
-        "s_near band0 distance",
-        "dv_detroit_a band0 no-distance",
-        "dv_dearborn band1 no-distance",
-        "dv_hp band1 no-distance",
-        "dv_downriver band2 no-distance",
-        "s_far band2 distance",
-        "dv_national band2 no-distance",
-        "dv_statewide band2 no-distance"
-      ]
+      "expect": ["dv_detroit_b band0 no-distance", "dv_no_area band0 no-distance", "s_near band0 distance", "dv_detroit_a band0 no-distance", "dv_dearborn band1 no-distance", "dv_hp band1 no-distance", "dv_downriver band2 no-distance", "dv_macomb band2 no-distance", "dv_oakland band2 no-distance", "dv_wayne band2 no-distance", "s_far band2 distance", "dv_national band2 no-distance", "dv_statewide band2 no-distance"]
     },
     {
       "name": "mixed list, ids only",
       "fn": "rank",
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter", "near": { "lat": 42.35, "lon": -83.06 } },
-      "expect": [
-        "dv_detroit_b",
-        "dv_no_area",
-        "s_near",
-        "dv_detroit_a",
-        "dv_dearborn",
-        "dv_hp",
-        "dv_downriver",
-        "s_far",
-        "dv_national",
-        "dv_statewide"
-      ]
+      "expect": ["dv_detroit_b", "dv_no_area", "s_near", "dv_detroit_a", "dv_dearborn", "dv_hp", "dv_downriver", "dv_macomb", "dv_oakland", "dv_wayne", "s_far", "dv_national", "dv_statewide"]
     },
     {
       "name": "an ordinary shelter far from the person is still band 2 and still carries its real distance: nothing here changed for them",
@@ -222,6 +170,27 @@
       "now": "2026-09-18T17:45:00Z",
       "query": { "category": "shelter.emergency", "near": { "lat": 42.35, "lon": -83.06 } },
       "expect": ["s_near band0 distance", "s_far band2 distance"]
+    },
+    {
+      "name": "from Pontiac: Oakland County's area is the nearest local area (band 1: the Census point is about 5 miles out), and still no distance",
+      "fn": "rankDetail",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv", "near": { "lat": 42.6389, "lon": -83.291 } },
+      "expect": ["dv_no_area band0 no-distance", "dv_oakland band1 no-distance", "dv_dearborn band2 no-distance", "dv_detroit_b band2 no-distance", "dv_downriver band2 no-distance", "dv_hp band2 no-distance", "dv_macomb band2 no-distance", "dv_wayne band2 no-distance", "dv_detroit_a band2 no-distance", "dv_national band2 no-distance", "dv_statewide band2 no-distance"]
+    },
+    {
+      "name": "from Sterling Heights: Macomb County's area comes first of the areas, by its Census point, never by a shelter",
+      "fn": "rankDetail",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv", "near": { "lat": 42.5803, "lon": -83.0302 } },
+      "expect": ["dv_no_area band0 no-distance", "dv_macomb band1 no-distance", "dv_dearborn band2 no-distance", "dv_detroit_b band2 no-distance", "dv_downriver band2 no-distance", "dv_hp band2 no-distance", "dv_oakland band2 no-distance", "dv_wayne band2 no-distance", "dv_detroit_a band2 no-distance", "dv_national band2 no-distance", "dv_statewide band2 no-distance"]
+    },
+    {
+      "name": "from Taylor: Downriver band 0; Wayne County, now at the Census Bureau's internal point (2026-09-24), band 1 beside Dearborn",
+      "fn": "rankDetail",
+      "now": "2026-09-18T17:45:00Z",
+      "query": { "category": "shelter.dv", "near": { "lat": 42.2409, "lon": -83.2697 } },
+      "expect": ["dv_downriver band0 no-distance", "dv_no_area band0 no-distance", "dv_dearborn band1 no-distance", "dv_wayne band1 no-distance", "dv_detroit_b band2 no-distance", "dv_hp band2 no-distance", "dv_macomb band2 no-distance", "dv_oakland band2 no-distance", "dv_detroit_a band2 no-distance", "dv_national band2 no-distance", "dv_statewide band2 no-distance"]
     }
   ]
 }
