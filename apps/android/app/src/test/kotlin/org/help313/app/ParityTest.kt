@@ -278,10 +278,13 @@ class ParityTest {
         val quoted = Regex("SEMCOG_NOTICE = '([^']+)'").find(web)?.groupValues?.get(1)
         assertNotNull("apps/web/src/hoods.ts no longer declares SEMCOG_NOTICE", quoted)
         assertEquals(quoted, SEMCOG_NOTICE)
-        // It is never translated: the same English on an Arabic, Bengali or Spanish screen.
+        // It is never translated: the same English on an Arabic, Bengali or Spanish screen. A string may NAME SEMCOG
+        // as a source (the map's source line and the About credits do, since 2026-09-24); what it may not do is
+        // carry a copy of the notice's own words.
+        val notice = Regex("""Reproduction or Use Without Permission|All Rights Reserved""", RegexOption.IGNORE_CASE)
         for (lang in LANGS) {
             val s = strings("strings/$lang.json")
-            assertFalse("strings/$lang.json has taken a copy of SEMCOG's notice", s.values.any { it.contains("SEMCOG") })
+            assertFalse("strings/$lang.json has taken a copy of SEMCOG's notice", s.values.any { notice.containsMatchIn(it) })
         }
     }
 
