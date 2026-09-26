@@ -246,9 +246,14 @@ City of Detroit open data (data.detroitmi.gov):
   Detroit Department of Transportation (DDOT): bus stops
 
 US Census Bureau (TIGER/Line and TIGERweb; public domain):
-  Outlines of Detroit, Hamtramck, Highland Park and Dearborn
-  Streets in Hamtramck, Highland Park and Dearborn
-  ZIP Code Tabulation Areas for Dearborn ZIP codes
+  Outlines of the 75 cities and townships a DDOT or SMART bus reaches (county
+    subdivisions), each with its own internal point
+  Streets outside Detroit
+  ZIP Code Tabulation Areas for the ZIP codes outside Detroit
+
+SEMCOG, Parks and amenities (park outlines outside Detroit on the map), used under
+  SEMCOG's Copyright License Agreement; its notice is printed beside the map's
+  source line
 
 THE FOUR CITY PAGES (Detroit, Hamtramck, Highland Park, Dearborn)
 
@@ -339,9 +344,9 @@ layer owner is contacted while the map is open.
   US DOT Bureau of Transportation Statistics, NTAD Intercity Bus Atlas Stops —
     CC BY-NC 4.0 (attribution, non-commercial).
     Licence: https://creativecommons.org/licenses/by-nc/4.0/
-    Modified: filtered to Detroit, Hamtramck, Highland Park and Dearborn plus a
-    surrounding margin, and reduced to the fields the app draws. 9 stops of the
-    national file. data/ingested/transit/intercity_bus.json is NOT covered by
+    Modified: filtered to the box around the 75 cities and townships a bus
+    reaches, plus a small margin, and reduced to the fields the app draws. 10
+    stops of the national file. data/ingested/transit/intercity_bus.json is NOT covered by
     this repository's Apache-2.0 licence (data/LICENSE-DATA.md).
 
 
