@@ -56523,6 +56523,2141 @@
   "assured_date": "2026-09-24"
  },
  {
+  "id": "732c2963-8b95-5571-849a-3b094aa918a8",
+  "name": "Free Narcan box, 41A District Court, Sterling Heights",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "35611efc-2d92-5942-beaf-8eaccaef742f",
+    "location": {
+     "id": "a2aa731c-8631-5036-8d74-481015fa1283",
+     "name": "Free Narcan box, 41A District Court, Sterling Heights, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.589271,
+     "longitude": -83.01114,
+     "addresses": [
+      {
+       "id": "c6f4df6f-5851-5c28-8ea2-ce4b2cac081c",
+       "address_1": "40111 Dodge Park Rd",
+       "city": "Sterling Heights",
+       "state_province": "MI",
+       "postal_code": "48313",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_41a_district_court_ster"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "690ce2e6-746b-5dbc-927a-c7e6a8ec84ca",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:30",
+      "closes_at": "12:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     },
+     {
+      "id": "afab2a1f-cc00-52d4-a78e-2d5f35519584",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "13:00",
+      "closes_at": "16:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_41a_district_court_ster",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_41a_district_court_ster",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "6991beae-2b92-5443-ac7e-576642be3b46",
+  "name": "Free Narcan box, BioMed Behavioral Healthcare, Roseville",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4ce4ee6d-20b1-5aa8-9051-8e273f48b444",
+    "location": {
+     "id": "79d50f13-01e9-5d06-b998-ee23ad1a6ff2",
+     "name": "Free Narcan box, BioMed Behavioral Healthcare, Roseville, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.531379,
+     "longitude": -82.914793,
+     "addresses": [
+      {
+       "id": "2e201516-2a28-5127-8ba7-ab336b7a438d",
+       "address_1": "31851 Gratiot Ave",
+       "city": "Roseville",
+       "state_province": "MI",
+       "postal_code": "48066",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_biomed_behavioral_healt"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "1ffb8eb5-3812-5014-b848-20b7bfdcd7c5",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "05:00",
+      "closes_at": "13:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_biomed_behavioral_healt",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_biomed_behavioral_healt",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "97781e54-ebf1-5bbf-bb3c-974ee3013399",
+  "name": "Free Narcan box, Building H, Macomb Community College Center Campus",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in Building H. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d4188241-7236-5fe2-ba9f-e2b1e4cd19a3",
+    "location": {
+     "id": "ddf4230e-cc19-553d-9159-ee21bd8618c6",
+     "name": "Free Narcan box, Building H, Macomb Community College Center Campus, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.623531,
+     "longitude": -82.953396,
+     "addresses": [
+      {
+       "id": "2cce5a66-54d2-5f09-a196-111ea1b7aab4",
+       "address_1": "44575 Garfield Rd",
+       "city": "Clinton Township",
+       "state_province": "MI",
+       "postal_code": "48038",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_building_h_macomb_commu"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_building_h_macomb_commu",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list says 24 hours. Call first: a college building can be locked.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_building_h_macomb_commu",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "2b9c9471-edde-5d5e-be89-9f4c0092579d",
+  "name": "Free Narcan box, Building P, Macomb Community College Center Campus",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in Building P. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "6e23cc3d-4323-5482-a4fd-aeb1f8b1c6fd",
+    "location": {
+     "id": "f483d1fa-e9c3-5e5a-bb14-21054d57cd02",
+     "name": "Free Narcan box, Building P, Macomb Community College Center Campus, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.623531,
+     "longitude": -82.953396,
+     "addresses": [
+      {
+       "id": "772d5ea7-ece9-5ea8-b681-42734170d2a6",
+       "address_1": "44575 Garfield Rd",
+       "city": "Clinton Township",
+       "state_province": "MI",
+       "postal_code": "48038",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_building_p_macomb_commu"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_building_p_macomb_commu",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list says 24 hours. Call first: a college building can be locked.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_building_p_macomb_commu",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "d4d06c28-bf24-5f5c-8a31-16289647a8e5",
+  "name": "Free Narcan box, Center Line City Hall",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the main lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4fae17fe-8a4c-5e88-a8a0-3fd823b4c845",
+    "location": {
+     "id": "bff95897-36de-502d-a1fc-1d984e9eff43",
+     "name": "Free Narcan box, Center Line City Hall, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.477196,
+     "longitude": -83.033726,
+     "addresses": [
+      {
+       "id": "92dbad72-dcbd-587a-bd5a-1bf0d6aecd1c",
+       "address_1": "7070 E. 10 Mile Rd.",
+       "city": "Center Line",
+       "state_province": "MI",
+       "postal_code": "48015",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_center_line_city_hall"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "b9733529-aed3-5807-8841-b3f2a26a4aeb",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_center_line_city_hall",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_center_line_city_hall",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "680c272d-4628-5cf7-a365-4a33bac996da",
+  "name": "Free Narcan box, Center Line Parks and Recreation",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4d84a585-edc6-5dba-a491-80d5ba598bf9",
+    "location": {
+     "id": "1ec9b16c-8253-5a8f-8650-5278a0a3585a",
+     "name": "Free Narcan box, Center Line Parks and Recreation, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.480558,
+     "longitude": -83.032496,
+     "addresses": [
+      {
+       "id": "1227df70-05db-5a18-aa35-cab4b4ead8e3",
+       "address_1": "25355 Lawrence Ave.",
+       "city": "Center Line",
+       "state_province": "MI",
+       "postal_code": "48015",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_center_line_parks_and_r"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "9e7154b7-487a-54cf-a6da-e70bbaf78641",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "17:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_center_line_parks_and_r",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_center_line_parks_and_r",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "df336b11-9c4a-5062-a9f2-5fb69a133505",
+  "name": "Free Narcan box, Center Line Public Safety Department",
+  "status": "active",
+  "description": "Free Narcan from a small box on the wall. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "b945d8f9-7a9e-56f7-a171-eb1d68a3181e",
+    "location": {
+     "id": "6a353f40-8462-54c8-8352-c421ba59d13f",
+     "name": "Free Narcan box, Center Line Public Safety Department, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.477196,
+     "longitude": -83.033726,
+     "addresses": [
+      {
+       "id": "50360bf9-4e94-5cd9-abc7-750164143c27",
+       "address_1": "7070 E. 10 Mile Rd.",
+       "city": "Center Line",
+       "state_province": "MI",
+       "postal_code": "48015",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_center_line_public_safe"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_center_line_public_safe",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_center_line_public_safe",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "ec4e59b1-b6ba-5415-9568-3b34a010cc85",
+  "name": "Free Narcan box, Community Medical Services, Sterling Heights",
+  "status": "active",
+  "description": "Free Narcan from a stand-up box. It is outside the front doors. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "b236c121-f601-5e48-890c-60cfbd0db747",
+    "location": {
+     "id": "b9fbadb4-e3a2-558b-8156-ef1d86615a7b",
+     "name": "Free Narcan box, Community Medical Services, Sterling Heights, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.54585,
+     "longitude": -83.028683,
+     "addresses": [
+      {
+       "id": "121d3deb-5f05-5ba9-9365-c50fb17a7506",
+       "address_1": "34208 Van Dyke Ave",
+       "city": "Sterling Heights",
+       "state_province": "MI",
+       "postal_code": "48312",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_community_medical_servi"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_community_medical_servi",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list does not give hours.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_community_medical_servi",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "fb98ae4b-d9c2-5f26-821f-bb235b1e5dd4",
+  "name": "Free Narcan box, East Campus, Macomb Community College",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the commons and lunch area. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "af2ecab4-d705-543a-86a8-9a8054fa132e",
+    "location": {
+     "id": "4f759fc6-6121-5970-aa3d-afc8775d580f",
+     "name": "Free Narcan box, East Campus, Macomb Community College, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.617752,
+     "longitude": -82.894509,
+     "addresses": [
+      {
+       "id": "62daab3f-b877-54f3-abff-435c2005dc30",
+       "address_1": "21901 Dunham Rd.",
+       "city": "Clinton Township",
+       "state_province": "MI",
+       "postal_code": "48036",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_east_campus_macomb_comm"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_east_campus_macomb_comm",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list says 24 hours. Call first: a college building can be locked.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_east_campus_macomb_comm",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "d700a6e6-c448-51ca-adc5-dcad19b702a3",
+  "name": "Free Narcan box, Gammons Medical, Warren",
+  "status": "active",
+  "description": "Free Narcan from a stand-up box. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "acdccffb-ced7-5c3b-8395-38503c0f18f5",
+    "location": {
+     "id": "7af2cf8a-5a7f-5b10-aa64-3b11a7c3c2b2",
+     "name": "Free Narcan box, Gammons Medical, Warren, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.503401,
+     "longitude": -83.006773,
+     "addresses": [
+      {
+       "id": "d9b0fb4e-3a23-5d4c-9547-83e33b6e218a",
+       "address_1": "28477 Hoover Rd",
+       "city": "Warren",
+       "state_province": "MI",
+       "postal_code": "48093",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_gammons_medical_warren"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_gammons_medical_warren",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Mon-Thu 8am-5pm, Fri 8am-12pm",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_gammons_medical_warren",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "b4f8409d-7513-5625-a276-c94a495298ff",
+  "name": "Free Narcan box, M-Tech, Macomb Community College",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the main lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "9328928e-4573-5802-b437-0bd4384a282d",
+    "location": {
+     "id": "328541ae-e71e-5b8e-93d3-a746e55cfa8d",
+     "name": "Free Narcan box, M-Tech, Macomb Community College, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.498131,
+     "longitude": -83.034994,
+     "addresses": [
+      {
+       "id": "1ac4e68f-bd59-55d7-8955-f0be144da458",
+       "address_1": "7900 Tank Ave",
+       "city": "Warren",
+       "state_province": "MI",
+       "postal_code": "48092",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_m_tech_macomb_community"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_m_tech_macomb_community",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list says 24 hours. Call first: a college building can be locked.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_m_tech_macomb_community",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "70016c3f-146b-528f-ac10-516073071405",
+  "name": "Free Narcan box, Macomb County Alano Center",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the vestibule. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "880f5ce9-3e66-508b-8ddc-25ff3f615fd9",
+    "location": {
+     "id": "dc7754e4-49eb-54c1-a639-f54662ca3793",
+     "name": "Free Narcan box, Macomb County Alano Center, Families Against Narcotics",
+     "location_type": "physical",
+     "addresses": [
+      {
+       "id": "3ef4d022-e25c-50f4-b49d-4a686d447ae6",
+       "address_1": "20900 Cass Avenue",
+       "city": "Clinton Township",
+       "state_province": "MI",
+       "postal_code": "48036",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_macomb_county_alano_cen",
+      "service_area": "clinton_township"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "b737d905-fb15-5881-88e9-058ce7511663",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR,SA,SU",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "22:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_macomb_county_alano_cen",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "service_area": "clinton_township",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_macomb_county_alano_cen",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "7b3f51c1-4770-5b8c-bef7-ba65ce2749cd",
+  "name": "Free Narcan box, Macomb County Clerk's Office",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the lobby on the 1st floor. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "94ee12a8-8b53-5abc-a3f4-718a8dc50a97",
+    "location": {
+     "id": "7f0cbcc7-69ab-5a68-8d7b-bbd9912b0757",
+     "name": "Free Narcan box, Macomb County Clerk's Office, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.600345,
+     "longitude": -82.876053,
+     "addresses": [
+      {
+       "id": "dbf74843-e9ab-5005-9343-dc7493e7b61d",
+       "address_1": "120 N. Main St. 1st Floor",
+       "city": "Mount Clemens",
+       "state_province": "MI",
+       "postal_code": "48043",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_macomb_county_clerk_s_o"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "30d125a5-6370-5068-be56-f24cd43133c3",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "08:00",
+      "closes_at": "16:15",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_macomb_county_clerk_s_o",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_macomb_county_clerk_s_o",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "0d584654-acb1-59cc-aaf0-495faf2b81d6",
+  "name": "Free Narcan box, Macomb Foster Closet",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the store lobby. Visits are by appointment only. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "6744f63d-ad9b-5366-b2d3-9d90d139afd9",
+    "location": {
+     "id": "95b07979-1388-5f40-a999-b6fcce1ea575",
+     "name": "Free Narcan box, Macomb Foster Closet, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.592053,
+     "longitude": -82.88054,
+     "addresses": [
+      {
+       "id": "c3ec69c1-3bdf-5580-afa4-1ce4f4dc8151",
+       "address_1": "158 South Main Street",
+       "city": "Mount Clemens",
+       "state_province": "MI",
+       "postal_code": "48043",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_macomb_foster_closet"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_macomb_foster_closet",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "appointment_required"
+     ],
+     "hours_text": "By appointment only.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_macomb_foster_closet",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "1e5bd802-9a72-5eb9-b29b-234476dc977d",
+  "name": "Free Narcan box, Metro Testing Services",
+  "status": "active",
+  "description": "Free Narcan from a stand-up box. It is outside the front doors. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "868ac9dc-962c-5f4c-bf5d-0bccefce9eeb",
+    "location": {
+     "id": "81c78cdb-1408-5491-b4f5-0fe8d9d8a4d9",
+     "name": "Free Narcan box, Metro Testing Services, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.530793,
+     "longitude": -82.889485,
+     "addresses": [
+      {
+       "id": "db643651-1d03-5a92-921c-6314617fd04a",
+       "address_1": "32000 Harper Ave",
+       "city": "St. Clair Shores",
+       "state_province": "MI",
+       "postal_code": "48082",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_metro_testing_services"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_metro_testing_services",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Mon-Fri 8am-8pm, Sat-Sun 8am-2pm",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_metro_testing_services",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "78334539-7da3-55ed-9981-13fa4e659f8f",
+  "name": "Free Narcan box, Mobil, Hall Rd and Hayes Rd",
+  "status": "active",
+  "description": "Free Narcan from a small box on the wall. It is near the counter. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "16945aae-1acc-5277-853a-b7af3f198434",
+    "location": {
+     "id": "a0f30b98-b041-5675-bbd3-82893080d6c3",
+     "name": "Free Narcan box, Mobil, Hall Rd and Hayes Rd, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.627139,
+     "longitude": -82.972601,
+     "addresses": [
+      {
+       "id": "23ae89c8-a4f9-5866-b391-aa8c11c4f053",
+       "address_1": "15250 Hall Rd",
+       "city": "Clinton Township",
+       "state_province": "MI",
+       "postal_code": "48038",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_mobil_hall_rd_and_hayes"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_mobil_hall_rd_and_hayes",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_mobil_hall_rd_and_hayes",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "30b3de00-fb42-55af-9eb5-614a66c2322e",
+  "name": "Free Narcan box, Opals Hallmark, New Baltimore",
+  "status": "active",
+  "description": "Free Narcan from a small box on the wall. It is at the check-out counter. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f7789e49-cf61-56ea-bb11-d89d8011fcf8",
+    "location": {
+     "id": "f1810ef4-4454-56e5-be80-b0d5018b2518",
+     "name": "Free Narcan box, Opals Hallmark, New Baltimore, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.67585,
+     "longitude": -82.760112,
+     "addresses": [
+      {
+       "id": "9133ceb4-a2bd-5d6f-a36b-cfe94ea7190b",
+       "address_1": "34760 23 Mile Rd",
+       "city": "New Baltimore",
+       "state_province": "MI",
+       "postal_code": "48047",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_opals_hallmark_new_balt"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_opals_hallmark_new_balt",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Mon-Thu 9:30am-6pm. Their list does not give other days.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_opals_hallmark_new_balt",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "fd31e942-0465-5698-b95e-7e240f867bc6",
+  "name": "Free Narcan box, Opals Hallmark, St. Clair Shores",
+  "status": "active",
+  "description": "Free Narcan from a small box on the wall. It is at the check-out counter. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "d892ac98-b1b5-52d5-9148-dea8fbad7e76",
+    "location": {
+     "id": "380679f5-38d9-528c-90b8-be2efa27822e",
+     "name": "Free Narcan box, Opals Hallmark, St. Clair Shores, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.473975,
+     "longitude": -82.904456,
+     "addresses": [
+      {
+       "id": "7b6d33fc-d7be-5ef2-9f2d-0bcb9a1bf710",
+       "address_1": "24311 Harper Ave",
+       "city": "St. Clair Shores",
+       "state_province": "MI",
+       "postal_code": "48080",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_opals_hallmark_st_clair"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_opals_hallmark_st_clair",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Mon-Thu 9:30am-6pm. Their list does not give other days.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_opals_hallmark_st_clair",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "d0c84d54-460b-5ecf-b19e-a68c3ba25bc7",
+  "name": "Free Narcan box, Relax Inn, Roseville",
+  "status": "active",
+  "description": "Free Narcan from a small box on the wall. It is in the office. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4c893f47-be97-5183-8180-07dd8ade4a78",
+    "location": {
+     "id": "f25e4709-49ed-5e60-a820-8be282034f24",
+     "name": "Free Narcan box, Relax Inn, Roseville, Families Against Narcotics",
+     "location_type": "physical",
+     "addresses": [
+      {
+       "id": "ade8da2c-7492-57be-8a22-ac6f2037ad37",
+       "address_1": "32851 Gratiot",
+       "city": "Roseville",
+       "state_province": "MI",
+       "postal_code": "48066",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_relax_inn_roseville",
+      "service_area": "roseville"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_relax_inn_roseville",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "service_area": "roseville",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_relax_inn_roseville",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "9e5ff02c-2f69-58d8-95a8-699235b3d104",
+  "name": "Free Narcan box, Roseville Police Department",
+  "status": "active",
+  "description": "Free Narcan from a stand-up box. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "cb68a646-a731-5b6b-841f-cd9a9144dc13",
+    "location": {
+     "id": "900c67b8-459e-5a18-80fd-0be08158279d",
+     "name": "Free Narcan box, Roseville Police Department, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.51587,
+     "longitude": -82.925506,
+     "addresses": [
+      {
+       "id": "f843c55e-8835-5ba2-86ae-d8f208ea1d31",
+       "address_1": "29753 Gratiot Ave",
+       "city": "Roseville",
+       "state_province": "MI",
+       "postal_code": "48066",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_roseville_police_depart"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_roseville_police_depart",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_roseville_police_depart",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "b9af3fed-2feb-5623-8a7d-2fd78536ac67",
+  "name": "Free Narcan box, South Campus Building G, Macomb Community College",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in Building G. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "7171d94f-5698-5a17-8221-57e908f5dd90",
+    "location": {
+     "id": "df7a6b27-f006-5d02-ab90-ca71cde271ca",
+     "name": "Free Narcan box, South Campus Building G, Macomb Community College, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.508646,
+     "longitude": -82.970729,
+     "addresses": [
+      {
+       "id": "0a8c511e-9d40-5ff1-b0cf-1988543dea3e",
+       "address_1": "14500 E 12 Mile Rd",
+       "city": "Warren",
+       "state_province": "MI",
+       "postal_code": "48088",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_south_campus_building_g"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_south_campus_building_g",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list says 24 hours. Call first: a college building can be locked.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_south_campus_building_g",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "10734c81-8b61-53f4-a162-f7f034a7a7ad",
+  "name": "Free Narcan box, South Campus Building K, Macomb Community College",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in Building K. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "68ee606b-5f32-56dc-a079-3acbc9553a18",
+    "location": {
+     "id": "850eb4ea-f16b-53af-8e04-2f271a291b06",
+     "name": "Free Narcan box, South Campus Building K, Macomb Community College, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.508646,
+     "longitude": -82.970729,
+     "addresses": [
+      {
+       "id": "84a5f2e1-f063-5112-ac6f-300399df0c1f",
+       "address_1": "14500 E 12 Mile Rd",
+       "city": "Warren",
+       "state_province": "MI",
+       "postal_code": "48088",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_south_campus_building_k"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_south_campus_building_k",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list says 24 hours. Call first: a college building can be locked.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_south_campus_building_k",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "1c0b864e-6b24-5b57-a23f-322abeafe481",
+  "name": "Free Narcan box, St. Margaret of Scotland Church",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is outside the gym. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "6f044b89-dd1b-552c-bccf-59eef95660ea",
+    "location": {
+     "id": "8d489dc0-7b66-505b-9176-08e9d90c601b",
+     "name": "Free Narcan box, St. Margaret of Scotland Church, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.524948,
+     "longitude": -82.901073,
+     "addresses": [
+      {
+       "id": "5a5d162a-2a19-559b-b67d-205a694cec02",
+       "address_1": "21201 E 13 Mile Rd",
+       "city": "St. Clair Shores",
+       "state_province": "MI",
+       "postal_code": "48082",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_st_margaret_of_scotland"
+     }
+    },
+    "phones": [],
+    "schedules": [
+     {
+      "id": "b1b8c564-d845-5090-a7db-44fb4077e6b9",
+      "freq": "WEEKLY",
+      "byday": "MO,TU,WE,TH,FR",
+      "dtstart": "2026-09-14",
+      "opens_at": "09:00",
+      "closes_at": "16:00",
+      "x_detroit": {
+       "timezone": "America/Detroit",
+       "wall_clock": true
+      }
+     }
+    ],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_st_margaret_of_scotland",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "scheduled",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_st_margaret_of_scotland",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "fe1c9e0e-d2c1-54b8-bd28-b878bd0e3c5e",
+  "name": "Free Narcan box, Sterling Heights Lions Club",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is near the restroom. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "14dcca65-ea01-53ab-b60e-5e321b3388ee",
+    "location": {
+     "id": "777e4a73-9cd5-5997-adda-41e164e23bc6",
+     "name": "Free Narcan box, Sterling Heights Lions Club, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.616852,
+     "longitude": -83.000189,
+     "addresses": [
+      {
+       "id": "1c230cfe-c6ad-50e3-8632-f832f3b8b034",
+       "address_1": "12828 Canal Rd",
+       "city": "Sterling Heights",
+       "state_province": "MI",
+       "postal_code": "48313",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_sterling_heights_lions_"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_sterling_heights_lions_",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list does not give hours.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_sterling_heights_lions_",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "dbd22a65-1ff4-53b0-b302-6f74c38e5b3b",
+  "name": "Free Narcan box, Sterling Heights Police Department",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "21ec6167-7969-5aab-ae54-7384174421a0",
+    "location": {
+     "id": "acbdda32-dead-5421-b738-4ce9cd26b4a8",
+     "name": "Free Narcan box, Sterling Heights Police Department, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.590948,
+     "longitude": -83.011218,
+     "addresses": [
+      {
+       "id": "dc2a3383-ff3a-5091-b816-b7611f813bcb",
+       "address_1": "40333 Dodge Park Rd",
+       "city": "Sterling Heights",
+       "state_province": "MI",
+       "postal_code": "48313",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_sterling_heights_police"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_sterling_heights_police",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "always",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_sterling_heights_police",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "20b166df-2ea9-5bb6-80c5-c8e19e3b23b6",
+  "name": "Free Narcan box, Sterling Heights Public Library",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "14e9f7dc-6959-56b7-8193-b70e5c03b910",
+    "location": {
+     "id": "23436323-fb47-5387-8877-1bf29013ac39",
+     "name": "Free Narcan box, Sterling Heights Public Library, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.590227,
+     "longitude": -83.011186,
+     "addresses": [
+      {
+       "id": "1f12cb7a-3f73-53fb-bb26-954f44ca1209",
+       "address_1": "40255 Dodge Park Rd",
+       "city": "Sterling Heights",
+       "state_province": "MI",
+       "postal_code": "48313",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_sterling_heights_public"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_sterling_heights_public",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Mon-Thu 8:30am-8pm, Fri 1pm-5pm, Sat 9:30am-5pm, Sun 1pm-5pm",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_sterling_heights_public",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "7bae9e23-bb83-5b41-aa8b-f78ca987e4d9",
+  "name": "Free Narcan box, Sterling Heights Senior Center",
+  "status": "active",
+  "description": "Free Narcan from a white cabinet. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "ab811047-1f0d-51af-9211-a98b81012398",
+    "location": {
+     "id": "5f26455d-8147-58a4-8820-0924f8d0a0d9",
+     "name": "Free Narcan box, Sterling Heights Senior Center, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.589591,
+     "longitude": -83.008115,
+     "addresses": [
+      {
+       "id": "aa5349f5-dbaa-5c68-9549-7032df4b0cad",
+       "address_1": "40200 Utica Road",
+       "city": "Sterling Heights",
+       "state_province": "MI",
+       "postal_code": "48313",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_sterling_heights_senior"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_sterling_heights_senior",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Mon-Thu 9am-8pm, Fri-Sat 9am-5pm",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_sterling_heights_senior",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "ebcfa61e-0464-595e-a458-13d239dbaa69",
+  "name": "Free Narcan box, Tiger Eye Recovery Network",
+  "status": "active",
+  "description": "Free Narcan from a stand-up box. It is in the lobby. Narcan can stop an overdose.",
+  "url": "https://www.faceaddictionnow.org",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "f1b43cc4-5b21-52bf-822f-b3e295017d23",
+    "location": {
+     "id": "c9643ee4-3edc-52ed-b0b3-03ea88ad8969",
+     "name": "Free Narcan box, Tiger Eye Recovery Network, Families Against Narcotics",
+     "location_type": "physical",
+     "latitude": 42.531739,
+     "longitude": -82.909385,
+     "addresses": [
+      {
+       "id": "890a31ef-148a-51c3-9086-f17fdda976ee",
+       "address_1": "31960 Little Mack Ave",
+       "city": "Roseville",
+       "state_province": "MI",
+       "postal_code": "48066",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_families_against_free_narcan_box_tiger_eye_recovery_netw"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_families_against_free_narcan_box_tiger_eye_recovery_netw",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their list does not give hours.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "web",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Families Against Narcotics website",
+      "url": "https://www.faceaddictionnow.org/rescuebox"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_families_against_free_narcan_box_tiger_eye_recovery_netw",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
   "id": "a4bfc562-e468-5b92-bbf0-ff078cb704d0",
   "name": "Rent help for young adults ages 18 to 24",
   "status": "active",
@@ -88546,6 +90681,82 @@
   "assured_date": "2026-09-19"
  },
  {
+  "id": "cc17a2dc-a05c-599c-8655-bfade8c5ebfd",
+  "name": "Free Narcan machine, Live Rite Recovery Resource Center",
+  "status": "active",
+  "description": "A machine with free Narcan (naloxone) inside the recovery center, plus free Narcan from the office. Narcan can stop an overdose.",
+  "url": "https://liveritestructuredcorp.com/",
+  "organization": {
+   "id": "d28d0874-e1bb-55db-98b5-56a03430884a",
+   "name": "Live Rite Structured Recovery",
+   "description": "Live Rite Structured Recovery",
+   "x_detroit": {
+    "id": "org_live_rite_structured_recovery"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "45b28c09-647e-577f-8531-47b13a9190d2",
+    "location": {
+     "id": "2920c1fe-61c9-5e62-8efe-58cd0e3fde80",
+     "name": "Free Narcan machine, Live Rite Recovery Resource Center",
+     "location_type": "physical",
+     "latitude": 42.499961,
+     "longitude": -82.934546,
+     "addresses": [
+      {
+       "id": "24132af2-a2ca-5620-b1db-8b0cb1b9b47d",
+       "address_1": "27700 Gratiot Ave",
+       "city": "Roseville",
+       "state_province": "MI",
+       "postal_code": "48066",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_live_rite_free_narcan_machine_live_rite_recovery_resourc"
+     }
+    },
+    "phones": [
+     {
+      "id": "a00318f2-fb9f-537d-912b-d97de0fefde9",
+      "number": "586-217-5899"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_live_rite_free_narcan_machine_live_rite_recovery_resourc",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [],
+     "hours_text": "The office gives out free Narcan Monday to Friday, 9 am to 4 pm. The machine can be used any time during meetings.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Live Rite Structured Recovery website",
+      "url": "https://liveritestructuredcorp.com/"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_live_rite_free_narcan_machine_live_rite_recovery_resourc",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
   "id": "0b9c50d7-b658-5bd5-8981-b0629bf536c0",
   "name": "Live Rite Recovery Resource Center, Roseville",
   "status": "active",
@@ -97435,6 +99646,85 @@
   "assured_date": "2026-09-24"
  },
  {
+  "id": "249d91f3-19de-500b-bcb8-cd4bfdd1aeb3",
+  "name": "Free Narcan box, McLaren Macomb emergency room",
+  "status": "active",
+  "description": "A box with free Narcan (naloxone) at the entrance of the emergency department. Anyone can take one. Narcan can stop an overdose.",
+  "eligibility_description": "Anyone can get it.",
+  "url": "https://www.mclaren.org",
+  "organization": {
+   "id": "312c3bc8-b089-5d19-a4ae-19f35f06c3e6",
+   "name": "McLaren Health Care",
+   "description": "McLaren Health Care",
+   "x_detroit": {
+    "id": "org_mclaren_health_care"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "9c12199d-be70-5c12-bc54-1315ae7b2658",
+    "location": {
+     "id": "d60f951f-e4c2-5e7f-8add-f23fb77d93b2",
+     "name": "Free Narcan box, McLaren Macomb emergency room",
+     "location_type": "physical",
+     "addresses": [
+      {
+       "id": "25e1a391-57ff-5a37-9d53-c1622abd22ab",
+       "address_1": "1000 Harrington Blvd",
+       "city": "Mount Clemens",
+       "state_province": "MI",
+       "postal_code": "48043",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_mclaren_health_free_narcan_box_mclaren_macomb_emergency_",
+      "service_area": "mount_clemens"
+     }
+    },
+    "phones": [
+     {
+      "id": "e5ad1f52-a342-5cc1-878f-ea91375c186e",
+      "number": "586-493-8000"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_mclaren_health_free_narcan_box_mclaren_macomb_emergency_",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "service_area": "mount_clemens",
+     "hours_text": "Their page does not give hours.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "McLaren Health Care website",
+      "url": "https://www.mclaren.org/macomb/mclaren-macomb-home"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_mclaren_health_free_narcan_box_mclaren_macomb_emergency_",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
   "id": "500dd92f-3f7a-587e-bbcf-e8c0859638ad",
   "name": "MCREST shelter, Mount Clemens",
   "status": "active",
@@ -98991,6 +101281,243 @@
    "category": "health.clinic"
   },
   "assured_date": "2026-09-24"
+ },
+ {
+  "id": "57c4c07f-1832-5e31-9d4e-4364a9b41fc3",
+  "name": "Free Narcan kits, MDHHS Mt. Clemens District office",
+  "status": "active",
+  "description": "Free naloxone (Narcan) kits at the state health and human services office. Ask at the front desk during business hours, while supplies last. Narcan can stop an overdose.",
+  "eligibility_description": "Michigan residents.",
+  "url": "https://www.michigan.gov/mdhhs",
+  "organization": {
+   "id": "cf23ff5f-b23e-582a-909f-83992914056e",
+   "name": "Michigan Department of Health and Human Services",
+   "description": "Michigan Department of Health and Human Services",
+   "x_detroit": {
+    "id": "org_michigan_department_of_health_and_human_"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "4be2f96a-9be9-5b74-9979-cdce6ccaebaf",
+    "location": {
+     "id": "576bd539-7939-5be9-b8fd-6f9ce6e8a91f",
+     "name": "Free Narcan kits, MDHHS Mt. Clemens District office, Michigan Department of Health and Human Services",
+     "location_type": "physical",
+     "latitude": 42.627221,
+     "longitude": -82.862375,
+     "addresses": [
+      {
+       "id": "bbd54467-6d94-5913-ba27-07e7f6b156b0",
+       "address_1": "44777 N Gratiot Ave, Ste A",
+       "city": "Clinton Township",
+       "state_province": "MI",
+       "postal_code": "48036",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_michigan_department_free_narcan_kits_mdhhs_mt_clemens_di"
+     }
+    },
+    "phones": [
+     {
+      "id": "a6b550c6-f2cc-5c42-9b80-f5e1b5a5fe8e",
+      "number": "586-469-7700"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_michigan_department_free_narcan_kits_mdhhs_mt_clemens_di",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their page does not give hours. Go during business hours.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Michigan Department of Health and Human Services website",
+      "url": "https://mdhhs.michigan.gov/CompositeDirPub/VignetteView.aspx?id=166"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_michigan_department_free_narcan_kits_mdhhs_mt_clemens_di",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "d1422746-19ec-5b59-8464-5a71c76fd852",
+  "name": "Free Narcan kits, MDHHS Sterling Heights office",
+  "status": "active",
+  "description": "Free naloxone (Narcan) kits at the state health and human services office. Ask at the front desk during business hours, while supplies last. Narcan can stop an overdose.",
+  "eligibility_description": "Michigan residents.",
+  "url": "https://www.michigan.gov/mdhhs",
+  "organization": {
+   "id": "cf23ff5f-b23e-582a-909f-83992914056e",
+   "name": "Michigan Department of Health and Human Services",
+   "description": "Michigan Department of Health and Human Services",
+   "x_detroit": {
+    "id": "org_michigan_department_of_health_and_human_"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "129e0c55-c111-5933-bbd6-0d7bf3f3a5ee",
+    "location": {
+     "id": "f223c10a-fe37-512b-9893-6236d564f076",
+     "name": "Free Narcan kits, MDHHS Sterling Heights office, Michigan Department of Health and Human Services",
+     "location_type": "physical",
+     "latitude": 42.59585,
+     "longitude": -83.050954,
+     "addresses": [
+      {
+       "id": "6b8fea19-334f-552c-b18a-4055ab166340",
+       "address_1": "41227 Mound Rd, Ste A",
+       "city": "Sterling Heights",
+       "state_province": "MI",
+       "postal_code": "48314",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_michigan_department_free_narcan_kits_mdhhs_sterling_heig"
+     }
+    },
+    "phones": [
+     {
+      "id": "69c4df75-0dbf-5428-bb21-cfa14ab48d73",
+      "number": "586-254-1500"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_michigan_department_free_narcan_kits_mdhhs_sterling_heig",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their page does not give hours. Go during business hours.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Michigan Department of Health and Human Services website",
+      "url": "https://mdhhs.michigan.gov/CompositeDirPub/VignetteView.aspx?id=168"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_michigan_department_free_narcan_kits_mdhhs_sterling_heig",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
+ },
+ {
+  "id": "3f1a3c7b-7deb-5a3a-9414-3daf2583568e",
+  "name": "Free Narcan kits, MDHHS Warren office",
+  "status": "active",
+  "description": "Free naloxone (Narcan) kits at the state health and human services office. Ask at the front desk during business hours, while supplies last. Narcan can stop an overdose.",
+  "eligibility_description": "Michigan residents.",
+  "url": "https://www.michigan.gov/mdhhs",
+  "organization": {
+   "id": "cf23ff5f-b23e-582a-909f-83992914056e",
+   "name": "Michigan Department of Health and Human Services",
+   "description": "Michigan Department of Health and Human Services",
+   "x_detroit": {
+    "id": "org_michigan_department_of_health_and_human_"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "a06f34f9-cd53-5f86-9a71-4188429c525c",
+    "location": {
+     "id": "587dfd7b-c37e-58e5-9442-af899fdec309",
+     "name": "Free Narcan kits, MDHHS Warren office, Michigan Department of Health and Human Services",
+     "location_type": "physical",
+     "latitude": 42.478226,
+     "longitude": -82.990978,
+     "addresses": [
+      {
+       "id": "c606e8cf-4996-5595-ab5c-72429d916e09",
+       "address_1": "13041 E 10 Mile Rd",
+       "city": "Warren",
+       "state_province": "MI",
+       "postal_code": "48089",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_michigan_department_free_narcan_kits_mdhhs_warren_office"
+     }
+    },
+    "phones": [
+     {
+      "id": "d9e30e3a-9613-55b4-a446-00aba81f59ed",
+      "number": "586-427-0600"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_michigan_department_free_narcan_kits_mdhhs_warren_office",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "hours_text": "Their page does not give hours. Go during business hours.",
+     "checked_at_entry": "2026-10-01",
+     "entry_method": "auto_check",
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "seed_list",
+      "name": "Michigan Department of Health and Human Services website",
+      "url": "https://mdhhs.michigan.gov/CompositeDirPub/VignetteView.aspx?id=167"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_michigan_department_free_narcan_kits_mdhhs_warren_office",
+   "category": "harm.narcan"
+  },
+  "assured_date": "2026-10-01"
  },
  {
   "id": "4cbc34f2-61a8-5c29-b8c1-7c9aca90614b",
