@@ -6,7 +6,7 @@ Free help, transit, parks and neighborhood facts for Detroit and the 74 other ci
 SMART buses reach, across Wayne, Oakland and Macomb counties — in an app that stores nothing about you, works with
 no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 1,841 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 1,947 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -53,8 +53,8 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **1,841 listings** in 62 categories, 1,121 of them outside the first four cities: 324 food, 227 health (including
-  **33 emergency rooms and 52 urgent care centers**), 154 harm reduction, 263 places to get somewhere safe now (177
+- **1,947 listings** in 62 categories, 1,227 of them outside the first four cities: 324 food, 227 health (including
+  **33 emergency rooms and 52 urgent care centers**), 260 harm reduction, 263 places to get somewhere safe now (177
   fire stations and 86 police stations), 122 recreation centers and libraries, 102 child care and free preschool,
   78 housing, 73 learning, 68 treatment, 61 jobs, and 15 more groups — among them help built for seniors, veterans
   and people with a disability.
@@ -84,9 +84,9 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
   and trip plans — are written three times against [one spec](schema/query-spec.md) and **223 shared fixture
   cases**; the web and iPhone pass every case, and Android's are run by CI.
-- **Tested and small.** 1,380 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
+- **Tested and small.** 1,397 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
-  (26 KB) loads only if chosen; the bundle is 6.7 MB for the whole three-county area.
+  (26 KB) loads only if chosen; the bundle is 6.8 MB for the whole three-county area.
 
 ## How listings stay fresh
 
@@ -131,7 +131,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,380 tests
+pnpm test                                   # 1,397 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/
@@ -190,7 +190,7 @@ support contracts fund the rest. Never ads, never data ([docs/12](docs/12-gift-a
 ## Data sources and licences
 
 Most listings come from each organization's own website; more than 150 are named in [NOTICE](NOTICE). Map,
-transit, park and neighborhood layers come from City of Detroit open data, Wayne County, SMART, the People Mover,
+transit, park and neighborhood layers come from City of Detroit open data, Wayne County, Oakland County, SMART, the People Mover,
 MDOT, SEMCOG, US Census TIGER, US DOT BTS and SAMHSA. Every listing names its source on screen. Per-source terms
 are in `data/sources.yaml`, [docs/02](docs/02-data-sources.md) and [data/LICENSE-DATA.md](data/LICENSE-DATA.md).
 **Licence:** code Apache-2.0 ([LICENSE](LICENSE)); our dataset CC BY 4.0; third-party data keeps its publisher's

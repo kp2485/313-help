@@ -12,7 +12,7 @@ import { buildAreas, buildIndicators, NEAR_MILES } from './indicators.js';
 import { GRID } from './ingest-basemap.js';
 import { fromIngested, fromSeed, toHsds, type Normalized } from './normalize.js';
 import { retiredPath } from './ingest-ids.js';
-import { hsdsSchema, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsds, validateHsdsPrivacy, validateIngestedIds, validateRows, type Issues } from './validate.js';
+import { hsdsSchema, scriptRefusingHosts, validateAlerts, validateEmergency, validateHsds, validateHsdsPrivacy, validateIngestedIds, validateRows, validateSameAs, type Issues } from './validate.js';
 import { readScriptRefusingHosts } from './seed-io.js';
 import { loadSigningKey, publicKeyB64, signBytes } from './sign.js';
 import { applyAggregates, fetchAggregates, pushTargets, type Aggregates } from './reports-sync.js';
@@ -63,6 +63,7 @@ export async function build(opts: BuildOptions = {}) {
   const alerts = JSON.parse(readFileSync(p('data/seed/alerts.json'), 'utf8')) as Alert[];
 
   // 2. Validate
+  for (const src of loadSources()) if (src.same_as) idIssues.push(validateSameAs(src.id, src.same_as, rows));
   const issues = [...idIssues, validateRows(rows, todayStr, scriptRefusingHosts(readScriptRefusingHosts())), validateAlerts(alerts, new Set(rows.map((r) => r.id)))];
   const regionFile = p('data/ingested/region.json');
   const placeIds = existsSync(regionFile) ? new Set((JSON.parse(readFileSync(regionFile, 'utf8')).municipalities as { id: string }[]).map((m) => m.id)) : undefined;

@@ -1890,11 +1890,11 @@
     -83.17723
    ],
    "help": {
-    "total": 2,
+    "total": 5,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 0,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -1916,18 +1916,17 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 0.8,
-     "narcan": 0.7,
+     "narcan": 0.5,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_word_in_food_pantry",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
-     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "narcan": "sal_ocn_13700_8_mile_rd_oak_park",
      "indoors": "sal_healthy_kidz_tindal_recreation_center"
     },
     "none_listed_yet": [
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -2259,11 +2258,11 @@
     -83.15632
    ],
    "help": {
-    "total": 13,
+    "total": 15,
     "by": {
      "food": 3,
      "health": 3,
-     "harm": 5,
+     "harm": 7,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -3159,13 +3158,13 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 1,
-     "narcan": 1.7,
+     "narcan": 1.6,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_puritan_street_food_pantry",
      "clinic": "sal_advantage_health_warren_8_mile_rd",
-     "narcan": "sal_oakland_county_free_narcan_machine_hazel_park",
+     "narcan": "sal_ocn_231_w_8_mile_rd_detroit",
      "indoors": "sal_detroit_parks_farwell_recreation_center"
     },
     "none_listed_yet": [
@@ -12167,11 +12166,11 @@
     -83.14965
    ],
    "help": {
-    "total": 6,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 0,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -12193,18 +12192,16 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 1.9,
-     "narcan": 1.4,
+     "narcan": 0.6,
      "indoors": 0.7
     },
     "nearest_id": {
      "food": "sal_new_prospect_grocery_give_away",
      "clinic": "sal_ferncare_free_clinic",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_affirmations_fernd",
+     "narcan": "sal_ocn_429_livernois_ferndale",
      "indoors": "sal_royal_oak_township_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -14730,11 +14727,11 @@
     -83.12961
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -14756,13 +14753,13 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 1.4,
-     "narcan": 0.7,
+     "narcan": 0.4,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_new_prospect_grocery_give_away",
      "clinic": "sal_detroit_community_nolan_family_medical_center",
-     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "narcan": "sal_ocn_330_8_mile_rd_ferndale",
      "indoors": "sal_ferndale_area_district_library"
     },
     "none_listed_yet": [],
@@ -14939,13 +14936,13 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 0.7,
-     "narcan": 1.5,
+     "narcan": 1.3,
      "indoors": 2.3
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_first_baptist_in",
      "clinic": "sal_the_wellness_wellness_plan_northwest_medical_center_oak_",
-     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "narcan": "sal_ocn_16001_w_nine_mile_rd_southfield",
      "indoors": "sal_detroit_parks_northwest_activities_center"
     },
     "none_listed_yet": [
@@ -20676,13 +20673,13 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 1.5,
-     "narcan": 1,
+     "narcan": 0.8,
      "indoors": 0.4
     },
     "nearest_id": {
      "food": "sal_word_in_food_pantry",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
-     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "narcan": "sal_ocn_21009_ithaca_ave_ferndale",
      "indoors": "sal_healthy_kidz_tindal_recreation_center"
     },
     "none_listed_yet": [
@@ -24053,11 +24050,11 @@
     -83.09326
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -24079,13 +24076,13 @@
     "nearest_miles": {
      "food": 0.9,
      "clinic": 0.9,
-     "narcan": 1.2,
+     "narcan": 0.7,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_puritan_street_food_pantry",
      "clinic": "sal_detroit_community_nolan_family_medical_center",
-     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "narcan": "sal_ocn_231_w_8_mile_rd_detroit",
      "indoors": "sal_hazel_park_district_library"
     },
     "none_listed_yet": [],
@@ -26150,13 +26147,13 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 2,
-     "narcan": 1.4,
+     "narcan": 0.9,
      "indoors": 0.7
     },
     "nearest_id": {
      "food": "sal_new_prospect_grocery_give_away",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
-     "narcan": "sal_hr_8031_w_mcnichols",
+     "narcan": "sal_ocn_21009_ithaca_ave_ferndale",
      "indoors": "sal_healthy_kidz_tindal_recreation_center"
     },
     "none_listed_yet": [
@@ -27563,11 +27560,11 @@
     -83.16529
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 0,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -27589,18 +27586,17 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 1.5,
-     "narcan": 1.2,
+     "narcan": 0.4,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_word_in_food_pantry",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
-     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "narcan": "sal_ocn_21009_ithaca_ave_ferndale",
      "indoors": "sal_royal_oak_township_library"
     },
     "none_listed_yet": [
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -27750,11 +27746,11 @@
     -83.11328
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -31634,11 +31630,11 @@
     -83.18815
    ],
    "help": {
-    "total": 11,
+    "total": 13,
     "by": {
      "food": 4,
      "health": 4,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -31660,13 +31656,13 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 0.3,
-     "narcan": 0.8,
+     "narcan": 0.4,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_jalen_rose_leade",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
-     "narcan": "sal_hr_13635_w_7_mile_rd",
+     "narcan": "sal_ocn_13700_8_mile_rd_oak_park",
      "indoors": "sal_healthy_kidz_tindal_recreation_center"
     },
     "none_listed_yet": [],
@@ -32776,13 +32772,13 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 1.6,
-     "narcan": 1.1,
+     "narcan": 0.8,
      "indoors": 1.5
     },
     "nearest_id": {
      "food": "sal_new_prospect_grocery_give_away",
      "clinic": "sal_detroit_community_nolan_family_medical_center",
-     "narcan": "sal_hr_1121_w_eight_mile_rd",
+     "narcan": "sal_ocn_330_8_mile_rd_ferndale",
      "indoors": "sal_healthy_kidz_tindal_recreation_center"
     },
     "none_listed_yet": [
@@ -33505,11 +33501,11 @@
     -83.11416
    ],
    "help": {
-    "total": 1,
+    "total": 3,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -38426,11 +38422,11 @@
     -83.10224
    ],
    "help": {
-    "total": 540,
+    "total": 541,
     "by": {
      "food": 142,
      "health": 64,
-     "harm": 73,
+     "harm": 74,
      "shelter": 7,
      "utilities": 4,
      "hygiene": 4,
@@ -39551,13 +39547,13 @@
     "nearest_miles": {
      "food": 2.2,
      "clinic": 2.9,
-     "narcan": 2.9,
+     "narcan": 2.8,
      "indoors": 1.7
     },
     "nearest_id": {
      "food": "sal_macomb_county_senior_lunch_at_leisure_manor",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_grosse_pointe_woods_branch_library"
     },
     "none_listed_yet": [
@@ -39616,13 +39612,13 @@
     "nearest_miles": {
      "food": 1.8,
      "clinic": 1.8,
-     "narcan": 1.8,
+     "narcan": 1.6,
      "indoors": 0.5
     },
     "nearest_id": {
      "food": "sal_my_father_s_food_pantry",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_grosse_pointe_woods_branch_library"
     },
     "none_listed_yet": [
@@ -39687,7 +39683,7 @@
     "nearest_id": {
      "food": "sal_my_father_s_food_pantry",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_city_of_harper_woods_parks_and_recreation"
     },
     "none_listed_yet": [
@@ -39780,11 +39776,11 @@
     -83.18126
    ],
    "help": {
-    "total": 19,
+    "total": 20,
     "by": {
      "food": 0,
      "health": 2,
-     "harm": 4,
+     "harm": 5,
      "shelter": 8,
      "utilities": 0,
      "hygiene": 0,
@@ -40030,11 +40026,11 @@
     -83.12416
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 1,
      "health": 0,
-     "harm": 4,
+     "harm": 5,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
@@ -40219,11 +40215,11 @@
     -83.20569
    ],
    "help": {
-    "total": 16,
+    "total": 19,
     "by": {
      "food": 3,
      "health": 2,
-     "harm": 2,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40280,11 +40276,11 @@
     -83.26769
    ],
    "help": {
-    "total": 25,
+    "total": 27,
     "by": {
      "food": 2,
      "health": 6,
-     "harm": 3,
+     "harm": 5,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -40587,11 +40583,11 @@
     -83.24361
    ],
    "help": {
-    "total": 10,
+    "total": 11,
     "by": {
      "food": 0,
      "health": 1,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40613,18 +40609,17 @@
     "nearest_miles": {
      "food": 2.3,
      "clinic": 1.4,
-     "narcan": 3.5,
+     "narcan": 0.3,
      "indoors": 1
     },
     "nearest_id": {
      "food": "sal_moriah_high_food_pantry",
      "clinic": "sal_honor_community_pontiac_middle_school_health_center",
-     "narcan": "sal_oakland_county_harm_reduction_clinic_pontiac",
+     "narcan": "sal_ocn_2399_walton_blvd_auburn_hills",
      "indoors": "sal_auburn_hills_public_library"
     },
     "none_listed_yet": [
-     "food",
-     "harm"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -40651,11 +40646,11 @@
     -83.18534
    ],
    "help": {
-    "total": 7,
+    "total": 10,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 0,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40677,18 +40672,16 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 0.9,
-     "narcan": 0.9,
+     "narcan": 0.3,
      "indoors": 0.2
     },
     "nearest_id": {
      "food": "sal_yad_ezra_kosher_food_pantry",
      "clinic": "sal_honor_community_honor_clinic_at_the_south_oakland_health",
-     "narcan": "sal_free_narcan_cabinet_oakland_county_health_division_south",
+     "narcan": "sal_ocn_2395_w_12_mile_berkley",
      "indoors": "sal_berkley_public_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -40714,11 +40707,11 @@
     -83.21658
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40740,19 +40733,18 @@
     "nearest_miles": {
      "food": 2.9,
      "clinic": 3.3,
-     "narcan": 2.6,
+     "narcan": 0.1,
      "indoors": 0
     },
     "nearest_id": {
      "food": "sal_lighthouse_southfield_food_pantry_at_st_david_s",
      "clinic": "sal_michigan_association_mapi_charitable_clinic",
-     "narcan": "sal_oakland_county_free_narcan_machine_probation_department_",
+     "narcan": "sal_ocn_151_martin_st_birmingham",
      "indoors": "sal_baldwin_public_library"
     },
     "none_listed_yet": [
      "food",
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -40805,13 +40797,13 @@
     "nearest_miles": {
      "food": 2.8,
      "clinic": 3.4,
-     "narcan": 4.9,
+     "narcan": 2,
      "indoors": 2.1
     },
     "nearest_id": {
      "food": "sal_franklin_road_food_pantry",
      "clinic": "sal_honor_community_avondale_high_school_health_center",
-     "narcan": "sal_oakland_county_free_narcan_machine_probation_department_",
+     "narcan": "sal_ocn_43141_woodward_ave_bloomfield_hills",
      "indoors": "sal_bloomfield_township_public_library"
     },
     "none_listed_yet": [
@@ -40844,11 +40836,11 @@
     -83.27447
    ],
    "help": {
-    "total": 10,
+    "total": 11,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40870,18 +40862,16 @@
     "nearest_miles": {
      "food": 2.2,
      "clinic": 3.7,
-     "narcan": 4.6,
+     "narcan": 1.9,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_franklin_road_food_pantry",
      "clinic": "sal_the_wellness_wellness_plan_medical_center_pontiac",
-     "narcan": "sal_oakland_county_harm_reduction_clinic_pontiac",
+     "narcan": "sal_ocn_43141_woodward_ave_bloomfield_hills",
      "indoors": "sal_bloomfield_township_public_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -40971,11 +40961,11 @@
     -83.49569
    ],
    "help": {
-    "total": 11,
+    "total": 13,
     "by": {
      "food": 1,
      "health": 2,
-     "harm": 0,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40997,18 +40987,16 @@
     "nearest_miles": {
      "food": 3,
      "clinic": 8.7,
-     "narcan": 6.8,
+     "narcan": 1,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_hospitality_house_food_pantry",
      "clinic": "sal_honor_community_waterford_durant_high_school_health_cent",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_meridian_n_oakland",
+     "narcan": "sal_ocn_425_glengary_rd_wolverine_lake",
      "indoors": "sal_commerce_township_community_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41034,11 +41022,11 @@
     -83.37838
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41060,19 +41048,18 @@
     "nearest_miles": {
      "food": 3,
      "clinic": 5.9,
-     "narcan": 3,
+     "narcan": 0.3,
      "indoors": 0.1
     },
     "nearest_id": {
      "food": "sal_cares_of_food_pantry_by_appointment",
      "clinic": "sal_honor_community_plum_hollow_center",
-     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "narcan": "sal_ocn_23600_liberty_st_farmington",
      "indoors": "sal_farmington_community_library_farmington"
     },
     "none_listed_yet": [
      "food",
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -41099,11 +41086,11 @@
     -83.37596
    ],
    "help": {
-    "total": 18,
+    "total": 23,
     "by": {
      "food": 2,
      "health": 4,
-     "harm": 0,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41125,18 +41112,16 @@
     "nearest_miles": {
      "food": 3.7,
      "clinic": 6.1,
-     "narcan": 4.4,
+     "narcan": 0.8,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_cares_of_food_pantry_by_appointment",
      "clinic": "sal_honor_community_plum_hollow_center",
-     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "narcan": "sal_ocn_31605_w_11_mile_rd_farmington",
      "indoors": "sal_farmington_community_library_farmington_hills"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41162,11 +41147,11 @@
     -83.13137
    ],
    "help": {
-    "total": 15,
+    "total": 20,
     "by": {
      "food": 3,
      "health": 4,
-     "harm": 1,
+     "harm": 6,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41188,13 +41173,13 @@
     "nearest_miles": {
      "food": 0.1,
      "clinic": 0.4,
-     "narcan": 0.4,
+     "narcan": 0.1,
      "indoors": 0.1
     },
     "nearest_id": {
      "food": "sal_zion_lutheran_food_pantry",
      "clinic": "sal_ferncare_free_clinic",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_affirmations_fernd",
+     "narcan": "sal_ocn_305_e_9_mile_ferndale",
      "indoors": "sal_ferndale_area_district_library"
     },
     "none_listed_yet": [],
@@ -41223,11 +41208,11 @@
     -83.09769
    ],
    "help": {
-    "total": 14,
+    "total": 16,
     "by": {
      "food": 0,
      "health": 2,
-     "harm": 1,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41312,13 +41297,13 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 2,
-     "narcan": 2,
+     "narcan": 0.7,
      "indoors": 0.3
     },
     "nearest_id": {
      "food": "sal_open_hands_food_pantry",
      "clinic": "sal_honor_community_honor_clinic_at_the_south_oakland_health",
-     "narcan": "sal_free_narcan_cabinet_oakland_county_health_division_south",
+     "narcan": "sal_ocn_1964_w_11_mile_rd_berkley",
      "indoors": "sal_city_of_gillham_recreation_center"
     },
     "none_listed_yet": [
@@ -41415,11 +41400,11 @@
     -83.10335
    ],
    "help": {
-    "total": 16,
+    "total": 17,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41441,18 +41426,16 @@
     "nearest_miles": {
      "food": 0.9,
      "clinic": 2.5,
-     "narcan": 3.2,
+     "narcan": 1,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_community_choice_mobile_market_at_mdhh",
      "clinic": "sal_corktown_health_in_hazel_park",
-     "narcan": "sal_oakland_county_free_narcan_machine_hazel_park",
+     "narcan": "sal_ocn_28303_dequindre_rd_100_madison_heights",
      "indoors": "sal_madison_heights_public_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41478,11 +41461,11 @@
     -83.48682
    ],
    "help": {
-    "total": 21,
+    "total": 24,
     "by": {
      "food": 1,
      "health": 3,
-     "harm": 0,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41504,18 +41487,16 @@
     "nearest_miles": {
      "food": 1.1,
      "clinic": 11.5,
-     "narcan": 8.1,
+     "narcan": 1.7,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_tawheed_center_o",
      "clinic": "sal_honor_community_plum_hollow_center",
-     "narcan": "sal_wws_livonia_carl_sandburg_library",
+     "narcan": "sal_ocn_47601_grand_river_ave_novi",
      "indoors": "sal_novi_public_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41541,11 +41522,11 @@
     -83.18241
    ],
    "help": {
-    "total": 9,
+    "total": 14,
     "by": {
      "food": 1,
      "health": 2,
-     "harm": 0,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41567,18 +41548,16 @@
     "nearest_miles": {
      "food": 1.4,
      "clinic": 1.5,
-     "narcan": 2.3,
+     "narcan": 0.8,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_community_choice_market_in_oak_park",
      "clinic": "sal_the_wellness_wellness_plan_northwest_medical_center_oak_",
-     "narcan": "sal_free_narcan_cabinet_oakland_county_health_division_south",
+     "narcan": "sal_ocn_21675_coolidge_hwy_oak_park",
      "indoors": "sal_city_of_gillham_recreation_center"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41604,11 +41583,11 @@
     -83.26194
    ],
    "help": {
-    "total": 13,
+    "total": 16,
     "by": {
      "food": 2,
      "health": 1,
-     "harm": 0,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41630,18 +41609,16 @@
     "nearest_miles": {
      "food": 1.2,
      "clinic": 5.5,
-     "narcan": 8,
+     "narcan": 1.1,
      "indoors": 1.5
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_woodside_orion",
      "clinic": "sal_honor_community_baldwin_family_medicine_center",
-     "narcan": "sal_free_narcan_cabinet_oakland_county_health_division_ponti",
+     "narcan": "sal_ocn_2323_joslyn_rd_lake_orion",
      "indoors": "sal_orion_township_public_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41693,13 +41670,13 @@
     "nearest_miles": {
      "food": 0.8,
      "clinic": 1.3,
-     "narcan": 0.8,
+     "narcan": 0.5,
      "indoors": 0.3
     },
     "nearest_id": {
      "food": "sal_affirmations_lgbtq_food_pantry",
      "clinic": "sal_ferncare_free_clinic",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_affirmations_fernd",
+     "narcan": "sal_ocn_1223_s_washington_ave_royal_oak",
      "indoors": "sal_city_of_pleasant_ridge_community_center"
     },
     "none_listed_yet": [
@@ -41732,11 +41709,11 @@
     -83.28736
    ],
    "help": {
-    "total": 98,
+    "total": 121,
     "by": {
      "food": 19,
      "health": 20,
-     "harm": 3,
+     "harm": 26,
      "shelter": 1,
      "utilities": 2,
      "hygiene": 2,
@@ -41758,13 +41735,13 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 1.1,
-     "narcan": 0.7,
+     "narcan": 0.1,
      "indoors": 0.8
     },
     "nearest_id": {
      "food": "sal_believers_community_food_pantry_by_appointment",
      "clinic": "sal_honor_community_orchard_lake_center",
-     "narcan": "sal_oakland_county_harm_reduction_clinic_pontiac",
+     "narcan": "sal_ocn_547_perry_st_pontiac",
      "indoors": "sal_pontiac_public_library"
     },
     "none_listed_yet": [],
@@ -41793,11 +41770,11 @@
     -83.11972
    ],
    "help": {
-    "total": 12,
+    "total": 13,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41819,18 +41796,16 @@
     "nearest_miles": {
      "food": 1,
      "clinic": 6.9,
-     "narcan": 9.6,
+     "narcan": 0.9,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_rochester_area_neighborhood_house_food_pantry",
      "clinic": "sal_honor_community_avondale_high_school_health_center",
-     "narcan": "sal_oakland_county_harm_reduction_clinic_pontiac",
+     "narcan": "sal_ocn_400_sixth_street_rochester",
      "indoors": "sal_rochester_avon_rara_recreation_center_rochester"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41856,11 +41831,11 @@
     -83.1592
    ],
    "help": {
-    "total": 7,
+    "total": 9,
     "by": {
      "food": 0,
      "health": 1,
-     "harm": 0,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41882,18 +41857,17 @@
     "nearest_miles": {
      "food": 2.3,
      "clinic": 4.3,
-     "narcan": 7.2,
+     "narcan": 0.4,
      "indoors": 1.9
     },
     "nearest_id": {
      "food": "sal_rochester_area_neighborhood_house_food_pantry",
      "clinic": "sal_honor_community_avondale_high_school_health_center",
-     "narcan": "sal_oakland_county_harm_reduction_clinic_pontiac",
+     "narcan": "sal_ocn_1111_horizon_ct_rochester_hills",
      "indoors": "sal_rochester_hills_public_library"
     },
     "none_listed_yet": [
-     "food",
-     "harm"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -41920,11 +41894,11 @@
     -83.15389
    ],
    "help": {
-    "total": 20,
+    "total": 26,
     "by": {
      "food": 2,
      "health": 3,
-     "harm": 0,
+     "harm": 6,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
@@ -41946,18 +41920,16 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 2.7,
-     "narcan": 2.5,
+     "narcan": 1.4,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_salvation_army_royal_oak_corps_food_pantry",
      "clinic": "sal_honor_community_honor_clinic_at_the_south_oakland_health",
-     "narcan": "sal_oakland_county_free_narcan_machine_probation_department_",
+     "narcan": "sal_ocn_117_west_3rd_street_royal_oak",
      "indoors": "sal_royal_oak_public_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -41983,11 +41955,11 @@
     -83.1624
    ],
    "help": {
-    "total": 4,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 0,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42009,18 +41981,17 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 1.8,
-     "narcan": 1.4,
+     "narcan": 0.1,
      "indoors": 0.2
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_second_new_hope_",
      "clinic": "sal_institute_for_iph_health_center_james_couzens",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_affirmations_fernd",
+     "narcan": "sal_ocn_21009_ithaca_ave_ferndale",
      "indoors": "sal_royal_oak_township_library"
     },
     "none_listed_yet": [
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -42047,11 +42018,11 @@
     -83.25951
    ],
    "help": {
-    "total": 36,
+    "total": 44,
     "by": {
      "food": 7,
      "health": 7,
-     "harm": 1,
+     "harm": 9,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42073,13 +42044,13 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 1.2,
-     "narcan": 3.2,
+     "narcan": 0.5,
      "indoors": 1.1
     },
     "nearest_id": {
      "food": "sal_franciscan_outreach_food_pantry",
      "clinic": "sal_honor_community_plum_hollow_center",
-     "narcan": "sal_free_narcan_cabinet_oakland_county_health_division_south",
+     "narcan": "sal_ocn_21000_w_10_mile_rd_m113_southfield",
      "indoors": "sal_southfield_public_library"
     },
     "none_listed_yet": [],
@@ -42134,13 +42105,13 @@
     "nearest_miles": {
      "food": 2.7,
      "clinic": 2.3,
-     "narcan": 3.6,
+     "narcan": 2.5,
      "indoors": 2.9
     },
     "nearest_id": {
      "food": "sal_closet_of_food_pantry",
      "clinic": "sal_authority_health_ira_land_family_health_center",
-     "narcan": "sal_free_narcan_cabinet_oakland_county_health_division_south",
+     "narcan": "sal_ocn_28200_franklin_road_southfield",
      "indoors": "sal_southfield_public_library"
     },
     "none_listed_yet": [
@@ -42199,13 +42170,13 @@
     "nearest_miles": {
      "food": 2.2,
      "clinic": 1.6,
-     "narcan": 1.8,
+     "narcan": 0.5,
      "indoors": 2.7
     },
     "nearest_id": {
      "food": "sal_catholic_charities_la_casa_amiga_food_pantry",
      "clinic": "sal_honor_community_webster_teen_health_center",
-     "narcan": "sal_oakland_county_free_narcan_machine_community_corrections",
+     "narcan": "sal_ocn_2399_figa_ave_west_bloomfield_township",
      "indoors": "sal_pontiac_public_library"
     },
     "none_listed_yet": [
@@ -42238,11 +42209,11 @@
     -83.14553
    ],
    "help": {
-    "total": 33,
+    "total": 34,
     "by": {
      "food": 3,
      "health": 3,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42264,13 +42235,13 @@
     "nearest_miles": {
      "food": 0.9,
      "clinic": 5.4,
-     "narcan": 3,
+     "narcan": 1.7,
      "indoors": 1.2
     },
     "nearest_id": {
      "food": "sal_st_joseph_food_pantry",
      "clinic": "sal_honor_community_avondale_high_school_health_center",
-     "narcan": "sal_oakland_county_free_narcan_machine_probation_department_",
+     "narcan": "sal_ocn_5505_corporate_drive_troy",
      "indoors": "sal_city_of_troy_community_center"
     },
     "none_listed_yet": [],
@@ -42299,11 +42270,11 @@
     -83.47371
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42325,19 +42296,18 @@
     "nearest_miles": {
      "food": 0.9,
      "clinic": 9.6,
-     "narcan": 8.7,
+     "narcan": 0.3,
      "indoors": 0.4
     },
     "nearest_id": {
      "food": "sal_hospitality_house_food_pantry",
      "clinic": "sal_honor_community_waterford_durant_high_school_health_cent",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_meridian_n_oakland",
+     "narcan": "sal_ocn_1010_e_west_maple_rd_suite_200_walled_lake",
      "indoors": "sal_walled_lake_city_library"
     },
     "none_listed_yet": [
      "food",
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -42364,11 +42334,11 @@
     -83.38792
    ],
    "help": {
-    "total": 24,
+    "total": 29,
     "by": {
      "food": 5,
      "health": 2,
-     "harm": 2,
+     "harm": 7,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42390,13 +42360,13 @@
     "nearest_miles": {
      "food": 1.4,
      "clinic": 1.9,
-     "narcan": 2.2,
+     "narcan": 0,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_lakecrest_baptist_food_pantry_by_appointment",
      "clinic": "sal_honor_community_waterford_durant_high_school_health_cent",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_meridian_n_oakland",
+     "narcan": "sal_ocn_1585_crescent_lake_rd_waterford",
      "indoors": "sal_waterford_township_public_library"
     },
     "none_listed_yet": [],
@@ -42425,11 +42395,11 @@
     -83.38709
    ],
    "help": {
-    "total": 14,
+    "total": 29,
     "by": {
      "food": 0,
      "health": 3,
-     "harm": 0,
+     "harm": 15,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42451,18 +42421,17 @@
     "nearest_miles": {
      "food": 3.9,
      "clinic": 5.7,
-     "narcan": 6.2,
+     "narcan": 0.8,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_hospitality_house_food_pantry",
      "clinic": "sal_honor_community_waterford_durant_high_school_health_cent",
-     "narcan": "sal_oakland_county_free_narcan_machine_community_corrections",
+     "narcan": "sal_ocn_4550_walnut_lake_rd_west_bloomfield_township",
      "indoors": "sal_west_bloomfield_main_library"
     },
     "none_listed_yet": [
-     "food",
-     "harm"
+     "food"
     ],
     "coverage_checked": false
    },
@@ -42515,13 +42484,13 @@
     "nearest_miles": {
      "food": 4.7,
      "clinic": 7.4,
-     "narcan": 3.5,
+     "narcan": 3.4,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_open_door_open_door_food_pantry_main_campus",
      "clinic": "sal_honor_community_waterford_durant_high_school_health_cent",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_meridian_n_oakland",
+     "narcan": "sal_ocn_1255_n_oakland_blvd_waterford",
      "indoors": "sal_white_lake_township_library"
     },
     "none_listed_yet": [
@@ -42580,13 +42549,13 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 12.3,
-     "narcan": 10.7,
+     "narcan": 2.6,
      "indoors": 0.1
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_first_baptist_ch",
      "clinic": "sal_honor_community_waterford_durant_high_school_health_cent",
-     "narcan": "sal_oakland_county_free_narcan_machine_at_meridian_n_oakland",
+     "narcan": "sal_ocn_47601_grand_river_ave_novi",
      "indoors": "sal_wixom_public_library"
     },
     "none_listed_yet": [
@@ -42707,13 +42676,13 @@
     "nearest_miles": {
      "food": 2.3,
      "clinic": 5.8,
-     "narcan": 17,
+     "narcan": 16.5,
      "indoors": 1.1
     },
     "nearest_id": {
      "food": "sal_macomb_county_senior_lunch_at_chesterfield_senior_center",
      "clinic": "sal_mycare_health_center_clinton_township",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_750_barclay_circle_rochester_hills",
      "indoors": "sal_chesterfield_community_center"
     },
     "none_listed_yet": [
@@ -42770,13 +42739,13 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 2.2,
-     "narcan": 9.7,
+     "narcan": 9.6,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_food_pantry_at_central_bible_church",
      "clinic": "sal_macomb_county_shots_at_the_verkuilen_building_clinton_to",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_clinton_macomb_main_library"
     },
     "none_listed_yet": [
@@ -42839,7 +42808,7 @@
     "nearest_id": {
      "food": "sal_food_pantry_at_st_peter_s_lutheran_church",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_eastpointe_memorial_library"
     },
     "none_listed_yet": [
@@ -42903,7 +42872,7 @@
     "nearest_id": {
      "food": "sal_gleaners_community_gleaners_drive_up_food_at_fraser_vfw_",
      "clinic": "sal_advantage_health_warren_13_mile_rd",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_fraser_public_library"
     },
     "none_listed_yet": [
@@ -42961,13 +42930,13 @@
     "nearest_miles": {
      "food": 2.2,
      "clinic": 3,
-     "narcan": 11.1,
+     "narcan": 11,
      "indoors": 1.8
     },
     "nearest_id": {
      "food": "sal_macomb_county_senior_lunch_at_tucker_senior_center",
      "clinic": "sal_mycare_health_center_mount_clemens",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_harrison_township_public_library"
     },
     "none_listed_yet": [
@@ -43025,13 +42994,13 @@
     "nearest_miles": {
      "food": 1.3,
      "clinic": 4.1,
-     "narcan": 15.5,
+     "narcan": 10.8,
      "indoors": 1.5
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_st_isidore_catho",
      "clinic": "sal_macomb_county_shots_at_the_verkuilen_building_clinton_to",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_750_barclay_circle_rochester_hills",
      "indoors": "sal_clinton_macomb_north_branch_library"
     },
     "none_listed_yet": [
@@ -43088,13 +43057,13 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 0.3,
-     "narcan": 10.5,
+     "narcan": 10.4,
      "indoors": 0.1
     },
     "nearest_id": {
      "food": "sal_food_pantry_at_st_peter_s_catholic_church",
      "clinic": "sal_mycare_health_center_mount_clemens",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_mount_clemens_public_library"
     },
     "none_listed_yet": [
@@ -43151,13 +43120,13 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 8.8,
-     "narcan": 19,
+     "narcan": 18.8,
      "indoors": 0.4
     },
     "nearest_id": {
      "food": "sal_macomb_county_senior_lunch_truck_at_new_baltimore_parks_",
      "clinic": "sal_mycare_health_center_clinton_township",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_macdonald_public_library"
     },
     "none_listed_yet": [
@@ -43215,13 +43184,13 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 2.5,
-     "narcan": 4,
+     "narcan": 3.9,
      "indoors": 0.7
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_covenant_mission",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_recreation_authority_center_roseville"
     },
     "none_listed_yet": [
@@ -43279,13 +43248,13 @@
     "nearest_miles": {
      "food": 1.5,
      "clinic": 5.4,
-     "narcan": 11.2,
+     "narcan": 5.1,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_lakepointe_church_lakepointe_pantry",
      "clinic": "sal_henry_ford_neighbors_caring_for_neighbors_free_clinic",
-     "narcan": "sal_oakland_county_free_narcan_machine_probation_department_",
+     "narcan": "sal_ocn_750_barclay_circle_rochester_hills",
      "indoors": "sal_shelby_township_library"
     },
     "none_listed_yet": [
@@ -43316,11 +43285,11 @@
     -82.8909
    ],
    "help": {
-    "total": 22,
+    "total": 23,
     "by": {
      "food": 3,
      "health": 6,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -43342,18 +43311,16 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 0.9,
-     "narcan": 3.6,
+     "narcan": 3.4,
      "indoors": 0.3
     },
     "nearest_id": {
      "food": "sal_food_pantry_at_lakeshore_presbyterian",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_wws_harper_woods_wayne_county_community_college_district_mar",
+     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
      "indoors": "sal_st_clair_shores_public_library"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -43405,13 +43372,13 @@
     "nearest_miles": {
      "food": 1,
      "clinic": 3.7,
-     "narcan": 7.4,
+     "narcan": 6.3,
      "indoors": 1.2
     },
     "nearest_id": {
      "food": "sal_st_ephrem_food_pantry_at_st_ephrem",
      "clinic": "sal_henry_ford_neighbors_caring_for_neighbors_free_clinic",
-     "narcan": "sal_oakland_county_free_narcan_machine_probation_department_",
+     "narcan": "sal_ocn_28303_dequindre_rd_100_madison_heights",
      "indoors": "sal_city_of_sterling_heights_community_center"
     },
     "none_listed_yet": [
@@ -43468,13 +43435,13 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 2.9,
-     "narcan": 9.4,
+     "narcan": 5.3,
      "indoors": 0.7
     },
     "nearest_id": {
      "food": "sal_sunday_community_meal_at_trinity_lutheran",
      "clinic": "sal_henry_ford_neighbors_caring_for_neighbors_free_clinic",
-     "narcan": "sal_oakland_county_free_narcan_machine_probation_department_",
+     "narcan": "sal_ocn_750_barclay_circle_rochester_hills",
      "indoors": "sal_utica_public_library"
     },
     "none_listed_yet": [
@@ -43532,13 +43499,13 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 0.3,
-     "narcan": 3.3,
+     "narcan": 3.2,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_south_eastern_food_pantry_at_southeastern_michigan_india",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_warre",
-     "narcan": "sal_hr_20216_van_dyke_ave",
+     "narcan": "sal_ocn_28303_dequindre_rd_100_madison_heights",
      "indoors": "sal_city_of_center_line_parks_and_recreation_game_room"
     },
     "none_listed_yet": [
@@ -43563,7 +43530,7 @@
   "src_detroit_parks": {
    "name": "City of Detroit parks layer",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0",
-   "last_edited": "2026-09-21",
+   "last_edited": "2026-09-28",
    "license": "Unstated (the City portal publishes a disclaimer only)"
   },
   "src_semcog_crashes": {

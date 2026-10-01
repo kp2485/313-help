@@ -289,3 +289,15 @@ export function validateHsds(services: unknown[], schema: object): Issues {
   }
   return { errors, warnings: [] };
 }
+
+/**
+ * A checked layer's `same_as` names the seed rows that stand for some of its records (sources.yaml). Each must be
+ * an active listing: if a person archives one, the County's record would silently vanish from the app with it, so
+ * the build stops and asks for the line to be removed (the record then comes back from the layer) or repointed.
+ */
+export function validateSameAs(srcId: string, sameAs: Record<string, string>, rows: BundleRow[]): Issues {
+  const active = new Set(rows.filter((r) => r.status === 'active').map((r) => r.id));
+  const errors = Object.entries(sameAs).filter(([, id]) => !active.has(id))
+    .map(([ref, id]) => `${srcId}: same_as "${ref}" names ${id}, which is not an active listing`);
+  return { errors, warnings: [] };
+}

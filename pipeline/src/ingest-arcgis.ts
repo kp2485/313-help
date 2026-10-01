@@ -15,9 +15,15 @@ export interface Source {
   category?: string; org?: { id: string; name: string };
   fields?: Record<string, string>; extra?: string[]; id_prefix?: string;
   /** Which plain wording normalize.ts gives this layer's rows. Default: the Narcan boxes' wording. */
-  wording?: 'narcan_box' | 'supplies_station' | 'police_station' | 'fire_station';
+  wording?: 'narcan_box' | 'supplies_station' | 'police_station' | 'fire_station' | 'county_narcan';
   /** Service-area cities a layer that covers more than the service area is filtered to (ingest-mymap.ts). */
   cities?: string[];
+  /**
+   * kind arcgis_checked: records a person has already listed from the owner's own page, by the layer's record ref
+   * ("name|address"), each with the seed row that stands for it. They are skipped, and the build fails if the
+   * seed row named is not an active listing (ingest-checked.ts).
+   */
+  same_as?: Record<string, string>;
 }
 
 export const INGESTED_COLUMNS = [
@@ -44,7 +50,7 @@ async function getJson(url: string): Promise<any> {
  * what the server allows, and the next page is asked for whenever a page comes back full (some servers never set
  * exceededTransferLimit on GeoJSON). A page that fails stops the whole read: nothing partial is ever written.
  */
-export async function fetchLayer(src: Source): Promise<{ lastEdited: string | null; features: any[] }> {
+export async function fetchLayer(src: Source, fields: string[] = ['*']): Promise<{ lastEdited: string | null; features: any[] }> {
   const meta = await getJson(`${src.url}?f=json`);
   const ms = meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate;
   const lastEdited = ms ? today(new Date(ms)) : null;
@@ -52,7 +58,7 @@ export async function fetchLayer(src: Source): Promise<{ lastEdited: string | nu
   const oid = meta.objectIdField ?? (meta.fields ?? []).find((f: { type?: string }) => f.type === 'esriFieldTypeOID')?.name ?? 'OBJECTID';
   const features: any[] = [];
   for (let offset = 0; offset < 1_000_000;) {
-    const page = await getJson(`${src.url}/query?where=1%3D1&outFields=*&f=geojson&orderByFields=${encodeURIComponent(oid)}&resultOffset=${offset}&resultRecordCount=${size}`);
+    const page = await getJson(`${src.url}/query?where=1%3D1&outFields=${encodeURIComponent(fields.join(','))}&f=geojson&orderByFields=${encodeURIComponent(oid)}&resultOffset=${offset}&resultRecordCount=${size}`);
     const got: any[] = page.features ?? [];
     features.push(...got);
     offset += got.length;
@@ -106,7 +112,8 @@ async function main() {
   const fetchedAt = today();
   // `ingest:opendata <id> …` reads only those sources; with no ids, every ArcGIS source (the nightly run).
   const only = process.argv.slice(2);
-  for (const src of loadSources().filter((s) => s.kind === 'arcgis' && (!only.length || only.includes(s.id)))) {
+  for (const src of loadSources().filter((s) => (s.kind === 'arcgis' || s.kind === 'arcgis_checked') && (!only.length || only.includes(s.id)))) {
+    if (src.kind === 'arcgis_checked') { await (await import('./ingest-checked.js')).ingestChecked(src, fetchedAt); continue; }
     const { lastEdited, features } = await fetchLayer(src);
     // What this layer committed last time: every record it has already been given an id for, and every id it
     // has retired. Both decide the ids below, so this read happens before anything is minted.

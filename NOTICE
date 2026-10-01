@@ -44,6 +44,17 @@ Naloxone and test-strip stations outside Detroit:
     "Map updated" date. Asking the County about reuse is still owed. The
     content is the County's; the delivery is Google's — the map is a published
     Google My Map and we read its own KML endpoint
+
+Narcan boxes, cabinets and vending machines in Oakland County:
+  Oakland County, "Narcan Locations" map (services1.arcgis.com, item
+    18a981590ea042a2b3f15a7040fbd56e; the map oakgov.maps.arcgis.com). The
+    vending machines and cabinets are the Oakland County Health Division's; the
+    Save a Life boxes are the Alliance of Coalitions for Healthy Communities' and
+    Families Against Narcotics'. Used under the County's Open Data Terms of Use,
+    which allow reuse "for any lawful purpose". Modified: limited to the 75 cities
+    and townships a DDOT or SMART bus reaches, and where a record's city or ZIP is
+    not the place its street is in, the city or ZIP printed is the US Census
+    Bureau's match of that street (each such row says what the County wrote).
     (google.com/maps/d/kml?mid=...&forcekml=1), which Google documents nowhere.
     Asking the County for the file directly is owed too.
 

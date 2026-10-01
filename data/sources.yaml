@@ -21,6 +21,42 @@ sources:
     extra: [Distribution_Device_Type, Box_Location, Type_of_Business]
     id_prefix: hr
 
+  # Oakland County's Narcan Locations map (Kyle, 2026-10-01). 153 records countywide (143 of them the Alliance of
+  # Coalitions for Healthy Communities' "Save a Life" boxes); those inside the 75 places enter as listings. Read by
+  # pipeline/src/ingest-checked.ts through the nightly ingest:opendata. The records' typed cities are not always
+  # right ("Pontiac" for a Southfield street, "Hazel Pak"), and a few map points sit far from their own street, so
+  # every street and ZIP is matched by the US Census Bureau first: the printed city is the County's where it names
+  # the right place and the Census Bureau's postal city where it does not (each row's city_from says which), and a
+  # record that cannot be matched, or whose point is over 1 km from its address, is held in data/staging for a
+  # person. No coordinate ever names a city or an address (DECISIONS 2026-10-01).
+  # USER_Contact_Name is a staff name: it is never mapped, and never even fetched (only the fields below are asked for).
+  - id: oakland_narcan
+    name: Oakland County Narcan Locations map
+    tier: A
+    kind: arcgis_checked
+    url: https://services1.arcgis.com/GE4Idg9FL97XBa3P/arcgis/rest/services/Narcan_Locations/FeatureServer/0
+    page: https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677
+    license: Oakland County Open Data Terms of Use   # stated on the County's map item; see NOTICE and DECISIONS 2026-10-01
+    mode: publish
+    max_age_days: 90
+    category: harm.narcan
+    wording: county_narcan
+    org: { id: org_oakland_county, name: Oakland County }
+    fields: { name: USER_Name, address: USER_Address, city: USER_City, zip: USER_Zip, phone: USER_Phone, org: USER_Managed_By, ref: USER_Name+USER_Address }
+    extra: [USER_Notes, USER_Location]
+    id_prefix: ocn
+    # The County records a person already listed from the owner's own page. Those rows stay as they are.
+    same_as:
+      "Meridian Health Services - MAT|1435 N Oakland Boulevard": sal_oakland_county_free_narcan_machine_at_meridian_n_oakland
+      "Affirmations|290 W Nine Mile Rd": sal_oakland_county_free_narcan_machine_at_affirmations_fernd
+      "Meridian Health Services - MAT|269 Summit Drive": sal_oakland_county_free_narcan_machine_at_meridian_summit_dr
+      "Neu Hope|704 E. 9 Mile Rd": sal_oakland_county_free_narcan_machine_hazel_park
+      "Oakland County Health Division|27725 Greenfield Rd": sal_free_narcan_cabinet_oakland_county_health_division_south
+      "Oakland University|318 Meadow Brook Rd": sal_oakland_county_free_narcan_machine_at_oakland_university
+      "Oakland County Health Division|1200 N. Telegraph Rd 34E": sal_free_narcan_cabinet_oakland_county_health_division_ponti
+      "Oakland County Community Corrections|250 Elizabeth Lake Rd #1520": sal_oakland_county_free_narcan_machine_community_corrections
+      "Oakland County Probation Department|1151 Crooks Rd": sal_oakland_county_free_narcan_machine_probation_department_
+
   # Wayne County's own station map (Kyle, 2026-09-20). 97 stations countywide; those inside the service area's
   # outlines (every city and township a DDOT or SMART bus stops in, 2026-09-24) enter as listings, facts only and
   # attributed to the County. Read by pipeline/src/ingest-mymap.ts (pnpm ingest:mymap).
