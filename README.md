@@ -6,7 +6,7 @@ Free help, transit, parks and neighborhood facts for Detroit and the 74 other ci
 SMART buses reach, across Wayne, Oakland and Macomb counties — in an app that stores nothing about you, works with
 no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 1,992 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 2,025 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -53,8 +53,8 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **1,992 listings** in 62 categories, 1,272 of them outside the first four cities: 324 food, 227 health (including
-  **33 emergency rooms and 52 urgent care centers**), 305 harm reduction, 263 places to get somewhere safe now (177
+- **2,025 listings** in 62 categories, 1,290 of them outside the first four cities: 324 food, 227 health (including
+  **33 emergency rooms and 52 urgent care centers**), 338 harm reduction, 263 places to get somewhere safe now (177
   fire stations and 86 police stations), 122 recreation centers and libraries, 102 child care and free preschool,
   78 housing, 73 learning, 68 treatment, 61 jobs, and 15 more groups — among them help built for seniors, veterans
   and people with a disability.

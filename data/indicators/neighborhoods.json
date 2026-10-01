@@ -1316,11 +1316,11 @@
     -83.19295
    ],
    "help": {
-    "total": 4,
+    "total": 5,
     "by": {
      "food": 1,
      "health": 0,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -1696,11 +1696,11 @@
     -83.16983
    ],
    "help": {
-    "total": 12,
+    "total": 13,
     "by": {
      "food": 5,
      "health": 0,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -1722,13 +1722,13 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 1.7,
-     "narcan": 1,
+     "narcan": 0.5,
      "indoors": 0.7
     },
     "nearest_id": {
      "food": "sal_detroit_area_frozen_meals_for_seniors_at_adams_butzel_re",
      "clinic": "sal_advantage_health_west_mcnichols",
-     "narcan": "sal_hr_13601_w_mcnichols",
+     "narcan": "sal_families_against_free_narcan_box_our_community_laundroma",
      "indoors": "sal_detroit_parks_adams_butzel_complex"
     },
     "none_listed_yet": [
@@ -2770,11 +2770,11 @@
     -83.05184
    ],
    "help": {
-    "total": 38,
+    "total": 39,
     "by": {
      "food": 3,
      "health": 13,
-     "harm": 5,
+     "harm": 6,
      "shelter": 2,
      "utilities": 0,
      "hygiene": 0,
@@ -2802,7 +2802,7 @@
     "nearest_id": {
      "food": "sal_noah_bag_lunch",
      "clinic": "sal_central_city_health_peterboro",
-     "narcan": "sal_hr_100_mack_ave",
+     "narcan": "sal_families_against_free_narcan_box_noah_project_at_central",
      "indoors": "sal_detroit_public_main_library"
     },
     "none_listed_yet": [],
@@ -4257,11 +4257,11 @@
     -83.09804
    ],
    "help": {
-    "total": 52,
+    "total": 58,
     "by": {
      "food": 11,
      "health": 8,
-     "harm": 6,
+     "harm": 12,
      "shelter": 2,
      "utilities": 1,
      "hygiene": 0,
@@ -4450,11 +4450,11 @@
     -83.10325
    ],
    "help": {
-    "total": 37,
+    "total": 39,
     "by": {
      "food": 9,
      "health": 8,
-     "harm": 3,
+     "harm": 5,
      "shelter": 2,
      "utilities": 1,
      "hygiene": 0,
@@ -4833,11 +4833,11 @@
     -82.97745
    ],
    "help": {
-    "total": 32,
+    "total": 33,
     "by": {
      "food": 4,
      "health": 8,
-     "harm": 6,
+     "harm": 7,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
@@ -4859,13 +4859,13 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 0.3,
-     "narcan": 0.4,
+     "narcan": 0.3,
      "indoors": 0.1
     },
     "nearest_id": {
      "food": "sal_icna_relief_michigan_muslim_family_services",
      "clinic": "sal_trinity_health_primary_care",
-     "narcan": "sal_hr_11919_e_warren_ave",
+     "narcan": "sal_families_against_free_narcan_box_detroit_qrt_office_sama",
      "indoors": "sal_detroit_parks_chandler_park_fieldhouse"
     },
     "none_listed_yet": [],
@@ -5209,11 +5209,11 @@
     -83.13992
    ],
    "help": {
-    "total": 31,
+    "total": 32,
     "by": {
      "food": 8,
      "health": 7,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -5970,11 +5970,11 @@
     -82.96555
    ],
    "help": {
-    "total": 36,
+    "total": 37,
     "by": {
      "food": 3,
      "health": 8,
-     "harm": 5,
+     "harm": 6,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
@@ -6309,11 +6309,11 @@
     -83.07415
    ],
    "help": {
-    "total": 33,
+    "total": 35,
     "by": {
      "food": 4,
      "health": 5,
-     "harm": 5,
+     "harm": 7,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 1,
@@ -6335,13 +6335,13 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 0.7,
-     "narcan": 0.8,
+     "narcan": 0.5,
      "indoors": 0.4
     },
     "nearest_id": {
      "food": "sal_st_peter_s_manna_community_meal",
      "clinic": "sal_st_frances_cabrini_clinic",
-     "narcan": "sal_community_health_life_points_outreach",
+     "narcan": "sal_families_against_free_narcan_box_miside_housing_resource",
      "indoors": "sal_detroit_parks_clemente_recreation_center"
     },
     "none_listed_yet": [],
@@ -6486,11 +6486,11 @@
     -82.92028
    ],
    "help": {
-    "total": 17,
+    "total": 18,
     "by": {
      "food": 1,
      "health": 5,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -7430,11 +7430,11 @@
     -83.11023
    ],
    "help": {
-    "total": 15,
+    "total": 16,
     "by": {
      "food": 5,
      "health": 2,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -7456,13 +7456,13 @@
     "nearest_miles": {
      "food": 1,
      "clinic": 1.2,
-     "narcan": 1.2,
+     "narcan": 1.1,
      "indoors": 1.6
     },
     "nearest_id": {
      "food": "sal_gleaners_community_gleaners_drive_up_food_at_urban_neigh",
      "clinic": "sal_chass_southwest",
-     "narcan": "sal_hr_1725_lawndale",
+     "narcan": "sal_families_against_free_narcan_box_southwest_counseling_so",
      "indoors": "sal_detroit_parks_patton_community_center"
     },
     "none_listed_yet": [],
@@ -8345,11 +8345,11 @@
     -83.04737
    ],
    "help": {
-    "total": 29,
+    "total": 30,
     "by": {
      "food": 2,
      "health": 10,
-     "harm": 3,
+     "harm": 4,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
@@ -8377,7 +8377,7 @@
     "nearest_id": {
      "food": "sal_noah_bag_lunch",
      "clinic": "sal_central_city_health_peterboro",
-     "narcan": "sal_hr_100_mack_ave",
+     "narcan": "sal_families_against_free_narcan_box_noah_project_at_central",
      "indoors": "sal_detroit_parks_coleman_a_young_community_center"
     },
     "none_listed_yet": [],
@@ -8474,11 +8474,11 @@
     -83.04659
    ],
    "help": {
-    "total": 52,
+    "total": 54,
     "by": {
      "food": 6,
      "health": 3,
-     "harm": 10,
+     "harm": 12,
      "shelter": 2,
      "utilities": 0,
      "hygiene": 2,
@@ -8674,7 +8674,7 @@
     "nearest_id": {
      "food": "sal_csk_conner_meals",
      "clinic": "sal_trinity_health_primary_care",
-     "narcan": "sal_hr_11919_e_warren_ave",
+     "narcan": "sal_families_against_free_narcan_box_detroit_qrt_office_sama",
      "indoors": "sal_detroit_parks_chandler_park_fieldhouse"
     },
     "none_listed_yet": [
@@ -8824,11 +8824,11 @@
     -82.93322
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 1,
      "health": 0,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -9203,11 +9203,11 @@
     -83.04137
    ],
    "help": {
-    "total": 24,
+    "total": 25,
     "by": {
      "food": 5,
      "health": 3,
-     "harm": 2,
+     "harm": 3,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
@@ -10092,11 +10092,11 @@
     -83.25192
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -10283,11 +10283,11 @@
     -83.227
    ],
    "help": {
-    "total": 12,
+    "total": 13,
     "by": {
      "food": 4,
      "health": 2,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -11594,11 +11594,11 @@
     -82.96086
    ],
    "help": {
-    "total": 27,
+    "total": 28,
     "by": {
      "food": 4,
      "health": 8,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 1,
@@ -11782,11 +11782,11 @@
     -82.98547
    ],
    "help": {
-    "total": 13,
+    "total": 14,
     "by": {
      "food": 4,
      "health": 1,
-     "harm": 3,
+     "harm": 4,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
@@ -14415,7 +14415,7 @@
     "nearest_id": {
      "food": "sal_nativity_of_nativity_pantry",
      "clinic": "sal_detroit_community_dr_sophie_womack_health_center",
-     "narcan": "sal_hr_11919_e_warren_ave",
+     "narcan": "sal_families_against_free_narcan_box_detroit_qrt_office_sama",
      "indoors": "sal_detroit_parks_butzel_family_center"
     },
     "none_listed_yet": [
@@ -14575,11 +14575,11 @@
     -83.04073
    ],
    "help": {
-    "total": 30,
+    "total": 31,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 7,
+     "harm": 8,
      "shelter": 2,
      "utilities": 0,
      "hygiene": 1,
@@ -15879,13 +15879,13 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 2.1,
-     "narcan": 1.1,
+     "narcan": 1,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_wayne_metro_senior_food_boxes_stansbury_pick_up",
      "clinic": "sal_advantage_health_west_mcnichols",
-     "narcan": "sal_hr_14040_greenfield",
+     "narcan": "sal_families_against_free_narcan_box_our_community_laundroma",
      "indoors": "sal_detroit_parks_adams_butzel_complex"
     },
     "none_listed_yet": [
@@ -16036,11 +16036,11 @@
     -83.1736
    ],
    "help": {
-    "total": 16,
+    "total": 17,
     "by": {
      "food": 5,
      "health": 1,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -16593,11 +16593,11 @@
     -83.24891
    ],
    "help": {
-    "total": 14,
+    "total": 15,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -16787,11 +16787,11 @@
     -83.08922
    ],
    "help": {
-    "total": 23,
+    "total": 26,
     "by": {
      "food": 4,
      "health": 2,
-     "harm": 2,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -16813,13 +16813,13 @@
     "nearest_miles": {
      "food": 0.1,
      "clinic": 0.7,
-     "narcan": 0.4,
+     "narcan": 0.3,
      "indoors": 0.4
     },
     "nearest_id": {
      "food": "sal_gleaners_community_gleaners_fresh_market_at_western_inte",
      "clinic": "sal_chass_southwest",
-     "narcan": "sal_hr_4276_w_fort",
+     "narcan": "sal_families_against_free_narcan_box_miside_miwealth_youthbu",
      "indoors": "sal_detroit_public_bowen_branch_library"
     },
     "none_listed_yet": [],
@@ -16962,11 +16962,11 @@
     -83.07385
    ],
    "help": {
-    "total": 18,
+    "total": 20,
     "by": {
      "food": 4,
      "health": 1,
-     "harm": 2,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 1,
@@ -16988,13 +16988,13 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 0.8,
-     "narcan": 0.8,
+     "narcan": 0.4,
      "indoors": 0.3
     },
     "nearest_id": {
      "food": "sal_loaves_and_ste_anne_pantry",
      "clinic": "sal_st_frances_cabrini_clinic",
-     "narcan": "sal_community_health_life_points_outreach",
+     "narcan": "sal_families_against_free_narcan_box_miside_miwealth_southwe",
      "indoors": "sal_detroit_parks_clemente_recreation_center"
     },
     "none_listed_yet": [],
@@ -17329,11 +17329,11 @@
     -83.19064
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 3,
      "health": 2,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -19199,7 +19199,7 @@
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_st_john_presbyte",
      "clinic": "sal_central_city_health_peterboro",
-     "narcan": "sal_hr_2313_gratiot_ave",
+     "narcan": "sal_families_against_free_narcan_box_noah_project_at_central",
      "indoors": "sal_detroit_parks_coleman_a_young_community_center"
     },
     "none_listed_yet": [],
@@ -21505,11 +21505,11 @@
     -83.08474
    ],
    "help": {
-    "total": 19,
+    "total": 22,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 2,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -21531,13 +21531,13 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 1,
-     "narcan": 0.6,
+     "narcan": 0.3,
      "indoors": 0.2
     },
     "nearest_id": {
      "food": "sal_detroit_area_senior_meals_at_delray_united_action_counci",
      "clinic": "sal_chass_southwest",
-     "narcan": "sal_hr_4415_w_vernor_hwy",
+     "narcan": "sal_families_against_free_narcan_box_miside_miwealth_southwe",
      "indoors": "sal_detroit_public_bowen_branch_library"
     },
     "none_listed_yet": [
@@ -21670,11 +21670,11 @@
     -83.11984
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 2,
      "health": 3,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -21853,11 +21853,11 @@
     -83.06043
    ],
    "help": {
-    "total": 55,
+    "total": 56,
     "by": {
      "food": 5,
      "health": 15,
-     "harm": 8,
+     "harm": 9,
      "shelter": 2,
      "utilities": 0,
      "hygiene": 1,
@@ -22033,11 +22033,11 @@
     -83.1262
    ],
    "help": {
-    "total": 30,
+    "total": 31,
     "by": {
      "food": 10,
      "health": 3,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -22059,13 +22059,13 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 0.8,
-     "narcan": 1.1,
+     "narcan": 0.8,
      "indoors": 1.8
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_equity_alliance_",
      "clinic": "sal_detroit_community_dr_feleta_wilson_health_center",
-     "narcan": "sal_hr_2127_w_grand_blvd",
+     "narcan": "sal_families_against_free_narcan_box_shar",
      "indoors": "sal_detroit_parks_helen_moore_community_center"
     },
     "none_listed_yet": [],
@@ -22756,11 +22756,11 @@
     -82.97604
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 1,
+     "harm": 2,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
@@ -22788,7 +22788,7 @@
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_lift_up_a_child_",
      "clinic": "sal_the_wellness_east_medical_center",
-     "narcan": "sal_hr_15325_gratiot",
+     "narcan": "sal_families_against_free_narcan_box_jz_motel_detroit",
      "indoors": "sal_detroit_parks_heilmann_recreation_center"
     },
     "none_listed_yet": [
@@ -22947,11 +22947,11 @@
     -82.94469
    ],
    "help": {
-    "total": 7,
+    "total": 8,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -22973,13 +22973,13 @@
     "nearest_miles": {
      "food": 0.1,
      "clinic": 1.9,
-     "narcan": 1.2,
+     "narcan": 1.1,
      "indoors": 1.5
     },
     "nearest_id": {
      "food": "sal_peace_lutheran_food_pantry",
      "clinic": "sal_detroit_community_east_riverside_health_center",
-     "narcan": "sal_wws_detroit_focus_hope_chalmers_st",
+     "narcan": "sal_families_against_free_narcan_box_rnr_pharmacy",
      "indoors": "sal_grosse_pointe_neighborhood_club"
     },
     "none_listed_yet": [
@@ -23141,11 +23141,11 @@
     -82.94105
    ],
    "help": {
-    "total": 18,
+    "total": 19,
     "by": {
      "food": 3,
      "health": 2,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -25568,11 +25568,11 @@
     -83.10077
    ],
    "help": {
-    "total": 14,
+    "total": 15,
     "by": {
      "food": 2,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -25751,11 +25751,11 @@
     -83.23033
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -25777,18 +25777,16 @@
     "nearest_miles": {
      "food": 0.4,
      "clinic": 0.5,
-     "narcan": 1,
+     "narcan": 0.6,
      "indoors": 2.2
     },
     "nearest_id": {
      "food": "sal_calvary_presbyterian_food_pantry",
      "clinic": "sal_health_center_at_henry_ford_high_school",
-     "narcan": "sal_wws_detroit_wayne_county_community_college_district_northwes",
+     "narcan": "sal_families_against_free_narcan_box_dedicated_senior_medica",
      "indoors": "sal_detroit_parks_crowell_recreation_center"
     },
-    "none_listed_yet": [
-     "harm"
-    ],
+    "none_listed_yet": [],
     "coverage_checked": false
    },
    "places": {
@@ -26833,11 +26831,11 @@
     -82.96213
    ],
    "help": {
-    "total": 9,
+    "total": 10,
     "by": {
      "food": 4,
      "health": 0,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -28116,11 +28114,11 @@
     -83.11696
    ],
    "help": {
-    "total": 10,
+    "total": 11,
     "by": {
      "food": 3,
      "health": 0,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -30010,11 +30008,11 @@
     -82.95465
    ],
    "help": {
-    "total": 13,
+    "total": 15,
     "by": {
      "food": 3,
      "health": 0,
-     "harm": 1,
+     "harm": 3,
      "shelter": 1,
      "utilities": 1,
      "hygiene": 0,
@@ -30036,13 +30034,13 @@
     "nearest_miles": {
      "food": 0.6,
      "clinic": 1.9,
-     "narcan": 0.8,
+     "narcan": 0.6,
      "indoors": 0.5
     },
     "nearest_id": {
      "food": "sal_deo_gratias_food_pantry_by_appointment",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_hr_15325_gratiot",
+     "narcan": "sal_families_against_free_narcan_box_cns_healthcare_eli_z_ru",
      "indoors": "sal_detroit_parks_heilmann_recreation_center"
     },
     "none_listed_yet": [
@@ -33308,11 +33306,11 @@
     -83.13552
    ],
    "help": {
-    "total": 27,
+    "total": 28,
     "by": {
      "food": 6,
      "health": 0,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -36129,11 +36127,11 @@
     -82.99356
    ],
    "help": {
-    "total": 27,
+    "total": 28,
     "by": {
      "food": 1,
      "health": 9,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -36508,11 +36506,11 @@
     -83.07609
    ],
    "help": {
-    "total": 41,
+    "total": 43,
     "by": {
      "food": 7,
      "health": 3,
-     "harm": 8,
+     "harm": 10,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 1,
@@ -36534,13 +36532,13 @@
     "nearest_miles": {
      "food": 0.2,
      "clinic": 1.1,
-     "narcan": 0.8,
+     "narcan": 0.5,
      "indoors": 0.5
     },
     "nearest_id": {
      "food": "sal_loaves_and_ste_anne_pantry",
      "clinic": "sal_st_frances_cabrini_clinic",
-     "narcan": "sal_hr_4276_w_fort",
+     "narcan": "sal_families_against_free_narcan_box_miside_miwealth_southwe",
      "indoors": "sal_detroit_parks_clemente_recreation_center"
     },
     "none_listed_yet": [],
@@ -37041,11 +37039,11 @@
     -83.10633
    ],
    "help": {
-    "total": 14,
+    "total": 15,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -37600,11 +37598,11 @@
     -82.94313
    ],
    "help": {
-    "total": 8,
+    "total": 9,
     "by": {
      "food": 1,
      "health": 2,
-     "harm": 3,
+     "harm": 4,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -37626,13 +37624,13 @@
     "nearest_miles": {
      "food": 0.8,
      "clinic": 1,
-     "narcan": 0.3,
+     "narcan": 0.2,
      "indoors": 1.4
     },
     "nearest_id": {
      "food": "sal_bethany_lutheran_bethany_food_bank",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_hr_17111_harper_ave",
+     "narcan": "sal_families_against_free_narcan_box_rnr_pharmacy",
      "indoors": "sal_harper_woods_public_library"
     },
     "none_listed_yet": [],
@@ -38422,11 +38420,11 @@
     -83.10224
    ],
    "help": {
-    "total": 541,
+    "total": 555,
     "by": {
      "food": 142,
      "health": 64,
-     "harm": 74,
+     "harm": 88,
      "shelter": 7,
      "utilities": 4,
      "hygiene": 4,
@@ -38903,11 +38901,11 @@
     -83.21149
    ],
    "help": {
-    "total": 61,
+    "total": 62,
     "by": {
      "food": 8,
      "health": 13,
-     "harm": 9,
+     "harm": 10,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -39083,11 +39081,11 @@
     -83.21039
    ],
    "help": {
-    "total": 12,
+    "total": 15,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 2,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -39109,13 +39107,13 @@
     "nearest_miles": {
      "food": 0.3,
      "clinic": 1.9,
-     "narcan": 0.1,
+     "narcan": 0,
      "indoors": 0.1
     },
     "nearest_id": {
      "food": "sal_honeycomb_food_pantry_allen_park",
      "clinic": "sal_western_wayne_lincoln_park_health_center",
-     "narcan": "sal_wws_allen_park_big_ben_s_comix_oasis",
+     "narcan": "sal_families_against_free_narcan_box_allen_park_police_depar",
      "indoors": "sal_city_of_allen_park_community_center"
     },
     "none_listed_yet": [],
@@ -39329,11 +39327,11 @@
     -82.90387
    ],
    "help": {
-    "total": 6,
+    "total": 7,
     "by": {
      "food": 0,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -39355,13 +39353,13 @@
     "nearest_miles": {
      "food": 2.3,
      "clinic": 2.4,
-     "narcan": 1.2,
+     "narcan": 0.6,
      "indoors": 0.3
     },
     "nearest_id": {
      "food": "sal_st_john_food_pantry",
      "clinic": "sal_detroit_community_east_riverside_health_center",
-     "narcan": "sal_wws_grosse_pointe_grosse_pointe_public_safety_department",
+     "narcan": "sal_families_against_free_narcan_box_grosse_pointe_beaumont_",
      "indoors": "sal_the_war_memorial_grosse_pointe"
     },
     "none_listed_yet": [
@@ -39424,7 +39422,7 @@
     "nearest_id": {
      "food": "sal_my_father_s_food_pantry",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_wws_grosse_pointe_grosse_pointe_public_safety_department",
+     "narcan": "sal_families_against_free_narcan_box_grosse_pointe_beaumont_",
      "indoors": "sal_grosse_pointe_central_library"
     },
     "none_listed_yet": [
@@ -39482,13 +39480,13 @@
     "nearest_miles": {
      "food": 1.3,
      "clinic": 1.3,
-     "narcan": 1.6,
+     "narcan": 0.8,
      "indoors": 0.7
     },
     "nearest_id": {
      "food": "sal_st_john_food_pantry",
      "clinic": "sal_detroit_community_east_riverside_health_center",
-     "narcan": "sal_wws_grosse_pointe_grosse_pointe_public_safety_department",
+     "narcan": "sal_families_against_free_narcan_box_grosse_pointe_beaumont_",
      "indoors": "sal_grosse_pointe_ewald_branch_library"
     },
     "none_listed_yet": [
@@ -39776,11 +39774,11 @@
     -83.18126
    ],
    "help": {
-    "total": 20,
+    "total": 21,
     "by": {
      "food": 0,
      "health": 2,
-     "harm": 5,
+     "harm": 6,
      "shelter": 8,
      "utilities": 0,
      "hygiene": 0,
@@ -39808,7 +39806,7 @@
     "nearest_id": {
      "food": "sal_gleaners_community_gleaners_drive_up_food_at_the_kennedy",
      "clinic": "sal_western_wayne_lincoln_park_health_center",
-     "narcan": "sal_wws_lincoln_park_lincoln_park_smokers",
+     "narcan": "sal_families_against_free_narcan_box_lincoln_park_public_lib",
      "indoors": "sal_lincoln_park_public_library"
     },
     "none_listed_yet": [
@@ -39839,11 +39837,11 @@
     -83.37232
    ],
    "help": {
-    "total": 34,
+    "total": 37,
     "by": {
      "food": 3,
      "health": 5,
-     "harm": 3,
+     "harm": 6,
      "shelter": 0,
      "utilities": 1,
      "hygiene": 0,
@@ -39900,11 +39898,11 @@
     -83.18216
    ],
    "help": {
-    "total": 11,
+    "total": 12,
     "by": {
      "food": 2,
      "health": 0,
-     "harm": 4,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40398,11 +40396,11 @@
     -83.38815
    ],
    "help": {
-    "total": 18,
+    "total": 21,
     "by": {
      "food": 0,
      "health": 6,
-     "harm": 4,
+     "harm": 7,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41086,11 +41084,11 @@
     -83.37596
    ],
    "help": {
-    "total": 23,
+    "total": 25,
     "by": {
      "food": 2,
      "health": 4,
-     "harm": 5,
+     "harm": 7,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41400,11 +41398,11 @@
     -83.10335
    ],
    "help": {
-    "total": 17,
+    "total": 18,
     "by": {
      "food": 3,
      "health": 1,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41426,13 +41424,13 @@
     "nearest_miles": {
      "food": 0.9,
      "clinic": 2.5,
-     "narcan": 1,
+     "narcan": 0.9,
      "indoors": 0.9
     },
     "nearest_id": {
      "food": "sal_forgotten_harvest_community_choice_mobile_market_at_mdhh",
      "clinic": "sal_corktown_health_in_hazel_park",
-     "narcan": "sal_ocn_28303_dequindre_rd_100_madison_heights",
+     "narcan": "sal_families_against_free_narcan_box_madison_heights_police_",
      "indoors": "sal_madison_heights_public_library"
     },
     "none_listed_yet": [],
@@ -41709,11 +41707,11 @@
     -83.28736
    ],
    "help": {
-    "total": 124,
+    "total": 125,
     "by": {
      "food": 19,
      "health": 20,
-     "harm": 29,
+     "harm": 30,
      "shelter": 1,
      "utilities": 2,
      "hygiene": 2,
@@ -41894,11 +41892,11 @@
     -83.15389
    ],
    "help": {
-    "total": 26,
+    "total": 27,
     "by": {
      "food": 2,
      "health": 3,
-     "harm": 6,
+     "harm": 7,
      "shelter": 1,
      "utilities": 0,
      "hygiene": 0,
@@ -42208,11 +42206,11 @@
     -83.14553
    ],
    "help": {
-    "total": 34,
+    "total": 35,
     "by": {
      "food": 3,
      "health": 3,
-     "harm": 2,
+     "harm": 3,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42794,13 +42792,13 @@
     "nearest_miles": {
      "food": 0.5,
      "clinic": 2.6,
-     "narcan": 1.4,
+     "narcan": 1.3,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_food_pantry_at_st_peter_s_lutheran_church",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
+     "narcan": "sal_families_against_free_narcan_box_cns_healthcare_eli_z_ru",
      "indoors": "sal_eastpointe_memorial_library"
     },
     "none_listed_yet": [
