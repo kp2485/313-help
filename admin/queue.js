@@ -63,7 +63,7 @@ export function ownerEmail(name, link, expiresAt, sourceUrl) {
 
 Hello,
 
-313 Help is a free app that helps people in Detroit, Hamtramck, Highland Park and Dearborn find free help. It lists "${name}". We found this email address on your own website: ${sourceUrl}
+313 Help is a free app that helps people in Detroit and the cities its buses reach find free help. It lists "${name}". We found this email address on your own website: ${sourceUrl}
 
 Could you check that what we say is right? It takes a minute:
 ${link}

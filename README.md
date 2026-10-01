@@ -2,9 +2,9 @@
 
 [![ci](https://github.com/kp2485/313-help/actions/workflows/ci.yml/badge.svg)](https://github.com/kp2485/313-help/actions/workflows/ci.yml)
 
-Free help, transit, parks and neighborhood facts for Detroit and every city and township its buses reach — 75 places
-where a DDOT or SMART bus stops or runs, across Wayne, Oakland and Macomb counties — in an app that
-stores nothing about you, works with no signal, and never sends you to a pantry that closed last month.
+Free help, transit, parks and neighborhood facts for Detroit and the 74 other cities and townships its DDOT and
+SMART buses reach, across Wayne, Oakland and Macomb counties — in an app that stores nothing about you, works with
+no signal, and never sends you to a pantry that closed last month.
 
 **Live at <https://313help.com>** — 1,841 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
