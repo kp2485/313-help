@@ -1196,6 +1196,8 @@
   "dir.walk_card": "المشي",
   "dir.bus_card": "حافلة {route}",
   "dir.bus_card_two": "حافلة {a}، ثم حافلة {b}",
+  "dir.bus_card_three": "حافلة {a}، ثم حافلة {b}، ثم حافلة {c}",
+  "dir.bus_card_four": "حافلة {a}، ثم حافلة {b}، ثم حافلة {c}، ثم حافلة {d}",
   "dir.range": "حوالي {lo}–{hi} دقيقة",
   "dir.every": "حوالي كل {minutes} دقيقة",
   "dir.leg_walk": "امشِ {distance}",

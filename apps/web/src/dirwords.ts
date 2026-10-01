@@ -39,12 +39,15 @@ export function distance(t: Say, metres: number): string {
  *  rounded to the metre, because that is the number the spec says a person is told. */
 export const offStreet = (t: Say, metres: number): string => t('dir.dist_m', { metres: Math.round(metres) });
 
-/** "Walk", "Bus 4", "Bus 4, then bus 16". One line, and the only place a route is named in a card's heading. */
+/** "Walk", "Bus 4", "Bus 4, then bus 16", up to four buses. One line, and the only place a route is named in a card's heading. */
 export function itineraryTitle(t: Say, it: Itinerary): string {
   const rides = it.legs.filter(isRide);
   if (!rides.length) return t('dir.walk_card');
   if (rides.length === 1) return t('dir.bus_card', { route: routeName(rides[0]!) });
-  return t('dir.bus_card_two', { a: routeName(rides[0]!), b: routeName(rides[1]!) });
+  if (rides.length === 2) return t('dir.bus_card_two', { a: routeName(rides[0]!), b: routeName(rides[1]!) });
+  // Up to three changes since 2026-10-01 (schema/query-spec.md "The wide search"): every bus is named.
+  if (rides.length === 3) return t('dir.bus_card_three', { a: routeName(rides[0]!), b: routeName(rides[1]!), c: routeName(rides[2]!) });
+  return t('dir.bus_card_four', { a: routeName(rides[0]!), b: routeName(rides[1]!), c: routeName(rides[2]!), d: routeName(rides[3]!) });
 }
 /** "walk 0.3 mi, ride 9 stops, walk 0.1 mi" — the shape of the trip, leg by leg, in the order it is walked. */
 export function legsLine(t: Say, it: Itinerary): string {

@@ -246,6 +246,17 @@ fun runFixtures(dir: File = fixturesDir()): FixtureResult {
                     val got = transferStops(network!!, latLon(c["from"]!!), latLon(c["to"]!!))
                     if (!matches(got, expect)) fail(got)
                 }
+                // The wide search (17-wide-trip-plans.json): whether it runs, and the route chains it hands to plan.
+                "hasShortPlan" -> {
+                    val got = hasShortPlan(network!!, latLon(c["from"]!!), latLon(c["to"]!!))
+                    if (!matches(got, expect)) fail(got)
+                }
+                "routeChains" -> {
+                    val net = network!!
+                    val got = routeChains(net, latLon(c["from"]!!), latLon(c["to"]!!))
+                        .map { ch -> ch.joinToString(">") { r -> net.routes[r.route].id } }
+                    if (!matches(got, expect)) fail(got)
+                }
                 "windowRoads" -> {
                     val w = tripWindow(network, latLon(c["from"]!!), latLon(c["to"]!!))
                     val kept = windowFiles(streets.first(), streets.drop(1), w)

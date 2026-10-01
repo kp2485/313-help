@@ -405,12 +405,16 @@ Minutes, and only minutes. There is no clock in it.
 | `WAIT_FRACTION_OF_HEADWAY` | 0.5 | boarding wait = half the published headway |
 | `DEFAULT_WAIT_MIN` | 15 | the assumed wait where no headway is published (SMART, QLINE, People Mover) |
 | `CHANGE_PENALTY_MIN` | 5 | the cost of changing vehicle, on top of wait and walk |
-| `MAX_CHANGES` | 1 | **hard cap.** A plan with more changes and no times is a maze, not advice |
+| `SHORT_CHANGES` | 1 | the first search's cap: a trip one change answers is always answered that way |
+| `MAX_CHANGES` | 3 | **hard cap**, in the wide search only (Kyle, 2026-10-01) |
 | `ACCESS_M` | 400 | straight-line radius for access stops (92% of listings have one) |
 | `MAX_ACCESS_STOPS` | 8 | access stops considered at each end |
 | `TRANSFER_WALK_M` | 150 | longest walk at a change |
 | `MAX_WALK_ONLY_M` | 4828 | walking alone is always offered up to 3 miles |
 | `MAX_PLANS` | 3 | how many itineraries come back |
+| `ACCESS_WIDE_M` | 800 | the wide search's radius for access stops (half a mile) |
+| `TRANSFER_WIDE_M` | 400 | the wide search's longest walk at a change |
+| `WIDE_CHAINS` | 6 | route chains the wide search hands on to be walked out |
 
 **Where a change can happen.** At the same stop, or at any stop within `TRANSFER_WALK_M` on foot — which
 covers the `interchanges` groups in a `.net.json` file (stops of two or more routes within 75 m) without
@@ -453,7 +457,44 @@ Itinerary = { legs: PlanLeg[], changes, walk_metres, ride_metres, minutes, range
               start_off_metres, end_off_metres }
 ```
 
-`plan()` returns `[]` when nothing works — nothing within walking distance, and no route within one change. A
+### The wide search
+
+Kyle, 2026-10-01: *"allow 3 changes and widen the walk."* With 75 places, a stop on 15 Mile Road in Clinton
+Township is two changes from most of Detroit (of about 200 points across the city, 15 had a one-change plan). So
+`plan` searches twice, and the second search runs **only when the first has nothing to try**:
+
+1. **The one-change search** (steps 1 and 2 above, unchanged): access stops within `ACCESS_M`, at most
+   `SHORT_CHANGES` change, a change walk of at most `TRANSFER_WALK_M`. A trip this search can answer is always
+   answered this way, so no plan that worked before changes.
+2. **The wide search**, when `hasShortPlan(net, from, to)` is false — read from the network alone, so `plan` and
+   `tripWindow` always agree: no route calls within `ACCESS_M` of both ends in travel order, and no change within
+   `TRANSFER_WALK_M` joins a route near the start to one near the end. It allows up to `MAX_CHANGES` changes,
+   access stops within `ACCESS_WIDE_M` and a change walk of up to `TRANSFER_WIDE_M`.
+
+`routeChains(net, from, to)` is the wide search on the network alone — straight lines and averages, no street read:
+
+```
+board[0][s] = metres(from, s) / WALK_M_PER_MIN            for every stop s within ACCESS_WIDE_M of `from`
+round k = 0 .. MAX_CHANGES:
+  rides:  each route in index order, each pattern in order, stop by stop (cum = metres along the pattern so far);
+          at position i, if boarded: c = best + cum/BUS_M_PER_MIN + wait + (k > 0 ? CHANGE_PENALTY_MIN : 0);
+          if c < arrive[k][p[i]] it becomes that stop's label, with the ride that made it;
+          then, if board[k][p[i]] is finite and that stop was not reached on this same route:
+          key = board[k][p[i]] - cum/BUS_M_PER_MIN; if key < best, board here.
+  walks:  for each stop s in index order with arrive[k][s] finite, each u within TRANSFER_WIDE_M (u = s included):
+          if arrive[k][s] + metres(s, u)/WALK_M_PER_MIN < board[k+1][u] it becomes u's label, from s.
+ends:   every (k, t), t within ACCESS_WIDE_M of `to`, scores arrive[k][t] + metres(t, to)/WALK_M_PER_MIN;
+        sort by score, then k, then t; trace each back to its rides; keep one chain per sequence of route ids;
+        the first WIDE_CHAINS.
+```
+
+A label changes only when **strictly** better, and every loop runs in index order, so the three clients pick the
+same chain on a tie. `plan` then walks each chain out on the streets — the walk to the first stop, every change
+walk, the walk from the last stop — drops any chain the streets cannot join, and ranks what is left with
+everything else by the same cost model. Two different stops less than 1 m apart (a DDOT and a SMART stop on one
+pole) are one spot: a change between them has no walk leg, in both searches.
+
+`plan()` returns `[]` when nothing works — nothing within walking distance, and no route within three changes. A
 client says so; it never invents a leg.
 
 ## The trip window
@@ -468,6 +509,8 @@ known from the two ends and the bus network before a street is read:
 | the start, and the end | the point | `END_PAD_M` = `ACCESS_M` + 800 = 1,200 m |
 | the walk between them, only when `metresBetween(from, to)` ≤ `MAX_WALK_ONLY_M` | the box of the two points | `WALK_PAD_M` = 800 m |
 | each stop of `transferStops(net, from, to)` | the stop | `TRANSFER_PAD_M` = `TRANSFER_WALK_M` + 800 = 950 m |
+| when the wide search runs (`!hasShortPlan`): the start, and the end | the point | `WIDE_END_PAD_M` = `ACCESS_WIDE_M` + 800 = 1,600 m |
+| when the wide search runs: each stop of `chainChangeStops(net, routeChains(net, from, to))` | the stop | `WIDE_TRANSFER_PAD_M` = `TRANSFER_WIDE_M` + 800 = 1,200 m |
 
 Boxes are in degrees: `metres / M_PER_DEG_LAT` north and south, `metres / M_PER_DEG_LON` east and west. They come
 in that order (start, end, the walk if any, then each transfer stop in ascending stop number).

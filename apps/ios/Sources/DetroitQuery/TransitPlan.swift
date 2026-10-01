@@ -1,4 +1,4 @@
-// One integrated trip plan: walk, or walk-ride-walk, or walk-ride-walk-ride-walk.
+// One integrated trip plan: walk, or walk-ride-walk, or up to four rides with walks between (three changes).
 // Swift port of packages/query/src/transit-plan.ts. Spec: schema/query-spec.md "Trip plans".
 //
 // Kyle, 2026-09-22: "I want integrated walking and bus routes for the best user experience." So there is one
@@ -20,10 +20,21 @@ public let WAIT_FRACTION_OF_HEADWAY = 0.5
 public let DEFAULT_WAIT_MIN = 15.0
 /// The cost of changing vehicle at all, on top of the wait and the walk.
 public let CHANGE_PENALTY_MIN = 5.0
-/// At most one change. Distance-only planning over-transfers; a plan with three changes and no times is a maze.
-public let MAX_CHANGES = 1
+/// The first search allows one change, within ACCESS_M and TRANSFER_WALK_M: distance-only planning over-transfers,
+/// so a trip one change answers is always answered that way (2026-09-22). Only when that search has nothing to try
+/// does the wide search run (Kyle, 2026-10-01: "allow 3 changes and widen the walk"): the area is 75 places now, and
+/// from most of Detroit a stop on 15 Mile Road in Clinton Township is two changes away.
+public let SHORT_CHANGES = 1
+/// The hard cap, in the wide search.
+public let MAX_CHANGES = 3
 /// A stop is "at" a place when it is this close in a straight line; the walk to it is then routed properly.
 public let ACCESS_M = 400.0
+/// The wide search's radius for access stops: half a mile, because suburban stops are far apart.
+public let ACCESS_WIDE_M = 800.0
+/// The wide search's longest walk at a change: across a wide suburban intersection to the far-side stop.
+public let TRANSFER_WIDE_M = 400.0
+/// How many route chains the wide search hands on to be walked out on the streets.
+public let WIDE_CHAINS = 6
 /// How many access stops we consider at each end.
 public let MAX_ACCESS_STOPS = 8
 /// A change on foot may be this long.
@@ -339,6 +350,8 @@ private func ridePolyline(_ net: TransitNetwork, _ route: TransitRoute, _ patter
 
 private func stopRef(_ net: TransitNetwork, _ i: Int) -> StopRef { StopRef(index: i, name: net.stops[i].name) }
 
+private func stopPoint(_ net: TransitNetwork, _ i: Int) -> LatLon { LatLon(lat: net.stops[i].lat, lon: net.stops[i].lon) }
+
 private func walkLeg(_ r: WalkRoute, toStop: StopRef? = nil, fromStop: StopRef? = nil) -> PlanLeg {
     .walk(WalkLeg(metres: r.metres, minutes: r.metres / WALK_M_PER_MIN, steps: r.steps, polyline: r.polyline,
                   toStop: toStop, fromStop: fromStop))
@@ -389,8 +402,11 @@ public struct PlanOptions: Sendable {
 /// same cost model as the bus plans — so "walk, it is four blocks" wins on its own merits, and a bus only wins
 /// when it really is faster given an honest wait.
 ///
-/// Returns [] when nothing works: nothing within walking distance, no route between the two ends within one
-/// change, and the two ends in different pieces of the street graph. A client says so; it never invents a leg.
+/// When the one-change search has nothing to try (`hasShortPlan` is false), the wide search runs: up to MAX_CHANGES
+/// changes, access stops within ACCESS_WIDE_M and changes within TRANSFER_WIDE_M (`routeChains`).
+///
+/// Returns [] when nothing works: nothing within walking distance, no route between the two ends within three
+/// changes, and the two ends in different pieces of the street graph. A client says so; it never invents a leg.
 public func plan(_ g: StreetGraph, _ net: TransitNetwork, from: LatLon, to: LatLon, options: PlanOptions = PlanOptions()) -> [Itinerary] {
     let access = options.accessMetres
     var out: [Itinerary] = []
@@ -467,7 +483,7 @@ public func plan(_ g: StreetGraph, _ net: TransitNetwork, from: LatLon, to: LatL
         }
 
         // 2. one change: ride, then a change at the same stop or a walk of at most TRANSFER_WALK_M
-        if MAX_CHANGES >= 1 {
+        if SHORT_CHANGES >= 1 {
             var transferWalk: [String: WalkRoute?] = [:]
             func walkBetween(_ i: Int, _ j: Int) -> WalkRoute? {
                 let k = "\(i):\(j)"
@@ -502,8 +518,9 @@ public func plan(_ g: StreetGraph, _ net: TransitNetwork, from: LatLon, to: LatL
                                           let leg1 = makeRideLeg(r1, b.pattern, b.at, at),
                                           let leg2 = makeRideLeg(e.route, e.pattern, e.at, a.at) else { continue }
                                     var mid: [PlanLeg] = []
-                                    if x != y {
-                                        guard gap >= 1, let w2 = walkBetween(x, y) else { continue }
+                                    // Two stops less than a metre apart (a DDOT and a SMART stop on one pole) are one spot: no walk.
+                                    if x != y && gap >= 1 {
+                                        guard let w2 = walkBetween(x, y) else { continue }
                                         mid.append(walkLeg(w2, toStop: stopRef(net, y), fromStop: stopRef(net, x)))
                                     }
                                     out.append(finish([walkLeg(w1, toStop: stopRef(net, b.stop)), leg1] + mid
@@ -515,6 +532,49 @@ public func plan(_ g: StreetGraph, _ net: TransitNetwork, from: LatLon, to: LatL
                     }
                 }
             }
+        }
+    }
+
+    // 3. the wide search, only when the one-change search had nothing to try
+    if !hasShortPlan(net, from: from, to: to, access: access) {
+        let fromSnap = nearestEdgePoint(g, from), toSnap = nearestEdgePoint(g, to)
+        var snaps: [Int: EdgePoint?] = [:]
+        func snapStop(_ i: Int) -> EdgePoint? {
+            if let s = snaps[i] { return s }
+            let s = nearestEdgePoint(g, stopPoint(net, i))
+            snaps[i] = s
+            return s
+        }
+        chains: for chain in routeChains(net, from: from, to: to) {
+            let first = chain[0], last = chain[chain.count - 1]
+            let b0 = net.routes[first.route].patterns[first.pattern][first.from]
+            let an = net.routes[last.route].patterns[last.pattern][last.to]
+            let s0 = snapStop(b0), sn = snapStop(an)
+            let w1 = (fromSnap != nil && s0 != nil) ? routeBetween(g, fromSnap!, s0!, from: from, to: stopPoint(net, b0)) : nil
+            let w3 = (sn != nil && toSnap != nil) ? routeBetween(g, sn!, toSnap!, from: stopPoint(net, an), to: to) : nil
+            guard let w1, let w3 else { continue }
+            var legs: [PlanLeg] = [walkLeg(w1, toStop: stopRef(net, b0))]
+            for (i, c) in chain.enumerated() {
+                if i > 0 {
+                    let prev = chain[i - 1]
+                    let x = net.routes[prev.route].patterns[prev.pattern][prev.to], y = net.routes[c.route].patterns[c.pattern][c.from]
+                    if x != y && metresBetween(stopPoint(net, x), stopPoint(net, y)) >= 1 {
+                        let a = snapStop(x), b = snapStop(y)
+                        guard a != nil && b != nil, let w = routeBetween(g, a!, b!, from: stopPoint(net, x), to: stopPoint(net, y))
+                        else { continue chains }
+                        legs.append(walkLeg(w, toStop: stopRef(net, y), fromStop: stopRef(net, x)))
+                    }
+                }
+                let r = net.routes[c.route], p = r.patterns[c.pattern], m = rideMetres(net, p, c.from, c.to)
+                var leg = RideLeg(routeId: r.id, routeShort: r.short, routeLong: r.long, agency: r.agency,
+                                  headwayMinutes: r.headway, fromStop: stopRef(net, p[c.from]), toStop: stopRef(net, p[c.to]),
+                                  stops: c.to - c.from, metres: m, minutes: m / BUS_M_PER_MIN, waitMinutes: waitFor(r),
+                                  polyline: [])
+                leg.route = c.route; leg.pattern = c.pattern; leg.fromAt = c.from; leg.toAt = c.to
+                legs.append(.ride(leg))
+            }
+            legs.append(walkLeg(w3, fromStop: stopRef(net, an)))
+            out.append(finish(legs, w1.startOffMetres, w3.endOffMetres))
         }
     }
 
@@ -542,4 +602,132 @@ public func plan(_ g: StreetGraph, _ net: TransitNetwork, from: LatLon, to: LatL
         }
     }
     return ranked
+}
+
+// ---- the wide search ---------------------------------------------------------------------------
+
+/// Whether the one-change search (`plan`'s steps 1 and 2) has anything to try: a route that calls within `access`
+/// of both ends in travel order, or a change within TRANSFER_WALK_M from a route near the start onto one near the
+/// end. Read from the network alone, so `plan` and `tripWindow` always agree on whether the wide search runs.
+public func hasShortPlan(_ net: TransitNetwork, from: LatLon, to: LatLon, access: Double = ACCESS_M) -> Bool {
+    let originStops = stopsNear(net, from, metres: access).prefix(MAX_ACCESS_STOPS)
+    let destStops = stopsNear(net, to, metres: access).prefix(MAX_ACCESS_STOPS)
+    if originStops.isEmpty || destStops.isEmpty { return false }
+    var destAt: [Int: [(pattern: Int, at: Int)]] = [:]
+    for d in destStops { for e in net.posOf[d.stop] ?? [] { destAt[e.route, default: []].append((e.pattern, e.at)) } }
+    func reachesEnd(_ route: Int, _ pattern: Int, _ at: Int) -> Bool {
+        (destAt[route] ?? []).contains { $0.pattern == pattern && $0.at > at }
+    }
+    for o in originStops {
+        for b in net.posOf[o.stop] ?? [] {
+            if reachesEnd(b.route, b.pattern, b.at) { return true }
+            let p1 = net.routes[b.route].patterns[b.pattern]
+            var at = b.at + 1
+            while at < p1.count {
+                for near in stopsNear(net, stopPoint(net, p1[at]), metres: TRANSFER_WALK_M) {
+                    for e in net.posOf[near.stop] ?? [] where e.route != b.route && reachesEnd(e.route, e.pattern, e.at) { return true }
+                }
+                at += 1
+            }
+        }
+    }
+    return false
+}
+
+/// One ride of a chain: a route, one of its patterns, and the positions boarded and left on it.
+public struct ChainRide: Sendable, Equatable {
+    public var route: Int, pattern: Int, from: Int, to: Int
+    public init(route: Int, pattern: Int, from: Int, to: Int) { self.route = route; self.pattern = pattern; self.from = from; self.to = to }
+}
+
+/// The wide search, on the network alone (no street is read): the best chains of one to MAX_CHANGES + 1 rides from
+/// stops within ACCESS_WIDE_M of `from` to stops within ACCESS_WIDE_M of `to`, changing at the same stop or after a
+/// straight-line walk of at most TRANSFER_WIDE_M. Rounds, one per ride (schema/query-spec.md "The wide search"):
+///
+///   board[0][s]  = metres(from, s) / WALK_M_PER_MIN for every access stop s
+///   ride round k: each route in index order, each pattern in order, walked stop by stop; at position i the best
+///                 boarding so far gives arrive[k][p[i]] = best + cum[i]/BUS_M_PER_MIN + wait + (k > 0 ? CHANGE_PENALTY_MIN : 0),
+///                 where best = min over earlier positions j of board[k][p[j]] - cum[j]/BUS_M_PER_MIN, and a stop is
+///                 never boarded from the route that brought you to it; a label only changes when strictly better.
+///   walk round:  board[k+1][u] = min over s of arrive[k][s] + metres(s, u)/WALK_M_PER_MIN, u within TRANSFER_WIDE_M
+///                 of s (u = s included), s taken in index order.
+///   ends:        every (k, t) with t within ACCESS_WIDE_M of `to` scores arrive[k][t] + metres(t, to)/WALK_M_PER_MIN;
+///                 sorted by score, then k, then t; each traced back to its rides; one chain per sequence of routes;
+///                 the first WIDE_CHAINS kept.
+///
+/// Straight lines and averages only: the chains are candidates, and `plan` walks each one out on the streets and
+/// ranks them with everything else. Deterministic, so the trip window can name every stop a plan may change at.
+/// The arithmetic is done in the TypeScript's order, so a tie breaks the same way on every client.
+public func routeChains(_ net: TransitNetwork, from: LatLon, to: LatLon) -> [[ChainRide]] {
+    let n = net.stops.count, K = MAX_CHANGES + 1
+    var board = Array(repeating: Array(repeating: Double.infinity, count: n), count: K)
+    var boardFrom = Array(repeating: Array(repeating: -1, count: n), count: K)      // stop alighted before walking here
+    var boardRoute = Array(repeating: Array(repeating: -1, count: n), count: K)     // route that brought you here
+    var arrive = Array(repeating: Array(repeating: Double.infinity, count: n), count: K)
+    var arriveRide = Array(repeating: [ChainRide?](repeating: nil, count: n), count: K)
+    for s in stopsNear(net, from, metres: ACCESS_WIDE_M) { board[0][s.stop] = s.metres / WALK_M_PER_MIN }
+    for k in 0..<K {
+        let pen = k > 0 ? CHANGE_PENALTY_MIN : 0
+        for (ri, r) in net.routes.enumerated() {
+            let wait = waitFor(r)
+            for (pi, p) in r.patterns.enumerated() {
+                var best = Double.infinity, bestAt = -1, cum = 0.0
+                for i in 0..<p.count {
+                    if i > 0 { cum += metresBetween(stopPoint(net, p[i - 1]), stopPoint(net, p[i])) }
+                    let s = p[i]
+                    if bestAt >= 0 {
+                        let c = best + cum / BUS_M_PER_MIN + wait + pen
+                        if c < arrive[k][s] { arrive[k][s] = c; arriveRide[k][s] = ChainRide(route: ri, pattern: pi, from: bestAt, to: i) }
+                    }
+                    if board[k][s] < Double.infinity && boardRoute[k][s] != ri {
+                        let key = board[k][s] - cum / BUS_M_PER_MIN
+                        if key < best { best = key; bestAt = i }
+                    }
+                }
+            }
+        }
+        if k + 1 < K {
+            for s in 0..<n where arrive[k][s] != Double.infinity {
+                for near in stopsNear(net, stopPoint(net, s), metres: TRANSFER_WIDE_M) {
+                    let u = near.stop, c = arrive[k][s] + near.metres / WALK_M_PER_MIN
+                    if c < board[k + 1][u] { board[k + 1][u] = c; boardFrom[k + 1][u] = s; boardRoute[k + 1][u] = arriveRide[k][s]!.route }
+                }
+            }
+        }
+    }
+    var ends: [(score: Double, k: Int, t: Int)] = []
+    for near in stopsNear(net, to, metres: ACCESS_WIDE_M) {
+        for k in 0..<K where arrive[k][near.stop] < Double.infinity {
+            ends.append((arrive[k][near.stop] + near.metres / WALK_M_PER_MIN, k, near.stop))
+        }
+    }
+    ends.sort { a, b in a.score != b.score ? a.score < b.score : a.k != b.k ? a.k < b.k : a.t < b.t }
+    var out: [[ChainRide]] = [], seen = Set<String>()
+    for end in ends {
+        var chain: [ChainRide] = []
+        var stop = end.t
+        for j in stride(from: end.k, through: 0, by: -1) {
+            let ride = arriveRide[j][stop]!
+            chain.insert(ride, at: 0)
+            if j > 0 { stop = boardFrom[j][net.routes[ride.route].patterns[ride.pattern][ride.from]] }
+        }
+        let key = chain.map { net.routes[$0.route].id }.joined(separator: ">")
+        if seen.contains(key) { continue }
+        seen.insert(key); out.append(chain)
+        if out.count >= WIDE_CHAINS { break }
+    }
+    return out
+}
+
+/// Every stop a wide-search chain changes at: where a ride ends and where the next one starts. Sorted, once each.
+public func chainChangeStops(_ net: TransitNetwork, _ chains: [[ChainRide]]) -> [Int] {
+    var out = Set<Int>()
+    for chain in chains {
+        for (i, c) in chain.enumerated() {
+            let p = net.routes[c.route].patterns[c.pattern]
+            if i > 0 { out.insert(p[c.from]) }
+            if i < chain.count - 1 { out.insert(p[c.to]) }
+        }
+    }
+    return out.sorted()
 }

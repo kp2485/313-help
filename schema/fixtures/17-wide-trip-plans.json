@@ -1,0 +1,909 @@
+{
+ "description": "The wide search (schema/query-spec.md \"The wide search\"): only when the one-change search has nothing to try, up to three changes, access stops within 800 m and changes within 400 m. Four routes in a staircase on a 6 km grid: A east, B north, C east starting 300 m past B's end, D north; a side street (E St) ends 600 m from the nearest stop, and Far Rd has no stop within 800 m.",
+ "streets": [
+  {
+   "origin": [
+    -83.1,
+    42.36
+   ],
+   "names": [
+    "A St",
+    "B Ave",
+    "C St",
+    "D Ave",
+    "E St",
+    "Far Rd"
+   ],
+   "roads": [
+    [
+     4,
+     0,
+     [
+      0,
+      0,
+      3647,
+      0
+     ]
+    ],
+    [
+     4,
+     1,
+     [
+      3647,
+      0,
+      0,
+      2699
+     ]
+    ],
+    [
+     4,
+     2,
+     [
+      3647,
+      2699,
+      3646,
+      0
+     ]
+    ],
+    [
+     4,
+     3,
+     [
+      7293,
+      2699,
+      0,
+      2700
+     ]
+    ],
+    [
+     4,
+     4,
+     [
+      7293,
+      4049,
+      851,
+      0
+     ]
+    ],
+    [
+     4,
+     5,
+     [
+      0,
+      5849,
+      608,
+      0
+     ]
+    ]
+   ],
+   "safety": [
+    84,
+    84,
+    84,
+    84,
+    84,
+    84
+   ]
+  }
+ ],
+ "transit": [
+  {
+   "stops": {
+    "origin": [
+     -83.1,
+     42.36
+    ],
+    "names": [
+     "A & 0",
+     "A & 500",
+     "A & 1000",
+     "A & 1500",
+     "A & 2000",
+     "A & 2500",
+     "A & 3000",
+     "B & 0",
+     "B & 500",
+     "B & 1000",
+     "B & 1500",
+     "B & 2000",
+     "B & 2500",
+     "B & 3000",
+     "C & 3300",
+     "C & 3800",
+     "C & 4300",
+     "C & 4800",
+     "C & 5300",
+     "C & 6000",
+     "D & 3000",
+     "D & 3500",
+     "D & 4000",
+     "D & 4500",
+     "D & 5000",
+     "D & 5500",
+     "D & 6000"
+    ],
+    "points": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      608,
+      0
+     ],
+     [
+      2,
+      1216,
+      0
+     ],
+     [
+      3,
+      1823,
+      0
+     ],
+     [
+      4,
+      2431,
+      0
+     ],
+     [
+      5,
+      3039,
+      0
+     ],
+     [
+      6,
+      3647,
+      0
+     ],
+     [
+      7,
+      3647,
+      0
+     ],
+     [
+      8,
+      3647,
+      450
+     ],
+     [
+      9,
+      3647,
+      900
+     ],
+     [
+      10,
+      3647,
+      1350
+     ],
+     [
+      11,
+      3647,
+      1800
+     ],
+     [
+      12,
+      3647,
+      2250
+     ],
+     [
+      13,
+      3647,
+      2699
+     ],
+     [
+      14,
+      4011,
+      2699
+     ],
+     [
+      15,
+      4619,
+      2699
+     ],
+     [
+      16,
+      5227,
+      2699
+     ],
+     [
+      17,
+      5834,
+      2699
+     ],
+     [
+      18,
+      6442,
+      2699
+     ],
+     [
+      19,
+      7293,
+      2699
+     ],
+     [
+      20,
+      7293,
+      2699
+     ],
+     [
+      21,
+      7293,
+      3149
+     ],
+     [
+      22,
+      7293,
+      3599
+     ],
+     [
+      23,
+      7293,
+      4049
+     ],
+     [
+      24,
+      7293,
+      4499
+     ],
+     [
+      25,
+      7293,
+      4949
+     ],
+     [
+      26,
+      7293,
+      5399
+     ]
+    ]
+   },
+   "routes": {
+    "origin": [
+     -83.1,
+     42.36
+    ],
+    "names": [
+     "A line",
+     "B line",
+     "C line",
+     "D line"
+    ],
+    "agency": "Test Transit",
+    "system": "test",
+    "lines": [
+     [
+      0,
+      [
+       0,
+       0,
+       3647,
+       0
+      ]
+     ],
+     [
+      1,
+      [
+       3647,
+       0,
+       0,
+       2699
+      ]
+     ],
+     [
+      2,
+      [
+       4011,
+       2699,
+       3282,
+       0
+      ]
+     ],
+     [
+      3,
+      [
+       7293,
+       2699,
+       0,
+       2700
+      ]
+     ]
+    ],
+    "routes": [
+     {
+      "id": "rt_wide_a",
+      "short": "A",
+      "long": "A St",
+      "headway": 10,
+      "frequent": true,
+      "lines": [
+       0
+      ],
+      "stops": [
+       [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ]
+      ]
+     },
+     {
+      "id": "rt_wide_b",
+      "short": "B",
+      "long": "B Ave",
+      "headway": 20,
+      "lines": [
+       1
+      ],
+      "stops": [
+       [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+       ]
+      ]
+     },
+     {
+      "id": "rt_wide_c",
+      "short": "C",
+      "long": "C St",
+      "lines": [
+       2
+      ],
+      "stops": [
+       [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+       ]
+      ]
+     },
+     {
+      "id": "rt_wide_d",
+      "short": "D",
+      "long": "D Ave",
+      "headway": 10,
+      "lines": [
+       3
+      ],
+      "stops": [
+       [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+       ]
+      ]
+     }
+    ],
+    "route_ids": [
+     "rt_wide_a",
+     "rt_wide_b",
+     "rt_wide_c",
+     "rt_wide_d"
+    ],
+    "serves": [
+     [
+      0
+     ],
+     [
+      0
+     ],
+     [
+      0
+     ],
+     [
+      0
+     ],
+     [
+      0
+     ],
+     [
+      0
+     ],
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      1
+     ],
+     [
+      1
+     ],
+     [
+      1
+     ],
+     [
+      1
+     ],
+     [
+      1
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ],
+     [
+      3
+     ],
+     [
+      3
+     ],
+     [
+      3
+     ],
+     [
+      3
+     ],
+     [
+      3
+     ],
+     [
+      3
+     ]
+    ]
+   }
+  }
+ ],
+ "cases": [
+  {
+   "name": "plan: three changes: four routes in a staircase, and a 300 m walk at the third",
+   "fn": "plan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.4139,
+    "lon": -83.02707
+   },
+   "expect": [
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 6st every 20 > walk 300m > ride rt_wide_c 5st no-headway > ride rt_wide_d 6st every 10 > walk 10m [80-120]"
+   ]
+  },
+  {
+   "name": "planWindow: three changes: four routes in a staircase, and a 300 m walk at the third",
+   "fn": "planWindow",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.4139,
+    "lon": -83.02707
+   },
+   "expect": [
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 6st every 20 > walk 300m > ride rt_wide_c 5st no-headway > ride rt_wide_d 6st every 10 > walk 10m [80-120]"
+   ]
+  },
+  {
+   "name": "hasShortPlan: three changes: four routes in a staircase, and a 300 m walk at the third",
+   "fn": "hasShortPlan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.4139,
+    "lon": -83.02707
+   },
+   "expect": false
+  },
+  {
+   "name": "routeChains: three changes: four routes in a staircase, and a 300 m walk at the third",
+   "fn": "routeChains",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.4139,
+    "lon": -83.02707
+   },
+   "expect": [
+    "rt_wide_a>rt_wide_b>rt_wide_c>rt_wide_d"
+   ]
+  },
+  {
+   "name": "windowRoads: three changes: four routes in a staircase, and a 300 m walk at the third",
+   "fn": "windowRoads",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.4139,
+    "lon": -83.02707
+   },
+   "expect": {
+    "boxes": 10,
+    "roads": [
+     "A St",
+     "B Ave",
+     "C St",
+     "D Ave",
+     "E St"
+    ]
+   }
+  },
+  {
+   "name": "plan: two changes: off the third route",
+   "fn": "plan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.387175,
+    "lon": -83.031932
+   },
+   "expect": [
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 6st every 20 > walk 300m > ride rt_wide_c 4st no-headway > walk 300m [60-100]",
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 6st every 20 > walk 300m > ride rt_wide_c 5st no-headway > ride rt_wide_d 1st every 10 > walk 900m [80-125]"
+   ]
+  },
+  {
+   "name": "planWindow: two changes: off the third route",
+   "fn": "planWindow",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.387175,
+    "lon": -83.031932
+   },
+   "expect": [
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 6st every 20 > walk 300m > ride rt_wide_c 4st no-headway > walk 300m [60-100]",
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 6st every 20 > walk 300m > ride rt_wide_c 5st no-headway > ride rt_wide_d 1st every 10 > walk 900m [80-125]"
+   ]
+  },
+  {
+   "name": "hasShortPlan: two changes: off the third route",
+   "fn": "hasShortPlan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.387175,
+    "lon": -83.031932
+   },
+   "expect": false
+  },
+  {
+   "name": "routeChains: two changes: off the third route",
+   "fn": "routeChains",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.387175,
+    "lon": -83.031932
+   },
+   "expect": [
+    "rt_wide_a>rt_wide_b>rt_wide_c",
+    "rt_wide_a>rt_wide_b>rt_wide_c>rt_wide_d"
+   ]
+  },
+  {
+   "name": "windowRoads: two changes: off the third route",
+   "fn": "windowRoads",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.387175,
+    "lon": -83.031932
+   },
+   "expect": {
+    "boxes": 10,
+    "roads": [
+     "A St",
+     "B Ave",
+     "C St",
+     "D Ave",
+     "E St"
+    ]
+   }
+  },
+  {
+   "name": "plan: a stop half a mile away: no stop within 400 m of the end, one at 600 m",
+   "fn": "plan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.388795,
+    "lon": -83.027191
+   },
+   "to": {
+    "lat": 42.400492,
+    "lon": -83.019169
+   },
+   "expect": [
+    "walk 300m > ride rt_wide_d 2st every 10 > walk 650m [15-30]",
+    "walk 1950m [20-35]",
+    "walk 900m > ride rt_wide_c 1st no-headway > ride rt_wide_d 3st every 10 > walk 650m [40-70]"
+   ]
+  },
+  {
+   "name": "planWindow: a stop half a mile away: no stop within 400 m of the end, one at 600 m",
+   "fn": "planWindow",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.388795,
+    "lon": -83.027191
+   },
+   "to": {
+    "lat": 42.400492,
+    "lon": -83.019169
+   },
+   "expect": [
+    "walk 300m > ride rt_wide_d 2st every 10 > walk 650m [15-30]",
+    "walk 1950m [20-35]",
+    "walk 900m > ride rt_wide_c 1st no-headway > ride rt_wide_d 3st every 10 > walk 650m [40-70]"
+   ]
+  },
+  {
+   "name": "hasShortPlan: a stop half a mile away: no stop within 400 m of the end, one at 600 m",
+   "fn": "hasShortPlan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.388795,
+    "lon": -83.027191
+   },
+   "to": {
+    "lat": 42.400492,
+    "lon": -83.019169
+   },
+   "expect": false
+  },
+  {
+   "name": "routeChains: a stop half a mile away: no stop within 400 m of the end, one at 600 m",
+   "fn": "routeChains",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.388795,
+    "lon": -83.027191
+   },
+   "to": {
+    "lat": 42.400492,
+    "lon": -83.019169
+   },
+   "expect": [
+    "rt_wide_d",
+    "rt_wide_c>rt_wide_d"
+   ]
+  },
+  {
+   "name": "windowRoads: a stop half a mile away: no stop within 400 m of the end, one at 600 m",
+   "fn": "windowRoads",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.388795,
+    "lon": -83.027191
+   },
+   "to": {
+    "lat": 42.400492,
+    "lon": -83.019169
+   },
+   "expect": {
+    "boxes": 7,
+    "roads": [
+     "C St",
+     "D Ave",
+     "E St"
+    ]
+   }
+  },
+  {
+   "name": "plan: one change still answers the old way: the wide search does not run",
+   "fn": "plan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.381596,
+    "lon": -83.063413
+   },
+   "expect": [
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 5st every 20 > walk 100m [30-55]"
+   ]
+  },
+  {
+   "name": "planWindow: one change still answers the old way: the wide search does not run",
+   "fn": "planWindow",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.381596,
+    "lon": -83.063413
+   },
+   "expect": [
+    "walk 0m > ride rt_wide_a 6st every 10 > ride rt_wide_b 5st every 20 > walk 100m [30-55]"
+   ]
+  },
+  {
+   "name": "hasShortPlan: one change still answers the old way: the wide search does not run",
+   "fn": "hasShortPlan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.381596,
+    "lon": -83.063413
+   },
+   "expect": true
+  },
+  {
+   "name": "routeChains: one change still answers the old way: the wide search does not run",
+   "fn": "routeChains",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.381596,
+    "lon": -83.063413
+   },
+   "expect": [
+    "rt_wide_a>rt_wide_b"
+   ]
+  },
+  {
+   "name": "windowRoads: one change still answers the old way: the wide search does not run",
+   "fn": "windowRoads",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.381596,
+    "lon": -83.063413
+   },
+   "expect": {
+    "boxes": 3,
+    "roads": [
+     "A St",
+     "B Ave",
+     "C St"
+    ]
+   }
+  },
+  {
+   "name": "plan: nothing within half a mile of the end and too far to walk: nothing",
+   "fn": "plan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.418489,
+    "lon": -83.096961
+   },
+   "expect": []
+  },
+  {
+   "name": "planWindow: nothing within half a mile of the end and too far to walk: nothing",
+   "fn": "planWindow",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.418489,
+    "lon": -83.096961
+   },
+   "expect": []
+  },
+  {
+   "name": "hasShortPlan: nothing within half a mile of the end and too far to walk: nothing",
+   "fn": "hasShortPlan",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.418489,
+    "lon": -83.096961
+   },
+   "expect": false
+  },
+  {
+   "name": "routeChains: nothing within half a mile of the end and too far to walk: nothing",
+   "fn": "routeChains",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.418489,
+    "lon": -83.096961
+   },
+   "expect": []
+  },
+  {
+   "name": "windowRoads: nothing within half a mile of the end and too far to walk: nothing",
+   "fn": "windowRoads",
+   "now": "2026-10-01T16:00:00Z",
+   "from": {
+    "lat": 42.36027,
+    "lon": -83.1
+   },
+   "to": {
+    "lat": 42.418489,
+    "lon": -83.096961
+   },
+   "expect": {
+    "boxes": 4,
+    "roads": [
+     "A St",
+     "Far Rd"
+    ]
+   }
+  }
+ ]
+}

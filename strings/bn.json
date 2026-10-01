@@ -1196,6 +1196,8 @@
   "dir.walk_card": "হেঁটে",
   "dir.bus_card": "বাস {route}",
   "dir.bus_card_two": "বাস {a}, তারপর বাস {b}",
+  "dir.bus_card_three": "বাস {a}, তারপর বাস {b}, তারপর বাস {c}",
+  "dir.bus_card_four": "বাস {a}, তারপর বাস {b}, তারপর বাস {c}, তারপর বাস {d}",
   "dir.range": "প্রায় {lo}–{hi} মিনিট",
   "dir.every": "প্রায় প্রতি {minutes} মিনিটে",
   "dir.leg_walk": "হাঁটুন {distance}",

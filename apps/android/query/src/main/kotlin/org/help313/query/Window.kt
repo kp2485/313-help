@@ -30,6 +30,12 @@ const val TRANSFER_PAD_M = TRANSFER_WALK_M + 800.0
 /** Padding round the box between the two ends, when they are close enough to walk. */
 const val WALK_PAD_M = 800.0
 
+/** When the wide search runs: padding round each end (an access walk of up to ACCESS_WIDE_M) ... */
+const val WIDE_END_PAD_M = ACCESS_WIDE_M + 800.0
+
+/** ... and round each stop a wide-search chain changes at (a walk of up to TRANSFER_WIDE_M). */
+const val WIDE_TRANSFER_PAD_M = TRANSFER_WIDE_M + 800.0
+
 /** A box in degrees. */
 data class GeoBox(val lonMin: Double, val latMin: Double, val lonMax: Double, val latMax: Double)
 
@@ -64,7 +70,7 @@ fun transferStops(net: TransitNetwork, from: LatLon, to: LatLon, access: Double 
             val x = p1[at]
             for (near in stopsNear(net, net.stops[x].point, TRANSFER_WALK_M)) {
                 val y = near.stop
-                if (x == y) continue                                     // a change at the same stop: no walk
+                if (x == y || metresBetween(net.stops[x].point, net.stops[y].point) < 1) continue   // a change on the spot: no walk
                 val reaches = (net.posOf[y] ?: emptyList()).any { e ->
                     e.route != b.route && (destAt[e.route] ?: emptyList()).any { a -> a[0] == e.pattern && a[1] > e.at }
                 }
@@ -98,6 +104,13 @@ fun tripWindow(
         )
     }
     if (net != null) for (s in transferStops(net, from, to, accessMetres)) boxes.add(boxAround(net.stops[s].point, TRANSFER_PAD_M))
+    // The wide search runs exactly when `plan` runs it (the same network-only test), and walks only at its chains'
+    // ends and changes, all of which are known here.
+    if (net != null && !hasShortPlan(net, from, to, accessMetres)) {
+        boxes.add(boxAround(from, WIDE_END_PAD_M))
+        boxes.add(boxAround(to, WIDE_END_PAD_M))
+        for (s in chainChangeStops(net, routeChains(net, from, to))) boxes.add(boxAround(net.stops[s].point, WIDE_TRANSFER_PAD_M))
+    }
     return TripWindow(boxes)
 }
 

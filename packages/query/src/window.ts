@@ -22,7 +22,7 @@
 
 import { M_PER_DEG_LAT, M_PER_DEG_LON, STREET_SCALE, type PackedStreets } from './streets.js';
 import { metresBetween } from './walk.js';
-import { ACCESS_M, MAX_ACCESS_STOPS, MAX_WALK_ONLY_M, TRANSFER_WALK_M, stopsNear, type TransitNetwork } from './transit-plan.js';
+import { ACCESS_M, ACCESS_WIDE_M, MAX_ACCESS_STOPS, MAX_WALK_ONLY_M, TRANSFER_WALK_M, TRANSFER_WIDE_M, chainChangeStops, hasShortPlan, routeChains, stopsNear, type TransitNetwork } from './transit-plan.js';
 
 /** Padding round each end of a trip. An access walk is at most ACCESS_M in a straight line; streets wander. */
 export const END_PAD_M = ACCESS_M + 800;
@@ -30,6 +30,10 @@ export const END_PAD_M = ACCESS_M + 800;
 export const TRANSFER_PAD_M = TRANSFER_WALK_M + 800;
 /** Padding round the box between the two ends, when they are close enough to walk. */
 export const WALK_PAD_M = 800;
+/** When the wide search runs: padding round each end (an access walk of up to ACCESS_WIDE_M) ... */
+export const WIDE_END_PAD_M = ACCESS_WIDE_M + 800;
+/** ... and round each stop a wide-search chain changes at (a walk of up to TRANSFER_WIDE_M). */
+export const WIDE_TRANSFER_PAD_M = TRANSFER_WIDE_M + 800;
 
 /** A box in degrees. */
 export interface GeoBox { lonMin: number; latMin: number; lonMax: number; latMax: number }
@@ -62,7 +66,7 @@ export function transferStops(net: TransitNetwork, from: { lat: number; lon: num
     for (let at = b.at + 1; at < p1.length; at++) {
       const x = p1[at]!;
       for (const { stop: y } of stopsNear(net, net.stops[x]!, TRANSFER_WALK_M)) {
-        if (x === y) continue;                                              // a change at the same stop: no walk
+        if (x === y || metresBetween(net.stops[x]!, net.stops[y]!) < 1) continue;   // a change on the spot: no walk
         const reaches = (net.posOf.get(y) ?? []).some((e) => e.route !== b.route
           && (destAt.get(e.route) ?? []).some((a) => a.pattern === e.pattern && a.at > e.at));
         if (reaches) { out.add(x); out.add(y); }
@@ -85,6 +89,12 @@ export function tripWindow(net: TransitNetwork | null, from: { lat: number; lon:
     boxes.push({ lonMin: Math.min(a.lonMin, b.lonMin), latMin: Math.min(a.latMin, b.latMin), lonMax: Math.max(a.lonMax, b.lonMax), latMax: Math.max(a.latMax, b.latMax) });
   }
   if (net) for (const s of transferStops(net, from, to, opts.accessMetres ?? ACCESS_M)) boxes.push(boxAround(net.stops[s]!, TRANSFER_PAD_M));
+  // The wide search runs exactly when `plan` runs it (the same network-only test), and walks only at its chains'
+  // ends and changes, all of which are known here.
+  if (net && !hasShortPlan(net, from, to, opts.accessMetres ?? ACCESS_M)) {
+    boxes.push(boxAround(from, WIDE_END_PAD_M), boxAround(to, WIDE_END_PAD_M));
+    for (const s of chainChangeStops(net, routeChains(net, from, to))) boxes.push(boxAround(net.stops[s]!, WIDE_TRANSFER_PAD_M));
+  }
   return { boxes };
 }
 

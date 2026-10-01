@@ -248,6 +248,16 @@ describe('the cards a person picks from', () => {
     expect(itineraryTitle(t, two)).toBe('Bus 4, then bus 16');
     expect(two.changes).toBe(1);
   });
+
+  it('a plan with two or three changes names every bus (the wide search, 2026-10-01)', () => {
+    const walk = walkLeg(100, [], [[-83.07, 42.36], [-83.071, 42.361]]);
+    const three = finish([BUS.legs[0]!, rideLeg(), walk, rideLeg({ route_short: '530', route_long: 'Schoenherr' }), rideLeg({ route_short: '780', route_long: '15 Mile Crosstown' }), BUS.legs[2]!]);
+    expect(itineraryTitle(t, three)).toBe('Bus 4, then bus 530, then bus 780');
+    expect(three.changes).toBe(2);
+    const four = finish([BUS.legs[0]!, rideLeg(), rideLeg({ route_short: '16' }), walk, rideLeg({ route_short: '530' }), rideLeg({ route_short: '780' }), BUS.legs[2]!]);
+    expect(itineraryTitle(t, four)).toBe('Bus 4, then bus 16, then bus 530, then bus 780');
+    expect(four.changes).toBe(3);
+  });
 });
 
 describe('the route drawn on the map', () => {

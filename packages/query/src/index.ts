@@ -26,6 +26,7 @@ export {
   plan, buildTransitNetwork, stopsNear, minutesRange,
   BUS_M_PER_MIN, WAIT_FRACTION_OF_HEADWAY, DEFAULT_WAIT_MIN, CHANGE_PENALTY_MIN, MAX_CHANGES, ACCESS_M,
   MAX_ACCESS_STOPS, TRANSFER_WALK_M, MAX_WALK_ONLY_M, MAX_PLANS,
+  SHORT_CHANGES, ACCESS_WIDE_M, TRANSFER_WIDE_M, WIDE_CHAINS, hasShortPlan, routeChains, chainChangeStops, type ChainRide,
   type Itinerary, type PlanLeg, type WalkLeg, type RideLeg, type PlanOptions,
   type TransitNetwork, type TransitLayer, type TransitRoute, type TransitStop,
   type PackedPoints, type PackedRoutes, type PackedServes,
@@ -34,6 +35,6 @@ export {
 // "The trip window".
 export {
   tripWindow, windowFiles, transferStops, roadsInBoxes, boxAround,
-  END_PAD_M, TRANSFER_PAD_M, WALK_PAD_M,
+  END_PAD_M, TRANSFER_PAD_M, WALK_PAD_M, WIDE_END_PAD_M, WIDE_TRANSFER_PAD_M,
   type GeoBox, type TripWindow,
 } from './window.js';

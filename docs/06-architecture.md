@@ -78,12 +78,12 @@ Directions are computed on the device from files the bundle already carries, and
                                               │  severity, lanes, speed, AADT fields, packed by ingest-basemap)
                                               ▼
   map/transit/*.json + *.net.json ──▶ buildTransitNetwork ──▶ plan(origin, destination)  (transit-plan.ts)
-        (stops, routes, stops per route in travel order,          ranks walk-only, one ride, one change;
+        (stops, routes, stops per route in travel order,          ranks walk-only, one ride, one change, then up to three;
          published headways)                                       every walking leg is an A* walk (walk.ts)
 ```
 
 - **Inputs** are the origin the map already holds in memory (a location allowed this visit, a typed cross street or ZIP centre) and the destination's published address or coordinate. Nothing is written down and nothing is sent: the web runs it in a classic Worker (`apps/web/src/dirworker.ts`) and the screen (`dirscreen.ts`, `dirwords.ts`) has no URL and no history entry; iOS is `HelpApp/Directions.swift` over `DetroitQuery`; Android is `app/.../Directions.kt`, compiled and tested in `:core` on a plain JDK.
-- **What it may say** is fixed by the spec: published headways only (never real-time, never a timetable), every estimate a range, at most one bus change, the route ends at the street outside and says how far the door is, and no screen uses "safe" or "accessible". Three implementations, one spec, the same fixtures (`schema/fixtures/14-streets-walk.json`, `15-trip-plans.json`), and `packages/query/test/routing-real.test.ts` measures the committed basemap (about 23.6k nodes and 39.7k edges, 99.7 % in one piece).
+- **What it may say** is fixed by the spec: published headways only (never real-time, never a timetable), every estimate a range, one bus change where one will do and up to three where it won't, the route ends at the street outside and says how far the door is, and no screen uses "safe" or "accessible". Three implementations, one spec, the same fixtures (`schema/fixtures/14-streets-walk.json`, `15-trip-plans.json`), and `packages/query/test/routing-real.test.ts` measures the committed basemap (about 23.6k nodes and 39.7k edges, 99.7 % in one piece).
 - **Areas and city pages.** `indicators/neighborhoods.json` carries the 205 neighborhood outlines and, since 2026-09-22, `areas[]` — the four city outlines — plus the four city pages' numbers from `data/ingested/cities.json`. Point-in-polygon runs on the device (`apps/web/src/hoodfind.ts`, `HelpCore/Hoods.swift`, `:core`), so the Areas tab can open on the outline a person is standing in and the Map tab can draw every boundary (`apps/web/src/bounds.ts`, docs/MAP-STYLE.md §15) without a request. Every count in the file is the exact number the source returned (docs/13).
 
 ## Write API (Cloudflare Worker + D1)

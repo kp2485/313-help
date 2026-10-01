@@ -1,6 +1,7 @@
-// One integrated trip plan: walk, or walk-ride-walk, or walk-ride-walk-ride-walk.
+// One integrated trip plan: walk, or walk-ride-walk, or up to four rides with walks between (three changes).
 // Spec: schema/query-spec.md "Trip plans". Study: docs/research/2026-09-22-offline-directions.md §1.3, §2.
-// A case-for-case Kotlin port of packages/query/src/transit-plan.ts, held to schema/fixtures/15-trip-plans.json.
+// A case-for-case Kotlin port of packages/query/src/transit-plan.ts, held to schema/fixtures/15-trip-plans.json
+// and 17-wide-trip-plans.json.
 //
 // Kyle, 2026-09-22: "I want integrated walking and bus routes for the best user experience." So there is one
 // entry point, `plan()`, and walking on its own is simply one of the candidates it ranks. Every walking leg,
@@ -25,10 +26,23 @@ const val WAIT_FRACTION_OF_HEADWAY = 0.5
 const val DEFAULT_WAIT_MIN = 15.0
 /** The cost of changing vehicle at all, on top of the wait and the walk. */
 const val CHANGE_PENALTY_MIN = 5.0
-/** At most one change. Distance-only planning over-transfers; a plan with three changes and no times is a maze. */
-const val MAX_CHANGES = 1
+/**
+ * The first search allows one change, within ACCESS_M and TRANSFER_WALK_M: distance-only planning over-transfers,
+ * so a trip one change answers is always answered that way (2026-09-22). Only when that search has nothing to try
+ * does the wide search run (Kyle, 2026-10-01: "allow 3 changes and widen the walk"): the area is 75 places now, and
+ * from most of Detroit a stop on 15 Mile Road in Clinton Township is two changes away.
+ */
+const val SHORT_CHANGES = 1
+/** The hard cap, in the wide search. */
+const val MAX_CHANGES = 3
 /** A stop is "at" a place when it is this close in a straight line; the walk to it is then routed properly. */
 const val ACCESS_M = 400.0
+/** The wide search's radius for access stops: half a mile, because suburban stops are far apart. */
+const val ACCESS_WIDE_M = 800.0
+/** The wide search's longest walk at a change: across a wide suburban intersection to the far-side stop. */
+const val TRANSFER_WIDE_M = 400.0
+/** How many route chains the wide search hands on to be walked out on the streets. */
+const val WIDE_CHAINS = 6
 /** How many access stops we consider at each end. */
 const val MAX_ACCESS_STOPS = 8
 /** A change on foot may be this long. */
@@ -385,7 +399,11 @@ class PlanOptions(
  * same cost model as the bus plans — so "walk, it is four blocks" wins on its own merits, and a bus only wins
  * when it really is faster given an honest wait.
  *
- * Returns [] when nothing works. A client says so; it never invents a leg.
+ * When the one-change search has nothing to try (`hasShortPlan` is false), the wide search runs: up to MAX_CHANGES
+ * changes, access stops within ACCESS_WIDE_M and changes within TRANSFER_WIDE_M (`routeChains`).
+ *
+ * Returns [] when nothing works: nothing within walking distance, no route between the two ends within three
+ * changes, and the two ends in different pieces of the street graph. A client says so; it never invents a leg.
  */
 fun plan(
     g: StreetGraph,
@@ -472,7 +490,7 @@ fun plan(
         }
 
         // 2. one change: ride, then a change at the same stop or a walk of at most TRANSFER_WALK_M
-        if (MAX_CHANGES >= 1) {
+        if (SHORT_CHANGES >= 1) {
             val transferWalk = HashMap<Long, WalkRoute?>()
             fun walkBetween(i: Int, j: Int): WalkRoute? = transferWalk.getOrPut(i * 1_000_000L + j) {
                 val a = snapStop(i)
@@ -502,9 +520,10 @@ fun plan(
                                     val leg2 = rideLeg(e.route, e.pattern, e.at, a.at)
                                     if (w1 == null || w3 == null || leg1 == null || leg2 == null) continue
                                     val mid = ArrayList<PlanLeg>()
-                                    if (x != y) {
-                                        val w2 = if (near.metres < 1) null else walkBetween(x, y)
-                                        if (w2 == null) continue
+                                    // Two stops less than a metre apart (a DDOT and a SMART stop on one pole) are
+                                    // one spot: no walk.
+                                    if (x != y && near.metres >= 1) {
+                                        val w2 = walkBetween(x, y) ?: continue
                                         mid.add(walkLeg(w2, toStop = stopRef(net, y), fromStop = stopRef(net, x)))
                                     }
                                     val legs = ArrayList<PlanLeg>()
@@ -523,6 +542,57 @@ fun plan(
         }
     }
 
+    // 3. the wide search, only when the one-change search had nothing to try
+    if (!hasShortPlan(net, from, to, access)) {
+        val fromSnap = nearestEdgePoint(g, from.lat, from.lon)
+        val toSnap = nearestEdgePoint(g, to.lat, to.lon)
+        val snaps = HashMap<Int, EdgePoint?>()
+        fun snapStop(i: Int): EdgePoint? = snaps.getOrPut(i) {
+            nearestEdgePoint(g, net.stops[i].lat, net.stops[i].lon)
+        }
+        chains@ for (chain in routeChains(net, from, to)) {
+            val first = chain[0]
+            val last = chain[chain.size - 1]
+            val b0 = net.routes[first.route].patterns[first.pattern][first.from]
+            val an = net.routes[last.route].patterns[last.pattern][last.to]
+            val s0 = snapStop(b0)
+            val sn = snapStop(an)
+            val w1 = if (fromSnap != null && s0 != null) routeBetween(g, fromSnap, s0, from, net.stops[b0].point) else null
+            val w3 = if (sn != null && toSnap != null) routeBetween(g, sn, toSnap, net.stops[an].point, to) else null
+            if (w1 == null || w3 == null) continue
+            val legs = ArrayList<PlanLeg>()
+            legs.add(walkLeg(w1, toStop = stopRef(net, b0)))
+            for ((i, c) in chain.withIndex()) {
+                if (i > 0) {
+                    val prev = chain[i - 1]
+                    val x = net.routes[prev.route].patterns[prev.pattern][prev.to]
+                    val y = net.routes[c.route].patterns[c.pattern][c.from]
+                    // the same "on the spot" rule as step 2: under a metre apart is one stop, no walk
+                    if (x != y && metresBetween(net.stops[x].point, net.stops[y].point) >= 1) {
+                        val a = snapStop(x)
+                        val b = snapStop(y)
+                        val w = (if (a != null && b != null) routeBetween(g, a, b, net.stops[x].point, net.stops[y].point) else null)
+                            ?: continue@chains
+                        legs.add(walkLeg(w, toStop = stopRef(net, y), fromStop = stopRef(net, x)))
+                    }
+                }
+                val r = net.routes[c.route]
+                val p = r.patterns[c.pattern]
+                val m = rideMetres(net, p, c.from, c.to)
+                val leg = RideLeg(
+                    routeId = r.id, routeShort = r.short, routeLong = r.long, agency = r.agency,
+                    headwayMinutes = r.headway, fromStop = stopRef(net, p[c.from]), toStop = stopRef(net, p[c.to]),
+                    stops = c.to - c.from, metres = m, minutes = m / BUS_M_PER_MIN, waitMinutes = waitFor(r),
+                    polyline = emptyList(),
+                )
+                pending[leg] = intArrayOf(c.route, c.pattern, c.from, c.to)
+                legs.add(leg)
+            }
+            legs.add(walkLeg(w3, fromStop = stopRef(net, an)))
+            out.add(finish(legs, w1.startOffMetres, w3.endOffMetres))
+        }
+    }
+
     // one itinerary per shape: the same sequence of routes never comes back twice
     val seen = HashSet<String>()
     val ranked = ArrayList<Itinerary>()
@@ -538,6 +608,148 @@ fun plan(
         l.polyline = ridePolyline(net, net.routes[p[0]], net.routes[p[0]].patterns[p[1]], p[2], p[3])
     }
     return ranked
+}
+
+// ---- the wide search ---------------------------------------------------------------------------
+
+/**
+ * Whether the one-change search (`plan`'s steps 1 and 2) has anything to try: a route that calls within `access`
+ * of both ends in travel order, or a change within TRANSFER_WALK_M from a route near the start onto one near the
+ * end. Read from the network alone, so `plan` and `tripWindow` always agree on whether the wide search runs.
+ */
+fun hasShortPlan(net: TransitNetwork, from: LatLon, to: LatLon, access: Double = ACCESS_M): Boolean {
+    val originStops = stopsNear(net, from, access).take(MAX_ACCESS_STOPS)
+    val destStops = stopsNear(net, to, access).take(MAX_ACCESS_STOPS)
+    if (originStops.isEmpty() || destStops.isEmpty()) return false
+    val destAt = LinkedHashMap<Int, MutableList<IntArray>>()          // route -> [pattern, at]
+    for (sn in destStops) for (e in net.posOf[sn.stop] ?: emptyList()) {
+        destAt.getOrPut(e.route) { ArrayList() }.add(intArrayOf(e.pattern, e.at))
+    }
+    fun reachesEnd(route: Int, pattern: Int, at: Int): Boolean =
+        (destAt[route] ?: emptyList()).any { a -> a[0] == pattern && a[1] > at }
+    for (sn in originStops) for (b in net.posOf[sn.stop] ?: emptyList()) {
+        if (reachesEnd(b.route, b.pattern, b.at)) return true
+        val p1 = net.routes[b.route].patterns[b.pattern]
+        for (at in b.at + 1 until p1.size) {
+            for (near in stopsNear(net, net.stops[p1[at]].point, TRANSFER_WALK_M)) {
+                for (e in net.posOf[near.stop] ?: emptyList()) {
+                    if (e.route != b.route && reachesEnd(e.route, e.pattern, e.at)) return true
+                }
+            }
+        }
+    }
+    return false
+}
+
+/** One ride of a chain: a route, one of its patterns, and the positions boarded and left on it. */
+class ChainRide(val route: Int, val pattern: Int, val from: Int, val to: Int)
+
+/** A place a chain can end: its score, the round it arrived in, and the stop. */
+private class ChainEnd(val score: Double, val k: Int, val t: Int)
+
+/**
+ * The wide search, on the network alone (no street is read): the best chains of one to MAX_CHANGES + 1 rides from
+ * stops within ACCESS_WIDE_M of `from` to stops within ACCESS_WIDE_M of `to`, changing at the same stop or after a
+ * straight-line walk of at most TRANSFER_WIDE_M. Rounds, one per ride (schema/query-spec.md "The wide search"):
+ *
+ *   board[0][s]  = metres(from, s) / WALK_M_PER_MIN for every access stop s
+ *   ride round k: each route in index order, each pattern in order, walked stop by stop; at position i the best
+ *                 boarding so far gives arrive[k][p[i]] = best + cum[i]/BUS_M_PER_MIN + wait + (k > 0 ? CHANGE_PENALTY_MIN : 0),
+ *                 where best = min over earlier positions j of board[k][p[j]] - cum[j]/BUS_M_PER_MIN, and a stop is
+ *                 never boarded from the route that brought you to it; a label only changes when strictly better.
+ *   walk round:  board[k+1][u] = min over s of arrive[k][s] + metres(s, u)/WALK_M_PER_MIN, u within TRANSFER_WIDE_M
+ *                 of s (u = s included), s taken in index order.
+ *   ends:        every (k, t) with t within ACCESS_WIDE_M of `to` scores arrive[k][t] + metres(t, to)/WALK_M_PER_MIN;
+ *                 sorted by score, then k, then t; each traced back to its rides; one chain per sequence of routes;
+ *                 the first WIDE_CHAINS kept.
+ *
+ * Straight lines and averages only: the chains are candidates, and `plan` walks each one out on the streets and
+ * ranks them with everything else. Deterministic, so the trip window can name every stop a plan may change at.
+ * The arithmetic is in the TypeScript's order, term by term, so a tie breaks the same way on all three clients.
+ */
+fun routeChains(net: TransitNetwork, from: LatLon, to: LatLon): List<List<ChainRide>> {
+    val n = net.stops.size
+    val rounds = MAX_CHANGES + 1
+    val inf = Double.POSITIVE_INFINITY
+    val board = Array(rounds) { DoubleArray(n) { inf } }
+    val boardFrom = Array(rounds) { IntArray(n) { -1 } }          // stop alighted before walking here
+    val boardRoute = Array(rounds) { IntArray(n) { -1 } }         // route that brought you here
+    val arrive = Array(rounds) { DoubleArray(n) { inf } }
+    val arriveRide = Array(rounds) { arrayOfNulls<ChainRide>(n) }
+    for (sn in stopsNear(net, from, ACCESS_WIDE_M)) board[0][sn.stop] = sn.metres / WALK_M_PER_MIN
+    for (k in 0 until rounds) {
+        val bk = board[k]
+        val ak = arrive[k]
+        val rideK = arriveRide[k]
+        val routeK = boardRoute[k]
+        val pen = if (k > 0) CHANGE_PENALTY_MIN else 0.0
+        for ((ri, r) in net.routes.withIndex()) {
+            val wait = waitFor(r)
+            for ((pi, p) in r.patterns.withIndex()) {
+                var best = inf
+                var bestAt = -1
+                var cum = 0.0
+                for (i in p.indices) {
+                    if (i > 0) cum += metresBetween(net.stops[p[i - 1]].point, net.stops[p[i]].point)
+                    val s = p[i]
+                    if (bestAt >= 0) {
+                        val c = best + cum / BUS_M_PER_MIN + wait + pen
+                        if (c < ak[s]) { ak[s] = c; rideK[s] = ChainRide(ri, pi, bestAt, i) }
+                    }
+                    if (bk[s] < inf && routeK[s] != ri) {
+                        val key = bk[s] - cum / BUS_M_PER_MIN
+                        if (key < best) { best = key; bestAt = i }
+                    }
+                }
+            }
+        }
+        if (k + 1 < rounds) {
+            val nb = board[k + 1]
+            for (s in 0 until n) {
+                if (ak[s] == inf) continue
+                for (near in stopsNear(net, net.stops[s].point, TRANSFER_WIDE_M)) {
+                    val u = near.stop
+                    val c = ak[s] + near.metres / WALK_M_PER_MIN
+                    if (c < nb[u]) { nb[u] = c; boardFrom[k + 1][u] = s; boardRoute[k + 1][u] = rideK[s]!!.route }
+                }
+            }
+        }
+    }
+    val ends = ArrayList<ChainEnd>()
+    for (sn in stopsNear(net, to, ACCESS_WIDE_M)) {
+        for (k in 0 until rounds) {
+            if (arrive[k][sn.stop] < inf) ends.add(ChainEnd(arrive[k][sn.stop] + sn.metres / WALK_M_PER_MIN, k, sn.stop))
+        }
+    }
+    val out = ArrayList<List<ChainRide>>()
+    val seen = HashSet<String>()
+    for (e in ends.sortedWith(compareBy<ChainEnd>({ it.score }, { it.k }, { it.t }))) {
+        val chain = ArrayList<ChainRide>()
+        var stop = e.t
+        for (j in e.k downTo 0) {
+            val ride = arriveRide[j][stop]!!
+            chain.add(0, ride)
+            if (j > 0) stop = boardFrom[j][net.routes[ride.route].patterns[ride.pattern][ride.from]]
+        }
+        val key = chain.joinToString(">") { net.routes[it.route].id }
+        if (!seen.add(key)) continue
+        out.add(chain)
+        if (out.size >= WIDE_CHAINS) break
+    }
+    return out
+}
+
+/** Every stop a wide-search chain changes at: where a ride ends and where the next one starts. Sorted, once each. */
+fun chainChangeStops(net: TransitNetwork, chains: List<List<ChainRide>>): List<Int> {
+    val out = HashSet<Int>()
+    for (chain in chains) {
+        for ((i, c) in chain.withIndex()) {
+            val p = net.routes[c.route].patterns[c.pattern]
+            if (i > 0) out.add(p[c.from])
+            if (i < chain.size - 1) out.add(p[c.to])
+        }
+    }
+    return out.sorted()
 }
 
 /** The one wording of a plan that all three runners compare (schema/fixtures/15-trip-plans.json). */

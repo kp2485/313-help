@@ -1196,6 +1196,8 @@
   "dir.walk_card": "Walk",
   "dir.bus_card": "Bus {route}",
   "dir.bus_card_two": "Bus {a}, then bus {b}",
+  "dir.bus_card_three": "Bus {a}, then bus {b}, then bus {c}",
+  "dir.bus_card_four": "Bus {a}, then bus {b}, then bus {c}, then bus {d}",
   "dir.range": "about {lo}–{hi} min",
   "dir.every": "about every {minutes} min",
   "dir.leg_walk": "walk {distance}",

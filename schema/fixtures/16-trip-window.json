@@ -568,7 +568,7 @@
     "lon": -83.039225
    },
    "expect": {
-    "boxes": 3,
+    "boxes": 5,
     "roads": [
      "Lone Rd"
     ]

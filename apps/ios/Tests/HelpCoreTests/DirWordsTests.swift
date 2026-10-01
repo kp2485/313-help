@@ -220,6 +220,12 @@ final class DirWordsTests: XCTestCase {
         XCTAssertEqual(itineraryTitle(t, two), "Bus 4, then bus 4")
     }
 
+    func testAPlanWithThreeChangesNamesEveryBus() {
+        let legs = bus.legs
+        XCTAssertEqual(itineraryTitle(t, finish([legs[0], rideLeg(), rideLeg(), rideLeg(), legs[2]])), "Bus 4, then bus 4, then bus 4")
+        XCTAssertEqual(itineraryTitle(t, finish([legs[0], rideLeg(), rideLeg(), rideLeg(), rideLeg(), legs[2]])), "Bus 4, then bus 4, then bus 4, then bus 4")
+    }
+
     func testARideWearsItsAgencysLayerToneAndAWalkItsOwn() {
         XCTAssertEqual(rideToken(agency: "DDOT"), "bus")
         XCTAssertEqual(rideToken(agency: "SMART"), "smart")
