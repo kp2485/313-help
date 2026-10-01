@@ -6,7 +6,7 @@ Free help, transit, parks and neighborhood facts for Detroit and the 74 other ci
 SMART buses reach, across Wayne, Oakland and Macomb counties — in an app that stores nothing about you, works with
 no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 1,959 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 1,992 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -53,8 +53,8 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **1,959 listings** in 62 categories, 1,239 of them outside the first four cities: 324 food, 227 health (including
-  **33 emergency rooms and 52 urgent care centers**), 272 harm reduction, 263 places to get somewhere safe now (177
+- **1,992 listings** in 62 categories, 1,272 of them outside the first four cities: 324 food, 227 health (including
+  **33 emergency rooms and 52 urgent care centers**), 305 harm reduction, 263 places to get somewhere safe now (177
   fire stations and 86 police stations), 122 recreation centers and libraries, 102 child care and free preschool,
   78 housing, 73 learning, 68 treatment, 61 jobs, and 15 more groups — among them help built for seniors, veterans
   and people with a disability.
@@ -190,7 +190,7 @@ support contracts fund the rest. Never ads, never data ([docs/12](docs/12-gift-a
 ## Data sources and licences
 
 Most listings come from each organization's own website; more than 150 are named in [NOTICE](NOTICE). Map,
-transit, park and neighborhood layers come from City of Detroit open data, Wayne County, Oakland County, SMART, the People Mover,
+transit, park and neighborhood layers come from City of Detroit open data, Wayne County, Oakland County, Families Against Narcotics, SMART, the People Mover,
 MDOT, SEMCOG, US Census TIGER, US DOT BTS and SAMHSA. Every listing names its source on screen. Per-source terms
 are in `data/sources.yaml`, [docs/02](docs/02-data-sources.md) and [data/LICENSE-DATA.md](data/LICENSE-DATA.md).
 **Licence:** code Apache-2.0 ([LICENSE](LICENSE)); our dataset CC BY 4.0; third-party data keeps its publisher's
