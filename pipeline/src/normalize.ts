@@ -1,7 +1,7 @@
 // Seed + ingested CSV rows -> (a) bundle rows for the apps, (b) nested HSDS 3.2 services for everyone else.
 
 import type { BundleRow, Schedule, SourceType, VerifyMethod, Availability, RowStatus } from '@313help/query';
-import { formatPhone, parsePhone, uuid5, type CsvRow } from './util.js';
+import { formatPhone, parsePhone, slug, uuid5, type CsvRow } from './util.js';
 import type { Source } from './ingest-arcgis.js';
 
 export interface Normalized { rows: BundleRow[]; orgs: Map<string, string>; svcOf: Map<string, { svc_id: string; service_name: string; org_id: string }> }
@@ -124,6 +124,22 @@ const WORDING: Record<string, Wording> = {
     /** The number the City prints beside the building. Not a dispatch line, and never the way to reach 911. */
     phone_label: 'Station desk',
   },
+  // Oakland County's Narcan Locations map (2026-10-01). The County's own words are "Locations for free Narcan and
+  // harm-reduction tools", and the map names the device and where it sits. It says nothing about ID, questions,
+  // hours or which tools, so neither do we: no no_id_required flag, no hours, no test strips.
+  county_narcan: {
+    service_name: 'Free Narcan',
+    what: (extra: Record<string, string>) => {
+      const kind = (extra.USER_Notes ?? '').toLowerCase();
+      const device = kind.includes('vending') && kind.includes('save a life') ? 'a vending machine and a Save a Life box'
+        : kind.includes('vending') ? 'a vending machine' : kind.includes('save a life') ? 'a Save a Life box' : kind.includes('cabinet') ? 'a cabinet' : 'a box';
+      const at = (extra.USER_Location ?? '').toLowerCase();
+      const where = at === 'outside' ? ' It is outside.' : at === 'in the lobby' ? ' It is in the lobby.'
+        : at === 'inside (wall mount)' ? ' It is inside, on the wall.' : at === 'inside' ? ' It is inside.' : '';
+      return `Free Narcan from ${device}.${where}`;
+    },
+    flags: ['walk_in'],
+  },
   fire_station: {
     service_name: 'Fire station',
     what: () => 'A fire station. Firefighters are there all day and night, but they go out on calls.',
@@ -143,12 +159,16 @@ export function fromIngested(src: Source, ingested: CsvRow[]): Normalized {
       const at = kv.indexOf('=');
       return [kv.slice(0, at), kv.slice(at + 1)] as [string, string];
     }));
-    svcOf.set(r.sal_id!, { svc_id: `svc_${src.id}`, service_name: wording.service_name, org_id: src.org!.id });
+    // A layer may name who runs each place (Oakland County's boxes are stocked by different groups); the
+    // publisher is the organization otherwise.
+    const org = r.org_name ? { id: `org_${slug(r.org_name)}`, name: r.org_name } : src.org!;
+    orgs.set(org.id, org.name);
+    svcOf.set(r.sal_id!, { svc_id: org === src.org ? `svc_${src.id}` : `svc_${src.id}_${org.id.slice(4)}`, service_name: wording.service_name, org_id: org.id });
     const ph = parsePhone(r.phone ?? '');
     const always = ALWAYS.test((r.hours_text ?? '').trim());
     const hasCoords = r.lat !== undefined && r.lat !== '' && r.lon !== undefined && r.lon !== '';
     return {
-      id: r.sal_id!, name: r.name!, org: src.org!.name, category: src.category!,
+      id: r.sal_id!, name: r.name!, org: org.name, category: src.category!,
       what: wording.what(extra),
       // A layer may publish a city of its own (this one spans four) and may have no street address at all.
       // A coordinate is never turned into an address: the row simply has none, and the map dot comes from the
