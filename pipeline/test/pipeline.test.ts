@@ -1251,10 +1251,14 @@ describe('the real bundle', () => {
     // No timers (DECISIONS 2026-09-19): months later the badge states the same fact.
     expect(badge(st, new Date('2027-01-15T17:45:00Z'))).toMatchObject({ level: 'source_listed', params: { source_date: '2026-08-26' } });
   });
-  it('only an unambiguous "24 hours" becomes open-now; other hours text is shown as written', () => {
+  it('a Narcan listing is never "call first" (you cannot call a box); only an unambiguous "24 hours" or a parsed schedule is open-now', () => {
+    // DECISIONS 2026-09-19: a box whose page gives no hours is `unknown`. FAN's RescueBox table gives the host's hours
+    // (2026-10-01), so a Narcan row may now carry a real schedule; any other hours text stays words and `unknown`.
     for (const r of rows.filter((x) => x.category === 'harm.narcan')) {
-      if (r.availability === 'always') expect(r.hours_text).toBeUndefined();
-      else { expect(r.availability).toBe('unknown'); expect(openNow(r, new Date()).state).toBe('unknown'); }
+      expect(r.availability, r.id).not.toBe('call_first');
+      if (r.availability === 'always') expect(r.hours_text, r.id).toBeUndefined();
+      else if (r.availability === 'scheduled') expect(r.schedules.length, r.id).toBeGreaterThan(0);
+      else { expect(r.availability, r.id).toBe('unknown'); expect(openNow(r, new Date()).state).toBe('unknown'); }
     }
   });
   it('answers a real question: free meals near Eastern Market, Friday 1:45pm', () => {
