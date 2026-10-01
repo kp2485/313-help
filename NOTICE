@@ -55,6 +55,8 @@ Narcan boxes, cabinets and vending machines in Oakland County:
     and townships a DDOT or SMART bus reaches, and where a record's city or ZIP is
     not the place its street is in, the city or ZIP printed is the US Census
     Bureau's match of that street (each such row says what the County wrote).
+    For 23 records the name and address printed are the ones on the place's
+    own website, read 2026-10-01 (data/seed/oakland-narcan-sites.csv).
     (google.com/maps/d/kml?mid=...&forcekml=1), which Google documents nowhere.
     Asking the County for the file directly is owed too.
 

@@ -6,7 +6,7 @@ Free help, transit, parks and neighborhood facts for Detroit and the 74 other ci
 SMART buses reach, across Wayne, Oakland and Macomb counties — in an app that stores nothing about you, works with
 no signal, and never sends you to a pantry that closed last month.
 
-**Live at <https://313help.com>** — 1,947 listings in a release-signed bundle, rebuilt by a nightly publish job.
+**Live at <https://313help.com>** — 1,959 listings in a release-signed bundle, rebuilt by a nightly publish job.
 
 ## Who it is for
 
@@ -53,8 +53,8 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 
 ## What's in it
 
-- **1,947 listings** in 62 categories, 1,227 of them outside the first four cities: 324 food, 227 health (including
-  **33 emergency rooms and 52 urgent care centers**), 260 harm reduction, 263 places to get somewhere safe now (177
+- **1,959 listings** in 62 categories, 1,239 of them outside the first four cities: 324 food, 227 health (including
+  **33 emergency rooms and 52 urgent care centers**), 272 harm reduction, 263 places to get somewhere safe now (177
   fire stations and 86 police stations), 122 recreation centers and libraries, 102 child care and free preschool,
   78 housing, 73 learning, 68 treatment, 61 jobs, and 15 more groups — among them help built for seniors, veterans
   and people with a disability.
@@ -84,7 +84,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
   and trip plans — are written three times against [one spec](schema/query-spec.md) and **223 shared fixture
   cases**; the web and iPhone pass every case, and Android's are run by CI.
-- **Tested and small.** 1,397 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
+- **Tested and small.** 1,402 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
   (26 KB) loads only if chosen; the bundle is 6.8 MB for the whole three-county area.
 
@@ -131,7 +131,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,397 tests
+pnpm test                                   # 1,402 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/

@@ -45,6 +45,9 @@ sources:
     fields: { name: USER_Name, address: USER_Address, city: USER_City, zip: USER_Zip, phone: USER_Phone, org: USER_Managed_By, ref: USER_Name+USER_Address }
     extra: [USER_Notes, USER_Location]
     id_prefix: ocn
+    # Records looked up on the place's own website (Kyle, 2026-10-01): that page's name and address are printed,
+    # and a record that is a second copy of another is left out. See ingest-checked.ts.
+    site_checks: data/seed/oakland-narcan-sites.csv
     # The County records a person already listed from the owner's own page. Those rows stay as they are.
     same_as:
       "Meridian Health Services - MAT|1435 N Oakland Boulevard": sal_oakland_county_free_narcan_machine_at_meridian_n_oakland

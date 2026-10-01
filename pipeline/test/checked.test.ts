@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { loadSources, type Source } from '../src/ingest-arcgis.js';
-import { CHECKED_COLUMNS, MAX_GAP_M, outFields, sameCity, streetOnly, titleCity, toCheckedRows, type Match } from '../src/ingest-checked.js';
+import { CHECKED_COLUMNS, MAX_GAP_M, outFields, sameCity, siteChecks, streetOnly, titleCity, toCheckedRows, type Match } from '../src/ingest-checked.js';
 import { fromIngested } from '../src/normalize.js';
 import { placeAt } from '../src/region.js';
 import { validateSameAs } from '../src/validate.js';
@@ -47,13 +47,13 @@ describe('what a County record becomes (toCheckedRows)', () => {
   const by = (name: string) => [...out.rows, ...out.held].find((r) => r.name === name)!;
 
   it('a misspelt city takes the Census Bureau\'s spelling, and says so', () => {
-    expect(by('Youngbloods')).toMatchObject({ city: 'Hazel Park', census_fixed: 'city (the layer says "Hazel Pak") from the US Census Bureau\'s match of this street' });
+    expect(by('Youngbloods')).toMatchObject({ city: 'Hazel Park', corrected: 'city (the layer says "Hazel Pak") from the US Census Bureau\'s match of this street' });
   });
   it('a right city stays, though the postal city differs: the match lies in the place the County named', () => {
-    expect(by('Rochester Hills substation')).toMatchObject({ city: 'Rochester Hills', census_fixed: '' });
+    expect(by('Rochester Hills substation')).toMatchObject({ city: 'Rochester Hills', corrected: '' });
   });
   it('a mistyped ZIP takes the Census Bureau\'s ZIP, and says so', () => {
-    expect(by('Temple')).toMatchObject({ zip: '48237', census_fixed: 'ZIP (the layer says "48327") from the US Census Bureau\'s match of this street' });
+    expect(by('Temple')).toMatchObject({ zip: '48237', corrected: 'ZIP (the layer says "48327") from the US Census Bureau\'s match of this street' });
   });
   it('the street, phone and map point printed are the County\'s own, and no staff name is carried', () => {
     const t = by('Temple');
@@ -74,6 +74,53 @@ describe('what a County record becomes (toCheckedRows)', () => {
   });
   it('ids are the layer\'s prefix and the record\'s own street and city', () => {
     expect(by('Youngbloods').sal_id).toBe('sal_ocn_24918_john_r_rd_hazel_park');
+  });
+});
+
+describe("a person's check on the place's own website wins (site_checks)", () => {
+  const features = [
+    rec('Library 1', '4600 Walnut Lake Rd', 'West Bloomfield Township', '48323', 42.56, -83.373),
+    rec('Far library', '4600 Walnut Lake Rd', 'West Bloomfield Township', '48323', 42.56, -83.31),
+    rec('Church', '4100 Walnut Lake Rd', 'West Bloomfield', '48323', 42.56, -83.364),
+    rec('Church copy', '4100 Walnut Lake Rd', 'West Bloomfield Township', '48323', 42.56, -83.364),
+    rec('Unmatched', '3155 Coolidge Hwy', 'Berkley', '48072', 42.49, -83.18),
+  ];
+  const checks = siteChecks([
+    { record_ref: 'Library 1|4600 Walnut Lake Rd', action: 'use', url: 'https://wblib.org/visit', name: 'West Bloomfield Township Public Library', address_1: '4600 Walnut Lake Rd', city: 'West Bloomfield', zip: '48323', read_on: '2026-10-01', note: '' },
+    { record_ref: 'Far library|4600 Walnut Lake Rd', action: 'use', url: 'https://wblib.org/visit', name: 'West Bloomfield Township Public Library', address_1: '4600 Walnut Lake Rd', city: 'West Bloomfield', zip: '48323', read_on: '2026-10-01', note: '' },
+    { record_ref: 'Church copy|4100 Walnut Lake Rd', action: 'duplicate', url: '', name: '', address_1: '', city: '', zip: '', read_on: '2026-10-01', note: 'same church' },
+    { record_ref: 'Unmatched|3155 Coolidge Hwy', action: 'use', url: 'https://berkley.example/library', name: 'Berkley Public Library', address_1: '3155 Coolidge Hwy', city: 'Berkley', zip: '48072', read_on: '2026-10-01', note: '' },
+  ]);
+  const site = match(42.5601, -83.3731, 'WEST BLOOMFIELD', '48323');
+  const matches = new Map<string, Match | null>([
+    ['Library 1|4600 Walnut Lake Rd', site], ['Far library|4600 Walnut Lake Rd', site],
+    ['Church|4100 Walnut Lake Rd', match(42.5601, -83.3641, 'WEST BLOOMFIELD', '48323')], ['Unmatched|3155 Coolidge Hwy', null],
+  ]);
+  const berkleyPin = (lat: number) => (Math.abs(lat - 42.49) < 0.005 ? 'Berkley' : placeOf(lat));
+  const out = toCheckedRows(OCN, '2026-08-06', features, matches, '2026-10-01', undefined, berkleyPin, checks);
+  const by = (ref: string) => [...out.rows, ...out.held].find((r) => r.record_ref === ref)!;
+
+  it("prints the website's name and links the page, saying what the County wrote", () => {
+    expect(by('Library 1|4600 Walnut Lake Rd')).toMatchObject({ name: 'West Bloomfield Township Public Library', city: 'West Bloomfield', website: 'https://wblib.org/visit', lat: '42.560000', lon: '-83.373000' });
+    expect(by('Library 1|4600 Walnut Lake Rd').corrected).toBe('name, city from the place\'s own website, read 2026-10-01 (the layer says "Library 1", "West Bloomfield Township")');
+  });
+  it("a pin far from the website's address moves to the Census Bureau's match of that address", () => {
+    expect(by('Far library|4600 Walnut Lake Rd')).toMatchObject({ lat: '42.560100', lon: '-83.373100' });
+    expect(by('Far library|4600 Walnut Lake Rd').corrected).toMatch(/; map point from the US Census Bureau's match of that address \(the County's is 5\.2 km away\)$/);
+  });
+  it("a part the page leaves blank keeps the County's value", () => {
+    const one = toCheckedRows(OCN, '2026-08-06', [rec('Wolverine Lake Police Department', '425 Glengary Rd.', 'Wolverine', '48390', 42.56, -83.48)],
+      new Map([['Wolverine Lake Police Department|425 Glengary Rd.', match(42.5601, -83.4801, 'WOLVERINE LK', '48390')]]), '2026-10-01', undefined, placeOf,
+      siteChecks([{ record_ref: 'Wolverine Lake Police Department|425 Glengary Rd.', action: 'use', url: 'https://wolverinelake.example/police', name: 'Village of Wolverine Lake Police Department', address_1: '', city: 'Wolverine Lake', zip: '', pin: '', read_on: '2026-10-01', note: '' }]));
+    expect(one.rows[0]).toMatchObject({ name: 'Village of Wolverine Lake Police Department', address_1: '425 Glengary Rd.', city: 'Wolverine Lake', zip: '48390' });
+  });
+  it('a second copy of one place is left out', () => {
+    expect(out.same).toBe(1);
+    expect(by('Church copy|4100 Walnut Lake Rd')).toBeUndefined();
+  });
+  it("an address the Census Bureau can't match is published at the County's pin when the pin is in the website's city", () => {
+    expect(out.held).toEqual([]);
+    expect(by('Unmatched|3155 Coolidge Hwy')).toMatchObject({ name: 'Berkley Public Library', lat: '42.490000' });
   });
 });
 
@@ -99,7 +146,7 @@ describe('the small rules', () => {
 describe('the listing a County record becomes (fromIngested, county_narcan)', () => {
   const [row] = fromIngested(OCN, [{
     sal_id: 'sal_ocn_x', record_ref: 'r', name: 'Neighborhood House', address_1: '1 Main St', city: 'Royal Oak', zip: '48067',
-    org_name: 'Families Against Narcotics', census_fixed: '', lat: '42.49', lon: '-83.14', phone: '', website: '', hours_text: '',
+    org_name: 'Families Against Narcotics', corrected: '', lat: '42.49', lon: '-83.14', phone: '', website: '', hours_text: '',
     extra: 'USER_Notes=Vending Machine / Save a Life Box; USER_Location=in the lobby', source_id: 'oakland_narcan', source_last_edited: '2026-08-06', fetched_at: '2026-10-01',
   }]).rows;
   it('says what the County says and nothing more: free Narcan, the device, where it sits', () => {
@@ -120,8 +167,8 @@ describe('the committed file and the build', () => {
     expect(live.length).toBeGreaterThan(80);
     for (const r of live) expect(placeAt(Number(r.lat), Number(r.lon)), r.sal_id).not.toBeNull();
   });
-  it('a row the Census Bureau corrected says what the County had written', () => {
-    for (const r of live.filter((x) => x.census_fixed)) expect(r.census_fixed, r.sal_id).toMatch(/the layer says "[^"]*"\) from the US Census Bureau's match of this street$/);
+  it('a corrected row says where the correction came from and what the County had written', () => {
+    for (const r of live.filter((x) => x.corrected)) expect(r.corrected, r.sal_id).toMatch(/the layer says "[^"]*"\) from the US Census Bureau's match of this street$|^(name and address confirmed on|[a-zA-Z, ]+ from) the place's own website, read \d{4}-\d\d-\d\d/);
   });
   it('a same_as line naming a row that is not an active listing stops the build', () => {
     const rows = [{ id: 'sal_a', status: 'active' }, { id: 'sal_b', status: 'archived' }] as any;

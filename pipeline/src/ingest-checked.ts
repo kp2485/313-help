@@ -15,8 +15,15 @@
 //   - the street, phone and map point printed are the County's own, unchanged;
 //   - a record the Census Bureau cannot match, or whose point is more than MAX_GAP_M from its matched address, is
 //     held in data/staging/<id>.csv with the reason, for a person. Nothing is guessed to fill the gap.
-// Each row says what the Census Bureau corrected and what the layer had written (`census_fixed`, empty when
-// nothing was), so the sourcing travels with the data.
+// Each row says what was corrected, from where, and what the layer had written (`corrected`, empty when nothing
+// was), so the sourcing travels with the data.
+//
+// A PERSON'S CHECK WINS. Where a record was looked up on the place's own website (the `site_checks` file named in
+// sources.yaml, Kyle 2026-10-01: "use the website to verify the name and address"), that page's name, street, city
+// and ZIP are printed and the page becomes the row's website. Its street is still matched by the Census Bureau:
+// the County's pin stays when it is within MAX_GAP_M, and otherwise the pin is the Census Bureau's match of the
+// address the website gives — forward geocoding, as `pnpm geocode` does for every seed row. A check can also say a
+// record is a second copy of another record at the same place (`action: duplicate`); it is then left out.
 //
 // Only the fields the source maps are asked for: a contact-name field on the layer is never fetched at all.
 
@@ -26,7 +33,20 @@ import { placeAt, regionPlaces } from './region.js';
 import { inBbox, slug, type CsvRow } from './util.js';
 
 /** The ArcGIS columns, plus the city and organization each record states, and where the printed city came from. */
-export const CHECKED_COLUMNS = [...INGESTED_COLUMNS.slice(0, 4), 'city', 'org_name', 'census_fixed', ...INGESTED_COLUMNS.slice(4)];
+export const CHECKED_COLUMNS = [...INGESTED_COLUMNS.slice(0, 4), 'city', 'org_name', 'corrected', ...INGESTED_COLUMNS.slice(4)];
+
+/** One row of a source's `site_checks` file: the place's own page, read by a person, for one County record. */
+export interface SiteCheck {
+  record_ref: string; action: 'use' | 'duplicate'; url: string; name: string; address_1: string; city: string; zip: string;
+  /** 'county': a person judged the County's pin right where the Census Bureau's point is only a street estimate (a campus). */
+  pin: '' | 'county';
+  read_on: string; note: string;
+}
+export const SITE_CHECK_COLUMNS = ['record_ref', 'action', 'url', 'name', 'address_1', 'city', 'zip', 'pin', 'read_on', 'note'];
+export function siteChecks(rows: CsvRow[]): Map<string, SiteCheck> {
+  return new Map(rows.filter((r) => r.record_ref && (r.action === 'use' || r.action === 'duplicate'))
+    .map((r) => [r.record_ref!, Object.fromEntries(SITE_CHECK_COLUMNS.map((k) => [k, (r[k] ?? '').trim()])) as unknown as SiteCheck]));
+}
 /** A held record keeps every column, plus why a person has to look at it. */
 export const HELD_COLUMNS = [...CHECKED_COLUMNS, 'why'];
 
@@ -78,6 +98,7 @@ export interface Checked { rows: CsvRow[]; held: CsvRow[]; warnings: string[]; r
 export function toCheckedRows(
   src: Source, lastEdited: string | null, features: any[], matches: Map<string, Match | null>, fetchedAt: string,
   prior: PriorIds = NO_PRIOR, placeOf: (lat: number, lon: number) => string | null = (lat, lon) => placeAt(lat, lon)?.name ?? null,
+  checks: Map<string, SiteCheck> = new Map(),
 ): Checked {
   const f = src.fields ?? {};
   const same = new Set(Object.keys(src.same_as ?? {}));
@@ -96,17 +117,21 @@ export function toCheckedRows(
     const ref = (f.ref ?? '').split('+').map((k) => get(props, k)).filter(Boolean).join('|');
     // A place a person has already listed from its owner's own page stays that row (sources.yaml `same_as`).
     if (same.has(ref)) { skipped++; continue; }
+    const check = checks.get(ref);
+    // A second County record for a place another record already stands for (a person's check says which).
+    if (check?.action === 'duplicate') { skipped++; continue; }
 
     const given = get(props, f.city), zip = get(props, f.zip);
     const m = matches.get(ref) ?? null;
     const extra = (src.extra ?? []).map((k) => `${k}=${get(props, k)}`).filter((s) => !s.endsWith('=')).join('; ');
     const row: CsvRow = {
-      sal_id: '', record_ref: ref, name, address_1: address, city: given, org_name: get(props, f.org), census_fixed: '',
+      sal_id: '', record_ref: ref, name, address_1: address, city: given, org_name: get(props, f.org), corrected: '',
       zip, lat: lat.toFixed(6), lon: lon.toFixed(6), phone: get(props, f.phone), website: get(props, f.website),
       hours_text: get(props, f.hours), extra, source_id: src.id, source_last_edited: lastEdited ?? '', fetched_at: fetchedAt,
     };
     let why = '';
-    if (!m) why = `the Census Bureau found no match for "${streetOnly(address)}, MI ${zip}"`;
+    if (check) why = fromSite(row, check, m, lat, lon, placeOf);
+    else if (!m) why = `the Census Bureau found no match for "${streetOnly(address)}, MI ${zip}"`;
     else {
       const gap = metres(lat, lon, m.lat, m.lon);
       if (gap > MAX_GAP_M) why = `its map point is ${(gap / 1000).toFixed(1)} km from its own street address (${m.matched})`;
@@ -114,7 +139,7 @@ export function toCheckedRows(
         const fixes: string[] = [];
         if (!sameCity(m.city, given) && !sameCity(placeOf(m.lat, m.lon) ?? '', given)) { row.city = titleCity(m.city); fixes.push(`city (the layer says "${given}")`); }
         if (m.zip && m.zip !== zip) { row.zip = m.zip; fixes.push(`ZIP (the layer says "${zip}")`); }
-        if (fixes.length) row.census_fixed = `${fixes.join(' and ')} from the US Census Bureau's match of this street`;
+        if (fixes.length) row.corrected = `${fixes.join(' and ')} from the US Census Bureau's match of this street`;
       }
     }
     all.push({ row, why });
@@ -134,6 +159,34 @@ export function toCheckedRows(
   const rows = one.rows.filter((r) => !whyOf.get(recordKey(r))).sort(byId);
   const held = one.rows.filter((r) => whyOf.get(recordKey(r))).map((r) => ({ ...r, why: whyOf.get(recordKey(r))! })).sort(byId);
   return { rows, held, warnings, retired: assigned.retired, outside, same: skipped };
+}
+
+/**
+ * Apply a person's check of the place's own website to a row. Returns why the row is still held ('' if it is not).
+ * `m` is the Census Bureau's match of the website's address, not the County's.
+ */
+function fromSite(row: CsvRow, c: SiteCheck, m: Match | null, lat: number, lon: number, placeOf: (lat: number, lon: number) => string | null): string {
+  const was: [string, string, string][] = [['name', row.name!, c.name], ['street', row.address_1!, c.address_1], ['city', row.city!, c.city], ['ZIP', row.zip!, c.zip]];
+  const changed = was.filter(([, county, site]) => site && site !== county);
+  const layerZip = row.zip!;
+  Object.assign(row, { name: c.name || row.name, address_1: c.address_1 || row.address_1, city: c.city || row.city, zip: c.zip || row.zip, website: c.url });
+  const notes = [changed.length
+    ? `${changed.map(([k]) => k).join(', ')} from the place's own website, read ${c.read_on} (the layer says ${changed.map(([, county]) => `"${county}"`).join(', ')})`
+    : `name and address confirmed on the place's own website, read ${c.read_on}`];
+  // A page that prints no ZIP for the building (only a P.O. box's, or none) leaves the ZIP to the Census Bureau's match.
+  if (!c.zip && m?.zip && m.zip !== layerZip) { row.zip = m.zip; notes.push(`ZIP from the US Census Bureau's match of that address (the layer says "${layerZip}")`); }
+  if (c.pin === 'county') notes.push("map point the County's, which marks the building on its own campus");
+  else if (m) {
+    const gap = metres(lat, lon, m.lat, m.lon);
+    if (gap > MAX_GAP_M) {
+      row.lat = m.lat.toFixed(6); row.lon = m.lon.toFixed(6);
+      notes.push(`map point from the US Census Bureau's match of that address (the County's is ${(gap / 1000).toFixed(1)} km away)`);
+    }
+  } else if (!sameCity(placeOf(lat, lon) ?? '', row.city!)) {
+    return `the Census Bureau found no match for the website's address, and the County's pin is not in ${row.city}`;
+  }
+  row.corrected = notes.join('; ');
+  return '';
 }
 
 /**
@@ -170,17 +223,21 @@ export async function ingestChecked(src: Source, fetchedAt: string): Promise<voi
   const { lastEdited, features } = await fetchLayer(src, outFields(src));
   const f = src.fields ?? {};
   const same = new Set(Object.keys(src.same_as ?? {}));
+  const checks = siteChecks(src.site_checks ? readCsv(p(src.site_checks)) : []);
   const matches = new Map<string, Match | null>();
   for (const feat of features) {
     const props = feat.properties ?? {};
     const [lon, lat] = feat.geometry?.coordinates ?? [];
     const ref = (f.ref ?? '').split('+').map((k) => tidy(props[k])).filter(Boolean).join('|');
-    if (typeof lat !== 'number' || !inBbox(lat, lon) || !placeAt(lat, lon) || same.has(ref) || matches.has(ref)) continue;
-    matches.set(ref, await censusMatch(tidy(props[f.address!]), tidy(props[f.zip!]), tidy(props[f.city!])));
+    const c = checks.get(ref);
+    if (typeof lat !== 'number' || !inBbox(lat, lon) || !placeAt(lat, lon) || same.has(ref) || matches.has(ref) || c?.action === 'duplicate') continue;
+    // A check's blank street, city or ZIP means the page did not print it: the County's stands, and is what is asked.
+    const street = c?.address_1 || tidy(props[f.address!]), zip = c?.zip || tidy(props[f.zip!]), city = c?.city || tidy(props[f.city!]);
+    matches.set(ref, await censusMatch(street, zip, city));
   }
 
   const prior = readPrior(src.id);
-  const out = toCheckedRows(src, lastEdited, features, matches, fetchedAt, prior);
+  const out = toCheckedRows(src, lastEdited, features, matches, fetchedAt, prior, undefined, checks);
   const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
   // A layer its publisher hasn't edited in max_age_days publishes nothing new: everything goes to staging for a
   // person and the last published file stays live. Nothing disappears on a timer.
@@ -198,7 +255,7 @@ export async function ingestChecked(src: Source, fetchedAt: string): Promise<voi
   if (!stale) writeCsv(pubPath, publish, CHECKED_COLUMNS);
   writeCsv(heldPath, held, HELD_COLUMNS);
   if (out.retired.length) writeCsv(retiredPath('data/ingested', src.id), retiredRows(out.retired), RETIRED_COLUMNS);
-  const fixed = publish.filter((r) => r.census_fixed).length;
-  console.log(`${src.id}: ${publish.length} published (${fixed} with a city or ZIP from the Census Bureau), ${held.length} held for a person, ${out.same} already listed by hand, ${out.outside} outside the area; layer last edited ${lastEdited ?? 'unknown'}`);
+  const fixed = publish.filter((r) => r.corrected).length;
+  console.log(`${src.id}: ${publish.length} published (${fixed} corrected or confirmed), ${held.length} held for a person, ${out.same} already listed by hand, ${out.outside} outside the area; layer last edited ${lastEdited ?? 'unknown'}`);
   for (const w of out.warnings) console.warn('  warn:', w);
 }

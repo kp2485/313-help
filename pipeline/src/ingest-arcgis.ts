@@ -24,6 +24,8 @@ export interface Source {
    * seed row named is not an active listing (ingest-checked.ts).
    */
   same_as?: Record<string, string>;
+  /** kind arcgis_checked: a CSV of records a person looked up on the place's own website (ingest-checked.ts). */
+  site_checks?: string;
 }
 
 export const INGESTED_COLUMNS = [

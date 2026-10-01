@@ -39553,7 +39553,7 @@
     "nearest_id": {
      "food": "sal_macomb_county_senior_lunch_at_leisure_manor",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_grosse_pointe_woods_branch_library"
     },
     "none_listed_yet": [
@@ -39618,7 +39618,7 @@
     "nearest_id": {
      "food": "sal_my_father_s_food_pantry",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_grosse_pointe_woods_branch_library"
     },
     "none_listed_yet": [
@@ -39683,7 +39683,7 @@
     "nearest_id": {
      "food": "sal_my_father_s_food_pantry",
      "clinic": "sal_covenant_community_care_moross",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_city_of_harper_woods_parks_and_recreation"
     },
     "none_listed_yet": [
@@ -40646,11 +40646,11 @@
     -83.18534
    ],
    "help": {
-    "total": 10,
+    "total": 12,
     "by": {
      "food": 1,
      "health": 1,
-     "harm": 3,
+     "harm": 5,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -40672,13 +40672,13 @@
     "nearest_miles": {
      "food": 0.7,
      "clinic": 0.9,
-     "narcan": 0.3,
+     "narcan": 0.2,
      "indoors": 0.2
     },
     "nearest_id": {
      "food": "sal_yad_ezra_kosher_food_pantry",
      "clinic": "sal_honor_community_honor_clinic_at_the_south_oakland_health",
-     "narcan": "sal_ocn_2395_w_12_mile_berkley",
+     "narcan": "sal_ocn_3155_coolidge_hwy_berkley",
      "indoors": "sal_berkley_public_library"
     },
     "none_listed_yet": [],
@@ -41022,11 +41022,11 @@
     -83.37838
    ],
    "help": {
-    "total": 5,
+    "total": 6,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 1,
+     "harm": 2,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -41048,13 +41048,13 @@
     "nearest_miles": {
      "food": 3,
      "clinic": 5.9,
-     "narcan": 0.3,
+     "narcan": 0.2,
      "indoors": 0.1
     },
     "nearest_id": {
      "food": "sal_cares_of_food_pantry_by_appointment",
      "clinic": "sal_honor_community_plum_hollow_center",
-     "narcan": "sal_ocn_23600_liberty_st_farmington",
+     "narcan": "sal_ocn_23500_liberty_street_farmington",
      "indoors": "sal_farmington_community_library_farmington"
     },
     "none_listed_yet": [
@@ -41709,11 +41709,11 @@
     -83.28736
    ],
    "help": {
-    "total": 121,
+    "total": 124,
     "by": {
      "food": 19,
      "health": 20,
-     "harm": 26,
+     "harm": 29,
      "shelter": 1,
      "utilities": 2,
      "hygiene": 2,
@@ -42144,11 +42144,11 @@
     -83.33346
    ],
    "help": {
-    "total": 1,
+    "total": 2,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42181,8 +42181,7 @@
     },
     "none_listed_yet": [
      "food",
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -42334,11 +42333,11 @@
     -83.38792
    ],
    "help": {
-    "total": 29,
+    "total": 30,
     "by": {
      "food": 5,
      "health": 2,
-     "harm": 7,
+     "harm": 8,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42395,11 +42394,11 @@
     -83.38709
    ],
    "help": {
-    "total": 29,
+    "total": 32,
     "by": {
      "food": 0,
      "health": 3,
-     "harm": 15,
+     "harm": 18,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42458,11 +42457,11 @@
     -83.50081
    ],
    "help": {
-    "total": 3,
+    "total": 4,
     "by": {
      "food": 0,
      "health": 0,
-     "harm": 0,
+     "harm": 1,
      "shelter": 0,
      "utilities": 0,
      "hygiene": 0,
@@ -42484,19 +42483,18 @@
     "nearest_miles": {
      "food": 4.7,
      "clinic": 7.4,
-     "narcan": 3.4,
+     "narcan": 0.7,
      "indoors": 0.6
     },
     "nearest_id": {
      "food": "sal_open_door_open_door_food_pantry_main_campus",
      "clinic": "sal_honor_community_waterford_durant_high_school_health_cent",
-     "narcan": "sal_ocn_1255_n_oakland_blvd_waterford",
+     "narcan": "sal_ocn_7525_highland_road_white_lake",
      "indoors": "sal_white_lake_township_library"
     },
     "none_listed_yet": [
      "food",
-     "health",
-     "harm"
+     "health"
     ],
     "coverage_checked": false
    },
@@ -42745,7 +42743,7 @@
     "nearest_id": {
      "food": "sal_food_pantry_at_central_bible_church",
      "clinic": "sal_macomb_county_shots_at_the_verkuilen_building_clinton_to",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_clinton_macomb_main_library"
     },
     "none_listed_yet": [
@@ -42808,7 +42806,7 @@
     "nearest_id": {
      "food": "sal_food_pantry_at_st_peter_s_lutheran_church",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_eastpointe_memorial_library"
     },
     "none_listed_yet": [
@@ -42872,7 +42870,7 @@
     "nearest_id": {
      "food": "sal_gleaners_community_gleaners_drive_up_food_at_fraser_vfw_",
      "clinic": "sal_advantage_health_warren_13_mile_rd",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_fraser_public_library"
     },
     "none_listed_yet": [
@@ -42936,7 +42934,7 @@
     "nearest_id": {
      "food": "sal_macomb_county_senior_lunch_at_tucker_senior_center",
      "clinic": "sal_mycare_health_center_mount_clemens",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_harrison_township_public_library"
     },
     "none_listed_yet": [
@@ -43063,7 +43061,7 @@
     "nearest_id": {
      "food": "sal_food_pantry_at_st_peter_s_catholic_church",
      "clinic": "sal_mycare_health_center_mount_clemens",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_mount_clemens_public_library"
     },
     "none_listed_yet": [
@@ -43126,7 +43124,7 @@
     "nearest_id": {
      "food": "sal_macomb_county_senior_lunch_truck_at_new_baltimore_parks_",
      "clinic": "sal_mycare_health_center_clinton_township",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_macdonald_public_library"
     },
     "none_listed_yet": [
@@ -43190,7 +43188,7 @@
     "nearest_id": {
      "food": "sal_forgotten_harvest_mobile_food_pantry_at_covenant_mission",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_recreation_authority_center_roseville"
     },
     "none_listed_yet": [
@@ -43317,7 +43315,7 @@
     "nearest_id": {
      "food": "sal_food_pantry_at_lakeshore_presbyterian",
      "clinic": "sal_macomb_county_birth_control_and_pregnancy_tests_in_st_cl",
-     "narcan": "sal_ocn_19611_e_eight_mile_rd_st_clair_shores",
+     "narcan": "sal_ocn_19611_e_8_mile_st_clair_shores",
      "indoors": "sal_st_clair_shores_public_library"
     },
     "none_listed_yet": [],
