@@ -1,4 +1,4 @@
-// One integrated trip plan: walk, or walk-ride-walk, or walk-ride-walk-ride-walk.
+// One integrated trip plan: walk, or walk-ride-walk, or up to four rides with walks between (three changes).
 // Spec: schema/query-spec.md "Trip plans". Study: docs/research/2026-09-22-offline-directions.md §1.3, §2.
 //
 // Kyle, 2026-09-22: "I want integrated walking and bus routes for the best user experience." So there is one
@@ -24,10 +24,23 @@ export const WAIT_FRACTION_OF_HEADWAY = 0.5;
 export const DEFAULT_WAIT_MIN = 15;
 /** The cost of changing vehicle at all, on top of the wait and the walk. */
 export const CHANGE_PENALTY_MIN = 5;
-/** At most one change. Distance-only planning over-transfers; a plan with three changes and no times is a maze. */
-export const MAX_CHANGES = 1;
+/**
+ * The first search allows one change, within ACCESS_M and TRANSFER_WALK_M: distance-only planning over-transfers,
+ * so a trip one change answers is always answered that way (2026-09-22). Only when that search has nothing to try
+ * does the wide search run (Kyle, 2026-10-01: "allow 3 changes and widen the walk"): the area is 75 places now, and
+ * from most of Detroit a stop on 15 Mile Road in Clinton Township is two changes away.
+ */
+export const SHORT_CHANGES = 1;
+/** The hard cap, in the wide search. */
+export const MAX_CHANGES = 3;
 /** A stop is "at" a place when it is this close in a straight line; the walk to it is then routed properly. */
 export const ACCESS_M = 400;
+/** The wide search's radius for access stops: half a mile, because suburban stops are far apart. */
+export const ACCESS_WIDE_M = 800;
+/** The wide search's longest walk at a change: across a wide suburban intersection to the far-side stop. */
+export const TRANSFER_WIDE_M = 400;
+/** How many route chains the wide search hands on to be walked out on the streets. */
+export const WIDE_CHAINS = 6;
 /** How many access stops we consider at each end. */
 export const MAX_ACCESS_STOPS = 8;
 /** A change on foot may be this long. */
@@ -279,8 +292,11 @@ export interface PlanOptions {
  * same cost model as the bus plans — so "walk, it is four blocks" wins on its own merits, and a bus only wins
  * when it really is faster given an honest wait.
  *
- * Returns [] when nothing works: nothing within walking distance, no route between the two ends within one
- * change, and the two ends in different pieces of the street graph. A client says so; it never invents a leg.
+ * When the one-change search has nothing to try (`hasShortPlan` is false), the wide search runs: up to MAX_CHANGES
+ * changes, access stops within ACCESS_WIDE_M and changes within TRANSFER_WIDE_M (`routeChains`).
+ *
+ * Returns [] when nothing works: nothing within walking distance, no route between the two ends within three
+ * changes, and the two ends in different pieces of the street graph. A client says so; it never invents a leg.
  */
 export function plan(
   g: StreetGraph,
@@ -368,7 +384,7 @@ export function plan(
     }
 
     // 2. one change: ride, then a change at the same stop or a walk of at most TRANSFER_WALK_M
-    if (MAX_CHANGES >= 1) {
+    if (SHORT_CHANGES >= 1) {
       const transferWalk = new Map<string, ReturnType<typeof routeBetween>>();
       const walkBetween = (i: number, j: number) => {
         const k = `${i}:${j}`;
@@ -398,8 +414,9 @@ export function plan(
                   const leg1 = rideLeg(r1, b.pattern, b.at, at), leg2 = rideLeg(e.route, e.pattern, e.at, a.at);
                   if (!w1 || !w3 || !leg1 || !leg2) continue;
                   const mid: PlanLeg[] = [];
-                  if (x !== y) {
-                    const w2 = gap < 1 ? null : walkBetween(x, y);
+                  // Two stops less than a metre apart (a DDOT and a SMART stop on one pole) are one spot: no walk.
+                  if (x !== y && gap >= 1) {
+                    const w2 = walkBetween(x, y);
                     if (!w2) continue;
                     mid.push(walkLeg(w2, { from_stop: stopRef(net, x), to_stop: stopRef(net, y) }));
                   }
@@ -413,6 +430,48 @@ export function plan(
           }
         }
       }
+    }
+  }
+
+  // 3. the wide search, only when the one-change search had nothing to try
+  if (!hasShortPlan(net, from, to, access)) {
+    const fromSnap = nearestEdgePoint(g, from), toSnap = nearestEdgePoint(g, to);
+    const snap = new Map<number, EdgePoint | null>();
+    const snapStop = (i: number) => { if (!snap.has(i)) snap.set(i, nearestEdgePoint(g, net.stops[i]!)); return snap.get(i)!; };
+    for (const chain of routeChains(net, from, to)) {
+      const first = chain[0]!, last = chain[chain.length - 1]!;
+      const p0 = net.routes[first.route]!.patterns[first.pattern]!, pn = net.routes[last.route]!.patterns[last.pattern]!;
+      const b0 = p0[first.from]!, an = pn[last.to]!;
+      const s0 = snapStop(b0), sn = snapStop(an);
+      const w1 = fromSnap && s0 ? routeBetween(g, fromSnap, s0, from, net.stops[b0]!) : null;
+      const w3 = sn && toSnap ? routeBetween(g, sn, toSnap, net.stops[an]!, to) : null;
+      if (!w1 || !w3) continue;
+      const legs: PlanLeg[] = [walkLeg(w1, { to_stop: stopRef(net, b0) })];
+      let ok = true;
+      chain.forEach((c, i) => {
+        if (!ok) return;
+        if (i > 0) {
+          const prev = chain[i - 1]!;
+          const x = net.routes[prev.route]!.patterns[prev.pattern]![prev.to]!, y = net.routes[c.route]!.patterns[c.pattern]![c.from]!;
+          if (x !== y && metresBetween(net.stops[x]!, net.stops[y]!) >= 1) {
+            const a = snapStop(x), b = snapStop(y);
+            const w = a && b ? routeBetween(g, a, b, net.stops[x]!, net.stops[y]!) : null;
+            if (!w) { ok = false; return; }
+            legs.push(walkLeg(w, { from_stop: stopRef(net, x), to_stop: stopRef(net, y) }));
+          }
+        }
+        const r = net.routes[c.route]!, p = r.patterns[c.pattern]!, m = rideMetres(net, p, c.from, c.to);
+        const leg: RideLeg = {
+          kind: 'ride', route_id: r.id, route_short: r.short, route_long: r.long, agency: r.agency,
+          headway_minutes: r.headway, from_stop: stopRef(net, p[c.from]!), to_stop: stopRef(net, p[c.to]!),
+          stops: c.to - c.from, metres: m, minutes: m / BUS_M_PER_MIN, wait_minutes: waitFor(r), polyline: [],
+        };
+        pending.set(leg, { route: c.route, pattern: c.pattern, from: c.from, to: c.to });
+        legs.push(leg);
+      });
+      if (!ok) continue;
+      legs.push(walkLeg(w3, { from_stop: stopRef(net, an) }));
+      out.push(finish(legs, w1.startOffMetres, w3.endOffMetres));
     }
   }
 
@@ -432,4 +491,127 @@ export function plan(
     if (p) l.polyline = ridePolyline(net, net.routes[p.route]!, net.routes[p.route]!.patterns[p.pattern]!, p.from, p.to);
   }
   return ranked;
+}
+
+// ---- the wide search ---------------------------------------------------------------------------
+
+/**
+ * Whether the one-change search (`plan`'s steps 1 and 2) has anything to try: a route that calls within `access`
+ * of both ends in travel order, or a change within TRANSFER_WALK_M from a route near the start onto one near the
+ * end. Read from the network alone, so `plan` and `tripWindow` always agree on whether the wide search runs.
+ */
+export function hasShortPlan(net: TransitNetwork, from: { lat: number; lon: number }, to: { lat: number; lon: number }, access = ACCESS_M): boolean {
+  const originStops = stopsNear(net, from, access).slice(0, MAX_ACCESS_STOPS);
+  const destStops = stopsNear(net, to, access).slice(0, MAX_ACCESS_STOPS);
+  if (!originStops.length || !destStops.length) return false;
+  const destAt = new Map<number, { pattern: number; at: number }[]>();
+  for (const { stop } of destStops) for (const e of net.posOf.get(stop) ?? []) {
+    const l = destAt.get(e.route); const v = { pattern: e.pattern, at: e.at };
+    if (l) l.push(v); else destAt.set(e.route, [v]);
+  }
+  const reachesEnd = (route: number, pattern: number, at: number) => (destAt.get(route) ?? []).some((a) => a.pattern === pattern && a.at > at);
+  for (const { stop } of originStops) for (const b of net.posOf.get(stop) ?? []) {
+    if (reachesEnd(b.route, b.pattern, b.at)) return true;
+    const p1 = net.routes[b.route]!.patterns[b.pattern]!;
+    for (let at = b.at + 1; at < p1.length; at++) {
+      for (const { stop: y } of stopsNear(net, net.stops[p1[at]!]!, TRANSFER_WALK_M)) {
+        for (const e of net.posOf.get(y) ?? []) if (e.route !== b.route && reachesEnd(e.route, e.pattern, e.at)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** One ride of a chain: a route, one of its patterns, and the positions boarded and left on it. */
+export interface ChainRide { route: number; pattern: number; from: number; to: number }
+
+/**
+ * The wide search, on the network alone (no street is read): the best chains of one to MAX_CHANGES + 1 rides from
+ * stops within ACCESS_WIDE_M of `from` to stops within ACCESS_WIDE_M of `to`, changing at the same stop or after a
+ * straight-line walk of at most TRANSFER_WIDE_M. Rounds, one per ride (schema/query-spec.md "The wide search"):
+ *
+ *   board[0][s]  = metres(from, s) / WALK_M_PER_MIN for every access stop s
+ *   ride round k: each route in index order, each pattern in order, walked stop by stop; at position i the best
+ *                 boarding so far gives arrive[k][p[i]] = best + cum[i]/BUS_M_PER_MIN + wait + (k > 0 ? CHANGE_PENALTY_MIN : 0),
+ *                 where best = min over earlier positions j of board[k][p[j]] - cum[j]/BUS_M_PER_MIN, and a stop is
+ *                 never boarded from the route that brought you to it; a label only changes when strictly better.
+ *   walk round:  board[k+1][u] = min over s of arrive[k][s] + metres(s, u)/WALK_M_PER_MIN, u within TRANSFER_WIDE_M
+ *                 of s (u = s included), s taken in index order.
+ *   ends:        every (k, t) with t within ACCESS_WIDE_M of `to` scores arrive[k][t] + metres(t, to)/WALK_M_PER_MIN;
+ *                 sorted by score, then k, then t; each traced back to its rides; one chain per sequence of routes;
+ *                 the first WIDE_CHAINS kept.
+ *
+ * Straight lines and averages only: the chains are candidates, and `plan` walks each one out on the streets and
+ * ranks them with everything else. Deterministic, so the trip window can name every stop a plan may change at.
+ */
+export function routeChains(net: TransitNetwork, from: { lat: number; lon: number }, to: { lat: number; lon: number }): ChainRide[][] {
+  const n = net.stops.length, K = MAX_CHANGES + 1;
+  const board = Array.from({ length: K }, () => new Float64Array(n).fill(Infinity));
+  const boardFrom = Array.from({ length: K }, () => new Int32Array(n).fill(-1));        // stop alighted before walking here
+  const boardRoute = Array.from({ length: K }, () => new Int32Array(n).fill(-1));       // route that brought you here
+  const arrive = Array.from({ length: K }, () => new Float64Array(n).fill(Infinity));
+  const arriveRide: (ChainRide | null)[][] = Array.from({ length: K }, () => new Array<ChainRide | null>(n).fill(null));
+  for (const { stop, metres } of stopsNear(net, from, ACCESS_WIDE_M)) board[0]![stop] = metres / WALK_M_PER_MIN;
+  for (let k = 0; k < K; k++) {
+    const bk = board[k]!, ak = arrive[k]!, pen = k > 0 ? CHANGE_PENALTY_MIN : 0;
+    net.routes.forEach((r, ri) => {
+      const wait = waitFor(r);
+      r.patterns.forEach((p, pi) => {
+        let best = Infinity, bestAt = -1, cum = 0;
+        for (let i = 0; i < p.length; i++) {
+          if (i > 0) cum += metresBetween(net.stops[p[i - 1]!]!, net.stops[p[i]!]!);
+          const s = p[i]!;
+          if (bestAt >= 0) {
+            const c = best + cum / BUS_M_PER_MIN + wait + pen;
+            if (c < ak[s]!) { ak[s] = c; arriveRide[k]![s] = { route: ri, pattern: pi, from: bestAt, to: i }; }
+          }
+          if (bk[s]! < Infinity && boardRoute[k]![s] !== ri) {
+            const key = bk[s]! - cum / BUS_M_PER_MIN;
+            if (key < best) { best = key; bestAt = i; }
+          }
+        }
+      });
+    });
+    if (k + 1 < K) {
+      const nb = board[k + 1]!;
+      for (let s = 0; s < n; s++) {
+        if (ak[s] === Infinity) continue;
+        for (const { stop: u, metres } of stopsNear(net, net.stops[s]!, TRANSFER_WIDE_M)) {
+          const c = ak[s]! + metres / WALK_M_PER_MIN;
+          if (c < nb[u]!) { nb[u] = c; boardFrom[k + 1]![u] = s; boardRoute[k + 1]![u] = arriveRide[k]![s]!.route; }
+        }
+      }
+    }
+  }
+  const ends: { score: number; k: number; t: number }[] = [];
+  for (const { stop: t, metres } of stopsNear(net, to, ACCESS_WIDE_M)) {
+    for (let k = 0; k < K; k++) if (arrive[k]![t]! < Infinity) ends.push({ score: arrive[k]![t]! + metres / WALK_M_PER_MIN, k, t });
+  }
+  ends.sort((a, b) => a.score - b.score || a.k - b.k || a.t - b.t);
+  const out: ChainRide[][] = [], seen = new Set<string>();
+  for (const { k, t } of ends) {
+    const chain: ChainRide[] = [];
+    let stop = t;
+    for (let j = k; j >= 0; j--) {
+      const ride = arriveRide[j]![stop]!;
+      chain.unshift(ride);
+      if (j > 0) stop = boardFrom[j]![net.routes[ride.route]!.patterns[ride.pattern]![ride.from]!]!;
+    }
+    const key = chain.map((c) => net.routes[c.route]!.id).join('>');
+    if (seen.has(key)) continue;
+    seen.add(key); out.push(chain);
+    if (out.length >= WIDE_CHAINS) break;
+  }
+  return out;
+}
+
+/** Every stop a wide-search chain changes at: where a ride ends and where the next one starts. Sorted, once each. */
+export function chainChangeStops(net: TransitNetwork, chains: ChainRide[][]): number[] {
+  const out = new Set<number>();
+  for (const chain of chains) chain.forEach((c, i) => {
+    const p = net.routes[c.route]!.patterns[c.pattern]!;
+    if (i > 0) out.add(p[c.from]!);
+    if (i < chain.length - 1) out.add(p[c.to]!);
+  });
+  return [...out].sort((a, b) => a - b);
 }

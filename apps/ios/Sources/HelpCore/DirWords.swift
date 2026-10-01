@@ -46,7 +46,10 @@ public func itineraryTitle(_ t: Say, _ it: Itinerary) -> String {
     let rides = it.legs.compactMap(\.rideLeg)
     if rides.isEmpty { return t("dir.walk_card", [:]) }
     if rides.count == 1 { return t("dir.bus_card", ["route": routeName(rides[0])]) }
-    return t("dir.bus_card_two", ["a": routeName(rides[0]), "b": routeName(rides[1])])
+    if rides.count == 2 { return t("dir.bus_card_two", ["a": routeName(rides[0]), "b": routeName(rides[1])]) }
+    // Up to three changes since 2026-10-01 (schema/query-spec.md "The wide search"): every bus is named.
+    if rides.count == 3 { return t("dir.bus_card_three", ["a": routeName(rides[0]), "b": routeName(rides[1]), "c": routeName(rides[2])]) }
+    return t("dir.bus_card_four", ["a": routeName(rides[0]), "b": routeName(rides[1]), "c": routeName(rides[2]), "d": routeName(rides[3])])
 }
 
 /// "walk 0.3 mi, ride 9 stops, walk 0.1 mi" — the shape of the trip, leg by leg, in the order it is walked.

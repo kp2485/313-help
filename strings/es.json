@@ -1196,6 +1196,8 @@
   "dir.walk_card": "Caminar",
   "dir.bus_card": "Autobús {route}",
   "dir.bus_card_two": "Autobús {a}, luego autobús {b}",
+  "dir.bus_card_three": "Autobús {a}, luego autobús {b}, luego autobús {c}",
+  "dir.bus_card_four": "Autobús {a}, luego autobús {b}, luego autobús {c}, luego autobús {d}",
   "dir.range": "como {lo}–{hi} min",
   "dir.every": "como cada {minutes} min",
   "dir.leg_walk": "caminar {distance}",

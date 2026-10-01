@@ -70,7 +70,10 @@ fun itineraryTitle(t: Say, it: Itinerary): String {
     val rides = it.legs.filterIsInstance<RideLeg>()
     if (rides.isEmpty()) return t("dir.walk_card", emptyMap())
     if (rides.size == 1) return t("dir.bus_card", mapOf("route" to routeName(rides[0])))
-    return t("dir.bus_card_two", mapOf("a" to routeName(rides[0]), "b" to routeName(rides[1])))
+    if (rides.size == 2) return t("dir.bus_card_two", mapOf("a" to routeName(rides[0]), "b" to routeName(rides[1])))
+    // Up to three changes since 2026-10-01 (schema/query-spec.md "The wide search"): every bus is named.
+    if (rides.size == 3) return t("dir.bus_card_three", mapOf("a" to routeName(rides[0]), "b" to routeName(rides[1]), "c" to routeName(rides[2])))
+    return t("dir.bus_card_four", mapOf("a" to routeName(rides[0]), "b" to routeName(rides[1]), "c" to routeName(rides[2]), "d" to routeName(rides[3])))
 }
 
 /** "walk 0.3 mi, ride 9 stops, walk 0.1 mi" — the shape of the trip, leg by leg, in the order it is walked. */

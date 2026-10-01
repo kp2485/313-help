@@ -191,6 +191,16 @@ final class FixtureTests: XCTestCase {
                     let got = transferStops(network!, from: latLon(c["from"])!, to: latLon(c["to"])!)
                     ok = got == (expect as? [NSNumber])?.map(\.intValue)
                     if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
+                // The wide search (17-wide-trip-plans.json): whether it runs, and the route chains it hands to plan.
+                case "hasShortPlan":
+                    let got = hasShortPlan(network!, from: latLon(c["from"])!, to: latLon(c["to"])!)
+                    ok = got == expect as? Bool
+                    if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
+                case "routeChains":
+                    let got = routeChains(network!, from: latLon(c["from"])!, to: latLon(c["to"])!)
+                        .map { ch in ch.map { network!.routes[$0.route].id }.joined(separator: ">") }
+                    ok = got == expect as? [String]
+                    if !ok { failures.append("\(name): got \(got)"); ran += 1; continue }
                 case "windowRoads":
                     let w = tripWindow(network, from: latLon(c["from"])!, to: latLon(c["to"])!)
                     let kept = windowFiles(streets[0], Array(streets.dropFirst()), w)

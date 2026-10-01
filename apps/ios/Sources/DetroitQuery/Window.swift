@@ -26,6 +26,10 @@ public let END_PAD_M = ACCESS_M + 800
 public let TRANSFER_PAD_M = TRANSFER_WALK_M + 800
 /// Padding round the box between the two ends, when they are close enough to walk.
 public let WALK_PAD_M = 800.0
+/// When the wide search runs: padding round each end (an access walk of up to ACCESS_WIDE_M) ...
+public let WIDE_END_PAD_M = ACCESS_WIDE_M + 800
+/// ... and round each stop a wide-search chain changes at (a walk of up to TRANSFER_WIDE_M).
+public let WIDE_TRANSFER_PAD_M = TRANSFER_WIDE_M + 800
 
 /// A box in degrees.
 public struct GeoBox: Equatable, Sendable {
@@ -62,7 +66,9 @@ public func transferStops(_ net: TransitNetwork, from: LatLon, to: LatLon, acces
                 let sx = net.stops[x]
                 for near in stopsNear(net, LatLon(lat: sx.lat, lon: sx.lon), metres: TRANSFER_WALK_M) {
                     let y = near.stop
-                    if x == y { continue }                                      // a change at the same stop: no walk
+                    if x == y || metresBetween(LatLon(lat: sx.lat, lon: sx.lon), LatLon(lat: net.stops[y].lat, lon: net.stops[y].lon)) < 1 {
+                        continue                                                // a change on the spot: no walk
+                    }
                     let reaches = (net.posOf[y] ?? []).contains { e in
                         e.route != b.route && (destAt[e.route] ?? []).contains { $0.pattern == e.pattern && $0.at > e.at }
                     }
@@ -93,6 +99,14 @@ public func tripWindow(_ net: TransitNetwork?, from: LatLon, to: LatLon,
     if let net {
         for s in transferStops(net, from: from, to: to, access: accessMetres) {
             boxes.append(boxAround(LatLon(lat: net.stops[s].lat, lon: net.stops[s].lon), TRANSFER_PAD_M))
+        }
+        // The wide search runs exactly when `plan` runs it (the same network-only test), and walks only at its
+        // chains' ends and changes, all of which are known here.
+        if !hasShortPlan(net, from: from, to: to, access: accessMetres) {
+            boxes.append(boxAround(from, WIDE_END_PAD_M)); boxes.append(boxAround(to, WIDE_END_PAD_M))
+            for s in chainChangeStops(net, routeChains(net, from: from, to: to)) {
+                boxes.append(boxAround(LatLon(lat: net.stops[s].lat, lon: net.stops[s].lon), WIDE_TRANSFER_PAD_M))
+            }
         }
     }
     return TripWindow(boxes: boxes)

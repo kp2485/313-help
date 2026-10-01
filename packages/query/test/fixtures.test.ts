@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   badge, bundleAge, buildStreetGraph, buildTransitNetwork, effectiveNow, helpAlong, milesToSegment, nearestSegment,
-  nextOccurrences, openNow, plan, rank, search, walkRoute, tripWindow, windowFiles, transferStops,
+  nextOccurrences, openNow, plan, rank, search, walkRoute, tripWindow, windowFiles, transferStops, hasShortPlan, routeChains,
 } from '../src/index.js';
 import type { Alert, BundleRow, PackedStreets, Segment, TransitLayer, WalkRoute } from '../src/index.js';
 
@@ -13,7 +13,7 @@ const dir = join(__dirname, '../../../schema/fixtures');
 interface Case {
   name: string;
   fn: 'openNow' | 'nextOccurrences' | 'badge' | 'rank' | 'rankDetail' | 'bundleAge' | 'effectiveNow' | 'helpAlong' | 'milesToSegment' | 'nearestSegment' | 'search'
-  | 'streetGraph' | 'walk' | 'plan' | 'planWindow' | 'transferStops' | 'windowRoads';
+  | 'streetGraph' | 'walk' | 'plan' | 'planWindow' | 'transferStops' | 'windowRoads' | 'hasShortPlan' | 'routeChains';
   segment?: string; openOnly?: boolean; maxMiles?: number; tolerance?: number;
   now: string;
   text?: string;
@@ -130,6 +130,11 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
           }
           case 'transferStops':
             expect(transferStops(network!, c.from!, c.to!)).toEqual(c.expect); break;
+          // The wide search (17-wide-trip-plans.json): whether it runs, and the route chains it hands to plan.
+          case 'hasShortPlan':
+            expect(hasShortPlan(network!, c.from!, c.to!)).toBe(c.expect); break;
+          case 'routeChains':
+            expect(routeChains(network!, c.from!, c.to!).map((ch) => ch.map((r) => network!.routes[r.route]!.id).join('>'))).toEqual(c.expect); break;
           case 'windowRoads': {
             const w = tripWindow(network, c.from!, c.to!);
             const kept = windowFiles(streets[0]!, streets.slice(1), w);

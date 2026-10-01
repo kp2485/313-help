@@ -83,7 +83,7 @@ One or two lines per date; the reasoning behind each change is in [DECISIONS.md]
   52 more waiting for a person with a browser (DECISIONS 2026-09-24).
 - **2026-09-22 — Directions, one tab set, and the Areas map.** Offline walking and bus directions on all three
   clients, from the street graph and transit files already in the bundle: A* with the City's own safety fields as
-  the penalty, published headways only, ranges never times, at most one change, traceless
+  the penalty, published headways only, ranges never times, at most one change (three since 2026-10-01, when one finds nothing), traceless
   ([research](research/2026-09-22-offline-directions.md)). The tab set becomes Home · Help · Map · Areas on
   every client after the [navigation audit](NAVIGATION-AUDIT-2026-09-22.md): every map opens on your location,
   else a typed cross street, else City Hall, two miles around; the Map tab opens with help on it and the

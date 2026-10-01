@@ -67,7 +67,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   ([MAP-STYLE](docs/MAP-STYLE.md)). Keyboard: arrows pan, N and P walk the features, Enter opens one.
 - **Directions with no signal.** Walking and bus directions computed on the phone from the bundle's own street
   graph and transit files: A* over the streets, steered off the City's own High Injury Network; published
-  headways only (never real-time, never a timetable); every estimate a range; at most one bus change; the route
+  headways only (never real-time, never a timetable); every estimate a range; one bus change where one will do, up to three (and half a mile to a stop) where it won't; the route
   drawn on our own map. Nothing leaves the device and the screen leaves no URL or history entry
   ([study](docs/research/2026-09-22-offline-directions.md)). A phone builds only the streets the trip can walk
   on — 2,000 to 3,500 nodes, not the area's 108,820 — so it stays quick on an old phone. On web, iPhone and Android.
@@ -82,9 +82,9 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   [test script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
 - **Three clients, one spec.** A web PWA (vanilla TypeScript), an iPhone app (SwiftUI) and an Android app (Kotlin,
   **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
-  and trip plans — are written three times against [one spec](schema/query-spec.md) and **223 shared fixture
+  and trip plans — are written three times against [one spec](schema/query-spec.md) and **248 shared fixture
   cases**; the web and iPhone pass every case, and Android's are run by CI.
-- **Tested and small.** 1,402 tests in `pnpm test`, 378 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
+- **Tested and small.** 1,428 tests in `pnpm test`, 379 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
   (26 KB) loads only if chosen; the bundle is 6.8 MB for the whole three-county area.
 
@@ -131,7 +131,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,402 tests
+pnpm test                                   # 1,428 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/

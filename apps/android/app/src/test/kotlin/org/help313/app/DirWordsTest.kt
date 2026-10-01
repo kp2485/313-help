@@ -363,4 +363,54 @@ class DirWordsTest {
         )
         assertNotEquals(dirSummary(t, bus), dirSummary(t, walkTrip()))
     }
+
+    // ---- the wide search: up to three changes (2026-10-01) -------------------------------------------------------
+
+    /** A SMART ride on from the 4, the shape a trip to Macomb County takes. */
+    private fun smartRide(short: String, long: String = short) = RideLeg(
+        routeId = "rt_smart_$short", routeShort = short, routeLong = long, agency = "SMART",
+        headwayMinutes = null,
+        fromStop = StopRef(20, "Gratiot & 8 Mile"), toStop = StopRef(21, "15 Mile & Gratiot"),
+        stops = 6, metres = 3000.0, minutes = 11.0, waitMinutes = 15.0,
+        polyline = listOf(pt(-82.98, 42.45), pt(-82.95, 42.55)),
+    )
+
+    /** Three and four buses: every one is named, in the order they are ridden, never "and more". */
+    @Test
+    fun aPlanWithThreeChangesNamesEveryBus() {
+        val t = say("en")
+        val legs = busTrip().legs
+        val change = WalkLeg(
+            metres = 100.0, minutes = 1.25, steps = emptyList(),
+            polyline = listOf(pt(-82.98, 42.45), pt(-82.981, 42.451)),
+            toStop = StopRef(22, "Gratiot & 15 Mile"), fromStop = StopRef(21, "15 Mile & Gratiot"),
+        )
+        val three = itinerary(
+            listOf(legs[0], legs[1], change, smartRide("530", "Schoenherr"), smartRide("780", "15 Mile Crosstown"), legs[2]),
+            endOff = 40.0,
+        )
+        assertEquals("Bus 4, then bus 530, then bus 780", itineraryTitle(t, three))
+        val four = itinerary(
+            listOf(legs[0], legs[1], smartRide("16"), change, smartRide("530"), smartRide("780"), legs[2]),
+            endOff = 40.0,
+        )
+        assertEquals("Bus 4, then bus 16, then bus 530, then bus 780", itineraryTitle(t, four))
+        // Every ride has its three sentences, and the change walk between two rides is said too.
+        val said = dirSteps(t, four, "Middle School").map { it.text }
+        assertEquals(4, said.count { it.startsWith("Board the ") })
+        assertEquals(4, said.count { it.startsWith("Get off at ") })
+        assertTrue(said.contains("Walk 0.1 mi to Gratiot & 15 Mile"))
+
+        for (lang in LANGS) {
+            val other = say(lang)
+            for (trip in listOf(three, four)) {
+                val title = itineraryTitle(other, trip)
+                assertFalse("$lang: a placeholder was never filled in: $title", title.contains("{"))
+                for (r in trip.legs.filterIsInstance<RideLeg>()) {
+                    assertTrue("$lang: bus ${r.routeShort} is not named in \"$title\"", title.contains(r.routeShort))
+                }
+                assertFalse("$lang: a raw string key reached a screen: $title", title.startsWith("dir."))
+            }
+        }
+    }
 }
