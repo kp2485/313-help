@@ -112117,6 +112117,6106 @@
   "assured_date": "2026-09-24"
  },
  {
+  "id": "5e5a83c5-aa16-52d0-878d-7ef603f0f815",
+  "name": "Free Narcan",
+  "status": "active",
+  "description": "Free Narcan from a Save a Life box.",
+  "organization": {
+   "id": "b13e02fc-aeca-542f-a634-c1a166233158",
+   "name": "Alliance of Coalitions for Healthy Communities",
+   "description": "Alliance of Coalitions for Healthy Communities",
+   "x_detroit": {
+    "id": "org_alliance_of_coalitions_for_healthy_communities"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "801d04fd-bb87-5def-a2b2-70253cae18e3",
+    "location": {
+     "id": "fd21bec1-5cde-59a2-ba92-f93c964fa6bb",
+     "name": "Lighthouse",
+     "location_type": "physical",
+     "latitude": 42.639484,
+     "longitude": -83.284241,
+     "addresses": [
+      {
+       "id": "4f7ae340-86b4-5c8a-924f-c083d0d2d60c",
+       "address_1": "101 Mechanic St,",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_101_mechanic_st_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_101_mechanic_st_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "6b6263ea-c207-50c9-88f7-f796cef7296f",
+    "location": {
+     "id": "744f2e1b-c761-54aa-a8b0-e1bb94d121e3",
+     "name": "Therapeutics LLC - Easterseals",
+     "location_type": "physical",
+     "latitude": 42.537491,
+     "longitude": -83.479535,
+     "addresses": [
+      {
+       "id": "f5dc049e-0ac4-5050-a6fb-8083d4411cea",
+       "address_1": "1010 E West Maple Rd Suite 200",
+       "city": "Walled Lake",
+       "state_province": "MI",
+       "postal_code": "48390",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1010_e_west_maple_rd_suite_200_walled_lake"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1010_e_west_maple_rd_suite_200_walled_lake",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "4d45ee2a-80cf-54e8-bb97-496e554091f1",
+    "location": {
+     "id": "3e131970-6648-5774-a517-bab9846df921",
+     "name": "Oakland County Sheriffs Office- Pontiac",
+     "location_type": "physical",
+     "latitude": 42.636546,
+     "longitude": -83.287701,
+     "addresses": [
+      {
+       "id": "ec234cdb-8801-5106-b464-a8b28f3520d6",
+       "address_1": "110 E Pike",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_110_e_pike_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_110_e_pike_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c6bd6643-9a39-5625-89ea-82d7aed4346e",
+    "location": {
+     "id": "17eee4e6-63d2-5658-9d99-634a4414c841",
+     "name": "Rochester Hills Fire Department",
+     "location_type": "physical",
+     "latitude": 42.657768,
+     "longitude": -83.156049,
+     "addresses": [
+      {
+       "id": "f65bb1e4-d2bd-5712-b0a7-94207d7b46bb",
+       "address_1": "1111 Horizon Ct",
+       "city": "Rochester Hills",
+       "state_province": "MI",
+       "postal_code": "48309",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1111_horizon_ct_rochester_hills"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1111_horizon_ct_rochester_hills",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "66d57481-9c2d-5bb4-8a27-af22dbd1ece8",
+    "location": {
+     "id": "786f4423-0434-51d5-b565-e19088f44e9f",
+     "name": "Oakland Family Services Pontiac",
+     "location_type": "physical",
+     "latitude": 42.635124,
+     "longitude": -83.2959,
+     "addresses": [
+      {
+       "id": "6f45b901-489a-5b24-a15c-9ed19a341f42",
+       "address_1": "114 Orchard Lake Rd",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_114_orchard_lake_rd_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_114_orchard_lake_rd_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "056005d7-fa18-5dd8-b7d6-f67de46aa764",
+    "location": {
+     "id": "054e0c88-7de0-50b2-95bc-55564a3bd2f7",
+     "name": "Skywood Outpatient",
+     "location_type": "physical",
+     "latitude": 42.487905,
+     "longitude": -83.145095,
+     "addresses": [
+      {
+       "id": "4160093d-83b0-5053-b05f-aedbc78bb9f7",
+       "address_1": "117 West 3rd Street",
+       "city": "Royal Oak",
+       "state_province": "MI",
+       "postal_code": "48067",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_117_west_3rd_street_royal_oak"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_117_west_3rd_street_royal_oak",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "90f50b99-b1cf-59a7-8de7-6891885f45cd",
+    "location": {
+     "id": "56cf41c1-e428-5686-82bc-9e699177ccef",
+     "name": "Oakland County Circuit Court- North Entrance",
+     "location_type": "physical",
+     "latitude": 42.655849,
+     "longitude": -83.32707,
+     "addresses": [
+      {
+       "id": "07baa7e5-b660-5fc9-954e-bc895806e012",
+       "address_1": "1200 N Telegraph",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1200_n_telegraph_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1200_n_telegraph_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2ab3fb3d-1a52-5859-903c-a03e514c3625",
+    "location": {
+     "id": "64e834f5-cef3-5b8c-82a6-0fbe1d068b99",
+     "name": "Oakland County Circuit Court- South Entrance",
+     "location_type": "physical",
+     "latitude": 42.65541,
+     "longitude": -83.326607,
+     "addresses": [
+      {
+       "id": "6d3270c9-d636-58dc-8ed9-79f8486dbdf6",
+       "address_1": "1200 N Telegraph",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1200_n_telegraph_pontiac_oakland_county_circu"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1200_n_telegraph_pontiac_oakland_county_circu",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f4df8ca7-6f0c-5f1c-b487-3fd8b4bae792",
+    "location": {
+     "id": "bf65431d-5cce-5095-93f6-0f760838d2cf",
+     "name": "Oakland County Sheriff's Office",
+     "location_type": "physical",
+     "latitude": 42.660578,
+     "longitude": -83.332624,
+     "addresses": [
+      {
+       "id": "fb2976fc-e222-536d-aab4-8685e3bb2fc0",
+       "address_1": "1200 N. Telegraph Rd, Bldg 38E",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1200_n_telegraph_rd_bldg_38e_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1200_n_telegraph_rd_bldg_38e_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f6bd8cc1-13e3-55cf-aa30-12a92bdf227b",
+    "location": {
+     "id": "54a61b3a-ca9b-5ee4-a118-f0132ee05ec4",
+     "name": "Resource and Crisis Center",
+     "location_type": "physical",
+     "latitude": 42.657402,
+     "longitude": -83.331349,
+     "addresses": [
+      {
+       "id": "d19d5fa1-c93e-50a6-9715-9d9f4455f095",
+       "address_1": "1200 North Telegraph Road Building #32E",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1200_north_telegraph_road_building_32e_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1200_north_telegraph_road_building_32e_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2a4a00d2-71ba-5507-9e87-e5f0d1b149d4",
+    "location": {
+     "id": "83298b28-6a04-5496-9bde-002bdd6a1537",
+     "name": "Sober Support Unit",
+     "location_type": "physical",
+     "latitude": 42.657413,
+     "longitude": -83.331136,
+     "addresses": [
+      {
+       "id": "02dc2105-aa3c-5c5d-a8f6-1cd1cf29f5a9",
+       "address_1": "1200 North Telegraph Road Building #32E",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1200_north_telegraph_road_building_32e_pontiac_sober_support_unit"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1200_north_telegraph_road_building_32e_pontiac_sober_support_unit",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c4520f3f-bdba-5dae-bd3d-4e4122ebf565",
+    "location": {
+     "id": "575af716-095c-5b4e-b767-d9daec41a351",
+     "name": "Oakland County Board of Commissioners",
+     "location_type": "physical",
+     "latitude": 42.655436,
+     "longitude": -83.327083,
+     "addresses": [
+      {
+       "id": "411d0fb1-bfa7-5089-8be4-431ca0210591",
+       "address_1": "1200 North Telegraph Road",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1200_north_telegraph_road_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1200_north_telegraph_road_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "16cbc924-4094-546a-bedf-480a9a00fc53",
+    "location": {
+     "id": "d2a3f31a-dd63-5c2b-88ee-9a6c16a15411",
+     "name": "Oakland County Jail",
+     "location_type": "physical",
+     "latitude": 42.651318,
+     "longitude": -83.327118,
+     "addresses": [
+      {
+       "id": "169a887a-5b87-53db-8eb8-5e54496c7003",
+       "address_1": "1201 North Telegraph",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1201_north_telegraph_pontiac"
+     }
+    },
+    "phones": [
+     {
+      "id": "f461cb9e-61a3-59f6-a419-2639ad76f7a3",
+      "number": "248-858-1800",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1201_north_telegraph_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7cd2c38e-6182-5137-a372-b5277981f972",
+    "location": {
+     "id": "ce0af201-feb1-5eb6-ad04-4bc8303e2e41",
+     "name": "Gammons Medical",
+     "location_type": "physical",
+     "latitude": 42.478877,
+     "longitude": -83.145794,
+     "addresses": [
+      {
+       "id": "0f40d2dd-7a69-5548-8590-41c9aa6f9fda",
+       "address_1": "1223 S Washington Ave",
+       "city": "Royal Oak",
+       "state_province": "MI",
+       "postal_code": "48067",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1223_s_washington_ave_royal_oak"
+     }
+    },
+    "phones": [
+     {
+      "id": "d73788fa-7ad7-5c3c-8a8c-a98618d81f79",
+      "number": "248-439-1060",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1223_s_washington_ave_royal_oak",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "a7bd14c9-db19-5f72-91d3-35a8cf8aabc1",
+    "location": {
+     "id": "bf32407c-24b8-5617-92b7-478c315d8290",
+     "name": "New Springfield Missionary Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.624492,
+     "longitude": -83.282769,
+     "addresses": [
+      {
+       "id": "49e5f527-c4d7-5d17-ae26-8b276b685ae0",
+       "address_1": "124 Prospect St,",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_124_prospect_st_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_124_prospect_st_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0ba2d7ba-cb57-5153-9575-3c95f8dacbd7",
+    "location": {
+     "id": "55aecc42-9b15-5591-a5ce-6b751e5ae7fe",
+     "name": "Meridian Health Services Men's Facility",
+     "location_type": "physical",
+     "latitude": 42.655041,
+     "longitude": -83.433794,
+     "addresses": [
+      {
+       "id": "328221a4-e904-544f-9265-59af8688424c",
+       "address_1": "1255 N Oakland Blvd",
+       "city": "Waterford",
+       "state_province": "MI",
+       "postal_code": "48327",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1255_n_oakland_blvd_waterford"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1255_n_oakland_blvd_waterford",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "82ed32c5-9229-5b65-9838-7e640dd05294",
+    "location": {
+     "id": "793236ff-e1c5-5ffc-bb2a-889a3340e8b8",
+     "name": "Lighthouse Path",
+     "location_type": "physical",
+     "latitude": 42.630384,
+     "longitude": -83.286235,
+     "addresses": [
+      {
+       "id": "17d565f3-c613-55e9-adce-7da3dd7f90ac",
+       "address_1": "130 Center St,",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_130_center_st_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_130_center_st_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8f01c10e-2fbc-5e2b-b530-69580c824b82",
+    "location": {
+     "id": "b0611629-704f-535e-b6f3-3f7b56b8afad",
+     "name": "The Guidance Center",
+     "location_type": "physical",
+     "latitude": 42.211863,
+     "longitude": -83.22734,
+     "addresses": [
+      {
+       "id": "9a7596b4-97da-5c83-9724-411b183bd2a9",
+       "address_1": "13101 Allen Road, Building 4",
+       "city": "Southgate",
+       "state_province": "MI",
+       "postal_code": "48195",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_13101_allen_road_building_4_southgate"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_13101_allen_road_building_4_southgate",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "baee2baa-3ace-54f6-8306-38acaed82364",
+    "location": {
+     "id": "71f1b99f-1f63-5cff-8418-dfb8219c978f",
+     "name": "Select Wine",
+     "location_type": "physical",
+     "latitude": 42.460425,
+     "longitude": -83.151891,
+     "addresses": [
+      {
+       "id": "4afebc53-f60e-5e57-b213-05f0e3e4fb2e",
+       "address_1": "1318 W 9 Mile Rd",
+       "city": "Ferndale",
+       "state_province": "MI",
+       "postal_code": "48220",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1318_w_9_mile_rd_ferndale"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1318_w_9_mile_rd_ferndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "fbe41e85-7e3c-5833-af0a-05e905eae34e",
+    "location": {
+     "id": "852c59c3-8c54-5de7-8c66-39e1885900ae",
+     "name": "Oak Liquor & Wine",
+     "location_type": "physical",
+     "latitude": 42.445737,
+     "longitude": -83.182955,
+     "addresses": [
+      {
+       "id": "bd4a1dd5-37ee-5874-be15-1b7b66ff9a4e",
+       "address_1": "13700 8 Mile Rd",
+       "city": "Oak Park",
+       "state_province": "MI",
+       "postal_code": "48237",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_13700_8_mile_rd_oak_park"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_13700_8_mile_rd_oak_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "bf1986e4-f9dd-5bfb-be82-f28e2245659a",
+    "location": {
+     "id": "a3bd94a7-0d08-57bb-9df5-49e067fbb054",
+     "name": "Welcome Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.631623,
+     "longitude": -83.310336,
+     "addresses": [
+      {
+       "id": "1735fcd2-a548-522b-98cf-95228f1664d0",
+       "address_1": "143 Oneida St.",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_143_oneida_st_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_143_oneida_st_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5e394ce1-2c81-52b0-8fd4-c70fb3e2f496",
+    "location": {
+     "id": "6a1a55df-fa91-5a1b-a3bf-bd98c6769251",
+     "name": "Temple Emanu-el",
+     "location_type": "physical",
+     "latitude": 42.475696,
+     "longitude": -83.193715,
+     "addresses": [
+      {
+       "id": "43b2f34a-6ae4-54aa-9f09-62b66bdbb12d",
+       "address_1": "14450 W 10 Mile Rd",
+       "city": "Oak Park",
+       "state_province": "MI",
+       "postal_code": "48237",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_14450_w_10_mile_rd_oak_park"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_14450_w_10_mile_rd_oak_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "fd2f0e1a-254a-506f-b4b2-27eabe6617bb",
+    "location": {
+     "id": "6ba23a13-d7f1-5ae6-b916-f1e5dc22dd2a",
+     "name": "Congregation Beth Shalom",
+     "location_type": "physical",
+     "latitude": 42.480548,
+     "longitude": -83.193104,
+     "addresses": [
+      {
+       "id": "128d669a-8aa1-5ae0-83a7-35795c64740a",
+       "address_1": "14601 Lincoln St,",
+       "city": "Oak Park",
+       "state_province": "MI",
+       "postal_code": "48237",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_14601_lincoln_st_oak_park"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_14601_lincoln_st_oak_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7d5acac2-9d07-526c-bf4a-0d8a2b058eec",
+    "location": {
+     "id": "ea95b6a8-cbdd-530f-8081-808bdbafc257",
+     "name": "Birmingham Police Department",
+     "location_type": "physical",
+     "latitude": 42.545884,
+     "longitude": -83.21551,
+     "addresses": [
+      {
+       "id": "d5468b9b-0cb7-51f7-8b95-d66c3a1d0b56",
+       "address_1": "151 Martin St",
+       "city": "Birmingham",
+       "state_province": "MI",
+       "postal_code": "48009",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_151_martin_st_birmingham"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_151_martin_st_birmingham",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "499b1445-7684-5228-9fd0-d404cba00cb4",
+    "location": {
+     "id": "72e2d7ec-5ff4-5c92-a677-f9c9c3f0c87f",
+     "name": "Oasis / Youngbloods",
+     "location_type": "physical",
+     "latitude": 42.662556,
+     "longitude": -83.387893,
+     "addresses": [
+      {
+       "id": "d566b730-c6be-574e-aab3-a29d406a978b",
+       "address_1": "1585 Crescent Lake Rd",
+       "city": "Waterford",
+       "state_province": "MI",
+       "postal_code": "48327",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1585_crescent_lake_rd_waterford"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1585_crescent_lake_rd_waterford",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "a2c6422d-3d9e-5681-8f46-617c1596c9af",
+    "location": {
+     "id": "748c86ee-849b-5c20-9416-83125ffe97b0",
+     "name": "Henry Ford Providence Southfield Hospital ER",
+     "location_type": "physical",
+     "latitude": 42.457428,
+     "longitude": -83.205243,
+     "addresses": [
+      {
+       "id": "22c3e851-60ec-5b32-b2bf-e7ff68ef0680",
+       "address_1": "16001 W Nine Mile Rd",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48075",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_16001_w_nine_mile_rd_southfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_16001_w_nine_mile_rd_southfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b3fc6ca5-88da-5c91-8fa5-c14f9537002b",
+    "location": {
+     "id": "7f32f7c7-34bd-5e0c-b8de-1fe069e04687",
+     "name": "Henry Ford Providence Southfield Main",
+     "location_type": "physical",
+     "latitude": 42.457428,
+     "longitude": -83.205243,
+     "addresses": [
+      {
+       "id": "746c1173-e4b4-5288-8b83-24d13b22efdb",
+       "address_1": "16001 W Nine Mile Rd",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48075",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_16001_w_nine_mile_rd_southfield_henry_ford_providenc"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_16001_w_nine_mile_rd_southfield_henry_ford_providenc",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d7ea513c-0a65-53c1-932d-50b5343eee61",
+    "location": {
+     "id": "1864129b-bc64-5879-ad05-be53721f7e11",
+     "name": "Therapeutics LLC - Easterseals",
+     "location_type": "physical",
+     "latitude": 42.68168,
+     "longitude": -83.302545,
+     "addresses": [
+      {
+       "id": "5e059f07-9ec1-5b9a-9fc5-03399f9905a9",
+       "address_1": "1685 Baldwin Avenue",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48340",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1685_baldwin_avenue_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1685_baldwin_avenue_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "fd0a9164-0281-5095-a73e-9d34f0d006a9",
+    "location": {
+     "id": "276843b7-2261-58f7-9579-d2b49d77638f",
+     "name": "CNS",
+     "location_type": "physical",
+     "latitude": 42.640486,
+     "longitude": -83.315939,
+     "addresses": [
+      {
+       "id": "8c575f51-e7be-50f8-b3fe-07944736050e",
+       "address_1": "185 Elizabeth Lake Rd.",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_185_elizabeth_lake_rd_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_185_elizabeth_lake_rd_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2ad97f28-9397-5261-a698-03e740c01f01",
+    "location": {
+     "id": "ef5a8419-e9d9-5c8d-a7d2-20dee91fad3c",
+     "name": "The Guidance Center",
+     "location_type": "physical",
+     "latitude": 42.212768,
+     "longitude": -83.226901,
+     "addresses": [
+      {
+       "id": "71df4789-af86-5c92-8605-8746483046bb",
+       "address_1": "19291 Northline Road, Building 6",
+       "city": "Southgate",
+       "state_province": "MI",
+       "postal_code": "48195",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_19291_northline_road_building_6_southgate"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_19291_northline_road_building_6_southgate",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "99abb7eb-8ab2-57d9-8c6b-562a6cdef662",
+    "location": {
+     "id": "eb89a145-16bf-545a-986f-e9226651c54d",
+     "name": "The Guidance Center",
+     "location_type": "physical",
+     "latitude": 42.212554,
+     "longitude": -83.22774,
+     "addresses": [
+      {
+       "id": "ccaa2e51-e4be-5c7a-926a-e4ca1a71b806",
+       "address_1": "19401 Northline Road, Building 5",
+       "city": "Southgate",
+       "state_province": "MI",
+       "postal_code": "48195",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_19401_northline_road_building_5_southgate"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_19401_northline_road_building_5_southgate",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "046e143d-c8a7-59a8-a45b-4cc3254925fe",
+    "location": {
+     "id": "5b66745b-5b4b-5957-a2cc-5090e9ddf2b0",
+     "name": "OLHSA",
+     "location_type": "physical",
+     "latitude": 42.644997,
+     "longitude": -83.298348,
+     "addresses": [
+      {
+       "id": "6e47ac5c-44bc-5626-8991-806011169f03",
+       "address_1": "196 Cesar E. Chavez Avenue",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_196_cesar_e_chavez_avenue_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_196_cesar_e_chavez_avenue_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "4263e5b0-1397-5ae9-9b82-c984b44d4ea6",
+    "location": {
+     "id": "dfc952dc-cf19-59d4-acdc-ed0213492c05",
+     "name": "Sacred Heart Rehabilitation Center",
+     "location_type": "physical",
+     "latitude": 42.450994,
+     "longitude": -82.927127,
+     "addresses": [
+      {
+       "id": "ae974aeb-49ac-51f5-8f7b-ab05f5dbe011",
+       "address_1": "19611 E. 8 Mile",
+       "city": "St. Clair Shores",
+       "state_province": "MI",
+       "postal_code": "48080",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_19611_e_8_mile_st_clair_shores"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_19611_e_8_mile_st_clair_shores",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "186d353d-4759-56bd-919e-410061c1e8bc",
+    "location": {
+     "id": "6a830b37-01a9-5706-9d23-425665498d29",
+     "name": "BeWell Medical Center",
+     "location_type": "physical",
+     "latitude": 42.48918,
+     "longitude": -83.176628,
+     "addresses": [
+      {
+       "id": "e33ee97c-8bf5-5243-a538-68985bab1357",
+       "address_1": "1964 W 11 Mile Rd",
+       "city": "Berkley",
+       "state_province": "MI",
+       "postal_code": "48072",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_1964_w_11_mile_rd_berkley"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_1964_w_11_mile_rd_berkley",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8ca32a9a-6633-552d-bf76-69ed9cf9fd17",
+    "location": {
+     "id": "8d217eea-3654-516e-b98c-d665e22805b0",
+     "name": "Oakland County Sheriffs Office- Commerce",
+     "location_type": "physical",
+     "latitude": 42.566427,
+     "longitude": -83.450408,
+     "addresses": [
+      {
+       "id": "d1ebaf55-d3f9-5fd9-afda-265ec7e8ee1f",
+       "address_1": "2019 Township Dr",
+       "city": "Commerce Township",
+       "state_province": "MI",
+       "postal_code": "48390",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2019_township_dr_commerce_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2019_township_dr_commerce_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "72bee323-7c46-5b5c-bc07-9e7c439b29d6",
+    "location": {
+     "id": "2955bcb3-ca05-56c2-afd0-d59122d366e1",
+     "name": "The Guidance Center Adult Behavioral",
+     "location_type": "physical",
+     "latitude": 42.211249,
+     "longitude": -83.229794,
+     "addresses": [
+      {
+       "id": "564432de-50da-5c53-9a30-4e69ff4e4121",
+       "address_1": "20300 Superior Road, Suite 250",
+       "city": "Taylor",
+       "state_province": "MI",
+       "postal_code": "48180",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_20300_superior_road_suite_250_taylor"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_20300_superior_road_suite_250_taylor",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "495df3b3-6867-5020-8204-52479a98edfb",
+    "location": {
+     "id": "9b7fe006-9c5b-5b33-9c3e-dbed9cb9d3c2",
+     "name": "The Guidance Center Adult Behavioral",
+     "location_type": "physical",
+     "latitude": 42.19885,
+     "longitude": -83.236661,
+     "addresses": [
+      {
+       "id": "e23aa7de-aa78-5aa7-b1bf-c0ecd0f9c03e",
+       "address_1": "20600 Eureka Road, Suite 900",
+       "city": "Taylor",
+       "state_province": "MI",
+       "postal_code": "48180",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_20600_eureka_road_suite_900_taylor"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_20600_eureka_road_suite_900_taylor",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "1665dde8-da94-57a6-a0f8-75dca81e1016",
+    "location": {
+     "id": "11dfeb2f-eaf9-53a6-83b3-71507cc04f20",
+     "name": "Lawrence Tech Student Center",
+     "location_type": "physical",
+     "latitude": 42.474942,
+     "longitude": -83.249699,
+     "addresses": [
+      {
+       "id": "33100bc5-6816-50af-842e-c4de92fd6422",
+       "address_1": "21000 W 10 Mile Rd M113",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48075",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_21000_w_10_mile_rd_m113_southfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_21000_w_10_mile_rd_m113_southfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "138f08c9-46b3-5711-885b-e4a53a159c0b",
+    "location": {
+     "id": "2eaafb50-d015-5fe0-a2eb-abf3e430096c",
+     "name": "Lawrence Tech Dorms",
+     "location_type": "physical",
+     "latitude": 42.474942,
+     "longitude": -83.249699,
+     "addresses": [
+      {
+       "id": "4a0401e8-3fff-50c9-b35d-8222c922ed4b",
+       "address_1": "21000 W 10 Mile Rd",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48075",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_21000_w_10_mile_rd_southfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_21000_w_10_mile_rd_southfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "826edfd7-15f6-5f44-85b3-4597c3224f6a",
+    "location": {
+     "id": "79d98c43-031f-52af-807d-0032275ce45f",
+     "name": "New Mt. Vernon Baptist Church",
+     "location_type": "physical",
+     "latitude": 42.448626,
+     "longitude": -83.163352,
+     "addresses": [
+      {
+       "id": "9c808992-41d4-5940-bd0a-033f395c59c0",
+       "address_1": "21009 Ithaca Ave",
+       "city": "Ferndale",
+       "state_province": "MI",
+       "postal_code": "48220",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_21009_ithaca_ave_ferndale"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_21009_ithaca_ave_ferndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "6ee6dc06-fa9d-5a2b-913d-828b112d85a5",
+    "location": {
+     "id": "3e73b130-5275-56d4-b1c1-799d32bcd231",
+     "name": "Lighthouse",
+     "location_type": "physical",
+     "latitude": 42.450266,
+     "longitude": -83.181914,
+     "addresses": [
+      {
+       "id": "ebad3531-96cf-5f4d-b665-ccb0488ea36b",
+       "address_1": "21301 Coolidge Hwy",
+       "city": "Oak Park",
+       "state_province": "MI",
+       "postal_code": "48237",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_21301_coolidge_hwy_oak_park"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_21301_coolidge_hwy_oak_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f0281b4c-44fd-5277-b1b0-42c4e3aaca0d",
+    "location": {
+     "id": "516dffc5-166c-53d8-9e02-6d2c0b46aa92",
+     "name": "Focus Program INV",
+     "location_type": "physical",
+     "latitude": 42.453816,
+     "longitude": -83.182154,
+     "addresses": [
+      {
+       "id": "af1ca5bd-9a6d-53a9-b371-26da7e0b6fdf",
+       "address_1": "21675 Coolidge Hwy",
+       "city": "Oak Park",
+       "state_province": "MI",
+       "postal_code": "48237",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_21675_coolidge_hwy_oak_park"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_21675_coolidge_hwy_oak_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8f2127fc-4ec4-5d86-b25b-50c8a2de2fe3",
+    "location": {
+     "id": "3ba811da-cbb3-5b24-bd66-9fa2153f798c",
+     "name": "Waterford Motel",
+     "location_type": "physical",
+     "latitude": 42.666488,
+     "longitude": -83.33185,
+     "addresses": [
+      {
+       "id": "62ded7cf-6130-5772-a0fa-daf3f70b6162",
+       "address_1": "2201 Dixie Hwy",
+       "city": "Waterford",
+       "state_province": "MI",
+       "postal_code": "48328",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2201_dixie_hwy_waterford"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2201_dixie_hwy_waterford",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "e0382caa-cbf5-557b-9789-40c6af0a8bf2",
+    "location": {
+     "id": "d477c796-c745-5d1e-843f-abb7f58f8bba",
+     "name": "Easterseals MORC- Southfield",
+     "location_type": "physical",
+     "latitude": 42.457876,
+     "longitude": -83.261756,
+     "addresses": [
+      {
+       "id": "e259023c-f075-5fc6-878a-94deeba706a4",
+       "address_1": "22170 W Nine Mile Rd",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48033",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_22170_w_nine_mile_rd_southfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_22170_w_nine_mile_rd_southfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "dee06657-fd62-53b8-87e6-71ffbf819c9e",
+    "location": {
+     "id": "eb10725d-e36b-53d2-84b2-2c76c5b267ce",
+     "name": "Sylvan Manor Park",
+     "location_type": "physical",
+     "latitude": 42.605412,
+     "longitude": -83.336582,
+     "addresses": [
+      {
+       "id": "09a87228-1171-573b-845b-a5515ee0507b",
+       "address_1": "2294 Woodrow Wilson Blvd",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48324",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2294_woodrow_wilson_blvd_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2294_woodrow_wilson_blvd_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "876c5d87-b0be-5d41-bd0b-fb3c8afc3140",
+    "location": {
+     "id": "472113a0-d65f-5570-8136-98269430d6c3",
+     "name": "Citgo Gas Station",
+     "location_type": "physical",
+     "latitude": 42.446617,
+     "longitude": -83.105887,
+     "addresses": [
+      {
+       "id": "b381dae7-5a32-5c3c-97b8-7751cacc63ed",
+       "address_1": "231 W 8 Mile Rd",
+       "city": "Detroit",
+       "state_province": "MI",
+       "postal_code": "48203",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_231_w_8_mile_rd_detroit"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_231_w_8_mile_rd_detroit",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d9de2493-a660-5200-8874-d8ed9d3d189e",
+    "location": {
+     "id": "f07656b4-b7ea-5c2e-ab78-c1a84071f687",
+     "name": "Oakland County Sheriffs Office- Orion Twp",
+     "location_type": "physical",
+     "latitude": 42.74748,
+     "longitude": -83.27948,
+     "addresses": [
+      {
+       "id": "7da24af5-9f6d-561d-b91e-d63239f570e2",
+       "address_1": "2323 Joslyn Rd",
+       "city": "Lake Orion",
+       "state_province": "MI",
+       "postal_code": "48360",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2323_joslyn_rd_lake_orion"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2323_joslyn_rd_lake_orion",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "1adf85c5-fd40-5b28-95b4-f0f7930bf682",
+    "location": {
+     "id": "9613285a-9137-5bea-bd37-e0dcbbea9609",
+     "name": "Farmington Community Library",
+     "location_type": "physical",
+     "latitude": 42.464063,
+     "longitude": -83.378228,
+     "addresses": [
+      {
+       "id": "3185cbdf-100c-505e-b4e1-8c9200eb45db",
+       "address_1": "23500 Liberty Street",
+       "city": "Farmington",
+       "state_province": "MI",
+       "postal_code": "48335",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_23500_liberty_street_farmington"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_23500_liberty_street_farmington",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d366dd40-bf1c-5739-ab3d-25b47434ab7c",
+    "location": {
+     "id": "7c3a2879-5d95-5a87-b922-cca4cff508c2",
+     "name": "Farmington Public Safety Department",
+     "location_type": "physical",
+     "latitude": 42.464979,
+     "longitude": -83.377822,
+     "addresses": [
+      {
+       "id": "8057dd49-15bb-5449-bdb0-bccbc6645cd2",
+       "address_1": "23600 Liberty St",
+       "city": "Farmington",
+       "state_province": "MI",
+       "postal_code": "48335",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_23600_liberty_st_farmington"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_23600_liberty_st_farmington",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "00d22ff0-274d-542a-9fee-b52a80be6f39",
+    "location": {
+     "id": "7622a47f-0b51-50a7-aacb-eda657ef7a11",
+     "name": "Berkley Public Safety",
+     "location_type": "physical",
+     "latitude": 42.503227,
+     "longitude": -83.182639,
+     "addresses": [
+      {
+       "id": "17f49eea-81c9-5a3d-85b4-6028d9e5c083",
+       "address_1": "2395 W 12 Mile",
+       "city": "Berkley",
+       "state_province": "MI",
+       "postal_code": "48072",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2395_w_12_mile_berkley"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2395_w_12_mile_berkley",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "937ac42e-0100-548a-94a4-47416e42d574",
+    "location": {
+     "id": "c1c9d112-057c-5d3a-b54f-dcabcc196fa9",
+     "name": "Spirit of Grace Church",
+     "location_type": "physical",
+     "latitude": 42.608993,
+     "longitude": -83.331457,
+     "addresses": [
+      {
+       "id": "02f3529c-7566-5fa4-8722-53e2ab9338ab",
+       "address_1": "2399 Figa Ave",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48324",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2399_figa_ave_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2399_figa_ave_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0c589de7-21ba-5a02-ad2e-931c09bb18f0",
+    "location": {
+     "id": "f6ea5433-b041-5b8e-81f6-b0a618832459",
+     "name": "Easterseals MORC- Auburn Hills",
+     "location_type": "physical",
+     "latitude": 42.679377,
+     "longitude": -83.242445,
+     "addresses": [
+      {
+       "id": "5b031de2-d466-5dd7-a94f-9ed918824389",
+       "address_1": "2399 Walton Blvd.",
+       "city": "Auburn Hills",
+       "state_province": "MI",
+       "postal_code": "48326",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2399_walton_blvd_auburn_hills"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2399_walton_blvd_auburn_hills",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "a772186b-238e-58be-bef3-155e0d70f4ee",
+    "location": {
+     "id": "ae208926-3ed7-5df6-a50a-977ab85fd197",
+     "name": "Neu Urgent Care",
+     "location_type": "physical",
+     "latitude": 42.461362,
+     "longitude": -83.103894,
+     "addresses": [
+      {
+       "id": "ff29b64d-2eb0-5da4-9263-2d8808abdb47",
+       "address_1": "24 E 9 Mile Rd",
+       "city": "Hazel Park",
+       "state_province": "MI",
+       "postal_code": "48030",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_24_e_9_mile_rd_hazel_park"
+     }
+    },
+    "phones": [
+     {
+      "id": "a7c4e8b1-7405-55bb-9ea2-de7cbd35afe4",
+      "number": "248-629-7497",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_24_e_9_mile_rd_hazel_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c5f7d2ef-b3b9-5bf7-84a5-0d0a31e404ef",
+    "location": {
+     "id": "d6dc660d-3095-5b7b-bf0a-5ab62492ddb5",
+     "name": "Berkley Parks & Recreation Community Center",
+     "location_type": "physical",
+     "latitude": 42.494487,
+     "longitude": -83.188172,
+     "addresses": [
+      {
+       "id": "c89b9080-0f4f-5c07-9d08-853b16c72f9c",
+       "address_1": "2400 Robina Ave",
+       "city": "Berkley",
+       "state_province": "MI",
+       "postal_code": "48072",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2400_robina_ave_berkley"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2400_robina_ave_berkley",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b9eeb40a-8ce1-5904-8f9e-abcb256f6434",
+    "location": {
+     "id": "ec705f78-9b93-5b33-9b8a-b0037c533ee1",
+     "name": "CNS- Novi",
+     "location_type": "physical",
+     "latitude": 42.468858,
+     "longitude": -83.438487,
+     "addresses": [
+      {
+       "id": "cea7e0b7-0dfc-5c81-9610-af95d59c48d5",
+       "address_1": "24230 Karim Boulevard, Suite 100",
+       "city": "Novi",
+       "state_province": "MI",
+       "postal_code": "48375",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_24230_karim_boulevard_suite_100_novi"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_24230_karim_boulevard_suite_100_novi",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "078f591e-b8cb-5905-a681-74a7ab9392a3",
+    "location": {
+     "id": "b7f28a85-5b1f-5e19-af94-f56ce6135881",
+     "name": "Easterseals MORC- Southfield",
+     "location_type": "physical",
+     "latitude": 42.468138,
+     "longitude": -83.237058,
+     "addresses": [
+      {
+       "id": "942fd1ee-cce9-5cec-adb7-3ac7f2e7aa9f",
+       "address_1": "24445 Northweatern Hwy",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48075",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_24445_northweatern_hwy_southfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_24445_northweatern_hwy_southfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d1af7a28-e768-518c-85b5-203ea32dd5f6",
+    "location": {
+     "id": "9568dae6-b47c-594d-8840-00047164118f",
+     "name": "CNS",
+     "location_type": "physical",
+     "latitude": 42.470354,
+     "longitude": -83.237436,
+     "addresses": [
+      {
+       "id": "c5134114-8bff-5a5b-96d5-e01eacd79f81",
+       "address_1": "24600 Northwestern Highway",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48075",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_24600_northwestern_highway_southfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_24600_northwestern_highway_southfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f03c314e-889c-5218-909c-9f335038bccb",
+    "location": {
+     "id": "2ef8682b-c41e-50a0-8507-94095b352b60",
+     "name": "HOPE Shelter",
+     "location_type": "physical",
+     "latitude": 42.651632,
+     "longitude": -83.299754,
+     "addresses": [
+      {
+       "id": "8168f533-8655-5775-8531-07b640bd27b8",
+       "address_1": "249 Baldwin Ave",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_249_baldwin_ave_pontiac"
+     }
+    },
+    "phones": [
+     {
+      "id": "d2ee2aa5-54b3-5676-9e89-4c77d63ed30c",
+      "number": "248-330-4185",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_249_baldwin_ave_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "edc474ae-9a16-58d2-a7e3-9d6c665a3b80",
+    "location": {
+     "id": "ca9dffc5-a2d6-5a9e-b2fe-078594eb080b",
+     "name": "Youngbloods Shop",
+     "location_type": "physical",
+     "latitude": 42.475734,
+     "longitude": -83.104263,
+     "addresses": [
+      {
+       "id": "e6443136-54a2-56a5-a651-e890144dfe38",
+       "address_1": "24918 John R Road",
+       "city": "Hazel Park",
+       "state_province": "MI",
+       "postal_code": "48030",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_24918_john_r_road_hazel_park"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_24918_john_r_road_hazel_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7f6df02c-0ee0-5e4b-8cbe-c3c1f32c1983",
+    "location": {
+     "id": "b58a0050-dc17-50d0-a3c0-bd96c3a67eeb",
+     "name": "Oakland County Pretrial & Justice Services",
+     "location_type": "physical",
+     "latitude": 42.641874,
+     "longitude": -83.317937,
+     "addresses": [
+      {
+       "id": "a55f7cbd-37c3-5d77-8f3b-5a2ef3ceeb6e",
+       "address_1": "250 Elizabeth Lake Road Suite 1520",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_250_elizabeth_lake_road_suite_1520_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_250_elizabeth_lake_road_suite_1520_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "1bd35637-f4df-5c9a-a01f-32e562fb6508",
+    "location": {
+     "id": "a8c3fcee-984a-5379-8e46-53b1c030969e",
+     "name": "Oak Barrell Party Shoppe",
+     "location_type": "physical",
+     "latitude": 42.744855,
+     "longitude": -83.24582,
+     "addresses": [
+      {
+       "id": "a26a3dea-80e1-563f-a0c1-89598911c6dd",
+       "address_1": "2515 S Lapeer Rd",
+       "city": "Lake Orion",
+       "state_province": "MI",
+       "postal_code": "48360",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2515_s_lapeer_rd_lake_orion"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2515_s_lapeer_rd_lake_orion",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b2ba114f-a239-525f-aa8b-5f52334049aa",
+    "location": {
+     "id": "f8af4f7e-a513-5957-adf7-3de3606ee5e9",
+     "name": "Carriage Place Apartments",
+     "location_type": "physical",
+     "latitude": 42.633639,
+     "longitude": -83.260336,
+     "addresses": [
+      {
+       "id": "33f2f65e-fa97-5226-b4f6-e92ca267199f",
+       "address_1": "255 Carriage Cir Dr",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_255_carriage_cir_dr_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_255_carriage_cir_dr_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "22da5244-27b7-5abe-9c7d-091cd8bf36eb",
+    "location": {
+     "id": "48b890dd-07b7-5ba2-b2e9-f1b822310b04",
+     "name": "The Guidance Center",
+     "location_type": "physical",
+     "latitude": 42.257923,
+     "longitude": -83.164792,
+     "addresses": [
+      {
+       "id": "7276ad5e-3105-5247-b517-91e3181a6970",
+       "address_1": "26300 Outer Drive",
+       "city": "Lincoln Park",
+       "state_province": "MI",
+       "postal_code": "48146",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_26300_outer_drive_lincoln_park"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_26300_outer_drive_lincoln_park",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "74c26627-b523-54f7-93b0-2a7a49217de4",
+    "location": {
+     "id": "1d4fc9fe-3b5f-5f79-9cf8-c46d7c0fe2b1",
+     "name": "Oakland Family Services Royal Oak",
+     "location_type": "physical",
+     "latitude": 42.488055,
+     "longitude": -83.156625,
+     "addresses": [
+      {
+       "id": "71fcf950-c12c-591b-a820-3880fdb7b2b1",
+       "address_1": "26862 Woodward Ave Suite 103",
+       "city": "Royal Oak",
+       "state_province": "MI",
+       "postal_code": "48067",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_26862_woodward_ave_suite_103_royal_oak"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_26862_woodward_ave_suite_103_royal_oak",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "1f81ebc5-a26e-5cfd-8fd6-2df4734ae4b9",
+    "location": {
+     "id": "425653a8-c68f-5fd6-ad07-94959dc4235d",
+     "name": "North Hill Farms",
+     "location_type": "physical",
+     "latitude": 42.666207,
+     "longitude": -83.319821,
+     "addresses": [
+      {
+       "id": "b5fc607c-80f3-5b9b-827a-539b0d4d70f0",
+       "address_1": "28 Cherry Hill Dr",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48340",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_28_cherry_hill_dr_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_28_cherry_hill_dr_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5515ca4e-023f-527b-be9c-a203ac5bbeb7",
+    "location": {
+     "id": "e596fc85-88b6-5b1c-8205-07eb16de213a",
+     "name": "West Bloomfield Marshbank Park",
+     "location_type": "physical",
+     "latitude": 42.595659,
+     "longitude": -83.393289,
+     "addresses": [
+      {
+       "id": "bb386c8a-82aa-58cd-90a5-19f3d939660e",
+       "address_1": "2805 Hiller Rd",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48324",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_2805_hiller_rd_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_2805_hiller_rd_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5b4a981e-53ff-58e9-ab3d-43ecd5cf3f41",
+    "location": {
+     "id": "b53984b2-c4fd-5dcf-a5fb-0ac07b89b239",
+     "name": "Farmington Family YMCA",
+     "location_type": "physical",
+     "latitude": 42.501528,
+     "longitude": -83.376679,
+     "addresses": [
+      {
+       "id": "13624178-eb97-5ad3-ba4e-1bbd8d45deb0",
+       "address_1": "28100 Farmington Rd",
+       "city": "Farmington",
+       "state_province": "MI",
+       "postal_code": "48334",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_28100_farmington_rd_farmington"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_28100_farmington_rd_farmington",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "fa6b52f4-7f56-54a4-a683-4aa25d140607",
+    "location": {
+     "id": "e2a58421-f3b2-5691-b79d-58641ca584d6",
+     "name": "CNS",
+     "location_type": "physical",
+     "latitude": 42.495397,
+     "longitude": -83.301279,
+     "addresses": [
+      {
+       "id": "83e6d1fa-8d79-545a-9795-6de1165969fe",
+       "address_1": "28200 Franklin Road",
+       "city": "Southfield",
+       "state_province": "MI",
+       "postal_code": "48034",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_28200_franklin_road_southfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_28200_franklin_road_southfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "62243983-c30f-5bff-b14d-a4364042cc5e",
+    "location": {
+     "id": "76f51ff8-4f26-58fe-a82e-5c0425cf0bac",
+     "name": "Sacred Heart Rehabilitation Center- Madison Heights",
+     "location_type": "physical",
+     "latitude": 42.500524,
+     "longitude": -83.086021,
+     "addresses": [
+      {
+       "id": "cf056b15-9dc8-5148-a1a8-7af7c882f189",
+       "address_1": "28303 Dequindre Rd #100",
+       "city": "Madison Heights",
+       "state_province": "MI",
+       "postal_code": "48071",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_28303_dequindre_rd_100_madison_heights"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_28303_dequindre_rd_100_madison_heights",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0180b3c2-9cae-5c2d-9048-7aa41803b426",
+    "location": {
+     "id": "d525bc2b-db37-5d7b-9981-fb5fcba3ae00",
+     "name": "Lighthouse Teen Path",
+     "location_type": "physical",
+     "latitude": 42.632867,
+     "longitude": -83.279734,
+     "addresses": [
+      {
+       "id": "597e64e0-0e3e-5d0f-ac5e-6fedd1241484",
+       "address_1": "285 Whittemore St,",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_285_whittemore_st_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_285_whittemore_st_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "5836bc83-b4af-5e28-8d56-e54b40767bca",
+    "location": {
+     "id": "88ab49d7-0b74-5c46-ab2d-53f1c73a21f4",
+     "name": "The Hawk Fitness Center",
+     "location_type": "physical",
+     "latitude": 42.49782,
+     "longitude": -83.346292,
+     "addresses": [
+      {
+       "id": "ee49b99f-90ab-5af9-9c6e-298e613f43ca",
+       "address_1": "29995 W 12 Mile Rd",
+       "city": "Farmington Hills",
+       "state_province": "MI",
+       "postal_code": "48334",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_29995_w_12_mile_rd_farmington_hills"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_29995_w_12_mile_rd_farmington_hills",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c3d45b44-8faf-57f3-999b-8e7473b9e4d2",
+    "location": {
+     "id": "2cc9f6c6-5b97-57b2-ab22-769fd6989abf",
+     "name": "Royal Liquor",
+     "location_type": "physical",
+     "latitude": 42.441728,
+     "longitude": -83.346565,
+     "addresses": [
+      {
+       "id": "1941ab80-e859-5665-a209-21c304560da0",
+       "address_1": "30444 W 8 Mile Rd",
+       "city": "Farmington Hills",
+       "state_province": "MI",
+       "postal_code": "48336",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_30444_w_8_mile_rd_farmington_hills"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_30444_w_8_mile_rd_farmington_hills",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b0baf691-c70b-5d1e-8783-cc681c5ec06f",
+    "location": {
+     "id": "5e5fa59e-97b7-5c27-998c-ccfebfe6079b",
+     "name": "43rd District Court Ferndale",
+     "location_type": "physical",
+     "latitude": 42.460941,
+     "longitude": -83.131009,
+     "addresses": [
+      {
+       "id": "f0ffac19-507f-5726-8ab1-165e48c01cea",
+       "address_1": "305 E 9 Mile",
+       "city": "Ferndale",
+       "state_province": "MI",
+       "postal_code": "48220",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_305_e_9_mile_ferndale"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_305_e_9_mile_ferndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "9c1c3cd1-20d9-5799-b7db-cfd88eacad91",
+    "location": {
+     "id": "6efb6fb3-1564-5224-812b-5557a3748f23",
+     "name": "Berkley Public Library",
+     "location_type": "physical",
+     "latitude": 42.501044,
+     "longitude": -83.18419,
+     "addresses": [
+      {
+       "id": "1e953a05-9b37-585e-892e-dcb1727f6d5a",
+       "address_1": "3155 Coolidge Hwy",
+       "city": "Berkley",
+       "state_province": "MI",
+       "postal_code": "48072",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_3155_coolidge_hwy_berkley"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_3155_coolidge_hwy_berkley",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "03fe87e3-b9a3-5707-bc0e-f73e18478519",
+    "location": {
+     "id": "1b34de10-0427-56b1-b2b7-8d9d8d08da98",
+     "name": "47th District Courthouse",
+     "location_type": "physical",
+     "latitude": 42.483636,
+     "longitude": -83.359566,
+     "addresses": [
+      {
+       "id": "8a333be9-4a30-5a1f-94a5-196ec0fbd25f",
+       "address_1": "31605 W 11 Mile Rd",
+       "city": "Farmington",
+       "state_province": "MI",
+       "postal_code": "48336",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_31605_w_11_mile_rd_farmington"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_31605_w_11_mile_rd_farmington",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "27b8144c-ad23-5014-b0ca-9c9461dbfb7a",
+    "location": {
+     "id": "d73cb649-1c48-54a2-8117-08048ff26d2a",
+     "name": "Farmington Community Library",
+     "location_type": "physical",
+     "latitude": 42.497865,
+     "longitude": -83.370879,
+     "addresses": [
+      {
+       "id": "f38d4ffa-84fa-5104-be92-6742827aed27",
+       "address_1": "32737 W 12 Mile Rd.",
+       "city": "Farmington Hills",
+       "state_province": "MI",
+       "postal_code": "48334",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_32737_w_12_mile_rd_farmington_hills"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_32737_w_12_mile_rd_farmington_hills",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "af99d8af-3b9e-57c1-8590-84cfc9923db2",
+    "location": {
+     "id": "bad7a8e8-a804-5b80-b003-7cf7a30324d3",
+     "name": "Sylvan Mobil",
+     "location_type": "physical",
+     "latitude": 42.625224,
+     "longitude": -83.325591,
+     "addresses": [
+      {
+       "id": "4a8c275b-2e7f-5eef-a91a-80bae6532922",
+       "address_1": "328 S Telegraph Rd",
+       "city": "Sylvan Lake",
+       "state_province": "MI",
+       "postal_code": "48320",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_328_s_telegraph_rd_sylvan_lake"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_328_s_telegraph_rd_sylvan_lake",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "888c1919-3755-5d0e-a976-58dde5bd5d25",
+    "location": {
+     "id": "6c9c5c64-9ce1-5226-a3d5-a99388238b50",
+     "name": "8 Woods Motel",
+     "location_type": "physical",
+     "latitude": 42.446934,
+     "longitude": -83.128501,
+     "addresses": [
+      {
+       "id": "7d6b05fd-8614-5b4a-8032-23fb373a5333",
+       "address_1": "330 8 Mile Rd",
+       "city": "Ferndale",
+       "state_province": "MI",
+       "postal_code": "48220",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_330_8_mile_rd_ferndale"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_330_8_mile_rd_ferndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c3413231-50ff-5d97-b944-3dc8eee8354d",
+    "location": {
+     "id": "6cc94ebd-6098-5065-bff0-8df2cfff6e9a",
+     "name": "Berkley City Hall",
+     "location_type": "physical",
+     "latitude": 42.502672,
+     "longitude": -83.202857,
+     "addresses": [
+      {
+       "id": "eb92ecc9-f581-502c-8ca1-d555f826fbd2",
+       "address_1": "3338 Coolidge Highway",
+       "city": "Berkley",
+       "state_province": "MI",
+       "postal_code": "48072",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_3338_coolidge_highway_berkley"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_3338_coolidge_highway_berkley",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "18f4cc90-f503-5d65-ad02-6215226d3ec2",
+    "location": {
+     "id": "04c2a3bb-c97e-5340-a32a-a9ed3642d937",
+     "name": "Fire Station #2",
+     "location_type": "physical",
+     "latitude": 42.587397,
+     "longitude": -83.412605,
+     "addresses": [
+      {
+       "id": "e7d16f95-f6c0-5868-bf11-646e6ef061d0",
+       "address_1": "3340 Green Lake Road",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48324",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_3340_green_lake_road_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_3340_green_lake_road_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2cbaeda5-2244-597f-b9e6-352fef2a69c3",
+    "location": {
+     "id": "dbaab153-86f7-594c-a570-2faea0ff1858",
+     "name": "Temple Shir Shalom",
+     "location_type": "physical",
+     "latitude": 42.556842,
+     "longitude": -83.35971,
+     "addresses": [
+      {
+       "id": "bba71b36-d58f-5750-9600-6468f5339522",
+       "address_1": "3999 Walnut Lake Road",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_3999_walnut_lake_road_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_3999_walnut_lake_road_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "8f8f4cc4-c0ed-59ed-8e46-1d6da7d6c391",
+    "location": {
+     "id": "a2fe4454-12c0-5d75-bcdc-f6169f603746",
+     "name": "Rochester Police Department",
+     "location_type": "physical",
+     "latitude": 42.683265,
+     "longitude": -83.137576,
+     "addresses": [
+      {
+       "id": "070e7f17-98b1-5eb3-b328-2142c737390e",
+       "address_1": "400 Sixth Street",
+       "city": "Rochester",
+       "state_province": "MI",
+       "postal_code": "48307",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_400_sixth_street_rochester"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_400_sixth_street_rochester",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "827aa052-67ea-5425-b27f-1568ee5013f2",
+    "location": {
+     "id": "73923e0d-3679-5ab6-8d8c-6be0f851d35e",
+     "name": "West Bloomfield United Methodist Church",
+     "location_type": "physical",
+     "latitude": 42.558255,
+     "longitude": -83.364044,
+     "addresses": [
+      {
+       "id": "9b3b0d11-8717-531f-b73f-4dc5e5777fd1",
+       "address_1": "4100 Walnut Lake Rd.",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_4100_walnut_lake_rd_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_4100_walnut_lake_rd_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "34e0b649-14ff-5405-89f5-b1f11c8f63cb",
+    "location": {
+     "id": "fb36807c-d334-567b-a841-ed74e2a36d5e",
+     "name": "Baker College",
+     "location_type": "physical",
+     "latitude": 42.486543,
+     "longitude": -83.148156,
+     "addresses": [
+      {
+       "id": "1317409b-c391-5b30-8d0c-0541606c5971",
+       "address_1": "420 S Lafayette Ave",
+       "city": "Royal Oak",
+       "state_province": "MI",
+       "postal_code": "48067",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_420_s_lafayette_ave_royal_oak"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_420_s_lafayette_ave_royal_oak",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0ae5ecef-c562-5808-ac2e-70f55f661dd3",
+    "location": {
+     "id": "57858aa9-3a3b-58ff-9447-61010e2d7eb0",
+     "name": "Village of Wolverine Lake Police Department",
+     "location_type": "physical",
+     "latitude": 42.561522,
+     "longitude": -83.48432,
+     "addresses": [
+      {
+       "id": "16a11dc3-176a-591a-9ba2-e32f97e8be95",
+       "address_1": "425 Glengary Rd.",
+       "city": "Wolverine Lake",
+       "state_province": "MI",
+       "postal_code": "48390",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_425_glengary_rd_wolverine_lake"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_425_glengary_rd_wolverine_lake",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "2967029b-2aa5-522a-9a79-6fbadc56a8a2",
+    "location": {
+     "id": "7d9d65d6-94c2-5853-9fd0-f225373d8d8b",
+     "name": "The Matrix",
+     "location_type": "physical",
+     "latitude": 42.449013,
+     "longitude": -83.142958,
+     "addresses": [
+      {
+       "id": "c887a3eb-e06e-53d0-8d34-74df211f6a44",
+       "address_1": "429 Livernois",
+       "city": "Ferndale",
+       "state_province": "MI",
+       "postal_code": "48220",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_429_livernois_ferndale"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_429_livernois_ferndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "db900b1c-06ad-5d92-82ac-f87efbb60647",
+    "location": {
+     "id": "05d261e1-6311-5d6f-8877-476734442416",
+     "name": "Bloomfield Urgent Care",
+     "location_type": "physical",
+     "latitude": 42.605332,
+     "longitude": -83.267232,
+     "addresses": [
+      {
+       "id": "0d8655fc-0ad7-5523-949d-41fd3dfcf8b2",
+       "address_1": "43141 Woodward Ave",
+       "city": "Bloomfield Hills",
+       "state_province": "MI",
+       "postal_code": "48302",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_43141_woodward_ave_bloomfield_hills"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_43141_woodward_ave_bloomfield_hills",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "ab736071-a3b6-5729-b5d8-fa20efb8e568",
+    "location": {
+     "id": "3add95d3-b66c-5d80-b9be-a68ac38f5460",
+     "name": "Trinity Health Woodward Building",
+     "location_type": "physical",
+     "latitude": 42.616701,
+     "longitude": -83.27398,
+     "addresses": [
+      {
+       "id": "069f43e2-a5f9-51c7-954c-9cd340ff0407",
+       "address_1": "44428 Woodward Ave",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_44428_woodward_ave_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_44428_woodward_ave_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "21d1dcde-98d2-5e1e-a1f1-04800cf31989",
+    "location": {
+     "id": "4d5cdc8a-442c-5de6-977a-a3776b10f0cb",
+     "name": "Royal Oak Police Station",
+     "location_type": "physical",
+     "latitude": 42.489876,
+     "longitude": -83.140331,
+     "addresses": [
+      {
+       "id": "f516c58e-5add-52d6-9359-ed260227f004",
+       "address_1": "450E 11 Mile Rd",
+       "city": "Royal Oak",
+       "state_province": "MI",
+       "postal_code": "48067",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_450e_11_mile_rd_royal_oak"
+     }
+    },
+    "phones": [
+     {
+      "id": "2aa9a6b5-6809-56f6-984f-cc335730cbb1",
+      "number": "248-885-1721",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_450e_11_mile_rd_royal_oak",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "6c9c5169-d540-5f84-82ef-718f2305cd1b",
+    "location": {
+     "id": "c3dcb834-2129-59d1-a5a4-5347dd95191a",
+     "name": "West Bloomfield Civic Center",
+     "location_type": "physical",
+     "latitude": 42.560517,
+     "longitude": -83.373823,
+     "addresses": [
+      {
+       "id": "e26ffa82-2c1d-58d3-9649-27232f1e37b1",
+       "address_1": "4550 Walnut Lake Rd",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_4550_walnut_lake_rd_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_4550_walnut_lake_rd_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d659c899-3ddf-5001-b079-6a0c6508ed5d",
+    "location": {
+     "id": "53985460-aa2b-55f7-990e-1925e7077e17",
+     "name": "Gary Burnstein Community Health Clinic",
+     "location_type": "physical",
+     "latitude": 42.625068,
+     "longitude": -83.283885,
+     "addresses": [
+      {
+       "id": "b1535a52-6fef-526e-ab03-695d6241e45c",
+       "address_1": "45580 Woodward Ave.",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_45580_woodward_ave_pontiac"
+     }
+    },
+    "phones": [
+     {
+      "id": "fd75bab8-deb0-5891-b9d0-94cb62fba9ec",
+      "number": "248-309-3752",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_45580_woodward_ave_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "208e2139-4b10-52a0-923d-2282f941dca9",
+    "location": {
+     "id": "0bf1e1eb-b830-552a-8755-75d6683e2a71",
+     "name": "West Bloomfield Township Public Library",
+     "location_type": "physical",
+     "latitude": 42.557232,
+     "longitude": -83.373235,
+     "addresses": [
+      {
+       "id": "01ff59fd-8174-5f96-b5d3-c2f4c3a9bef0",
+       "address_1": "4600 Walnut Lake Rd",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_4600_walnut_lake_rd_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_4600_walnut_lake_rd_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "d92361ce-ad6e-529d-be20-fb958f5963a0",
+    "location": {
+     "id": "60f15cfe-ad50-50a8-a3a2-1275e4b8a190",
+     "name": "Fire Station #1",
+     "location_type": "physical",
+     "latitude": 42.569688,
+     "longitude": -83.361337,
+     "addresses": [
+      {
+       "id": "9487f088-38f8-5aca-8db9-6ed4bce84b12",
+       "address_1": "4601 Orchard Lake Road",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_4601_orchard_lake_road_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_4601_orchard_lake_road_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "cf31e102-45a4-5436-8275-dbf1b7573b59",
+    "location": {
+     "id": "6c1a4962-add5-5af3-88dc-22114da50f53",
+     "name": "Parks and Recreation",
+     "location_type": "physical",
+     "latitude": 42.557216,
+     "longitude": -83.373955,
+     "addresses": [
+      {
+       "id": "491eb311-2eac-5a77-a326-efa6107d57f4",
+       "address_1": "4640 Walnut Lake Road",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_4640_walnut_lake_road_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_4640_walnut_lake_road_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "ed1871da-e00f-5068-81f2-1529715ed746",
+    "location": {
+     "id": "5e7796ca-c6cb-5e7f-99a2-0fc3a584e2aa",
+     "name": "Healing Hearts",
+     "location_type": "physical",
+     "latitude": 42.638072,
+     "longitude": -83.294686,
+     "addresses": [
+      {
+       "id": "81ac0615-7be8-54b5-804e-6aa891d1ddeb",
+       "address_1": "47 W Huron St",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_47_w_huron_st_pontiac"
+     }
+    },
+    "phones": [
+     {
+      "id": "6d639518-444d-5493-8015-57c06154b6a1",
+      "number": "248-778-7161",
+      "description": "Host site"
+     }
+    ],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_47_w_huron_st_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "fd8baaff-2c68-593f-84a0-ace329e734ec",
+    "location": {
+     "id": "4e820996-c5ed-5052-8d99-ef581f818bfc",
+     "name": "Henry Ford Providence Novi Hospital ER",
+     "location_type": "physical",
+     "latitude": 42.486885,
+     "longitude": -83.518024,
+     "addresses": [
+      {
+       "id": "24f2fd14-d6cf-5dd4-b5e8-ca94cd34cecd",
+       "address_1": "47601 Grand River Ave",
+       "city": "Novi",
+       "state_province": "MI",
+       "postal_code": "48374",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_47601_grand_river_ave_novi"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_47601_grand_river_ave_novi",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "a3564bb8-a59a-50a1-9ef4-f07cc3194b9a",
+    "location": {
+     "id": "0062511f-16fa-5485-8a7c-5417052de676",
+     "name": "Henry Ford Providence Novi Hospital Main",
+     "location_type": "physical",
+     "latitude": 42.486885,
+     "longitude": -83.518024,
+     "addresses": [
+      {
+       "id": "2eef220a-d0d8-5c48-a257-5cf4fdd902ed",
+       "address_1": "47601 Grand River Ave",
+       "city": "Novi",
+       "state_province": "MI",
+       "postal_code": "48374",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_47601_grand_river_ave_novi_henry_ford_providenc"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_47601_grand_river_ave_novi_henry_ford_providenc",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "86a3e38c-e767-5e51-9347-6fc02b6c118a",
+    "location": {
+     "id": "8af9e6df-f6da-5597-85de-eab1e5504d58",
+     "name": "Powerhouse Gym West Bloomfield",
+     "location_type": "physical",
+     "latitude": 42.56442,
+     "longitude": -83.436881,
+     "addresses": [
+      {
+       "id": "a0f5b6ec-d338-5d1b-ac15-257f868c9693",
+       "address_1": "4805 Haggerty Rd",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_4805_haggerty_rd_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_4805_haggerty_rd_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "508d5134-338b-55c4-9d2b-0da016c24052",
+    "location": {
+     "id": "ce93eb1f-8178-524b-9849-56b6288600ef",
+     "name": "Birmingham Royal Oak Medical Group",
+     "location_type": "physical",
+     "latitude": 42.538184,
+     "longitude": -83.184225,
+     "addresses": [
+      {
+       "id": "d9ef4dd9-862e-5f15-aa6d-40588fd15b5b",
+       "address_1": "5130 Coolidge Hwy",
+       "city": "Royal Oak",
+       "state_province": "MI",
+       "postal_code": "48073",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_5130_coolidge_hwy_royal_oak"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_5130_coolidge_hwy_royal_oak",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "c1651bef-21e8-5aa9-8a3c-ab9662a31291",
+    "location": {
+     "id": "45f38dd2-5929-54c7-b64a-a0842e94f9c6",
+     "name": "West Bloomfield Fire Station No. 5 (Main Station)",
+     "location_type": "physical",
+     "latitude": 42.542869,
+     "longitude": -83.347927,
+     "addresses": [
+      {
+       "id": "2b6ca731-20ec-5c69-ab1f-b02e2e5b1903",
+       "address_1": "5425 West Maple",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48322",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_5425_west_maple_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_5425_west_maple_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b9d67881-5a55-509e-9699-8a0c8140b923",
+    "location": {
+     "id": "5e3526df-70b2-5993-bb50-b2996bc9156d",
+     "name": "Marathon Gas Station",
+     "location_type": "physical",
+     "latitude": 42.650311,
+     "longitude": -83.284813,
+     "addresses": [
+      {
+       "id": "13750f81-8a6a-50e4-a6f4-6e2c6d97462a",
+       "address_1": "547 Perry St",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_547_perry_st_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_547_perry_st_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "e6941a29-8132-502a-ac26-a1a851b89411",
+    "location": {
+     "id": "7500811f-e060-5720-b3e8-045afe75423e",
+     "name": "The Guidance Center",
+     "location_type": "physical",
+     "latitude": 42.264554,
+     "longitude": -83.146773,
+     "addresses": [
+      {
+       "id": "400f904c-2d31-5748-ad06-feb569450fab",
+       "address_1": "550 Eaton, Walter White Building",
+       "city": "River Rouge",
+       "state_province": "MI",
+       "postal_code": "48218",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_550_eaton_walter_white_building_river_rouge"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_550_eaton_walter_white_building_river_rouge",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "278e0ca7-5b59-58bf-97d3-28cd1506d762",
+    "location": {
+     "id": "3a06b2c8-e184-531e-8f59-d8a11350214f",
+     "name": "Oakland County Health Network",
+     "location_type": "physical",
+     "latitude": 42.598163,
+     "longitude": -83.173056,
+     "addresses": [
+      {
+       "id": "34b7177c-6c13-54e5-8550-dc8a6e8a8488",
+       "address_1": "5505 Corporate Drive",
+       "city": "Troy",
+       "state_province": "MI",
+       "postal_code": "48098",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_5505_corporate_drive_troy"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_5505_corporate_drive_troy",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "071ae585-0ff1-5e42-ae8e-3121aec8b8f4",
+    "location": {
+     "id": "d317fb40-0216-5900-bb5f-9ab6b3a3f0e3",
+     "name": "Temple Israel",
+     "location_type": "physical",
+     "latitude": 42.554772,
+     "longitude": -83.395211,
+     "addresses": [
+      {
+       "id": "0c768b5c-eb27-5137-81ab-dc11ad9eb441",
+       "address_1": "5725 Walnut Lake Rd",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48323",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_5725_walnut_lake_rd_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_5725_walnut_lake_rd_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "acc555a3-06c9-5d33-8266-1959ee5acbfc",
+    "location": {
+     "id": "212c9827-4337-5b05-9c1a-a7e43ee8e79c",
+     "name": "Fire Station #4",
+     "location_type": "physical",
+     "latitude": 42.607789,
+     "longitude": -83.399836,
+     "addresses": [
+      {
+       "id": "b83ccba7-6430-5135-b48a-e16326952421",
+       "address_1": "5842 Greer Lake Road",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48324",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_5842_greer_lake_road_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_5842_greer_lake_road_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "93f201ba-31c4-5b07-987c-2f20806fcb37",
+    "location": {
+     "id": "8f72621d-367e-53b3-b794-53cb34fa176c",
+     "name": "CNS- Pontiac",
+     "location_type": "physical",
+     "latitude": 42.646716,
+     "longitude": -83.325262,
+     "addresses": [
+      {
+       "id": "be435aa3-deb0-5062-a4f9-15a49cbdab95",
+       "address_1": "600 N Telegraph Ste 300",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48341",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_600_n_telegraph_ste_300_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_600_n_telegraph_ste_300_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "a9232cee-a14d-5d2c-a26b-79672afdd917",
+    "location": {
+     "id": "fd394e8b-e790-5dc7-bd72-9396ff4bda52",
+     "name": "Ferndale Foods",
+     "location_type": "physical",
+     "latitude": 42.460911,
+     "longitude": -83.142445,
+     "addresses": [
+      {
+       "id": "34c8abec-e312-584e-9512-bfac3d24f827",
+       "address_1": "600 West 9 Mile Rd",
+       "city": "Ferndale",
+       "state_province": "MI",
+       "postal_code": "48220",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_600_west_9_mile_rd_ferndale"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_600_west_9_mile_rd_ferndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "00513ed8-27cc-58a4-a392-cb143a671a06",
+    "location": {
+     "id": "21625b4a-3bf9-590d-a962-950c2738ca3c",
+     "name": "Serenity Rehab",
+     "location_type": "physical",
+     "latitude": 42.654708,
+     "longitude": -83.276302,
+     "addresses": [
+      {
+       "id": "6ebf350d-8afa-56b2-b4f8-9b761e27f36c",
+       "address_1": "673 Martin Luther Kind Jr Blvd N",
+       "city": "Pontiac",
+       "state_province": "MI",
+       "postal_code": "48342",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_673_martin_luther_kind_jr_blvd_n_pontiac"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_673_martin_luther_kind_jr_blvd_n_pontiac",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "b3bb9056-76af-5064-8725-81912e7f5d19",
+    "location": {
+     "id": "394fe53d-d636-5c8f-9765-14884562a0ef",
+     "name": "Henry Ford Maplegrove Center",
+     "location_type": "physical",
+     "latitude": 42.541519,
+     "longitude": -83.407923,
+     "addresses": [
+      {
+       "id": "5764b5d0-4cac-59e3-9776-4191f9734c6d",
+       "address_1": "6773 W Maple Rd",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48322",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_6773_w_maple_rd_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_6773_w_maple_rd_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "0e50aa35-b5bf-5a5d-b79d-9b56e4fdf4f7",
+    "location": {
+     "id": "27088148-50bd-5dae-80d3-72b6d9ca89b5",
+     "name": "Drake Sports Park",
+     "location_type": "physical",
+     "latitude": 42.537437,
+     "longitude": -83.397857,
+     "addresses": [
+      {
+       "id": "de49d83f-0ce6-5a31-8c90-92c82526d33f",
+       "address_1": "6801 Drake Road",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48322",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_6801_drake_road_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_6801_drake_road_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7c59a1eb-9aee-508d-9064-a7e45c24f618",
+    "location": {
+     "id": "79955cf2-9c6b-5477-992c-3aade4b057b5",
+     "name": "Fire Station #2",
+     "location_type": "physical",
+     "latitude": 42.540926,
+     "longitude": -83.415707,
+     "addresses": [
+      {
+       "id": "e3c63c5d-ac91-54a6-9041-c2096a8eceff",
+       "address_1": "6925 West Maple",
+       "city": "West Bloomfield",
+       "state_province": "MI",
+       "postal_code": "48322",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_6925_west_maple_west_bloomfield"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_6925_west_maple_west_bloomfield",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "7b2a461e-c9a6-54ad-be78-5fb7f90060f5",
+    "location": {
+     "id": "4f5756b2-56e3-5273-adce-a6a2d375ee5a",
+     "name": "Open Door Outreach",
+     "location_type": "physical",
+     "latitude": 42.61617,
+     "longitude": -83.426985,
+     "addresses": [
+      {
+       "id": "f70a8079-3241-5db5-b1a6-b1914d9f3901",
+       "address_1": "7170 Cooley Lake Rd",
+       "city": "Waterford",
+       "state_province": "MI",
+       "postal_code": "48327",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_7170_cooley_lake_rd_waterford"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_7170_cooley_lake_rd_waterford",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "4fddf48f-8bce-517f-bfe1-ccb4cafc8062",
+    "location": {
+     "id": "e6b2992d-2ae8-5cfe-a4e1-bbebbb81a84e",
+     "name": "West Acres Branch Library",
+     "location_type": "physical",
+     "latitude": 42.591528,
+     "longitude": -83.428331,
+     "addresses": [
+      {
+       "id": "66fa5bd2-4d79-514a-98f1-b0a19c1a80ce",
+       "address_1": "7321 Commerce Road",
+       "city": "West Bloomfield Township",
+       "state_province": "MI",
+       "postal_code": "48324",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_7321_commerce_road_west_bloomfield_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_7321_commerce_road_west_bloomfield_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "34371aaf-a763-56c7-8837-55dc90b1895b",
+    "location": {
+     "id": "07c14152-6f21-57e1-88af-c7c3f4f877a3",
+     "name": "Oakland County Sheriffs Office- Rochester Hills",
+     "location_type": "physical",
+     "latitude": 42.639507,
+     "longitude": -83.125638,
+     "addresses": [
+      {
+       "id": "2c02082b-bc06-5f4b-a3eb-8514503b533a",
+       "address_1": "750 Barclay Circle",
+       "city": "Rochester Hills",
+       "state_province": "MI",
+       "postal_code": "48307",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_750_barclay_circle_rochester_hills"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_750_barclay_circle_rochester_hills",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f8493cb5-99bb-5ef2-8c16-20467b3c5262",
+    "location": {
+     "id": "221f49bb-b60a-5d71-9845-96ad05641d4f",
+     "name": "White Lake Township Police",
+     "location_type": "physical",
+     "latitude": 42.649813,
+     "longitude": -83.511596,
+     "addresses": [
+      {
+       "id": "d4e6aaef-1d7a-5458-820d-593f08dc6852",
+       "address_1": "7525 Highland Road",
+       "city": "White Lake",
+       "state_province": "MI",
+       "postal_code": "48383",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_7525_highland_road_white_lake"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_7525_highland_road_white_lake",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "f1404ef0-de14-5abb-bdf0-3054f3b85c25",
+    "location": {
+     "id": "607a24b2-ce58-5013-822e-9560dc995263",
+     "name": "Orion Township Library",
+     "location_type": "physical",
+     "latitude": 42.771359,
+     "longitude": -83.282112,
+     "addresses": [
+      {
+       "id": "8f87572d-db13-5f84-a699-94b224473f8c",
+       "address_1": "825 Joslyn Rd",
+       "city": "Orion Township",
+       "state_province": "MI",
+       "postal_code": "48362",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_825_joslyn_rd_orion_township"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_825_joslyn_rd_orion_township",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   },
+   {
+    "id": "e85aa3f9-6083-5fc6-b571-795fc80587d4",
+    "location": {
+     "id": "b93fb1ca-e44f-59e4-b21d-a3b19adae113",
+     "name": "Tri-County Educational Center",
+     "location_type": "physical",
+     "latitude": 42.450344,
+     "longitude": -83.158985,
+     "addresses": [
+      {
+       "id": "e91ae8a3-5c59-525f-9260-3d869f20ddb1",
+       "address_1": "8711 Cloverdale Ave",
+       "city": "Ferndale",
+       "state_province": "MI",
+       "postal_code": "48220",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_8711_cloverdale_ave_ferndale"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_8711_cloverdale_ave_ferndale",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_oakland_narcan_alliance_of_coalitions_for_healthy_communities",
+   "category": "harm.narcan"
+  }
+ },
+ {
+  "id": "de1136a0-144e-5628-9512-9b8ffca7bc47",
+  "name": "Free Narcan",
+  "status": "active",
+  "description": "Free Narcan from a Save a Life box. It is in the lobby.",
+  "organization": {
+   "id": "22485dbd-7ae1-5c26-aba2-ead1624b05ce",
+   "name": "Families Against Narcotics",
+   "description": "Families Against Narcotics",
+   "x_detroit": {
+    "id": "org_families_against_narcotics"
+   }
+  },
+  "service_at_locations": [
+   {
+    "id": "fb209cdb-6346-538c-bcb5-8f1d081282e0",
+    "location": {
+     "id": "5206e246-cc2e-5450-93b8-7fba60c63f45",
+     "name": "Waterford Police Department",
+     "location_type": "physical",
+     "latitude": 42.669912,
+     "longitude": -83.388546,
+     "addresses": [
+      {
+       "id": "e07f4509-a41e-55aa-bd09-1cfe79704651",
+       "address_1": "5150 Civic Center Dr",
+       "city": "Waterford",
+       "state_province": "MI",
+       "postal_code": "48329",
+       "country": "US",
+       "address_type": "physical"
+      }
+     ],
+     "x_detroit": {
+      "id": "loc_ocn_5150_civic_center_dr_waterford"
+     }
+    },
+    "phones": [],
+    "schedules": [],
+    "x_detroit": {
+     "id": "sal_ocn_5150_civic_center_dr_waterford",
+     "status": "active",
+     "hsds_status": "active",
+     "availability": "unknown",
+     "flags": [
+      "walk_in"
+     ],
+     "checked_at_entry": null,
+     "entry_method": null,
+     "last_confirmed_at": null,
+     "last_confirm_method": null,
+     "reports": {
+      "closed_open": 0,
+      "closed_last_at": null,
+      "wrong_open": 0
+     },
+     "source": {
+      "type": "open_data",
+      "name": "Oakland County Narcan Locations map",
+      "url": "https://oakgov.maps.arcgis.com/apps/instant/sidebar/index.html?appid=96df1b2b41d84d1b8f6a7523e7eda677",
+      "last_edited": "2026-08-06"
+     },
+     "archived": null
+    }
+   }
+  ],
+  "x_detroit": {
+   "id": "svc_oakland_narcan_families_against_narcotics",
+   "category": "harm.narcan"
+  }
+ },
+ {
   "id": "42b43ec3-6666-5319-9491-2025070e5ac3",
   "name": "Oakland University police station",
   "status": "active",
