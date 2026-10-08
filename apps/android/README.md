@@ -18,6 +18,18 @@ Three Gradle modules:
 - **`app/`** — the screens, the signed-bundle loader and the report queue. Platform Android views (no Jetpack
   Compose, no AndroidX), minSdk 24. **Compiled, tested, built and run** for the first time on 2026-09-20.
 
+> **State on 2026-10-08: released.** Kyle: "go for the full release, use the current icon we use for iOS". The app
+> ships as a **signed 2,357,023-byte (2.25 MiB) release APK on GitHub Releases** (tag `android-v1.0.0`), built on
+> a laptop by `scripts/release-android.sh` — never in CI, so no workflow accepts Google's SDK licence and the APK
+> signing key never leaves Kyle's hands (DECISIONS 2026-10-08; docs/OPERATIONS.md "Releasing the Android app").
+> The APK packages the bundle residents are using, fetched from the live site and checked against its signature
+> (`pnpm fetch:bundle`), pins both release public keys, and was installed and run on the API 35 emulator: Home, a
+> category, Back through the new `OnBackInvokedDispatcher` path, the launcher icon. What changed for it: the
+> launcher icon is the iPhone mark as vector drawables (adaptive + monochrome + a flat one for Android 7),
+> `versionName` 1.0.0, a signing config read from four environment variables, Back decided in one method
+> (`MainActivity.handleBack`), and one stale test (the transit hub count, 4 → 5, the iPhone test already said 5).
+> Still true: **nothing has run on a real phone or below Android 15**, and the release notes say so.
+>
 > **State on 2026-09-20 (second entry).** Kyle, away at work, asked in chat that the Android SDK be installed and
 > the SDK licence accepted on his behalf, naming exactly which packages that covered. It was done:
 > `brew install --cask android-commandlinetools` (no `sudo`, no password), and **one** licence accepted,
@@ -194,8 +206,8 @@ Three Gradle modules:
    `gradle/wrapper/gradle-wrapper.properties` pins Gradle 8.11.1. All four have now actually been downloaded and
    exercised together, AGP included, and they work. Lint notes that AGP 9.4.1 exists; nothing here needs it, and
    the repository rule is that a new version must be a day old.
-3. **Decide about the release blockers** at the bottom of this file. The APK that exists is a debug build; a store
-   release still needs two real pinned keys, an icon, a signing config and the Play data-safety form.
+3. **The release blockers** at the bottom of this file: the keys, the icon, the signing config and the back handler
+   are done (2026-10-08); a phone run below Android 15 and the Play data-safety form are not.
 
 ## Building and testing
 
@@ -1470,19 +1482,23 @@ Not built:
 
 1. ~~The `:app` half has never been compiled.~~ Done on 2026-09-20: it compiles, its tests pass, it assembles and
    it runs. See the two sections above for the five errors that first compile and first run found.
-2. Two real pinned keys and a real `bundleBase` (the build refuses a release without them). Checked again with
+2. ~~Two real pinned keys and a real `bundleBase`.~~ Done 2026-10-08: `scripts/release-android.sh` passes the
+   repository variable `BUNDLE_PUBLIC_KEYS` and `https://313help.com/data/bundle/v1/`, and checks both are in the
+   APK it publishes. The gate itself is unchanged and still refuses a release without them. Checked again with
    the SDK present: `:app:assembleRelease` stops at `checkReleaseKeys` and names what is missing. Since
    2026-09-20 the gate also refuses a public key of order 1, 2, 4 or 8 — under such a key an all-zero signature
    verifies any message — reading the eight points out of `Ed25519.kt` so the gate and the runtime check cannot
    disagree (see HIGH 2 above).
-3. No app icon and no launch artwork: `res/drawable/ic_launcher_*.xml` is a placeholder mark. Lint also asks for
-   a monochrome icon, and `ic_launcher_round` is unused.
+3. ~~No app icon.~~ Done 2026-10-08: the iPhone mark (`apps/ios/Scripts/make-icon.swift`) redrawn as vector
+   drawables — adaptive foreground, background and monochrome, plus a flat full-bleed `mipmap/ic_launcher` for
+   launchers before Android 8. The unused `ic_launcher_round` is gone.
 4. **Nothing has run on a real phone, and nothing has run below Android 15.** The emulator run on 2026-09-20 was
    API 35 only. This is the biggest remaining gap and it is not a formality: the worst bug found that day
    (`stack.last()` binding to an API 35 method) would have crashed every phone from minSdk 24 to Android 14 and
    would not have shown up on the emulator that was used. A device or emulator at API 24 and at API 30 should be
-   run before a release. There are still no instrumented tests, no signing config, no upload key, and no Play
-   Store listing or data-safety form. The data-safety answers are "no data collected, no data shared"; docs/08
+   run before a release. ~~No signing config, no upload key~~ (done 2026-10-08: a signing config read from four
+   `HELP313_*` environment variables, the keystore Kyle's and outside the repository). There are still no
+   instrumented tests and no Play Store listing or data-safety form. The data-safety answers are "no data collected, no data shared"; docs/08
    has the wording.
 5. ~~No CI job.~~ Done on 2026-09-20: `.github/workflows/ci.yml` has an `android-query` job (ubuntu-24.04,
    `actions/setup-java@v5` temurin 17, then `./gradlew :query:test :core:test` and `./gradlew :query:runFixtures`
@@ -1493,9 +1509,9 @@ Not built:
    be accepting a licence on this repository's behalf. The screens are compiled on a laptop that has the SDK.
    One gap, unchanged: the job builds no data bundle, so `:core`'s real-bundle assertion prints "skipping" there.
    It does run locally after `pnpm build:bundle`, and the RFC 8032 vectors cover the signature code in CI.
-6. `MainActivity.onBackPressed` is the deprecated form. It still works at `targetSdk` 35 — it was used on the
-   emulator and worked — but it should move to `OnBackInvokedCallback` before a store release. It is the only
-   warning the Kotlin compiler emits.
+6. ~~`MainActivity.onBackPressed` is the deprecated form.~~ Done 2026-10-08: `handleBack()` decides, reached by an
+   `OnBackInvokedCallback` on Android 13+ (`enableOnBackInvokedCallback` in the manifest) and by `onBackPressed`
+   below; checked on the API 35 emulator (Food → Back → Home → Back → gone).
 
 9. **Two things from the 2026-09-20 reviews are verified by reading, not by running**: the accessibility heading
    (LOW 11) and the text fields' autofill and IME flags (MEDIUM 9). `uiautomator dump` serialises none of them.

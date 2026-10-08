@@ -203,6 +203,13 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_Help313)
         L.load(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+: the system no longer calls onBackPressed once the manifest opts in. Same rules, one
+            // place (handleBack); finishing is what super.onBackPressed does on the older path.
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT
+            ) { if (!handleBack()) finish() }
+        }
 
         root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
@@ -388,32 +395,43 @@ class MainActivity : Activity() {
     /** The screen showing now, for the rules that depend on it (FLAG_SECURE, "Leave this page fast"). */
     fun current(): Route = if (stack.isEmpty()) Route.Home else stack[stack.size - 1]
 
-    override fun onBackPressed() {
+    /**
+     * Back, decided in one place. Android 13 and later call [handleBack] through the OnBackInvokedDispatcher
+     * registered in [onCreate] (the manifest opts in with enableOnBackInvokedCallback); older phones arrive by the
+     * deprecated [onBackPressed]. Both doors run the same rules, so there is one behaviour to test. Returns false
+     * only when nothing in the app is left to close, and the activity should finish.
+     */
+    fun handleBack(): Boolean {
         // A card open over the map is the innermost thing on screen, so Back closes that first — one Back, one
         // thing, the same rule Escape follows inside the map itself (MapView.onKeyDown).
         if (current() is Route.Map && locateCard) {
             // Back is "Not now", the same answer Escape gives on the web.
             closeLocateCard()
-            return
+            return true
         }
         // An area page opened in place on the Areas tab is the innermost thing on screen, and it is not a pushed
         // screen: Back closes it and leaves the map whole again, exactly as the strip's own Back button does
         // (Kyle, 2026-09-22; AreaScreens.onBack).
         if (current() is Route.Hoods && AreaScreens.onBack()) {
             render()
-            return
+            return true
         }
         if (current() is Route.Map && MapModel.selection != null) {
             MapModel.selection = null
             render()
-            return
+            return true
         }
         if (stack.size > 1) {
             stack.removeAt(stack.size - 1)
             render()
-        } else {
-            super.onBackPressed()
+            return true
         }
+        return false
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
+    override fun onBackPressed() {
+        if (!handleBack()) super.onBackPressed()
     }
 
     fun render() {

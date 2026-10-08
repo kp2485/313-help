@@ -81,7 +81,8 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
 - **WCAG 2.2 AA audit: 44 pass, 27 found and fixed, 0 open** ([audit](docs/ACCESSIBILITY-AUDIT-2026-09-20.md),
   [test script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
 - **Three clients, one spec.** A web PWA (vanilla TypeScript), an iPhone app (SwiftUI) and an Android app (Kotlin,
-  **zero third-party libraries in the APK**). The query rules — open now, next times, badges, ranking, walking
+  **zero third-party libraries in the APK**, a 2.3 MB signed APK on
+  [GitHub Releases](https://github.com/kp2485/313-help/releases) that works offline from first open). The query rules — open now, next times, badges, ranking, walking
   and trip plans — are written three times against [one spec](schema/query-spec.md) and **248 shared fixture
   cases**; the web and iPhone pass every case, and Android's are run by CI.
 - **Tested and small.** 1,428 tests in `pnpm test`, 379 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
@@ -156,7 +157,7 @@ More: [iPhone](apps/ios/README.md) · [Android](apps/android/README.md) · [desi
   whose listings cite their own website, then every three months.
 - Native-speaker review of Spanish, Arabic and Bengali, crisis screens first; testing with people who use screen
   readers, switches and large text ([script](docs/ACCESSIBILITY-TEST-SCRIPT.md)).
-- App Store and Google Play releases.
+- An App Store release; the Android APK on a phone at Android 7 and 11, then Google Play.
 
 **Next**
 - Page watchers that open a steward task the day an owner's page changes, and same-day signals — "out of food
