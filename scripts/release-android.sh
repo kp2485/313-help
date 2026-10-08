@@ -32,7 +32,7 @@ TAG="android-v$VERSION"
 [[ -n "$VERSION" && -n "$CODE" ]] || { echo "release-android: could not read versionName/versionCode"; exit 2; }
 
 if [[ $DRY == 0 ]]; then
-  [[ -z "$(git status --porcelain)" ]] || { echo "release-android: the working tree is not clean; a release is built from a commit."; exit 2; }
+  [[ -z "$(git status --porcelain --untracked-files=no)" ]] || { echo "release-android: tracked files are modified; a release is built from a commit."; exit 2; }
   [[ "$(git rev-parse --abbrev-ref HEAD)" == "main" ]] || { echo "release-android: release from main, so the tag points at what residents got."; exit 2; }
   ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null || { echo "release-android: tag $TAG exists; bump versionName and versionCode first."; exit 2; }
   ! gh release view "$TAG" >/dev/null 2>&1 || { echo "release-android: release $TAG already exists."; exit 2; }
