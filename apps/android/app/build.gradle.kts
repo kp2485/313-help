@@ -165,8 +165,8 @@ android {
     }
 
     // -----------------------------------------------------------------------------------------------------------
-    // APK signing (2026-10-08). The release APK is signed on a laptop with a keystore that lives OUTSIDE this
-    // repository (docs/OPERATIONS.md says where), named by four environment variables. None of them has a default:
+    // APK signing (2026-10-08). The release APK is signed on a laptop with a keystore that is never committed:
+    // it lives in the git-ignored .keys/ folder (docs/OPERATIONS.md), named by four environment variables. None of them has a default:
     // with any of them missing the release build produces app-release-unsigned.apk, which no phone will install
     // and which scripts/release-android.sh refuses to publish. Nothing about the keystore is ever committed: not
     // its path, not its password, not its alias. This is the key Android ties updates to, so losing it means every

@@ -1497,7 +1497,7 @@ Not built:
    (`stack.last()` binding to an API 35 method) would have crashed every phone from minSdk 24 to Android 14 and
    would not have shown up on the emulator that was used. A device or emulator at API 24 and at API 30 should be
    run before a release. ~~No signing config, no upload key~~ (done 2026-10-08: a signing config read from four
-   `HELP313_*` environment variables, the keystore Kyle's and outside the repository). There are still no
+   `HELP313_*` environment variables, the keystore Kyle's, in the git-ignored `.keys/`). There are still no
    instrumented tests and no Play Store listing or data-safety form. The data-safety answers are "no data collected, no data shared"; docs/08
    has the wording.
 5. ~~No CI job.~~ Done on 2026-09-20: `.github/workflows/ci.yml` has an `android-query` job (ubuntu-24.04,
