@@ -192,7 +192,7 @@ The Cloudflare free tier covers all of it at expected traffic.
 |---|---|---|
 | `BUNDLE_SIGNING_KEY` | GitHub Actions | Ed25519 private key that signs `index.json` |
 | spare signing key | offline only | Second pinned key, for rotation |
-| APK signing keystore | Kyle's laptop + password manager, never Actions | Signs every Android release; Android ties updates to it (DECISIONS 2026-10-08) |
+| APK signing keystore | `.keys/android-release.{jks,env}` on Kyle's laptop (git-ignored) + password manager, never Actions | Signs every Android release; Android ties updates to it (DECISIONS 2026-10-08) |
 | `ACCESS_CLIENT_ID` / `ACCESS_CLIENT_SECRET` | GitHub Actions | Access service token the pipeline uses to read report counts, sync ids and send the nightly re-check's tasks |
 | `CLOUDFLARE_API_TOKEN` | GitHub Actions | Deploys Pages (the Worker is deployed by hand with `wrangler deploy`) |
 | `CLOUDFLARE_ACCOUNT_ID` | GitHub Actions | Which Cloudflare account to deploy to |
@@ -207,18 +207,22 @@ licence for this repository, and the APK signing key never enters Actions). The 
 residents will use 313 Help; the APK is for people who want an app that works offline from first open.
 
 **Once, by Kyle: the APK signing keystore.** It is the key Android ties every update to; losing it means no
-installed copy can ever update, so it lives outside the repository and in a password manager, never in Actions.
+installed copy can ever update. It lives in **`.keys/`**, the git-ignored folder that already holds the dev
+bundle key (Kyle, 2026-10-08: "write the key into a git ignored file"), with a copy in a password manager, and
+never in Actions. Generated once, on 2026-10-08:
 
 ```sh
-mkdir -p ~/.313help && chmod 700 ~/.313help
-keytool -genkeypair -v -keystore ~/.313help/android-release.jks -storetype PKCS12 -alias help313 \
+mkdir -p .keys && chmod 700 .keys
+keytool -genkeypair -v -keystore .keys/android-release.jks -storetype PKCS12 -alias help313 \
   -keyalg RSA -keysize 4096 -validity 10950 -dname "CN=313 Help, O=313 Help, L=Detroit, ST=Michigan, C=US"
 ```
 
-Then put the four values in a file the shell can `source` (mode 600, backed up with the keystore):
-`HELP313_KEYSTORE=~/.313help/android-release.jks`, `HELP313_KEYSTORE_PASSWORD`, `HELP313_KEY_ALIAS=help313`,
-`HELP313_KEY_PASSWORD`. Without all four, `:app:assembleRelease` produces `app-release-unsigned.apk` and the
-release script stops.
+The four values sit beside it in `.keys/android-release.env` (mode 600, backed up with the keystore):
+`HELP313_KEYSTORE=<repo>/.keys/android-release.jks`, `HELP313_KEYSTORE_PASSWORD`, `HELP313_KEY_ALIAS=help313`,
+`HELP313_KEY_PASSWORD`. Load them with `set -a; source .keys/android-release.env; set +a`. Without all four,
+`:app:assembleRelease` produces `app-release-unsigned.apk` and the release script stops. `git check-ignore
+.keys/android-release.jks` must answer before anything is written there; a second clone has no `.keys/` and
+cannot release until the two files are copied in from the password manager.
 
 **Each release**, from a clean checkout of `main`:
 
