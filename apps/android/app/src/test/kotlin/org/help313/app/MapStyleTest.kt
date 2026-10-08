@@ -661,13 +661,13 @@ class NetFileTest {
         val extras = NetFileDecoder.transitExtras(file.readBytes())
         assertEquals(setOf("ddot_routes", "ddot_stops", "smart_routes", "smart_stops", "qline", "people_mover"), extras.netFiles.keys)
         assertEquals("map/transit/qline.net.json", extras.netFiles["qline"])
-        assertEquals(4, extras.hubs.size)
+        assertEquals(5, extras.hubs.size)  // Dearborn, Congress, Grand Circus Park, Detroit, Pontiac (the iPhone test agrees)
         val gcp = extras.hubs.first { it.name == "Grand Circus Park" }
         assertEquals(listOf("people_mover", "qline"), gcp.layers)
         near(42.3364, MapProjection.lat(gcp.y), by = 0.002)
         near(-83.0507, MapProjection.lon(gcp.x), by = 0.002)
         val origins = Json.parse(file.readBytes())["hubs"]!!.arr.map { it["origin"]?.arr?.size }
-        assertEquals("every hub says what its numbers count from", listOf(2, 2, 2, 2), origins)
+        assertEquals("every hub says what its numbers count from", listOf(2, 2, 2, 2, 2), origins)
         assertFalse("a hub is drawn when two or more of its layers are on", gcp.shows(listOf("go:qline")))
         assertTrue(gcp.shows(listOf("go:qline", "go:people_mover")))
         // Every network file the layer list names is in the signed index, with a checksum: that is the only way in.

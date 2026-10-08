@@ -192,11 +192,50 @@ The Cloudflare free tier covers all of it at expected traffic.
 |---|---|---|
 | `BUNDLE_SIGNING_KEY` | GitHub Actions | Ed25519 private key that signs `index.json` |
 | spare signing key | offline only | Second pinned key, for rotation |
+| APK signing keystore | Kyle's laptop + password manager, never Actions | Signs every Android release; Android ties updates to it (DECISIONS 2026-10-08) |
 | `ACCESS_CLIENT_ID` / `ACCESS_CLIENT_SECRET` | GitHub Actions | Access service token the pipeline uses to read report counts, sync ids and send the nightly re-check's tasks |
 | `CLOUDFLARE_API_TOKEN` | GitHub Actions | Deploys Pages (the Worker is deployed by hand with `wrangler deploy`) |
 | `CLOUDFLARE_ACCOUNT_ID` | GitHub Actions | Which Cloudflare account to deploy to |
 
 Repository **variables** (not secret): `PUBLISH_ENABLED` (`true` turns the nightly publish on), `BUNDLE_PUBLIC_KEYS` (the two pinned public keys), `REPORTS_API` (the API's address), `PAGES_PROJECT` (the Cloudflare Pages project name).
+
+## Releasing the Android app
+
+Since 2026-10-08 the Android app is published as a signed APK on **GitHub Releases** (tag `android-v<versionName>`),
+built on a laptop that has the Android SDK, never in CI (DECISIONS 2026-10-08: no workflow accepts Google's SDK
+licence for this repository, and the APK signing key never enters Actions). The PWA remains the way most Android
+residents will use 313 Help; the APK is for people who want an app that works offline from first open.
+
+**Once, by Kyle: the APK signing keystore.** It is the key Android ties every update to; losing it means no
+installed copy can ever update, so it lives outside the repository and in a password manager, never in Actions.
+
+```sh
+mkdir -p ~/.313help && chmod 700 ~/.313help
+keytool -genkeypair -v -keystore ~/.313help/android-release.jks -storetype PKCS12 -alias help313 \
+  -keyalg RSA -keysize 4096 -validity 10950 -dname "CN=313 Help, O=313 Help, L=Detroit, ST=Michigan, C=US"
+```
+
+Then put the four values in a file the shell can `source` (mode 600, backed up with the keystore):
+`HELP313_KEYSTORE=~/.313help/android-release.jks`, `HELP313_KEYSTORE_PASSWORD`, `HELP313_KEY_ALIAS=help313`,
+`HELP313_KEY_PASSWORD`. Without all four, `:app:assembleRelease` produces `app-release-unsigned.apk` and the
+release script stops.
+
+**Each release**, from a clean checkout of `main`:
+
+1. Bump `versionCode` (by one; Android refuses a smaller number) and `versionName` in
+   `apps/android/app/build.gradle.kts`, and update the user agent test in `GuardsTest.kt` if it names the version.
+   Merge that.
+2. `scripts/release-android.sh --dry-run`: fetches the bundle residents are using from the live site
+   (`pnpm fetch:bundle`: release-signed by a pinned key, every file checked against the signed index), builds the
+   release APK with both public keys pinned, verifies the signature with `apksigner`, checks the keys, the bundle
+   home and the snapshot are inside the APK, and prints the release notes.
+3. Install that APK on the emulator (`adb install -r apps/android/app/build/outputs/release/313help-<v>.apk`) and on
+   a phone when one is at hand; open Home, a category, a listing, Urgent help, Back.
+4. `scripts/release-android.sh`: tags `android-v<versionName>`, pushes the tag, and creates the GitHub Release with
+   the APK, its `.sha256` and the notes. `--latest=false`, so the repository's "latest release" is never an APK.
+
+The release notes say what the APK holds (the bundle version), how to check the hash, and exactly what it was
+tested on. **Never write that it ran on a phone, or on a version below Android 15, until it has** (CLAUDE.md).
 
 ## What the write API stores, completely
 

@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A placeholder mark: the app has no artwork yet (see README.md, "Release blockers"). -->
+<!--
+  The app's mark, the same artwork as the iPhone icon and the web's icon.svg: a white pin with a green cross cut
+  out of it. The geometry is apps/ios/Scripts/make-icon.swift's, on its 512 grid, scaled into the adaptive icon's
+  108dp canvas (108 / 512). The pin spans y 116–396 of 512, which is 24–84 of 108: inside the 66dp safe circle, so
+  no launcher mask clips it. The circle's two tangent-ish points at y=286 (x=168 and x=344) are where the triangle
+  begins, so the pin is one outline: an arc over the top, then the point. The cross is a second sub-path wound the
+  other way, so with the default non-zero fill it is a hole, and the same drawable serves as the monochrome icon.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M34,36h8v14h24V36h8v36h-8V58H42v14h-8z" />
+    <group android:scaleX="0.2109375" android:scaleY="0.2109375">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M168,286 A108,108 0 1 1 344,286 L256,396 Z
+                M238,180 L238,218 L200,218 L200,254 L238,254 L238,292 L274,292 L274,254 L312,254 L312,218 L274,218 L274,180 Z" />
+    </group>
 </vector>

@@ -139,8 +139,10 @@ android {
         // no java.time, no AndroidX, no Play Services. See README.md for what minSdk 21 would cost.
         minSdk = 24
         targetSdk = 35
+        // versionCode counts up by one on every GitHub Release (docs/OPERATIONS.md, "Releasing the Android app");
+        // Android refuses to update an installed app to a smaller number.
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
         // No test runner and no locale filter: the words come from the assets, and more languages (Arabic
         // among them) are coming, so nothing here should have to change to add one.
     }
@@ -160,6 +162,38 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // APK signing (2026-10-08). The release APK is signed on a laptop with a keystore that lives OUTSIDE this
+    // repository (docs/OPERATIONS.md says where), named by four environment variables. None of them has a default:
+    // with any of them missing the release build produces app-release-unsigned.apk, which no phone will install
+    // and which scripts/release-android.sh refuses to publish. Nothing about the keystore is ever committed: not
+    // its path, not its password, not its alias. This is the key Android ties updates to, so losing it means every
+    // installed copy stops updating; the private half of it never enters CI, which is one reason the release is
+    // built on a laptop (DECISIONS 2026-10-08).
+    // -----------------------------------------------------------------------------------------------------------
+    val keystoreEnv = mapOf(
+        "store" to providers.environmentVariable("HELP313_KEYSTORE").orNull,
+        "storePass" to providers.environmentVariable("HELP313_KEYSTORE_PASSWORD").orNull,
+        "alias" to providers.environmentVariable("HELP313_KEY_ALIAS").orNull,
+        "keyPass" to providers.environmentVariable("HELP313_KEY_PASSWORD").orNull,
+    )
+    val hasKeystore = keystoreEnv.values.all { !it.isNullOrBlank() }
+    if (hasKeystore) {
+        signingConfigs {
+            create("release") {
+                storeFile = File(keystoreEnv["store"]!!)
+                storePassword = keystoreEnv["storePass"]
+                keyAlias = keystoreEnv["alias"]
+                keyPassword = keystoreEnv["keyPass"]
+                // v1 is left off on purpose: minSdk 24 verifies v2, and a v1 (JAR) signature is the one that can be
+                // stripped and re-signed without the APK noticing.
+                enableV1Signing = false
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
     }
 
     buildTypes {
@@ -192,6 +226,7 @@ android {
             buildConfigField("boolean", "IS_RELEASE", "false")
         }
         release {
+            if (hasKeystore) signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

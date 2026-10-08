@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Launchers before Android 8 use this flat version. Placeholder artwork; see README.md. -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_launcher_background" />
-    <item android:drawable="@drawable/ic_launcher_foreground" />
-</layer-list>
+<!-- Launchers before Android 8 use this flat version: the whole iPhone icon, square and full-bleed, on a 48dp
+     canvas (48 / 512 of the drawing grid in apps/ios/Scripts/make-icon.swift). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp" android:height="48dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+    <path android:fillColor="#0B3D2E" android:pathData="M0,0h512v512h-512z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M168,286 A108,108 0 1 1 344,286 L256,396 Z
+            M238,180 L238,218 L200,218 L200,254 L238,254 L238,292 L274,292 L274,254 L312,254 L312,218 L274,218 L274,180 Z" />
+</vector>

@@ -66,6 +66,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:usesCleartextTraffic="false"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Help313">
 
         <!-- Arabic is written right to left: supportsRtl is on and no layout in this app uses left or right,

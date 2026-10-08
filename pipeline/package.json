@@ -14,6 +14,7 @@
     "tasks:sync": "tsx src/tasks-sync.ts",
     "preflight": "tsx src/preflight.ts",
     "smoke": "tsx src/smoke.ts",
+    "fetch:bundle": "tsx src/fetch-bundle.ts",
     "keys:generate": "tsx src/keys.ts",
     "check:emergency": "tsx src/check-emergency.ts",
     "ingest:greenway": "tsx src/ingest-greenway.ts",
