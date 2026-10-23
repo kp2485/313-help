@@ -51,7 +51,12 @@ export const TRANSIT: { checked: string; sections: Section[]; bike: { body: stri
         { label: 'SMART trip planner', url: 'https://www.smartbus.org/Schedules/Trip-Planner', system: 'smart' },
       ] },
   ],
-  bike: { body: 'MoGo bike share has a $5 a year pass for people who get food assistance, Medicaid, or other state benefits. You sign up with MoGo, not here.', label: 'MoGo Access Pass', url: 'https://mogodetroit.org/pricing/' },
+  // MoGo paused on 2026-10-22 ("closed for the season ... while we work with the City of Detroit on an enhanced
+  // system"): its own page says so and its own feed reports no station renting (pipeline/src/check-mogo.ts). Until
+  // it is back, this says that instead of selling the $5 Access Pass nobody can use. When the feed says `open`
+  // again, restore: "MoGo bike share has a $5 a year pass for people who get food assistance, Medicaid, or other
+  // state benefits. You sign up with MoGo, not here." → "MoGo Access Pass", https://mogodetroit.org/pricing/
+  bike: { body: 'MoGo bike share is paused. MoGo says it is closed for the season while it works with the City on a new system. No bikes can be rented right now.', label: 'What MoGo says', url: 'https://mogodetroit.org/' },
 };
 
 /** The address the Map tab already gives for an agency's trip planner, by the `system` a `.net.json` file names. */

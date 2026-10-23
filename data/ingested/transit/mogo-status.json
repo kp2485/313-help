@@ -1,0 +1,7 @@
+{
+ "fetched_at": "2026-10-23",
+ "feed": "https://detroit.publicbikesystem.net/customer/gbfs/v3.0/station_status",
+ "state": "paused",
+ "stations": 81,
+ "renting": 0
+}

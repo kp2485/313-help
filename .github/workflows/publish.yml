@@ -90,6 +90,9 @@ jobs:
           pnpm --filter @313help/pipeline ingest:greenway
           pnpm --filter @313help/pipeline ingest:city parks
           pnpm --filter @313help/pipeline ingest:city zips
+          # Does MoGo's own feed say the bikes can be rented? One small file; a change of state opens the pull
+          # request below (2026-10-23: MoGo paused and the City's station layer, read monthly, could not say so).
+          pnpm --filter @313help/pipeline check:mogo
           # Monthly: the street map, the neighborhood outlines and, since 2026-09-23, the transport layers (Kyle). Every
           # change still arrives as the pull request below; nothing here publishes on its own.
           if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; pnpm ingest:transit; fi

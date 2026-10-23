@@ -693,7 +693,7 @@
   "layer.go.smart_stops": "Paradas de autobús SMART",
   "layer.go.qline": "Tranvía QLINE",
   "layer.go.people_mover": "People Mover",
-  "layer.go.mogo": "Estaciones de bicicletas MoGo",
+  "layer.go.mogo": "Estaciones de bicicletas MoGo (en pausa)",
   "layer.go.bike_lanes": "Carriles para bicicletas",
   "layer.go.stations": "Estaciones de tren y autobús",
   "layer.go.intercity_bus": "Paradas de autobús interurbano",

@@ -1,1 +1,16 @@
-[]
+[
+ {
+  "id": "alert_mogo_bike_share_is_paused_20261023t1145",
+  "kind": "notice",
+  "category": "transit",
+  "title": "MoGo bike share is paused",
+  "body_plain": "MoGo says it is closed for the season while it works with the City on a new system. No bikes can be rented right now. The MoGo stations on the map are not in use.",
+  "starts_at": "2026-10-23T15:45:00Z",
+  "ends_at": "2026-10-30T15:45:00Z",
+  "source": {
+   "type": "press_release",
+   "url": "https://mogodetroit.org/"
+  },
+  "status": "published"
+ }
+]
