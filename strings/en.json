@@ -693,7 +693,7 @@
   "layer.go.smart_stops": "SMART bus stops",
   "layer.go.qline": "QLINE streetcar",
   "layer.go.people_mover": "People Mover",
-  "layer.go.mogo": "MoGo bike stations",
+  "layer.go.mogo": "MoGo bike stations (paused)",
   "layer.go.bike_lanes": "Bike lanes",
   "layer.go.stations": "Train and bus stations",
   "layer.go.intercity_bus": "Intercity bus stops",

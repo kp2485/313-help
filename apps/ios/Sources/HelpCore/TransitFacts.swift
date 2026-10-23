@@ -65,8 +65,9 @@ public struct TransitFacts: Sendable {
                 Link(label: "SMART trip planner", url: "https://www.smartbus.org/Schedules/Trip-Planner", system: "smart"),
             ]),
         ],
-        bike: ("MoGo bike share has a $5 a year pass for people who get food assistance, Medicaid, or other state benefits. You sign up with MoGo, not here.",
-               Link(label: "MoGo Access Pass", url: "https://mogodetroit.org/pricing/")))
+        // MoGo paused on 2026-10-22; the same words as apps/web/src/transit.ts, which says when to put the Access Pass back.
+        bike: ("MoGo bike share is paused. MoGo says it is closed for the season while it works with the City on a new system. No bikes can be rented right now.",
+               Link(label: "What MoGo says", url: "https://mogodetroit.org/")))
 
     /// The owner's own trip planner for a network (`system` in a `.net.json` file) — **the same link** the
     /// "Getting around" section carries, so there is one source of truth. `nil` when we carry none, and the

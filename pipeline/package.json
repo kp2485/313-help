@@ -16,6 +16,7 @@
     "smoke": "tsx src/smoke.ts",
     "fetch:bundle": "tsx src/fetch-bundle.ts",
     "keys:generate": "tsx src/keys.ts",
+    "check:mogo": "tsx src/check-mogo.ts",
     "check:emergency": "tsx src/check-emergency.ts",
     "ingest:greenway": "tsx src/ingest-greenway.ts",
     "ingest:city": "tsx src/ingest-city.ts",

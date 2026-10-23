@@ -693,7 +693,7 @@
   "layer.go.smart_stops": "مواقف حافلات SMART",
   "layer.go.qline": "ترام QLINE",
   "layer.go.people_mover": "قطار People Mover",
-  "layer.go.mogo": "محطات دراجات MoGo",
+  "layer.go.mogo": "محطات دراجات MoGo (متوقفة مؤقتًا)",
   "layer.go.bike_lanes": "مسارات الدراجات",
   "layer.go.stations": "محطات القطار والحافلات",
   "layer.go.intercity_bus": "مواقف الحافلات بين المدن",

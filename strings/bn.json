@@ -693,7 +693,7 @@
   "layer.go.smart_stops": "SMART বাস স্টপ",
   "layer.go.qline": "QLINE স্ট্রিটকার",
   "layer.go.people_mover": "People Mover",
-  "layer.go.mogo": "MoGo সাইকেল স্টেশন",
+  "layer.go.mogo": "MoGo সাইকেল স্টেশন (সাময়িকভাবে বন্ধ)",
   "layer.go.bike_lanes": "সাইকেল লেন",
   "layer.go.stations": "ট্রেন আর বাস স্টেশন",
   "layer.go.intercity_bus": "শহরের বাইরে যাওয়া বাসের স্টপ",

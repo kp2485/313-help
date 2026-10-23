@@ -85,7 +85,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   [GitHub Releases](https://github.com/kp2485/313-help/releases) that works offline from first open). The query rules — open now, next times, badges, ranking, walking
   and trip plans — are written three times against [one spec](schema/query-spec.md) and **248 shared fixture
   cases**; the web and iPhone pass every case, and Android's are run by CI.
-- **Tested and small.** 1,428 tests in `pnpm test`, 379 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
+- **Tested and small.** 1,434 tests in `pnpm test`, 379 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
   (26 KB) loads only if chosen; the bundle is 6.8 MB for the whole three-county area.
 
