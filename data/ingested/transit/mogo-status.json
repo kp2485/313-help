@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-24",
+ "fetched_at": "2026-10-25",
  "feed": "https://detroit.publicbikesystem.net/customer/gbfs/v3.0/station_status",
  "state": "paused",
  "stations": 81,
