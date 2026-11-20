@@ -25,7 +25,9 @@
 name: publish
 on:
   schedule:
-    - cron: '0 8 * * *'          # 04:00 in Detroit (03:00 in winter)
+    # Off the hour on purpose: GitHub starts top-of-the-hour schedules late under load, and through October and
+    # November 2026 this job, asked for at 08:00 UTC, started between 12:20 and 18:00.
+    - cron: '23 7 * * *'         # 03:23 in Detroit (02:23 in winter)
   workflow_dispatch:
 permissions:
   contents: write
@@ -83,6 +85,13 @@ jobs:
           git push
 
       # 4. Everything else from open data is held for a person. The street map changes rarely: monthly.
+      #    Each file is judged by itself (scripts/settle-ingest.sh, DECISIONS 2026-11-20): one that only moved its
+      #    fetch dates goes to main; anything else waits in ONE pull request, on ingest/pending, rebuilt each night.
+      - name: Carry what is already waiting for review
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/settle-ingest.sh overlay
       - name: Re-read open data
         continue-on-error: true
         run: |
@@ -90,45 +99,16 @@ jobs:
           pnpm --filter @313help/pipeline ingest:greenway
           pnpm --filter @313help/pipeline ingest:city parks
           pnpm --filter @313help/pipeline ingest:city zips
-          # Does MoGo's own feed say the bikes can be rented? One small file; a change of state opens the pull
+          # Does MoGo's own feed say the bikes can be rented? One small file; a change of state goes to the pull
           # request below (2026-10-23: MoGo paused and the City's station layer, read monthly, could not say so).
           pnpm --filter @313help/pipeline check:mogo
           # Monthly: the street map, the neighborhood outlines and, since 2026-09-23, the transport layers (Kyle). Every
           # change still arrives as the pull request below; nothing here publishes on its own.
           if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; pnpm ingest:transit; fi
-      - name: Commit a date-only refresh, or open a pull request if a source changed
+      - name: Fetch-date-only files to main; anything else to the one review pull request
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          git add data/ingested data/staging
-          if git diff --cached --quiet; then echo "No source changed."; exit 0; fi
-          # The fetch dates move every night. When nothing else did (fetched_at, source_last_edited, last_edited, by
-          # name: pipeline/src/ingest-changes.ts), there is nothing for a person to read, so it goes straight to main
-          # (Kyle, 2026-09-24; DECISIONS). Anything else, or any doubt, exits non-zero and goes to review below.
-          if pnpm --silent --filter @313help/pipeline ingest:refresh-only; then
-            git commit -m "Open data re-read on $(date -u +%F): only the fetch dates changed"
-            git push
-            exit 0
-          fi
-          branch="ingest/$(date -u +%F)"
-          # -B and --force-with-lease so a second run on the same day updates that day's branch instead of failing on
-          # a name that already exists; the branch is only ever written by this job.
-          git checkout -B "$branch"
-          git commit -m "Open data changed on $(date -u +%F): review before it is published"
-          # A fresh checkout knows nothing about that day's branch on the server, and --force-with-lease with nothing
-          # to compare against refuses the push ("stale info") — which is what failed the second run on 2026-09-21.
-          # Fetch it first when it exists, so the lease has the server's real state to hold the push to.
-          git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" 2>/dev/null || true
-          git push -u --force-with-lease origin "$branch"
-          # Only an open pull request for this branch is "already open". Any other failure to open one fails this step,
-          # so the run goes red: until 2026-09-24 a blanket `|| echo "already open"` hid three nights of
-          # "GitHub Actions is not permitted to create or approve pull requests" (a repository setting). The site was
-          # already published above, and the re-check below still runs.
-          if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
-            echo "A pull request for $branch is already open; it now has tonight's changes too."
-          else
-            gh pr create --title "Open data changed $(date -u +%F)" --body "A City source changed. Read the diff: a changed phone number, address or coordinate is published only when this is merged. Nothing here was published tonight." --base main --head "$branch"
-          fi
+        run: scripts/settle-ingest.sh settle
 
       # 5. The nightly re-check. It runs even if a step above failed, and never fails the job: a flaky page must
       #    not block a publish. Nothing here is committed: the resources.csv notes stay on this runner, and
