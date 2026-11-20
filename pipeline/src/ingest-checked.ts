@@ -27,10 +27,11 @@
 //
 // Only the fields the source maps are asked for: a contact-name field on the layer is never fetched at all.
 
+import { sameAsPublished } from './ingest-changes.js';
 import { assertNoMovedIds, assignIds, NO_PRIOR, oneRowPerRecord, recordKey, type IdRequest, type PriorIds, type Retired } from './ingest-ids.js';
 import { INGESTED_COLUMNS, type Source } from './ingest-arcgis.js';
 import { placeAt, regionPlaces } from './region.js';
-import { inBbox, slug, type CsvRow } from './util.js';
+import { inBbox, slug, type CsvRow, csvText } from './util.js';
 
 /** The ArcGIS columns, plus the city and organization each record states, and where the printed city came from. */
 export const CHECKED_COLUMNS = [...INGESTED_COLUMNS.slice(0, 4), 'city', 'org_name', 'corrected', ...INGESTED_COLUMNS.slice(4)];
@@ -241,9 +242,11 @@ export async function ingestChecked(src: Source, fetchedAt: string): Promise<voi
   const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
   // A layer its publisher hasn't edited in max_age_days publishes nothing new: everything goes to staging for a
   // person and the last published file stays live. Nothing disappears on a timer.
-  const stale = (src.mode ?? 'stage') !== 'publish' || ageDays > (src.max_age_days ?? 90);
-  if (stale) out.warnings.push(`${src.id}: layer last edited ${lastEdited} (${ageDays} days ago) or not a publish source; staging everything`);
+  // (DECISIONS 2026-11-20) Past max_age_days, a re-read that says exactly what is published is only a refresh;
+  // only one that differs is held.
   const pubPath = p('data/ingested', `${src.id}.csv`), heldPath = p('data/staging', `${src.id}.csv`);
+  const stale = (src.mode ?? 'stage') !== 'publish' || (ageDays > (src.max_age_days ?? 90) && !sameAsPublished(pubPath, csvText(out.rows, CHECKED_COLUMNS)));
+  if (stale) out.warnings.push(`${src.id}: layer last edited ${lastEdited} (${ageDays} days ago) and it differs from what is published, or not a publish source; staging everything`);
   const publish = stale ? [] : out.rows;
   const held = stale ? [...out.rows.map((r) => ({ ...r, why: 'layer too old to publish' })), ...out.held] : out.held;
   const before = existsSync(pubPath) ? readCsv(pubPath).length : 0;

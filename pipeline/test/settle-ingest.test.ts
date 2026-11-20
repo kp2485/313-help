@@ -141,3 +141,38 @@ describe('the review text', () => {
     expect(summarize('data/staging/county.csv', held(2, '2026-11-03'), held(120, '2026-11-04'))).toEqual(['2 rows → 120: 118 added, 0 removed, 0 changed', '118 newly held: layer too old to publish']);
   });
 });
+
+describe('the age rule: an old layer may be re-dated, never changed, without a person (DECISIONS 2026-11-20)', () => {
+  let tmp = '';
+  afterEach(() => { if (tmp) rmSync(tmp, { recursive: true, force: true }); tmp = ''; });
+  it('a re-read that says what is published is the same; a changed phone, a new row or no published file is not', async () => {
+    const { sameAsPublished } = await import('../src/ingest-changes.js');
+    tmp = mkdtempSync(join(tmpdir(), 'age-'));
+    const file = join(tmp, 'county.csv');
+    expect(sameAsPublished(file, boxes('(313) 866-2562', '2026-11-20'))).toBe(false);          // never published: a person first
+    writeFileSync(file, boxes('(313) 866-2562', '2026-11-03'));
+    expect(sameAsPublished(file, boxes('(313) 866-2562', '2026-11-20'))).toBe(true);
+    expect(sameAsPublished(file, boxes('(313) 866-0000', '2026-11-20'))).toBe(false);
+    expect(sameAsPublished(file, boxes('(313) 866-2562', '2026-11-20') + 'sal_hr_2,(313) 555-0100,2026-09-14,2026-11-20\n')).toBe(false);
+  });
+});
+
+describe('one network blip does not cost a night', () => {
+  const res = (status: number) => new Response('{}', { status });
+  it('a thrown fetch or a 5xx is tried again, and the third answer stands', async () => {
+    const { patiently } = await import('../src/reports-sync.js');
+    let n = 0;
+    expect((await patiently(async () => { if (++n === 1) throw new Error('fetch failed'); return n === 2 ? res(503) : res(200); }, [1, 1])).status).toBe(200);
+    expect(n).toBe(3);
+    n = 0;
+    expect((await patiently(async () => { n++; return res(503); }, [1, 1])).status).toBe(503);
+    expect(n).toBe(3);
+    await expect(patiently(async () => { throw new Error('fetch failed'); }, [1, 1])).rejects.toThrow('fetch failed');
+  });
+  it('a refusal is not retried: waiting does not fix a 403', async () => {
+    const { patiently } = await import('../src/reports-sync.js');
+    let n = 0;
+    expect((await patiently(async () => { n++; return res(403); }, [1, 1])).status).toBe(403);
+    expect(n).toBe(1);
+  });
+});

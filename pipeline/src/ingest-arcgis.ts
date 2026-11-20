@@ -4,10 +4,11 @@
 // gets seen and approved by a person before it reaches the bundle (10-A5).
 // Never maps staff-name fields. Never writes back to a source.
 
+import { sameAsPublished } from './ingest-changes.js';
 import { existsSync, readFileSync } from 'node:fs';
 import YAML from 'yaml';
 import { assertNoMovedIds, assignIds, NO_PRIOR, oneRowPerRecord, readPrior, recordKey, RETIRED_COLUMNS, retiredPath, retiredRows, type IdRequest, type PriorIds, type Retired } from './ingest-ids.js';
-import { p, readCsv, writeCsv, slug, inBbox, type CsvRow, today } from './util.js';
+import { p, readCsv, writeCsv, slug, inBbox, type CsvRow, today, csvText } from './util.js';
 
 export interface Source {
   id: string; name: string; kind: string; url: string; page?: string; license?: string;
@@ -122,10 +123,13 @@ async function main() {
     const prior = readPrior(src.id);
     const { rows, warnings, retired } = toRows(src, lastEdited, features, fetchedAt, prior);
     const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
-    // A layer its publisher hasn't edited in max_age_days publishes nothing new: fresh rows go to staging for a person,
-    // and the last published file stays live. Nothing disappears on a timer.
+    // A layer its publisher hasn't edited in max_age_days publishes nothing NEW: a re-read that differs from what is
+    // published goes to staging for a person, and the last published file stays live. A re-read that says exactly
+    // what is published is only a refresh and is written as one (DECISIONS 2026-11-20: until then every aged layer
+    // was copied whole into staging each night, which is what froze every source in November 2026). Nothing
+    // disappears on a timer.
     let mode = src.mode ?? 'stage';
-    if (mode === 'publish' && ageDays > (src.max_age_days ?? 90)) {
+    if (mode === 'publish' && ageDays > (src.max_age_days ?? 90) && !sameAsPublished(p('data/ingested', `${src.id}.csv`), csvText(rows, INGESTED_COLUMNS))) {
       warnings.push(`${src.id}: layer last edited ${lastEdited} (${ageDays} days ago); too old to publish, staging instead`);
       mode = 'stage';
     }
