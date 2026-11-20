@@ -80,7 +80,24 @@ export interface YearStats { sales?: Count; median_price?: number; permits?: Cou
 export interface NowStats { rental_certs?: Count; vacant_reg?: Count; roads?: { pieces: Count; miles?: number; poor_pct?: number } }
 export interface RoadTotals { pieces: number; miles: number; poor_miles: number }
 
-const get = async (url: string) => { const j = (await (await fetch(url, { headers: UA })).json()) as any; if (j.error) throw new Error(`${url.slice(0, 120)}: ${JSON.stringify(j.error)}`); return j; };
+// The City's server answers some of these statistics queries with a passing error — a 400 "Unable to perform query"
+// on one layer one run and on another the next (2026-11-20: property sales on the runner, Improve Detroit on a
+// laptop minutes later, the same queries succeeding in between), or a dropped connection. This read makes about a
+// hundred of them, so one such answer used to lose the whole month's numbers. Each query is asked up to four times,
+// a little further apart each time; an error that is still there after that is real and stops the read as before.
+export async function getJson(url: string, fetcher: (u: string) => Promise<any> = async (u) => (await fetch(u, { headers: UA })).json(), waits: number[] = [3000, 10000, 30000]): Promise<any> {
+  for (let i = 0; ; i++) {
+    let why: string;
+    try {
+      const j = await fetcher(url);
+      if (!j?.error) return j;
+      why = JSON.stringify(j.error);
+    } catch (e) { why = `fetch failed: ${(e as Error).message}`; }
+    if (i >= waits.length) throw new Error(`${url.slice(0, 120)}: ${why}`);
+    await new Promise((ok) => setTimeout(ok, waits[i]));
+  }
+}
+const get = (url: string) => getJson(url);
 const edited = async (layer: string) => { const m = await get(`${layer}?f=json`); return today(new Date(m.editingInfo?.dataLastEditDate ?? m.editingInfo?.lastEditDate)); };
 const q = (layer: string, params: Record<string, string>) => get(`${layer}/query?${new URLSearchParams({ f: 'json', ...params })}`);
 

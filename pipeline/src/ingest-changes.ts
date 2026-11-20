@@ -66,7 +66,7 @@ export function sameAsPublished(path: string, csvText: string): boolean {
 /** The staged files under the two ingest folders, and whether each is a date-only refresh. */
 export function stagedChanges(root: string): { path: string; refreshOnly: boolean }[] {
   const git = (...args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28 });
-  const paths = git('diff', '--cached', '--no-renames', '--name-only', '--', 'data/ingested', 'data/staging').split('\n').filter(Boolean);
+  const paths = git('diff', '--cached', '--no-renames', '--name-only', '--', 'data/ingested', 'data/staging', 'data/indicators').split('\n').filter(Boolean);
   return paths.map((path) => {
     let before: string | null = null;
     try { before = git('show', `HEAD:${path}`); } catch { before = null; }

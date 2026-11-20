@@ -1104,9 +1104,13 @@ describe('neighborhood indicators (docs/13)', () => {
     const inHoods = (arr: number[][]) => arr.filter((q) => h.some((n: any) => pointInRings({ lat: q[1]!, lon: q[0]! }, n.rings))).length;
     const inDetroit = (arr: number[][]) => arr.filter((q) => pointInRings({ lat: q[1]!, lon: q[0]! }, ct.rings)).length;
     expect(ind.neighborhoods).toHaveLength(205);
-    expect(sum('bus_stops')).toBe(4526);
-    expect(sum('snap_stores')).toBe(893);
-    expect(ind.neighborhoods.find((n: any) => n.id === 'nbh_airport_sub').places).toMatchObject({ bus_stops: 139, snap_stores: 16 });
+    // No count is typed here (2026-11-20): DDOT and the USDA own these numbers and change them, and a test that
+    // pinned 4,526 stops failed the moment DDOT added nine. What is held is the rule: the file's counts are the
+    // points inside the outlines, for the whole city and for one neighborhood counted again by hand.
+    const airport = h.find((n: any) => n.id === 'nbh_airport_sub');
+    const inAirport = (arr: number[][]) => arr.filter((q) => pointInRings({ lat: q[1]!, lon: q[0]! }, airport.rings)).length;
+    expect(ind.neighborhoods.find((n: any) => n.id === 'nbh_airport_sub').places).toMatchObject({ bus_stops: inAirport(pts.bus_stops), snap_stores: inAirport(pts.snap) });
+    expect(inAirport(pts.bus_stops)).toBeGreaterThan(50);
     // The sum is the stops inside SOME neighborhood outline, give or take the three that sit on a shared simplified
     // edge and count in both; the rest of the 5,098 are on or outside the city line (Hamtramck, Highland Park,
     // Dearborn, freeway edges) and count in no neighborhood.

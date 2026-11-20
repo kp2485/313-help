@@ -15,6 +15,11 @@
 # `overlay` exists because some layers are read monthly: without it, a change read on the 1st would drop out of the
 # pull request on the 2nd, when the branch is rebuilt from main. Only files the waiting branch changed, and main has
 # not touched since, are carried; and only while that pull request is open, so closing it is a real "no".
+#
+# data/indicators travels with them (2026-11-20): the neighborhood numbers file is built FROM the ingested files and
+# is committed, and the tests hold the two to each other. A data change merged without it left main inconsistent and
+# would have stopped the next night's publish at its test gate; the job now rebuilds it before settling, so it rides
+# in the same commit or the same pull request as the data it was counted from.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 PENDING="${INGEST_PENDING_BRANCH:-ingest/pending}"
@@ -33,13 +38,13 @@ overlay)
     git diff --quiet "$base" HEAD -- "$f" || { echo "main changed $f since; main's copy stands."; continue; }
     if git cat-file -e "origin/$PENDING:$f" 2>/dev/null; then git checkout -q "origin/$PENDING" -- "$f"; else rm -f -- "$f"; fi
     carried=$((carried + 1))
-  done < <(git diff --name-only --no-renames "$base" "origin/$PENDING" -- data/ingested data/staging)
+  done < <(git diff --name-only --no-renames "$base" "origin/$PENDING" -- data/ingested data/staging data/indicators 2>/dev/null || true)
   git reset -q
   echo "Carried $carried waiting file(s) from $PENDING; tonight's re-read goes on top."
   ;;
 settle)
   out="$(mktemp -d)"
-  git add -A data/ingested data/staging
+  for d in data/ingested data/staging data/indicators; do [ ! -e "$d" ] || git add -A "$d"; done
   if git diff --cached --quiet; then
     echo "No source changed."; : > "$out/refresh.txt"; : > "$out/real.txt"
   else

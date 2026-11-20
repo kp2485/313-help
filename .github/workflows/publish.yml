@@ -127,6 +127,12 @@ jobs:
             read_source pnpm ingest:neighborhoods
             read_source pnpm ingest:transit
           fi
+          # The neighborhood numbers file (data/indicators) is counted from what was just read and is committed with
+          # it, so main never holds data and numbers that disagree (scripts/settle-ingest.sh). A plain dev build:
+          # the site was deployed above, this step has no signing key and no API address, and nothing else it
+          # writes is committed.
+          read_source pnpm build:bundle
+          git checkout -q -- data/hsds
           if [ -n "$failed" ]; then echo "Reads that failed:$failed"; exit 1; fi
       - name: Fetch-date-only files to main; anything else to the one review pull request
         env:

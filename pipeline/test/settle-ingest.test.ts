@@ -176,3 +176,16 @@ describe('one network blip does not cost a night', () => {
     expect(n).toBe(1);
   });
 });
+
+describe('a passing error from the City\'s server does not lose the month\'s neighborhood numbers', () => {
+  it('asks again after an error answer or a dropped connection, and gives up only when it stays', async () => {
+    const { getJson } = await import('../src/ingest-neighborhoods.js');
+    let n = 0;
+    const flaky = async () => { n++; if (n === 1) return { error: { code: 400, details: ['Unable to perform query.'] } }; if (n === 2) throw new Error('socket hang up'); return { features: [1] }; };
+    expect(await getJson('https://example.invalid/q', flaky, [1, 1, 1])).toEqual({ features: [1] });
+    expect(n).toBe(3);
+    n = 0;
+    await expect(getJson('https://example.invalid/q', async () => { n++; return { error: { code: 400 } }; }, [1, 1, 1])).rejects.toThrow('{"code":400}');
+    expect(n).toBe(4);
+  });
+});
