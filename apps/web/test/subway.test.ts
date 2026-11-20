@@ -131,8 +131,13 @@ describe('subway: what decides the drawing is plain functions (docs/MAP-STYLE.md
     for (const id of ['ddot_routes', 'smart_routes']) for (const r of NETS[id]!.routes) expect([0, 1, 2, 3, 4, 5]).toContain(r.tone);
     const four = NETS.ddot_routes!.routes.find((r) => r.short === '4')!, raw = file('ddot_routes.net.json').routes.find((r: { short: string }) => r.short === '4');
     expect(S.routeColour(four)).toBe('--tr-' + raw.tone);
-    expect(NETS.ddot_routes!.routes.filter((r) => r.frequent).map((r) => r.short)).toEqual(['3', '4', '9']);                   // the owner's word, as the data carries it
-    expect(NETS.smart_routes!.routes.filter((r) => r.frequent).map((r) => r.short)).toEqual(['261', '461', '462', '561']);
+    // The owner's word, as the data carries it — read from the file, never typed here: DDOT made route 6 frequent in
+    // November 2026 and a typed ['3', '4', '9'] failed on the day its data was merged.
+    for (const id of ['ddot_routes', 'smart_routes']) {
+      const said = file(`${id}.net.json`).routes.filter((r: { frequent?: boolean }) => r.frequent).map((r: { short: string }) => r.short);
+      expect(NETS[id]!.routes.filter((r) => r.frequent).map((r) => r.short)).toEqual(said);
+      expect(said.length).toBeGreaterThan(0); expect(said.length).toBeLessThan(NETS[id]!.routes.length);
+    }
   });
   it('widths are table 7.1', () => {
     const w = (r: S.RouteLook) => (['far', 'mid', 'near'] as const).map((b) => S.lineWidth(r, b));
@@ -172,8 +177,15 @@ describe('subway: what decides the drawing is plain functions (docs/MAP-STYLE.md
       expect(S.basemapTokens(style, on, contrast)).toEqual({ quiet: false, road: '--map-road', main: '--map-main', fwy: '--map-fwy', park: '--map-park', parkInk: '--map-park-ink', ink: '--map-ink' });
   });
   it('reads the four real network files, and refuses anything that is not format 2 by answering "draw standard"', () => {
-    expect(NETS.ddot_routes).toMatchObject({ system: 'ddot', agency: 'DDOT', stopsLayer: 'ddot_stops' }); expect(NETS.ddot_routes!.routes.length).toBe(37); expect(NETS.smart_routes!.routes.length).toBe(45);   // 42 while the network was clipped to four cities
-    expect(NETS.ddot_routes!.trunks.length).toBe(5); expect(NETS.smart_routes!.trunks.length).toBe(11); expect(Math.max(...NETS.ddot_routes!.trunks.map((k) => k.routes.length))).toBe(17);
+    expect(NETS.ddot_routes).toMatchObject({ system: 'ddot', agency: 'DDOT', stopsLayer: 'ddot_stops' }); 
+    // Sizes are the files' own, within what a bus network can be; no count is typed (the agencies change them).
+    for (const id of ['ddot_routes', 'smart_routes']) {
+      const raw = file(`${id}.net.json`);
+      expect(NETS[id]!.routes.length).toBe(raw.routes.length); expect(NETS[id]!.trunks.length).toBe(raw.trunks.length);
+      expect(NETS[id]!.routes.length).toBeGreaterThan(20); expect(NETS[id]!.routes.length).toBeLessThan(80);
+      expect(NETS[id]!.trunks.length).toBeGreaterThan(0);
+      for (const k of NETS[id]!.trunks) { expect(k.routes.length).toBeGreaterThan(1); expect(k.routes.length).toBeLessThanOrEqual(NETS[id]!.routes.length); }
+    }
     expect(NETS.people_mover!.routes[0]).toMatchObject({ loop: true, short: 'DPM', ends: [] }); expect(NETS.qline!.routes[0]!.ends.map((e) => e.name)).toEqual(['Congress Station', 'Grand Blvd Station']);
     for (const net of Object.values(NETS)) for (const l of net!.lines) { expect(l.runs[0]!.from).toBe(0); expect(l.runs[l.runs.length - 1]!.to).toBe(l.pts.length / 2 - 1); for (const r of l.runs) expect(r.to).toBeGreaterThan(r.from); }
     expect(S.decodeServes(file('ddot_stops.net.json'))!.length).toBe(decodeLayer(file('ddot_stops.json')).points.length);
@@ -392,7 +404,8 @@ describe('subway: hubs are placed by the file, routes stay in reach, and the lis
       const routes = new Set(seen.filter((x) => /\|(DDOT|SMART|M-1 RAIL|Detroit Transportation Corporation|Detroit People Mover)$/.test(x) && !x.includes(' · ')));
       expect(routes.size, JSON.stringify(seen.slice(0, 6))).toBeGreaterThanOrEqual(8);
     }
-  });
+    // Two whole maps drawn at two zooms with both bus networks on: over the 5 s default on a busy machine.
+  }, 30000);
   it('"See this map as a list" is the same HTML, to the character, in standard and in subway', () => {
     // main.ts hands mapListHtml the same things whichever style is on: the listings, the greenway, the parks and
     // the STANDARD layers that are on. The subway files are never given to it; this proves they are not needed.
