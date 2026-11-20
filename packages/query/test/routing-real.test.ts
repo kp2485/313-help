@@ -298,6 +298,7 @@ describe('the trip window (schema/query-spec.md "The trip window")', () => {
       if (full.length) compared++;
     }
     expect(compared).toBeGreaterThanOrEqual(6);
-  });
+    // 24 trips planned twice over the real map: about 5.5 s on a laptop, over the 5 s default (2026-11-20).
+  }, 30000);
 });
 
