@@ -3,7 +3,7 @@
   "sales": {
    "name": "City of Detroit Assessor: property sales",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/assessor_property_sales_view/FeatureServer/0",
-   "last_edited": "2026-11-19"
+   "last_edited": "2026-11-20"
   },
   "permits": {
    "name": "City of Detroit BSEED: building permits",
@@ -28,7 +28,7 @@
   "parcels": {
    "name": "City of Detroit Assessor: parcels",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/parcel_file_current/FeatureServer/0",
-   "last_edited": "2026-11-19"
+   "last_edited": "2026-11-20"
   },
   "rentals": {
    "name": "City of Detroit BSEED: active rental certificates of compliance",
@@ -125,7 +125,7 @@
   "nbh_downtown": 876,
   "nbh_east_canfield": 583,
   "nbh_east_english_village": 2143,
-  "nbh_east_village": 4091,
+  "nbh_east_village": 4092,
   "nbh_eastern_market": 615,
   "nbh_eden_gardens": 2273,
   "nbh_elijah_mccoy": 778,
@@ -181,11 +181,11 @@
   "nbh_joy_schaefer": 556,
   "nbh_krainz_woods": 1909,
   "nbh_lafayette_park": 434,
-  "nbh_lasalle_college_park": 1419,
+  "nbh_lasalle_college_park": 1418,
   "nbh_lasalle_gardens": 701,
   "nbh_littlefield_community": 1373,
   "nbh_mapleridge": 5240,
-  "nbh_marina_district": 678,
+  "nbh_marina_district": 677,
   "nbh_martin_park": 1657,
   "nbh_mcdougall_hunt": 4260,
   "nbh_mcdowell": 934,
@@ -269,7 +269,7 @@
   "nbh_wade": 1904,
   "nbh_warren_ave_community": 4049,
   "nbh_warrendale": 9013,
-  "nbh_waterworks_park": 4,
+  "nbh_waterworks_park": 5,
   "nbh_wayne_state": 58,
   "nbh_we_care_community": 1220,
   "nbh_weatherby": 976,
@@ -366,7 +366,7 @@
    "fires": 2245
   },
   "2026": {
-   "sales": 5334,
+   "sales": 5342,
    "median_price": 85000,
    "permits": 5502,
    "permit_cost": 2401487095,
@@ -8118,7 +8118,7 @@
     "issues": 326,
     "issue_days": 8,
     "fires": 15,
-    "sales": 131,
+    "sales": 132,
     "median_price": 125000,
     "permits": 108,
     "permit_cost": 3380374
@@ -10107,7 +10107,7 @@
     "issues": 55,
     "issue_days": 18,
     "fires": 8,
-    "sales": 7,
+    "sales": 8,
     "permits": 11,
     "permit_cost": 54949674
    }
@@ -10371,8 +10371,8 @@
     "blight": 105,
     "issues": 40,
     "issue_days": 15,
-    "sales": 13,
-    "median_price": 90000,
+    "sales": 14,
+    "median_price": 91750,
     "permits": 13,
     "permit_cost": 5732781
    }
@@ -10620,8 +10620,8 @@
     "issues": 207,
     "issue_days": 6,
     "fires": 20,
-    "sales": 93,
-    "median_price": 86000,
+    "sales": 94,
+    "median_price": 85788,
     "permits": 64,
     "permit_cost": 1498096
    }
@@ -11552,8 +11552,8 @@
     "issues": 85,
     "issue_days": 10,
     "fires": 8,
-    "sales": 32,
-    "median_price": 32000,
+    "sales": 33,
+    "median_price": 34000,
     "permits": 30,
     "permit_cost": 309570
    }
@@ -15873,8 +15873,8 @@
     "issues": 127,
     "issue_days": 8,
     "fires": 10,
-    "sales": 64,
-    "median_price": 64000,
+    "sales": 66,
+    "median_price": 69000,
     "permits": 54,
     "permit_cost": 747040
    }
