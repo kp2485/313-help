@@ -20,13 +20,14 @@
 // id rules (`ingest-ids.ts`: an id belongs to one record of the publisher's, for good) and the sharp-drop
 // guard. Staff-name fields are never mapped. Nothing is ever written back to a source.
 
+import { sameAsPublished } from './ingest-changes.js';
 import { existsSync } from 'node:fs';
 import {
   assertNoMovedIds, assignIds, NO_PRIOR, oneRowPerRecord, readPrior, recordKey,
   RETIRED_COLUMNS, retiredPath, retiredRows, type IdRequest, type PriorIds, type Retired,
 } from './ingest-ids.js';
 import { fetchLayer, loadSources, sharpDrop, type Source } from './ingest-arcgis.js';
-import { p, readCsv, writeCsv, slug, inBbox, type CsvRow, today } from './util.js';
+import { p, readCsv, writeCsv, slug, inBbox, type CsvRow, today, csvText } from './util.js';
 
 /** Same columns as the other ingested files, plus the city the layer states. */
 export const SAFE_COLUMNS = [
@@ -128,8 +129,9 @@ async function main() {
     const prior = readPrior(src.id);
     const { rows, warnings, retired, dropped } = toSafeRows(src, lastEdited, features, fetchedAt, prior);
     const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
+    // Past max_age_days only a re-read that differs from what is published is held (ingest-arcgis.ts has the rule).
     let mode = src.mode ?? 'stage';
-    if (mode === 'publish' && ageDays > (src.max_age_days ?? 90)) {
+    if (mode === 'publish' && ageDays > (src.max_age_days ?? 90) && !sameAsPublished(p('data/ingested', `${src.id}.csv`), csvText(rows, SAFE_COLUMNS))) {
       warnings.push(`layer last edited ${lastEdited} (${ageDays} days ago); too old to publish, staging instead`);
       mode = 'stage';
     }

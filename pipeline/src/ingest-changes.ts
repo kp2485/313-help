@@ -13,7 +13,7 @@
 //   exit 0: only fetch dates changed in the staged files; exit 1: something else changed, or anything failed.
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'csv-parse/sync';
 
@@ -52,6 +52,15 @@ export function onlyRefreshed(path: string, before: string | null, after: string
     return false;
   }
   return false;
+}
+
+/**
+ * Would writing these rows change what is already published at `path`, apart from the fetch dates? Used by the
+ * ingests' age rule (DECISIONS 2026-11-20): a layer past its max_age_days may still be re-read and re-dated when it
+ * says exactly what it said, because that publishes nothing new; only a difference is held for a person.
+ */
+export function sameAsPublished(path: string, csvText: string): boolean {
+  return existsSync(path) && onlyRefreshed(path, readFileSync(path, 'utf8'), csvText);
 }
 
 /** The staged files under the two ingest folders, and whether each is a date-only refresh. */

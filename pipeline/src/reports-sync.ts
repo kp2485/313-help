@@ -57,10 +57,27 @@ export function headers(env: Record<string, string | undefined> = process.env): 
   return { 'content-type': 'application/json', 'CF-Access-Client-Id': env.ACCESS_CLIENT_ID ?? '', 'CF-Access-Client-Secret': env.ACCESS_CLIENT_SECRET ?? '' };
 }
 
+/**
+ * One network blip must not cost a night's publish: on 2026-10-30 a single "fetch failed" here stopped the release
+ * build. A thrown fetch or a 5xx is tried again, three times in all, a few seconds apart. Any other answer (a 403
+ * from Access, a 400) is returned at once: waiting does not fix those, and the callers still refuse to build on them.
+ */
+export async function patiently(call: () => Promise<Response>, waits: number[] = [3000, 10000]): Promise<Response> {
+  for (let i = 0; ; i++) {
+    try {
+      const res = await call();
+      if (res.status < 500 || i >= waits.length) return res;
+    } catch (e) {
+      if (i >= waits.length) throw e;
+    }
+    await new Promise((ok) => setTimeout(ok, waits[i]));
+  }
+}
+
 export async function fetchAggregates(): Promise<Aggregates | null> {
   const api = process.env.REPORTS_API;
   if (!api) return null;
-  const res = await fetch(`${api}/v1/steward/aggregates`, { headers: headers() });
+  const res = await patiently(() => fetch(`${api}/v1/steward/aggregates`, { headers: headers() }));
   if (!res.ok) throw new Error(`reports API answered ${res.status}; refusing to build with silently missing report data`);
   return (await res.json()) as Aggregates;
 }
@@ -68,6 +85,6 @@ export async function fetchAggregates(): Promise<Aggregates | null> {
 export async function pushTargets(listings: string[], places: string[]): Promise<void> {
   const api = process.env.REPORTS_API;
   if (!api) return;
-  const res = await fetch(`${api}/v1/steward/targets`, { method: 'PUT', headers: headers(), body: JSON.stringify({ listings, places }) });
+  const res = await patiently(() => fetch(`${api}/v1/steward/targets`, { method: 'PUT', headers: headers(), body: JSON.stringify({ listings, places }) }));
   if (!res.ok) throw new Error(`could not sync targets: ${res.status}`);
 }

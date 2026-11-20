@@ -16,10 +16,11 @@
 // The KML is small, flat and has no namespaced elements, so it is read with regular expressions rather than by
 // adding an XML dependency. Anything the reader does not recognise is left out of `extra`, never guessed at.
 
+import { sameAsPublished } from './ingest-changes.js';
 import { existsSync } from 'node:fs';
 import { INGESTED_COLUMNS, loadSources, sharpDrop, type Source } from './ingest-arcgis.js';
 import { assertNoMovedIds, assignIds, NO_PRIOR, oneRowPerRecord, readPrior, recordKey, RETIRED_COLUMNS, retiredPath, retiredRows, type IdRequest, type PriorIds, type Retired } from './ingest-ids.js';
-import { p, readCsv, writeCsv, slug, inBbox, today, type CsvRow } from './util.js';
+import { p, readCsv, writeCsv, slug, inBbox, today, type CsvRow, csvText } from './util.js';
 import { placeAt } from './region.js';
 
 /** Same columns as an ArcGIS layer, plus the city this layer publishes for itself. */
@@ -188,10 +189,13 @@ async function main() {
     const prior = readPrior(src.id);
     const { rows, warnings, retired } = toRows(src, lastEdited, placemarks, fetchedAt, prior);
     const ageDays = lastEdited ? Math.round((Date.now() - Date.parse(lastEdited)) / 86400000) : Infinity;
-    // A map its publisher hasn't updated in max_age_days publishes nothing new: fresh rows go to staging for a
-    // person and the last published file stays live. Nothing disappears on a timer.
+    // A layer its publisher hasn't edited in max_age_days publishes nothing NEW: a re-read that differs from what is
+    // published goes to staging for a person, and the last published file stays live. A re-read that says exactly
+    // what is published is only a refresh and is written as one (DECISIONS 2026-11-20: until then every aged layer
+    // was copied whole into staging each night, which is what froze every source in November 2026). Nothing
+    // disappears on a timer.
     let mode = src.mode ?? 'stage';
-    if (mode === 'publish' && ageDays > (src.max_age_days ?? 90)) {
+    if (mode === 'publish' && ageDays > (src.max_age_days ?? 90) && !sameAsPublished(p('data/ingested', `${src.id}.csv`), csvText(rows, MYMAP_COLUMNS))) {
       warnings.push(`${src.id}: map last updated ${lastEdited ?? 'unknown'} (${ageDays} days ago); too old to publish, staging instead`);
       mode = 'stage';
     }

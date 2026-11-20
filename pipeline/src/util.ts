@@ -23,9 +23,12 @@ export function readCsv(path: string): CsvRow[] {
   return parse(readFileSync(path, 'utf8'), { columns: true, skip_empty_lines: true, trim: true, bom: true }) as CsvRow[];
 }
 
+/** The exact text writeCsv would write, so a caller can compare it with what is on disk first. */
+export const csvText = (rows: CsvRow[], columns: string[]): string => stringify(rows, { header: true, columns });
+
 export function writeCsv(path: string, rows: CsvRow[], columns: string[]): void {
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, stringify(rows, { header: true, columns }), 'utf8');
+  writeFileSync(path, csvText(rows, columns), 'utf8');
 }
 
 export function writeJson(path: string, data: unknown): Buffer {

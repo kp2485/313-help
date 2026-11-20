@@ -62,6 +62,16 @@ export async function framesOf(spec: MapSpec, index: BundleIndex, media: Record<
   const view = new MapView(new (await import('./fakes.js')).FakeEl('div') as unknown as HTMLElement, spec, index);
   await settle();
   const canvas = page.canvases[page.canvases.length - 1]!;
+  // The map's files load and are checksummed off the main path, and a fixed 25 ms was not always enough on a busy
+  // CI runner: on 2026-10-28 a frame was recorded before the base map had arrived and the nightly publish failed on
+  // it. Wait until two frames in a row are the same drawing (at most 3 s), then record.
+  let last = '';
+  for (let i = 0; i < 120; i++) {
+    canvas.log.length = 0; view.redraw();
+    const now = canvas.log.join('\n');
+    if (i > 0 && now === last) break;
+    last = now; await settle();
+  }
   canvas.log.length = 0; view.redraw(); const far = [...canvas.log];
   for (let i = 0; i < 3; i++) canvas.fire('keydown', { key: '+' });
   canvas.log.length = 0; view.redraw(); const near = [...canvas.log];

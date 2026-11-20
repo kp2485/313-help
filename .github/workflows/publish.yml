@@ -29,6 +29,11 @@ on:
     # November 2026 this job, asked for at 08:00 UTC, started between 12:20 and 18:00.
     - cron: '23 7 * * *'         # 03:23 in Detroit (02:23 in winter)
   workflow_dispatch:
+    inputs:
+      monthly:
+        description: "Also run the monthly reads (street map, neighborhoods, transport layers)"
+        type: boolean
+        default: false
 permissions:
   contents: write
   pull-requests: write
@@ -74,7 +79,13 @@ jobs:
           BUNDLE_PUBLIC_KEYS: ${{ vars.BUNDLE_PUBLIC_KEYS }}
           WEB_RELEASE: '1'     # refuses to build unless two good keys are pinned and the list is release-signed
       - name: Deploy to Cloudflare Pages
-        run: pnpm --filter @313help/api exec wrangler pages deploy ../apps/web/dist --project-name "${{ vars.PAGES_PROJECT }}" --branch main
+        # Three tries: on 2026-11-13 Cloudflare's API answered one 503 ("no healthy upstream") and the night was lost.
+        run: |
+          for try in 1 2 3; do
+            if pnpm --filter @313help/api exec wrangler pages deploy ../apps/web/dist --project-name "${{ vars.PAGES_PROJECT }}" --branch main; then exit 0; fi
+            echo "Deploy attempt $try failed."; [ "$try" = 3 ] || sleep $((try * 30))
+          done
+          exit 1
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -104,7 +115,8 @@ jobs:
           pnpm --filter @313help/pipeline check:mogo
           # Monthly: the street map, the neighborhood outlines and, since 2026-09-23, the transport layers (Kyle). Every
           # change still arrives as the pull request below; nothing here publishes on its own.
-          if [ "$(date -u +%d)" = "01" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; pnpm ingest:transit; fi
+          # A run started by hand can ask for them on any day (Actions → publish → Run workflow → monthly).
+          if [ "$(date -u +%d)" = "01" ] || [ "${{ inputs.monthly }}" = "true" ]; then pnpm ingest:basemap; pnpm ingest:neighborhoods; pnpm ingest:transit; fi
       - name: Fetch-date-only files to main; anything else to the one review pull request
         env:
           GH_TOKEN: ${{ github.token }}
