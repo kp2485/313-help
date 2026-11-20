@@ -709,6 +709,9 @@ describe('ZIP center points', () => {
       { attributes: { zipcode: '48202' } },
     ])).toEqual({ '48201': [42.347, -83.06], '48236': [42.425, -82.9] });
   });
+  it('reads the column under either name: the City renamed `zipcode` to `zip_code` in November 2026 and every ZIP vanished', () => {
+    expect(toZipCenters([{ attributes: { zip_code: '48201' }, centroid: { x: -83.06012, y: 42.34731 } }])).toEqual({ '48201': [42.347, -83.06] });
+  });
   it('ZIPs outside Detroit come from the Census layer, by where the Bureau puts each one, only when the City\'s layer lacks them', () => {
     const census = [
       { attributes: { ZCTA5: '48124', INTPTLAT: '+42.2980362', INTPTLON: '-083.2476095' } },

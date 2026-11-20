@@ -27,10 +27,12 @@ async function parks(): Promise<void> {
 }
 
 /** ZIP -> [lat, lon] of the area's center, 3 decimals (about 100 m): plenty for sorting by distance. */
-export function toZipCenters(features: { attributes: { zipcode?: unknown }; centroid?: { x: number; y: number } }[]): Record<string, [number, number]> {
+export function toZipCenters(features: { attributes: { zipcode?: unknown; zip_code?: unknown }; centroid?: { x: number; y: number } }[]): Record<string, [number, number]> {
   const out: Record<string, [number, number]> = {};
   for (const f of features) {
-    const zip = String(f.attributes.zipcode ?? '').trim(), c = f.centroid;
+    // The City renamed this column from `zipcode` to `zip_code` around 2026-11-17, and the read then found no ZIPs at
+    // all (the guard below kept the last good file). Either name is read.
+    const zip = String(f.attributes.zip_code ?? f.attributes.zipcode ?? '').trim(), c = f.centroid;
     // Border ZIPs reach into the suburbs, so a center may sit a little outside the city bbox: allow 0.05 degrees.
     if (!/^\d{5}$/.test(zip) || !c || !inBbox(c.y, c.x, 0.05)) continue;
     out[zip] = [Number(c.y.toFixed(3)), Number(c.x.toFixed(3))];
@@ -64,7 +66,7 @@ export function addNeighborZips(city: Record<string, [number, number]>, census: 
 async function zips(): Promise<void> {
   const meta = (await (await fetch(`${ZIPS}?f=json`, { headers: UA })).json()) as any;
   const lastEdited = today(new Date(meta.editingInfo?.dataLastEditDate ?? meta.editingInfo?.lastEditDate));
-  const q = `${ZIPS}/query?where=1%3D1&outFields=zipcode&returnGeometry=false&returnCentroid=true&outSR=4326&f=json`;
+  const q = `${ZIPS}/query?where=1%3D1&outFields=*&returnGeometry=false&returnCentroid=true&outSR=4326&f=json`;
   const city = toZipCenters(((await (await fetch(q, { headers: UA })).json()) as any).features ?? []);
   if (Object.keys(city).length < 20) throw new Error(`zips: only ${Object.keys(city).length} parsed. Not overwriting the last good file.`);
   const env = encodeURIComponent(JSON.stringify({ xmin: BBOX.lonMin, ymin: BBOX.latMin, xmax: BBOX.lonMax, ymax: BBOX.latMax, spatialReference: { wkid: 4326 } }));
