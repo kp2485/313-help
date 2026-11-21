@@ -19,6 +19,8 @@
 #      address, or can't be read, becomes a task in the steward queue ("Pages that changed"); nothing in the app
 #      changes (DECISIONS 2026-09-19). The notes this writes into data/seed/resources.csv are NOT committed.
 #
+# What needs a person afterwards is gathered once a week by digest.yml, which also watches this job every day.
+#
 # Secrets (names only; docs/OPERATIONS.md): BUNDLE_SIGNING_KEY, ACCESS_CLIENT_ID, ACCESS_CLIENT_SECRET,
 # CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Variables: PUBLISH_ENABLED, BUNDLE_PUBLIC_KEYS, REPORTS_API,
 # PAGES_PROJECT.
@@ -37,6 +39,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write        # only to start ci.yml against the review pull request (scripts/settle-ingest.sh)
 concurrency: { group: publish, cancel-in-progress: false }
 jobs:
   publish:

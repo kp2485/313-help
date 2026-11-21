@@ -74,6 +74,10 @@ settle)
   # "already open" hid three nights of a repository setting refusing it). The site was already published above.
   if [ -n "$pr" ]; then gh pr edit "$pr" --title "$title" --body-file "$out/summary.md"
   else gh pr create --title "$title" --body-file "$out/summary.md" --base main --head "$PENDING"; fi
+  # A pull request opened with the workflow's own token gets no CI run of its own, so ask for one against this
+  # branch: its result shows on the pull request and in the weekly review (2026-11-21). Until then a person had to
+  # build and test the data on a laptop before merging.
+  gh workflow run ci.yml --ref "$PENDING"
   git checkout -q "$start"
   ;;
 *) echo "usage: $0 overlay|settle"; exit 2 ;;

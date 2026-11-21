@@ -1,0 +1,60 @@
+# The weekly review and the daily watch (DECISIONS 2026-11-21; docs/OPERATIONS.md "The weekly review").
+#
+# Every day: is the nightly publish healthy? Two failed runs in a row, no run started in 48 hours, or data on the
+# site more than 48 hours old opens ONE issue assigned to the repository's owner, which GitHub emails; it closes
+# itself when things are healthy again. In November 2026 the open data stood still for seventeen nights and nothing
+# told anyone.
+#
+# Mondays: one issue, "Weekly review", listing what needs a person as checkboxes with the link that does each:
+# the open data pull request and whether its tests passed, what waits in the steward queue by kind, emergency
+# numbers a script cannot read that are coming due, alerts about to end. It replaces last week's.
+#
+# This repository is public and so are its issues: pipeline/src/digest.ts writes counts and links only, never a
+# report's words, a steward's note or a listing id from the queue. It reads the queue with the same Access service
+# token the nightly build uses. This job cannot push, deploy or sign: it holds no signing key and no Cloudflare token.
+name: digest
+on:
+  schedule:
+    # After the nightly publish (07:23 UTC) has had hours to finish, and off the hour so GitHub starts it on time.
+    - cron: '41 13 * * 1'          # Monday 08:41 in Detroit (09:41 in summer): the watch and the weekly review
+    - cron: '41 13 * * 0,2-6'      # every other day: the watch only
+  workflow_dispatch:
+    inputs:
+      weekly:
+        description: "Also write the weekly review now"
+        type: boolean
+        default: true
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+  actions: read
+concurrency: { group: digest, cancel-in-progress: false }
+jobs:
+  digest:
+    if: vars.PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, package-manager-cache: false }
+      - run: pnpm install --frozen-lockfile
+      - name: What happened
+        run: |
+          d="$RUNNER_TEMP/digest"; mkdir -p "$d"
+          gh run list --workflow publish.yml --limit 14 --json conclusion,status,createdAt,url > "$d/runs.json"
+          gh pr list --head ingest/pending --state open --json number,url,headRefOid > "$d/pr.json"
+          gh run list --workflow ci.yml --branch ingest/pending --limit 5 --json conclusion,status,headSha,url > "$d/ci.json" || echo '[]' > "$d/ci.json"
+          pnpm --filter @313help/pipeline digest --in "$d"
+        env:
+          REPORTS_API: ${{ vars.REPORTS_API }}
+          ACCESS_CLIENT_ID: ${{ secrets.ACCESS_CLIENT_ID }}
+          ACCESS_CLIENT_SECRET: ${{ secrets.ACCESS_CLIENT_SECRET }}
+      - name: The watch
+        run: scripts/digest-issues.sh alarm "$RUNNER_TEMP/digest"
+      - name: The weekly review
+        if: github.event.schedule == '41 13 * * 1' || inputs.weekly
+        run: scripts/digest-issues.sh weekly "$RUNNER_TEMP/digest"

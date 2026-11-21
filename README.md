@@ -85,7 +85,7 @@ Web PWA at phone and laptop width, and the iPhone app. Every map is drawn on the
   [GitHub Releases](https://github.com/kp2485/313-help/releases) that works offline from first open). The query rules — open now, next times, badges, ranking, walking
   and trip plans — are written three times against [one spec](schema/query-spec.md) and **248 shared fixture
   cases**; the web and iPhone pass every case, and Android's are run by CI.
-- **Tested and small.** 1,447 tests in `pnpm test`, 379 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
+- **Tested and small.** 1,465 tests in `pnpm test`, 379 in `swift test`, and Android's rules in Gradle on a plain JDK. 105 KB of
   JavaScript and 10 KB of CSS gzipped; a language (25–29 KB), the Subway style (12 KB) or offline directions
   (26 KB) loads only if chosen; the bundle is 6.8 MB for the whole three-county area.
 
@@ -132,7 +132,7 @@ Node 22 and pnpm 12 (`corepack enable`).
 
 ```sh
 pnpm install
-pnpm test                                   # 1,428 tests
+pnpm test                                   # 1,465 tests
 pnpm build:bundle                           # data/seed + data/ingested -> data/hsds + signed data/bundle/v1
 pnpm --filter @313help/api migrate:local && pnpm --filter @313help/api dev    # write API on :8787
 pnpm --filter @313help/web dev              # app on http://localhost:5173, steward queue at /admin/
