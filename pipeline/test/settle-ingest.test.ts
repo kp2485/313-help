@@ -67,6 +67,7 @@ esac
     expect(w.onMain(HELD)).toBe(held(2, '2026-11-03').trim());             // the held rows did not
     expect(w.waiting(HELD)).toContain('sal_ocn_119');
     expect(w.prOpen()).toBe(true);
+    expect(w.gh()).toContain('workflow run ci.yml --ref ingest/pending');    // its tests are asked for (2026-11-21)
   });
 
   it('is one pull request, updated each night, not one a day', () => {

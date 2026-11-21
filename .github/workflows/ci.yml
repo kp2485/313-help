@@ -2,6 +2,9 @@ name: ci
 on:
   push: { branches: [main] }
   pull_request:
+  # Started by hand, or by the nightly job against the open data waiting for review: a pull request opened with the
+  # workflow's own token gets no `pull_request` run, so scripts/settle-ingest.sh asks for this one (2026-11-21).
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
