@@ -43545,7 +43545,7 @@
   "src_detroit_parks": {
    "name": "City of Detroit parks layer",
    "url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/city_parks/FeatureServer/0",
-   "last_edited": "2026-11-16",
+   "last_edited": "2026-11-23",
    "license": "Unstated (the City portal publishes a disclaimer only)"
   },
   "src_semcog_crashes": {
